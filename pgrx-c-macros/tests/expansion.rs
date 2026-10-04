@@ -14,9 +14,9 @@
 mod oracle;
 
 use pgrx_c_macros::{
-    AnalysisSession, ExpandedMacro, ExpansionBatch, ExpansionLimits, ExpansionResult,
-    ExpansionSkipCode, FrontendError, MacroScanner, inspect, prepare_expansions,
-    prepare_expansions_with_limits,
+    AnalysisSession, AnalysisStatus, ExpandedMacro, ExpansionBatch, ExpansionLimits,
+    ExpansionResult, ExpansionSkipCode, FrontendError, MacroScanner, SkipReasonCode, inspect,
+    prepare_expansions, prepare_expansions_with_limits,
 };
 use std::path::PathBuf;
 use std::sync::Mutex;
@@ -203,7 +203,7 @@ fn parameter_markers_do_not_invent_grouping_and_cannot_collide_with_header_symbo
     assert_eq!(expanded(&batch, "EXP_HOSTILE").occurrences.len(), 1);
 }
 
-/// Checks that unsafe preprocessing constructs reject through the dependency closure.
+/// Reject unsafe dependency preprocessing while retaining stringification for contextual analysis.
 #[test]
 fn unsafe_preprocessing_constructs_reject_through_the_dependency_closure() {
     let _lock = SCANNER_LOCK.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
@@ -229,9 +229,7 @@ fn unsafe_preprocessing_constructs_reject_through_the_dependency_closure() {
     )
     .unwrap();
     for (name, code) in [
-        ("EXP_STRING", ExpansionSkipCode::Stringification),
         ("EXP_PASTE", ExpansionSkipCode::TokenPaste),
-        ("EXP_DYNAMIC", ExpansionSkipCode::DynamicBuiltin),
         ("EXP_COUNTER", ExpansionSkipCode::DynamicBuiltin),
         ("EXP_DATE", ExpansionSkipCode::DynamicBuiltin),
         ("EXP_PRAGMA", ExpansionSkipCode::DynamicBuiltin),
@@ -244,9 +242,26 @@ fn unsafe_preprocessing_constructs_reject_through_the_dependency_closure() {
     ] {
         assert_skip(&batch, name, code);
     }
-    let ExpansionResult::Skipped { reason } = &batch.results["EXP_STRING"] else { unreachable!() };
-    assert_eq!(reason.dependency.as_deref(), Some("EXP_STRING_HELPER"));
-    assert_eq!(reason.spans.len(), 2, "root and helper spans are retained");
+    let string = expanded(&batch, "EXP_STRING");
+    assert!(string.definition.provenance.is_some());
+    assert!(string.dependencies.iter().any(|dependency| {
+        dependency.name == "EXP_STRING_HELPER" && dependency.provenance.is_some()
+    }));
+    let session = AnalysisSession::prepare(&scanner, &frontend, &["EXP_STRING"]).unwrap();
+    let analysis = session.analyze("EXP_STRING");
+    let AnalysisStatus::Skipped { reason } = analysis.status else {
+        panic!("a returned stringified operand must remain unsupported");
+    };
+    assert_eq!(reason.code, SkipReasonCode::Stringification);
+    assert!(!reason.message.is_empty());
+    let dynamic = expanded(&batch, "EXP_DYNAMIC");
+    assert!(body(dynamic).contains(&"__LINE__"));
+    assert!(dynamic.dependencies.iter().any(|dependency| {
+        dependency.name == "EXP_DYNAMIC_HELPER" && dependency.provenance.is_some()
+    }));
+    let session = AnalysisSession::prepare(&scanner, &frontend, &["EXP_DYNAMIC"]).unwrap();
+    let analysis = session.analyze("EXP_DYNAMIC");
+    assert!(matches!(analysis.status, AnalysisStatus::Candidate), "{analysis:?}");
     let ExpansionResult::Skipped { reason } = &batch.results["EXP_AMBIG"] else { unreachable!() };
     assert_eq!(reason.spans.len(), 3, "both ambiguous definitions and the root are retained");
     assert!(reason.spans.windows(2).all(|pair| pair[0].start_line <= pair[1].start_line));
@@ -283,7 +298,7 @@ fn expansion_budgets_and_compiler_rejection_are_structured_skips() {
     assert_skip(&batch, "EXP_BAD_ARITY", ExpansionSkipCode::CompilerRejected);
 }
 
-/// Checks that closed pastes reject erased operands dynamic helpers and probe collisions.
+/// Reject unsafe pastes and probe collisions without rejecting fully erased stringification.
 #[test]
 fn closed_pastes_reject_erased_operands_dynamic_helpers_and_probe_collisions() {
     let _lock = SCANNER_LOCK.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
@@ -335,7 +350,6 @@ int __paste_native(int);
         "P_HIDDEN_PRAGMA",
         "P_HIDDEN_QUERY",
         "P_UNKNOWN",
-        "P_SYNTH_STRING",
         "P_SYNTH_VARIADIC",
         "P_FORGED_PARAMETER",
         "P_FORGED_BOUNDARY",
@@ -349,7 +363,7 @@ int __paste_native(int);
     ] {
         let frontend = inspect(&scanner, &header, &arguments, None).unwrap();
         let original = frontend.inventory().clone();
-        let names = good.iter().chain(&bad).copied().collect::<Vec<_>>();
+        let names = good.iter().chain(&bad).copied().chain(["P_SYNTH_STRING"]).collect::<Vec<_>>();
         let batch = prepare_expansions(&scanner, &frontend, &names).unwrap();
         for name in good {
             let expansion = expanded(&batch, name);
@@ -357,6 +371,34 @@ int __paste_native(int);
             assert!(expansion.symbolic_parameters[0].starts_with("__pgrx_c_expand_1_"));
         }
         assert!(body(expanded(&batch, "P_CLOSED")).contains(&"0xFFU"));
+        let erased_string = expanded(&batch, "P_SYNTH_STRING");
+        assert_eq!(body(erased_string), ["0"]);
+        assert!(erased_string.occurrences.is_empty());
+        assert!(erased_string.dependencies.iter().any(|dependency| {
+            dependency.name == "P_STRING" && dependency.provenance.is_some()
+        }));
+        let session = AnalysisSession::prepare(&scanner, &frontend, &["P_SYNTH_STRING"]).unwrap();
+        let analysis = session.analyze("P_SYNTH_STRING");
+        if arguments.iter().any(|argument| argument == "-fms-extensions") {
+            // Preprocessing is valid in this profile, but its extra Unix semantic
+            // option still must not bypass the independent runtime profile gate.
+            assert!(
+                matches!(analysis.status, AnalysisStatus::Skipped { ref reason }
+                if reason.code == SkipReasonCode::UnsupportedProfile
+                    && reason.message.contains("-fms-extensions")),
+                "{analysis:?}"
+            );
+        } else {
+            assert!(matches!(analysis.status, AnalysisStatus::Candidate), "{analysis:?}");
+        }
+        let checked = oracle::run_c(
+            &frontend.profile().compiler.executable,
+            &header,
+            "_Static_assert(P_SYNTH_STRING(never_declared) == 0, \"erased stringification\");\n",
+            &frontend.profile().arguments.iter().map(String::as_str).collect::<Vec<_>>(),
+            false,
+        );
+        assert!(checked.is_empty());
         for name in bad {
             let ExpansionResult::Skipped { reason } = &batch.results[name] else {
                 panic!("{name} must reject under {arguments:?}");
@@ -364,15 +406,12 @@ int __paste_native(int);
             assert!(!reason.message.is_empty());
             assert!(!reason.spans.is_empty());
         }
-        for (name, helper, code) in [
-            ("P_SYNTH_STRING", "P_STRING", ExpansionSkipCode::Stringification),
-            ("P_SYNTH_VARIADIC", "P_VARIADIC", ExpansionSkipCode::Variadic),
-        ] {
-            assert_skip(&batch, name, code);
-            let ExpansionResult::Skipped { reason } = &batch.results[name] else { unreachable!() };
-            assert_eq!(reason.dependency.as_deref(), Some(helper));
-            assert_eq!(reason.spans.len(), 2);
-        }
+        assert_skip(&batch, "P_SYNTH_VARIADIC", ExpansionSkipCode::Variadic);
+        let ExpansionResult::Skipped { reason } = &batch.results["P_SYNTH_VARIADIC"] else {
+            unreachable!()
+        };
+        assert_eq!(reason.dependency.as_deref(), Some("P_VARIADIC"));
+        assert_eq!(reason.spans.len(), 2);
         assert_eq!(frontend.inventory(), &original);
         assert!(!frontend.environment().active.keys().any(|name| name.contains("paste_forbidden")));
     }

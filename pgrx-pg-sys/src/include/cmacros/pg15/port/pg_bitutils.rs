@@ -5,8 +5,1736 @@ This code is generated for documentation purposes, so that it is easy to referen
 // C macros from pg_bitutils.h.
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
+    target_pointer_width = "64",
+    target_endian = "little"
+)))]
+#[cfg(not(docsrs))]
+compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
+#[doc(hidden)]
+#[macro_export]
+macro_rules! __pgrx_c_args_pg_ceil_log2_32 {
+    (@collect $mode:ident [$($done:tt)*]; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_pg_ceil_log2_32!(@p0 $mode [$($done)*]; $($raw)*)
+    };
+    (@classified [$next:ident $mode:ident [$($done:tt)*] [$($rest:tt)*]] $descriptor:tt) => {
+        $crate::__pgrx_c_args_pg_ceil_log2_32!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
+    };
+    (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
+        $crate::__pgrx_c_args_pg_ceil_log2_32!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
+    };
+    (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
+        $crate::__pgrx_c_args_pg_ceil_log2_32!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_pg_ceil_log2_32!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+            $($rest)*
+        )
+    };
+    (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_pg_ceil_log2_32!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; - $($raw:tt)*) => {
+        $crate::__pgrx_c_args_pg_ceil_log2_32!(@negative0 $mode [$($done)*]; - $($raw)*)
+    };
+    (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
+        $crate::__pgrx_c_args_pg_ceil_log2_32!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pg_ceil_log2_32] [p1 $mode [$($done)*] []] [
+                $head $(::$tail)* ! $group
+            ]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; ::$head:ident $(::$tail:ident)* ! $group:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pg_ceil_log2_32] [p1 $mode [$($done)*] []] [
+                ::$head $(::$tail)* ! $group
+            ]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; ($($inner:tt)*)) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pg_ceil_log2_32] [p1 $mode [$($done)*] []] [($($inner)*)]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
+        $crate::__pgrx_c_args_pg_ceil_log2_32!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
+        $crate::__pgrx_c_args_pg_ceil_log2_32!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
+        $crate::__pgrx_c_args_pg_ceil_log2_32!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pg_ceil_log2_32] [p1 $mode [$($done)*] [$($rest)*]] [
+                $head $(::$tail)* ! $group
+            ]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; ::$head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pg_ceil_log2_32] [p1 $mode [$($done)*] [$($rest)*]] [
+                ::$head $(::$tail)* ! $group
+            ]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; ($($inner:tt)*), $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pg_ceil_log2_32] [p1 $mode [$($done)*] [$($rest)*]] [
+                ($($inner)*)
+            ]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_pg_ceil_log2_32!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_pg_ceil_log2_32!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*];) => {
+        $crate::pg_ceil_log2_32!(@$mode; $($done)*)
+    };
+    ($($invalid:tt)*) => {
+        compile_error!("arguments do not satisfy this C macro's invocation contract")
+    };
+}
+/// Typed call adapter for C inline function pg_ceil_log2_32 from pg_bitutils.h:228
+///
+/// ```c
+/// static inline uint32
+/// pg_ceil_log2_32(uint32 num)
+/// {
+/// 	if (num < 2)
+/// 		return 0;
+/// 	else
+/// 		return pg_leftmost_one_pos32(num - 1) + 1;
+/// }
+/// ```
+///
+///
+/// Calls the original function through its inspected C prototype. Each operand is evaluated once and converted using C parameter assignment rules. The result retains the function's original C type; `.get()` extracts its native storage, including `()` for a void result. Native calls retain the backend thread, PostgreSQL error, and caller safety contracts of the generated guarded binding.
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+#[macro_export]
+macro_rules! pg_ceil_log2_32 {
+    (@__pgrx_emit_check_safety; $num:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $num);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_pg_ceil_log2_32!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
+    (@__pgrx_emit_public; $num:tt $(,)?) => {
+        $crate::__pgrx_c_macros::expression_result::finish(
+            $crate::pg_ceil_log2_32!(@__pgrx_emit_value; $num)
+        )
+    };
+    (@__pgrx_emit_value; $num:tt $(,)?) => {
+        $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+            <$crate::__pgrx_c_macros::CUnsignedInt as $crate::__pgrx_c_macros::expression::CType>::from_storage(
+                $crate::__pgrx_c_bindings::pg_ceil_log2_32(
+                    <
+                        $crate::__pgrx_c_macros::CUnsignedInt as $crate::__pgrx_c_macros::expression::CType
+                    >::into_storage(
+                        $crate::__pgrx_c_macros::expression::implicit::<
+                            $crate::__pgrx_c_macros::CUnsignedInt,
+                            _
+                        >(
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_operand!(@value [true]; $num)
+                            )
+                        )
+                    ),
+                )
+            )
+        )
+    };
+    (@__pgrx_c_value; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_pg_ceil_log2_32!(@collect __pgrx_emit_value []; $($raw)*)
+    };
+    (@__pgrx_emit_place; $num:tt $(,)?) => {
+        compile_error!("C expression is not a place in this operation")
+    };
+    (@__pgrx_c_place; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_pg_ceil_log2_32!(@collect __pgrx_emit_place []; $($raw)*)
+    };
+    (@__pgrx_emit_read_place; $num:tt $(,)?) => {
+        compile_error!("C expression is not a place in this operation")
+    };
+    (@__pgrx_c_read_place; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_pg_ceil_log2_32!(@collect __pgrx_emit_read_place []; $($raw)*)
+    };
+    (@__pgrx_emit_size; $num:tt $(,)?) => {
+        $crate::__pgrx_c_macros::expression::size_of_value_type(
+            if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $num);
+                    }
+                }
+                Some(
+                    unsafe {
+                        $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                            <
+                                $crate::__pgrx_c_macros::CUnsignedInt as $crate::__pgrx_c_macros::expression::CType
+                            >::from_storage(
+                                $crate::__pgrx_c_bindings::pg_ceil_log2_32(
+                                    <
+                                        $crate::__pgrx_c_macros::CUnsignedInt as $crate::__pgrx_c_macros::expression::CType
+                                    >::into_storage(
+                                        $crate::__pgrx_c_macros::expression::implicit::<
+                                            $crate::__pgrx_c_macros::CUnsignedInt,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_macros::expression::profile_value::<
+                                                true,
+                                                _
+                                            >($crate::__pgrx_c_operand!(@value [true]; $num))
+                                        )
+                                    ),
+                                )
+                            )
+                        )
+                    }
+                )
+            } else {
+                None
+            }
+        )
+    };
+    (@__pgrx_c_size; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_pg_ceil_log2_32!(@collect __pgrx_emit_size []; $($raw)*)
+    };
+    (@__pgrx_emit_discard; $num:tt $(,)?) => {
+        {
+            let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                <
+                    $crate::__pgrx_c_macros::CUnsignedInt as $crate::__pgrx_c_macros::expression::CType
+                >::from_storage(
+                    $crate::__pgrx_c_bindings::pg_ceil_log2_32(
+                        <
+                            $crate::__pgrx_c_macros::CUnsignedInt as $crate::__pgrx_c_macros::expression::CType
+                        >::into_storage(
+                            $crate::__pgrx_c_macros::expression::implicit::<
+                                $crate::__pgrx_c_macros::CUnsignedInt,
+                                _
+                            >(
+                                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                    $crate::__pgrx_c_operand!(@value [true]; $num)
+                                )
+                            )
+                        ),
+                    )
+                )
+            );
+        }
+    };
+    (@__pgrx_c_discard; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_pg_ceil_log2_32!(@collect __pgrx_emit_discard []; $($raw)*)
+    };
+    ($($raw:tt)*) => {
+        $crate::__pgrx_c_args_pg_ceil_log2_32!(@collect __pgrx_emit_public []; $($raw)*)
+    };
+}
+
+#[cfg(not(all(
+    target_arch = "x86_64",
+    target_os = "linux",
+    target_pointer_width = "64",
+    target_endian = "little"
+)))]
+#[cfg(not(docsrs))]
+compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
+#[doc(hidden)]
+#[macro_export]
+macro_rules! __pgrx_c_args_pg_ceil_log2_64 {
+    (@collect $mode:ident [$($done:tt)*]; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_pg_ceil_log2_64!(@p0 $mode [$($done)*]; $($raw)*)
+    };
+    (@classified [$next:ident $mode:ident [$($done:tt)*] [$($rest:tt)*]] $descriptor:tt) => {
+        $crate::__pgrx_c_args_pg_ceil_log2_64!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
+    };
+    (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
+        $crate::__pgrx_c_args_pg_ceil_log2_64!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
+    };
+    (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
+        $crate::__pgrx_c_args_pg_ceil_log2_64!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_pg_ceil_log2_64!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+            $($rest)*
+        )
+    };
+    (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_pg_ceil_log2_64!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; - $($raw:tt)*) => {
+        $crate::__pgrx_c_args_pg_ceil_log2_64!(@negative0 $mode [$($done)*]; - $($raw)*)
+    };
+    (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
+        $crate::__pgrx_c_args_pg_ceil_log2_64!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pg_ceil_log2_64] [p1 $mode [$($done)*] []] [
+                $head $(::$tail)* ! $group
+            ]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; ::$head:ident $(::$tail:ident)* ! $group:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pg_ceil_log2_64] [p1 $mode [$($done)*] []] [
+                ::$head $(::$tail)* ! $group
+            ]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; ($($inner:tt)*)) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pg_ceil_log2_64] [p1 $mode [$($done)*] []] [($($inner)*)]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
+        $crate::__pgrx_c_args_pg_ceil_log2_64!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
+        $crate::__pgrx_c_args_pg_ceil_log2_64!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
+        $crate::__pgrx_c_args_pg_ceil_log2_64!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pg_ceil_log2_64] [p1 $mode [$($done)*] [$($rest)*]] [
+                $head $(::$tail)* ! $group
+            ]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; ::$head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pg_ceil_log2_64] [p1 $mode [$($done)*] [$($rest)*]] [
+                ::$head $(::$tail)* ! $group
+            ]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; ($($inner:tt)*), $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pg_ceil_log2_64] [p1 $mode [$($done)*] [$($rest)*]] [
+                ($($inner)*)
+            ]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_pg_ceil_log2_64!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_pg_ceil_log2_64!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*];) => {
+        $crate::pg_ceil_log2_64!(@$mode; $($done)*)
+    };
+    ($($invalid:tt)*) => {
+        compile_error!("arguments do not satisfy this C macro's invocation contract")
+    };
+}
+/// Typed call adapter for C inline function pg_ceil_log2_64 from pg_bitutils.h:241
+///
+/// ```c
+/// static inline uint64
+/// pg_ceil_log2_64(uint64 num)
+/// {
+/// 	if (num < 2)
+/// 		return 0;
+/// 	else
+/// 		return pg_leftmost_one_pos64(num - 1) + 1;
+/// }
+/// ```
+///
+///
+/// Calls the original function through its inspected C prototype. Each operand is evaluated once and converted using C parameter assignment rules. The result retains the function's original C type; `.get()` extracts its native storage, including `()` for a void result. Native calls retain the backend thread, PostgreSQL error, and caller safety contracts of the generated guarded binding.
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+#[macro_export]
+macro_rules! pg_ceil_log2_64 {
+    (@__pgrx_emit_check_safety; $num:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $num);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_pg_ceil_log2_64!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
+    (@__pgrx_emit_public; $num:tt $(,)?) => {
+        $crate::__pgrx_c_macros::expression_result::finish(
+            $crate::pg_ceil_log2_64!(@__pgrx_emit_value; $num)
+        )
+    };
+    (@__pgrx_emit_value; $num:tt $(,)?) => {
+        $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+            <$crate::__pgrx_c_macros::CUnsignedLong as $crate::__pgrx_c_macros::expression::CType>::from_storage(
+                $crate::__pgrx_c_bindings::pg_ceil_log2_64(
+                    <
+                        $crate::__pgrx_c_macros::CUnsignedLong as $crate::__pgrx_c_macros::expression::CType
+                    >::into_storage(
+                        $crate::__pgrx_c_macros::expression::implicit::<
+                            $crate::__pgrx_c_macros::CUnsignedLong,
+                            _
+                        >(
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_operand!(@value [true]; $num)
+                            )
+                        )
+                    ),
+                )
+            )
+        )
+    };
+    (@__pgrx_c_value; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_pg_ceil_log2_64!(@collect __pgrx_emit_value []; $($raw)*)
+    };
+    (@__pgrx_emit_place; $num:tt $(,)?) => {
+        compile_error!("C expression is not a place in this operation")
+    };
+    (@__pgrx_c_place; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_pg_ceil_log2_64!(@collect __pgrx_emit_place []; $($raw)*)
+    };
+    (@__pgrx_emit_read_place; $num:tt $(,)?) => {
+        compile_error!("C expression is not a place in this operation")
+    };
+    (@__pgrx_c_read_place; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_pg_ceil_log2_64!(@collect __pgrx_emit_read_place []; $($raw)*)
+    };
+    (@__pgrx_emit_size; $num:tt $(,)?) => {
+        $crate::__pgrx_c_macros::expression::size_of_value_type(
+            if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $num);
+                    }
+                }
+                Some(
+                    unsafe {
+                        $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                            <
+                                $crate::__pgrx_c_macros::CUnsignedLong as $crate::__pgrx_c_macros::expression::CType
+                            >::from_storage(
+                                $crate::__pgrx_c_bindings::pg_ceil_log2_64(
+                                    <
+                                        $crate::__pgrx_c_macros::CUnsignedLong as $crate::__pgrx_c_macros::expression::CType
+                                    >::into_storage(
+                                        $crate::__pgrx_c_macros::expression::implicit::<
+                                            $crate::__pgrx_c_macros::CUnsignedLong,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_macros::expression::profile_value::<
+                                                true,
+                                                _
+                                            >($crate::__pgrx_c_operand!(@value [true]; $num))
+                                        )
+                                    ),
+                                )
+                            )
+                        )
+                    }
+                )
+            } else {
+                None
+            }
+        )
+    };
+    (@__pgrx_c_size; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_pg_ceil_log2_64!(@collect __pgrx_emit_size []; $($raw)*)
+    };
+    (@__pgrx_emit_discard; $num:tt $(,)?) => {
+        {
+            let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                <
+                    $crate::__pgrx_c_macros::CUnsignedLong as $crate::__pgrx_c_macros::expression::CType
+                >::from_storage(
+                    $crate::__pgrx_c_bindings::pg_ceil_log2_64(
+                        <
+                            $crate::__pgrx_c_macros::CUnsignedLong as $crate::__pgrx_c_macros::expression::CType
+                        >::into_storage(
+                            $crate::__pgrx_c_macros::expression::implicit::<
+                                $crate::__pgrx_c_macros::CUnsignedLong,
+                                _
+                            >(
+                                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                    $crate::__pgrx_c_operand!(@value [true]; $num)
+                                )
+                            )
+                        ),
+                    )
+                )
+            );
+        }
+    };
+    (@__pgrx_c_discard; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_pg_ceil_log2_64!(@collect __pgrx_emit_discard []; $($raw)*)
+    };
+    ($($raw:tt)*) => {
+        $crate::__pgrx_c_args_pg_ceil_log2_64!(@collect __pgrx_emit_public []; $($raw)*)
+    };
+}
+
+#[cfg(not(all(
+    target_arch = "x86_64",
+    target_os = "linux",
+    target_pointer_width = "64",
+    target_endian = "little"
+)))]
+#[cfg(not(docsrs))]
+compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
+#[doc(hidden)]
+#[macro_export]
+macro_rules! __pgrx_c_args_pg_leftmost_one_pos32 {
+    (@collect $mode:ident [$($done:tt)*]; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_pg_leftmost_one_pos32!(@p0 $mode [$($done)*]; $($raw)*)
+    };
+    (@classified [$next:ident $mode:ident [$($done:tt)*] [$($rest:tt)*]] $descriptor:tt) => {
+        $crate::__pgrx_c_args_pg_leftmost_one_pos32!(
+            @$next $mode [$($done)* $descriptor,];
+            $($rest)*
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
+        $crate::__pgrx_c_args_pg_leftmost_one_pos32!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
+    };
+    (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
+        $crate::__pgrx_c_args_pg_leftmost_one_pos32!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_pg_leftmost_one_pos32!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+            $($rest)*
+        )
+    };
+    (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_pg_leftmost_one_pos32!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; - $($raw:tt)*) => {
+        $crate::__pgrx_c_args_pg_leftmost_one_pos32!(@negative0 $mode [$($done)*]; - $($raw)*)
+    };
+    (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
+        $crate::__pgrx_c_args_pg_leftmost_one_pos32!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pg_leftmost_one_pos32] [p1 $mode [$($done)*] []] [
+                $head $(::$tail)* ! $group
+            ]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; ::$head:ident $(::$tail:ident)* ! $group:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pg_leftmost_one_pos32] [p1 $mode [$($done)*] []] [
+                ::$head $(::$tail)* ! $group
+            ]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; ($($inner:tt)*)) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pg_leftmost_one_pos32] [p1 $mode [$($done)*] []] [($($inner)*)]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
+        $crate::__pgrx_c_args_pg_leftmost_one_pos32!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
+        $crate::__pgrx_c_args_pg_leftmost_one_pos32!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
+        $crate::__pgrx_c_args_pg_leftmost_one_pos32!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pg_leftmost_one_pos32] [p1 $mode [$($done)*] [$($rest)*]] [
+                $head $(::$tail)* ! $group
+            ]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; ::$head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pg_leftmost_one_pos32] [p1 $mode [$($done)*] [$($rest)*]] [
+                ::$head $(::$tail)* ! $group
+            ]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; ($($inner:tt)*), $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pg_leftmost_one_pos32] [p1 $mode [$($done)*] [$($rest)*]] [
+                ($($inner)*)
+            ]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_pg_leftmost_one_pos32!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_pg_leftmost_one_pos32!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*];) => {
+        $crate::pg_leftmost_one_pos32!(@$mode; $($done)*)
+    };
+    ($($invalid:tt)*) => {
+        compile_error!("arguments do not satisfy this C macro's invocation contract")
+    };
+}
+/// Typed call adapter for C inline function pg_leftmost_one_pos32 from pg_bitutils.h:25
+///
+/// ```c
+/// static inline int
+/// pg_leftmost_one_pos32(uint32 word)
+/// {
+/// #ifdef HAVE__BUILTIN_CLZ
+/// 	Assert(word != 0);
+///
+/// 	return 31 - __builtin_clz(word);
+/// #else
+/// 	int			shift = 32 - 8;
+///
+/// 	Assert(word != 0);
+///
+/// 	while ((word >> shift) == 0)
+/// 		shift -= 8;
+///
+/// 	return shift + pg_leftmost_one_pos[(word >> shift) & 255];
+/// #endif							/* HAVE__BUILTIN_CLZ */
+/// }
+/// ```
+///
+///
+/// Calls the original function through its inspected C prototype. Each operand is evaluated once and converted using C parameter assignment rules. The result retains the function's original C type; `.get()` extracts its native storage, including `()` for a void result. Native calls retain the backend thread, PostgreSQL error, and caller safety contracts of the generated guarded binding.
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+#[macro_export]
+macro_rules! pg_leftmost_one_pos32 {
+    (@__pgrx_emit_check_safety; $word:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $word);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_pg_leftmost_one_pos32!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
+    (@__pgrx_emit_public; $word:tt $(,)?) => {
+        $crate::__pgrx_c_macros::expression_result::finish(
+            $crate::pg_leftmost_one_pos32!(@__pgrx_emit_value; $word)
+        )
+    };
+    (@__pgrx_emit_value; $word:tt $(,)?) => {
+        $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+            <$crate::__pgrx_c_macros::CInt as $crate::__pgrx_c_macros::expression::CType>::from_storage(
+                $crate::__pgrx_c_bindings::pg_leftmost_one_pos32(
+                    <
+                        $crate::__pgrx_c_macros::CUnsignedInt as $crate::__pgrx_c_macros::expression::CType
+                    >::into_storage(
+                        $crate::__pgrx_c_macros::expression::implicit::<
+                            $crate::__pgrx_c_macros::CUnsignedInt,
+                            _
+                        >(
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_operand!(@value [true]; $word)
+                            )
+                        )
+                    ),
+                )
+            )
+        )
+    };
+    (@__pgrx_c_value; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_pg_leftmost_one_pos32!(@collect __pgrx_emit_value []; $($raw)*)
+    };
+    (@__pgrx_emit_place; $word:tt $(,)?) => {
+        compile_error!("C expression is not a place in this operation")
+    };
+    (@__pgrx_c_place; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_pg_leftmost_one_pos32!(@collect __pgrx_emit_place []; $($raw)*)
+    };
+    (@__pgrx_emit_read_place; $word:tt $(,)?) => {
+        compile_error!("C expression is not a place in this operation")
+    };
+    (@__pgrx_c_read_place; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_pg_leftmost_one_pos32!(@collect __pgrx_emit_read_place []; $($raw)*)
+    };
+    (@__pgrx_emit_size; $word:tt $(,)?) => {
+        $crate::__pgrx_c_macros::expression::size_of_value_type(
+            if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $word);
+                    }
+                }
+                Some(
+                    unsafe {
+                        $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                            <
+                                $crate::__pgrx_c_macros::CInt as $crate::__pgrx_c_macros::expression::CType
+                            >::from_storage(
+                                $crate::__pgrx_c_bindings::pg_leftmost_one_pos32(
+                                    <
+                                        $crate::__pgrx_c_macros::CUnsignedInt as $crate::__pgrx_c_macros::expression::CType
+                                    >::into_storage(
+                                        $crate::__pgrx_c_macros::expression::implicit::<
+                                            $crate::__pgrx_c_macros::CUnsignedInt,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_macros::expression::profile_value::<
+                                                true,
+                                                _
+                                            >($crate::__pgrx_c_operand!(@value [true]; $word))
+                                        )
+                                    ),
+                                )
+                            )
+                        )
+                    }
+                )
+            } else {
+                None
+            }
+        )
+    };
+    (@__pgrx_c_size; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_pg_leftmost_one_pos32!(@collect __pgrx_emit_size []; $($raw)*)
+    };
+    (@__pgrx_emit_discard; $word:tt $(,)?) => {
+        {
+            let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                <$crate::__pgrx_c_macros::CInt as $crate::__pgrx_c_macros::expression::CType>::from_storage(
+                    $crate::__pgrx_c_bindings::pg_leftmost_one_pos32(
+                        <
+                            $crate::__pgrx_c_macros::CUnsignedInt as $crate::__pgrx_c_macros::expression::CType
+                        >::into_storage(
+                            $crate::__pgrx_c_macros::expression::implicit::<
+                                $crate::__pgrx_c_macros::CUnsignedInt,
+                                _
+                            >(
+                                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                    $crate::__pgrx_c_operand!(@value [true]; $word)
+                                )
+                            )
+                        ),
+                    )
+                )
+            );
+        }
+    };
+    (@__pgrx_c_discard; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_pg_leftmost_one_pos32!(@collect __pgrx_emit_discard []; $($raw)*)
+    };
+    ($($raw:tt)*) => {
+        $crate::__pgrx_c_args_pg_leftmost_one_pos32!(@collect __pgrx_emit_public []; $($raw)*)
+    };
+}
+
+#[cfg(not(all(
+    target_arch = "x86_64",
+    target_os = "linux",
+    target_pointer_width = "64",
+    target_endian = "little"
+)))]
+#[cfg(not(docsrs))]
+compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
+#[doc(hidden)]
+#[macro_export]
+macro_rules! __pgrx_c_args_pg_leftmost_one_pos64 {
+    (@collect $mode:ident [$($done:tt)*]; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_pg_leftmost_one_pos64!(@p0 $mode [$($done)*]; $($raw)*)
+    };
+    (@classified [$next:ident $mode:ident [$($done:tt)*] [$($rest:tt)*]] $descriptor:tt) => {
+        $crate::__pgrx_c_args_pg_leftmost_one_pos64!(
+            @$next $mode [$($done)* $descriptor,];
+            $($rest)*
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
+        $crate::__pgrx_c_args_pg_leftmost_one_pos64!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
+    };
+    (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
+        $crate::__pgrx_c_args_pg_leftmost_one_pos64!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_pg_leftmost_one_pos64!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+            $($rest)*
+        )
+    };
+    (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_pg_leftmost_one_pos64!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; - $($raw:tt)*) => {
+        $crate::__pgrx_c_args_pg_leftmost_one_pos64!(@negative0 $mode [$($done)*]; - $($raw)*)
+    };
+    (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
+        $crate::__pgrx_c_args_pg_leftmost_one_pos64!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pg_leftmost_one_pos64] [p1 $mode [$($done)*] []] [
+                $head $(::$tail)* ! $group
+            ]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; ::$head:ident $(::$tail:ident)* ! $group:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pg_leftmost_one_pos64] [p1 $mode [$($done)*] []] [
+                ::$head $(::$tail)* ! $group
+            ]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; ($($inner:tt)*)) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pg_leftmost_one_pos64] [p1 $mode [$($done)*] []] [($($inner)*)]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
+        $crate::__pgrx_c_args_pg_leftmost_one_pos64!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
+        $crate::__pgrx_c_args_pg_leftmost_one_pos64!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
+        $crate::__pgrx_c_args_pg_leftmost_one_pos64!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pg_leftmost_one_pos64] [p1 $mode [$($done)*] [$($rest)*]] [
+                $head $(::$tail)* ! $group
+            ]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; ::$head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pg_leftmost_one_pos64] [p1 $mode [$($done)*] [$($rest)*]] [
+                ::$head $(::$tail)* ! $group
+            ]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; ($($inner:tt)*), $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pg_leftmost_one_pos64] [p1 $mode [$($done)*] [$($rest)*]] [
+                ($($inner)*)
+            ]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_pg_leftmost_one_pos64!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_pg_leftmost_one_pos64!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*];) => {
+        $crate::pg_leftmost_one_pos64!(@$mode; $($done)*)
+    };
+    ($($invalid:tt)*) => {
+        compile_error!("arguments do not satisfy this C macro's invocation contract")
+    };
+}
+/// Typed call adapter for C inline function pg_leftmost_one_pos64 from pg_bitutils.h:48
+///
+/// ```c
+/// static inline int
+/// pg_leftmost_one_pos64(uint64 word)
+/// {
+/// #ifdef HAVE__BUILTIN_CLZ
+/// 	Assert(word != 0);
+///
+/// #if defined(HAVE_LONG_INT_64)
+/// 	return 63 - __builtin_clzl(word);
+/// #elif defined(HAVE_LONG_LONG_INT_64)
+/// 	return 63 - __builtin_clzll(word);
+/// #else
+/// #error must have a working 64-bit integer datatype
+/// #endif
+/// #else							/* !HAVE__BUILTIN_CLZ */
+/// 	int			shift = 64 - 8;
+///
+/// 	Assert(word != 0);
+///
+/// 	while ((word >> shift) == 0)
+/// 		shift -= 8;
+///
+/// 	return shift + pg_leftmost_one_pos[(word >> shift) & 255];
+/// #endif							/* HAVE__BUILTIN_CLZ */
+/// }
+/// ```
+///
+///
+/// Calls the original function through its inspected C prototype. Each operand is evaluated once and converted using C parameter assignment rules. The result retains the function's original C type; `.get()` extracts its native storage, including `()` for a void result. Native calls retain the backend thread, PostgreSQL error, and caller safety contracts of the generated guarded binding.
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+#[macro_export]
+macro_rules! pg_leftmost_one_pos64 {
+    (@__pgrx_emit_check_safety; $word:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $word);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_pg_leftmost_one_pos64!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
+    (@__pgrx_emit_public; $word:tt $(,)?) => {
+        $crate::__pgrx_c_macros::expression_result::finish(
+            $crate::pg_leftmost_one_pos64!(@__pgrx_emit_value; $word)
+        )
+    };
+    (@__pgrx_emit_value; $word:tt $(,)?) => {
+        $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+            <$crate::__pgrx_c_macros::CInt as $crate::__pgrx_c_macros::expression::CType>::from_storage(
+                $crate::__pgrx_c_bindings::pg_leftmost_one_pos64(
+                    <
+                        $crate::__pgrx_c_macros::CUnsignedLong as $crate::__pgrx_c_macros::expression::CType
+                    >::into_storage(
+                        $crate::__pgrx_c_macros::expression::implicit::<
+                            $crate::__pgrx_c_macros::CUnsignedLong,
+                            _
+                        >(
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_operand!(@value [true]; $word)
+                            )
+                        )
+                    ),
+                )
+            )
+        )
+    };
+    (@__pgrx_c_value; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_pg_leftmost_one_pos64!(@collect __pgrx_emit_value []; $($raw)*)
+    };
+    (@__pgrx_emit_place; $word:tt $(,)?) => {
+        compile_error!("C expression is not a place in this operation")
+    };
+    (@__pgrx_c_place; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_pg_leftmost_one_pos64!(@collect __pgrx_emit_place []; $($raw)*)
+    };
+    (@__pgrx_emit_read_place; $word:tt $(,)?) => {
+        compile_error!("C expression is not a place in this operation")
+    };
+    (@__pgrx_c_read_place; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_pg_leftmost_one_pos64!(@collect __pgrx_emit_read_place []; $($raw)*)
+    };
+    (@__pgrx_emit_size; $word:tt $(,)?) => {
+        $crate::__pgrx_c_macros::expression::size_of_value_type(
+            if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $word);
+                    }
+                }
+                Some(
+                    unsafe {
+                        $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                            <
+                                $crate::__pgrx_c_macros::CInt as $crate::__pgrx_c_macros::expression::CType
+                            >::from_storage(
+                                $crate::__pgrx_c_bindings::pg_leftmost_one_pos64(
+                                    <
+                                        $crate::__pgrx_c_macros::CUnsignedLong as $crate::__pgrx_c_macros::expression::CType
+                                    >::into_storage(
+                                        $crate::__pgrx_c_macros::expression::implicit::<
+                                            $crate::__pgrx_c_macros::CUnsignedLong,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_macros::expression::profile_value::<
+                                                true,
+                                                _
+                                            >($crate::__pgrx_c_operand!(@value [true]; $word))
+                                        )
+                                    ),
+                                )
+                            )
+                        )
+                    }
+                )
+            } else {
+                None
+            }
+        )
+    };
+    (@__pgrx_c_size; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_pg_leftmost_one_pos64!(@collect __pgrx_emit_size []; $($raw)*)
+    };
+    (@__pgrx_emit_discard; $word:tt $(,)?) => {
+        {
+            let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                <$crate::__pgrx_c_macros::CInt as $crate::__pgrx_c_macros::expression::CType>::from_storage(
+                    $crate::__pgrx_c_bindings::pg_leftmost_one_pos64(
+                        <
+                            $crate::__pgrx_c_macros::CUnsignedLong as $crate::__pgrx_c_macros::expression::CType
+                        >::into_storage(
+                            $crate::__pgrx_c_macros::expression::implicit::<
+                                $crate::__pgrx_c_macros::CUnsignedLong,
+                                _
+                            >(
+                                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                    $crate::__pgrx_c_operand!(@value [true]; $word)
+                                )
+                            )
+                        ),
+                    )
+                )
+            );
+        }
+    };
+    (@__pgrx_c_discard; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_pg_leftmost_one_pos64!(@collect __pgrx_emit_discard []; $($raw)*)
+    };
+    ($($raw:tt)*) => {
+        $crate::__pgrx_c_args_pg_leftmost_one_pos64!(@collect __pgrx_emit_public []; $($raw)*)
+    };
+}
+
+#[cfg(not(all(
+    target_arch = "x86_64",
+    target_os = "linux",
+    target_pointer_width = "64",
+    target_endian = "little"
+)))]
+#[cfg(not(docsrs))]
+compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
+#[doc(hidden)]
+#[macro_export]
+macro_rules! __pgrx_c_args_pg_nextpower2_32 {
+    (@collect $mode:ident [$($done:tt)*]; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_pg_nextpower2_32!(@p0 $mode [$($done)*]; $($raw)*)
+    };
+    (@classified [$next:ident $mode:ident [$($done:tt)*] [$($rest:tt)*]] $descriptor:tt) => {
+        $crate::__pgrx_c_args_pg_nextpower2_32!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
+    };
+    (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
+        $crate::__pgrx_c_args_pg_nextpower2_32!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
+    };
+    (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
+        $crate::__pgrx_c_args_pg_nextpower2_32!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_pg_nextpower2_32!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+            $($rest)*
+        )
+    };
+    (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_pg_nextpower2_32!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; - $($raw:tt)*) => {
+        $crate::__pgrx_c_args_pg_nextpower2_32!(@negative0 $mode [$($done)*]; - $($raw)*)
+    };
+    (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
+        $crate::__pgrx_c_args_pg_nextpower2_32!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pg_nextpower2_32] [p1 $mode [$($done)*] []] [
+                $head $(::$tail)* ! $group
+            ]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; ::$head:ident $(::$tail:ident)* ! $group:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pg_nextpower2_32] [p1 $mode [$($done)*] []] [
+                ::$head $(::$tail)* ! $group
+            ]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; ($($inner:tt)*)) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pg_nextpower2_32] [p1 $mode [$($done)*] []] [($($inner)*)]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
+        $crate::__pgrx_c_args_pg_nextpower2_32!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
+        $crate::__pgrx_c_args_pg_nextpower2_32!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
+        $crate::__pgrx_c_args_pg_nextpower2_32!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pg_nextpower2_32] [p1 $mode [$($done)*] [$($rest)*]] [
+                $head $(::$tail)* ! $group
+            ]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; ::$head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pg_nextpower2_32] [p1 $mode [$($done)*] [$($rest)*]] [
+                ::$head $(::$tail)* ! $group
+            ]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; ($($inner:tt)*), $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pg_nextpower2_32] [p1 $mode [$($done)*] [$($rest)*]] [
+                ($($inner)*)
+            ]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_pg_nextpower2_32!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_pg_nextpower2_32!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*];) => {
+        $crate::pg_nextpower2_32!(@$mode; $($done)*)
+    };
+    ($($invalid:tt)*) => {
+        compile_error!("arguments do not satisfy this C macro's invocation contract")
+    };
+}
+/// Typed call adapter for C inline function pg_nextpower2_32 from pg_bitutils.h:139
+///
+/// ```c
+/// static inline uint32
+/// pg_nextpower2_32(uint32 num)
+/// {
+/// 	Assert(num > 0 && num <= PG_UINT32_MAX / 2 + 1);
+///
+/// 	/*
+/// 	 * A power 2 number has only 1 bit set.  Subtracting 1 from such a number
+/// 	 * will turn on all previous bits resulting in no common bits being set
+/// 	 * between num and num-1.
+/// 	 */
+/// 	if ((num & (num - 1)) == 0)
+/// 		return num;				/* already power 2 */
+///
+/// 	return ((uint32) 1) << (pg_leftmost_one_pos32(num) + 1);
+/// }
+/// ```
+///
+///
+/// Calls the original function through its inspected C prototype. Each operand is evaluated once and converted using C parameter assignment rules. The result retains the function's original C type; `.get()` extracts its native storage, including `()` for a void result. Native calls retain the backend thread, PostgreSQL error, and caller safety contracts of the generated guarded binding.
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+#[macro_export]
+macro_rules! pg_nextpower2_32 {
+    (@__pgrx_emit_check_safety; $num:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $num);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_pg_nextpower2_32!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
+    (@__pgrx_emit_public; $num:tt $(,)?) => {
+        $crate::__pgrx_c_macros::expression_result::finish(
+            $crate::pg_nextpower2_32!(@__pgrx_emit_value; $num)
+        )
+    };
+    (@__pgrx_emit_value; $num:tt $(,)?) => {
+        $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+            <$crate::__pgrx_c_macros::CUnsignedInt as $crate::__pgrx_c_macros::expression::CType>::from_storage(
+                $crate::__pgrx_c_bindings::pg_nextpower2_32(
+                    <
+                        $crate::__pgrx_c_macros::CUnsignedInt as $crate::__pgrx_c_macros::expression::CType
+                    >::into_storage(
+                        $crate::__pgrx_c_macros::expression::implicit::<
+                            $crate::__pgrx_c_macros::CUnsignedInt,
+                            _
+                        >(
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_operand!(@value [true]; $num)
+                            )
+                        )
+                    ),
+                )
+            )
+        )
+    };
+    (@__pgrx_c_value; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_pg_nextpower2_32!(@collect __pgrx_emit_value []; $($raw)*)
+    };
+    (@__pgrx_emit_place; $num:tt $(,)?) => {
+        compile_error!("C expression is not a place in this operation")
+    };
+    (@__pgrx_c_place; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_pg_nextpower2_32!(@collect __pgrx_emit_place []; $($raw)*)
+    };
+    (@__pgrx_emit_read_place; $num:tt $(,)?) => {
+        compile_error!("C expression is not a place in this operation")
+    };
+    (@__pgrx_c_read_place; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_pg_nextpower2_32!(@collect __pgrx_emit_read_place []; $($raw)*)
+    };
+    (@__pgrx_emit_size; $num:tt $(,)?) => {
+        $crate::__pgrx_c_macros::expression::size_of_value_type(
+            if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $num);
+                    }
+                }
+                Some(
+                    unsafe {
+                        $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                            <
+                                $crate::__pgrx_c_macros::CUnsignedInt as $crate::__pgrx_c_macros::expression::CType
+                            >::from_storage(
+                                $crate::__pgrx_c_bindings::pg_nextpower2_32(
+                                    <
+                                        $crate::__pgrx_c_macros::CUnsignedInt as $crate::__pgrx_c_macros::expression::CType
+                                    >::into_storage(
+                                        $crate::__pgrx_c_macros::expression::implicit::<
+                                            $crate::__pgrx_c_macros::CUnsignedInt,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_macros::expression::profile_value::<
+                                                true,
+                                                _
+                                            >($crate::__pgrx_c_operand!(@value [true]; $num))
+                                        )
+                                    ),
+                                )
+                            )
+                        )
+                    }
+                )
+            } else {
+                None
+            }
+        )
+    };
+    (@__pgrx_c_size; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_pg_nextpower2_32!(@collect __pgrx_emit_size []; $($raw)*)
+    };
+    (@__pgrx_emit_discard; $num:tt $(,)?) => {
+        {
+            let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                <
+                    $crate::__pgrx_c_macros::CUnsignedInt as $crate::__pgrx_c_macros::expression::CType
+                >::from_storage(
+                    $crate::__pgrx_c_bindings::pg_nextpower2_32(
+                        <
+                            $crate::__pgrx_c_macros::CUnsignedInt as $crate::__pgrx_c_macros::expression::CType
+                        >::into_storage(
+                            $crate::__pgrx_c_macros::expression::implicit::<
+                                $crate::__pgrx_c_macros::CUnsignedInt,
+                                _
+                            >(
+                                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                    $crate::__pgrx_c_operand!(@value [true]; $num)
+                                )
+                            )
+                        ),
+                    )
+                )
+            );
+        }
+    };
+    (@__pgrx_c_discard; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_pg_nextpower2_32!(@collect __pgrx_emit_discard []; $($raw)*)
+    };
+    ($($raw:tt)*) => {
+        $crate::__pgrx_c_args_pg_nextpower2_32!(@collect __pgrx_emit_public []; $($raw)*)
+    };
+}
+
+#[cfg(not(all(
+    target_arch = "x86_64",
+    target_os = "linux",
+    target_pointer_width = "64",
+    target_endian = "little"
+)))]
+#[cfg(not(docsrs))]
+compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
+#[doc(hidden)]
+#[macro_export]
+macro_rules! __pgrx_c_args_pg_nextpower2_64 {
+    (@collect $mode:ident [$($done:tt)*]; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_pg_nextpower2_64!(@p0 $mode [$($done)*]; $($raw)*)
+    };
+    (@classified [$next:ident $mode:ident [$($done:tt)*] [$($rest:tt)*]] $descriptor:tt) => {
+        $crate::__pgrx_c_args_pg_nextpower2_64!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
+    };
+    (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
+        $crate::__pgrx_c_args_pg_nextpower2_64!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
+    };
+    (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
+        $crate::__pgrx_c_args_pg_nextpower2_64!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_pg_nextpower2_64!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+            $($rest)*
+        )
+    };
+    (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_pg_nextpower2_64!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; - $($raw:tt)*) => {
+        $crate::__pgrx_c_args_pg_nextpower2_64!(@negative0 $mode [$($done)*]; - $($raw)*)
+    };
+    (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
+        $crate::__pgrx_c_args_pg_nextpower2_64!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pg_nextpower2_64] [p1 $mode [$($done)*] []] [
+                $head $(::$tail)* ! $group
+            ]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; ::$head:ident $(::$tail:ident)* ! $group:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pg_nextpower2_64] [p1 $mode [$($done)*] []] [
+                ::$head $(::$tail)* ! $group
+            ]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; ($($inner:tt)*)) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pg_nextpower2_64] [p1 $mode [$($done)*] []] [($($inner)*)]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
+        $crate::__pgrx_c_args_pg_nextpower2_64!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
+        $crate::__pgrx_c_args_pg_nextpower2_64!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
+        $crate::__pgrx_c_args_pg_nextpower2_64!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pg_nextpower2_64] [p1 $mode [$($done)*] [$($rest)*]] [
+                $head $(::$tail)* ! $group
+            ]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; ::$head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pg_nextpower2_64] [p1 $mode [$($done)*] [$($rest)*]] [
+                ::$head $(::$tail)* ! $group
+            ]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; ($($inner:tt)*), $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pg_nextpower2_64] [p1 $mode [$($done)*] [$($rest)*]] [
+                ($($inner)*)
+            ]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_pg_nextpower2_64!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_pg_nextpower2_64!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*];) => {
+        $crate::pg_nextpower2_64!(@$mode; $($done)*)
+    };
+    ($($invalid:tt)*) => {
+        compile_error!("arguments do not satisfy this C macro's invocation contract")
+    };
+}
+/// Typed call adapter for C inline function pg_nextpower2_64 from pg_bitutils.h:162
+///
+/// ```c
+/// static inline uint64
+/// pg_nextpower2_64(uint64 num)
+/// {
+/// 	Assert(num > 0 && num <= PG_UINT64_MAX / 2 + 1);
+///
+/// 	/*
+/// 	 * A power 2 number has only 1 bit set.  Subtracting 1 from such a number
+/// 	 * will turn on all previous bits resulting in no common bits being set
+/// 	 * between num and num-1.
+/// 	 */
+/// 	if ((num & (num - 1)) == 0)
+/// 		return num;				/* already power 2 */
+///
+/// 	return ((uint64) 1) << (pg_leftmost_one_pos64(num) + 1);
+/// }
+/// ```
+///
+///
+/// Calls the original function through its inspected C prototype. Each operand is evaluated once and converted using C parameter assignment rules. The result retains the function's original C type; `.get()` extracts its native storage, including `()` for a void result. Native calls retain the backend thread, PostgreSQL error, and caller safety contracts of the generated guarded binding.
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+#[macro_export]
+macro_rules! pg_nextpower2_64 {
+    (@__pgrx_emit_check_safety; $num:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $num);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_pg_nextpower2_64!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
+    (@__pgrx_emit_public; $num:tt $(,)?) => {
+        $crate::__pgrx_c_macros::expression_result::finish(
+            $crate::pg_nextpower2_64!(@__pgrx_emit_value; $num)
+        )
+    };
+    (@__pgrx_emit_value; $num:tt $(,)?) => {
+        $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+            <$crate::__pgrx_c_macros::CUnsignedLong as $crate::__pgrx_c_macros::expression::CType>::from_storage(
+                $crate::__pgrx_c_bindings::pg_nextpower2_64(
+                    <
+                        $crate::__pgrx_c_macros::CUnsignedLong as $crate::__pgrx_c_macros::expression::CType
+                    >::into_storage(
+                        $crate::__pgrx_c_macros::expression::implicit::<
+                            $crate::__pgrx_c_macros::CUnsignedLong,
+                            _
+                        >(
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_operand!(@value [true]; $num)
+                            )
+                        )
+                    ),
+                )
+            )
+        )
+    };
+    (@__pgrx_c_value; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_pg_nextpower2_64!(@collect __pgrx_emit_value []; $($raw)*)
+    };
+    (@__pgrx_emit_place; $num:tt $(,)?) => {
+        compile_error!("C expression is not a place in this operation")
+    };
+    (@__pgrx_c_place; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_pg_nextpower2_64!(@collect __pgrx_emit_place []; $($raw)*)
+    };
+    (@__pgrx_emit_read_place; $num:tt $(,)?) => {
+        compile_error!("C expression is not a place in this operation")
+    };
+    (@__pgrx_c_read_place; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_pg_nextpower2_64!(@collect __pgrx_emit_read_place []; $($raw)*)
+    };
+    (@__pgrx_emit_size; $num:tt $(,)?) => {
+        $crate::__pgrx_c_macros::expression::size_of_value_type(
+            if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $num);
+                    }
+                }
+                Some(
+                    unsafe {
+                        $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                            <
+                                $crate::__pgrx_c_macros::CUnsignedLong as $crate::__pgrx_c_macros::expression::CType
+                            >::from_storage(
+                                $crate::__pgrx_c_bindings::pg_nextpower2_64(
+                                    <
+                                        $crate::__pgrx_c_macros::CUnsignedLong as $crate::__pgrx_c_macros::expression::CType
+                                    >::into_storage(
+                                        $crate::__pgrx_c_macros::expression::implicit::<
+                                            $crate::__pgrx_c_macros::CUnsignedLong,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_macros::expression::profile_value::<
+                                                true,
+                                                _
+                                            >($crate::__pgrx_c_operand!(@value [true]; $num))
+                                        )
+                                    ),
+                                )
+                            )
+                        )
+                    }
+                )
+            } else {
+                None
+            }
+        )
+    };
+    (@__pgrx_c_size; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_pg_nextpower2_64!(@collect __pgrx_emit_size []; $($raw)*)
+    };
+    (@__pgrx_emit_discard; $num:tt $(,)?) => {
+        {
+            let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                <
+                    $crate::__pgrx_c_macros::CUnsignedLong as $crate::__pgrx_c_macros::expression::CType
+                >::from_storage(
+                    $crate::__pgrx_c_bindings::pg_nextpower2_64(
+                        <
+                            $crate::__pgrx_c_macros::CUnsignedLong as $crate::__pgrx_c_macros::expression::CType
+                        >::into_storage(
+                            $crate::__pgrx_c_macros::expression::implicit::<
+                                $crate::__pgrx_c_macros::CUnsignedLong,
+                                _
+                            >(
+                                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                    $crate::__pgrx_c_operand!(@value [true]; $num)
+                                )
+                            )
+                        ),
+                    )
+                )
+            );
+        }
+    };
+    (@__pgrx_c_discard; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_pg_nextpower2_64!(@collect __pgrx_emit_discard []; $($raw)*)
+    };
+    ($($raw:tt)*) => {
+        $crate::__pgrx_c_args_pg_nextpower2_64!(@collect __pgrx_emit_public []; $($raw)*)
+    };
+}
+
+#[cfg(not(all(
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -37,21 +1765,23 @@ macro_rules! __pgrx_c_args_pg_nextpower2_size_t {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
         $crate::__pgrx_c_args_pg_nextpower2_size_t!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_pg_nextpower2_size_t!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_pg_nextpower2_size_t!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_pg_nextpower2_size_t!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_pg_nextpower2_size_t!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -59,7 +1789,9 @@ macro_rules! __pgrx_c_args_pg_nextpower2_size_t {
         $crate::__pgrx_c_args_pg_nextpower2_size_t!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_pg_nextpower2_size_t!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_pg_nextpower2_size_t!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -81,14 +1813,18 @@ macro_rules! __pgrx_c_args_pg_nextpower2_size_t {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_pg_nextpower2_size_t!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_pg_nextpower2_size_t!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_pg_nextpower2_size_t!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_pg_nextpower2_size_t!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_pg_nextpower2_size_t!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -115,13 +1851,13 @@ macro_rules! __pgrx_c_args_pg_nextpower2_size_t {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_pg_nextpower2_size_t!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_pg_nextpower2_size_t!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -167,7 +1903,7 @@ macro_rules! pg_nextpower2_size_t {
         /* PGRX: pg_nextpower2_size_t remains expanded because pg_nextpower2_64 is not an active function-like macro. */
         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
             <$crate::__pgrx_c_macros::CUnsignedLong as $crate::__pgrx_c_macros::expression::CType>::from_storage(
-                $crate::pg_nextpower2_64(
+                $crate::__pgrx_c_bindings::pg_nextpower2_64(
                     <
                         $crate::__pgrx_c_macros::CUnsignedLong as $crate::__pgrx_c_macros::expression::CType
                     >::into_storage(
@@ -214,7 +1950,7 @@ macro_rules! pg_nextpower2_size_t {
                             <
                                 $crate::__pgrx_c_macros::CUnsignedLong as $crate::__pgrx_c_macros::expression::CType
                             >::from_storage(
-                                $crate::pg_nextpower2_64(
+                                $crate::__pgrx_c_bindings::pg_nextpower2_64(
                                     <
                                         $crate::__pgrx_c_macros::CUnsignedLong as $crate::__pgrx_c_macros::expression::CType
                                     >::into_storage(
@@ -248,7 +1984,7 @@ macro_rules! pg_nextpower2_size_t {
                 <
                     $crate::__pgrx_c_macros::CUnsignedLong as $crate::__pgrx_c_macros::expression::CType
                 >::from_storage(
-                    $crate::pg_nextpower2_64(
+                    $crate::__pgrx_c_bindings::pg_nextpower2_64(
                         <
                             $crate::__pgrx_c_macros::CUnsignedLong as $crate::__pgrx_c_macros::expression::CType
                         >::into_storage(
@@ -275,8 +2011,564 @@ macro_rules! pg_nextpower2_size_t {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
+    target_pointer_width = "64",
+    target_endian = "little"
+)))]
+#[cfg(not(docsrs))]
+compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
+#[doc(hidden)]
+#[macro_export]
+macro_rules! __pgrx_c_args_pg_prevpower2_32 {
+    (@collect $mode:ident [$($done:tt)*]; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_pg_prevpower2_32!(@p0 $mode [$($done)*]; $($raw)*)
+    };
+    (@classified [$next:ident $mode:ident [$($done:tt)*] [$($rest:tt)*]] $descriptor:tt) => {
+        $crate::__pgrx_c_args_pg_prevpower2_32!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
+    };
+    (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
+        $crate::__pgrx_c_args_pg_prevpower2_32!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
+    };
+    (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
+        $crate::__pgrx_c_args_pg_prevpower2_32!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_pg_prevpower2_32!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+            $($rest)*
+        )
+    };
+    (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_pg_prevpower2_32!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; - $($raw:tt)*) => {
+        $crate::__pgrx_c_args_pg_prevpower2_32!(@negative0 $mode [$($done)*]; - $($raw)*)
+    };
+    (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
+        $crate::__pgrx_c_args_pg_prevpower2_32!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pg_prevpower2_32] [p1 $mode [$($done)*] []] [
+                $head $(::$tail)* ! $group
+            ]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; ::$head:ident $(::$tail:ident)* ! $group:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pg_prevpower2_32] [p1 $mode [$($done)*] []] [
+                ::$head $(::$tail)* ! $group
+            ]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; ($($inner:tt)*)) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pg_prevpower2_32] [p1 $mode [$($done)*] []] [($($inner)*)]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
+        $crate::__pgrx_c_args_pg_prevpower2_32!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
+        $crate::__pgrx_c_args_pg_prevpower2_32!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
+        $crate::__pgrx_c_args_pg_prevpower2_32!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pg_prevpower2_32] [p1 $mode [$($done)*] [$($rest)*]] [
+                $head $(::$tail)* ! $group
+            ]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; ::$head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pg_prevpower2_32] [p1 $mode [$($done)*] [$($rest)*]] [
+                ::$head $(::$tail)* ! $group
+            ]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; ($($inner:tt)*), $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pg_prevpower2_32] [p1 $mode [$($done)*] [$($rest)*]] [
+                ($($inner)*)
+            ]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_pg_prevpower2_32!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_pg_prevpower2_32!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*];) => {
+        $crate::pg_prevpower2_32!(@$mode; $($done)*)
+    };
+    ($($invalid:tt)*) => {
+        compile_error!("arguments do not satisfy this C macro's invocation contract")
+    };
+}
+/// Typed call adapter for C inline function pg_prevpower2_32 from pg_bitutils.h:195
+///
+/// ```c
+/// static inline uint32
+/// pg_prevpower2_32(uint32 num)
+/// {
+/// 	return ((uint32) 1) << pg_leftmost_one_pos32(num);
+/// }
+/// ```
+///
+///
+/// Calls the original function through its inspected C prototype. Each operand is evaluated once and converted using C parameter assignment rules. The result retains the function's original C type; `.get()` extracts its native storage, including `()` for a void result. Native calls retain the backend thread, PostgreSQL error, and caller safety contracts of the generated guarded binding.
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+#[macro_export]
+macro_rules! pg_prevpower2_32 {
+    (@__pgrx_emit_check_safety; $num:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $num);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_pg_prevpower2_32!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
+    (@__pgrx_emit_public; $num:tt $(,)?) => {
+        $crate::__pgrx_c_macros::expression_result::finish(
+            $crate::pg_prevpower2_32!(@__pgrx_emit_value; $num)
+        )
+    };
+    (@__pgrx_emit_value; $num:tt $(,)?) => {
+        $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+            <$crate::__pgrx_c_macros::CUnsignedInt as $crate::__pgrx_c_macros::expression::CType>::from_storage(
+                $crate::__pgrx_c_bindings::pg_prevpower2_32(
+                    <
+                        $crate::__pgrx_c_macros::CUnsignedInt as $crate::__pgrx_c_macros::expression::CType
+                    >::into_storage(
+                        $crate::__pgrx_c_macros::expression::implicit::<
+                            $crate::__pgrx_c_macros::CUnsignedInt,
+                            _
+                        >(
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_operand!(@value [true]; $num)
+                            )
+                        )
+                    ),
+                )
+            )
+        )
+    };
+    (@__pgrx_c_value; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_pg_prevpower2_32!(@collect __pgrx_emit_value []; $($raw)*)
+    };
+    (@__pgrx_emit_place; $num:tt $(,)?) => {
+        compile_error!("C expression is not a place in this operation")
+    };
+    (@__pgrx_c_place; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_pg_prevpower2_32!(@collect __pgrx_emit_place []; $($raw)*)
+    };
+    (@__pgrx_emit_read_place; $num:tt $(,)?) => {
+        compile_error!("C expression is not a place in this operation")
+    };
+    (@__pgrx_c_read_place; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_pg_prevpower2_32!(@collect __pgrx_emit_read_place []; $($raw)*)
+    };
+    (@__pgrx_emit_size; $num:tt $(,)?) => {
+        $crate::__pgrx_c_macros::expression::size_of_value_type(
+            if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $num);
+                    }
+                }
+                Some(
+                    unsafe {
+                        $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                            <
+                                $crate::__pgrx_c_macros::CUnsignedInt as $crate::__pgrx_c_macros::expression::CType
+                            >::from_storage(
+                                $crate::__pgrx_c_bindings::pg_prevpower2_32(
+                                    <
+                                        $crate::__pgrx_c_macros::CUnsignedInt as $crate::__pgrx_c_macros::expression::CType
+                                    >::into_storage(
+                                        $crate::__pgrx_c_macros::expression::implicit::<
+                                            $crate::__pgrx_c_macros::CUnsignedInt,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_macros::expression::profile_value::<
+                                                true,
+                                                _
+                                            >($crate::__pgrx_c_operand!(@value [true]; $num))
+                                        )
+                                    ),
+                                )
+                            )
+                        )
+                    }
+                )
+            } else {
+                None
+            }
+        )
+    };
+    (@__pgrx_c_size; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_pg_prevpower2_32!(@collect __pgrx_emit_size []; $($raw)*)
+    };
+    (@__pgrx_emit_discard; $num:tt $(,)?) => {
+        {
+            let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                <
+                    $crate::__pgrx_c_macros::CUnsignedInt as $crate::__pgrx_c_macros::expression::CType
+                >::from_storage(
+                    $crate::__pgrx_c_bindings::pg_prevpower2_32(
+                        <
+                            $crate::__pgrx_c_macros::CUnsignedInt as $crate::__pgrx_c_macros::expression::CType
+                        >::into_storage(
+                            $crate::__pgrx_c_macros::expression::implicit::<
+                                $crate::__pgrx_c_macros::CUnsignedInt,
+                                _
+                            >(
+                                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                    $crate::__pgrx_c_operand!(@value [true]; $num)
+                                )
+                            )
+                        ),
+                    )
+                )
+            );
+        }
+    };
+    (@__pgrx_c_discard; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_pg_prevpower2_32!(@collect __pgrx_emit_discard []; $($raw)*)
+    };
+    ($($raw:tt)*) => {
+        $crate::__pgrx_c_args_pg_prevpower2_32!(@collect __pgrx_emit_public []; $($raw)*)
+    };
+}
+
+#[cfg(not(all(
+    target_arch = "x86_64",
+    target_os = "linux",
+    target_pointer_width = "64",
+    target_endian = "little"
+)))]
+#[cfg(not(docsrs))]
+compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
+#[doc(hidden)]
+#[macro_export]
+macro_rules! __pgrx_c_args_pg_prevpower2_64 {
+    (@collect $mode:ident [$($done:tt)*]; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_pg_prevpower2_64!(@p0 $mode [$($done)*]; $($raw)*)
+    };
+    (@classified [$next:ident $mode:ident [$($done:tt)*] [$($rest:tt)*]] $descriptor:tt) => {
+        $crate::__pgrx_c_args_pg_prevpower2_64!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
+    };
+    (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
+        $crate::__pgrx_c_args_pg_prevpower2_64!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
+    };
+    (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
+        $crate::__pgrx_c_args_pg_prevpower2_64!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_pg_prevpower2_64!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+            $($rest)*
+        )
+    };
+    (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_pg_prevpower2_64!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; - $($raw:tt)*) => {
+        $crate::__pgrx_c_args_pg_prevpower2_64!(@negative0 $mode [$($done)*]; - $($raw)*)
+    };
+    (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
+        $crate::__pgrx_c_args_pg_prevpower2_64!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pg_prevpower2_64] [p1 $mode [$($done)*] []] [
+                $head $(::$tail)* ! $group
+            ]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; ::$head:ident $(::$tail:ident)* ! $group:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pg_prevpower2_64] [p1 $mode [$($done)*] []] [
+                ::$head $(::$tail)* ! $group
+            ]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; ($($inner:tt)*)) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pg_prevpower2_64] [p1 $mode [$($done)*] []] [($($inner)*)]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
+        $crate::__pgrx_c_args_pg_prevpower2_64!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
+        $crate::__pgrx_c_args_pg_prevpower2_64!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
+        $crate::__pgrx_c_args_pg_prevpower2_64!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pg_prevpower2_64] [p1 $mode [$($done)*] [$($rest)*]] [
+                $head $(::$tail)* ! $group
+            ]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; ::$head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pg_prevpower2_64] [p1 $mode [$($done)*] [$($rest)*]] [
+                ::$head $(::$tail)* ! $group
+            ]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; ($($inner:tt)*), $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pg_prevpower2_64] [p1 $mode [$($done)*] [$($rest)*]] [
+                ($($inner)*)
+            ]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_pg_prevpower2_64!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_pg_prevpower2_64!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*];) => {
+        $crate::pg_prevpower2_64!(@$mode; $($done)*)
+    };
+    ($($invalid:tt)*) => {
+        compile_error!("arguments do not satisfy this C macro's invocation contract")
+    };
+}
+/// Typed call adapter for C inline function pg_prevpower2_64 from pg_bitutils.h:208
+///
+/// ```c
+/// static inline uint64
+/// pg_prevpower2_64(uint64 num)
+/// {
+/// 	return ((uint64) 1) << pg_leftmost_one_pos64(num);
+/// }
+/// ```
+///
+///
+/// Calls the original function through its inspected C prototype. Each operand is evaluated once and converted using C parameter assignment rules. The result retains the function's original C type; `.get()` extracts its native storage, including `()` for a void result. Native calls retain the backend thread, PostgreSQL error, and caller safety contracts of the generated guarded binding.
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+#[macro_export]
+macro_rules! pg_prevpower2_64 {
+    (@__pgrx_emit_check_safety; $num:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $num);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_pg_prevpower2_64!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
+    (@__pgrx_emit_public; $num:tt $(,)?) => {
+        $crate::__pgrx_c_macros::expression_result::finish(
+            $crate::pg_prevpower2_64!(@__pgrx_emit_value; $num)
+        )
+    };
+    (@__pgrx_emit_value; $num:tt $(,)?) => {
+        $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+            <$crate::__pgrx_c_macros::CUnsignedLong as $crate::__pgrx_c_macros::expression::CType>::from_storage(
+                $crate::__pgrx_c_bindings::pg_prevpower2_64(
+                    <
+                        $crate::__pgrx_c_macros::CUnsignedLong as $crate::__pgrx_c_macros::expression::CType
+                    >::into_storage(
+                        $crate::__pgrx_c_macros::expression::implicit::<
+                            $crate::__pgrx_c_macros::CUnsignedLong,
+                            _
+                        >(
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_operand!(@value [true]; $num)
+                            )
+                        )
+                    ),
+                )
+            )
+        )
+    };
+    (@__pgrx_c_value; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_pg_prevpower2_64!(@collect __pgrx_emit_value []; $($raw)*)
+    };
+    (@__pgrx_emit_place; $num:tt $(,)?) => {
+        compile_error!("C expression is not a place in this operation")
+    };
+    (@__pgrx_c_place; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_pg_prevpower2_64!(@collect __pgrx_emit_place []; $($raw)*)
+    };
+    (@__pgrx_emit_read_place; $num:tt $(,)?) => {
+        compile_error!("C expression is not a place in this operation")
+    };
+    (@__pgrx_c_read_place; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_pg_prevpower2_64!(@collect __pgrx_emit_read_place []; $($raw)*)
+    };
+    (@__pgrx_emit_size; $num:tt $(,)?) => {
+        $crate::__pgrx_c_macros::expression::size_of_value_type(
+            if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $num);
+                    }
+                }
+                Some(
+                    unsafe {
+                        $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                            <
+                                $crate::__pgrx_c_macros::CUnsignedLong as $crate::__pgrx_c_macros::expression::CType
+                            >::from_storage(
+                                $crate::__pgrx_c_bindings::pg_prevpower2_64(
+                                    <
+                                        $crate::__pgrx_c_macros::CUnsignedLong as $crate::__pgrx_c_macros::expression::CType
+                                    >::into_storage(
+                                        $crate::__pgrx_c_macros::expression::implicit::<
+                                            $crate::__pgrx_c_macros::CUnsignedLong,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_macros::expression::profile_value::<
+                                                true,
+                                                _
+                                            >($crate::__pgrx_c_operand!(@value [true]; $num))
+                                        )
+                                    ),
+                                )
+                            )
+                        )
+                    }
+                )
+            } else {
+                None
+            }
+        )
+    };
+    (@__pgrx_c_size; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_pg_prevpower2_64!(@collect __pgrx_emit_size []; $($raw)*)
+    };
+    (@__pgrx_emit_discard; $num:tt $(,)?) => {
+        {
+            let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                <
+                    $crate::__pgrx_c_macros::CUnsignedLong as $crate::__pgrx_c_macros::expression::CType
+                >::from_storage(
+                    $crate::__pgrx_c_bindings::pg_prevpower2_64(
+                        <
+                            $crate::__pgrx_c_macros::CUnsignedLong as $crate::__pgrx_c_macros::expression::CType
+                        >::into_storage(
+                            $crate::__pgrx_c_macros::expression::implicit::<
+                                $crate::__pgrx_c_macros::CUnsignedLong,
+                                _
+                            >(
+                                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                    $crate::__pgrx_c_operand!(@value [true]; $num)
+                                )
+                            )
+                        ),
+                    )
+                )
+            );
+        }
+    };
+    (@__pgrx_c_discard; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_pg_prevpower2_64!(@collect __pgrx_emit_discard []; $($raw)*)
+    };
+    ($($raw:tt)*) => {
+        $crate::__pgrx_c_args_pg_prevpower2_64!(@collect __pgrx_emit_public []; $($raw)*)
+    };
+}
+
+#[cfg(not(all(
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -307,21 +2599,23 @@ macro_rules! __pgrx_c_args_pg_prevpower2_size_t {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
         $crate::__pgrx_c_args_pg_prevpower2_size_t!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_pg_prevpower2_size_t!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_pg_prevpower2_size_t!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_pg_prevpower2_size_t!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_pg_prevpower2_size_t!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -329,7 +2623,9 @@ macro_rules! __pgrx_c_args_pg_prevpower2_size_t {
         $crate::__pgrx_c_args_pg_prevpower2_size_t!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_pg_prevpower2_size_t!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_pg_prevpower2_size_t!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -351,14 +2647,18 @@ macro_rules! __pgrx_c_args_pg_prevpower2_size_t {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_pg_prevpower2_size_t!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_pg_prevpower2_size_t!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_pg_prevpower2_size_t!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_pg_prevpower2_size_t!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_pg_prevpower2_size_t!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -385,13 +2685,13 @@ macro_rules! __pgrx_c_args_pg_prevpower2_size_t {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_pg_prevpower2_size_t!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_pg_prevpower2_size_t!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -437,7 +2737,7 @@ macro_rules! pg_prevpower2_size_t {
         /* PGRX: pg_prevpower2_size_t remains expanded because pg_prevpower2_64 is not an active function-like macro. */
         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
             <$crate::__pgrx_c_macros::CUnsignedLong as $crate::__pgrx_c_macros::expression::CType>::from_storage(
-                $crate::pg_prevpower2_64(
+                $crate::__pgrx_c_bindings::pg_prevpower2_64(
                     <
                         $crate::__pgrx_c_macros::CUnsignedLong as $crate::__pgrx_c_macros::expression::CType
                     >::into_storage(
@@ -484,7 +2784,7 @@ macro_rules! pg_prevpower2_size_t {
                             <
                                 $crate::__pgrx_c_macros::CUnsignedLong as $crate::__pgrx_c_macros::expression::CType
                             >::from_storage(
-                                $crate::pg_prevpower2_64(
+                                $crate::__pgrx_c_bindings::pg_prevpower2_64(
                                     <
                                         $crate::__pgrx_c_macros::CUnsignedLong as $crate::__pgrx_c_macros::expression::CType
                                     >::into_storage(
@@ -518,7 +2818,7 @@ macro_rules! pg_prevpower2_size_t {
                 <
                     $crate::__pgrx_c_macros::CUnsignedLong as $crate::__pgrx_c_macros::expression::CType
                 >::from_storage(
-                    $crate::pg_prevpower2_64(
+                    $crate::__pgrx_c_bindings::pg_prevpower2_64(
                         <
                             $crate::__pgrx_c_macros::CUnsignedLong as $crate::__pgrx_c_macros::expression::CType
                         >::into_storage(
@@ -544,5 +2844,1361 @@ macro_rules! pg_prevpower2_size_t {
     };
 }
 
+#[cfg(not(all(
+    target_arch = "x86_64",
+    target_os = "linux",
+    target_pointer_width = "64",
+    target_endian = "little"
+)))]
+#[cfg(not(docsrs))]
+compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
+#[doc(hidden)]
+#[macro_export]
+macro_rules! __pgrx_c_args_pg_rightmost_one_pos32 {
+    (@collect $mode:ident [$($done:tt)*]; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_pg_rightmost_one_pos32!(@p0 $mode [$($done)*]; $($raw)*)
+    };
+    (@classified [$next:ident $mode:ident [$($done:tt)*] [$($rest:tt)*]] $descriptor:tt) => {
+        $crate::__pgrx_c_args_pg_rightmost_one_pos32!(
+            @$next $mode [$($done)* $descriptor,];
+            $($rest)*
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
+        $crate::__pgrx_c_args_pg_rightmost_one_pos32!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
+    };
+    (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
+        $crate::__pgrx_c_args_pg_rightmost_one_pos32!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_pg_rightmost_one_pos32!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+            $($rest)*
+        )
+    };
+    (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_pg_rightmost_one_pos32!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; - $($raw:tt)*) => {
+        $crate::__pgrx_c_args_pg_rightmost_one_pos32!(@negative0 $mode [$($done)*]; - $($raw)*)
+    };
+    (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
+        $crate::__pgrx_c_args_pg_rightmost_one_pos32!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pg_rightmost_one_pos32] [p1 $mode [$($done)*] []] [
+                $head $(::$tail)* ! $group
+            ]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; ::$head:ident $(::$tail:ident)* ! $group:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pg_rightmost_one_pos32] [p1 $mode [$($done)*] []] [
+                ::$head $(::$tail)* ! $group
+            ]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; ($($inner:tt)*)) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pg_rightmost_one_pos32] [p1 $mode [$($done)*] []] [
+                ($($inner)*)
+            ]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
+        $crate::__pgrx_c_args_pg_rightmost_one_pos32!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
+        $crate::__pgrx_c_args_pg_rightmost_one_pos32!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
+        $crate::__pgrx_c_args_pg_rightmost_one_pos32!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pg_rightmost_one_pos32] [p1 $mode [$($done)*] [$($rest)*]] [
+                $head $(::$tail)* ! $group
+            ]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; ::$head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pg_rightmost_one_pos32] [p1 $mode [$($done)*] [$($rest)*]] [
+                ::$head $(::$tail)* ! $group
+            ]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; ($($inner:tt)*), $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pg_rightmost_one_pos32] [p1 $mode [$($done)*] [$($rest)*]] [
+                ($($inner)*)
+            ]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_pg_rightmost_one_pos32!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_pg_rightmost_one_pos32!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*];) => {
+        $crate::pg_rightmost_one_pos32!(@$mode; $($done)*)
+    };
+    ($($invalid:tt)*) => {
+        compile_error!("arguments do not satisfy this C macro's invocation contract")
+    };
+}
+/// Typed call adapter for C inline function pg_rightmost_one_pos32 from pg_bitutils.h:78
+///
+/// ```c
+/// static inline int
+/// pg_rightmost_one_pos32(uint32 word)
+/// {
+/// #ifdef HAVE__BUILTIN_CTZ
+/// 	Assert(word != 0);
+///
+/// 	return __builtin_ctz(word);
+/// #else
+/// 	int			result = 0;
+///
+/// 	Assert(word != 0);
+///
+/// 	while ((word & 255) == 0)
+/// 	{
+/// 		word >>= 8;
+/// 		result += 8;
+/// 	}
+/// 	result += pg_rightmost_one_pos[word & 255];
+/// 	return result;
+/// #endif							/* HAVE__BUILTIN_CTZ */
+/// }
+/// ```
+///
+///
+/// Calls the original function through its inspected C prototype. Each operand is evaluated once and converted using C parameter assignment rules. The result retains the function's original C type; `.get()` extracts its native storage, including `()` for a void result. Native calls retain the backend thread, PostgreSQL error, and caller safety contracts of the generated guarded binding.
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+#[macro_export]
+macro_rules! pg_rightmost_one_pos32 {
+    (@__pgrx_emit_check_safety; $word:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $word);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_pg_rightmost_one_pos32!(
+            @collect __pgrx_emit_check_safety [];
+            $($raw)*
+        )
+    };
+    (@__pgrx_emit_public; $word:tt $(,)?) => {
+        $crate::__pgrx_c_macros::expression_result::finish(
+            $crate::pg_rightmost_one_pos32!(@__pgrx_emit_value; $word)
+        )
+    };
+    (@__pgrx_emit_value; $word:tt $(,)?) => {
+        $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+            <$crate::__pgrx_c_macros::CInt as $crate::__pgrx_c_macros::expression::CType>::from_storage(
+                $crate::__pgrx_c_bindings::pg_rightmost_one_pos32(
+                    <
+                        $crate::__pgrx_c_macros::CUnsignedInt as $crate::__pgrx_c_macros::expression::CType
+                    >::into_storage(
+                        $crate::__pgrx_c_macros::expression::implicit::<
+                            $crate::__pgrx_c_macros::CUnsignedInt,
+                            _
+                        >(
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_operand!(@value [true]; $word)
+                            )
+                        )
+                    ),
+                )
+            )
+        )
+    };
+    (@__pgrx_c_value; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_pg_rightmost_one_pos32!(@collect __pgrx_emit_value []; $($raw)*)
+    };
+    (@__pgrx_emit_place; $word:tt $(,)?) => {
+        compile_error!("C expression is not a place in this operation")
+    };
+    (@__pgrx_c_place; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_pg_rightmost_one_pos32!(@collect __pgrx_emit_place []; $($raw)*)
+    };
+    (@__pgrx_emit_read_place; $word:tt $(,)?) => {
+        compile_error!("C expression is not a place in this operation")
+    };
+    (@__pgrx_c_read_place; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_pg_rightmost_one_pos32!(@collect __pgrx_emit_read_place []; $($raw)*)
+    };
+    (@__pgrx_emit_size; $word:tt $(,)?) => {
+        $crate::__pgrx_c_macros::expression::size_of_value_type(
+            if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $word);
+                    }
+                }
+                Some(
+                    unsafe {
+                        $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                            <
+                                $crate::__pgrx_c_macros::CInt as $crate::__pgrx_c_macros::expression::CType
+                            >::from_storage(
+                                $crate::__pgrx_c_bindings::pg_rightmost_one_pos32(
+                                    <
+                                        $crate::__pgrx_c_macros::CUnsignedInt as $crate::__pgrx_c_macros::expression::CType
+                                    >::into_storage(
+                                        $crate::__pgrx_c_macros::expression::implicit::<
+                                            $crate::__pgrx_c_macros::CUnsignedInt,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_macros::expression::profile_value::<
+                                                true,
+                                                _
+                                            >($crate::__pgrx_c_operand!(@value [true]; $word))
+                                        )
+                                    ),
+                                )
+                            )
+                        )
+                    }
+                )
+            } else {
+                None
+            }
+        )
+    };
+    (@__pgrx_c_size; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_pg_rightmost_one_pos32!(@collect __pgrx_emit_size []; $($raw)*)
+    };
+    (@__pgrx_emit_discard; $word:tt $(,)?) => {
+        {
+            let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                <$crate::__pgrx_c_macros::CInt as $crate::__pgrx_c_macros::expression::CType>::from_storage(
+                    $crate::__pgrx_c_bindings::pg_rightmost_one_pos32(
+                        <
+                            $crate::__pgrx_c_macros::CUnsignedInt as $crate::__pgrx_c_macros::expression::CType
+                        >::into_storage(
+                            $crate::__pgrx_c_macros::expression::implicit::<
+                                $crate::__pgrx_c_macros::CUnsignedInt,
+                                _
+                            >(
+                                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                    $crate::__pgrx_c_operand!(@value [true]; $word)
+                                )
+                            )
+                        ),
+                    )
+                )
+            );
+        }
+    };
+    (@__pgrx_c_discard; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_pg_rightmost_one_pos32!(@collect __pgrx_emit_discard []; $($raw)*)
+    };
+    ($($raw:tt)*) => {
+        $crate::__pgrx_c_args_pg_rightmost_one_pos32!(@collect __pgrx_emit_public []; $($raw)*)
+    };
+}
+
+#[cfg(not(all(
+    target_arch = "x86_64",
+    target_os = "linux",
+    target_pointer_width = "64",
+    target_endian = "little"
+)))]
+#[cfg(not(docsrs))]
+compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
+#[doc(hidden)]
+#[macro_export]
+macro_rules! __pgrx_c_args_pg_rightmost_one_pos64 {
+    (@collect $mode:ident [$($done:tt)*]; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_pg_rightmost_one_pos64!(@p0 $mode [$($done)*]; $($raw)*)
+    };
+    (@classified [$next:ident $mode:ident [$($done:tt)*] [$($rest:tt)*]] $descriptor:tt) => {
+        $crate::__pgrx_c_args_pg_rightmost_one_pos64!(
+            @$next $mode [$($done)* $descriptor,];
+            $($rest)*
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
+        $crate::__pgrx_c_args_pg_rightmost_one_pos64!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
+    };
+    (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
+        $crate::__pgrx_c_args_pg_rightmost_one_pos64!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_pg_rightmost_one_pos64!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+            $($rest)*
+        )
+    };
+    (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_pg_rightmost_one_pos64!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; - $($raw:tt)*) => {
+        $crate::__pgrx_c_args_pg_rightmost_one_pos64!(@negative0 $mode [$($done)*]; - $($raw)*)
+    };
+    (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
+        $crate::__pgrx_c_args_pg_rightmost_one_pos64!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pg_rightmost_one_pos64] [p1 $mode [$($done)*] []] [
+                $head $(::$tail)* ! $group
+            ]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; ::$head:ident $(::$tail:ident)* ! $group:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pg_rightmost_one_pos64] [p1 $mode [$($done)*] []] [
+                ::$head $(::$tail)* ! $group
+            ]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; ($($inner:tt)*)) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pg_rightmost_one_pos64] [p1 $mode [$($done)*] []] [
+                ($($inner)*)
+            ]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
+        $crate::__pgrx_c_args_pg_rightmost_one_pos64!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
+        $crate::__pgrx_c_args_pg_rightmost_one_pos64!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
+        $crate::__pgrx_c_args_pg_rightmost_one_pos64!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pg_rightmost_one_pos64] [p1 $mode [$($done)*] [$($rest)*]] [
+                $head $(::$tail)* ! $group
+            ]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; ::$head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pg_rightmost_one_pos64] [p1 $mode [$($done)*] [$($rest)*]] [
+                ::$head $(::$tail)* ! $group
+            ]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; ($($inner:tt)*), $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pg_rightmost_one_pos64] [p1 $mode [$($done)*] [$($rest)*]] [
+                ($($inner)*)
+            ]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_pg_rightmost_one_pos64!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_pg_rightmost_one_pos64!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*];) => {
+        $crate::pg_rightmost_one_pos64!(@$mode; $($done)*)
+    };
+    ($($invalid:tt)*) => {
+        compile_error!("arguments do not satisfy this C macro's invocation contract")
+    };
+}
+/// Typed call adapter for C inline function pg_rightmost_one_pos64 from pg_bitutils.h:104
+///
+/// ```c
+/// static inline int
+/// pg_rightmost_one_pos64(uint64 word)
+/// {
+/// #ifdef HAVE__BUILTIN_CTZ
+/// 	Assert(word != 0);
+///
+/// #if defined(HAVE_LONG_INT_64)
+/// 	return __builtin_ctzl(word);
+/// #elif defined(HAVE_LONG_LONG_INT_64)
+/// 	return __builtin_ctzll(word);
+/// #else
+/// #error must have a working 64-bit integer datatype
+/// #endif
+/// #else							/* !HAVE__BUILTIN_CTZ */
+/// 	int			result = 0;
+///
+/// 	Assert(word != 0);
+///
+/// 	while ((word & 255) == 0)
+/// 	{
+/// 		word >>= 8;
+/// 		result += 8;
+/// 	}
+/// 	result += pg_rightmost_one_pos[word & 255];
+/// 	return result;
+/// #endif							/* HAVE__BUILTIN_CTZ */
+/// }
+/// ```
+///
+///
+/// Calls the original function through its inspected C prototype. Each operand is evaluated once and converted using C parameter assignment rules. The result retains the function's original C type; `.get()` extracts its native storage, including `()` for a void result. Native calls retain the backend thread, PostgreSQL error, and caller safety contracts of the generated guarded binding.
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+#[macro_export]
+macro_rules! pg_rightmost_one_pos64 {
+    (@__pgrx_emit_check_safety; $word:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $word);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_pg_rightmost_one_pos64!(
+            @collect __pgrx_emit_check_safety [];
+            $($raw)*
+        )
+    };
+    (@__pgrx_emit_public; $word:tt $(,)?) => {
+        $crate::__pgrx_c_macros::expression_result::finish(
+            $crate::pg_rightmost_one_pos64!(@__pgrx_emit_value; $word)
+        )
+    };
+    (@__pgrx_emit_value; $word:tt $(,)?) => {
+        $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+            <$crate::__pgrx_c_macros::CInt as $crate::__pgrx_c_macros::expression::CType>::from_storage(
+                $crate::__pgrx_c_bindings::pg_rightmost_one_pos64(
+                    <
+                        $crate::__pgrx_c_macros::CUnsignedLong as $crate::__pgrx_c_macros::expression::CType
+                    >::into_storage(
+                        $crate::__pgrx_c_macros::expression::implicit::<
+                            $crate::__pgrx_c_macros::CUnsignedLong,
+                            _
+                        >(
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_operand!(@value [true]; $word)
+                            )
+                        )
+                    ),
+                )
+            )
+        )
+    };
+    (@__pgrx_c_value; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_pg_rightmost_one_pos64!(@collect __pgrx_emit_value []; $($raw)*)
+    };
+    (@__pgrx_emit_place; $word:tt $(,)?) => {
+        compile_error!("C expression is not a place in this operation")
+    };
+    (@__pgrx_c_place; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_pg_rightmost_one_pos64!(@collect __pgrx_emit_place []; $($raw)*)
+    };
+    (@__pgrx_emit_read_place; $word:tt $(,)?) => {
+        compile_error!("C expression is not a place in this operation")
+    };
+    (@__pgrx_c_read_place; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_pg_rightmost_one_pos64!(@collect __pgrx_emit_read_place []; $($raw)*)
+    };
+    (@__pgrx_emit_size; $word:tt $(,)?) => {
+        $crate::__pgrx_c_macros::expression::size_of_value_type(
+            if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $word);
+                    }
+                }
+                Some(
+                    unsafe {
+                        $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                            <
+                                $crate::__pgrx_c_macros::CInt as $crate::__pgrx_c_macros::expression::CType
+                            >::from_storage(
+                                $crate::__pgrx_c_bindings::pg_rightmost_one_pos64(
+                                    <
+                                        $crate::__pgrx_c_macros::CUnsignedLong as $crate::__pgrx_c_macros::expression::CType
+                                    >::into_storage(
+                                        $crate::__pgrx_c_macros::expression::implicit::<
+                                            $crate::__pgrx_c_macros::CUnsignedLong,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_macros::expression::profile_value::<
+                                                true,
+                                                _
+                                            >($crate::__pgrx_c_operand!(@value [true]; $word))
+                                        )
+                                    ),
+                                )
+                            )
+                        )
+                    }
+                )
+            } else {
+                None
+            }
+        )
+    };
+    (@__pgrx_c_size; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_pg_rightmost_one_pos64!(@collect __pgrx_emit_size []; $($raw)*)
+    };
+    (@__pgrx_emit_discard; $word:tt $(,)?) => {
+        {
+            let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                <$crate::__pgrx_c_macros::CInt as $crate::__pgrx_c_macros::expression::CType>::from_storage(
+                    $crate::__pgrx_c_bindings::pg_rightmost_one_pos64(
+                        <
+                            $crate::__pgrx_c_macros::CUnsignedLong as $crate::__pgrx_c_macros::expression::CType
+                        >::into_storage(
+                            $crate::__pgrx_c_macros::expression::implicit::<
+                                $crate::__pgrx_c_macros::CUnsignedLong,
+                                _
+                            >(
+                                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                    $crate::__pgrx_c_operand!(@value [true]; $word)
+                                )
+                            )
+                        ),
+                    )
+                )
+            );
+        }
+    };
+    (@__pgrx_c_discard; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_pg_rightmost_one_pos64!(@collect __pgrx_emit_discard []; $($raw)*)
+    };
+    ($($raw:tt)*) => {
+        $crate::__pgrx_c_args_pg_rightmost_one_pos64!(@collect __pgrx_emit_public []; $($raw)*)
+    };
+}
+
+#[cfg(not(all(
+    target_arch = "x86_64",
+    target_os = "linux",
+    target_pointer_width = "64",
+    target_endian = "little"
+)))]
+#[cfg(not(docsrs))]
+compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
+#[doc(hidden)]
+#[macro_export]
+macro_rules! __pgrx_c_args_pg_rotate_left32 {
+    (@collect $mode:ident [$($done:tt)*]; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_pg_rotate_left32!(@p0 $mode [$($done)*]; $($raw)*)
+    };
+    (@classified [$next:ident $mode:ident [$($done:tt)*] [$($rest:tt)*]] $descriptor:tt) => {
+        $crate::__pgrx_c_args_pg_rotate_left32!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
+    };
+    (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_pg_rotate_left32!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+            $($rest)*
+        )
+    };
+    (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_pg_rotate_left32!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; - $($raw:tt)*) => {
+        $crate::__pgrx_c_args_pg_rotate_left32!(@negative0 $mode [$($done)*]; - $($raw)*)
+    };
+    (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
+        $crate::__pgrx_c_args_pg_rotate_left32!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pg_rotate_left32] [p1 $mode [$($done)*] [$($rest)*]] [
+                $head $(::$tail)* ! $group
+            ]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; ::$head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pg_rotate_left32] [p1 $mode [$($done)*] [$($rest)*]] [
+                ::$head $(::$tail)* ! $group
+            ]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; ($($inner:tt)*), $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pg_rotate_left32] [p1 $mode [$($done)*] [$($rest)*]] [
+                ($($inner)*)
+            ]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_pg_rotate_left32!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_pg_rotate_left32!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; - $argument:literal) => {
+        $crate::__pgrx_c_args_pg_rotate_left32!(
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
+    };
+    (@negative1 $mode:ident [$($done:tt)*]; $argument:expr) => {
+        $crate::__pgrx_c_args_pg_rotate_left32!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_pg_rotate_left32!(
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+            $($rest)*
+        )
+    };
+    (@negative1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_pg_rotate_left32!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; - $($raw:tt)*) => {
+        $crate::__pgrx_c_args_pg_rotate_left32!(@negative1 $mode [$($done)*]; - $($raw)*)
+    };
+    (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
+        $crate::__pgrx_c_args_pg_rotate_left32!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pg_rotate_left32] [p2 $mode [$($done)*] []] [
+                $head $(::$tail)* ! $group
+            ]
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; ::$head:ident $(::$tail:ident)* ! $group:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pg_rotate_left32] [p2 $mode [$($done)*] []] [
+                ::$head $(::$tail)* ! $group
+            ]
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; ($($inner:tt)*)) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pg_rotate_left32] [p2 $mode [$($done)*] []] [($($inner)*)]
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
+        $crate::__pgrx_c_args_pg_rotate_left32!(
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; $argument:expr) => {
+        $crate::__pgrx_c_args_pg_rotate_left32!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
+        $crate::__pgrx_c_args_pg_rotate_left32!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pg_rotate_left32] [p2 $mode [$($done)*] [$($rest)*]] [
+                $head $(::$tail)* ! $group
+            ]
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; ::$head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pg_rotate_left32] [p2 $mode [$($done)*] [$($rest)*]] [
+                ::$head $(::$tail)* ! $group
+            ]
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; ($($inner:tt)*), $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pg_rotate_left32] [p2 $mode [$($done)*] [$($rest)*]] [
+                ($($inner)*)
+            ]
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_pg_rotate_left32!(
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_pg_rotate_left32!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p2 $mode:ident [$($done:tt)*];) => {
+        $crate::pg_rotate_left32!(@$mode; $($done)*)
+    };
+    ($($invalid:tt)*) => {
+        compile_error!("arguments do not satisfy this C macro's invocation contract")
+    };
+}
+/// Typed call adapter for C inline function pg_rotate_left32 from pg_bitutils.h:296
+///
+/// ```c
+/// static inline uint32
+/// pg_rotate_left32(uint32 word, int n)
+/// {
+/// 	return (word << n) | (word >> (32 - n));
+/// }
+/// ```
+///
+///
+/// Calls the original function through its inspected C prototype. Each operand is evaluated once and converted using C parameter assignment rules. The result retains the function's original C type; `.get()` extracts its native storage, including `()` for a void result. Native calls retain the backend thread, PostgreSQL error, and caller safety contracts of the generated guarded binding.
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+#[macro_export]
+macro_rules! pg_rotate_left32 {
+    (@__pgrx_emit_check_safety; $word:tt, $n:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $word);
+                $crate::__pgrx_c_operand!(@check_safety; $n);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_pg_rotate_left32!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
+    (@__pgrx_emit_public; $word:tt, $n:tt $(,)?) => {
+        $crate::__pgrx_c_macros::expression_result::finish(
+            $crate::pg_rotate_left32!(@__pgrx_emit_value; $word, $n)
+        )
+    };
+    (@__pgrx_emit_value; $word:tt, $n:tt $(,)?) => {
+        $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+            <$crate::__pgrx_c_macros::CUnsignedInt as $crate::__pgrx_c_macros::expression::CType>::from_storage(
+                $crate::__pgrx_c_bindings::pg_rotate_left32(
+                    <
+                        $crate::__pgrx_c_macros::CUnsignedInt as $crate::__pgrx_c_macros::expression::CType
+                    >::into_storage(
+                        $crate::__pgrx_c_macros::expression::implicit::<
+                            $crate::__pgrx_c_macros::CUnsignedInt,
+                            _
+                        >(
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_operand!(@value [true]; $word)
+                            )
+                        )
+                    ),
+                    <$crate::__pgrx_c_macros::CInt as $crate::__pgrx_c_macros::expression::CType>::into_storage(
+                        $crate::__pgrx_c_macros::expression::implicit::<
+                            $crate::__pgrx_c_macros::CInt,
+                            _
+                        >(
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_operand!(@value [true]; $n)
+                            )
+                        )
+                    ),
+                )
+            )
+        )
+    };
+    (@__pgrx_c_value; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_pg_rotate_left32!(@collect __pgrx_emit_value []; $($raw)*)
+    };
+    (@__pgrx_emit_place; $word:tt, $n:tt $(,)?) => {
+        compile_error!("C expression is not a place in this operation")
+    };
+    (@__pgrx_c_place; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_pg_rotate_left32!(@collect __pgrx_emit_place []; $($raw)*)
+    };
+    (@__pgrx_emit_read_place; $word:tt, $n:tt $(,)?) => {
+        compile_error!("C expression is not a place in this operation")
+    };
+    (@__pgrx_c_read_place; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_pg_rotate_left32!(@collect __pgrx_emit_read_place []; $($raw)*)
+    };
+    (@__pgrx_emit_size; $word:tt, $n:tt $(,)?) => {
+        $crate::__pgrx_c_macros::expression::size_of_value_type(
+            if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $word);
+                        $crate::__pgrx_c_operand!(@check_safety; $n);
+                    }
+                }
+                Some(
+                    unsafe {
+                        $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                            <
+                                $crate::__pgrx_c_macros::CUnsignedInt as $crate::__pgrx_c_macros::expression::CType
+                            >::from_storage(
+                                $crate::__pgrx_c_bindings::pg_rotate_left32(
+                                    <
+                                        $crate::__pgrx_c_macros::CUnsignedInt as $crate::__pgrx_c_macros::expression::CType
+                                    >::into_storage(
+                                        $crate::__pgrx_c_macros::expression::implicit::<
+                                            $crate::__pgrx_c_macros::CUnsignedInt,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_macros::expression::profile_value::<
+                                                true,
+                                                _
+                                            >($crate::__pgrx_c_operand!(@value [true]; $word))
+                                        )
+                                    ),
+                                    <
+                                        $crate::__pgrx_c_macros::CInt as $crate::__pgrx_c_macros::expression::CType
+                                    >::into_storage(
+                                        $crate::__pgrx_c_macros::expression::implicit::<
+                                            $crate::__pgrx_c_macros::CInt,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_macros::expression::profile_value::<
+                                                true,
+                                                _
+                                            >($crate::__pgrx_c_operand!(@value [true]; $n))
+                                        )
+                                    ),
+                                )
+                            )
+                        )
+                    }
+                )
+            } else {
+                None
+            }
+        )
+    };
+    (@__pgrx_c_size; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_pg_rotate_left32!(@collect __pgrx_emit_size []; $($raw)*)
+    };
+    (@__pgrx_emit_discard; $word:tt, $n:tt $(,)?) => {
+        {
+            let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                <
+                    $crate::__pgrx_c_macros::CUnsignedInt as $crate::__pgrx_c_macros::expression::CType
+                >::from_storage(
+                    $crate::__pgrx_c_bindings::pg_rotate_left32(
+                        <
+                            $crate::__pgrx_c_macros::CUnsignedInt as $crate::__pgrx_c_macros::expression::CType
+                        >::into_storage(
+                            $crate::__pgrx_c_macros::expression::implicit::<
+                                $crate::__pgrx_c_macros::CUnsignedInt,
+                                _
+                            >(
+                                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                    $crate::__pgrx_c_operand!(@value [true]; $word)
+                                )
+                            )
+                        ),
+                        <
+                            $crate::__pgrx_c_macros::CInt as $crate::__pgrx_c_macros::expression::CType
+                        >::into_storage(
+                            $crate::__pgrx_c_macros::expression::implicit::<
+                                $crate::__pgrx_c_macros::CInt,
+                                _
+                            >(
+                                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                    $crate::__pgrx_c_operand!(@value [true]; $n)
+                                )
+                            )
+                        ),
+                    )
+                )
+            );
+        }
+    };
+    (@__pgrx_c_discard; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_pg_rotate_left32!(@collect __pgrx_emit_discard []; $($raw)*)
+    };
+    ($($raw:tt)*) => {
+        $crate::__pgrx_c_args_pg_rotate_left32!(@collect __pgrx_emit_public []; $($raw)*)
+    };
+}
+
+#[cfg(not(all(
+    target_arch = "x86_64",
+    target_os = "linux",
+    target_pointer_width = "64",
+    target_endian = "little"
+)))]
+#[cfg(not(docsrs))]
+compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
+#[doc(hidden)]
+#[macro_export]
+macro_rules! __pgrx_c_args_pg_rotate_right32 {
+    (@collect $mode:ident [$($done:tt)*]; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_pg_rotate_right32!(@p0 $mode [$($done)*]; $($raw)*)
+    };
+    (@classified [$next:ident $mode:ident [$($done:tt)*] [$($rest:tt)*]] $descriptor:tt) => {
+        $crate::__pgrx_c_args_pg_rotate_right32!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
+    };
+    (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_pg_rotate_right32!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+            $($rest)*
+        )
+    };
+    (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_pg_rotate_right32!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; - $($raw:tt)*) => {
+        $crate::__pgrx_c_args_pg_rotate_right32!(@negative0 $mode [$($done)*]; - $($raw)*)
+    };
+    (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
+        $crate::__pgrx_c_args_pg_rotate_right32!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pg_rotate_right32] [p1 $mode [$($done)*] [$($rest)*]] [
+                $head $(::$tail)* ! $group
+            ]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; ::$head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pg_rotate_right32] [p1 $mode [$($done)*] [$($rest)*]] [
+                ::$head $(::$tail)* ! $group
+            ]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; ($($inner:tt)*), $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pg_rotate_right32] [p1 $mode [$($done)*] [$($rest)*]] [
+                ($($inner)*)
+            ]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_pg_rotate_right32!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_pg_rotate_right32!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; - $argument:literal) => {
+        $crate::__pgrx_c_args_pg_rotate_right32!(
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
+    };
+    (@negative1 $mode:ident [$($done:tt)*]; $argument:expr) => {
+        $crate::__pgrx_c_args_pg_rotate_right32!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_pg_rotate_right32!(
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+            $($rest)*
+        )
+    };
+    (@negative1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_pg_rotate_right32!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; - $($raw:tt)*) => {
+        $crate::__pgrx_c_args_pg_rotate_right32!(@negative1 $mode [$($done)*]; - $($raw)*)
+    };
+    (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
+        $crate::__pgrx_c_args_pg_rotate_right32!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pg_rotate_right32] [p2 $mode [$($done)*] []] [
+                $head $(::$tail)* ! $group
+            ]
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; ::$head:ident $(::$tail:ident)* ! $group:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pg_rotate_right32] [p2 $mode [$($done)*] []] [
+                ::$head $(::$tail)* ! $group
+            ]
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; ($($inner:tt)*)) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pg_rotate_right32] [p2 $mode [$($done)*] []] [($($inner)*)]
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
+        $crate::__pgrx_c_args_pg_rotate_right32!(
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; $argument:expr) => {
+        $crate::__pgrx_c_args_pg_rotate_right32!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
+        $crate::__pgrx_c_args_pg_rotate_right32!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pg_rotate_right32] [p2 $mode [$($done)*] [$($rest)*]] [
+                $head $(::$tail)* ! $group
+            ]
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; ::$head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pg_rotate_right32] [p2 $mode [$($done)*] [$($rest)*]] [
+                ::$head $(::$tail)* ! $group
+            ]
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; ($($inner:tt)*), $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_pg_rotate_right32] [p2 $mode [$($done)*] [$($rest)*]] [
+                ($($inner)*)
+            ]
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_pg_rotate_right32!(
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_pg_rotate_right32!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p2 $mode:ident [$($done:tt)*];) => {
+        $crate::pg_rotate_right32!(@$mode; $($done)*)
+    };
+    ($($invalid:tt)*) => {
+        compile_error!("arguments do not satisfy this C macro's invocation contract")
+    };
+}
+/// Typed call adapter for C inline function pg_rotate_right32 from pg_bitutils.h:290
+///
+/// ```c
+/// static inline uint32
+/// pg_rotate_right32(uint32 word, int n)
+/// {
+/// 	return (word >> n) | (word << (32 - n));
+/// }
+/// ```
+///
+///
+/// Calls the original function through its inspected C prototype. Each operand is evaluated once and converted using C parameter assignment rules. The result retains the function's original C type; `.get()` extracts its native storage, including `()` for a void result. Native calls retain the backend thread, PostgreSQL error, and caller safety contracts of the generated guarded binding.
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+#[macro_export]
+macro_rules! pg_rotate_right32 {
+    (@__pgrx_emit_check_safety; $word:tt, $n:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $word);
+                $crate::__pgrx_c_operand!(@check_safety; $n);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_pg_rotate_right32!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
+    (@__pgrx_emit_public; $word:tt, $n:tt $(,)?) => {
+        $crate::__pgrx_c_macros::expression_result::finish(
+            $crate::pg_rotate_right32!(@__pgrx_emit_value; $word, $n)
+        )
+    };
+    (@__pgrx_emit_value; $word:tt, $n:tt $(,)?) => {
+        $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+            <$crate::__pgrx_c_macros::CUnsignedInt as $crate::__pgrx_c_macros::expression::CType>::from_storage(
+                $crate::__pgrx_c_bindings::pg_rotate_right32(
+                    <
+                        $crate::__pgrx_c_macros::CUnsignedInt as $crate::__pgrx_c_macros::expression::CType
+                    >::into_storage(
+                        $crate::__pgrx_c_macros::expression::implicit::<
+                            $crate::__pgrx_c_macros::CUnsignedInt,
+                            _
+                        >(
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_operand!(@value [true]; $word)
+                            )
+                        )
+                    ),
+                    <$crate::__pgrx_c_macros::CInt as $crate::__pgrx_c_macros::expression::CType>::into_storage(
+                        $crate::__pgrx_c_macros::expression::implicit::<
+                            $crate::__pgrx_c_macros::CInt,
+                            _
+                        >(
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_operand!(@value [true]; $n)
+                            )
+                        )
+                    ),
+                )
+            )
+        )
+    };
+    (@__pgrx_c_value; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_pg_rotate_right32!(@collect __pgrx_emit_value []; $($raw)*)
+    };
+    (@__pgrx_emit_place; $word:tt, $n:tt $(,)?) => {
+        compile_error!("C expression is not a place in this operation")
+    };
+    (@__pgrx_c_place; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_pg_rotate_right32!(@collect __pgrx_emit_place []; $($raw)*)
+    };
+    (@__pgrx_emit_read_place; $word:tt, $n:tt $(,)?) => {
+        compile_error!("C expression is not a place in this operation")
+    };
+    (@__pgrx_c_read_place; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_pg_rotate_right32!(@collect __pgrx_emit_read_place []; $($raw)*)
+    };
+    (@__pgrx_emit_size; $word:tt, $n:tt $(,)?) => {
+        $crate::__pgrx_c_macros::expression::size_of_value_type(
+            if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $word);
+                        $crate::__pgrx_c_operand!(@check_safety; $n);
+                    }
+                }
+                Some(
+                    unsafe {
+                        $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                            <
+                                $crate::__pgrx_c_macros::CUnsignedInt as $crate::__pgrx_c_macros::expression::CType
+                            >::from_storage(
+                                $crate::__pgrx_c_bindings::pg_rotate_right32(
+                                    <
+                                        $crate::__pgrx_c_macros::CUnsignedInt as $crate::__pgrx_c_macros::expression::CType
+                                    >::into_storage(
+                                        $crate::__pgrx_c_macros::expression::implicit::<
+                                            $crate::__pgrx_c_macros::CUnsignedInt,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_macros::expression::profile_value::<
+                                                true,
+                                                _
+                                            >($crate::__pgrx_c_operand!(@value [true]; $word))
+                                        )
+                                    ),
+                                    <
+                                        $crate::__pgrx_c_macros::CInt as $crate::__pgrx_c_macros::expression::CType
+                                    >::into_storage(
+                                        $crate::__pgrx_c_macros::expression::implicit::<
+                                            $crate::__pgrx_c_macros::CInt,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_macros::expression::profile_value::<
+                                                true,
+                                                _
+                                            >($crate::__pgrx_c_operand!(@value [true]; $n))
+                                        )
+                                    ),
+                                )
+                            )
+                        )
+                    }
+                )
+            } else {
+                None
+            }
+        )
+    };
+    (@__pgrx_c_size; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_pg_rotate_right32!(@collect __pgrx_emit_size []; $($raw)*)
+    };
+    (@__pgrx_emit_discard; $word:tt, $n:tt $(,)?) => {
+        {
+            let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                <
+                    $crate::__pgrx_c_macros::CUnsignedInt as $crate::__pgrx_c_macros::expression::CType
+                >::from_storage(
+                    $crate::__pgrx_c_bindings::pg_rotate_right32(
+                        <
+                            $crate::__pgrx_c_macros::CUnsignedInt as $crate::__pgrx_c_macros::expression::CType
+                        >::into_storage(
+                            $crate::__pgrx_c_macros::expression::implicit::<
+                                $crate::__pgrx_c_macros::CUnsignedInt,
+                                _
+                            >(
+                                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                    $crate::__pgrx_c_operand!(@value [true]; $word)
+                                )
+                            )
+                        ),
+                        <
+                            $crate::__pgrx_c_macros::CInt as $crate::__pgrx_c_macros::expression::CType
+                        >::into_storage(
+                            $crate::__pgrx_c_macros::expression::implicit::<
+                                $crate::__pgrx_c_macros::CInt,
+                                _
+                            >(
+                                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                    $crate::__pgrx_c_operand!(@value [true]; $n)
+                                )
+                            )
+                        ),
+                    )
+                )
+            );
+        }
+    };
+    (@__pgrx_c_discard; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_pg_rotate_right32!(@collect __pgrx_emit_discard []; $($raw)*)
+    };
+    ($($raw:tt)*) => {
+        $crate::__pgrx_c_args_pg_rotate_right32!(@collect __pgrx_emit_public []; $($raw)*)
+    };
+}
+
+pub use pg_ceil_log2_32;
+pub use pg_ceil_log2_64;
+pub use pg_leftmost_one_pos32;
+pub use pg_leftmost_one_pos64;
+pub use pg_nextpower2_32;
+pub use pg_nextpower2_64;
 pub use pg_nextpower2_size_t;
+pub use pg_prevpower2_32;
+pub use pg_prevpower2_64;
 pub use pg_prevpower2_size_t;
+pub use pg_rightmost_one_pos32;
+pub use pg_rightmost_one_pos64;
+pub use pg_rotate_left32;
+pub use pg_rotate_right32;

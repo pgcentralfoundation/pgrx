@@ -15,7 +15,8 @@ use super::types::{EXPRESSION, Lowering, rust_path};
 use super::{BindingCatalog, MAX_EMISSION_BYTES, SUPPORT, binary_helper, render_expression, skip};
 use crate::analysis::{MacroAnalysis, ResolvedConstant, SkipReason, SkipReasonCode};
 use crate::syntax::{
-    BinaryOperator, ExpressionKind, NodeId, OffsetComponent, OffsetRecord, UnaryOperator,
+    BinaryOperator, ExpressionKind, NodeId, OffsetComponent, OffsetRecord, StringPart,
+    UnaryOperator,
 };
 use crate::{FrontendOutput, SignedOverflow, TypeCategory, TypeInfo, TypeShapeKind};
 use std::collections::BTreeMap;
@@ -159,7 +160,9 @@ impl<'a> Renderer<'a> {
                 }
                 ExpressionKind::Parameter { .. }
                 | ExpressionKind::Dereference { .. }
-                | ExpressionKind::Index { .. } => true,
+                | ExpressionKind::Index { .. }
+                | ExpressionKind::StringLiteral { .. }
+                | ExpressionKind::InvocationFile => true,
                 _ => false,
             });
         }
@@ -477,6 +480,65 @@ impl<'a> Renderer<'a> {
                             }
                         }
                         ExpressionKind::Empty => rust.push_str("()"),
+                        ExpressionKind::StringLiteral { bytes } => {
+                            if matches!(context, Context::Value) {
+                                write!(rust, "{EXPRESSION}::decay(").expect("String output");
+                            }
+                            write!(rust, "{{ const __PGRX_C_STRING: &[u8; {}] = &{:?}; {EXPRESSION}::string_literal(__PGRX_C_STRING) }}", bytes.len(), bytes).expect("String output");
+                            if matches!(context, Context::Value) {
+                                rust.push(')');
+                            }
+                        }
+                        ExpressionKind::Stringification { parts } => {
+                            if !matches!(context, Context::Value) {
+                                return Err(skip(
+                                    analysis,
+                                    SkipReasonCode::Stringification,
+                                    "operand spelling is supported only for a native diagnostic pointer value",
+                                    Some(node.tokens),
+                                ));
+                            }
+                            write!(rust, "/* PGRX: dependency diagnostics retain the original C text template and stringify the outer Rust invocation tokens without evaluating them. */ {{ const __PGRX_C_DIAGNOSTIC: &str = ::core::concat!(").expect("String output");
+                            for part in parts {
+                                match part {
+                                    StringPart::Text { bytes } => {
+                                        let text = std::str::from_utf8(bytes)
+                                            .expect("parsed diagnostic text is ASCII");
+                                        write!(rust, "{text:?}, ").expect("String output");
+                                    }
+                                    StringPart::Parameter { index } => {
+                                        write!(
+                                            rust,
+                                            "$crate::__pgrx_c_operand!(@stringify; ${}), ",
+                                            arguments::name(analysis, *index)
+                                        )
+                                        .expect("String output");
+                                    }
+                                }
+                            }
+                            write!(rust, "\"\\0\"); const __PGRX_C_BYTES: [u8; __PGRX_C_DIAGNOSTIC.len()] = {{ assert!(__PGRX_C_DIAGNOSTIC.is_ascii(), \"C diagnostic operand spelling requires ASCII tokens\"); {EXPRESSION}::invocation_file_bytes(__PGRX_C_DIAGNOSTIC) }}; {EXPRESSION}::decay({EXPRESSION}::string_literal(&__PGRX_C_BYTES)) }}").expect("String output");
+                        }
+                        ExpressionKind::InvocationFile => {
+                            if matches!(context, Context::Value) {
+                                write!(rust, "{EXPRESSION}::decay(").expect("String output");
+                            }
+                            write!(rust, "{{ const __PGRX_C_FILE: [u8; ::core::concat!(::core::file!(), \"\\0\").len()] = {EXPRESSION}::invocation_file_bytes(::core::concat!(::core::file!(), \"\\0\")); {EXPRESSION}::string_literal(&__PGRX_C_FILE) }}").expect("String output");
+                            if matches!(context, Context::Value) {
+                                rust.push(')');
+                            }
+                        }
+                        ExpressionKind::InvocationLine => {
+                            if matches!(context, Context::Place | Context::ReadPlace) {
+                                return Err(failure(
+                                    "an invocation line is not an object place".into(),
+                                ));
+                            }
+                            // The runtime ABI gate establishes the C int width.
+                            // Const evaluation refuses an unrepresentable Rust line.
+                            let bits =
+                                frontend.profile().target.integers[&crate::IntegerKind::Int].bits;
+                            write!(rust, "{{ const __PGRX_C_LINE: i{bits} = {{ assert!((::core::line!() as u128) <= (i{bits}::MAX as u128), \"Rust invocation line exceeds C int\"); ::core::line!() as i{bits} }}; {SUPPORT}::CValue::<{SUPPORT}::CInt>::new(__PGRX_C_LINE) }}").expect("String output");
+                        }
                         ExpressionKind::IntegerLiteral { .. }
                         | ExpressionKind::Identifier { .. } => {
                             if matches!(context, Context::Place | Context::ReadPlace) {
@@ -1023,6 +1085,8 @@ impl<'a> Renderer<'a> {
                                 | ExpressionKind::Member { .. }
                                 | ExpressionKind::Dereference { .. }
                                 | ExpressionKind::Index { .. }
+                                | ExpressionKind::StringLiteral { .. }
+                                | ExpressionKind::InvocationFile
                         )
                     {
                         return Err(failure(

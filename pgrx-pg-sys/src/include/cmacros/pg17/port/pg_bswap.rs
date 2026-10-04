@@ -5,8 +5,8 @@ This code is generated for documentation purposes, so that it is easy to referen
 // C macros from pg_bswap.h.
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -37,21 +37,23 @@ macro_rules! __pgrx_c_args_DatumBigEndianToNative {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
         $crate::__pgrx_c_args_DatumBigEndianToNative!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_DatumBigEndianToNative!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_DatumBigEndianToNative!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_DatumBigEndianToNative!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_DatumBigEndianToNative!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -59,7 +61,9 @@ macro_rules! __pgrx_c_args_DatumBigEndianToNative {
         $crate::__pgrx_c_args_DatumBigEndianToNative!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_DatumBigEndianToNative!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_DatumBigEndianToNative!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -84,15 +88,17 @@ macro_rules! __pgrx_c_args_DatumBigEndianToNative {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_DatumBigEndianToNative!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_DatumBigEndianToNative!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_DatumBigEndianToNative!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_DatumBigEndianToNative!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -119,13 +125,13 @@ macro_rules! __pgrx_c_args_DatumBigEndianToNative {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_DatumBigEndianToNative!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_DatumBigEndianToNative!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -173,14 +179,12 @@ macro_rules! DatumBigEndianToNative {
     (@__pgrx_emit_value; $x:tt $(,)?) => {
         /* PGRX: DatumBigEndianToNative remains expanded because pg_bswap64 expression structure differs after compiler expansion. */
         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-            <
-                $crate::__pgrx_c_macros::CUnsignedLongLong as $crate::__pgrx_c_macros::expression::CType
-            >::from_storage(
+            <$crate::__pgrx_c_macros::CUnsignedLong as $crate::__pgrx_c_macros::expression::CType>::from_storage(
                 <
-                    $crate::__pgrx_c_macros::CUnsignedLongLong as $crate::__pgrx_c_macros::expression::CType
+                    $crate::__pgrx_c_macros::CUnsignedLong as $crate::__pgrx_c_macros::expression::CType
                 >::into_storage(
                     $crate::__pgrx_c_macros::expression::implicit::<
-                        $crate::__pgrx_c_macros::CUnsignedLongLong,
+                        $crate::__pgrx_c_macros::CUnsignedLong,
                         _
                     >(
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -196,12 +200,10 @@ macro_rules! DatumBigEndianToNative {
     };
     (@__pgrx_emit_place; $x:tt $(,)?) => {
         /* PGRX: DatumBigEndianToNative remains expanded because pg_bswap64 expression structure differs after compiler expansion. */
-        <$crate::__pgrx_c_macros::CUnsignedLongLong as $crate::__pgrx_c_macros::expression::CType>::from_storage(
-            <
-                $crate::__pgrx_c_macros::CUnsignedLongLong as $crate::__pgrx_c_macros::expression::CType
-            >::into_storage(
+        <$crate::__pgrx_c_macros::CUnsignedLong as $crate::__pgrx_c_macros::expression::CType>::from_storage(
+            <$crate::__pgrx_c_macros::CUnsignedLong as $crate::__pgrx_c_macros::expression::CType>::into_storage(
                 $crate::__pgrx_c_macros::expression::implicit::<
-                    $crate::__pgrx_c_macros::CUnsignedLongLong,
+                    $crate::__pgrx_c_macros::CUnsignedLong,
                     _
                 >(
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -216,12 +218,10 @@ macro_rules! DatumBigEndianToNative {
     };
     (@__pgrx_emit_read_place; $x:tt $(,)?) => {
         /* PGRX: DatumBigEndianToNative remains expanded because pg_bswap64 expression structure differs after compiler expansion. */
-        <$crate::__pgrx_c_macros::CUnsignedLongLong as $crate::__pgrx_c_macros::expression::CType>::from_storage(
-            <
-                $crate::__pgrx_c_macros::CUnsignedLongLong as $crate::__pgrx_c_macros::expression::CType
-            >::into_storage(
+        <$crate::__pgrx_c_macros::CUnsignedLong as $crate::__pgrx_c_macros::expression::CType>::from_storage(
+            <$crate::__pgrx_c_macros::CUnsignedLong as $crate::__pgrx_c_macros::expression::CType>::into_storage(
                 $crate::__pgrx_c_macros::expression::implicit::<
-                    $crate::__pgrx_c_macros::CUnsignedLongLong,
+                    $crate::__pgrx_c_macros::CUnsignedLong,
                     _
                 >(
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -247,13 +247,13 @@ macro_rules! DatumBigEndianToNative {
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
-                                $crate::__pgrx_c_macros::CUnsignedLongLong as $crate::__pgrx_c_macros::expression::CType
+                                $crate::__pgrx_c_macros::CUnsignedLong as $crate::__pgrx_c_macros::expression::CType
                             >::from_storage(
                                 <
-                                    $crate::__pgrx_c_macros::CUnsignedLongLong as $crate::__pgrx_c_macros::expression::CType
+                                    $crate::__pgrx_c_macros::CUnsignedLong as $crate::__pgrx_c_macros::expression::CType
                                 >::into_storage(
                                     $crate::__pgrx_c_macros::expression::implicit::<
-                                        $crate::__pgrx_c_macros::CUnsignedLongLong,
+                                        $crate::__pgrx_c_macros::CUnsignedLong,
                                         _
                                     >(
                                         $crate::__pgrx_c_macros::expression::profile_value::<
@@ -279,13 +279,13 @@ macro_rules! DatumBigEndianToNative {
         {
             let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 <
-                    $crate::__pgrx_c_macros::CUnsignedLongLong as $crate::__pgrx_c_macros::expression::CType
+                    $crate::__pgrx_c_macros::CUnsignedLong as $crate::__pgrx_c_macros::expression::CType
                 >::from_storage(
                     <
-                        $crate::__pgrx_c_macros::CUnsignedLongLong as $crate::__pgrx_c_macros::expression::CType
+                        $crate::__pgrx_c_macros::CUnsignedLong as $crate::__pgrx_c_macros::expression::CType
                     >::into_storage(
                         $crate::__pgrx_c_macros::expression::implicit::<
-                            $crate::__pgrx_c_macros::CUnsignedLongLong,
+                            $crate::__pgrx_c_macros::CUnsignedLong,
                             _
                         >(
                             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -306,8 +306,8 @@ macro_rules! DatumBigEndianToNative {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -334,25 +334,34 @@ macro_rules! __pgrx_c_args_pg_bswap16 {
         $crate::__pgrx_c_args_pg_bswap16!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_pg_bswap16!(@p1 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_pg_bswap16!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_pg_bswap16!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_pg_bswap16!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_pg_bswap16!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_pg_bswap16!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_pg_bswap16!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $($raw:tt)*) => {
         $crate::__pgrx_c_args_pg_bswap16!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_pg_bswap16!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_pg_bswap16!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -374,13 +383,20 @@ macro_rules! __pgrx_c_args_pg_bswap16 {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_pg_bswap16!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_pg_bswap16!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_pg_bswap16!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_pg_bswap16!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
-        $crate::__pgrx_c_args_pg_bswap16!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_pg_bswap16!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
         $crate::__pgrx_c_classify!(
@@ -402,10 +418,16 @@ macro_rules! __pgrx_c_args_pg_bswap16 {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_pg_bswap16!(@p1 $mode [$($done)* (@literal [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_pg_bswap16!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+            $($rest)*
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_pg_bswap16!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_pg_bswap16!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p1 $mode:ident [$($done:tt)*];) => {
         $crate::pg_bswap16!(@$mode; $($done)*)
@@ -575,8 +597,8 @@ macro_rules! pg_bswap16 {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -603,25 +625,34 @@ macro_rules! __pgrx_c_args_pg_bswap32 {
         $crate::__pgrx_c_args_pg_bswap32!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_pg_bswap32!(@p1 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_pg_bswap32!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_pg_bswap32!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_pg_bswap32!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_pg_bswap32!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_pg_bswap32!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_pg_bswap32!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $($raw:tt)*) => {
         $crate::__pgrx_c_args_pg_bswap32!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_pg_bswap32!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_pg_bswap32!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -643,13 +674,20 @@ macro_rules! __pgrx_c_args_pg_bswap32 {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_pg_bswap32!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_pg_bswap32!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_pg_bswap32!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_pg_bswap32!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
-        $crate::__pgrx_c_args_pg_bswap32!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_pg_bswap32!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
         $crate::__pgrx_c_classify!(
@@ -671,10 +709,16 @@ macro_rules! __pgrx_c_args_pg_bswap32 {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_pg_bswap32!(@p1 $mode [$($done)* (@literal [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_pg_bswap32!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+            $($rest)*
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_pg_bswap32!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_pg_bswap32!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p1 $mode:ident [$($done:tt)*];) => {
         $crate::pg_bswap32!(@$mode; $($done)*)
@@ -844,8 +888,8 @@ macro_rules! pg_bswap32 {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -872,25 +916,34 @@ macro_rules! __pgrx_c_args_pg_bswap64 {
         $crate::__pgrx_c_args_pg_bswap64!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_pg_bswap64!(@p1 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_pg_bswap64!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_pg_bswap64!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_pg_bswap64!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_pg_bswap64!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_pg_bswap64!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_pg_bswap64!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $($raw:tt)*) => {
         $crate::__pgrx_c_args_pg_bswap64!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_pg_bswap64!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_pg_bswap64!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -912,13 +965,20 @@ macro_rules! __pgrx_c_args_pg_bswap64 {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_pg_bswap64!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_pg_bswap64!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_pg_bswap64!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_pg_bswap64!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
-        $crate::__pgrx_c_args_pg_bswap64!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_pg_bswap64!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
         $crate::__pgrx_c_classify!(
@@ -940,10 +1000,16 @@ macro_rules! __pgrx_c_args_pg_bswap64 {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_pg_bswap64!(@p1 $mode [$($done)* (@literal [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_pg_bswap64!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+            $($rest)*
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_pg_bswap64!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_pg_bswap64!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p1 $mode:ident [$($done:tt)*];) => {
         $crate::pg_bswap64!(@$mode; $($done)*)
@@ -986,14 +1052,12 @@ macro_rules! pg_bswap64 {
     (@__pgrx_emit_value; $x:tt $(,)?) => {
         /* PGRX: pg_bswap64 remains expanded because __builtin_bswap64 is not an active function-like macro. */
         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-            <
-                $crate::__pgrx_c_macros::CUnsignedLongLong as $crate::__pgrx_c_macros::expression::CType
-            >::from_storage(
+            <$crate::__pgrx_c_macros::CUnsignedLong as $crate::__pgrx_c_macros::expression::CType>::from_storage(
                 <
-                    $crate::__pgrx_c_macros::CUnsignedLongLong as $crate::__pgrx_c_macros::expression::CType
+                    $crate::__pgrx_c_macros::CUnsignedLong as $crate::__pgrx_c_macros::expression::CType
                 >::into_storage(
                     $crate::__pgrx_c_macros::expression::implicit::<
-                        $crate::__pgrx_c_macros::CUnsignedLongLong,
+                        $crate::__pgrx_c_macros::CUnsignedLong,
                         _
                     >(
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -1009,12 +1073,10 @@ macro_rules! pg_bswap64 {
     };
     (@__pgrx_emit_place; $x:tt $(,)?) => {
         /* PGRX: pg_bswap64 remains expanded because __builtin_bswap64 is not an active function-like macro. */
-        <$crate::__pgrx_c_macros::CUnsignedLongLong as $crate::__pgrx_c_macros::expression::CType>::from_storage(
-            <
-                $crate::__pgrx_c_macros::CUnsignedLongLong as $crate::__pgrx_c_macros::expression::CType
-            >::into_storage(
+        <$crate::__pgrx_c_macros::CUnsignedLong as $crate::__pgrx_c_macros::expression::CType>::from_storage(
+            <$crate::__pgrx_c_macros::CUnsignedLong as $crate::__pgrx_c_macros::expression::CType>::into_storage(
                 $crate::__pgrx_c_macros::expression::implicit::<
-                    $crate::__pgrx_c_macros::CUnsignedLongLong,
+                    $crate::__pgrx_c_macros::CUnsignedLong,
                     _
                 >(
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -1029,12 +1091,10 @@ macro_rules! pg_bswap64 {
     };
     (@__pgrx_emit_read_place; $x:tt $(,)?) => {
         /* PGRX: pg_bswap64 remains expanded because __builtin_bswap64 is not an active function-like macro. */
-        <$crate::__pgrx_c_macros::CUnsignedLongLong as $crate::__pgrx_c_macros::expression::CType>::from_storage(
-            <
-                $crate::__pgrx_c_macros::CUnsignedLongLong as $crate::__pgrx_c_macros::expression::CType
-            >::into_storage(
+        <$crate::__pgrx_c_macros::CUnsignedLong as $crate::__pgrx_c_macros::expression::CType>::from_storage(
+            <$crate::__pgrx_c_macros::CUnsignedLong as $crate::__pgrx_c_macros::expression::CType>::into_storage(
                 $crate::__pgrx_c_macros::expression::implicit::<
-                    $crate::__pgrx_c_macros::CUnsignedLongLong,
+                    $crate::__pgrx_c_macros::CUnsignedLong,
                     _
                 >(
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -1060,13 +1120,13 @@ macro_rules! pg_bswap64 {
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
-                                $crate::__pgrx_c_macros::CUnsignedLongLong as $crate::__pgrx_c_macros::expression::CType
+                                $crate::__pgrx_c_macros::CUnsignedLong as $crate::__pgrx_c_macros::expression::CType
                             >::from_storage(
                                 <
-                                    $crate::__pgrx_c_macros::CUnsignedLongLong as $crate::__pgrx_c_macros::expression::CType
+                                    $crate::__pgrx_c_macros::CUnsignedLong as $crate::__pgrx_c_macros::expression::CType
                                 >::into_storage(
                                     $crate::__pgrx_c_macros::expression::implicit::<
-                                        $crate::__pgrx_c_macros::CUnsignedLongLong,
+                                        $crate::__pgrx_c_macros::CUnsignedLong,
                                         _
                                     >(
                                         $crate::__pgrx_c_macros::expression::profile_value::<
@@ -1092,13 +1152,13 @@ macro_rules! pg_bswap64 {
         {
             let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 <
-                    $crate::__pgrx_c_macros::CUnsignedLongLong as $crate::__pgrx_c_macros::expression::CType
+                    $crate::__pgrx_c_macros::CUnsignedLong as $crate::__pgrx_c_macros::expression::CType
                 >::from_storage(
                     <
-                        $crate::__pgrx_c_macros::CUnsignedLongLong as $crate::__pgrx_c_macros::expression::CType
+                        $crate::__pgrx_c_macros::CUnsignedLong as $crate::__pgrx_c_macros::expression::CType
                     >::into_storage(
                         $crate::__pgrx_c_macros::expression::implicit::<
-                            $crate::__pgrx_c_macros::CUnsignedLongLong,
+                            $crate::__pgrx_c_macros::CUnsignedLong,
                             _
                         >(
                             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -1119,8 +1179,8 @@ macro_rules! pg_bswap64 {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -1147,22 +1207,34 @@ macro_rules! __pgrx_c_args_pg_hton16 {
         $crate::__pgrx_c_args_pg_hton16!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_pg_hton16!(@p1 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_pg_hton16!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_pg_hton16!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_pg_hton16!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_pg_hton16!(@p1 $mode [$($done)* (@literal [- $argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_pg_hton16!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+            $($rest)*
+        )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_pg_hton16!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_pg_hton16!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $($raw:tt)*) => {
         $crate::__pgrx_c_args_pg_hton16!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_pg_hton16!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_pg_hton16!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -1184,13 +1256,20 @@ macro_rules! __pgrx_c_args_pg_hton16 {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_pg_hton16!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_pg_hton16!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_pg_hton16!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_pg_hton16!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
-        $crate::__pgrx_c_args_pg_hton16!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_pg_hton16!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
         $crate::__pgrx_c_classify!(
@@ -1212,10 +1291,16 @@ macro_rules! __pgrx_c_args_pg_hton16 {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_pg_hton16!(@p1 $mode [$($done)* (@literal [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_pg_hton16!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+            $($rest)*
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_pg_hton16!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_pg_hton16!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p1 $mode:ident [$($done:tt)*];) => {
         $crate::pg_hton16!(@$mode; $($done)*)
@@ -1385,8 +1470,8 @@ macro_rules! pg_hton16 {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -1413,22 +1498,34 @@ macro_rules! __pgrx_c_args_pg_hton32 {
         $crate::__pgrx_c_args_pg_hton32!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_pg_hton32!(@p1 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_pg_hton32!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_pg_hton32!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_pg_hton32!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_pg_hton32!(@p1 $mode [$($done)* (@literal [- $argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_pg_hton32!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+            $($rest)*
+        )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_pg_hton32!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_pg_hton32!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $($raw:tt)*) => {
         $crate::__pgrx_c_args_pg_hton32!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_pg_hton32!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_pg_hton32!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -1450,13 +1547,20 @@ macro_rules! __pgrx_c_args_pg_hton32 {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_pg_hton32!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_pg_hton32!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_pg_hton32!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_pg_hton32!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
-        $crate::__pgrx_c_args_pg_hton32!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_pg_hton32!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
         $crate::__pgrx_c_classify!(
@@ -1478,10 +1582,16 @@ macro_rules! __pgrx_c_args_pg_hton32 {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_pg_hton32!(@p1 $mode [$($done)* (@literal [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_pg_hton32!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+            $($rest)*
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_pg_hton32!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_pg_hton32!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p1 $mode:ident [$($done:tt)*];) => {
         $crate::pg_hton32!(@$mode; $($done)*)
@@ -1651,8 +1761,8 @@ macro_rules! pg_hton32 {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -1679,22 +1789,34 @@ macro_rules! __pgrx_c_args_pg_hton64 {
         $crate::__pgrx_c_args_pg_hton64!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_pg_hton64!(@p1 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_pg_hton64!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_pg_hton64!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_pg_hton64!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_pg_hton64!(@p1 $mode [$($done)* (@literal [- $argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_pg_hton64!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+            $($rest)*
+        )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_pg_hton64!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_pg_hton64!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $($raw:tt)*) => {
         $crate::__pgrx_c_args_pg_hton64!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_pg_hton64!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_pg_hton64!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -1716,13 +1838,20 @@ macro_rules! __pgrx_c_args_pg_hton64 {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_pg_hton64!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_pg_hton64!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_pg_hton64!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_pg_hton64!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
-        $crate::__pgrx_c_args_pg_hton64!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_pg_hton64!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
         $crate::__pgrx_c_classify!(
@@ -1744,10 +1873,16 @@ macro_rules! __pgrx_c_args_pg_hton64 {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_pg_hton64!(@p1 $mode [$($done)* (@literal [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_pg_hton64!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+            $($rest)*
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_pg_hton64!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_pg_hton64!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p1 $mode:ident [$($done:tt)*];) => {
         $crate::pg_hton64!(@$mode; $($done)*)
@@ -1790,14 +1925,12 @@ macro_rules! pg_hton64 {
     (@__pgrx_emit_value; $x:tt $(,)?) => {
         /* PGRX: pg_hton64 remains expanded because pg_bswap64 expression structure differs after compiler expansion. */
         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-            <
-                $crate::__pgrx_c_macros::CUnsignedLongLong as $crate::__pgrx_c_macros::expression::CType
-            >::from_storage(
+            <$crate::__pgrx_c_macros::CUnsignedLong as $crate::__pgrx_c_macros::expression::CType>::from_storage(
                 <
-                    $crate::__pgrx_c_macros::CUnsignedLongLong as $crate::__pgrx_c_macros::expression::CType
+                    $crate::__pgrx_c_macros::CUnsignedLong as $crate::__pgrx_c_macros::expression::CType
                 >::into_storage(
                     $crate::__pgrx_c_macros::expression::implicit::<
-                        $crate::__pgrx_c_macros::CUnsignedLongLong,
+                        $crate::__pgrx_c_macros::CUnsignedLong,
                         _
                     >(
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -1813,12 +1946,10 @@ macro_rules! pg_hton64 {
     };
     (@__pgrx_emit_place; $x:tt $(,)?) => {
         /* PGRX: pg_hton64 remains expanded because pg_bswap64 expression structure differs after compiler expansion. */
-        <$crate::__pgrx_c_macros::CUnsignedLongLong as $crate::__pgrx_c_macros::expression::CType>::from_storage(
-            <
-                $crate::__pgrx_c_macros::CUnsignedLongLong as $crate::__pgrx_c_macros::expression::CType
-            >::into_storage(
+        <$crate::__pgrx_c_macros::CUnsignedLong as $crate::__pgrx_c_macros::expression::CType>::from_storage(
+            <$crate::__pgrx_c_macros::CUnsignedLong as $crate::__pgrx_c_macros::expression::CType>::into_storage(
                 $crate::__pgrx_c_macros::expression::implicit::<
-                    $crate::__pgrx_c_macros::CUnsignedLongLong,
+                    $crate::__pgrx_c_macros::CUnsignedLong,
                     _
                 >(
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -1833,12 +1964,10 @@ macro_rules! pg_hton64 {
     };
     (@__pgrx_emit_read_place; $x:tt $(,)?) => {
         /* PGRX: pg_hton64 remains expanded because pg_bswap64 expression structure differs after compiler expansion. */
-        <$crate::__pgrx_c_macros::CUnsignedLongLong as $crate::__pgrx_c_macros::expression::CType>::from_storage(
-            <
-                $crate::__pgrx_c_macros::CUnsignedLongLong as $crate::__pgrx_c_macros::expression::CType
-            >::into_storage(
+        <$crate::__pgrx_c_macros::CUnsignedLong as $crate::__pgrx_c_macros::expression::CType>::from_storage(
+            <$crate::__pgrx_c_macros::CUnsignedLong as $crate::__pgrx_c_macros::expression::CType>::into_storage(
                 $crate::__pgrx_c_macros::expression::implicit::<
-                    $crate::__pgrx_c_macros::CUnsignedLongLong,
+                    $crate::__pgrx_c_macros::CUnsignedLong,
                     _
                 >(
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -1864,13 +1993,13 @@ macro_rules! pg_hton64 {
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
-                                $crate::__pgrx_c_macros::CUnsignedLongLong as $crate::__pgrx_c_macros::expression::CType
+                                $crate::__pgrx_c_macros::CUnsignedLong as $crate::__pgrx_c_macros::expression::CType
                             >::from_storage(
                                 <
-                                    $crate::__pgrx_c_macros::CUnsignedLongLong as $crate::__pgrx_c_macros::expression::CType
+                                    $crate::__pgrx_c_macros::CUnsignedLong as $crate::__pgrx_c_macros::expression::CType
                                 >::into_storage(
                                     $crate::__pgrx_c_macros::expression::implicit::<
-                                        $crate::__pgrx_c_macros::CUnsignedLongLong,
+                                        $crate::__pgrx_c_macros::CUnsignedLong,
                                         _
                                     >(
                                         $crate::__pgrx_c_macros::expression::profile_value::<
@@ -1896,13 +2025,13 @@ macro_rules! pg_hton64 {
         {
             let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 <
-                    $crate::__pgrx_c_macros::CUnsignedLongLong as $crate::__pgrx_c_macros::expression::CType
+                    $crate::__pgrx_c_macros::CUnsignedLong as $crate::__pgrx_c_macros::expression::CType
                 >::from_storage(
                     <
-                        $crate::__pgrx_c_macros::CUnsignedLongLong as $crate::__pgrx_c_macros::expression::CType
+                        $crate::__pgrx_c_macros::CUnsignedLong as $crate::__pgrx_c_macros::expression::CType
                     >::into_storage(
                         $crate::__pgrx_c_macros::expression::implicit::<
-                            $crate::__pgrx_c_macros::CUnsignedLongLong,
+                            $crate::__pgrx_c_macros::CUnsignedLong,
                             _
                         >(
                             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -1923,8 +2052,8 @@ macro_rules! pg_hton64 {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -1951,22 +2080,34 @@ macro_rules! __pgrx_c_args_pg_ntoh16 {
         $crate::__pgrx_c_args_pg_ntoh16!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_pg_ntoh16!(@p1 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_pg_ntoh16!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_pg_ntoh16!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_pg_ntoh16!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_pg_ntoh16!(@p1 $mode [$($done)* (@literal [- $argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_pg_ntoh16!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+            $($rest)*
+        )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_pg_ntoh16!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_pg_ntoh16!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $($raw:tt)*) => {
         $crate::__pgrx_c_args_pg_ntoh16!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_pg_ntoh16!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_pg_ntoh16!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -1988,13 +2129,20 @@ macro_rules! __pgrx_c_args_pg_ntoh16 {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_pg_ntoh16!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_pg_ntoh16!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_pg_ntoh16!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_pg_ntoh16!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
-        $crate::__pgrx_c_args_pg_ntoh16!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_pg_ntoh16!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
         $crate::__pgrx_c_classify!(
@@ -2016,10 +2164,16 @@ macro_rules! __pgrx_c_args_pg_ntoh16 {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_pg_ntoh16!(@p1 $mode [$($done)* (@literal [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_pg_ntoh16!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+            $($rest)*
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_pg_ntoh16!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_pg_ntoh16!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p1 $mode:ident [$($done:tt)*];) => {
         $crate::pg_ntoh16!(@$mode; $($done)*)
@@ -2189,8 +2343,8 @@ macro_rules! pg_ntoh16 {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -2217,22 +2371,34 @@ macro_rules! __pgrx_c_args_pg_ntoh32 {
         $crate::__pgrx_c_args_pg_ntoh32!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_pg_ntoh32!(@p1 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_pg_ntoh32!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_pg_ntoh32!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_pg_ntoh32!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_pg_ntoh32!(@p1 $mode [$($done)* (@literal [- $argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_pg_ntoh32!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+            $($rest)*
+        )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_pg_ntoh32!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_pg_ntoh32!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $($raw:tt)*) => {
         $crate::__pgrx_c_args_pg_ntoh32!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_pg_ntoh32!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_pg_ntoh32!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -2254,13 +2420,20 @@ macro_rules! __pgrx_c_args_pg_ntoh32 {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_pg_ntoh32!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_pg_ntoh32!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_pg_ntoh32!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_pg_ntoh32!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
-        $crate::__pgrx_c_args_pg_ntoh32!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_pg_ntoh32!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
         $crate::__pgrx_c_classify!(
@@ -2282,10 +2455,16 @@ macro_rules! __pgrx_c_args_pg_ntoh32 {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_pg_ntoh32!(@p1 $mode [$($done)* (@literal [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_pg_ntoh32!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+            $($rest)*
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_pg_ntoh32!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_pg_ntoh32!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p1 $mode:ident [$($done:tt)*];) => {
         $crate::pg_ntoh32!(@$mode; $($done)*)
@@ -2455,8 +2634,8 @@ macro_rules! pg_ntoh32 {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -2483,22 +2662,34 @@ macro_rules! __pgrx_c_args_pg_ntoh64 {
         $crate::__pgrx_c_args_pg_ntoh64!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_pg_ntoh64!(@p1 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_pg_ntoh64!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_pg_ntoh64!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_pg_ntoh64!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_pg_ntoh64!(@p1 $mode [$($done)* (@literal [- $argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_pg_ntoh64!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+            $($rest)*
+        )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_pg_ntoh64!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_pg_ntoh64!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $($raw:tt)*) => {
         $crate::__pgrx_c_args_pg_ntoh64!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_pg_ntoh64!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_pg_ntoh64!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -2520,13 +2711,20 @@ macro_rules! __pgrx_c_args_pg_ntoh64 {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_pg_ntoh64!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_pg_ntoh64!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_pg_ntoh64!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_pg_ntoh64!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
-        $crate::__pgrx_c_args_pg_ntoh64!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_pg_ntoh64!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
         $crate::__pgrx_c_classify!(
@@ -2548,10 +2746,16 @@ macro_rules! __pgrx_c_args_pg_ntoh64 {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_pg_ntoh64!(@p1 $mode [$($done)* (@literal [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_pg_ntoh64!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+            $($rest)*
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_pg_ntoh64!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_pg_ntoh64!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p1 $mode:ident [$($done:tt)*];) => {
         $crate::pg_ntoh64!(@$mode; $($done)*)
@@ -2594,14 +2798,12 @@ macro_rules! pg_ntoh64 {
     (@__pgrx_emit_value; $x:tt $(,)?) => {
         /* PGRX: pg_ntoh64 remains expanded because pg_bswap64 expression structure differs after compiler expansion. */
         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-            <
-                $crate::__pgrx_c_macros::CUnsignedLongLong as $crate::__pgrx_c_macros::expression::CType
-            >::from_storage(
+            <$crate::__pgrx_c_macros::CUnsignedLong as $crate::__pgrx_c_macros::expression::CType>::from_storage(
                 <
-                    $crate::__pgrx_c_macros::CUnsignedLongLong as $crate::__pgrx_c_macros::expression::CType
+                    $crate::__pgrx_c_macros::CUnsignedLong as $crate::__pgrx_c_macros::expression::CType
                 >::into_storage(
                     $crate::__pgrx_c_macros::expression::implicit::<
-                        $crate::__pgrx_c_macros::CUnsignedLongLong,
+                        $crate::__pgrx_c_macros::CUnsignedLong,
                         _
                     >(
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -2617,12 +2819,10 @@ macro_rules! pg_ntoh64 {
     };
     (@__pgrx_emit_place; $x:tt $(,)?) => {
         /* PGRX: pg_ntoh64 remains expanded because pg_bswap64 expression structure differs after compiler expansion. */
-        <$crate::__pgrx_c_macros::CUnsignedLongLong as $crate::__pgrx_c_macros::expression::CType>::from_storage(
-            <
-                $crate::__pgrx_c_macros::CUnsignedLongLong as $crate::__pgrx_c_macros::expression::CType
-            >::into_storage(
+        <$crate::__pgrx_c_macros::CUnsignedLong as $crate::__pgrx_c_macros::expression::CType>::from_storage(
+            <$crate::__pgrx_c_macros::CUnsignedLong as $crate::__pgrx_c_macros::expression::CType>::into_storage(
                 $crate::__pgrx_c_macros::expression::implicit::<
-                    $crate::__pgrx_c_macros::CUnsignedLongLong,
+                    $crate::__pgrx_c_macros::CUnsignedLong,
                     _
                 >(
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -2637,12 +2837,10 @@ macro_rules! pg_ntoh64 {
     };
     (@__pgrx_emit_read_place; $x:tt $(,)?) => {
         /* PGRX: pg_ntoh64 remains expanded because pg_bswap64 expression structure differs after compiler expansion. */
-        <$crate::__pgrx_c_macros::CUnsignedLongLong as $crate::__pgrx_c_macros::expression::CType>::from_storage(
-            <
-                $crate::__pgrx_c_macros::CUnsignedLongLong as $crate::__pgrx_c_macros::expression::CType
-            >::into_storage(
+        <$crate::__pgrx_c_macros::CUnsignedLong as $crate::__pgrx_c_macros::expression::CType>::from_storage(
+            <$crate::__pgrx_c_macros::CUnsignedLong as $crate::__pgrx_c_macros::expression::CType>::into_storage(
                 $crate::__pgrx_c_macros::expression::implicit::<
-                    $crate::__pgrx_c_macros::CUnsignedLongLong,
+                    $crate::__pgrx_c_macros::CUnsignedLong,
                     _
                 >(
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -2668,13 +2866,13 @@ macro_rules! pg_ntoh64 {
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
-                                $crate::__pgrx_c_macros::CUnsignedLongLong as $crate::__pgrx_c_macros::expression::CType
+                                $crate::__pgrx_c_macros::CUnsignedLong as $crate::__pgrx_c_macros::expression::CType
                             >::from_storage(
                                 <
-                                    $crate::__pgrx_c_macros::CUnsignedLongLong as $crate::__pgrx_c_macros::expression::CType
+                                    $crate::__pgrx_c_macros::CUnsignedLong as $crate::__pgrx_c_macros::expression::CType
                                 >::into_storage(
                                     $crate::__pgrx_c_macros::expression::implicit::<
-                                        $crate::__pgrx_c_macros::CUnsignedLongLong,
+                                        $crate::__pgrx_c_macros::CUnsignedLong,
                                         _
                                     >(
                                         $crate::__pgrx_c_macros::expression::profile_value::<
@@ -2700,13 +2898,13 @@ macro_rules! pg_ntoh64 {
         {
             let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 <
-                    $crate::__pgrx_c_macros::CUnsignedLongLong as $crate::__pgrx_c_macros::expression::CType
+                    $crate::__pgrx_c_macros::CUnsignedLong as $crate::__pgrx_c_macros::expression::CType
                 >::from_storage(
                     <
-                        $crate::__pgrx_c_macros::CUnsignedLongLong as $crate::__pgrx_c_macros::expression::CType
+                        $crate::__pgrx_c_macros::CUnsignedLong as $crate::__pgrx_c_macros::expression::CType
                     >::into_storage(
                         $crate::__pgrx_c_macros::expression::implicit::<
-                            $crate::__pgrx_c_macros::CUnsignedLongLong,
+                            $crate::__pgrx_c_macros::CUnsignedLong,
                             _
                         >(
                             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(

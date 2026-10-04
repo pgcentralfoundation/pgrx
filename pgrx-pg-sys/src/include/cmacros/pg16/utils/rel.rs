@@ -5,8 +5,8 @@ This code is generated for documentation purposes, so that it is easy to referen
 // C macros from rel.h.
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -37,23 +37,23 @@ macro_rules! __pgrx_c_args_IndexRelationGetNumberOfAttributes {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
         $crate::__pgrx_c_args_IndexRelationGetNumberOfAttributes!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_IndexRelationGetNumberOfAttributes!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_IndexRelationGetNumberOfAttributes!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_IndexRelationGetNumberOfAttributes!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -65,7 +65,7 @@ macro_rules! __pgrx_c_args_IndexRelationGetNumberOfAttributes {
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
         $crate::__pgrx_c_args_IndexRelationGetNumberOfAttributes!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
@@ -91,17 +91,17 @@ macro_rules! __pgrx_c_args_IndexRelationGetNumberOfAttributes {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_IndexRelationGetNumberOfAttributes!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_IndexRelationGetNumberOfAttributes!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_IndexRelationGetNumberOfAttributes!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -128,13 +128,13 @@ macro_rules! __pgrx_c_args_IndexRelationGetNumberOfAttributes {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_IndexRelationGetNumberOfAttributes!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_IndexRelationGetNumberOfAttributes!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -400,8 +400,8 @@ macro_rules! IndexRelationGetNumberOfAttributes {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -435,23 +435,23 @@ macro_rules! __pgrx_c_args_IndexRelationGetNumberOfKeyAttributes {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
         $crate::__pgrx_c_args_IndexRelationGetNumberOfKeyAttributes!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_IndexRelationGetNumberOfKeyAttributes!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_IndexRelationGetNumberOfKeyAttributes!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_IndexRelationGetNumberOfKeyAttributes!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -463,7 +463,7 @@ macro_rules! __pgrx_c_args_IndexRelationGetNumberOfKeyAttributes {
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
         $crate::__pgrx_c_args_IndexRelationGetNumberOfKeyAttributes!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
@@ -489,17 +489,17 @@ macro_rules! __pgrx_c_args_IndexRelationGetNumberOfKeyAttributes {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_IndexRelationGetNumberOfKeyAttributes!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_IndexRelationGetNumberOfKeyAttributes!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_IndexRelationGetNumberOfKeyAttributes!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -526,13 +526,13 @@ macro_rules! __pgrx_c_args_IndexRelationGetNumberOfKeyAttributes {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_IndexRelationGetNumberOfKeyAttributes!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_IndexRelationGetNumberOfKeyAttributes!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -798,8 +798,8 @@ macro_rules! IndexRelationGetNumberOfKeyAttributes {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -826,20 +826,24 @@ macro_rules! __pgrx_c_args_RELATION_IS_LOCAL {
         $crate::__pgrx_c_args_RELATION_IS_LOCAL!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_RELATION_IS_LOCAL!(@p1 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_RELATION_IS_LOCAL!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_RELATION_IS_LOCAL!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_RELATION_IS_LOCAL!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_RELATION_IS_LOCAL!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_RELATION_IS_LOCAL!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -847,7 +851,9 @@ macro_rules! __pgrx_c_args_RELATION_IS_LOCAL {
         $crate::__pgrx_c_args_RELATION_IS_LOCAL!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_RELATION_IS_LOCAL!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_RELATION_IS_LOCAL!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -869,14 +875,18 @@ macro_rules! __pgrx_c_args_RELATION_IS_LOCAL {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_RELATION_IS_LOCAL!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_RELATION_IS_LOCAL!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_RELATION_IS_LOCAL!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_RELATION_IS_LOCAL!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_RELATION_IS_LOCAL!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -903,13 +913,13 @@ macro_rules! __pgrx_c_args_RELATION_IS_LOCAL {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_RELATION_IS_LOCAL!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_RELATION_IS_LOCAL!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -998,10 +1008,11 @@ macro_rules! RELATION_IS_LOCAL {
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::null_constant(
-                                        /* PGRX: InvalidSubTransactionId remains expanded because no integer constant binding is available in the defining Rust crate. */
                                         $crate::__pgrx_c_macros::CValue::<
                                             $crate::__pgrx_c_macros::CUnsignedInt
-                                        >::new(0u32)
+                                        >::new(
+                                            $crate::__pgrx_c_bindings::InvalidSubTransactionId as u32
+                                        )
                                     )
                                 )
                             )
@@ -1100,10 +1111,11 @@ macro_rules! RELATION_IS_LOCAL {
                                                 _
                                             >(
                                                 $crate::__pgrx_c_macros::expression::null_constant(
-                                                    /* PGRX: InvalidSubTransactionId remains expanded because no integer constant binding is available in the defining Rust crate. */
                                                     $crate::__pgrx_c_macros::CValue::<
                                                         $crate::__pgrx_c_macros::CUnsignedInt
-                                                    >::new(0u32)
+                                                    >::new(
+                                                        $crate::__pgrx_c_bindings::InvalidSubTransactionId as u32
+                                                    )
                                                 )
                                             )
                                         )
@@ -1176,10 +1188,11 @@ macro_rules! RELATION_IS_LOCAL {
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::null_constant(
-                                        /* PGRX: InvalidSubTransactionId remains expanded because no integer constant binding is available in the defining Rust crate. */
                                         $crate::__pgrx_c_macros::CValue::<
                                             $crate::__pgrx_c_macros::CUnsignedInt
-                                        >::new(0u32)
+                                        >::new(
+                                            $crate::__pgrx_c_bindings::InvalidSubTransactionId as u32
+                                        )
                                     )
                                 )
                             )
@@ -1202,8 +1215,8 @@ macro_rules! RELATION_IS_LOCAL {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -1234,21 +1247,23 @@ macro_rules! __pgrx_c_args_RELATION_IS_OTHER_TEMP {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
         $crate::__pgrx_c_args_RELATION_IS_OTHER_TEMP!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_RELATION_IS_OTHER_TEMP!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_RELATION_IS_OTHER_TEMP!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_RELATION_IS_OTHER_TEMP!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_RELATION_IS_OTHER_TEMP!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -1256,7 +1271,9 @@ macro_rules! __pgrx_c_args_RELATION_IS_OTHER_TEMP {
         $crate::__pgrx_c_args_RELATION_IS_OTHER_TEMP!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_RELATION_IS_OTHER_TEMP!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_RELATION_IS_OTHER_TEMP!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -1281,15 +1298,17 @@ macro_rules! __pgrx_c_args_RELATION_IS_OTHER_TEMP {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_RELATION_IS_OTHER_TEMP!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_RELATION_IS_OTHER_TEMP!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_RELATION_IS_OTHER_TEMP!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_RELATION_IS_OTHER_TEMP!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -1316,13 +1335,13 @@ macro_rules! __pgrx_c_args_RELATION_IS_OTHER_TEMP {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_RELATION_IS_OTHER_TEMP!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_RELATION_IS_OTHER_TEMP!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -1410,7 +1429,7 @@ macro_rules! RELATION_IS_OTHER_TEMP {
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                        $crate::RELPERSISTENCE_TEMP as i32
+                                        $crate::__pgrx_c_bindings::RELPERSISTENCE_TEMP as i32
                                     )
                                 )
                             )
@@ -1531,7 +1550,9 @@ macro_rules! RELATION_IS_OTHER_TEMP {
                                             >(
                                                 $crate::__pgrx_c_macros::CValue::<
                                                     $crate::__pgrx_c_macros::CInt
-                                                >::new($crate::RELPERSISTENCE_TEMP as i32)
+                                                >::new(
+                                                    $crate::__pgrx_c_bindings::RELPERSISTENCE_TEMP as i32
+                                                )
                                             )
                                         )
                                     )
@@ -1630,7 +1651,7 @@ macro_rules! RELATION_IS_OTHER_TEMP {
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                        $crate::RELPERSISTENCE_TEMP as i32
+                                        $crate::__pgrx_c_bindings::RELPERSISTENCE_TEMP as i32
                                     )
                                 )
                             )
@@ -1681,8 +1702,310 @@ macro_rules! RELATION_IS_OTHER_TEMP {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
+    target_pointer_width = "64",
+    target_endian = "little"
+)))]
+#[cfg(not(docsrs))]
+compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
+#[doc(hidden)]
+#[macro_export]
+macro_rules! __pgrx_c_args_RelationCloseSmgr {
+    (@collect $mode:ident [$($done:tt)*]; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_RelationCloseSmgr!(@p0 $mode [$($done)*]; $($raw)*)
+    };
+    (@classified [$next:ident $mode:ident [$($done:tt)*] [$($rest:tt)*]] $descriptor:tt) => {
+        $crate::__pgrx_c_args_RelationCloseSmgr!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
+    };
+    (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
+        $crate::__pgrx_c_args_RelationCloseSmgr!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
+    };
+    (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
+        $crate::__pgrx_c_args_RelationCloseSmgr!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_RelationCloseSmgr!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+            $($rest)*
+        )
+    };
+    (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_RelationCloseSmgr!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; - $($raw:tt)*) => {
+        $crate::__pgrx_c_args_RelationCloseSmgr!(@negative0 $mode [$($done)*]; - $($raw)*)
+    };
+    (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
+        $crate::__pgrx_c_args_RelationCloseSmgr!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_RelationCloseSmgr] [p1 $mode [$($done)*] []] [
+                $head $(::$tail)* ! $group
+            ]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; ::$head:ident $(::$tail:ident)* ! $group:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_RelationCloseSmgr] [p1 $mode [$($done)*] []] [
+                ::$head $(::$tail)* ! $group
+            ]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; ($($inner:tt)*)) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_RelationCloseSmgr] [p1 $mode [$($done)*] []] [($($inner)*)]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
+        $crate::__pgrx_c_args_RelationCloseSmgr!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
+        $crate::__pgrx_c_args_RelationCloseSmgr!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
+        $crate::__pgrx_c_args_RelationCloseSmgr!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_RelationCloseSmgr] [p1 $mode [$($done)*] [$($rest)*]] [
+                $head $(::$tail)* ! $group
+            ]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; ::$head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_RelationCloseSmgr] [p1 $mode [$($done)*] [$($rest)*]] [
+                ::$head $(::$tail)* ! $group
+            ]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; ($($inner:tt)*), $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_RelationCloseSmgr] [p1 $mode [$($done)*] [$($rest)*]] [
+                ($($inner)*)
+            ]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_RelationCloseSmgr!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_RelationCloseSmgr!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*];) => {
+        $crate::RelationCloseSmgr!(@$mode; $($done)*)
+    };
+    ($($invalid:tt)*) => {
+        compile_error!("arguments do not satisfy this C macro's invocation contract")
+    };
+}
+/// Typed call adapter for C inline function RelationCloseSmgr from rel.h:583
+///
+/// ```c
+/// static inline void
+/// RelationCloseSmgr(Relation relation)
+/// {
+/// 	if (relation->rd_smgr != NULL)
+/// 		smgrclose(relation->rd_smgr);
+///
+/// 	/* smgrclose should unhook from owner pointer */
+/// 	Assert(relation->rd_smgr == NULL);
+/// }
+/// ```
+///
+///
+/// Calls the original function through its inspected C prototype. Each operand is evaluated once and converted using C parameter assignment rules. The result retains the function's original C type; `.get()` extracts its native storage, including `()` for a void result. Native calls retain the backend thread, PostgreSQL error, and caller safety contracts of the generated guarded binding.
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+#[macro_export]
+macro_rules! RelationCloseSmgr {
+    (@__pgrx_emit_check_safety; $relation:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $relation);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_RelationCloseSmgr!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
+    (@__pgrx_emit_public; $relation:tt $(,)?) => {
+        $crate::__pgrx_c_macros::expression_result::finish(
+            $crate::RelationCloseSmgr!(@__pgrx_emit_value; $relation)
+        )
+    };
+    (@__pgrx_emit_value; $relation:tt $(,)?) => {
+        $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+            $crate::__pgrx_c_bindings::RelationCloseSmgr(
+                <
+                    $crate::__pgrx_c_macros::expression::CPointer<
+                        $crate::__pgrx_c_macros::expression::CRecord<
+                            $crate::__pgrx_c_bindings::RelationData
+                        >,
+                        $crate::__pgrx_c_macros::expression::ReadWrite
+                    > as $crate::__pgrx_c_macros::expression::CType
+                >::into_storage(
+                    $crate::__pgrx_c_macros::expression::implicit::<
+                        $crate::__pgrx_c_macros::expression::CPointer<
+                            $crate::__pgrx_c_macros::expression::CRecord<
+                                $crate::__pgrx_c_bindings::RelationData
+                            >,
+                            $crate::__pgrx_c_macros::expression::ReadWrite
+                        >,
+                        _
+                    >(
+                        $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                            $crate::__pgrx_c_operand!(@value [true]; $relation)
+                        )
+                    )
+                ),
+            )
+        )
+    };
+    (@__pgrx_c_value; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_RelationCloseSmgr!(@collect __pgrx_emit_value []; $($raw)*)
+    };
+    (@__pgrx_emit_place; $relation:tt $(,)?) => {
+        compile_error!("C expression is not a place in this operation")
+    };
+    (@__pgrx_c_place; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_RelationCloseSmgr!(@collect __pgrx_emit_place []; $($raw)*)
+    };
+    (@__pgrx_emit_read_place; $relation:tt $(,)?) => {
+        compile_error!("C expression is not a place in this operation")
+    };
+    (@__pgrx_c_read_place; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_RelationCloseSmgr!(@collect __pgrx_emit_read_place []; $($raw)*)
+    };
+    (@__pgrx_emit_size; $relation:tt $(,)?) => {
+        $crate::__pgrx_c_macros::expression::size_of_value_type(
+            if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $relation);
+                    }
+                }
+                Some(
+                    unsafe {
+                        $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                            $crate::__pgrx_c_bindings::RelationCloseSmgr(
+                                <
+                                    $crate::__pgrx_c_macros::expression::CPointer<
+                                        $crate::__pgrx_c_macros::expression::CRecord<
+                                            $crate::__pgrx_c_bindings::RelationData
+                                        >,
+                                        $crate::__pgrx_c_macros::expression::ReadWrite
+                                    > as $crate::__pgrx_c_macros::expression::CType
+                                >::into_storage(
+                                    $crate::__pgrx_c_macros::expression::implicit::<
+                                        $crate::__pgrx_c_macros::expression::CPointer<
+                                            $crate::__pgrx_c_macros::expression::CRecord<
+                                                $crate::__pgrx_c_bindings::RelationData
+                                            >,
+                                            $crate::__pgrx_c_macros::expression::ReadWrite
+                                        >,
+                                        _
+                                    >(
+                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                            true,
+                                            _
+                                        >($crate::__pgrx_c_operand!(@value [true]; $relation))
+                                    )
+                                ),
+                            )
+                        )
+                    }
+                )
+            } else {
+                None
+            }
+        )
+    };
+    (@__pgrx_c_size; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_RelationCloseSmgr!(@collect __pgrx_emit_size []; $($raw)*)
+    };
+    (@__pgrx_emit_discard; $relation:tt $(,)?) => {
+        {
+            let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                $crate::__pgrx_c_bindings::RelationCloseSmgr(
+                    <
+                        $crate::__pgrx_c_macros::expression::CPointer<
+                            $crate::__pgrx_c_macros::expression::CRecord<
+                                $crate::__pgrx_c_bindings::RelationData
+                            >,
+                            $crate::__pgrx_c_macros::expression::ReadWrite
+                        > as $crate::__pgrx_c_macros::expression::CType
+                    >::into_storage(
+                        $crate::__pgrx_c_macros::expression::implicit::<
+                            $crate::__pgrx_c_macros::expression::CPointer<
+                                $crate::__pgrx_c_macros::expression::CRecord<
+                                    $crate::__pgrx_c_bindings::RelationData
+                                >,
+                                $crate::__pgrx_c_macros::expression::ReadWrite
+                            >,
+                            _
+                        >(
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_operand!(@value [true]; $relation)
+                            )
+                        )
+                    ),
+                )
+            );
+        }
+    };
+    (@__pgrx_c_discard; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_RelationCloseSmgr!(@collect __pgrx_emit_discard []; $($raw)*)
+    };
+    ($($raw:tt)*) => {
+        $crate::__pgrx_c_args_RelationCloseSmgr!(@collect __pgrx_emit_public []; $($raw)*)
+    };
+}
+
+#[cfg(not(all(
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -1709,20 +2032,24 @@ macro_rules! __pgrx_c_args_RelationGetDescr {
         $crate::__pgrx_c_args_RelationGetDescr!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_RelationGetDescr!(@p1 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_RelationGetDescr!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_RelationGetDescr!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_RelationGetDescr!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_RelationGetDescr!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_RelationGetDescr!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -1730,7 +2057,9 @@ macro_rules! __pgrx_c_args_RelationGetDescr {
         $crate::__pgrx_c_args_RelationGetDescr!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_RelationGetDescr!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_RelationGetDescr!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -1752,14 +2081,18 @@ macro_rules! __pgrx_c_args_RelationGetDescr {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_RelationGetDescr!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_RelationGetDescr!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_RelationGetDescr!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_RelationGetDescr!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_RelationGetDescr!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -1786,13 +2119,13 @@ macro_rules! __pgrx_c_args_RelationGetDescr {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_RelationGetDescr!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_RelationGetDescr!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -1957,8 +2290,8 @@ macro_rules! RelationGetDescr {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -1989,13 +2322,13 @@ macro_rules! __pgrx_c_args_RelationGetFillFactor {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_RelationGetFillFactor!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_RelationGetFillFactor!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -2004,7 +2337,7 @@ macro_rules! __pgrx_c_args_RelationGetFillFactor {
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_RelationGetFillFactor!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -2031,33 +2364,35 @@ macro_rules! __pgrx_c_args_RelationGetFillFactor {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_RelationGetFillFactor!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_RelationGetFillFactor!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $argument:literal) => {
         $crate::__pgrx_c_args_RelationGetFillFactor!(
-            @p2 $mode [$($done)* (@literal [- $argument]),];
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
         )
     };
     (@negative1 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_RelationGetFillFactor!(@p2 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_RelationGetFillFactor!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_RelationGetFillFactor!(
-            @p2 $mode [$($done)* (@literal [- $argument]),];
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_RelationGetFillFactor!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -2065,7 +2400,9 @@ macro_rules! __pgrx_c_args_RelationGetFillFactor {
         $crate::__pgrx_c_args_RelationGetFillFactor!(@negative1 $mode [$($done)*]; - $($raw)*)
     };
     (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_RelationGetFillFactor!(@p2 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_RelationGetFillFactor!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -2087,14 +2424,18 @@ macro_rules! __pgrx_c_args_RelationGetFillFactor {
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_RelationGetFillFactor!(@p2 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_RelationGetFillFactor!(
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_RelationGetFillFactor!(@p2 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_RelationGetFillFactor!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_RelationGetFillFactor!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -2121,13 +2462,13 @@ macro_rules! __pgrx_c_args_RelationGetFillFactor {
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_RelationGetFillFactor!(
-            @p2 $mode [$($done)* (@literal [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_RelationGetFillFactor!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -2209,10 +2550,10 @@ macro_rules! RelationGetFillFactor {
                                                     _
                                                 >(
                                                     $crate::__pgrx_c_macros::expression::cast_as::<
-                                                        *mut $crate::StdRdOptions,
+                                                        *mut $crate::__pgrx_c_bindings::StdRdOptions,
                                                         $crate::__pgrx_c_macros::expression::CPointer<
                                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                                $crate::StdRdOptions
+                                                                $crate::__pgrx_c_bindings::StdRdOptions
                                                             >,
                                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                                         >,
@@ -2336,10 +2677,10 @@ macro_rules! RelationGetFillFactor {
                                                                 _
                                                             >(
                                                                 $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                    *mut $crate::StdRdOptions,
+                                                                    *mut $crate::__pgrx_c_bindings::StdRdOptions,
                                                                     $crate::__pgrx_c_macros::expression::CPointer<
                                                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                                                            $crate::StdRdOptions
+                                                                            $crate::__pgrx_c_bindings::StdRdOptions
                                                                         >,
                                                                         $crate::__pgrx_c_macros::expression::ReadWrite
                                                                     >,
@@ -2442,10 +2783,10 @@ macro_rules! RelationGetFillFactor {
                                                     _
                                                 >(
                                                     $crate::__pgrx_c_macros::expression::cast_as::<
-                                                        *mut $crate::StdRdOptions,
+                                                        *mut $crate::__pgrx_c_bindings::StdRdOptions,
                                                         $crate::__pgrx_c_macros::expression::CPointer<
                                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                                $crate::StdRdOptions
+                                                                $crate::__pgrx_c_bindings::StdRdOptions
                                                             >,
                                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                                         >,
@@ -2507,8 +2848,8 @@ macro_rules! RelationGetFillFactor {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -2535,20 +2876,24 @@ macro_rules! __pgrx_c_args_RelationGetForm {
         $crate::__pgrx_c_args_RelationGetForm!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_RelationGetForm!(@p1 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_RelationGetForm!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_RelationGetForm!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_RelationGetForm!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_RelationGetForm!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_RelationGetForm!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -2556,7 +2901,9 @@ macro_rules! __pgrx_c_args_RelationGetForm {
         $crate::__pgrx_c_args_RelationGetForm!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_RelationGetForm!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_RelationGetForm!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -2578,14 +2925,18 @@ macro_rules! __pgrx_c_args_RelationGetForm {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_RelationGetForm!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_RelationGetForm!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_RelationGetForm!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_RelationGetForm!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_RelationGetForm!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -2612,13 +2963,13 @@ macro_rules! __pgrx_c_args_RelationGetForm {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_RelationGetForm!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_RelationGetForm!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -2783,8 +3134,8 @@ macro_rules! RelationGetForm {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -2815,21 +3166,23 @@ macro_rules! __pgrx_c_args_RelationGetNamespace {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
         $crate::__pgrx_c_args_RelationGetNamespace!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_RelationGetNamespace!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_RelationGetNamespace!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_RelationGetNamespace!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_RelationGetNamespace!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -2837,7 +3190,9 @@ macro_rules! __pgrx_c_args_RelationGetNamespace {
         $crate::__pgrx_c_args_RelationGetNamespace!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_RelationGetNamespace!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_RelationGetNamespace!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -2859,14 +3214,18 @@ macro_rules! __pgrx_c_args_RelationGetNamespace {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_RelationGetNamespace!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_RelationGetNamespace!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_RelationGetNamespace!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_RelationGetNamespace!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_RelationGetNamespace!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -2893,13 +3252,13 @@ macro_rules! __pgrx_c_args_RelationGetNamespace {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_RelationGetNamespace!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_RelationGetNamespace!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -3144,8 +3503,8 @@ macro_rules! RelationGetNamespace {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -3176,23 +3535,23 @@ macro_rules! __pgrx_c_args_RelationGetNumberOfAttributes {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
         $crate::__pgrx_c_args_RelationGetNumberOfAttributes!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_RelationGetNumberOfAttributes!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_RelationGetNumberOfAttributes!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_RelationGetNumberOfAttributes!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -3204,7 +3563,7 @@ macro_rules! __pgrx_c_args_RelationGetNumberOfAttributes {
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
         $crate::__pgrx_c_args_RelationGetNumberOfAttributes!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
@@ -3230,17 +3589,17 @@ macro_rules! __pgrx_c_args_RelationGetNumberOfAttributes {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_RelationGetNumberOfAttributes!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_RelationGetNumberOfAttributes!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_RelationGetNumberOfAttributes!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -3267,13 +3626,13 @@ macro_rules! __pgrx_c_args_RelationGetNumberOfAttributes {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_RelationGetNumberOfAttributes!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_RelationGetNumberOfAttributes!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -3536,8 +3895,8 @@ macro_rules! RelationGetNumberOfAttributes {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -3568,13 +3927,13 @@ macro_rules! __pgrx_c_args_RelationGetParallelWorkers {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_RelationGetParallelWorkers!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_RelationGetParallelWorkers!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -3583,7 +3942,7 @@ macro_rules! __pgrx_c_args_RelationGetParallelWorkers {
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_RelationGetParallelWorkers!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -3610,35 +3969,35 @@ macro_rules! __pgrx_c_args_RelationGetParallelWorkers {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_RelationGetParallelWorkers!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_RelationGetParallelWorkers!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $argument:literal) => {
         $crate::__pgrx_c_args_RelationGetParallelWorkers!(
-            @p2 $mode [$($done)* (@literal [- $argument]),];
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
         )
     };
     (@negative1 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_RelationGetParallelWorkers!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_RelationGetParallelWorkers!(
-            @p2 $mode [$($done)* (@literal [- $argument]),];
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_RelationGetParallelWorkers!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -3647,7 +4006,7 @@ macro_rules! __pgrx_c_args_RelationGetParallelWorkers {
     };
     (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
         $crate::__pgrx_c_args_RelationGetParallelWorkers!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
@@ -3673,17 +4032,17 @@ macro_rules! __pgrx_c_args_RelationGetParallelWorkers {
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_RelationGetParallelWorkers!(
-            @p2 $mode [$($done)* (@literal [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_RelationGetParallelWorkers!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_RelationGetParallelWorkers!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -3710,13 +4069,13 @@ macro_rules! __pgrx_c_args_RelationGetParallelWorkers {
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_RelationGetParallelWorkers!(
-            @p2 $mode [$($done)* (@literal [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_RelationGetParallelWorkers!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -3801,10 +4160,10 @@ macro_rules! RelationGetParallelWorkers {
                                                     _
                                                 >(
                                                     $crate::__pgrx_c_macros::expression::cast_as::<
-                                                        *mut $crate::StdRdOptions,
+                                                        *mut $crate::__pgrx_c_bindings::StdRdOptions,
                                                         $crate::__pgrx_c_macros::expression::CPointer<
                                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                                $crate::StdRdOptions
+                                                                $crate::__pgrx_c_bindings::StdRdOptions
                                                             >,
                                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                                         >,
@@ -3931,10 +4290,10 @@ macro_rules! RelationGetParallelWorkers {
                                                                 _
                                                             >(
                                                                 $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                    *mut $crate::StdRdOptions,
+                                                                    *mut $crate::__pgrx_c_bindings::StdRdOptions,
                                                                     $crate::__pgrx_c_macros::expression::CPointer<
                                                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                                                            $crate::StdRdOptions
+                                                                            $crate::__pgrx_c_bindings::StdRdOptions
                                                                         >,
                                                                         $crate::__pgrx_c_macros::expression::ReadWrite
                                                                     >,
@@ -4037,10 +4396,10 @@ macro_rules! RelationGetParallelWorkers {
                                                     _
                                                 >(
                                                     $crate::__pgrx_c_macros::expression::cast_as::<
-                                                        *mut $crate::StdRdOptions,
+                                                        *mut $crate::__pgrx_c_bindings::StdRdOptions,
                                                         $crate::__pgrx_c_macros::expression::CPointer<
                                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                                $crate::StdRdOptions
+                                                                $crate::__pgrx_c_bindings::StdRdOptions
                                                             >,
                                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                                         >,
@@ -4102,8 +4461,8 @@ macro_rules! RelationGetParallelWorkers {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -4134,23 +4493,23 @@ macro_rules! __pgrx_c_args_RelationGetRelationName {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
         $crate::__pgrx_c_args_RelationGetRelationName!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_RelationGetRelationName!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_RelationGetRelationName!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_RelationGetRelationName!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -4159,7 +4518,7 @@ macro_rules! __pgrx_c_args_RelationGetRelationName {
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
         $crate::__pgrx_c_args_RelationGetRelationName!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
@@ -4185,17 +4544,17 @@ macro_rules! __pgrx_c_args_RelationGetRelationName {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_RelationGetRelationName!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_RelationGetRelationName!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_RelationGetRelationName!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -4222,13 +4581,13 @@ macro_rules! __pgrx_c_args_RelationGetRelationName {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_RelationGetRelationName!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_RelationGetRelationName!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -4543,8 +4902,8 @@ macro_rules! RelationGetRelationName {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -4571,20 +4930,24 @@ macro_rules! __pgrx_c_args_RelationGetRelid {
         $crate::__pgrx_c_args_RelationGetRelid!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_RelationGetRelid!(@p1 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_RelationGetRelid!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_RelationGetRelid!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_RelationGetRelid!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_RelationGetRelid!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_RelationGetRelid!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -4592,7 +4955,9 @@ macro_rules! __pgrx_c_args_RelationGetRelid {
         $crate::__pgrx_c_args_RelationGetRelid!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_RelationGetRelid!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_RelationGetRelid!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -4614,14 +4979,18 @@ macro_rules! __pgrx_c_args_RelationGetRelid {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_RelationGetRelid!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_RelationGetRelid!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_RelationGetRelid!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_RelationGetRelid!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_RelationGetRelid!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -4648,13 +5017,13 @@ macro_rules! __pgrx_c_args_RelationGetRelid {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_RelationGetRelid!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_RelationGetRelid!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -4819,8 +5188,335 @@ macro_rules! RelationGetRelid {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
+    target_pointer_width = "64",
+    target_endian = "little"
+)))]
+#[cfg(not(docsrs))]
+compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
+#[doc(hidden)]
+#[macro_export]
+macro_rules! __pgrx_c_args_RelationGetSmgr {
+    (@collect $mode:ident [$($done:tt)*]; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_RelationGetSmgr!(@p0 $mode [$($done)*]; $($raw)*)
+    };
+    (@classified [$next:ident $mode:ident [$($done:tt)*] [$($rest:tt)*]] $descriptor:tt) => {
+        $crate::__pgrx_c_args_RelationGetSmgr!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
+    };
+    (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
+        $crate::__pgrx_c_args_RelationGetSmgr!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
+    };
+    (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
+        $crate::__pgrx_c_args_RelationGetSmgr!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_RelationGetSmgr!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+            $($rest)*
+        )
+    };
+    (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_RelationGetSmgr!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; - $($raw:tt)*) => {
+        $crate::__pgrx_c_args_RelationGetSmgr!(@negative0 $mode [$($done)*]; - $($raw)*)
+    };
+    (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
+        $crate::__pgrx_c_args_RelationGetSmgr!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_RelationGetSmgr] [p1 $mode [$($done)*] []] [
+                $head $(::$tail)* ! $group
+            ]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; ::$head:ident $(::$tail:ident)* ! $group:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_RelationGetSmgr] [p1 $mode [$($done)*] []] [
+                ::$head $(::$tail)* ! $group
+            ]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; ($($inner:tt)*)) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_RelationGetSmgr] [p1 $mode [$($done)*] []] [($($inner)*)]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
+        $crate::__pgrx_c_args_RelationGetSmgr!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
+        $crate::__pgrx_c_args_RelationGetSmgr!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
+        $crate::__pgrx_c_args_RelationGetSmgr!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_RelationGetSmgr] [p1 $mode [$($done)*] [$($rest)*]] [
+                $head $(::$tail)* ! $group
+            ]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; ::$head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_RelationGetSmgr] [p1 $mode [$($done)*] [$($rest)*]] [
+                ::$head $(::$tail)* ! $group
+            ]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; ($($inner:tt)*), $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_RelationGetSmgr] [p1 $mode [$($done)*] [$($rest)*]] [
+                ($($inner)*)
+            ]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_RelationGetSmgr!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_RelationGetSmgr!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*];) => {
+        $crate::RelationGetSmgr!(@$mode; $($done)*)
+    };
+    ($($invalid:tt)*) => {
+        compile_error!("arguments do not satisfy this C macro's invocation contract")
+    };
+}
+/// Typed call adapter for C inline function RelationGetSmgr from rel.h:571
+///
+/// ```c
+/// static inline SMgrRelation
+/// RelationGetSmgr(Relation rel)
+/// {
+/// 	if (unlikely(rel->rd_smgr == NULL))
+/// 		smgrsetowner(&(rel->rd_smgr), smgropen(rel->rd_locator, rel->rd_backend));
+/// 	return rel->rd_smgr;
+/// }
+/// ```
+///
+///
+/// Calls the original function through its inspected C prototype. Each operand is evaluated once and converted using C parameter assignment rules. The result retains the function's original C type; `.get()` extracts its native storage, including `()` for a void result. Native calls retain the backend thread, PostgreSQL error, and caller safety contracts of the generated guarded binding.
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+#[macro_export]
+macro_rules! RelationGetSmgr {
+    (@__pgrx_emit_check_safety; $rel:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $rel);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_RelationGetSmgr!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
+    (@__pgrx_emit_public; $rel:tt $(,)?) => {
+        $crate::__pgrx_c_macros::expression_result::finish(
+            $crate::RelationGetSmgr!(@__pgrx_emit_value; $rel)
+        )
+    };
+    (@__pgrx_emit_value; $rel:tt $(,)?) => {
+        $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+            <
+                $crate::__pgrx_c_macros::expression::CPointer<
+                    $crate::__pgrx_c_macros::expression::CRecord<
+                        $crate::__pgrx_c_bindings::SMgrRelationData
+                    >,
+                    $crate::__pgrx_c_macros::expression::ReadWrite
+                > as $crate::__pgrx_c_macros::expression::CType
+            >::from_storage(
+                $crate::__pgrx_c_bindings::RelationGetSmgr(
+                    <
+                        $crate::__pgrx_c_macros::expression::CPointer<
+                            $crate::__pgrx_c_macros::expression::CRecord<
+                                $crate::__pgrx_c_bindings::RelationData
+                            >,
+                            $crate::__pgrx_c_macros::expression::ReadWrite
+                        > as $crate::__pgrx_c_macros::expression::CType
+                    >::into_storage(
+                        $crate::__pgrx_c_macros::expression::implicit::<
+                            $crate::__pgrx_c_macros::expression::CPointer<
+                                $crate::__pgrx_c_macros::expression::CRecord<
+                                    $crate::__pgrx_c_bindings::RelationData
+                                >,
+                                $crate::__pgrx_c_macros::expression::ReadWrite
+                            >,
+                            _
+                        >(
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_operand!(@value [true]; $rel)
+                            )
+                        )
+                    ),
+                )
+            )
+        )
+    };
+    (@__pgrx_c_value; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_RelationGetSmgr!(@collect __pgrx_emit_value []; $($raw)*)
+    };
+    (@__pgrx_emit_place; $rel:tt $(,)?) => {
+        compile_error!("C expression is not a place in this operation")
+    };
+    (@__pgrx_c_place; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_RelationGetSmgr!(@collect __pgrx_emit_place []; $($raw)*)
+    };
+    (@__pgrx_emit_read_place; $rel:tt $(,)?) => {
+        compile_error!("C expression is not a place in this operation")
+    };
+    (@__pgrx_c_read_place; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_RelationGetSmgr!(@collect __pgrx_emit_read_place []; $($raw)*)
+    };
+    (@__pgrx_emit_size; $rel:tt $(,)?) => {
+        $crate::__pgrx_c_macros::expression::size_of_value_type(
+            if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $rel);
+                    }
+                }
+                Some(
+                    unsafe {
+                        $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                            <
+                                $crate::__pgrx_c_macros::expression::CPointer<
+                                    $crate::__pgrx_c_macros::expression::CRecord<
+                                        $crate::__pgrx_c_bindings::SMgrRelationData
+                                    >,
+                                    $crate::__pgrx_c_macros::expression::ReadWrite
+                                > as $crate::__pgrx_c_macros::expression::CType
+                            >::from_storage(
+                                $crate::__pgrx_c_bindings::RelationGetSmgr(
+                                    <
+                                        $crate::__pgrx_c_macros::expression::CPointer<
+                                            $crate::__pgrx_c_macros::expression::CRecord<
+                                                $crate::__pgrx_c_bindings::RelationData
+                                            >,
+                                            $crate::__pgrx_c_macros::expression::ReadWrite
+                                        > as $crate::__pgrx_c_macros::expression::CType
+                                    >::into_storage(
+                                        $crate::__pgrx_c_macros::expression::implicit::<
+                                            $crate::__pgrx_c_macros::expression::CPointer<
+                                                $crate::__pgrx_c_macros::expression::CRecord<
+                                                    $crate::__pgrx_c_bindings::RelationData
+                                                >,
+                                                $crate::__pgrx_c_macros::expression::ReadWrite
+                                            >,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_macros::expression::profile_value::<
+                                                true,
+                                                _
+                                            >($crate::__pgrx_c_operand!(@value [true]; $rel))
+                                        )
+                                    ),
+                                )
+                            )
+                        )
+                    }
+                )
+            } else {
+                None
+            }
+        )
+    };
+    (@__pgrx_c_size; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_RelationGetSmgr!(@collect __pgrx_emit_size []; $($raw)*)
+    };
+    (@__pgrx_emit_discard; $rel:tt $(,)?) => {
+        {
+            let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                <
+                    $crate::__pgrx_c_macros::expression::CPointer<
+                        $crate::__pgrx_c_macros::expression::CRecord<
+                            $crate::__pgrx_c_bindings::SMgrRelationData
+                        >,
+                        $crate::__pgrx_c_macros::expression::ReadWrite
+                    > as $crate::__pgrx_c_macros::expression::CType
+                >::from_storage(
+                    $crate::__pgrx_c_bindings::RelationGetSmgr(
+                        <
+                            $crate::__pgrx_c_macros::expression::CPointer<
+                                $crate::__pgrx_c_macros::expression::CRecord<
+                                    $crate::__pgrx_c_bindings::RelationData
+                                >,
+                                $crate::__pgrx_c_macros::expression::ReadWrite
+                            > as $crate::__pgrx_c_macros::expression::CType
+                        >::into_storage(
+                            $crate::__pgrx_c_macros::expression::implicit::<
+                                $crate::__pgrx_c_macros::expression::CPointer<
+                                    $crate::__pgrx_c_macros::expression::CRecord<
+                                        $crate::__pgrx_c_bindings::RelationData
+                                    >,
+                                    $crate::__pgrx_c_macros::expression::ReadWrite
+                                >,
+                                _
+                            >(
+                                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                    $crate::__pgrx_c_operand!(@value [true]; $rel)
+                                )
+                            )
+                        ),
+                    )
+                )
+            );
+        }
+    };
+    (@__pgrx_c_discard; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_RelationGetSmgr!(@collect __pgrx_emit_discard []; $($raw)*)
+    };
+    ($($raw:tt)*) => {
+        $crate::__pgrx_c_args_RelationGetSmgr!(@collect __pgrx_emit_public []; $($raw)*)
+    };
+}
+
+#[cfg(not(all(
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -4851,21 +5547,23 @@ macro_rules! __pgrx_c_args_RelationGetTargetBlock {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
         $crate::__pgrx_c_args_RelationGetTargetBlock!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_RelationGetTargetBlock!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_RelationGetTargetBlock!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_RelationGetTargetBlock!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_RelationGetTargetBlock!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -4873,7 +5571,9 @@ macro_rules! __pgrx_c_args_RelationGetTargetBlock {
         $crate::__pgrx_c_args_RelationGetTargetBlock!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_RelationGetTargetBlock!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_RelationGetTargetBlock!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -4898,15 +5598,17 @@ macro_rules! __pgrx_c_args_RelationGetTargetBlock {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_RelationGetTargetBlock!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_RelationGetTargetBlock!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_RelationGetTargetBlock!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_RelationGetTargetBlock!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -4933,13 +5635,13 @@ macro_rules! __pgrx_c_args_RelationGetTargetBlock {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_RelationGetTargetBlock!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_RelationGetTargetBlock!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -5085,10 +5787,9 @@ macro_rules! RelationGetTargetBlock {
                     } else {
                         $crate::__pgrx_c_macros::Either::Right(
                             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                                /* PGRX: InvalidBlockNumber remains expanded because no integer constant binding is available in the defining Rust crate. */
                                 $crate::__pgrx_c_macros::CValue::<
                                     $crate::__pgrx_c_macros::CUnsignedInt
-                                >::new(4294967295u32)
+                                >::new($crate::__pgrx_c_bindings::InvalidBlockNumber as u32)
                             )
                         )
                     }
@@ -5232,10 +5933,11 @@ macro_rules! RelationGetTargetBlock {
                                             true,
                                             _
                                         >(
-                                            /* PGRX: InvalidBlockNumber remains expanded because no integer constant binding is available in the defining Rust crate. */
                                             $crate::__pgrx_c_macros::CValue::<
                                                 $crate::__pgrx_c_macros::CUnsignedInt
-                                            >::new(4294967295u32)
+                                            >::new(
+                                                $crate::__pgrx_c_bindings::InvalidBlockNumber as u32
+                                            )
                                         )
                                     )
                                 }
@@ -5352,10 +6054,9 @@ macro_rules! RelationGetTargetBlock {
                     } else {
                         $crate::__pgrx_c_macros::Either::Right(
                             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                                /* PGRX: InvalidBlockNumber remains expanded because no integer constant binding is available in the defining Rust crate. */
                                 $crate::__pgrx_c_macros::CValue::<
                                     $crate::__pgrx_c_macros::CUnsignedInt
-                                >::new(4294967295u32)
+                                >::new($crate::__pgrx_c_bindings::InvalidBlockNumber as u32)
                             )
                         )
                     }
@@ -5372,8 +6073,8 @@ macro_rules! RelationGetTargetBlock {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -5404,13 +6105,13 @@ macro_rules! __pgrx_c_args_RelationGetTargetPageFreeSpace {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_RelationGetTargetPageFreeSpace!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_RelationGetTargetPageFreeSpace!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -5422,7 +6123,7 @@ macro_rules! __pgrx_c_args_RelationGetTargetPageFreeSpace {
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_RelationGetTargetPageFreeSpace!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -5449,35 +6150,35 @@ macro_rules! __pgrx_c_args_RelationGetTargetPageFreeSpace {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_RelationGetTargetPageFreeSpace!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_RelationGetTargetPageFreeSpace!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $argument:literal) => {
         $crate::__pgrx_c_args_RelationGetTargetPageFreeSpace!(
-            @p2 $mode [$($done)* (@literal [- $argument]),];
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
         )
     };
     (@negative1 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_RelationGetTargetPageFreeSpace!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_RelationGetTargetPageFreeSpace!(
-            @p2 $mode [$($done)* (@literal [- $argument]),];
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_RelationGetTargetPageFreeSpace!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -5489,7 +6190,7 @@ macro_rules! __pgrx_c_args_RelationGetTargetPageFreeSpace {
     };
     (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
         $crate::__pgrx_c_args_RelationGetTargetPageFreeSpace!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
@@ -5515,17 +6216,17 @@ macro_rules! __pgrx_c_args_RelationGetTargetPageFreeSpace {
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_RelationGetTargetPageFreeSpace!(
-            @p2 $mode [$($done)* (@literal [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_RelationGetTargetPageFreeSpace!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_RelationGetTargetPageFreeSpace!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -5552,13 +6253,13 @@ macro_rules! __pgrx_c_args_RelationGetTargetPageFreeSpace {
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_RelationGetTargetPageFreeSpace!(
-            @p2 $mode [$($done)* (@literal [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_RelationGetTargetPageFreeSpace!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -5617,7 +6318,7 @@ macro_rules! RelationGetTargetPageFreeSpace {
                         >(
                             $crate::__pgrx_c_macros::expression::profile_value::<false, _>(
                                 $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                    $crate::BLCKSZ as i32
+                                    $crate::__pgrx_c_bindings::BLCKSZ as i32
                                 )
                             ),
                             (
@@ -5687,10 +6388,10 @@ macro_rules! RelationGetTargetPageFreeSpace {
                                                                                     _
                                                                                 >(
                                                                                     $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                                        *mut $crate::StdRdOptions,
+                                                                                        *mut $crate::__pgrx_c_bindings::StdRdOptions,
                                                                                         $crate::__pgrx_c_macros::expression::CPointer<
                                                                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                $crate::StdRdOptions
+                                                                                                $crate::__pgrx_c_bindings::StdRdOptions
                                                                                             >,
                                                                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                                                                         >,
@@ -5814,7 +6515,7 @@ macro_rules! RelationGetTargetPageFreeSpace {
                                         >(
                                             $crate::__pgrx_c_macros::CValue::<
                                                 $crate::__pgrx_c_macros::CInt
-                                            >::new($crate::BLCKSZ as i32)
+                                            >::new($crate::__pgrx_c_bindings::BLCKSZ as i32)
                                         ),
                                         (
                                             $crate::__pgrx_c_macros::expression::profile_value::<
@@ -5888,10 +6589,10 @@ macro_rules! RelationGetTargetPageFreeSpace {
                                                                                                 _
                                                                                             >(
                                                                                                 $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                                                    *mut $crate::StdRdOptions,
+                                                                                                    *mut $crate::__pgrx_c_bindings::StdRdOptions,
                                                                                                     $crate::__pgrx_c_macros::expression::CPointer<
                                                                                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                            $crate::StdRdOptions
+                                                                                                            $crate::__pgrx_c_bindings::StdRdOptions
                                                                                                         >,
                                                                                                         $crate::__pgrx_c_macros::expression::ReadWrite
                                                                                                     >,
@@ -5989,7 +6690,7 @@ macro_rules! RelationGetTargetPageFreeSpace {
                         >(
                             $crate::__pgrx_c_macros::expression::profile_value::<false, _>(
                                 $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                    $crate::BLCKSZ as i32
+                                    $crate::__pgrx_c_bindings::BLCKSZ as i32
                                 )
                             ),
                             (
@@ -6059,10 +6760,10 @@ macro_rules! RelationGetTargetPageFreeSpace {
                                                                                     _
                                                                                 >(
                                                                                     $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                                        *mut $crate::StdRdOptions,
+                                                                                        *mut $crate::__pgrx_c_bindings::StdRdOptions,
                                                                                         $crate::__pgrx_c_macros::expression::CPointer<
                                                                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                $crate::StdRdOptions
+                                                                                                $crate::__pgrx_c_bindings::StdRdOptions
                                                                                             >,
                                                                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                                                                         >,
@@ -6151,8 +6852,8 @@ macro_rules! RelationGetTargetPageFreeSpace {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -6183,13 +6884,13 @@ macro_rules! __pgrx_c_args_RelationGetTargetPageUsage {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_RelationGetTargetPageUsage!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_RelationGetTargetPageUsage!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -6198,7 +6899,7 @@ macro_rules! __pgrx_c_args_RelationGetTargetPageUsage {
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_RelationGetTargetPageUsage!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -6225,35 +6926,35 @@ macro_rules! __pgrx_c_args_RelationGetTargetPageUsage {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_RelationGetTargetPageUsage!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_RelationGetTargetPageUsage!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $argument:literal) => {
         $crate::__pgrx_c_args_RelationGetTargetPageUsage!(
-            @p2 $mode [$($done)* (@literal [- $argument]),];
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
         )
     };
     (@negative1 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_RelationGetTargetPageUsage!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_RelationGetTargetPageUsage!(
-            @p2 $mode [$($done)* (@literal [- $argument]),];
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_RelationGetTargetPageUsage!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -6262,7 +6963,7 @@ macro_rules! __pgrx_c_args_RelationGetTargetPageUsage {
     };
     (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
         $crate::__pgrx_c_args_RelationGetTargetPageUsage!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
@@ -6288,17 +6989,17 @@ macro_rules! __pgrx_c_args_RelationGetTargetPageUsage {
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_RelationGetTargetPageUsage!(
-            @p2 $mode [$($done)* (@literal [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_RelationGetTargetPageUsage!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_RelationGetTargetPageUsage!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -6325,13 +7026,13 @@ macro_rules! __pgrx_c_args_RelationGetTargetPageUsage {
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_RelationGetTargetPageUsage!(
-            @p2 $mode [$($done)* (@literal [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_RelationGetTargetPageUsage!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -6390,7 +7091,7 @@ macro_rules! RelationGetTargetPageUsage {
                         >(
                             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                 $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                    $crate::BLCKSZ as i32
+                                    $crate::__pgrx_c_bindings::BLCKSZ as i32
                                 )
                             ),
                             (
@@ -6442,10 +7143,10 @@ macro_rules! RelationGetTargetPageUsage {
                                                                         _
                                                                     >(
                                                                         $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                            *mut $crate::StdRdOptions,
+                                                                            *mut $crate::__pgrx_c_bindings::StdRdOptions,
                                                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                    $crate::StdRdOptions
+                                                                                    $crate::__pgrx_c_bindings::StdRdOptions
                                                                                 >,
                                                                                 $crate::__pgrx_c_macros::expression::ReadWrite
                                                                             >,
@@ -6560,7 +7261,7 @@ macro_rules! RelationGetTargetPageUsage {
                                         >(
                                             $crate::__pgrx_c_macros::CValue::<
                                                 $crate::__pgrx_c_macros::CInt
-                                            >::new($crate::BLCKSZ as i32)
+                                            >::new($crate::__pgrx_c_bindings::BLCKSZ as i32)
                                         ),
                                         (
                                             $crate::__pgrx_c_macros::expression::profile_value::<
@@ -6614,10 +7315,10 @@ macro_rules! RelationGetTargetPageUsage {
                                                                                     _
                                                                                 >(
                                                                                     $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                                        *mut $crate::StdRdOptions,
+                                                                                        *mut $crate::__pgrx_c_bindings::StdRdOptions,
                                                                                         $crate::__pgrx_c_macros::expression::CPointer<
                                                                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                $crate::StdRdOptions
+                                                                                                $crate::__pgrx_c_bindings::StdRdOptions
                                                                                             >,
                                                                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                                                                         >,
@@ -6709,7 +7410,7 @@ macro_rules! RelationGetTargetPageUsage {
                         >(
                             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                 $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                    $crate::BLCKSZ as i32
+                                    $crate::__pgrx_c_bindings::BLCKSZ as i32
                                 )
                             ),
                             (
@@ -6761,10 +7462,10 @@ macro_rules! RelationGetTargetPageUsage {
                                                                         _
                                                                     >(
                                                                         $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                            *mut $crate::StdRdOptions,
+                                                                            *mut $crate::__pgrx_c_bindings::StdRdOptions,
                                                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                    $crate::StdRdOptions
+                                                                                    $crate::__pgrx_c_bindings::StdRdOptions
                                                                                 >,
                                                                                 $crate::__pgrx_c_macros::expression::ReadWrite
                                                                             >,
@@ -6844,8 +7545,8 @@ macro_rules! RelationGetTargetPageUsage {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -6876,13 +7577,13 @@ macro_rules! __pgrx_c_args_RelationGetToastTupleTarget {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_RelationGetToastTupleTarget!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_RelationGetToastTupleTarget!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -6891,7 +7592,7 @@ macro_rules! __pgrx_c_args_RelationGetToastTupleTarget {
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_RelationGetToastTupleTarget!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -6918,35 +7619,35 @@ macro_rules! __pgrx_c_args_RelationGetToastTupleTarget {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_RelationGetToastTupleTarget!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_RelationGetToastTupleTarget!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $argument:literal) => {
         $crate::__pgrx_c_args_RelationGetToastTupleTarget!(
-            @p2 $mode [$($done)* (@literal [- $argument]),];
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
         )
     };
     (@negative1 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_RelationGetToastTupleTarget!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_RelationGetToastTupleTarget!(
-            @p2 $mode [$($done)* (@literal [- $argument]),];
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_RelationGetToastTupleTarget!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -6955,7 +7656,7 @@ macro_rules! __pgrx_c_args_RelationGetToastTupleTarget {
     };
     (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
         $crate::__pgrx_c_args_RelationGetToastTupleTarget!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
@@ -6981,17 +7682,17 @@ macro_rules! __pgrx_c_args_RelationGetToastTupleTarget {
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_RelationGetToastTupleTarget!(
-            @p2 $mode [$($done)* (@literal [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_RelationGetToastTupleTarget!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_RelationGetToastTupleTarget!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -7018,13 +7719,13 @@ macro_rules! __pgrx_c_args_RelationGetToastTupleTarget {
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_RelationGetToastTupleTarget!(
-            @p2 $mode [$($done)* (@literal [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_RelationGetToastTupleTarget!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -7109,10 +7810,10 @@ macro_rules! RelationGetToastTupleTarget {
                                                     _
                                                 >(
                                                     $crate::__pgrx_c_macros::expression::cast_as::<
-                                                        *mut $crate::StdRdOptions,
+                                                        *mut $crate::__pgrx_c_bindings::StdRdOptions,
                                                         $crate::__pgrx_c_macros::expression::CPointer<
                                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                                $crate::StdRdOptions
+                                                                $crate::__pgrx_c_bindings::StdRdOptions
                                                             >,
                                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                                         >,
@@ -7239,10 +7940,10 @@ macro_rules! RelationGetToastTupleTarget {
                                                                 _
                                                             >(
                                                                 $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                    *mut $crate::StdRdOptions,
+                                                                    *mut $crate::__pgrx_c_bindings::StdRdOptions,
                                                                     $crate::__pgrx_c_macros::expression::CPointer<
                                                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                                                            $crate::StdRdOptions
+                                                                            $crate::__pgrx_c_bindings::StdRdOptions
                                                                         >,
                                                                         $crate::__pgrx_c_macros::expression::ReadWrite
                                                                     >,
@@ -7350,10 +8051,10 @@ macro_rules! RelationGetToastTupleTarget {
                                                     _
                                                 >(
                                                     $crate::__pgrx_c_macros::expression::cast_as::<
-                                                        *mut $crate::StdRdOptions,
+                                                        *mut $crate::__pgrx_c_bindings::StdRdOptions,
                                                         $crate::__pgrx_c_macros::expression::CPointer<
                                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                                $crate::StdRdOptions
+                                                                $crate::__pgrx_c_bindings::StdRdOptions
                                                             >,
                                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                                         >,
@@ -7418,8 +8119,1916 @@ macro_rules! RelationGetToastTupleTarget {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
+    target_pointer_width = "64",
+    target_endian = "little"
+)))]
+#[cfg(not(docsrs))]
+compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
+#[doc(hidden)]
+#[macro_export]
+macro_rules! __pgrx_c_args_RelationHasCascadedCheckOption {
+    (@collect $mode:ident [$($done:tt)*]; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_RelationHasCascadedCheckOption!(@p0 $mode [$($done)*]; $($raw)*)
+    };
+    (@classified [$next:ident $mode:ident [$($done:tt)*] [$($rest:tt)*]] $descriptor:tt) => {
+        $crate::__pgrx_c_args_RelationHasCascadedCheckOption!(
+            @$next $mode [$($done)* $descriptor,];
+            $($rest)*
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
+        $crate::__pgrx_c_args_RelationHasCascadedCheckOption!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
+    };
+    (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
+        $crate::__pgrx_c_args_RelationHasCascadedCheckOption!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_RelationHasCascadedCheckOption!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+            $($rest)*
+        )
+    };
+    (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_RelationHasCascadedCheckOption!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; - $($raw:tt)*) => {
+        $crate::__pgrx_c_args_RelationHasCascadedCheckOption!(
+            @negative0 $mode [$($done)*];
+            - $($raw)*
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
+        $crate::__pgrx_c_args_RelationHasCascadedCheckOption!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_RelationHasCascadedCheckOption] [p1 $mode [$($done)*] []] [
+                $head $(::$tail)* ! $group
+            ]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; ::$head:ident $(::$tail:ident)* ! $group:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_RelationHasCascadedCheckOption] [p1 $mode [$($done)*] []] [
+                ::$head $(::$tail)* ! $group
+            ]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; ($($inner:tt)*)) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_RelationHasCascadedCheckOption] [p1 $mode [$($done)*] []] [
+                ($($inner)*)
+            ]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
+        $crate::__pgrx_c_args_RelationHasCascadedCheckOption!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
+        $crate::__pgrx_c_args_RelationHasCascadedCheckOption!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
+        $crate::__pgrx_c_args_RelationHasCascadedCheckOption!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_RelationHasCascadedCheckOption] [
+                p1 $mode [$($done)*] [$($rest)*]
+            ] [$head $(::$tail)* ! $group]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; ::$head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_RelationHasCascadedCheckOption] [
+                p1 $mode [$($done)*] [$($rest)*]
+            ] [::$head $(::$tail)* ! $group]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; ($($inner:tt)*), $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_RelationHasCascadedCheckOption] [
+                p1 $mode [$($done)*] [$($rest)*]
+            ] [($($inner)*)]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_RelationHasCascadedCheckOption!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_RelationHasCascadedCheckOption!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*];) => {
+        $crate::RelationHasCascadedCheckOption!(@$mode; $($done)*)
+    };
+    ($($invalid:tt)*) => {
+        compile_error!("arguments do not satisfy this C macro's invocation contract")
+    };
+}
+/// C macro RelationHasCascadedCheckOption from rel.h:467
+///
+/// ```text
+/// #define RelationHasCascadedCheckOption( relation ) ( AssertMacro ( relation -> rd_rel -> relkind == RELKIND_VIEW ) , ( relation ) -> rd_options && ( ( ViewOptions * ) ( relation ) -> rd_options ) -> check_option == VIEW_OPTION_CHECK_OPTION_CASCADED )
+/// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+#[macro_export]
+macro_rules! RelationHasCascadedCheckOption {
+    (@__pgrx_emit_check_safety; $relation:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $relation);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_RelationHasCascadedCheckOption!(
+            @collect __pgrx_emit_check_safety [];
+            $($raw)*
+        )
+    };
+    (@__pgrx_emit_public; $relation:tt $(,)?) => {
+        $crate::__pgrx_c_macros::expression_result::finish(
+            $crate::RelationHasCascadedCheckOption!(@__pgrx_emit_value; $relation)
+        )
+    };
+    (@__pgrx_emit_value; $relation:tt $(,)?) => {
+        /* PGRX: AssertMacro remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */
+        (
+            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                {
+                    {
+                        let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                            {
+                                {
+                                    let _ = $crate::__pgrx_c_macros::expression::profile_value::<
+                                        true,
+                                        _
+                                    >(
+                                        /* PGRX: true remains expanded because no integer constant binding is available in the defining Rust crate. */
+                                        $crate::__pgrx_c_macros::CValue::<
+                                            $crate::__pgrx_c_macros::CInt
+                                        >::new(1i32)
+                                    );
+                                }
+                            }
+                        );
+                    };
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
+                            if $crate::__pgrx_c_macros::expression::truth(
+                                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                    $crate::__pgrx_c_macros::expression::load(
+                                        $crate::__pgrx_c_macros::expression::project::<
+                                            $crate::__pgrx_c_generated::Field_rd_options,
+                                            _,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_macros::expression::pointee(
+                                                (
+                                                    $crate::__pgrx_c_macros::expression::profile_value::<
+                                                        true,
+                                                        _
+                                                    >(
+                                                        $crate::__pgrx_c_operand!(
+                                                            @value [true];
+                                                            $relation
+                                                        )
+                                                    )
+                                                )
+                                            )
+                                        )
+                                    )
+                                )
+                            ) && $crate::__pgrx_c_macros::expression::truth(
+                                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                    $crate::__pgrx_c_macros::expression::eq(
+                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                            true,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_macros::expression::load(
+                                                $crate::__pgrx_c_macros::expression::project::<
+                                                    $crate::__pgrx_c_generated::Field_check_option,
+                                                    _,
+                                                    _
+                                                >(
+                                                    $crate::__pgrx_c_macros::expression::pointee(
+                                                        (
+                                                            $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                true,
+                                                                _
+                                                            >(
+                                                                $crate::__pgrx_c_macros::expression::cast_as::<
+                                                                    *mut $crate::__pgrx_c_bindings::ViewOptions,
+                                                                    $crate::__pgrx_c_macros::expression::CPointer<
+                                                                        $crate::__pgrx_c_macros::expression::CRecord<
+                                                                            $crate::__pgrx_c_bindings::ViewOptions
+                                                                        >,
+                                                                        $crate::__pgrx_c_macros::expression::ReadWrite
+                                                                    >,
+                                                                    _
+                                                                >(
+                                                                    $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                        true,
+                                                                        _
+                                                                    >(
+                                                                        $crate::__pgrx_c_macros::expression::load(
+                                                                            $crate::__pgrx_c_macros::expression::project::<
+                                                                                $crate::__pgrx_c_generated::Field_rd_options,
+                                                                                _,
+                                                                                _
+                                                                            >(
+                                                                                $crate::__pgrx_c_macros::expression::pointee(
+                                                                                    (
+                                                                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                            true,
+                                                                                            _
+                                                                                        >(
+                                                                                            $crate::__pgrx_c_operand!(
+                                                                                                @value [
+                                                                                                    true
+                                                                                                ];
+                                                                                                $relation
+                                                                                            )
+                                                                                        )
+                                                                                    )
+                                                                                )
+                                                                            )
+                                                                        )
+                                                                    )
+                                                                )
+                                                            )
+                                                        )
+                                                    )
+                                                )
+                                            )
+                                        ),
+                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                            true,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_macros::CValue::<
+                                                $crate::__pgrx_c_macros::CInt
+                                            >::new(
+                                                $crate::__pgrx_c_bindings::ViewOptCheckOption::VIEW_OPTION_CHECK_OPTION_CASCADED as i32
+                                            )
+                                        )
+                                    )
+                                )
+                            ) {
+                                1
+                            } else {
+                                0
+                            }
+                        )
+                    )
+                }
+            )
+        )
+    };
+    (@__pgrx_c_value; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_RelationHasCascadedCheckOption!(
+            @collect __pgrx_emit_value [];
+            $($raw)*
+        )
+    };
+    (@__pgrx_emit_place; $relation:tt $(,)?) => {
+        compile_error!("C expression is not a place in this operation")
+    };
+    (@__pgrx_c_place; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_RelationHasCascadedCheckOption!(
+            @collect __pgrx_emit_place [];
+            $($raw)*
+        )
+    };
+    (@__pgrx_emit_read_place; $relation:tt $(,)?) => {
+        compile_error!("C expression is not a place in this operation")
+    };
+    (@__pgrx_c_read_place; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_RelationHasCascadedCheckOption!(
+            @collect __pgrx_emit_read_place [];
+            $($raw)*
+        )
+    };
+    (@__pgrx_emit_size; $relation:tt $(,)?) => {
+        /* PGRX: AssertMacro remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */
+        $crate::__pgrx_c_macros::expression::size_of_value_type(
+            if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $relation);
+                    }
+                }
+                Some(
+                    unsafe {
+                        $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                            {
+                                {
+                                    let _ = $crate::__pgrx_c_macros::expression::profile_value::<
+                                        true,
+                                        _
+                                    >(
+                                        {
+                                            {
+                                                let _ = $crate::__pgrx_c_macros::expression::profile_value::<
+                                                    true,
+                                                    _
+                                                >(
+                                                    /* PGRX: true remains expanded because no integer constant binding is available in the defining Rust crate. */
+                                                    $crate::__pgrx_c_macros::CValue::<
+                                                        $crate::__pgrx_c_macros::CInt
+                                                    >::new(1i32)
+                                                );
+                                            }
+                                        }
+                                    );
+                                };
+                                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                    $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
+                                        if $crate::__pgrx_c_macros::expression::truth(
+                                            $crate::__pgrx_c_macros::expression::profile_value::<
+                                                true,
+                                                _
+                                            >(
+                                                $crate::__pgrx_c_macros::expression::load(
+                                                    $crate::__pgrx_c_macros::expression::project::<
+                                                        $crate::__pgrx_c_generated::Field_rd_options,
+                                                        _,
+                                                        _
+                                                    >(
+                                                        $crate::__pgrx_c_macros::expression::pointee(
+                                                            (
+                                                                $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                    true,
+                                                                    _
+                                                                >(
+                                                                    $crate::__pgrx_c_operand!(
+                                                                        @value [true];
+                                                                        $relation
+                                                                    )
+                                                                )
+                                                            )
+                                                        )
+                                                    )
+                                                )
+                                            )
+                                        ) && $crate::__pgrx_c_macros::expression::truth(
+                                            $crate::__pgrx_c_macros::expression::profile_value::<
+                                                true,
+                                                _
+                                            >(
+                                                $crate::__pgrx_c_macros::expression::eq(
+                                                    $crate::__pgrx_c_macros::expression::profile_value::<
+                                                        true,
+                                                        _
+                                                    >(
+                                                        $crate::__pgrx_c_macros::expression::load(
+                                                            $crate::__pgrx_c_macros::expression::project::<
+                                                                $crate::__pgrx_c_generated::Field_check_option,
+                                                                _,
+                                                                _
+                                                            >(
+                                                                $crate::__pgrx_c_macros::expression::pointee(
+                                                                    (
+                                                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                            true,
+                                                                            _
+                                                                        >(
+                                                                            $crate::__pgrx_c_macros::expression::cast_as::<
+                                                                                *mut $crate::__pgrx_c_bindings::ViewOptions,
+                                                                                $crate::__pgrx_c_macros::expression::CPointer<
+                                                                                    $crate::__pgrx_c_macros::expression::CRecord<
+                                                                                        $crate::__pgrx_c_bindings::ViewOptions
+                                                                                    >,
+                                                                                    $crate::__pgrx_c_macros::expression::ReadWrite
+                                                                                >,
+                                                                                _
+                                                                            >(
+                                                                                $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                    true,
+                                                                                    _
+                                                                                >(
+                                                                                    $crate::__pgrx_c_macros::expression::load(
+                                                                                        $crate::__pgrx_c_macros::expression::project::<
+                                                                                            $crate::__pgrx_c_generated::Field_rd_options,
+                                                                                            _,
+                                                                                            _
+                                                                                        >(
+                                                                                            $crate::__pgrx_c_macros::expression::pointee(
+                                                                                                (
+                                                                                                    $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                                        true,
+                                                                                                        _
+                                                                                                    >(
+                                                                                                        $crate::__pgrx_c_operand!(
+                                                                                                            @value [
+                                                                                                                true
+                                                                                                            ];
+                                                                                                            $relation
+                                                                                                        )
+                                                                                                    )
+                                                                                                )
+                                                                                            )
+                                                                                        )
+                                                                                    )
+                                                                                )
+                                                                            )
+                                                                        )
+                                                                    )
+                                                                )
+                                                            )
+                                                        )
+                                                    ),
+                                                    $crate::__pgrx_c_macros::expression::profile_value::<
+                                                        true,
+                                                        _
+                                                    >(
+                                                        $crate::__pgrx_c_macros::CValue::<
+                                                            $crate::__pgrx_c_macros::CInt
+                                                        >::new(
+                                                            $crate::__pgrx_c_bindings::ViewOptCheckOption::VIEW_OPTION_CHECK_OPTION_CASCADED as i32
+                                                        )
+                                                    )
+                                                )
+                                            )
+                                        ) {
+                                            1
+                                        } else {
+                                            0
+                                        }
+                                    )
+                                )
+                            }
+                        )
+                    }
+                )
+            } else {
+                None
+            }
+        )
+    };
+    (@__pgrx_c_size; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_RelationHasCascadedCheckOption!(
+            @collect __pgrx_emit_size [];
+            $($raw)*
+        )
+    };
+    (@__pgrx_emit_discard; $relation:tt $(,)?) => {
+        /* PGRX: AssertMacro remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */
+        {
+            let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                {
+                    {
+                        let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                            {
+                                {
+                                    let _ = $crate::__pgrx_c_macros::expression::profile_value::<
+                                        true,
+                                        _
+                                    >(
+                                        /* PGRX: true remains expanded because no integer constant binding is available in the defining Rust crate. */
+                                        $crate::__pgrx_c_macros::CValue::<
+                                            $crate::__pgrx_c_macros::CInt
+                                        >::new(1i32)
+                                    );
+                                }
+                            }
+                        );
+                    };
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
+                            if $crate::__pgrx_c_macros::expression::truth(
+                                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                    $crate::__pgrx_c_macros::expression::load(
+                                        $crate::__pgrx_c_macros::expression::project::<
+                                            $crate::__pgrx_c_generated::Field_rd_options,
+                                            _,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_macros::expression::pointee(
+                                                (
+                                                    $crate::__pgrx_c_macros::expression::profile_value::<
+                                                        true,
+                                                        _
+                                                    >(
+                                                        $crate::__pgrx_c_operand!(
+                                                            @value [true];
+                                                            $relation
+                                                        )
+                                                    )
+                                                )
+                                            )
+                                        )
+                                    )
+                                )
+                            ) && $crate::__pgrx_c_macros::expression::truth(
+                                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                    $crate::__pgrx_c_macros::expression::eq(
+                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                            true,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_macros::expression::load(
+                                                $crate::__pgrx_c_macros::expression::project::<
+                                                    $crate::__pgrx_c_generated::Field_check_option,
+                                                    _,
+                                                    _
+                                                >(
+                                                    $crate::__pgrx_c_macros::expression::pointee(
+                                                        (
+                                                            $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                true,
+                                                                _
+                                                            >(
+                                                                $crate::__pgrx_c_macros::expression::cast_as::<
+                                                                    *mut $crate::__pgrx_c_bindings::ViewOptions,
+                                                                    $crate::__pgrx_c_macros::expression::CPointer<
+                                                                        $crate::__pgrx_c_macros::expression::CRecord<
+                                                                            $crate::__pgrx_c_bindings::ViewOptions
+                                                                        >,
+                                                                        $crate::__pgrx_c_macros::expression::ReadWrite
+                                                                    >,
+                                                                    _
+                                                                >(
+                                                                    $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                        true,
+                                                                        _
+                                                                    >(
+                                                                        $crate::__pgrx_c_macros::expression::load(
+                                                                            $crate::__pgrx_c_macros::expression::project::<
+                                                                                $crate::__pgrx_c_generated::Field_rd_options,
+                                                                                _,
+                                                                                _
+                                                                            >(
+                                                                                $crate::__pgrx_c_macros::expression::pointee(
+                                                                                    (
+                                                                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                            true,
+                                                                                            _
+                                                                                        >(
+                                                                                            $crate::__pgrx_c_operand!(
+                                                                                                @value [
+                                                                                                    true
+                                                                                                ];
+                                                                                                $relation
+                                                                                            )
+                                                                                        )
+                                                                                    )
+                                                                                )
+                                                                            )
+                                                                        )
+                                                                    )
+                                                                )
+                                                            )
+                                                        )
+                                                    )
+                                                )
+                                            )
+                                        ),
+                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                            true,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_macros::CValue::<
+                                                $crate::__pgrx_c_macros::CInt
+                                            >::new(
+                                                $crate::__pgrx_c_bindings::ViewOptCheckOption::VIEW_OPTION_CHECK_OPTION_CASCADED as i32
+                                            )
+                                        )
+                                    )
+                                )
+                            ) {
+                                1
+                            } else {
+                                0
+                            }
+                        )
+                    )
+                }
+            );
+        }
+    };
+    (@__pgrx_c_discard; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_RelationHasCascadedCheckOption!(
+            @collect __pgrx_emit_discard [];
+            $($raw)*
+        )
+    };
+    ($($raw:tt)*) => {
+        $crate::__pgrx_c_args_RelationHasCascadedCheckOption!(
+            @collect __pgrx_emit_public [];
+            $($raw)*
+        )
+    };
+}
+
+#[cfg(not(all(
+    target_arch = "x86_64",
+    target_os = "linux",
+    target_pointer_width = "64",
+    target_endian = "little"
+)))]
+#[cfg(not(docsrs))]
+compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
+#[doc(hidden)]
+#[macro_export]
+macro_rules! __pgrx_c_args_RelationHasCheckOption {
+    (@collect $mode:ident [$($done:tt)*]; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_RelationHasCheckOption!(@p0 $mode [$($done)*]; $($raw)*)
+    };
+    (@classified [$next:ident $mode:ident [$($done:tt)*] [$($rest:tt)*]] $descriptor:tt) => {
+        $crate::__pgrx_c_args_RelationHasCheckOption!(
+            @$next $mode [$($done)* $descriptor,];
+            $($rest)*
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
+        $crate::__pgrx_c_args_RelationHasCheckOption!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
+    };
+    (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
+        $crate::__pgrx_c_args_RelationHasCheckOption!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_RelationHasCheckOption!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+            $($rest)*
+        )
+    };
+    (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_RelationHasCheckOption!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; - $($raw:tt)*) => {
+        $crate::__pgrx_c_args_RelationHasCheckOption!(@negative0 $mode [$($done)*]; - $($raw)*)
+    };
+    (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
+        $crate::__pgrx_c_args_RelationHasCheckOption!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_RelationHasCheckOption] [p1 $mode [$($done)*] []] [
+                $head $(::$tail)* ! $group
+            ]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; ::$head:ident $(::$tail:ident)* ! $group:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_RelationHasCheckOption] [p1 $mode [$($done)*] []] [
+                ::$head $(::$tail)* ! $group
+            ]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; ($($inner:tt)*)) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_RelationHasCheckOption] [p1 $mode [$($done)*] []] [
+                ($($inner)*)
+            ]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
+        $crate::__pgrx_c_args_RelationHasCheckOption!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
+        $crate::__pgrx_c_args_RelationHasCheckOption!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
+        $crate::__pgrx_c_args_RelationHasCheckOption!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_RelationHasCheckOption] [p1 $mode [$($done)*] [$($rest)*]] [
+                $head $(::$tail)* ! $group
+            ]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; ::$head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_RelationHasCheckOption] [p1 $mode [$($done)*] [$($rest)*]] [
+                ::$head $(::$tail)* ! $group
+            ]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; ($($inner:tt)*), $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_RelationHasCheckOption] [p1 $mode [$($done)*] [$($rest)*]] [
+                ($($inner)*)
+            ]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_RelationHasCheckOption!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_RelationHasCheckOption!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*];) => {
+        $crate::RelationHasCheckOption!(@$mode; $($done)*)
+    };
+    ($($invalid:tt)*) => {
+        compile_error!("arguments do not satisfy this C macro's invocation contract")
+    };
+}
+/// C macro RelationHasCheckOption from rel.h:445
+///
+/// ```text
+/// #define RelationHasCheckOption( relation ) ( AssertMacro ( relation -> rd_rel -> relkind == RELKIND_VIEW ) , ( relation ) -> rd_options && ( ( ViewOptions * ) ( relation ) -> rd_options ) -> check_option != VIEW_OPTION_CHECK_OPTION_NOT_SET )
+/// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+#[macro_export]
+macro_rules! RelationHasCheckOption {
+    (@__pgrx_emit_check_safety; $relation:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $relation);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_RelationHasCheckOption!(
+            @collect __pgrx_emit_check_safety [];
+            $($raw)*
+        )
+    };
+    (@__pgrx_emit_public; $relation:tt $(,)?) => {
+        $crate::__pgrx_c_macros::expression_result::finish(
+            $crate::RelationHasCheckOption!(@__pgrx_emit_value; $relation)
+        )
+    };
+    (@__pgrx_emit_value; $relation:tt $(,)?) => {
+        /* PGRX: AssertMacro remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */
+        (
+            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                {
+                    {
+                        let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                            {
+                                {
+                                    let _ = $crate::__pgrx_c_macros::expression::profile_value::<
+                                        true,
+                                        _
+                                    >(
+                                        /* PGRX: true remains expanded because no integer constant binding is available in the defining Rust crate. */
+                                        $crate::__pgrx_c_macros::CValue::<
+                                            $crate::__pgrx_c_macros::CInt
+                                        >::new(1i32)
+                                    );
+                                }
+                            }
+                        );
+                    };
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
+                            if $crate::__pgrx_c_macros::expression::truth(
+                                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                    $crate::__pgrx_c_macros::expression::load(
+                                        $crate::__pgrx_c_macros::expression::project::<
+                                            $crate::__pgrx_c_generated::Field_rd_options,
+                                            _,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_macros::expression::pointee(
+                                                (
+                                                    $crate::__pgrx_c_macros::expression::profile_value::<
+                                                        true,
+                                                        _
+                                                    >(
+                                                        $crate::__pgrx_c_operand!(
+                                                            @value [true];
+                                                            $relation
+                                                        )
+                                                    )
+                                                )
+                                            )
+                                        )
+                                    )
+                                )
+                            ) && $crate::__pgrx_c_macros::expression::truth(
+                                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                    $crate::__pgrx_c_macros::expression::ne(
+                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                            true,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_macros::expression::load(
+                                                $crate::__pgrx_c_macros::expression::project::<
+                                                    $crate::__pgrx_c_generated::Field_check_option,
+                                                    _,
+                                                    _
+                                                >(
+                                                    $crate::__pgrx_c_macros::expression::pointee(
+                                                        (
+                                                            $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                true,
+                                                                _
+                                                            >(
+                                                                $crate::__pgrx_c_macros::expression::cast_as::<
+                                                                    *mut $crate::__pgrx_c_bindings::ViewOptions,
+                                                                    $crate::__pgrx_c_macros::expression::CPointer<
+                                                                        $crate::__pgrx_c_macros::expression::CRecord<
+                                                                            $crate::__pgrx_c_bindings::ViewOptions
+                                                                        >,
+                                                                        $crate::__pgrx_c_macros::expression::ReadWrite
+                                                                    >,
+                                                                    _
+                                                                >(
+                                                                    $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                        true,
+                                                                        _
+                                                                    >(
+                                                                        $crate::__pgrx_c_macros::expression::load(
+                                                                            $crate::__pgrx_c_macros::expression::project::<
+                                                                                $crate::__pgrx_c_generated::Field_rd_options,
+                                                                                _,
+                                                                                _
+                                                                            >(
+                                                                                $crate::__pgrx_c_macros::expression::pointee(
+                                                                                    (
+                                                                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                            true,
+                                                                                            _
+                                                                                        >(
+                                                                                            $crate::__pgrx_c_operand!(
+                                                                                                @value [
+                                                                                                    true
+                                                                                                ];
+                                                                                                $relation
+                                                                                            )
+                                                                                        )
+                                                                                    )
+                                                                                )
+                                                                            )
+                                                                        )
+                                                                    )
+                                                                )
+                                                            )
+                                                        )
+                                                    )
+                                                )
+                                            )
+                                        ),
+                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                            true,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_macros::expression::null_constant(
+                                                $crate::__pgrx_c_macros::CValue::<
+                                                    $crate::__pgrx_c_macros::CInt
+                                                >::new(
+                                                    $crate::__pgrx_c_bindings::ViewOptCheckOption::VIEW_OPTION_CHECK_OPTION_NOT_SET as i32
+                                                )
+                                            )
+                                        )
+                                    )
+                                )
+                            ) {
+                                1
+                            } else {
+                                0
+                            }
+                        )
+                    )
+                }
+            )
+        )
+    };
+    (@__pgrx_c_value; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_RelationHasCheckOption!(@collect __pgrx_emit_value []; $($raw)*)
+    };
+    (@__pgrx_emit_place; $relation:tt $(,)?) => {
+        compile_error!("C expression is not a place in this operation")
+    };
+    (@__pgrx_c_place; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_RelationHasCheckOption!(@collect __pgrx_emit_place []; $($raw)*)
+    };
+    (@__pgrx_emit_read_place; $relation:tt $(,)?) => {
+        compile_error!("C expression is not a place in this operation")
+    };
+    (@__pgrx_c_read_place; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_RelationHasCheckOption!(@collect __pgrx_emit_read_place []; $($raw)*)
+    };
+    (@__pgrx_emit_size; $relation:tt $(,)?) => {
+        /* PGRX: AssertMacro remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */
+        $crate::__pgrx_c_macros::expression::size_of_value_type(
+            if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $relation);
+                    }
+                }
+                Some(
+                    unsafe {
+                        $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                            {
+                                {
+                                    let _ = $crate::__pgrx_c_macros::expression::profile_value::<
+                                        true,
+                                        _
+                                    >(
+                                        {
+                                            {
+                                                let _ = $crate::__pgrx_c_macros::expression::profile_value::<
+                                                    true,
+                                                    _
+                                                >(
+                                                    /* PGRX: true remains expanded because no integer constant binding is available in the defining Rust crate. */
+                                                    $crate::__pgrx_c_macros::CValue::<
+                                                        $crate::__pgrx_c_macros::CInt
+                                                    >::new(1i32)
+                                                );
+                                            }
+                                        }
+                                    );
+                                };
+                                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                    $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
+                                        if $crate::__pgrx_c_macros::expression::truth(
+                                            $crate::__pgrx_c_macros::expression::profile_value::<
+                                                true,
+                                                _
+                                            >(
+                                                $crate::__pgrx_c_macros::expression::load(
+                                                    $crate::__pgrx_c_macros::expression::project::<
+                                                        $crate::__pgrx_c_generated::Field_rd_options,
+                                                        _,
+                                                        _
+                                                    >(
+                                                        $crate::__pgrx_c_macros::expression::pointee(
+                                                            (
+                                                                $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                    true,
+                                                                    _
+                                                                >(
+                                                                    $crate::__pgrx_c_operand!(
+                                                                        @value [true];
+                                                                        $relation
+                                                                    )
+                                                                )
+                                                            )
+                                                        )
+                                                    )
+                                                )
+                                            )
+                                        ) && $crate::__pgrx_c_macros::expression::truth(
+                                            $crate::__pgrx_c_macros::expression::profile_value::<
+                                                true,
+                                                _
+                                            >(
+                                                $crate::__pgrx_c_macros::expression::ne(
+                                                    $crate::__pgrx_c_macros::expression::profile_value::<
+                                                        true,
+                                                        _
+                                                    >(
+                                                        $crate::__pgrx_c_macros::expression::load(
+                                                            $crate::__pgrx_c_macros::expression::project::<
+                                                                $crate::__pgrx_c_generated::Field_check_option,
+                                                                _,
+                                                                _
+                                                            >(
+                                                                $crate::__pgrx_c_macros::expression::pointee(
+                                                                    (
+                                                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                            true,
+                                                                            _
+                                                                        >(
+                                                                            $crate::__pgrx_c_macros::expression::cast_as::<
+                                                                                *mut $crate::__pgrx_c_bindings::ViewOptions,
+                                                                                $crate::__pgrx_c_macros::expression::CPointer<
+                                                                                    $crate::__pgrx_c_macros::expression::CRecord<
+                                                                                        $crate::__pgrx_c_bindings::ViewOptions
+                                                                                    >,
+                                                                                    $crate::__pgrx_c_macros::expression::ReadWrite
+                                                                                >,
+                                                                                _
+                                                                            >(
+                                                                                $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                    true,
+                                                                                    _
+                                                                                >(
+                                                                                    $crate::__pgrx_c_macros::expression::load(
+                                                                                        $crate::__pgrx_c_macros::expression::project::<
+                                                                                            $crate::__pgrx_c_generated::Field_rd_options,
+                                                                                            _,
+                                                                                            _
+                                                                                        >(
+                                                                                            $crate::__pgrx_c_macros::expression::pointee(
+                                                                                                (
+                                                                                                    $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                                        true,
+                                                                                                        _
+                                                                                                    >(
+                                                                                                        $crate::__pgrx_c_operand!(
+                                                                                                            @value [
+                                                                                                                true
+                                                                                                            ];
+                                                                                                            $relation
+                                                                                                        )
+                                                                                                    )
+                                                                                                )
+                                                                                            )
+                                                                                        )
+                                                                                    )
+                                                                                )
+                                                                            )
+                                                                        )
+                                                                    )
+                                                                )
+                                                            )
+                                                        )
+                                                    ),
+                                                    $crate::__pgrx_c_macros::expression::profile_value::<
+                                                        true,
+                                                        _
+                                                    >(
+                                                        $crate::__pgrx_c_macros::expression::null_constant(
+                                                            $crate::__pgrx_c_macros::CValue::<
+                                                                $crate::__pgrx_c_macros::CInt
+                                                            >::new(
+                                                                $crate::__pgrx_c_bindings::ViewOptCheckOption::VIEW_OPTION_CHECK_OPTION_NOT_SET as i32
+                                                            )
+                                                        )
+                                                    )
+                                                )
+                                            )
+                                        ) {
+                                            1
+                                        } else {
+                                            0
+                                        }
+                                    )
+                                )
+                            }
+                        )
+                    }
+                )
+            } else {
+                None
+            }
+        )
+    };
+    (@__pgrx_c_size; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_RelationHasCheckOption!(@collect __pgrx_emit_size []; $($raw)*)
+    };
+    (@__pgrx_emit_discard; $relation:tt $(,)?) => {
+        /* PGRX: AssertMacro remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */
+        {
+            let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                {
+                    {
+                        let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                            {
+                                {
+                                    let _ = $crate::__pgrx_c_macros::expression::profile_value::<
+                                        true,
+                                        _
+                                    >(
+                                        /* PGRX: true remains expanded because no integer constant binding is available in the defining Rust crate. */
+                                        $crate::__pgrx_c_macros::CValue::<
+                                            $crate::__pgrx_c_macros::CInt
+                                        >::new(1i32)
+                                    );
+                                }
+                            }
+                        );
+                    };
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
+                            if $crate::__pgrx_c_macros::expression::truth(
+                                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                    $crate::__pgrx_c_macros::expression::load(
+                                        $crate::__pgrx_c_macros::expression::project::<
+                                            $crate::__pgrx_c_generated::Field_rd_options,
+                                            _,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_macros::expression::pointee(
+                                                (
+                                                    $crate::__pgrx_c_macros::expression::profile_value::<
+                                                        true,
+                                                        _
+                                                    >(
+                                                        $crate::__pgrx_c_operand!(
+                                                            @value [true];
+                                                            $relation
+                                                        )
+                                                    )
+                                                )
+                                            )
+                                        )
+                                    )
+                                )
+                            ) && $crate::__pgrx_c_macros::expression::truth(
+                                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                    $crate::__pgrx_c_macros::expression::ne(
+                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                            true,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_macros::expression::load(
+                                                $crate::__pgrx_c_macros::expression::project::<
+                                                    $crate::__pgrx_c_generated::Field_check_option,
+                                                    _,
+                                                    _
+                                                >(
+                                                    $crate::__pgrx_c_macros::expression::pointee(
+                                                        (
+                                                            $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                true,
+                                                                _
+                                                            >(
+                                                                $crate::__pgrx_c_macros::expression::cast_as::<
+                                                                    *mut $crate::__pgrx_c_bindings::ViewOptions,
+                                                                    $crate::__pgrx_c_macros::expression::CPointer<
+                                                                        $crate::__pgrx_c_macros::expression::CRecord<
+                                                                            $crate::__pgrx_c_bindings::ViewOptions
+                                                                        >,
+                                                                        $crate::__pgrx_c_macros::expression::ReadWrite
+                                                                    >,
+                                                                    _
+                                                                >(
+                                                                    $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                        true,
+                                                                        _
+                                                                    >(
+                                                                        $crate::__pgrx_c_macros::expression::load(
+                                                                            $crate::__pgrx_c_macros::expression::project::<
+                                                                                $crate::__pgrx_c_generated::Field_rd_options,
+                                                                                _,
+                                                                                _
+                                                                            >(
+                                                                                $crate::__pgrx_c_macros::expression::pointee(
+                                                                                    (
+                                                                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                            true,
+                                                                                            _
+                                                                                        >(
+                                                                                            $crate::__pgrx_c_operand!(
+                                                                                                @value [
+                                                                                                    true
+                                                                                                ];
+                                                                                                $relation
+                                                                                            )
+                                                                                        )
+                                                                                    )
+                                                                                )
+                                                                            )
+                                                                        )
+                                                                    )
+                                                                )
+                                                            )
+                                                        )
+                                                    )
+                                                )
+                                            )
+                                        ),
+                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                            true,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_macros::expression::null_constant(
+                                                $crate::__pgrx_c_macros::CValue::<
+                                                    $crate::__pgrx_c_macros::CInt
+                                                >::new(
+                                                    $crate::__pgrx_c_bindings::ViewOptCheckOption::VIEW_OPTION_CHECK_OPTION_NOT_SET as i32
+                                                )
+                                            )
+                                        )
+                                    )
+                                )
+                            ) {
+                                1
+                            } else {
+                                0
+                            }
+                        )
+                    )
+                }
+            );
+        }
+    };
+    (@__pgrx_c_discard; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_RelationHasCheckOption!(@collect __pgrx_emit_discard []; $($raw)*)
+    };
+    ($($raw:tt)*) => {
+        $crate::__pgrx_c_args_RelationHasCheckOption!(@collect __pgrx_emit_public []; $($raw)*)
+    };
+}
+
+#[cfg(not(all(
+    target_arch = "x86_64",
+    target_os = "linux",
+    target_pointer_width = "64",
+    target_endian = "little"
+)))]
+#[cfg(not(docsrs))]
+compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
+#[doc(hidden)]
+#[macro_export]
+macro_rules! __pgrx_c_args_RelationHasLocalCheckOption {
+    (@collect $mode:ident [$($done:tt)*]; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_RelationHasLocalCheckOption!(@p0 $mode [$($done)*]; $($raw)*)
+    };
+    (@classified [$next:ident $mode:ident [$($done:tt)*] [$($rest:tt)*]] $descriptor:tt) => {
+        $crate::__pgrx_c_args_RelationHasLocalCheckOption!(
+            @$next $mode [$($done)* $descriptor,];
+            $($rest)*
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
+        $crate::__pgrx_c_args_RelationHasLocalCheckOption!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
+    };
+    (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
+        $crate::__pgrx_c_args_RelationHasLocalCheckOption!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_RelationHasLocalCheckOption!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+            $($rest)*
+        )
+    };
+    (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_RelationHasLocalCheckOption!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; - $($raw:tt)*) => {
+        $crate::__pgrx_c_args_RelationHasLocalCheckOption!(@negative0 $mode [$($done)*]; - $($raw)*)
+    };
+    (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
+        $crate::__pgrx_c_args_RelationHasLocalCheckOption!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_RelationHasLocalCheckOption] [p1 $mode [$($done)*] []] [
+                $head $(::$tail)* ! $group
+            ]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; ::$head:ident $(::$tail:ident)* ! $group:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_RelationHasLocalCheckOption] [p1 $mode [$($done)*] []] [
+                ::$head $(::$tail)* ! $group
+            ]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; ($($inner:tt)*)) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_RelationHasLocalCheckOption] [p1 $mode [$($done)*] []] [
+                ($($inner)*)
+            ]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
+        $crate::__pgrx_c_args_RelationHasLocalCheckOption!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
+        $crate::__pgrx_c_args_RelationHasLocalCheckOption!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
+        $crate::__pgrx_c_args_RelationHasLocalCheckOption!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_RelationHasLocalCheckOption] [p1 $mode [$($done)*] [$($rest)*]] [
+                $head $(::$tail)* ! $group
+            ]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; ::$head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_RelationHasLocalCheckOption] [p1 $mode [$($done)*] [$($rest)*]] [
+                ::$head $(::$tail)* ! $group
+            ]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; ($($inner:tt)*), $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_RelationHasLocalCheckOption] [p1 $mode [$($done)*] [$($rest)*]] [
+                ($($inner)*)
+            ]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_RelationHasLocalCheckOption!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_RelationHasLocalCheckOption!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*];) => {
+        $crate::RelationHasLocalCheckOption!(@$mode; $($done)*)
+    };
+    ($($invalid:tt)*) => {
+        compile_error!("arguments do not satisfy this C macro's invocation contract")
+    };
+}
+/// C macro RelationHasLocalCheckOption from rel.h:456
+///
+/// ```text
+/// #define RelationHasLocalCheckOption( relation ) ( AssertMacro ( relation -> rd_rel -> relkind == RELKIND_VIEW ) , ( relation ) -> rd_options && ( ( ViewOptions * ) ( relation ) -> rd_options ) -> check_option == VIEW_OPTION_CHECK_OPTION_LOCAL )
+/// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+#[macro_export]
+macro_rules! RelationHasLocalCheckOption {
+    (@__pgrx_emit_check_safety; $relation:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $relation);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_RelationHasLocalCheckOption!(
+            @collect __pgrx_emit_check_safety [];
+            $($raw)*
+        )
+    };
+    (@__pgrx_emit_public; $relation:tt $(,)?) => {
+        $crate::__pgrx_c_macros::expression_result::finish(
+            $crate::RelationHasLocalCheckOption!(@__pgrx_emit_value; $relation)
+        )
+    };
+    (@__pgrx_emit_value; $relation:tt $(,)?) => {
+        /* PGRX: AssertMacro remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */
+        (
+            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                {
+                    {
+                        let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                            {
+                                {
+                                    let _ = $crate::__pgrx_c_macros::expression::profile_value::<
+                                        true,
+                                        _
+                                    >(
+                                        /* PGRX: true remains expanded because no integer constant binding is available in the defining Rust crate. */
+                                        $crate::__pgrx_c_macros::CValue::<
+                                            $crate::__pgrx_c_macros::CInt
+                                        >::new(1i32)
+                                    );
+                                }
+                            }
+                        );
+                    };
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
+                            if $crate::__pgrx_c_macros::expression::truth(
+                                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                    $crate::__pgrx_c_macros::expression::load(
+                                        $crate::__pgrx_c_macros::expression::project::<
+                                            $crate::__pgrx_c_generated::Field_rd_options,
+                                            _,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_macros::expression::pointee(
+                                                (
+                                                    $crate::__pgrx_c_macros::expression::profile_value::<
+                                                        true,
+                                                        _
+                                                    >(
+                                                        $crate::__pgrx_c_operand!(
+                                                            @value [true];
+                                                            $relation
+                                                        )
+                                                    )
+                                                )
+                                            )
+                                        )
+                                    )
+                                )
+                            ) && $crate::__pgrx_c_macros::expression::truth(
+                                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                    $crate::__pgrx_c_macros::expression::eq(
+                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                            true,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_macros::expression::load(
+                                                $crate::__pgrx_c_macros::expression::project::<
+                                                    $crate::__pgrx_c_generated::Field_check_option,
+                                                    _,
+                                                    _
+                                                >(
+                                                    $crate::__pgrx_c_macros::expression::pointee(
+                                                        (
+                                                            $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                true,
+                                                                _
+                                                            >(
+                                                                $crate::__pgrx_c_macros::expression::cast_as::<
+                                                                    *mut $crate::__pgrx_c_bindings::ViewOptions,
+                                                                    $crate::__pgrx_c_macros::expression::CPointer<
+                                                                        $crate::__pgrx_c_macros::expression::CRecord<
+                                                                            $crate::__pgrx_c_bindings::ViewOptions
+                                                                        >,
+                                                                        $crate::__pgrx_c_macros::expression::ReadWrite
+                                                                    >,
+                                                                    _
+                                                                >(
+                                                                    $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                        true,
+                                                                        _
+                                                                    >(
+                                                                        $crate::__pgrx_c_macros::expression::load(
+                                                                            $crate::__pgrx_c_macros::expression::project::<
+                                                                                $crate::__pgrx_c_generated::Field_rd_options,
+                                                                                _,
+                                                                                _
+                                                                            >(
+                                                                                $crate::__pgrx_c_macros::expression::pointee(
+                                                                                    (
+                                                                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                            true,
+                                                                                            _
+                                                                                        >(
+                                                                                            $crate::__pgrx_c_operand!(
+                                                                                                @value [
+                                                                                                    true
+                                                                                                ];
+                                                                                                $relation
+                                                                                            )
+                                                                                        )
+                                                                                    )
+                                                                                )
+                                                                            )
+                                                                        )
+                                                                    )
+                                                                )
+                                                            )
+                                                        )
+                                                    )
+                                                )
+                                            )
+                                        ),
+                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                            true,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_macros::CValue::<
+                                                $crate::__pgrx_c_macros::CInt
+                                            >::new(
+                                                $crate::__pgrx_c_bindings::ViewOptCheckOption::VIEW_OPTION_CHECK_OPTION_LOCAL as i32
+                                            )
+                                        )
+                                    )
+                                )
+                            ) {
+                                1
+                            } else {
+                                0
+                            }
+                        )
+                    )
+                }
+            )
+        )
+    };
+    (@__pgrx_c_value; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_RelationHasLocalCheckOption!(@collect __pgrx_emit_value []; $($raw)*)
+    };
+    (@__pgrx_emit_place; $relation:tt $(,)?) => {
+        compile_error!("C expression is not a place in this operation")
+    };
+    (@__pgrx_c_place; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_RelationHasLocalCheckOption!(@collect __pgrx_emit_place []; $($raw)*)
+    };
+    (@__pgrx_emit_read_place; $relation:tt $(,)?) => {
+        compile_error!("C expression is not a place in this operation")
+    };
+    (@__pgrx_c_read_place; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_RelationHasLocalCheckOption!(
+            @collect __pgrx_emit_read_place [];
+            $($raw)*
+        )
+    };
+    (@__pgrx_emit_size; $relation:tt $(,)?) => {
+        /* PGRX: AssertMacro remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */
+        $crate::__pgrx_c_macros::expression::size_of_value_type(
+            if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $relation);
+                    }
+                }
+                Some(
+                    unsafe {
+                        $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                            {
+                                {
+                                    let _ = $crate::__pgrx_c_macros::expression::profile_value::<
+                                        true,
+                                        _
+                                    >(
+                                        {
+                                            {
+                                                let _ = $crate::__pgrx_c_macros::expression::profile_value::<
+                                                    true,
+                                                    _
+                                                >(
+                                                    /* PGRX: true remains expanded because no integer constant binding is available in the defining Rust crate. */
+                                                    $crate::__pgrx_c_macros::CValue::<
+                                                        $crate::__pgrx_c_macros::CInt
+                                                    >::new(1i32)
+                                                );
+                                            }
+                                        }
+                                    );
+                                };
+                                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                    $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
+                                        if $crate::__pgrx_c_macros::expression::truth(
+                                            $crate::__pgrx_c_macros::expression::profile_value::<
+                                                true,
+                                                _
+                                            >(
+                                                $crate::__pgrx_c_macros::expression::load(
+                                                    $crate::__pgrx_c_macros::expression::project::<
+                                                        $crate::__pgrx_c_generated::Field_rd_options,
+                                                        _,
+                                                        _
+                                                    >(
+                                                        $crate::__pgrx_c_macros::expression::pointee(
+                                                            (
+                                                                $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                    true,
+                                                                    _
+                                                                >(
+                                                                    $crate::__pgrx_c_operand!(
+                                                                        @value [true];
+                                                                        $relation
+                                                                    )
+                                                                )
+                                                            )
+                                                        )
+                                                    )
+                                                )
+                                            )
+                                        ) && $crate::__pgrx_c_macros::expression::truth(
+                                            $crate::__pgrx_c_macros::expression::profile_value::<
+                                                true,
+                                                _
+                                            >(
+                                                $crate::__pgrx_c_macros::expression::eq(
+                                                    $crate::__pgrx_c_macros::expression::profile_value::<
+                                                        true,
+                                                        _
+                                                    >(
+                                                        $crate::__pgrx_c_macros::expression::load(
+                                                            $crate::__pgrx_c_macros::expression::project::<
+                                                                $crate::__pgrx_c_generated::Field_check_option,
+                                                                _,
+                                                                _
+                                                            >(
+                                                                $crate::__pgrx_c_macros::expression::pointee(
+                                                                    (
+                                                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                            true,
+                                                                            _
+                                                                        >(
+                                                                            $crate::__pgrx_c_macros::expression::cast_as::<
+                                                                                *mut $crate::__pgrx_c_bindings::ViewOptions,
+                                                                                $crate::__pgrx_c_macros::expression::CPointer<
+                                                                                    $crate::__pgrx_c_macros::expression::CRecord<
+                                                                                        $crate::__pgrx_c_bindings::ViewOptions
+                                                                                    >,
+                                                                                    $crate::__pgrx_c_macros::expression::ReadWrite
+                                                                                >,
+                                                                                _
+                                                                            >(
+                                                                                $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                    true,
+                                                                                    _
+                                                                                >(
+                                                                                    $crate::__pgrx_c_macros::expression::load(
+                                                                                        $crate::__pgrx_c_macros::expression::project::<
+                                                                                            $crate::__pgrx_c_generated::Field_rd_options,
+                                                                                            _,
+                                                                                            _
+                                                                                        >(
+                                                                                            $crate::__pgrx_c_macros::expression::pointee(
+                                                                                                (
+                                                                                                    $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                                        true,
+                                                                                                        _
+                                                                                                    >(
+                                                                                                        $crate::__pgrx_c_operand!(
+                                                                                                            @value [
+                                                                                                                true
+                                                                                                            ];
+                                                                                                            $relation
+                                                                                                        )
+                                                                                                    )
+                                                                                                )
+                                                                                            )
+                                                                                        )
+                                                                                    )
+                                                                                )
+                                                                            )
+                                                                        )
+                                                                    )
+                                                                )
+                                                            )
+                                                        )
+                                                    ),
+                                                    $crate::__pgrx_c_macros::expression::profile_value::<
+                                                        true,
+                                                        _
+                                                    >(
+                                                        $crate::__pgrx_c_macros::CValue::<
+                                                            $crate::__pgrx_c_macros::CInt
+                                                        >::new(
+                                                            $crate::__pgrx_c_bindings::ViewOptCheckOption::VIEW_OPTION_CHECK_OPTION_LOCAL as i32
+                                                        )
+                                                    )
+                                                )
+                                            )
+                                        ) {
+                                            1
+                                        } else {
+                                            0
+                                        }
+                                    )
+                                )
+                            }
+                        )
+                    }
+                )
+            } else {
+                None
+            }
+        )
+    };
+    (@__pgrx_c_size; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_RelationHasLocalCheckOption!(@collect __pgrx_emit_size []; $($raw)*)
+    };
+    (@__pgrx_emit_discard; $relation:tt $(,)?) => {
+        /* PGRX: AssertMacro remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */
+        {
+            let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                {
+                    {
+                        let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                            {
+                                {
+                                    let _ = $crate::__pgrx_c_macros::expression::profile_value::<
+                                        true,
+                                        _
+                                    >(
+                                        /* PGRX: true remains expanded because no integer constant binding is available in the defining Rust crate. */
+                                        $crate::__pgrx_c_macros::CValue::<
+                                            $crate::__pgrx_c_macros::CInt
+                                        >::new(1i32)
+                                    );
+                                }
+                            }
+                        );
+                    };
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
+                            if $crate::__pgrx_c_macros::expression::truth(
+                                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                    $crate::__pgrx_c_macros::expression::load(
+                                        $crate::__pgrx_c_macros::expression::project::<
+                                            $crate::__pgrx_c_generated::Field_rd_options,
+                                            _,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_macros::expression::pointee(
+                                                (
+                                                    $crate::__pgrx_c_macros::expression::profile_value::<
+                                                        true,
+                                                        _
+                                                    >(
+                                                        $crate::__pgrx_c_operand!(
+                                                            @value [true];
+                                                            $relation
+                                                        )
+                                                    )
+                                                )
+                                            )
+                                        )
+                                    )
+                                )
+                            ) && $crate::__pgrx_c_macros::expression::truth(
+                                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                    $crate::__pgrx_c_macros::expression::eq(
+                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                            true,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_macros::expression::load(
+                                                $crate::__pgrx_c_macros::expression::project::<
+                                                    $crate::__pgrx_c_generated::Field_check_option,
+                                                    _,
+                                                    _
+                                                >(
+                                                    $crate::__pgrx_c_macros::expression::pointee(
+                                                        (
+                                                            $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                true,
+                                                                _
+                                                            >(
+                                                                $crate::__pgrx_c_macros::expression::cast_as::<
+                                                                    *mut $crate::__pgrx_c_bindings::ViewOptions,
+                                                                    $crate::__pgrx_c_macros::expression::CPointer<
+                                                                        $crate::__pgrx_c_macros::expression::CRecord<
+                                                                            $crate::__pgrx_c_bindings::ViewOptions
+                                                                        >,
+                                                                        $crate::__pgrx_c_macros::expression::ReadWrite
+                                                                    >,
+                                                                    _
+                                                                >(
+                                                                    $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                        true,
+                                                                        _
+                                                                    >(
+                                                                        $crate::__pgrx_c_macros::expression::load(
+                                                                            $crate::__pgrx_c_macros::expression::project::<
+                                                                                $crate::__pgrx_c_generated::Field_rd_options,
+                                                                                _,
+                                                                                _
+                                                                            >(
+                                                                                $crate::__pgrx_c_macros::expression::pointee(
+                                                                                    (
+                                                                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                            true,
+                                                                                            _
+                                                                                        >(
+                                                                                            $crate::__pgrx_c_operand!(
+                                                                                                @value [
+                                                                                                    true
+                                                                                                ];
+                                                                                                $relation
+                                                                                            )
+                                                                                        )
+                                                                                    )
+                                                                                )
+                                                                            )
+                                                                        )
+                                                                    )
+                                                                )
+                                                            )
+                                                        )
+                                                    )
+                                                )
+                                            )
+                                        ),
+                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                            true,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_macros::CValue::<
+                                                $crate::__pgrx_c_macros::CInt
+                                            >::new(
+                                                $crate::__pgrx_c_bindings::ViewOptCheckOption::VIEW_OPTION_CHECK_OPTION_LOCAL as i32
+                                            )
+                                        )
+                                    )
+                                )
+                            ) {
+                                1
+                            } else {
+                                0
+                            }
+                        )
+                    )
+                }
+            );
+        }
+    };
+    (@__pgrx_c_discard; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_RelationHasLocalCheckOption!(
+            @collect __pgrx_emit_discard [];
+            $($raw)*
+        )
+    };
+    ($($raw:tt)*) => {
+        $crate::__pgrx_c_args_RelationHasLocalCheckOption!(@collect __pgrx_emit_public []; $($raw)*)
+    };
+}
+
+#[cfg(not(all(
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -7450,23 +10059,23 @@ macro_rules! __pgrx_c_args_RelationHasReferenceCountZero {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
         $crate::__pgrx_c_args_RelationHasReferenceCountZero!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_RelationHasReferenceCountZero!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_RelationHasReferenceCountZero!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_RelationHasReferenceCountZero!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -7478,7 +10087,7 @@ macro_rules! __pgrx_c_args_RelationHasReferenceCountZero {
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
         $crate::__pgrx_c_args_RelationHasReferenceCountZero!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
@@ -7504,17 +10113,17 @@ macro_rules! __pgrx_c_args_RelationHasReferenceCountZero {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_RelationHasReferenceCountZero!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_RelationHasReferenceCountZero!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_RelationHasReferenceCountZero!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -7541,13 +10150,13 @@ macro_rules! __pgrx_c_args_RelationHasReferenceCountZero {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_RelationHasReferenceCountZero!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_RelationHasReferenceCountZero!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -7791,8 +10400,615 @@ macro_rules! RelationHasReferenceCountZero {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
+    target_pointer_width = "64",
+    target_endian = "little"
+)))]
+#[cfg(not(docsrs))]
+compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
+#[doc(hidden)]
+#[macro_export]
+macro_rules! __pgrx_c_args_RelationHasSecurityInvoker {
+    (@collect $mode:ident [$($done:tt)*]; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_RelationHasSecurityInvoker!(@p0 $mode [$($done)*]; $($raw)*)
+    };
+    (@classified [$next:ident $mode:ident [$($done:tt)*] [$($rest:tt)*]] $descriptor:tt) => {
+        $crate::__pgrx_c_args_RelationHasSecurityInvoker!(
+            @$next $mode [$($done)* $descriptor,];
+            $($rest)*
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
+        $crate::__pgrx_c_args_RelationHasSecurityInvoker!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
+    };
+    (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
+        $crate::__pgrx_c_args_RelationHasSecurityInvoker!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_RelationHasSecurityInvoker!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+            $($rest)*
+        )
+    };
+    (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_RelationHasSecurityInvoker!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; - $($raw:tt)*) => {
+        $crate::__pgrx_c_args_RelationHasSecurityInvoker!(@negative0 $mode [$($done)*]; - $($raw)*)
+    };
+    (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
+        $crate::__pgrx_c_args_RelationHasSecurityInvoker!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_RelationHasSecurityInvoker] [p1 $mode [$($done)*] []] [
+                $head $(::$tail)* ! $group
+            ]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; ::$head:ident $(::$tail:ident)* ! $group:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_RelationHasSecurityInvoker] [p1 $mode [$($done)*] []] [
+                ::$head $(::$tail)* ! $group
+            ]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; ($($inner:tt)*)) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_RelationHasSecurityInvoker] [p1 $mode [$($done)*] []] [
+                ($($inner)*)
+            ]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
+        $crate::__pgrx_c_args_RelationHasSecurityInvoker!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
+        $crate::__pgrx_c_args_RelationHasSecurityInvoker!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
+        $crate::__pgrx_c_args_RelationHasSecurityInvoker!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_RelationHasSecurityInvoker] [p1 $mode [$($done)*] [$($rest)*]] [
+                $head $(::$tail)* ! $group
+            ]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; ::$head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_RelationHasSecurityInvoker] [p1 $mode [$($done)*] [$($rest)*]] [
+                ::$head $(::$tail)* ! $group
+            ]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; ($($inner:tt)*), $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_RelationHasSecurityInvoker] [p1 $mode [$($done)*] [$($rest)*]] [
+                ($($inner)*)
+            ]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_RelationHasSecurityInvoker!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_RelationHasSecurityInvoker!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*];) => {
+        $crate::RelationHasSecurityInvoker!(@$mode; $($done)*)
+    };
+    ($($invalid:tt)*) => {
+        compile_error!("arguments do not satisfy this C macro's invocation contract")
+    };
+}
+/// C macro RelationHasSecurityInvoker from rel.h:435
+///
+/// ```text
+/// #define RelationHasSecurityInvoker( relation ) ( AssertMacro ( relation -> rd_rel -> relkind == RELKIND_VIEW ) , ( relation ) -> rd_options ? ( ( ViewOptions * ) ( relation ) -> rd_options ) -> security_invoker : false )
+/// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+#[macro_export]
+macro_rules! RelationHasSecurityInvoker {
+    (@__pgrx_emit_check_safety; $relation:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $relation);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_RelationHasSecurityInvoker!(
+            @collect __pgrx_emit_check_safety [];
+            $($raw)*
+        )
+    };
+    (@__pgrx_emit_public; $relation:tt $(,)?) => {
+        $crate::__pgrx_c_macros::expression_result::finish(
+            $crate::RelationHasSecurityInvoker!(@__pgrx_emit_value; $relation)
+        )
+    };
+    (@__pgrx_emit_value; $relation:tt $(,)?) => {
+        /* PGRX: AssertMacro remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */
+        (
+            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                {
+                    {
+                        let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                            {
+                                {
+                                    let _ = $crate::__pgrx_c_macros::expression::profile_value::<
+                                        true,
+                                        _
+                                    >(
+                                        /* PGRX: true remains expanded because no integer constant binding is available in the defining Rust crate. */
+                                        $crate::__pgrx_c_macros::CValue::<
+                                            $crate::__pgrx_c_macros::CInt
+                                        >::new(1i32)
+                                    );
+                                }
+                            }
+                        );
+                    };
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::select(
+                            if $crate::__pgrx_c_macros::expression::truth(
+                                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                    $crate::__pgrx_c_macros::expression::load(
+                                        $crate::__pgrx_c_macros::expression::project::<
+                                            $crate::__pgrx_c_generated::Field_rd_options,
+                                            _,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_macros::expression::pointee(
+                                                (
+                                                    $crate::__pgrx_c_macros::expression::profile_value::<
+                                                        true,
+                                                        _
+                                                    >(
+                                                        $crate::__pgrx_c_operand!(
+                                                            @value [true];
+                                                            $relation
+                                                        )
+                                                    )
+                                                )
+                                            )
+                                        )
+                                    )
+                                )
+                            ) {
+                                $crate::__pgrx_c_macros::Either::Left(
+                                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                        $crate::__pgrx_c_macros::expression::load(
+                                            $crate::__pgrx_c_macros::expression::project::<
+                                                $crate::__pgrx_c_generated::Field_security_invoker,
+                                                _,
+                                                _
+                                            >(
+                                                $crate::__pgrx_c_macros::expression::pointee(
+                                                    (
+                                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                                            true,
+                                                            _
+                                                        >(
+                                                            $crate::__pgrx_c_macros::expression::cast_as::<
+                                                                *mut $crate::__pgrx_c_bindings::ViewOptions,
+                                                                $crate::__pgrx_c_macros::expression::CPointer<
+                                                                    $crate::__pgrx_c_macros::expression::CRecord<
+                                                                        $crate::__pgrx_c_bindings::ViewOptions
+                                                                    >,
+                                                                    $crate::__pgrx_c_macros::expression::ReadWrite
+                                                                >,
+                                                                _
+                                                            >(
+                                                                $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                    true,
+                                                                    _
+                                                                >(
+                                                                    $crate::__pgrx_c_macros::expression::load(
+                                                                        $crate::__pgrx_c_macros::expression::project::<
+                                                                            $crate::__pgrx_c_generated::Field_rd_options,
+                                                                            _,
+                                                                            _
+                                                                        >(
+                                                                            $crate::__pgrx_c_macros::expression::pointee(
+                                                                                (
+                                                                                    $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                        true,
+                                                                                        _
+                                                                                    >(
+                                                                                        $crate::__pgrx_c_operand!(
+                                                                                            @value [
+                                                                                                true
+                                                                                            ];
+                                                                                            $relation
+                                                                                        )
+                                                                                    )
+                                                                                )
+                                                                            )
+                                                                        )
+                                                                    )
+                                                                )
+                                                            )
+                                                        )
+                                                    )
+                                                )
+                                            )
+                                        )
+                                    )
+                                )
+                            } else {
+                                $crate::__pgrx_c_macros::Either::Right(
+                                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                        $crate::__pgrx_c_macros::expression::null_constant(
+                                            /* PGRX: false remains expanded because no integer constant binding is available in the defining Rust crate. */
+                                            $crate::__pgrx_c_macros::CValue::<
+                                                $crate::__pgrx_c_macros::CInt
+                                            >::new(0i32)
+                                        )
+                                    )
+                                )
+                            }
+                        )
+                    )
+                }
+            )
+        )
+    };
+    (@__pgrx_c_value; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_RelationHasSecurityInvoker!(@collect __pgrx_emit_value []; $($raw)*)
+    };
+    (@__pgrx_emit_place; $relation:tt $(,)?) => {
+        compile_error!("C expression is not a place in this operation")
+    };
+    (@__pgrx_c_place; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_RelationHasSecurityInvoker!(@collect __pgrx_emit_place []; $($raw)*)
+    };
+    (@__pgrx_emit_read_place; $relation:tt $(,)?) => {
+        compile_error!("C expression is not a place in this operation")
+    };
+    (@__pgrx_c_read_place; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_RelationHasSecurityInvoker!(
+            @collect __pgrx_emit_read_place [];
+            $($raw)*
+        )
+    };
+    (@__pgrx_emit_size; $relation:tt $(,)?) => {
+        /* PGRX: AssertMacro remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */
+        $crate::__pgrx_c_macros::expression::size_of_value_type(
+            if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $relation);
+                    }
+                }
+                Some(
+                    unsafe {
+                        $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                            {
+                                {
+                                    let _ = $crate::__pgrx_c_macros::expression::profile_value::<
+                                        true,
+                                        _
+                                    >(
+                                        {
+                                            {
+                                                let _ = $crate::__pgrx_c_macros::expression::profile_value::<
+                                                    true,
+                                                    _
+                                                >(
+                                                    /* PGRX: true remains expanded because no integer constant binding is available in the defining Rust crate. */
+                                                    $crate::__pgrx_c_macros::CValue::<
+                                                        $crate::__pgrx_c_macros::CInt
+                                                    >::new(1i32)
+                                                );
+                                            }
+                                        }
+                                    );
+                                };
+                                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                    $crate::__pgrx_c_macros::expression::select(
+                                        if $crate::__pgrx_c_macros::expression::truth(
+                                            $crate::__pgrx_c_macros::expression::profile_value::<
+                                                true,
+                                                _
+                                            >(
+                                                $crate::__pgrx_c_macros::expression::load(
+                                                    $crate::__pgrx_c_macros::expression::project::<
+                                                        $crate::__pgrx_c_generated::Field_rd_options,
+                                                        _,
+                                                        _
+                                                    >(
+                                                        $crate::__pgrx_c_macros::expression::pointee(
+                                                            (
+                                                                $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                    true,
+                                                                    _
+                                                                >(
+                                                                    $crate::__pgrx_c_operand!(
+                                                                        @value [true];
+                                                                        $relation
+                                                                    )
+                                                                )
+                                                            )
+                                                        )
+                                                    )
+                                                )
+                                            )
+                                        ) {
+                                            $crate::__pgrx_c_macros::Either::Left(
+                                                $crate::__pgrx_c_macros::expression::profile_value::<
+                                                    true,
+                                                    _
+                                                >(
+                                                    $crate::__pgrx_c_macros::expression::load(
+                                                        $crate::__pgrx_c_macros::expression::project::<
+                                                            $crate::__pgrx_c_generated::Field_security_invoker,
+                                                            _,
+                                                            _
+                                                        >(
+                                                            $crate::__pgrx_c_macros::expression::pointee(
+                                                                (
+                                                                    $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                        true,
+                                                                        _
+                                                                    >(
+                                                                        $crate::__pgrx_c_macros::expression::cast_as::<
+                                                                            *mut $crate::__pgrx_c_bindings::ViewOptions,
+                                                                            $crate::__pgrx_c_macros::expression::CPointer<
+                                                                                $crate::__pgrx_c_macros::expression::CRecord<
+                                                                                    $crate::__pgrx_c_bindings::ViewOptions
+                                                                                >,
+                                                                                $crate::__pgrx_c_macros::expression::ReadWrite
+                                                                            >,
+                                                                            _
+                                                                        >(
+                                                                            $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                true,
+                                                                                _
+                                                                            >(
+                                                                                $crate::__pgrx_c_macros::expression::load(
+                                                                                    $crate::__pgrx_c_macros::expression::project::<
+                                                                                        $crate::__pgrx_c_generated::Field_rd_options,
+                                                                                        _,
+                                                                                        _
+                                                                                    >(
+                                                                                        $crate::__pgrx_c_macros::expression::pointee(
+                                                                                            (
+                                                                                                $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                                    true,
+                                                                                                    _
+                                                                                                >(
+                                                                                                    $crate::__pgrx_c_operand!(
+                                                                                                        @value [
+                                                                                                            true
+                                                                                                        ];
+                                                                                                        $relation
+                                                                                                    )
+                                                                                                )
+                                                                                            )
+                                                                                        )
+                                                                                    )
+                                                                                )
+                                                                            )
+                                                                        )
+                                                                    )
+                                                                )
+                                                            )
+                                                        )
+                                                    )
+                                                )
+                                            )
+                                        } else {
+                                            $crate::__pgrx_c_macros::Either::Right(
+                                                $crate::__pgrx_c_macros::expression::profile_value::<
+                                                    true,
+                                                    _
+                                                >(
+                                                    $crate::__pgrx_c_macros::expression::null_constant(
+                                                        /* PGRX: false remains expanded because no integer constant binding is available in the defining Rust crate. */
+                                                        $crate::__pgrx_c_macros::CValue::<
+                                                            $crate::__pgrx_c_macros::CInt
+                                                        >::new(0i32)
+                                                    )
+                                                )
+                                            )
+                                        }
+                                    )
+                                )
+                            }
+                        )
+                    }
+                )
+            } else {
+                None
+            }
+        )
+    };
+    (@__pgrx_c_size; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_RelationHasSecurityInvoker!(@collect __pgrx_emit_size []; $($raw)*)
+    };
+    (@__pgrx_emit_discard; $relation:tt $(,)?) => {
+        /* PGRX: AssertMacro remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */
+        {
+            let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                {
+                    {
+                        let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                            {
+                                {
+                                    let _ = $crate::__pgrx_c_macros::expression::profile_value::<
+                                        true,
+                                        _
+                                    >(
+                                        /* PGRX: true remains expanded because no integer constant binding is available in the defining Rust crate. */
+                                        $crate::__pgrx_c_macros::CValue::<
+                                            $crate::__pgrx_c_macros::CInt
+                                        >::new(1i32)
+                                    );
+                                }
+                            }
+                        );
+                    };
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::select(
+                            if $crate::__pgrx_c_macros::expression::truth(
+                                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                    $crate::__pgrx_c_macros::expression::load(
+                                        $crate::__pgrx_c_macros::expression::project::<
+                                            $crate::__pgrx_c_generated::Field_rd_options,
+                                            _,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_macros::expression::pointee(
+                                                (
+                                                    $crate::__pgrx_c_macros::expression::profile_value::<
+                                                        true,
+                                                        _
+                                                    >(
+                                                        $crate::__pgrx_c_operand!(
+                                                            @value [true];
+                                                            $relation
+                                                        )
+                                                    )
+                                                )
+                                            )
+                                        )
+                                    )
+                                )
+                            ) {
+                                $crate::__pgrx_c_macros::Either::Left(
+                                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                        $crate::__pgrx_c_macros::expression::load(
+                                            $crate::__pgrx_c_macros::expression::project::<
+                                                $crate::__pgrx_c_generated::Field_security_invoker,
+                                                _,
+                                                _
+                                            >(
+                                                $crate::__pgrx_c_macros::expression::pointee(
+                                                    (
+                                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                                            true,
+                                                            _
+                                                        >(
+                                                            $crate::__pgrx_c_macros::expression::cast_as::<
+                                                                *mut $crate::__pgrx_c_bindings::ViewOptions,
+                                                                $crate::__pgrx_c_macros::expression::CPointer<
+                                                                    $crate::__pgrx_c_macros::expression::CRecord<
+                                                                        $crate::__pgrx_c_bindings::ViewOptions
+                                                                    >,
+                                                                    $crate::__pgrx_c_macros::expression::ReadWrite
+                                                                >,
+                                                                _
+                                                            >(
+                                                                $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                    true,
+                                                                    _
+                                                                >(
+                                                                    $crate::__pgrx_c_macros::expression::load(
+                                                                        $crate::__pgrx_c_macros::expression::project::<
+                                                                            $crate::__pgrx_c_generated::Field_rd_options,
+                                                                            _,
+                                                                            _
+                                                                        >(
+                                                                            $crate::__pgrx_c_macros::expression::pointee(
+                                                                                (
+                                                                                    $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                        true,
+                                                                                        _
+                                                                                    >(
+                                                                                        $crate::__pgrx_c_operand!(
+                                                                                            @value [
+                                                                                                true
+                                                                                            ];
+                                                                                            $relation
+                                                                                        )
+                                                                                    )
+                                                                                )
+                                                                            )
+                                                                        )
+                                                                    )
+                                                                )
+                                                            )
+                                                        )
+                                                    )
+                                                )
+                                            )
+                                        )
+                                    )
+                                )
+                            } else {
+                                $crate::__pgrx_c_macros::Either::Right(
+                                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                        $crate::__pgrx_c_macros::expression::null_constant(
+                                            /* PGRX: false remains expanded because no integer constant binding is available in the defining Rust crate. */
+                                            $crate::__pgrx_c_macros::CValue::<
+                                                $crate::__pgrx_c_macros::CInt
+                                            >::new(0i32)
+                                        )
+                                    )
+                                )
+                            }
+                        )
+                    )
+                }
+            );
+        }
+    };
+    (@__pgrx_c_discard; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_RelationHasSecurityInvoker!(@collect __pgrx_emit_discard []; $($raw)*)
+    };
+    ($($raw:tt)*) => {
+        $crate::__pgrx_c_args_RelationHasSecurityInvoker!(@collect __pgrx_emit_public []; $($raw)*)
+    };
+}
+
+#[cfg(not(all(
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -7829,7 +11045,7 @@ macro_rules! __pgrx_c_args_RelationIsAccessibleInLogicalDecoding {
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_RelationIsAccessibleInLogicalDecoding!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
@@ -7837,7 +11053,7 @@ macro_rules! __pgrx_c_args_RelationIsAccessibleInLogicalDecoding {
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_RelationIsAccessibleInLogicalDecoding!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -7846,7 +11062,7 @@ macro_rules! __pgrx_c_args_RelationIsAccessibleInLogicalDecoding {
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
         $crate::__pgrx_c_args_RelationIsAccessibleInLogicalDecoding!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
@@ -7872,17 +11088,17 @@ macro_rules! __pgrx_c_args_RelationIsAccessibleInLogicalDecoding {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_RelationIsAccessibleInLogicalDecoding!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:tt) => {
         $crate::__pgrx_c_args_RelationIsAccessibleInLogicalDecoding!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_RelationIsAccessibleInLogicalDecoding!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -7909,13 +11125,13 @@ macro_rules! __pgrx_c_args_RelationIsAccessibleInLogicalDecoding {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_RelationIsAccessibleInLogicalDecoding!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:tt, $($rest:tt)*) => {
         $crate::__pgrx_c_args_RelationIsAccessibleInLogicalDecoding!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -7984,7 +11200,7 @@ macro_rules! RelationIsAccessibleInLogicalDecoding {
                                                             $crate::__pgrx_c_macros::CInt
                                                         >(
                                                             ::core::ptr::addr_of_mut!(
-                                                                $crate::wal_level
+                                                                $crate::__pgrx_c_bindings::wal_level
                                                             )
                                                         )
                                                     )
@@ -7996,7 +11212,7 @@ macro_rules! RelationIsAccessibleInLogicalDecoding {
                                                     $crate::__pgrx_c_macros::CValue::<
                                                         $crate::__pgrx_c_macros::CInt
                                                     >::new(
-                                                        $crate::WalLevel::WAL_LEVEL_LOGICAL as i32
+                                                        $crate::__pgrx_c_bindings::WalLevel::WAL_LEVEL_LOGICAL as i32
                                                     )
                                                 )
                                             )
@@ -8068,7 +11284,7 @@ macro_rules! RelationIsAccessibleInLogicalDecoding {
                                                                     $crate::__pgrx_c_macros::CValue::<
                                                                         $crate::__pgrx_c_macros::CInt
                                                                     >::new(
-                                                                        $crate::RELPERSISTENCE_PERMANENT as i32
+                                                                        $crate::__pgrx_c_bindings::RELPERSISTENCE_PERMANENT as i32
                                                                     )
                                                                 )
                                                             )
@@ -8099,7 +11315,7 @@ macro_rules! RelationIsAccessibleInLogicalDecoding {
                                                                                             $crate::__pgrx_c_macros::CInt
                                                                                         >(
                                                                                             ::core::ptr::addr_of_mut!(
-                                                                                                $crate::wal_level
+                                                                                                $crate::__pgrx_c_bindings::wal_level
                                                                                             )
                                                                                         )
                                                                                     )
@@ -8111,7 +11327,7 @@ macro_rules! RelationIsAccessibleInLogicalDecoding {
                                                                                     $crate::__pgrx_c_macros::CValue::<
                                                                                         $crate::__pgrx_c_macros::CInt
                                                                                     >::new(
-                                                                                        $crate::WalLevel::WAL_LEVEL_REPLICA as i32
+                                                                                        $crate::__pgrx_c_bindings::WalLevel::WAL_LEVEL_REPLICA as i32
                                                                                     )
                                                                                 )
                                                                             )
@@ -8163,11 +11379,10 @@ macro_rules! RelationIsAccessibleInLogicalDecoding {
                                                                                                 _
                                                                                             >(
                                                                                                 $crate::__pgrx_c_macros::expression::null_constant(
-                                                                                                    /* PGRX: InvalidSubTransactionId remains expanded because no integer constant binding is available in the defining Rust crate. */
                                                                                                     $crate::__pgrx_c_macros::CValue::<
                                                                                                         $crate::__pgrx_c_macros::CUnsignedInt
                                                                                                     >::new(
-                                                                                                        0u32
+                                                                                                        $crate::__pgrx_c_bindings::InvalidSubTransactionId as u32
                                                                                                     )
                                                                                                 )
                                                                                             )
@@ -8210,11 +11425,10 @@ macro_rules! RelationIsAccessibleInLogicalDecoding {
                                                                                                 _
                                                                                             >(
                                                                                                 $crate::__pgrx_c_macros::expression::null_constant(
-                                                                                                    /* PGRX: InvalidSubTransactionId remains expanded because no integer constant binding is available in the defining Rust crate. */
                                                                                                     $crate::__pgrx_c_macros::CValue::<
                                                                                                         $crate::__pgrx_c_macros::CUnsignedInt
                                                                                                     >::new(
-                                                                                                        0u32
+                                                                                                        $crate::__pgrx_c_bindings::InvalidSubTransactionId as u32
                                                                                                     )
                                                                                                 )
                                                                                             )
@@ -8263,11 +11477,11 @@ macro_rules! RelationIsAccessibleInLogicalDecoding {
                                             <
                                                 $crate::__pgrx_c_macros::CBool as $crate::__pgrx_c_macros::expression::CType
                                             >::from_storage(
-                                                $crate::IsCatalogRelation(
+                                                $crate::__pgrx_c_bindings::IsCatalogRelation(
                                                     <
                                                         $crate::__pgrx_c_macros::expression::CPointer<
                                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                                $crate::RelationData
+                                                                $crate::__pgrx_c_bindings::RelationData
                                                             >,
                                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                                         > as $crate::__pgrx_c_macros::expression::CType
@@ -8275,7 +11489,7 @@ macro_rules! RelationIsAccessibleInLogicalDecoding {
                                                         $crate::__pgrx_c_macros::expression::implicit::<
                                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                                    $crate::RelationData
+                                                                    $crate::__pgrx_c_bindings::RelationData
                                                                 >,
                                                                 $crate::__pgrx_c_macros::expression::ReadWrite
                                                             >,
@@ -8404,7 +11618,7 @@ macro_rules! RelationIsAccessibleInLogicalDecoding {
                                                                                                 $crate::__pgrx_c_macros::CValue::<
                                                                                                     $crate::__pgrx_c_macros::CInt
                                                                                                 >::new(
-                                                                                                    $crate::RELKIND_RELATION as i32
+                                                                                                    $crate::__pgrx_c_bindings::RELKIND_RELATION as i32
                                                                                                 )
                                                                                             )
                                                                                         )
@@ -8465,7 +11679,7 @@ macro_rules! RelationIsAccessibleInLogicalDecoding {
                                                                                                 $crate::__pgrx_c_macros::CValue::<
                                                                                                     $crate::__pgrx_c_macros::CInt
                                                                                                 >::new(
-                                                                                                    $crate::RELKIND_MATVIEW as i32
+                                                                                                    $crate::__pgrx_c_bindings::RELKIND_MATVIEW as i32
                                                                                                 )
                                                                                             )
                                                                                         )
@@ -8504,10 +11718,10 @@ macro_rules! RelationIsAccessibleInLogicalDecoding {
                                                                                     _
                                                                                 >(
                                                                                     $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                                        *mut $crate::StdRdOptions,
+                                                                                        *mut $crate::__pgrx_c_bindings::StdRdOptions,
                                                                                         $crate::__pgrx_c_macros::expression::CPointer<
                                                                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                $crate::StdRdOptions
+                                                                                                $crate::__pgrx_c_bindings::StdRdOptions
                                                                                             >,
                                                                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                                                                         >,
@@ -8642,7 +11856,7 @@ macro_rules! RelationIsAccessibleInLogicalDecoding {
                                                                         $crate::__pgrx_c_macros::CInt
                                                                     >(
                                                                         ::core::ptr::addr_of_mut!(
-                                                                            $crate::wal_level
+                                                                            $crate::__pgrx_c_bindings::wal_level
                                                                         )
                                                                     )
                                                                 )
@@ -8654,7 +11868,7 @@ macro_rules! RelationIsAccessibleInLogicalDecoding {
                                                                 $crate::__pgrx_c_macros::CValue::<
                                                                     $crate::__pgrx_c_macros::CInt
                                                                 >::new(
-                                                                    $crate::WalLevel::WAL_LEVEL_LOGICAL as i32
+                                                                    $crate::__pgrx_c_bindings::WalLevel::WAL_LEVEL_LOGICAL as i32
                                                                 )
                                                             )
                                                         )
@@ -8726,7 +11940,7 @@ macro_rules! RelationIsAccessibleInLogicalDecoding {
                                                                                 $crate::__pgrx_c_macros::CValue::<
                                                                                     $crate::__pgrx_c_macros::CInt
                                                                                 >::new(
-                                                                                    $crate::RELPERSISTENCE_PERMANENT as i32
+                                                                                    $crate::__pgrx_c_bindings::RELPERSISTENCE_PERMANENT as i32
                                                                                 )
                                                                             )
                                                                         )
@@ -8757,7 +11971,7 @@ macro_rules! RelationIsAccessibleInLogicalDecoding {
                                                                                                         $crate::__pgrx_c_macros::CInt
                                                                                                     >(
                                                                                                         ::core::ptr::addr_of_mut!(
-                                                                                                            $crate::wal_level
+                                                                                                            $crate::__pgrx_c_bindings::wal_level
                                                                                                         )
                                                                                                     )
                                                                                                 )
@@ -8769,7 +11983,7 @@ macro_rules! RelationIsAccessibleInLogicalDecoding {
                                                                                                 $crate::__pgrx_c_macros::CValue::<
                                                                                                     $crate::__pgrx_c_macros::CInt
                                                                                                 >::new(
-                                                                                                    $crate::WalLevel::WAL_LEVEL_REPLICA as i32
+                                                                                                    $crate::__pgrx_c_bindings::WalLevel::WAL_LEVEL_REPLICA as i32
                                                                                                 )
                                                                                             )
                                                                                         )
@@ -8821,11 +12035,10 @@ macro_rules! RelationIsAccessibleInLogicalDecoding {
                                                                                                             _
                                                                                                         >(
                                                                                                             $crate::__pgrx_c_macros::expression::null_constant(
-                                                                                                                /* PGRX: InvalidSubTransactionId remains expanded because no integer constant binding is available in the defining Rust crate. */
                                                                                                                 $crate::__pgrx_c_macros::CValue::<
                                                                                                                     $crate::__pgrx_c_macros::CUnsignedInt
                                                                                                                 >::new(
-                                                                                                                    0u32
+                                                                                                                    $crate::__pgrx_c_bindings::InvalidSubTransactionId as u32
                                                                                                                 )
                                                                                                             )
                                                                                                         )
@@ -8868,11 +12081,10 @@ macro_rules! RelationIsAccessibleInLogicalDecoding {
                                                                                                             _
                                                                                                         >(
                                                                                                             $crate::__pgrx_c_macros::expression::null_constant(
-                                                                                                                /* PGRX: InvalidSubTransactionId remains expanded because no integer constant binding is available in the defining Rust crate. */
                                                                                                                 $crate::__pgrx_c_macros::CValue::<
                                                                                                                     $crate::__pgrx_c_macros::CUnsignedInt
                                                                                                                 >::new(
-                                                                                                                    0u32
+                                                                                                                    $crate::__pgrx_c_bindings::InvalidSubTransactionId as u32
                                                                                                                 )
                                                                                                             )
                                                                                                         )
@@ -8926,11 +12138,11 @@ macro_rules! RelationIsAccessibleInLogicalDecoding {
                                                         <
                                                             $crate::__pgrx_c_macros::CBool as $crate::__pgrx_c_macros::expression::CType
                                                         >::from_storage(
-                                                            $crate::IsCatalogRelation(
+                                                            $crate::__pgrx_c_bindings::IsCatalogRelation(
                                                                 <
                                                                     $crate::__pgrx_c_macros::expression::CPointer<
                                                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                                                            $crate::RelationData
+                                                                            $crate::__pgrx_c_bindings::RelationData
                                                                         >,
                                                                         $crate::__pgrx_c_macros::expression::ReadWrite
                                                                     > as $crate::__pgrx_c_macros::expression::CType
@@ -8938,7 +12150,7 @@ macro_rules! RelationIsAccessibleInLogicalDecoding {
                                                                     $crate::__pgrx_c_macros::expression::implicit::<
                                                                         $crate::__pgrx_c_macros::expression::CPointer<
                                                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                $crate::RelationData
+                                                                                $crate::__pgrx_c_bindings::RelationData
                                                                             >,
                                                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                                                         >,
@@ -9067,7 +12279,7 @@ macro_rules! RelationIsAccessibleInLogicalDecoding {
                                                                                                             $crate::__pgrx_c_macros::CValue::<
                                                                                                                 $crate::__pgrx_c_macros::CInt
                                                                                                             >::new(
-                                                                                                                $crate::RELKIND_RELATION as i32
+                                                                                                                $crate::__pgrx_c_bindings::RELKIND_RELATION as i32
                                                                                                             )
                                                                                                         )
                                                                                                     )
@@ -9128,7 +12340,7 @@ macro_rules! RelationIsAccessibleInLogicalDecoding {
                                                                                                             $crate::__pgrx_c_macros::CValue::<
                                                                                                                 $crate::__pgrx_c_macros::CInt
                                                                                                             >::new(
-                                                                                                                $crate::RELKIND_MATVIEW as i32
+                                                                                                                $crate::__pgrx_c_bindings::RELKIND_MATVIEW as i32
                                                                                                             )
                                                                                                         )
                                                                                                     )
@@ -9167,10 +12379,10 @@ macro_rules! RelationIsAccessibleInLogicalDecoding {
                                                                                                 _
                                                                                             >(
                                                                                                 $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                                                    *mut $crate::StdRdOptions,
+                                                                                                    *mut $crate::__pgrx_c_bindings::StdRdOptions,
                                                                                                     $crate::__pgrx_c_macros::expression::CPointer<
                                                                                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                            $crate::StdRdOptions
+                                                                                                            $crate::__pgrx_c_bindings::StdRdOptions
                                                                                                         >,
                                                                                                         $crate::__pgrx_c_macros::expression::ReadWrite
                                                                                                     >,
@@ -9282,7 +12494,7 @@ macro_rules! RelationIsAccessibleInLogicalDecoding {
                                                             $crate::__pgrx_c_macros::CInt
                                                         >(
                                                             ::core::ptr::addr_of_mut!(
-                                                                $crate::wal_level
+                                                                $crate::__pgrx_c_bindings::wal_level
                                                             )
                                                         )
                                                     )
@@ -9294,7 +12506,7 @@ macro_rules! RelationIsAccessibleInLogicalDecoding {
                                                     $crate::__pgrx_c_macros::CValue::<
                                                         $crate::__pgrx_c_macros::CInt
                                                     >::new(
-                                                        $crate::WalLevel::WAL_LEVEL_LOGICAL as i32
+                                                        $crate::__pgrx_c_bindings::WalLevel::WAL_LEVEL_LOGICAL as i32
                                                     )
                                                 )
                                             )
@@ -9366,7 +12578,7 @@ macro_rules! RelationIsAccessibleInLogicalDecoding {
                                                                     $crate::__pgrx_c_macros::CValue::<
                                                                         $crate::__pgrx_c_macros::CInt
                                                                     >::new(
-                                                                        $crate::RELPERSISTENCE_PERMANENT as i32
+                                                                        $crate::__pgrx_c_bindings::RELPERSISTENCE_PERMANENT as i32
                                                                     )
                                                                 )
                                                             )
@@ -9397,7 +12609,7 @@ macro_rules! RelationIsAccessibleInLogicalDecoding {
                                                                                             $crate::__pgrx_c_macros::CInt
                                                                                         >(
                                                                                             ::core::ptr::addr_of_mut!(
-                                                                                                $crate::wal_level
+                                                                                                $crate::__pgrx_c_bindings::wal_level
                                                                                             )
                                                                                         )
                                                                                     )
@@ -9409,7 +12621,7 @@ macro_rules! RelationIsAccessibleInLogicalDecoding {
                                                                                     $crate::__pgrx_c_macros::CValue::<
                                                                                         $crate::__pgrx_c_macros::CInt
                                                                                     >::new(
-                                                                                        $crate::WalLevel::WAL_LEVEL_REPLICA as i32
+                                                                                        $crate::__pgrx_c_bindings::WalLevel::WAL_LEVEL_REPLICA as i32
                                                                                     )
                                                                                 )
                                                                             )
@@ -9461,11 +12673,10 @@ macro_rules! RelationIsAccessibleInLogicalDecoding {
                                                                                                 _
                                                                                             >(
                                                                                                 $crate::__pgrx_c_macros::expression::null_constant(
-                                                                                                    /* PGRX: InvalidSubTransactionId remains expanded because no integer constant binding is available in the defining Rust crate. */
                                                                                                     $crate::__pgrx_c_macros::CValue::<
                                                                                                         $crate::__pgrx_c_macros::CUnsignedInt
                                                                                                     >::new(
-                                                                                                        0u32
+                                                                                                        $crate::__pgrx_c_bindings::InvalidSubTransactionId as u32
                                                                                                     )
                                                                                                 )
                                                                                             )
@@ -9508,11 +12719,10 @@ macro_rules! RelationIsAccessibleInLogicalDecoding {
                                                                                                 _
                                                                                             >(
                                                                                                 $crate::__pgrx_c_macros::expression::null_constant(
-                                                                                                    /* PGRX: InvalidSubTransactionId remains expanded because no integer constant binding is available in the defining Rust crate. */
                                                                                                     $crate::__pgrx_c_macros::CValue::<
                                                                                                         $crate::__pgrx_c_macros::CUnsignedInt
                                                                                                     >::new(
-                                                                                                        0u32
+                                                                                                        $crate::__pgrx_c_bindings::InvalidSubTransactionId as u32
                                                                                                     )
                                                                                                 )
                                                                                             )
@@ -9561,11 +12771,11 @@ macro_rules! RelationIsAccessibleInLogicalDecoding {
                                             <
                                                 $crate::__pgrx_c_macros::CBool as $crate::__pgrx_c_macros::expression::CType
                                             >::from_storage(
-                                                $crate::IsCatalogRelation(
+                                                $crate::__pgrx_c_bindings::IsCatalogRelation(
                                                     <
                                                         $crate::__pgrx_c_macros::expression::CPointer<
                                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                                $crate::RelationData
+                                                                $crate::__pgrx_c_bindings::RelationData
                                                             >,
                                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                                         > as $crate::__pgrx_c_macros::expression::CType
@@ -9573,7 +12783,7 @@ macro_rules! RelationIsAccessibleInLogicalDecoding {
                                                         $crate::__pgrx_c_macros::expression::implicit::<
                                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                                    $crate::RelationData
+                                                                    $crate::__pgrx_c_bindings::RelationData
                                                                 >,
                                                                 $crate::__pgrx_c_macros::expression::ReadWrite
                                                             >,
@@ -9702,7 +12912,7 @@ macro_rules! RelationIsAccessibleInLogicalDecoding {
                                                                                                 $crate::__pgrx_c_macros::CValue::<
                                                                                                     $crate::__pgrx_c_macros::CInt
                                                                                                 >::new(
-                                                                                                    $crate::RELKIND_RELATION as i32
+                                                                                                    $crate::__pgrx_c_bindings::RELKIND_RELATION as i32
                                                                                                 )
                                                                                             )
                                                                                         )
@@ -9763,7 +12973,7 @@ macro_rules! RelationIsAccessibleInLogicalDecoding {
                                                                                                 $crate::__pgrx_c_macros::CValue::<
                                                                                                     $crate::__pgrx_c_macros::CInt
                                                                                                 >::new(
-                                                                                                    $crate::RELKIND_MATVIEW as i32
+                                                                                                    $crate::__pgrx_c_bindings::RELKIND_MATVIEW as i32
                                                                                                 )
                                                                                             )
                                                                                         )
@@ -9802,10 +13012,10 @@ macro_rules! RelationIsAccessibleInLogicalDecoding {
                                                                                     _
                                                                                 >(
                                                                                     $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                                        *mut $crate::StdRdOptions,
+                                                                                        *mut $crate::__pgrx_c_bindings::StdRdOptions,
                                                                                         $crate::__pgrx_c_macros::expression::CPointer<
                                                                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                $crate::StdRdOptions
+                                                                                                $crate::__pgrx_c_bindings::StdRdOptions
                                                                                             >,
                                                                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                                                                         >,
@@ -9897,8 +13107,8 @@ macro_rules! RelationIsAccessibleInLogicalDecoding {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -9932,7 +13142,7 @@ macro_rules! __pgrx_c_args_RelationIsLogicallyLogged {
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_RelationIsLogicallyLogged!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
@@ -9940,7 +13150,7 @@ macro_rules! __pgrx_c_args_RelationIsLogicallyLogged {
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_RelationIsLogicallyLogged!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -9949,7 +13159,7 @@ macro_rules! __pgrx_c_args_RelationIsLogicallyLogged {
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
         $crate::__pgrx_c_args_RelationIsLogicallyLogged!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
@@ -9975,17 +13185,17 @@ macro_rules! __pgrx_c_args_RelationIsLogicallyLogged {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_RelationIsLogicallyLogged!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:tt) => {
         $crate::__pgrx_c_args_RelationIsLogicallyLogged!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_RelationIsLogicallyLogged!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -10012,13 +13222,13 @@ macro_rules! __pgrx_c_args_RelationIsLogicallyLogged {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_RelationIsLogicallyLogged!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:tt, $($rest:tt)*) => {
         $crate::__pgrx_c_args_RelationIsLogicallyLogged!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -10092,7 +13302,7 @@ macro_rules! RelationIsLogicallyLogged {
                                                                         $crate::__pgrx_c_macros::CInt
                                                                     >(
                                                                         ::core::ptr::addr_of_mut!(
-                                                                            $crate::wal_level
+                                                                            $crate::__pgrx_c_bindings::wal_level
                                                                         )
                                                                     )
                                                                 )
@@ -10104,7 +13314,7 @@ macro_rules! RelationIsLogicallyLogged {
                                                                 $crate::__pgrx_c_macros::CValue::<
                                                                     $crate::__pgrx_c_macros::CInt
                                                                 >::new(
-                                                                    $crate::WalLevel::WAL_LEVEL_LOGICAL as i32
+                                                                    $crate::__pgrx_c_bindings::WalLevel::WAL_LEVEL_LOGICAL as i32
                                                                 )
                                                             )
                                                         )
@@ -10176,7 +13386,7 @@ macro_rules! RelationIsLogicallyLogged {
                                                                                 $crate::__pgrx_c_macros::CValue::<
                                                                                     $crate::__pgrx_c_macros::CInt
                                                                                 >::new(
-                                                                                    $crate::RELPERSISTENCE_PERMANENT as i32
+                                                                                    $crate::__pgrx_c_bindings::RELPERSISTENCE_PERMANENT as i32
                                                                                 )
                                                                             )
                                                                         )
@@ -10207,7 +13417,7 @@ macro_rules! RelationIsLogicallyLogged {
                                                                                                         $crate::__pgrx_c_macros::CInt
                                                                                                     >(
                                                                                                         ::core::ptr::addr_of_mut!(
-                                                                                                            $crate::wal_level
+                                                                                                            $crate::__pgrx_c_bindings::wal_level
                                                                                                         )
                                                                                                     )
                                                                                                 )
@@ -10219,7 +13429,7 @@ macro_rules! RelationIsLogicallyLogged {
                                                                                                 $crate::__pgrx_c_macros::CValue::<
                                                                                                     $crate::__pgrx_c_macros::CInt
                                                                                                 >::new(
-                                                                                                    $crate::WalLevel::WAL_LEVEL_REPLICA as i32
+                                                                                                    $crate::__pgrx_c_bindings::WalLevel::WAL_LEVEL_REPLICA as i32
                                                                                                 )
                                                                                             )
                                                                                         )
@@ -10271,11 +13481,10 @@ macro_rules! RelationIsLogicallyLogged {
                                                                                                             _
                                                                                                         >(
                                                                                                             $crate::__pgrx_c_macros::expression::null_constant(
-                                                                                                                /* PGRX: InvalidSubTransactionId remains expanded because no integer constant binding is available in the defining Rust crate. */
                                                                                                                 $crate::__pgrx_c_macros::CValue::<
                                                                                                                     $crate::__pgrx_c_macros::CUnsignedInt
                                                                                                                 >::new(
-                                                                                                                    0u32
+                                                                                                                    $crate::__pgrx_c_bindings::InvalidSubTransactionId as u32
                                                                                                                 )
                                                                                                             )
                                                                                                         )
@@ -10318,11 +13527,10 @@ macro_rules! RelationIsLogicallyLogged {
                                                                                                             _
                                                                                                         >(
                                                                                                             $crate::__pgrx_c_macros::expression::null_constant(
-                                                                                                                /* PGRX: InvalidSubTransactionId remains expanded because no integer constant binding is available in the defining Rust crate. */
                                                                                                                 $crate::__pgrx_c_macros::CValue::<
                                                                                                                     $crate::__pgrx_c_macros::CUnsignedInt
                                                                                                                 >::new(
-                                                                                                                    0u32
+                                                                                                                    $crate::__pgrx_c_bindings::InvalidSubTransactionId as u32
                                                                                                                 )
                                                                                                             )
                                                                                                         )
@@ -10411,7 +13619,9 @@ macro_rules! RelationIsLogicallyLogged {
                                             >(
                                                 $crate::__pgrx_c_macros::CValue::<
                                                     $crate::__pgrx_c_macros::CInt
-                                                >::new($crate::RELKIND_FOREIGN_TABLE as i32)
+                                                >::new(
+                                                    $crate::__pgrx_c_bindings::RELKIND_FOREIGN_TABLE as i32
+                                                )
                                             )
                                         )
                                     )
@@ -10429,11 +13639,11 @@ macro_rules! RelationIsLogicallyLogged {
                                     <
                                         $crate::__pgrx_c_macros::CBool as $crate::__pgrx_c_macros::expression::CType
                                     >::from_storage(
-                                        $crate::IsCatalogRelation(
+                                        $crate::__pgrx_c_bindings::IsCatalogRelation(
                                             <
                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                        $crate::RelationData
+                                                        $crate::__pgrx_c_bindings::RelationData
                                                     >,
                                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                                 > as $crate::__pgrx_c_macros::expression::CType
@@ -10441,7 +13651,7 @@ macro_rules! RelationIsLogicallyLogged {
                                                 $crate::__pgrx_c_macros::expression::implicit::<
                                                     $crate::__pgrx_c_macros::expression::CPointer<
                                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                                            $crate::RelationData
+                                                            $crate::__pgrx_c_bindings::RelationData
                                                         >,
                                                         $crate::__pgrx_c_macros::expression::ReadWrite
                                                     >,
@@ -10532,7 +13742,7 @@ macro_rules! RelationIsLogicallyLogged {
                                                                                     $crate::__pgrx_c_macros::CInt
                                                                                 >(
                                                                                     ::core::ptr::addr_of_mut!(
-                                                                                        $crate::wal_level
+                                                                                        $crate::__pgrx_c_bindings::wal_level
                                                                                     )
                                                                                 )
                                                                             )
@@ -10544,7 +13754,7 @@ macro_rules! RelationIsLogicallyLogged {
                                                                             $crate::__pgrx_c_macros::CValue::<
                                                                                 $crate::__pgrx_c_macros::CInt
                                                                             >::new(
-                                                                                $crate::WalLevel::WAL_LEVEL_LOGICAL as i32
+                                                                                $crate::__pgrx_c_bindings::WalLevel::WAL_LEVEL_LOGICAL as i32
                                                                             )
                                                                         )
                                                                     )
@@ -10616,7 +13826,7 @@ macro_rules! RelationIsLogicallyLogged {
                                                                                             $crate::__pgrx_c_macros::CValue::<
                                                                                                 $crate::__pgrx_c_macros::CInt
                                                                                             >::new(
-                                                                                                $crate::RELPERSISTENCE_PERMANENT as i32
+                                                                                                $crate::__pgrx_c_bindings::RELPERSISTENCE_PERMANENT as i32
                                                                                             )
                                                                                         )
                                                                                     )
@@ -10647,7 +13857,7 @@ macro_rules! RelationIsLogicallyLogged {
                                                                                                                     $crate::__pgrx_c_macros::CInt
                                                                                                                 >(
                                                                                                                     ::core::ptr::addr_of_mut!(
-                                                                                                                        $crate::wal_level
+                                                                                                                        $crate::__pgrx_c_bindings::wal_level
                                                                                                                     )
                                                                                                                 )
                                                                                                             )
@@ -10659,7 +13869,7 @@ macro_rules! RelationIsLogicallyLogged {
                                                                                                             $crate::__pgrx_c_macros::CValue::<
                                                                                                                 $crate::__pgrx_c_macros::CInt
                                                                                                             >::new(
-                                                                                                                $crate::WalLevel::WAL_LEVEL_REPLICA as i32
+                                                                                                                $crate::__pgrx_c_bindings::WalLevel::WAL_LEVEL_REPLICA as i32
                                                                                                             )
                                                                                                         )
                                                                                                     )
@@ -10711,11 +13921,10 @@ macro_rules! RelationIsLogicallyLogged {
                                                                                                                         _
                                                                                                                     >(
                                                                                                                         $crate::__pgrx_c_macros::expression::null_constant(
-                                                                                                                            /* PGRX: InvalidSubTransactionId remains expanded because no integer constant binding is available in the defining Rust crate. */
                                                                                                                             $crate::__pgrx_c_macros::CValue::<
                                                                                                                                 $crate::__pgrx_c_macros::CUnsignedInt
                                                                                                                             >::new(
-                                                                                                                                0u32
+                                                                                                                                $crate::__pgrx_c_bindings::InvalidSubTransactionId as u32
                                                                                                                             )
                                                                                                                         )
                                                                                                                     )
@@ -10758,11 +13967,10 @@ macro_rules! RelationIsLogicallyLogged {
                                                                                                                         _
                                                                                                                     >(
                                                                                                                         $crate::__pgrx_c_macros::expression::null_constant(
-                                                                                                                            /* PGRX: InvalidSubTransactionId remains expanded because no integer constant binding is available in the defining Rust crate. */
                                                                                                                             $crate::__pgrx_c_macros::CValue::<
                                                                                                                                 $crate::__pgrx_c_macros::CUnsignedInt
                                                                                                                             >::new(
-                                                                                                                                0u32
+                                                                                                                                $crate::__pgrx_c_bindings::InvalidSubTransactionId as u32
                                                                                                                             )
                                                                                                                         )
                                                                                                                     )
@@ -10855,7 +14063,7 @@ macro_rules! RelationIsLogicallyLogged {
                                                             $crate::__pgrx_c_macros::CValue::<
                                                                 $crate::__pgrx_c_macros::CInt
                                                             >::new(
-                                                                $crate::RELKIND_FOREIGN_TABLE as i32
+                                                                $crate::__pgrx_c_bindings::RELKIND_FOREIGN_TABLE as i32
                                                             )
                                                         )
                                                     )
@@ -10877,11 +14085,11 @@ macro_rules! RelationIsLogicallyLogged {
                                                 <
                                                     $crate::__pgrx_c_macros::CBool as $crate::__pgrx_c_macros::expression::CType
                                                 >::from_storage(
-                                                    $crate::IsCatalogRelation(
+                                                    $crate::__pgrx_c_bindings::IsCatalogRelation(
                                                         <
                                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                                    $crate::RelationData
+                                                                    $crate::__pgrx_c_bindings::RelationData
                                                                 >,
                                                                 $crate::__pgrx_c_macros::expression::ReadWrite
                                                             > as $crate::__pgrx_c_macros::expression::CType
@@ -10889,7 +14097,7 @@ macro_rules! RelationIsLogicallyLogged {
                                                             $crate::__pgrx_c_macros::expression::implicit::<
                                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                                        $crate::RelationData
+                                                                        $crate::__pgrx_c_bindings::RelationData
                                                                     >,
                                                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                                                 >,
@@ -10957,7 +14165,7 @@ macro_rules! RelationIsLogicallyLogged {
                                                                         $crate::__pgrx_c_macros::CInt
                                                                     >(
                                                                         ::core::ptr::addr_of_mut!(
-                                                                            $crate::wal_level
+                                                                            $crate::__pgrx_c_bindings::wal_level
                                                                         )
                                                                     )
                                                                 )
@@ -10969,7 +14177,7 @@ macro_rules! RelationIsLogicallyLogged {
                                                                 $crate::__pgrx_c_macros::CValue::<
                                                                     $crate::__pgrx_c_macros::CInt
                                                                 >::new(
-                                                                    $crate::WalLevel::WAL_LEVEL_LOGICAL as i32
+                                                                    $crate::__pgrx_c_bindings::WalLevel::WAL_LEVEL_LOGICAL as i32
                                                                 )
                                                             )
                                                         )
@@ -11041,7 +14249,7 @@ macro_rules! RelationIsLogicallyLogged {
                                                                                 $crate::__pgrx_c_macros::CValue::<
                                                                                     $crate::__pgrx_c_macros::CInt
                                                                                 >::new(
-                                                                                    $crate::RELPERSISTENCE_PERMANENT as i32
+                                                                                    $crate::__pgrx_c_bindings::RELPERSISTENCE_PERMANENT as i32
                                                                                 )
                                                                             )
                                                                         )
@@ -11072,7 +14280,7 @@ macro_rules! RelationIsLogicallyLogged {
                                                                                                         $crate::__pgrx_c_macros::CInt
                                                                                                     >(
                                                                                                         ::core::ptr::addr_of_mut!(
-                                                                                                            $crate::wal_level
+                                                                                                            $crate::__pgrx_c_bindings::wal_level
                                                                                                         )
                                                                                                     )
                                                                                                 )
@@ -11084,7 +14292,7 @@ macro_rules! RelationIsLogicallyLogged {
                                                                                                 $crate::__pgrx_c_macros::CValue::<
                                                                                                     $crate::__pgrx_c_macros::CInt
                                                                                                 >::new(
-                                                                                                    $crate::WalLevel::WAL_LEVEL_REPLICA as i32
+                                                                                                    $crate::__pgrx_c_bindings::WalLevel::WAL_LEVEL_REPLICA as i32
                                                                                                 )
                                                                                             )
                                                                                         )
@@ -11136,11 +14344,10 @@ macro_rules! RelationIsLogicallyLogged {
                                                                                                             _
                                                                                                         >(
                                                                                                             $crate::__pgrx_c_macros::expression::null_constant(
-                                                                                                                /* PGRX: InvalidSubTransactionId remains expanded because no integer constant binding is available in the defining Rust crate. */
                                                                                                                 $crate::__pgrx_c_macros::CValue::<
                                                                                                                     $crate::__pgrx_c_macros::CUnsignedInt
                                                                                                                 >::new(
-                                                                                                                    0u32
+                                                                                                                    $crate::__pgrx_c_bindings::InvalidSubTransactionId as u32
                                                                                                                 )
                                                                                                             )
                                                                                                         )
@@ -11183,11 +14390,10 @@ macro_rules! RelationIsLogicallyLogged {
                                                                                                             _
                                                                                                         >(
                                                                                                             $crate::__pgrx_c_macros::expression::null_constant(
-                                                                                                                /* PGRX: InvalidSubTransactionId remains expanded because no integer constant binding is available in the defining Rust crate. */
                                                                                                                 $crate::__pgrx_c_macros::CValue::<
                                                                                                                     $crate::__pgrx_c_macros::CUnsignedInt
                                                                                                                 >::new(
-                                                                                                                    0u32
+                                                                                                                    $crate::__pgrx_c_bindings::InvalidSubTransactionId as u32
                                                                                                                 )
                                                                                                             )
                                                                                                         )
@@ -11276,7 +14482,9 @@ macro_rules! RelationIsLogicallyLogged {
                                             >(
                                                 $crate::__pgrx_c_macros::CValue::<
                                                     $crate::__pgrx_c_macros::CInt
-                                                >::new($crate::RELKIND_FOREIGN_TABLE as i32)
+                                                >::new(
+                                                    $crate::__pgrx_c_bindings::RELKIND_FOREIGN_TABLE as i32
+                                                )
                                             )
                                         )
                                     )
@@ -11294,11 +14502,11 @@ macro_rules! RelationIsLogicallyLogged {
                                     <
                                         $crate::__pgrx_c_macros::CBool as $crate::__pgrx_c_macros::expression::CType
                                     >::from_storage(
-                                        $crate::IsCatalogRelation(
+                                        $crate::__pgrx_c_bindings::IsCatalogRelation(
                                             <
                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                        $crate::RelationData
+                                                        $crate::__pgrx_c_bindings::RelationData
                                                     >,
                                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                                 > as $crate::__pgrx_c_macros::expression::CType
@@ -11306,7 +14514,7 @@ macro_rules! RelationIsLogicallyLogged {
                                                 $crate::__pgrx_c_macros::expression::implicit::<
                                                     $crate::__pgrx_c_macros::expression::CPointer<
                                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                                            $crate::RelationData
+                                                            $crate::__pgrx_c_bindings::RelationData
                                                         >,
                                                         $crate::__pgrx_c_macros::expression::ReadWrite
                                                     >,
@@ -11346,8 +14554,8 @@ macro_rules! RelationIsLogicallyLogged {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -11374,20 +14582,24 @@ macro_rules! __pgrx_c_args_RelationIsMapped {
         $crate::__pgrx_c_args_RelationIsMapped!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_RelationIsMapped!(@p1 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_RelationIsMapped!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_RelationIsMapped!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_RelationIsMapped!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_RelationIsMapped!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_RelationIsMapped!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -11395,7 +14607,9 @@ macro_rules! __pgrx_c_args_RelationIsMapped {
         $crate::__pgrx_c_args_RelationIsMapped!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_RelationIsMapped!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_RelationIsMapped!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -11417,14 +14631,18 @@ macro_rules! __pgrx_c_args_RelationIsMapped {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_RelationIsMapped!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_RelationIsMapped!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_RelationIsMapped!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_RelationIsMapped!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_RelationIsMapped!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -11451,13 +14669,13 @@ macro_rules! __pgrx_c_args_RelationIsMapped {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_RelationIsMapped!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_RelationIsMapped!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -11586,7 +14804,7 @@ macro_rules! RelationIsMapped {
                                                                                         $crate::__pgrx_c_macros::CValue::<
                                                                                             $crate::__pgrx_c_macros::CInt
                                                                                         >::new(
-                                                                                            $crate::RELKIND_RELATION as i32
+                                                                                            $crate::__pgrx_c_bindings::RELKIND_RELATION as i32
                                                                                         )
                                                                                     )
                                                                                 )
@@ -11649,7 +14867,7 @@ macro_rules! RelationIsMapped {
                                                                                         $crate::__pgrx_c_macros::CValue::<
                                                                                             $crate::__pgrx_c_macros::CInt
                                                                                         >::new(
-                                                                                            $crate::RELKIND_INDEX as i32
+                                                                                            $crate::__pgrx_c_bindings::RELKIND_INDEX as i32
                                                                                         )
                                                                                     )
                                                                                 )
@@ -11719,7 +14937,7 @@ macro_rules! RelationIsMapped {
                                                                             $crate::__pgrx_c_macros::CValue::<
                                                                                 $crate::__pgrx_c_macros::CInt
                                                                             >::new(
-                                                                                $crate::RELKIND_SEQUENCE as i32
+                                                                                $crate::__pgrx_c_bindings::RELKIND_SEQUENCE as i32
                                                                             )
                                                                         )
                                                                     )
@@ -11789,7 +15007,7 @@ macro_rules! RelationIsMapped {
                                                                 $crate::__pgrx_c_macros::CValue::<
                                                                     $crate::__pgrx_c_macros::CInt
                                                                 >::new(
-                                                                    $crate::RELKIND_TOASTVALUE as i32
+                                                                    $crate::__pgrx_c_bindings::RELKIND_TOASTVALUE as i32
                                                                 )
                                                             )
                                                         )
@@ -11858,7 +15076,9 @@ macro_rules! RelationIsMapped {
                                                 >(
                                                     $crate::__pgrx_c_macros::CValue::<
                                                         $crate::__pgrx_c_macros::CInt
-                                                    >::new($crate::RELKIND_MATVIEW as i32)
+                                                    >::new(
+                                                        $crate::__pgrx_c_bindings::RELKIND_MATVIEW as i32
+                                                    )
                                                 )
                                             )
                                         )
@@ -11914,10 +15134,11 @@ macro_rules! RelationIsMapped {
                                     ),
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::expression::null_constant(
-                                            /* PGRX: InvalidRelFileNumber remains expanded because no integer constant binding is available in the defining Rust crate. */
                                             $crate::__pgrx_c_macros::CValue::<
                                                 $crate::__pgrx_c_macros::CUnsignedInt
-                                            >::new(0u32)
+                                            >::new(
+                                                $crate::__pgrx_c_bindings::InvalidRelFileNumber as u32
+                                            )
                                         )
                                     )
                                 )
@@ -12051,7 +15272,7 @@ macro_rules! RelationIsMapped {
                                                                                                     $crate::__pgrx_c_macros::CValue::<
                                                                                                         $crate::__pgrx_c_macros::CInt
                                                                                                     >::new(
-                                                                                                        $crate::RELKIND_RELATION as i32
+                                                                                                        $crate::__pgrx_c_bindings::RELKIND_RELATION as i32
                                                                                                     )
                                                                                                 )
                                                                                             )
@@ -12114,7 +15335,7 @@ macro_rules! RelationIsMapped {
                                                                                                     $crate::__pgrx_c_macros::CValue::<
                                                                                                         $crate::__pgrx_c_macros::CInt
                                                                                                     >::new(
-                                                                                                        $crate::RELKIND_INDEX as i32
+                                                                                                        $crate::__pgrx_c_bindings::RELKIND_INDEX as i32
                                                                                                     )
                                                                                                 )
                                                                                             )
@@ -12184,7 +15405,7 @@ macro_rules! RelationIsMapped {
                                                                                         $crate::__pgrx_c_macros::CValue::<
                                                                                             $crate::__pgrx_c_macros::CInt
                                                                                         >::new(
-                                                                                            $crate::RELKIND_SEQUENCE as i32
+                                                                                            $crate::__pgrx_c_bindings::RELKIND_SEQUENCE as i32
                                                                                         )
                                                                                     )
                                                                                 )
@@ -12254,7 +15475,7 @@ macro_rules! RelationIsMapped {
                                                                             $crate::__pgrx_c_macros::CValue::<
                                                                                 $crate::__pgrx_c_macros::CInt
                                                                             >::new(
-                                                                                $crate::RELKIND_TOASTVALUE as i32
+                                                                                $crate::__pgrx_c_bindings::RELKIND_TOASTVALUE as i32
                                                                             )
                                                                         )
                                                                     )
@@ -12324,7 +15545,7 @@ macro_rules! RelationIsMapped {
                                                                 $crate::__pgrx_c_macros::CValue::<
                                                                     $crate::__pgrx_c_macros::CInt
                                                                 >::new(
-                                                                    $crate::RELKIND_MATVIEW as i32
+                                                                    $crate::__pgrx_c_bindings::RELKIND_MATVIEW as i32
                                                                 )
                                                             )
                                                         )
@@ -12392,10 +15613,11 @@ macro_rules! RelationIsMapped {
                                                     _
                                                 >(
                                                     $crate::__pgrx_c_macros::expression::null_constant(
-                                                        /* PGRX: InvalidRelFileNumber remains expanded because no integer constant binding is available in the defining Rust crate. */
                                                         $crate::__pgrx_c_macros::CValue::<
                                                             $crate::__pgrx_c_macros::CUnsignedInt
-                                                        >::new(0u32)
+                                                        >::new(
+                                                            $crate::__pgrx_c_bindings::InvalidRelFileNumber as u32
+                                                        )
                                                     )
                                                 )
                                             )
@@ -12509,7 +15731,7 @@ macro_rules! RelationIsMapped {
                                                                                         $crate::__pgrx_c_macros::CValue::<
                                                                                             $crate::__pgrx_c_macros::CInt
                                                                                         >::new(
-                                                                                            $crate::RELKIND_RELATION as i32
+                                                                                            $crate::__pgrx_c_bindings::RELKIND_RELATION as i32
                                                                                         )
                                                                                     )
                                                                                 )
@@ -12572,7 +15794,7 @@ macro_rules! RelationIsMapped {
                                                                                         $crate::__pgrx_c_macros::CValue::<
                                                                                             $crate::__pgrx_c_macros::CInt
                                                                                         >::new(
-                                                                                            $crate::RELKIND_INDEX as i32
+                                                                                            $crate::__pgrx_c_bindings::RELKIND_INDEX as i32
                                                                                         )
                                                                                     )
                                                                                 )
@@ -12642,7 +15864,7 @@ macro_rules! RelationIsMapped {
                                                                             $crate::__pgrx_c_macros::CValue::<
                                                                                 $crate::__pgrx_c_macros::CInt
                                                                             >::new(
-                                                                                $crate::RELKIND_SEQUENCE as i32
+                                                                                $crate::__pgrx_c_bindings::RELKIND_SEQUENCE as i32
                                                                             )
                                                                         )
                                                                     )
@@ -12712,7 +15934,7 @@ macro_rules! RelationIsMapped {
                                                                 $crate::__pgrx_c_macros::CValue::<
                                                                     $crate::__pgrx_c_macros::CInt
                                                                 >::new(
-                                                                    $crate::RELKIND_TOASTVALUE as i32
+                                                                    $crate::__pgrx_c_bindings::RELKIND_TOASTVALUE as i32
                                                                 )
                                                             )
                                                         )
@@ -12781,7 +16003,9 @@ macro_rules! RelationIsMapped {
                                                 >(
                                                     $crate::__pgrx_c_macros::CValue::<
                                                         $crate::__pgrx_c_macros::CInt
-                                                    >::new($crate::RELKIND_MATVIEW as i32)
+                                                    >::new(
+                                                        $crate::__pgrx_c_bindings::RELKIND_MATVIEW as i32
+                                                    )
                                                 )
                                             )
                                         )
@@ -12837,10 +16061,11 @@ macro_rules! RelationIsMapped {
                                     ),
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::expression::null_constant(
-                                            /* PGRX: InvalidRelFileNumber remains expanded because no integer constant binding is available in the defining Rust crate. */
                                             $crate::__pgrx_c_macros::CValue::<
                                                 $crate::__pgrx_c_macros::CUnsignedInt
-                                            >::new(0u32)
+                                            >::new(
+                                                $crate::__pgrx_c_bindings::InvalidRelFileNumber as u32
+                                            )
                                         )
                                     )
                                 )
@@ -12864,8 +16089,8 @@ macro_rules! RelationIsMapped {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -12892,20 +16117,24 @@ macro_rules! __pgrx_c_args_RelationIsPermanent {
         $crate::__pgrx_c_args_RelationIsPermanent!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_RelationIsPermanent!(@p1 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_RelationIsPermanent!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_RelationIsPermanent!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_RelationIsPermanent!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_RelationIsPermanent!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_RelationIsPermanent!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -12913,7 +16142,9 @@ macro_rules! __pgrx_c_args_RelationIsPermanent {
         $crate::__pgrx_c_args_RelationIsPermanent!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_RelationIsPermanent!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_RelationIsPermanent!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -12935,14 +16166,18 @@ macro_rules! __pgrx_c_args_RelationIsPermanent {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_RelationIsPermanent!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_RelationIsPermanent!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_RelationIsPermanent!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_RelationIsPermanent!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_RelationIsPermanent!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -12969,13 +16204,13 @@ macro_rules! __pgrx_c_args_RelationIsPermanent {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_RelationIsPermanent!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_RelationIsPermanent!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -13054,7 +16289,7 @@ macro_rules! RelationIsPermanent {
                     ),
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                            $crate::RELPERSISTENCE_PERMANENT as i32
+                            $crate::__pgrx_c_bindings::RELPERSISTENCE_PERMANENT as i32
                         )
                     )
                 )
@@ -13128,7 +16363,7 @@ macro_rules! RelationIsPermanent {
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                        $crate::RELPERSISTENCE_PERMANENT as i32
+                                        $crate::__pgrx_c_bindings::RELPERSISTENCE_PERMANENT as i32
                                     )
                                 )
                             )
@@ -13184,7 +16419,7 @@ macro_rules! RelationIsPermanent {
                     ),
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                            $crate::RELPERSISTENCE_PERMANENT as i32
+                            $crate::__pgrx_c_bindings::RELPERSISTENCE_PERMANENT as i32
                         )
                     )
                 )
@@ -13200,8 +16435,8 @@ macro_rules! RelationIsPermanent {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -13228,20 +16463,24 @@ macro_rules! __pgrx_c_args_RelationIsPopulated {
         $crate::__pgrx_c_args_RelationIsPopulated!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_RelationIsPopulated!(@p1 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_RelationIsPopulated!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_RelationIsPopulated!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_RelationIsPopulated!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_RelationIsPopulated!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_RelationIsPopulated!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -13249,7 +16488,9 @@ macro_rules! __pgrx_c_args_RelationIsPopulated {
         $crate::__pgrx_c_args_RelationIsPopulated!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_RelationIsPopulated!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_RelationIsPopulated!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -13271,14 +16512,18 @@ macro_rules! __pgrx_c_args_RelationIsPopulated {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_RelationIsPopulated!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_RelationIsPopulated!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_RelationIsPopulated!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_RelationIsPopulated!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_RelationIsPopulated!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -13305,13 +16550,13 @@ macro_rules! __pgrx_c_args_RelationIsPopulated {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_RelationIsPopulated!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_RelationIsPopulated!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -13556,8 +16801,8 @@ macro_rules! RelationIsPopulated {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -13584,20 +16829,24 @@ macro_rules! __pgrx_c_args_RelationIsScannable {
         $crate::__pgrx_c_args_RelationIsScannable!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_RelationIsScannable!(@p1 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_RelationIsScannable!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_RelationIsScannable!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_RelationIsScannable!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_RelationIsScannable!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_RelationIsScannable!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -13605,7 +16854,9 @@ macro_rules! __pgrx_c_args_RelationIsScannable {
         $crate::__pgrx_c_args_RelationIsScannable!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_RelationIsScannable!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_RelationIsScannable!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -13627,14 +16878,18 @@ macro_rules! __pgrx_c_args_RelationIsScannable {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_RelationIsScannable!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_RelationIsScannable!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_RelationIsScannable!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_RelationIsScannable!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_RelationIsScannable!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -13661,13 +16916,13 @@ macro_rules! __pgrx_c_args_RelationIsScannable {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_RelationIsScannable!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_RelationIsScannable!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -13912,8 +17167,612 @@ macro_rules! RelationIsScannable {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
+    target_pointer_width = "64",
+    target_endian = "little"
+)))]
+#[cfg(not(docsrs))]
+compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
+#[doc(hidden)]
+#[macro_export]
+macro_rules! __pgrx_c_args_RelationIsSecurityView {
+    (@collect $mode:ident [$($done:tt)*]; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_RelationIsSecurityView!(@p0 $mode [$($done)*]; $($raw)*)
+    };
+    (@classified [$next:ident $mode:ident [$($done:tt)*] [$($rest:tt)*]] $descriptor:tt) => {
+        $crate::__pgrx_c_args_RelationIsSecurityView!(
+            @$next $mode [$($done)* $descriptor,];
+            $($rest)*
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
+        $crate::__pgrx_c_args_RelationIsSecurityView!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
+    };
+    (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
+        $crate::__pgrx_c_args_RelationIsSecurityView!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_RelationIsSecurityView!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+            $($rest)*
+        )
+    };
+    (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_RelationIsSecurityView!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; - $($raw:tt)*) => {
+        $crate::__pgrx_c_args_RelationIsSecurityView!(@negative0 $mode [$($done)*]; - $($raw)*)
+    };
+    (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
+        $crate::__pgrx_c_args_RelationIsSecurityView!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_RelationIsSecurityView] [p1 $mode [$($done)*] []] [
+                $head $(::$tail)* ! $group
+            ]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; ::$head:ident $(::$tail:ident)* ! $group:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_RelationIsSecurityView] [p1 $mode [$($done)*] []] [
+                ::$head $(::$tail)* ! $group
+            ]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; ($($inner:tt)*)) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_RelationIsSecurityView] [p1 $mode [$($done)*] []] [
+                ($($inner)*)
+            ]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
+        $crate::__pgrx_c_args_RelationIsSecurityView!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
+        $crate::__pgrx_c_args_RelationIsSecurityView!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
+        $crate::__pgrx_c_args_RelationIsSecurityView!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_RelationIsSecurityView] [p1 $mode [$($done)*] [$($rest)*]] [
+                $head $(::$tail)* ! $group
+            ]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; ::$head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_RelationIsSecurityView] [p1 $mode [$($done)*] [$($rest)*]] [
+                ::$head $(::$tail)* ! $group
+            ]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; ($($inner:tt)*), $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_RelationIsSecurityView] [p1 $mode [$($done)*] [$($rest)*]] [
+                ($($inner)*)
+            ]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_RelationIsSecurityView!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_RelationIsSecurityView!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*];) => {
+        $crate::RelationIsSecurityView!(@$mode; $($done)*)
+    };
+    ($($invalid:tt)*) => {
+        compile_error!("arguments do not satisfy this C macro's invocation contract")
+    };
+}
+/// C macro RelationIsSecurityView from rel.h:425
+///
+/// ```text
+/// #define RelationIsSecurityView( relation ) ( AssertMacro ( relation -> rd_rel -> relkind == RELKIND_VIEW ) , ( relation ) -> rd_options ? ( ( ViewOptions * ) ( relation ) -> rd_options ) -> security_barrier : false )
+/// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+#[macro_export]
+macro_rules! RelationIsSecurityView {
+    (@__pgrx_emit_check_safety; $relation:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $relation);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_RelationIsSecurityView!(
+            @collect __pgrx_emit_check_safety [];
+            $($raw)*
+        )
+    };
+    (@__pgrx_emit_public; $relation:tt $(,)?) => {
+        $crate::__pgrx_c_macros::expression_result::finish(
+            $crate::RelationIsSecurityView!(@__pgrx_emit_value; $relation)
+        )
+    };
+    (@__pgrx_emit_value; $relation:tt $(,)?) => {
+        /* PGRX: AssertMacro remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */
+        (
+            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                {
+                    {
+                        let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                            {
+                                {
+                                    let _ = $crate::__pgrx_c_macros::expression::profile_value::<
+                                        true,
+                                        _
+                                    >(
+                                        /* PGRX: true remains expanded because no integer constant binding is available in the defining Rust crate. */
+                                        $crate::__pgrx_c_macros::CValue::<
+                                            $crate::__pgrx_c_macros::CInt
+                                        >::new(1i32)
+                                    );
+                                }
+                            }
+                        );
+                    };
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::select(
+                            if $crate::__pgrx_c_macros::expression::truth(
+                                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                    $crate::__pgrx_c_macros::expression::load(
+                                        $crate::__pgrx_c_macros::expression::project::<
+                                            $crate::__pgrx_c_generated::Field_rd_options,
+                                            _,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_macros::expression::pointee(
+                                                (
+                                                    $crate::__pgrx_c_macros::expression::profile_value::<
+                                                        true,
+                                                        _
+                                                    >(
+                                                        $crate::__pgrx_c_operand!(
+                                                            @value [true];
+                                                            $relation
+                                                        )
+                                                    )
+                                                )
+                                            )
+                                        )
+                                    )
+                                )
+                            ) {
+                                $crate::__pgrx_c_macros::Either::Left(
+                                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                        $crate::__pgrx_c_macros::expression::load(
+                                            $crate::__pgrx_c_macros::expression::project::<
+                                                $crate::__pgrx_c_generated::Field_security_barrier,
+                                                _,
+                                                _
+                                            >(
+                                                $crate::__pgrx_c_macros::expression::pointee(
+                                                    (
+                                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                                            true,
+                                                            _
+                                                        >(
+                                                            $crate::__pgrx_c_macros::expression::cast_as::<
+                                                                *mut $crate::__pgrx_c_bindings::ViewOptions,
+                                                                $crate::__pgrx_c_macros::expression::CPointer<
+                                                                    $crate::__pgrx_c_macros::expression::CRecord<
+                                                                        $crate::__pgrx_c_bindings::ViewOptions
+                                                                    >,
+                                                                    $crate::__pgrx_c_macros::expression::ReadWrite
+                                                                >,
+                                                                _
+                                                            >(
+                                                                $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                    true,
+                                                                    _
+                                                                >(
+                                                                    $crate::__pgrx_c_macros::expression::load(
+                                                                        $crate::__pgrx_c_macros::expression::project::<
+                                                                            $crate::__pgrx_c_generated::Field_rd_options,
+                                                                            _,
+                                                                            _
+                                                                        >(
+                                                                            $crate::__pgrx_c_macros::expression::pointee(
+                                                                                (
+                                                                                    $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                        true,
+                                                                                        _
+                                                                                    >(
+                                                                                        $crate::__pgrx_c_operand!(
+                                                                                            @value [
+                                                                                                true
+                                                                                            ];
+                                                                                            $relation
+                                                                                        )
+                                                                                    )
+                                                                                )
+                                                                            )
+                                                                        )
+                                                                    )
+                                                                )
+                                                            )
+                                                        )
+                                                    )
+                                                )
+                                            )
+                                        )
+                                    )
+                                )
+                            } else {
+                                $crate::__pgrx_c_macros::Either::Right(
+                                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                        $crate::__pgrx_c_macros::expression::null_constant(
+                                            /* PGRX: false remains expanded because no integer constant binding is available in the defining Rust crate. */
+                                            $crate::__pgrx_c_macros::CValue::<
+                                                $crate::__pgrx_c_macros::CInt
+                                            >::new(0i32)
+                                        )
+                                    )
+                                )
+                            }
+                        )
+                    )
+                }
+            )
+        )
+    };
+    (@__pgrx_c_value; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_RelationIsSecurityView!(@collect __pgrx_emit_value []; $($raw)*)
+    };
+    (@__pgrx_emit_place; $relation:tt $(,)?) => {
+        compile_error!("C expression is not a place in this operation")
+    };
+    (@__pgrx_c_place; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_RelationIsSecurityView!(@collect __pgrx_emit_place []; $($raw)*)
+    };
+    (@__pgrx_emit_read_place; $relation:tt $(,)?) => {
+        compile_error!("C expression is not a place in this operation")
+    };
+    (@__pgrx_c_read_place; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_RelationIsSecurityView!(@collect __pgrx_emit_read_place []; $($raw)*)
+    };
+    (@__pgrx_emit_size; $relation:tt $(,)?) => {
+        /* PGRX: AssertMacro remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */
+        $crate::__pgrx_c_macros::expression::size_of_value_type(
+            if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $relation);
+                    }
+                }
+                Some(
+                    unsafe {
+                        $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                            {
+                                {
+                                    let _ = $crate::__pgrx_c_macros::expression::profile_value::<
+                                        true,
+                                        _
+                                    >(
+                                        {
+                                            {
+                                                let _ = $crate::__pgrx_c_macros::expression::profile_value::<
+                                                    true,
+                                                    _
+                                                >(
+                                                    /* PGRX: true remains expanded because no integer constant binding is available in the defining Rust crate. */
+                                                    $crate::__pgrx_c_macros::CValue::<
+                                                        $crate::__pgrx_c_macros::CInt
+                                                    >::new(1i32)
+                                                );
+                                            }
+                                        }
+                                    );
+                                };
+                                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                    $crate::__pgrx_c_macros::expression::select(
+                                        if $crate::__pgrx_c_macros::expression::truth(
+                                            $crate::__pgrx_c_macros::expression::profile_value::<
+                                                true,
+                                                _
+                                            >(
+                                                $crate::__pgrx_c_macros::expression::load(
+                                                    $crate::__pgrx_c_macros::expression::project::<
+                                                        $crate::__pgrx_c_generated::Field_rd_options,
+                                                        _,
+                                                        _
+                                                    >(
+                                                        $crate::__pgrx_c_macros::expression::pointee(
+                                                            (
+                                                                $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                    true,
+                                                                    _
+                                                                >(
+                                                                    $crate::__pgrx_c_operand!(
+                                                                        @value [true];
+                                                                        $relation
+                                                                    )
+                                                                )
+                                                            )
+                                                        )
+                                                    )
+                                                )
+                                            )
+                                        ) {
+                                            $crate::__pgrx_c_macros::Either::Left(
+                                                $crate::__pgrx_c_macros::expression::profile_value::<
+                                                    true,
+                                                    _
+                                                >(
+                                                    $crate::__pgrx_c_macros::expression::load(
+                                                        $crate::__pgrx_c_macros::expression::project::<
+                                                            $crate::__pgrx_c_generated::Field_security_barrier,
+                                                            _,
+                                                            _
+                                                        >(
+                                                            $crate::__pgrx_c_macros::expression::pointee(
+                                                                (
+                                                                    $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                        true,
+                                                                        _
+                                                                    >(
+                                                                        $crate::__pgrx_c_macros::expression::cast_as::<
+                                                                            *mut $crate::__pgrx_c_bindings::ViewOptions,
+                                                                            $crate::__pgrx_c_macros::expression::CPointer<
+                                                                                $crate::__pgrx_c_macros::expression::CRecord<
+                                                                                    $crate::__pgrx_c_bindings::ViewOptions
+                                                                                >,
+                                                                                $crate::__pgrx_c_macros::expression::ReadWrite
+                                                                            >,
+                                                                            _
+                                                                        >(
+                                                                            $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                true,
+                                                                                _
+                                                                            >(
+                                                                                $crate::__pgrx_c_macros::expression::load(
+                                                                                    $crate::__pgrx_c_macros::expression::project::<
+                                                                                        $crate::__pgrx_c_generated::Field_rd_options,
+                                                                                        _,
+                                                                                        _
+                                                                                    >(
+                                                                                        $crate::__pgrx_c_macros::expression::pointee(
+                                                                                            (
+                                                                                                $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                                    true,
+                                                                                                    _
+                                                                                                >(
+                                                                                                    $crate::__pgrx_c_operand!(
+                                                                                                        @value [
+                                                                                                            true
+                                                                                                        ];
+                                                                                                        $relation
+                                                                                                    )
+                                                                                                )
+                                                                                            )
+                                                                                        )
+                                                                                    )
+                                                                                )
+                                                                            )
+                                                                        )
+                                                                    )
+                                                                )
+                                                            )
+                                                        )
+                                                    )
+                                                )
+                                            )
+                                        } else {
+                                            $crate::__pgrx_c_macros::Either::Right(
+                                                $crate::__pgrx_c_macros::expression::profile_value::<
+                                                    true,
+                                                    _
+                                                >(
+                                                    $crate::__pgrx_c_macros::expression::null_constant(
+                                                        /* PGRX: false remains expanded because no integer constant binding is available in the defining Rust crate. */
+                                                        $crate::__pgrx_c_macros::CValue::<
+                                                            $crate::__pgrx_c_macros::CInt
+                                                        >::new(0i32)
+                                                    )
+                                                )
+                                            )
+                                        }
+                                    )
+                                )
+                            }
+                        )
+                    }
+                )
+            } else {
+                None
+            }
+        )
+    };
+    (@__pgrx_c_size; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_RelationIsSecurityView!(@collect __pgrx_emit_size []; $($raw)*)
+    };
+    (@__pgrx_emit_discard; $relation:tt $(,)?) => {
+        /* PGRX: AssertMacro remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */
+        {
+            let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                {
+                    {
+                        let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                            {
+                                {
+                                    let _ = $crate::__pgrx_c_macros::expression::profile_value::<
+                                        true,
+                                        _
+                                    >(
+                                        /* PGRX: true remains expanded because no integer constant binding is available in the defining Rust crate. */
+                                        $crate::__pgrx_c_macros::CValue::<
+                                            $crate::__pgrx_c_macros::CInt
+                                        >::new(1i32)
+                                    );
+                                }
+                            }
+                        );
+                    };
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::select(
+                            if $crate::__pgrx_c_macros::expression::truth(
+                                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                    $crate::__pgrx_c_macros::expression::load(
+                                        $crate::__pgrx_c_macros::expression::project::<
+                                            $crate::__pgrx_c_generated::Field_rd_options,
+                                            _,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_macros::expression::pointee(
+                                                (
+                                                    $crate::__pgrx_c_macros::expression::profile_value::<
+                                                        true,
+                                                        _
+                                                    >(
+                                                        $crate::__pgrx_c_operand!(
+                                                            @value [true];
+                                                            $relation
+                                                        )
+                                                    )
+                                                )
+                                            )
+                                        )
+                                    )
+                                )
+                            ) {
+                                $crate::__pgrx_c_macros::Either::Left(
+                                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                        $crate::__pgrx_c_macros::expression::load(
+                                            $crate::__pgrx_c_macros::expression::project::<
+                                                $crate::__pgrx_c_generated::Field_security_barrier,
+                                                _,
+                                                _
+                                            >(
+                                                $crate::__pgrx_c_macros::expression::pointee(
+                                                    (
+                                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                                            true,
+                                                            _
+                                                        >(
+                                                            $crate::__pgrx_c_macros::expression::cast_as::<
+                                                                *mut $crate::__pgrx_c_bindings::ViewOptions,
+                                                                $crate::__pgrx_c_macros::expression::CPointer<
+                                                                    $crate::__pgrx_c_macros::expression::CRecord<
+                                                                        $crate::__pgrx_c_bindings::ViewOptions
+                                                                    >,
+                                                                    $crate::__pgrx_c_macros::expression::ReadWrite
+                                                                >,
+                                                                _
+                                                            >(
+                                                                $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                    true,
+                                                                    _
+                                                                >(
+                                                                    $crate::__pgrx_c_macros::expression::load(
+                                                                        $crate::__pgrx_c_macros::expression::project::<
+                                                                            $crate::__pgrx_c_generated::Field_rd_options,
+                                                                            _,
+                                                                            _
+                                                                        >(
+                                                                            $crate::__pgrx_c_macros::expression::pointee(
+                                                                                (
+                                                                                    $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                        true,
+                                                                                        _
+                                                                                    >(
+                                                                                        $crate::__pgrx_c_operand!(
+                                                                                            @value [
+                                                                                                true
+                                                                                            ];
+                                                                                            $relation
+                                                                                        )
+                                                                                    )
+                                                                                )
+                                                                            )
+                                                                        )
+                                                                    )
+                                                                )
+                                                            )
+                                                        )
+                                                    )
+                                                )
+                                            )
+                                        )
+                                    )
+                                )
+                            } else {
+                                $crate::__pgrx_c_macros::Either::Right(
+                                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                        $crate::__pgrx_c_macros::expression::null_constant(
+                                            /* PGRX: false remains expanded because no integer constant binding is available in the defining Rust crate. */
+                                            $crate::__pgrx_c_macros::CValue::<
+                                                $crate::__pgrx_c_macros::CInt
+                                            >::new(0i32)
+                                        )
+                                    )
+                                )
+                            }
+                        )
+                    )
+                }
+            );
+        }
+    };
+    (@__pgrx_c_discard; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_RelationIsSecurityView!(@collect __pgrx_emit_discard []; $($raw)*)
+    };
+    ($($raw:tt)*) => {
+        $crate::__pgrx_c_args_RelationIsSecurityView!(@collect __pgrx_emit_public []; $($raw)*)
+    };
+}
+
+#[cfg(not(all(
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -13944,23 +17803,23 @@ macro_rules! __pgrx_c_args_RelationIsUsedAsCatalogTable {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
         $crate::__pgrx_c_args_RelationIsUsedAsCatalogTable!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_RelationIsUsedAsCatalogTable!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_RelationIsUsedAsCatalogTable!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_RelationIsUsedAsCatalogTable!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -13972,7 +17831,7 @@ macro_rules! __pgrx_c_args_RelationIsUsedAsCatalogTable {
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
         $crate::__pgrx_c_args_RelationIsUsedAsCatalogTable!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
@@ -13998,17 +17857,17 @@ macro_rules! __pgrx_c_args_RelationIsUsedAsCatalogTable {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_RelationIsUsedAsCatalogTable!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_RelationIsUsedAsCatalogTable!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_RelationIsUsedAsCatalogTable!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -14035,13 +17894,13 @@ macro_rules! __pgrx_c_args_RelationIsUsedAsCatalogTable {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_RelationIsUsedAsCatalogTable!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_RelationIsUsedAsCatalogTable!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -14182,7 +18041,7 @@ macro_rules! RelationIsUsedAsCatalogTable {
                                                                 $crate::__pgrx_c_macros::CValue::<
                                                                     $crate::__pgrx_c_macros::CInt
                                                                 >::new(
-                                                                    $crate::RELKIND_RELATION as i32
+                                                                    $crate::__pgrx_c_bindings::RELKIND_RELATION as i32
                                                                 )
                                                             )
                                                         )
@@ -14243,7 +18102,7 @@ macro_rules! RelationIsUsedAsCatalogTable {
                                                                 $crate::__pgrx_c_macros::CValue::<
                                                                     $crate::__pgrx_c_macros::CInt
                                                                 >::new(
-                                                                    $crate::RELKIND_MATVIEW as i32
+                                                                    $crate::__pgrx_c_bindings::RELKIND_MATVIEW as i32
                                                                 )
                                                             )
                                                         )
@@ -14279,10 +18138,10 @@ macro_rules! RelationIsUsedAsCatalogTable {
                                                     _
                                                 >(
                                                     $crate::__pgrx_c_macros::expression::cast_as::<
-                                                        *mut $crate::StdRdOptions,
+                                                        *mut $crate::__pgrx_c_bindings::StdRdOptions,
                                                         $crate::__pgrx_c_macros::expression::CPointer<
                                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                                $crate::StdRdOptions
+                                                                $crate::__pgrx_c_bindings::StdRdOptions
                                                             >,
                                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                                         >,
@@ -14465,7 +18324,7 @@ macro_rules! RelationIsUsedAsCatalogTable {
                                                                             $crate::__pgrx_c_macros::CValue::<
                                                                                 $crate::__pgrx_c_macros::CInt
                                                                             >::new(
-                                                                                $crate::RELKIND_RELATION as i32
+                                                                                $crate::__pgrx_c_bindings::RELKIND_RELATION as i32
                                                                             )
                                                                         )
                                                                     )
@@ -14526,7 +18385,7 @@ macro_rules! RelationIsUsedAsCatalogTable {
                                                                             $crate::__pgrx_c_macros::CValue::<
                                                                                 $crate::__pgrx_c_macros::CInt
                                                                             >::new(
-                                                                                $crate::RELKIND_MATVIEW as i32
+                                                                                $crate::__pgrx_c_bindings::RELKIND_MATVIEW as i32
                                                                             )
                                                                         )
                                                                     )
@@ -14565,10 +18424,10 @@ macro_rules! RelationIsUsedAsCatalogTable {
                                                                 _
                                                             >(
                                                                 $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                    *mut $crate::StdRdOptions,
+                                                                    *mut $crate::__pgrx_c_bindings::StdRdOptions,
                                                                     $crate::__pgrx_c_macros::expression::CPointer<
                                                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                                                            $crate::StdRdOptions
+                                                                            $crate::__pgrx_c_bindings::StdRdOptions
                                                                         >,
                                                                         $crate::__pgrx_c_macros::expression::ReadWrite
                                                                     >,
@@ -14733,7 +18592,7 @@ macro_rules! RelationIsUsedAsCatalogTable {
                                                                 $crate::__pgrx_c_macros::CValue::<
                                                                     $crate::__pgrx_c_macros::CInt
                                                                 >::new(
-                                                                    $crate::RELKIND_RELATION as i32
+                                                                    $crate::__pgrx_c_bindings::RELKIND_RELATION as i32
                                                                 )
                                                             )
                                                         )
@@ -14794,7 +18653,7 @@ macro_rules! RelationIsUsedAsCatalogTable {
                                                                 $crate::__pgrx_c_macros::CValue::<
                                                                     $crate::__pgrx_c_macros::CInt
                                                                 >::new(
-                                                                    $crate::RELKIND_MATVIEW as i32
+                                                                    $crate::__pgrx_c_bindings::RELKIND_MATVIEW as i32
                                                                 )
                                                             )
                                                         )
@@ -14830,10 +18689,10 @@ macro_rules! RelationIsUsedAsCatalogTable {
                                                     _
                                                 >(
                                                     $crate::__pgrx_c_macros::expression::cast_as::<
-                                                        *mut $crate::StdRdOptions,
+                                                        *mut $crate::__pgrx_c_bindings::StdRdOptions,
                                                         $crate::__pgrx_c_macros::expression::CPointer<
                                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                                $crate::StdRdOptions
+                                                                $crate::__pgrx_c_bindings::StdRdOptions
                                                             >,
                                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                                         >,
@@ -14904,8 +18763,8 @@ macro_rules! RelationIsUsedAsCatalogTable {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -14932,20 +18791,24 @@ macro_rules! __pgrx_c_args_RelationIsValid {
         $crate::__pgrx_c_args_RelationIsValid!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_RelationIsValid!(@p1 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_RelationIsValid!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_RelationIsValid!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_RelationIsValid!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_RelationIsValid!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_RelationIsValid!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -14953,7 +18816,9 @@ macro_rules! __pgrx_c_args_RelationIsValid {
         $crate::__pgrx_c_args_RelationIsValid!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_RelationIsValid!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_RelationIsValid!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -14975,14 +18840,18 @@ macro_rules! __pgrx_c_args_RelationIsValid {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_RelationIsValid!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_RelationIsValid!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_RelationIsValid!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_RelationIsValid!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_RelationIsValid!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -15009,13 +18878,13 @@ macro_rules! __pgrx_c_args_RelationIsValid {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_RelationIsValid!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_RelationIsValid!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -15236,8 +19105,8 @@ macro_rules! RelationIsValid {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -15267,14 +19136,16 @@ macro_rules! __pgrx_c_args_RelationNeedsWAL {
         compile_error!("an ungrouped C parameter requires a parenthesized negative literal")
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_RelationNeedsWAL!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_RelationNeedsWAL!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         compile_error!("an ungrouped C parameter requires a parenthesized negative literal")
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_RelationNeedsWAL!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -15282,7 +19153,9 @@ macro_rules! __pgrx_c_args_RelationNeedsWAL {
         compile_error!("an ungrouped C parameter requires one token tree")
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_RelationNeedsWAL!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_RelationNeedsWAL!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -15304,14 +19177,18 @@ macro_rules! __pgrx_c_args_RelationNeedsWAL {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_RelationNeedsWAL!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_RelationNeedsWAL!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:tt) => {
-        $crate::__pgrx_c_args_RelationNeedsWAL!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_RelationNeedsWAL!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_RelationNeedsWAL!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -15338,13 +19215,13 @@ macro_rules! __pgrx_c_args_RelationNeedsWAL {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_RelationNeedsWAL!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:tt, $($rest:tt)*) => {
         $crate::__pgrx_c_args_RelationNeedsWAL!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -15432,7 +19309,9 @@ macro_rules! RelationNeedsWAL {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::CValue::<
                                             $crate::__pgrx_c_macros::CInt
-                                        >::new($crate::RELPERSISTENCE_PERMANENT as i32)
+                                        >::new(
+                                            $crate::__pgrx_c_bindings::RELPERSISTENCE_PERMANENT as i32
+                                        )
                                     )
                                 )
                             )
@@ -15457,7 +19336,7 @@ macro_rules! RelationNeedsWAL {
                                                                 $crate::__pgrx_c_macros::CInt
                                                             >(
                                                                 ::core::ptr::addr_of_mut!(
-                                                                    $crate::wal_level
+                                                                    $crate::__pgrx_c_bindings::wal_level
                                                                 )
                                                             )
                                                         )
@@ -15469,7 +19348,7 @@ macro_rules! RelationNeedsWAL {
                                                         $crate::__pgrx_c_macros::CValue::<
                                                             $crate::__pgrx_c_macros::CInt
                                                         >::new(
-                                                            $crate::WalLevel::WAL_LEVEL_REPLICA as i32
+                                                            $crate::__pgrx_c_bindings::WalLevel::WAL_LEVEL_REPLICA as i32
                                                         )
                                                     )
                                                 )
@@ -15521,10 +19400,11 @@ macro_rules! RelationNeedsWAL {
                                                                     _
                                                                 >(
                                                                     $crate::__pgrx_c_macros::expression::null_constant(
-                                                                        /* PGRX: InvalidSubTransactionId remains expanded because no integer constant binding is available in the defining Rust crate. */
                                                                         $crate::__pgrx_c_macros::CValue::<
                                                                             $crate::__pgrx_c_macros::CUnsignedInt
-                                                                        >::new(0u32)
+                                                                        >::new(
+                                                                            $crate::__pgrx_c_bindings::InvalidSubTransactionId as u32
+                                                                        )
                                                                     )
                                                                 )
                                                             )
@@ -15566,10 +19446,11 @@ macro_rules! RelationNeedsWAL {
                                                                     _
                                                                 >(
                                                                     $crate::__pgrx_c_macros::expression::null_constant(
-                                                                        /* PGRX: InvalidSubTransactionId remains expanded because no integer constant binding is available in the defining Rust crate. */
                                                                         $crate::__pgrx_c_macros::CValue::<
                                                                             $crate::__pgrx_c_macros::CUnsignedInt
-                                                                        >::new(0u32)
+                                                                        >::new(
+                                                                            $crate::__pgrx_c_bindings::InvalidSubTransactionId as u32
+                                                                        )
                                                                     )
                                                                 )
                                                             )
@@ -15683,7 +19564,9 @@ macro_rules! RelationNeedsWAL {
                                                 >(
                                                     $crate::__pgrx_c_macros::CValue::<
                                                         $crate::__pgrx_c_macros::CInt
-                                                    >::new($crate::RELPERSISTENCE_PERMANENT as i32)
+                                                    >::new(
+                                                        $crate::__pgrx_c_bindings::RELPERSISTENCE_PERMANENT as i32
+                                                    )
                                                 )
                                             )
                                         )
@@ -15713,7 +19596,7 @@ macro_rules! RelationNeedsWAL {
                                                                             $crate::__pgrx_c_macros::CInt
                                                                         >(
                                                                             ::core::ptr::addr_of_mut!(
-                                                                                $crate::wal_level
+                                                                                $crate::__pgrx_c_bindings::wal_level
                                                                             )
                                                                         )
                                                                     )
@@ -15725,7 +19608,7 @@ macro_rules! RelationNeedsWAL {
                                                                     $crate::__pgrx_c_macros::CValue::<
                                                                         $crate::__pgrx_c_macros::CInt
                                                                     >::new(
-                                                                        $crate::WalLevel::WAL_LEVEL_REPLICA as i32
+                                                                        $crate::__pgrx_c_bindings::WalLevel::WAL_LEVEL_REPLICA as i32
                                                                     )
                                                                 )
                                                             )
@@ -15777,10 +19660,11 @@ macro_rules! RelationNeedsWAL {
                                                                                 _
                                                                             >(
                                                                                 $crate::__pgrx_c_macros::expression::null_constant(
-                                                                                    /* PGRX: InvalidSubTransactionId remains expanded because no integer constant binding is available in the defining Rust crate. */
                                                                                     $crate::__pgrx_c_macros::CValue::<
                                                                                         $crate::__pgrx_c_macros::CUnsignedInt
-                                                                                    >::new(0u32)
+                                                                                    >::new(
+                                                                                        $crate::__pgrx_c_bindings::InvalidSubTransactionId as u32
+                                                                                    )
                                                                                 )
                                                                             )
                                                                         )
@@ -15822,10 +19706,11 @@ macro_rules! RelationNeedsWAL {
                                                                                 _
                                                                             >(
                                                                                 $crate::__pgrx_c_macros::expression::null_constant(
-                                                                                    /* PGRX: InvalidSubTransactionId remains expanded because no integer constant binding is available in the defining Rust crate. */
                                                                                     $crate::__pgrx_c_macros::CValue::<
                                                                                         $crate::__pgrx_c_macros::CUnsignedInt
-                                                                                    >::new(0u32)
+                                                                                    >::new(
+                                                                                        $crate::__pgrx_c_bindings::InvalidSubTransactionId as u32
+                                                                                    )
                                                                                 )
                                                                             )
                                                                         )
@@ -15913,7 +19798,9 @@ macro_rules! RelationNeedsWAL {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::CValue::<
                                             $crate::__pgrx_c_macros::CInt
-                                        >::new($crate::RELPERSISTENCE_PERMANENT as i32)
+                                        >::new(
+                                            $crate::__pgrx_c_bindings::RELPERSISTENCE_PERMANENT as i32
+                                        )
                                     )
                                 )
                             )
@@ -15938,7 +19825,7 @@ macro_rules! RelationNeedsWAL {
                                                                 $crate::__pgrx_c_macros::CInt
                                                             >(
                                                                 ::core::ptr::addr_of_mut!(
-                                                                    $crate::wal_level
+                                                                    $crate::__pgrx_c_bindings::wal_level
                                                                 )
                                                             )
                                                         )
@@ -15950,7 +19837,7 @@ macro_rules! RelationNeedsWAL {
                                                         $crate::__pgrx_c_macros::CValue::<
                                                             $crate::__pgrx_c_macros::CInt
                                                         >::new(
-                                                            $crate::WalLevel::WAL_LEVEL_REPLICA as i32
+                                                            $crate::__pgrx_c_bindings::WalLevel::WAL_LEVEL_REPLICA as i32
                                                         )
                                                     )
                                                 )
@@ -16002,10 +19889,11 @@ macro_rules! RelationNeedsWAL {
                                                                     _
                                                                 >(
                                                                     $crate::__pgrx_c_macros::expression::null_constant(
-                                                                        /* PGRX: InvalidSubTransactionId remains expanded because no integer constant binding is available in the defining Rust crate. */
                                                                         $crate::__pgrx_c_macros::CValue::<
                                                                             $crate::__pgrx_c_macros::CUnsignedInt
-                                                                        >::new(0u32)
+                                                                        >::new(
+                                                                            $crate::__pgrx_c_bindings::InvalidSubTransactionId as u32
+                                                                        )
                                                                     )
                                                                 )
                                                             )
@@ -16047,10 +19935,11 @@ macro_rules! RelationNeedsWAL {
                                                                     _
                                                                 >(
                                                                     $crate::__pgrx_c_macros::expression::null_constant(
-                                                                        /* PGRX: InvalidSubTransactionId remains expanded because no integer constant binding is available in the defining Rust crate. */
                                                                         $crate::__pgrx_c_macros::CValue::<
                                                                             $crate::__pgrx_c_macros::CUnsignedInt
-                                                                        >::new(0u32)
+                                                                        >::new(
+                                                                            $crate::__pgrx_c_bindings::InvalidSubTransactionId as u32
+                                                                        )
                                                                     )
                                                                 )
                                                             )
@@ -16089,8 +19978,8 @@ macro_rules! RelationNeedsWAL {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -16121,13 +20010,13 @@ macro_rules! __pgrx_c_args_RelationSetTargetBlock {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_RelationSetTargetBlock!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_RelationSetTargetBlock!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -16136,7 +20025,7 @@ macro_rules! __pgrx_c_args_RelationSetTargetBlock {
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_RelationSetTargetBlock!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -16163,33 +20052,35 @@ macro_rules! __pgrx_c_args_RelationSetTargetBlock {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_RelationSetTargetBlock!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_RelationSetTargetBlock!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $argument:literal) => {
         $crate::__pgrx_c_args_RelationSetTargetBlock!(
-            @p2 $mode [$($done)* (@literal [- $argument]),];
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
         )
     };
     (@negative1 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_RelationSetTargetBlock!(@p2 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_RelationSetTargetBlock!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_RelationSetTargetBlock!(
-            @p2 $mode [$($done)* (@literal [- $argument]),];
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_RelationSetTargetBlock!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -16197,7 +20088,9 @@ macro_rules! __pgrx_c_args_RelationSetTargetBlock {
         $crate::__pgrx_c_args_RelationSetTargetBlock!(@negative1 $mode [$($done)*]; - $($raw)*)
     };
     (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_RelationSetTargetBlock!(@p2 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_RelationSetTargetBlock!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -16222,15 +20115,17 @@ macro_rules! __pgrx_c_args_RelationSetTargetBlock {
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_RelationSetTargetBlock!(
-            @p2 $mode [$($done)* (@literal [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_RelationSetTargetBlock!(@p2 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_RelationSetTargetBlock!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_RelationSetTargetBlock!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -16257,13 +20152,13 @@ macro_rules! __pgrx_c_args_RelationSetTargetBlock {
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_RelationSetTargetBlock!(
-            @p2 $mode [$($done)* (@literal [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_RelationSetTargetBlock!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -16321,16 +20216,16 @@ macro_rules! RelationSetTargetBlock {
                                     <
                                         $crate::__pgrx_c_macros::expression::CPointer<
                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                $crate::SMgrRelationData
+                                                $crate::__pgrx_c_bindings::SMgrRelationData
                                             >,
                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::from_storage(
-                                        $crate::RelationGetSmgr(
+                                        $crate::__pgrx_c_bindings::RelationGetSmgr(
                                             <
                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                        $crate::RelationData
+                                                        $crate::__pgrx_c_bindings::RelationData
                                                     >,
                                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                                 > as $crate::__pgrx_c_macros::expression::CType
@@ -16338,7 +20233,7 @@ macro_rules! RelationSetTargetBlock {
                                                 $crate::__pgrx_c_macros::expression::implicit::<
                                                     $crate::__pgrx_c_macros::expression::CPointer<
                                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                                            $crate::RelationData
+                                                            $crate::__pgrx_c_bindings::RelationData
                                                         >,
                                                         $crate::__pgrx_c_macros::expression::ReadWrite
                                                     >,
@@ -16385,8 +20280,8 @@ macro_rules! RelationSetTargetBlock {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -16417,23 +20312,23 @@ macro_rules! __pgrx_c_args_RelationUsesLocalBuffers {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
         $crate::__pgrx_c_args_RelationUsesLocalBuffers!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_RelationUsesLocalBuffers!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_RelationUsesLocalBuffers!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_RelationUsesLocalBuffers!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -16442,7 +20337,7 @@ macro_rules! __pgrx_c_args_RelationUsesLocalBuffers {
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
         $crate::__pgrx_c_args_RelationUsesLocalBuffers!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
@@ -16468,17 +20363,17 @@ macro_rules! __pgrx_c_args_RelationUsesLocalBuffers {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_RelationUsesLocalBuffers!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_RelationUsesLocalBuffers!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_RelationUsesLocalBuffers!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -16505,13 +20400,13 @@ macro_rules! __pgrx_c_args_RelationUsesLocalBuffers {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_RelationUsesLocalBuffers!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_RelationUsesLocalBuffers!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -16593,7 +20488,7 @@ macro_rules! RelationUsesLocalBuffers {
                     ),
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                            $crate::RELPERSISTENCE_TEMP as i32
+                            $crate::__pgrx_c_bindings::RELPERSISTENCE_TEMP as i32
                         )
                     )
                 )
@@ -16670,7 +20565,7 @@ macro_rules! RelationUsesLocalBuffers {
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                        $crate::RELPERSISTENCE_TEMP as i32
+                                        $crate::__pgrx_c_bindings::RELPERSISTENCE_TEMP as i32
                                     )
                                 )
                             )
@@ -16726,7 +20621,7 @@ macro_rules! RelationUsesLocalBuffers {
                     ),
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                            $crate::RELPERSISTENCE_TEMP as i32
+                            $crate::__pgrx_c_bindings::RELPERSISTENCE_TEMP as i32
                         )
                     )
                 )
@@ -16745,6 +20640,7 @@ pub use IndexRelationGetNumberOfAttributes;
 pub use IndexRelationGetNumberOfKeyAttributes;
 pub use RELATION_IS_LOCAL;
 pub use RELATION_IS_OTHER_TEMP;
+pub use RelationCloseSmgr;
 pub use RelationGetDescr;
 pub use RelationGetFillFactor;
 pub use RelationGetForm;
@@ -16753,17 +20649,23 @@ pub use RelationGetNumberOfAttributes;
 pub use RelationGetParallelWorkers;
 pub use RelationGetRelationName;
 pub use RelationGetRelid;
+pub use RelationGetSmgr;
 pub use RelationGetTargetBlock;
 pub use RelationGetTargetPageFreeSpace;
 pub use RelationGetTargetPageUsage;
 pub use RelationGetToastTupleTarget;
+pub use RelationHasCascadedCheckOption;
+pub use RelationHasCheckOption;
+pub use RelationHasLocalCheckOption;
 pub use RelationHasReferenceCountZero;
+pub use RelationHasSecurityInvoker;
 pub use RelationIsAccessibleInLogicalDecoding;
 pub use RelationIsLogicallyLogged;
 pub use RelationIsMapped;
 pub use RelationIsPermanent;
 pub use RelationIsPopulated;
 pub use RelationIsScannable;
+pub use RelationIsSecurityView;
 pub use RelationIsUsedAsCatalogTable;
 pub use RelationIsValid;
 pub use RelationNeedsWAL;

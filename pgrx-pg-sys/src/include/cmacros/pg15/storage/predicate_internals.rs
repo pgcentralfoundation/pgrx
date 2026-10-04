@@ -5,8 +5,8 @@ This code is generated for documentation purposes, so that it is easy to referen
 // C macros from predicate_internals.h.
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -37,23 +37,23 @@ macro_rules! __pgrx_c_args_GET_PREDICATELOCKTARGETTAG_DB {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
         $crate::__pgrx_c_args_GET_PREDICATELOCKTARGETTAG_DB!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_GET_PREDICATELOCKTARGETTAG_DB!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GET_PREDICATELOCKTARGETTAG_DB!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GET_PREDICATELOCKTARGETTAG_DB!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -65,7 +65,7 @@ macro_rules! __pgrx_c_args_GET_PREDICATELOCKTARGETTAG_DB {
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
         $crate::__pgrx_c_args_GET_PREDICATELOCKTARGETTAG_DB!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
@@ -91,17 +91,17 @@ macro_rules! __pgrx_c_args_GET_PREDICATELOCKTARGETTAG_DB {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_GET_PREDICATELOCKTARGETTAG_DB!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_GET_PREDICATELOCKTARGETTAG_DB!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_GET_PREDICATELOCKTARGETTAG_DB!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -128,13 +128,13 @@ macro_rules! __pgrx_c_args_GET_PREDICATELOCKTARGETTAG_DB {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GET_PREDICATELOCKTARGETTAG_DB!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GET_PREDICATELOCKTARGETTAG_DB!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -306,8 +306,8 @@ macro_rules! GET_PREDICATELOCKTARGETTAG_DB {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -338,23 +338,23 @@ macro_rules! __pgrx_c_args_GET_PREDICATELOCKTARGETTAG_OFFSET {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
         $crate::__pgrx_c_args_GET_PREDICATELOCKTARGETTAG_OFFSET!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_GET_PREDICATELOCKTARGETTAG_OFFSET!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GET_PREDICATELOCKTARGETTAG_OFFSET!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GET_PREDICATELOCKTARGETTAG_OFFSET!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -366,7 +366,7 @@ macro_rules! __pgrx_c_args_GET_PREDICATELOCKTARGETTAG_OFFSET {
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
         $crate::__pgrx_c_args_GET_PREDICATELOCKTARGETTAG_OFFSET!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
@@ -392,17 +392,17 @@ macro_rules! __pgrx_c_args_GET_PREDICATELOCKTARGETTAG_OFFSET {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_GET_PREDICATELOCKTARGETTAG_OFFSET!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_GET_PREDICATELOCKTARGETTAG_OFFSET!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_GET_PREDICATELOCKTARGETTAG_OFFSET!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -429,13 +429,13 @@ macro_rules! __pgrx_c_args_GET_PREDICATELOCKTARGETTAG_OFFSET {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GET_PREDICATELOCKTARGETTAG_OFFSET!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GET_PREDICATELOCKTARGETTAG_OFFSET!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -484,7 +484,7 @@ macro_rules! GET_PREDICATELOCKTARGETTAG_OFFSET {
         (
             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::cast_as::<
-                    $crate::OffsetNumber,
+                    $crate::__pgrx_c_bindings::OffsetNumber,
                     $crate::__pgrx_c_macros::CUnsignedShort,
                     _
                 >(
@@ -537,7 +537,7 @@ macro_rules! GET_PREDICATELOCKTARGETTAG_OFFSET {
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::cast_as::<
-                                $crate::OffsetNumber,
+                                $crate::__pgrx_c_bindings::OffsetNumber,
                                 $crate::__pgrx_c_macros::CUnsignedShort,
                                 _
                             >(
@@ -569,7 +569,7 @@ macro_rules! GET_PREDICATELOCKTARGETTAG_OFFSET {
         {
             let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::cast_as::<
-                    $crate::OffsetNumber,
+                    $crate::__pgrx_c_bindings::OffsetNumber,
                     $crate::__pgrx_c_macros::CUnsignedShort,
                     _
                 >(
@@ -601,8 +601,8 @@ macro_rules! GET_PREDICATELOCKTARGETTAG_OFFSET {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -633,23 +633,23 @@ macro_rules! __pgrx_c_args_GET_PREDICATELOCKTARGETTAG_PAGE {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
         $crate::__pgrx_c_args_GET_PREDICATELOCKTARGETTAG_PAGE!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_GET_PREDICATELOCKTARGETTAG_PAGE!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GET_PREDICATELOCKTARGETTAG_PAGE!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GET_PREDICATELOCKTARGETTAG_PAGE!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -661,7 +661,7 @@ macro_rules! __pgrx_c_args_GET_PREDICATELOCKTARGETTAG_PAGE {
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
         $crate::__pgrx_c_args_GET_PREDICATELOCKTARGETTAG_PAGE!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
@@ -687,17 +687,17 @@ macro_rules! __pgrx_c_args_GET_PREDICATELOCKTARGETTAG_PAGE {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_GET_PREDICATELOCKTARGETTAG_PAGE!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_GET_PREDICATELOCKTARGETTAG_PAGE!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_GET_PREDICATELOCKTARGETTAG_PAGE!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -724,13 +724,13 @@ macro_rules! __pgrx_c_args_GET_PREDICATELOCKTARGETTAG_PAGE {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GET_PREDICATELOCKTARGETTAG_PAGE!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GET_PREDICATELOCKTARGETTAG_PAGE!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -779,7 +779,7 @@ macro_rules! GET_PREDICATELOCKTARGETTAG_PAGE {
         (
             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::cast_as::<
-                    $crate::BlockNumber,
+                    $crate::__pgrx_c_bindings::BlockNumber,
                     $crate::__pgrx_c_macros::CUnsignedInt,
                     _
                 >(
@@ -832,7 +832,7 @@ macro_rules! GET_PREDICATELOCKTARGETTAG_PAGE {
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::cast_as::<
-                                $crate::BlockNumber,
+                                $crate::__pgrx_c_bindings::BlockNumber,
                                 $crate::__pgrx_c_macros::CUnsignedInt,
                                 _
                             >(
@@ -864,7 +864,7 @@ macro_rules! GET_PREDICATELOCKTARGETTAG_PAGE {
         {
             let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::cast_as::<
-                    $crate::BlockNumber,
+                    $crate::__pgrx_c_bindings::BlockNumber,
                     $crate::__pgrx_c_macros::CUnsignedInt,
                     _
                 >(
@@ -896,8 +896,8 @@ macro_rules! GET_PREDICATELOCKTARGETTAG_PAGE {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -928,23 +928,23 @@ macro_rules! __pgrx_c_args_GET_PREDICATELOCKTARGETTAG_RELATION {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
         $crate::__pgrx_c_args_GET_PREDICATELOCKTARGETTAG_RELATION!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_GET_PREDICATELOCKTARGETTAG_RELATION!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GET_PREDICATELOCKTARGETTAG_RELATION!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GET_PREDICATELOCKTARGETTAG_RELATION!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -956,7 +956,7 @@ macro_rules! __pgrx_c_args_GET_PREDICATELOCKTARGETTAG_RELATION {
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
         $crate::__pgrx_c_args_GET_PREDICATELOCKTARGETTAG_RELATION!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
@@ -982,17 +982,17 @@ macro_rules! __pgrx_c_args_GET_PREDICATELOCKTARGETTAG_RELATION {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_GET_PREDICATELOCKTARGETTAG_RELATION!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_GET_PREDICATELOCKTARGETTAG_RELATION!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_GET_PREDICATELOCKTARGETTAG_RELATION!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -1019,13 +1019,13 @@ macro_rules! __pgrx_c_args_GET_PREDICATELOCKTARGETTAG_RELATION {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GET_PREDICATELOCKTARGETTAG_RELATION!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GET_PREDICATELOCKTARGETTAG_RELATION!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -1200,8 +1200,8 @@ macro_rules! GET_PREDICATELOCKTARGETTAG_RELATION {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -1232,23 +1232,23 @@ macro_rules! __pgrx_c_args_GET_PREDICATELOCKTARGETTAG_TYPE {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
         $crate::__pgrx_c_args_GET_PREDICATELOCKTARGETTAG_TYPE!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_GET_PREDICATELOCKTARGETTAG_TYPE!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GET_PREDICATELOCKTARGETTAG_TYPE!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GET_PREDICATELOCKTARGETTAG_TYPE!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -1260,7 +1260,7 @@ macro_rules! __pgrx_c_args_GET_PREDICATELOCKTARGETTAG_TYPE {
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
         $crate::__pgrx_c_args_GET_PREDICATELOCKTARGETTAG_TYPE!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
@@ -1286,17 +1286,17 @@ macro_rules! __pgrx_c_args_GET_PREDICATELOCKTARGETTAG_TYPE {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_GET_PREDICATELOCKTARGETTAG_TYPE!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_GET_PREDICATELOCKTARGETTAG_TYPE!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_GET_PREDICATELOCKTARGETTAG_TYPE!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -1323,13 +1323,13 @@ macro_rules! __pgrx_c_args_GET_PREDICATELOCKTARGETTAG_TYPE {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GET_PREDICATELOCKTARGETTAG_TYPE!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GET_PREDICATELOCKTARGETTAG_TYPE!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -1389,10 +1389,11 @@ macro_rules! GET_PREDICATELOCKTARGETTAG_TYPE {
                                     ),
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::expression::null_constant(
-                                            /* PGRX: InvalidOffsetNumber remains expanded because no integer constant binding is available in the defining Rust crate. */
                                             $crate::__pgrx_c_macros::CValue::<
                                                 $crate::__pgrx_c_macros::CUnsignedShort
-                                            >::new(0u16)
+                                            >::new(
+                                                $crate::__pgrx_c_bindings::InvalidOffsetNumber as u16
+                                            )
                                         )
                                     )
                                 )
@@ -1402,7 +1403,7 @@ macro_rules! GET_PREDICATELOCKTARGETTAG_TYPE {
                         $crate::__pgrx_c_macros::Either::Left(
                             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                 $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                    $crate::PredicateLockTargetType::PREDLOCKTAG_TUPLE as i32
+                                    $crate::__pgrx_c_bindings::PredicateLockTargetType::PREDLOCKTAG_TUPLE as i32
                                 )
                             )
                         )
@@ -1441,10 +1442,11 @@ macro_rules! GET_PREDICATELOCKTARGETTAG_TYPE {
                                                             true,
                                                             _
                                                         >(
-                                                            /* PGRX: InvalidBlockNumber remains expanded because no integer constant binding is available in the defining Rust crate. */
                                                             $crate::__pgrx_c_macros::CValue::<
                                                                 $crate::__pgrx_c_macros::CUnsignedInt
-                                                            >::new(4294967295u32)
+                                                            >::new(
+                                                                $crate::__pgrx_c_bindings::InvalidBlockNumber as u32
+                                                            )
                                                         )
                                                     )
                                                 )
@@ -1458,7 +1460,7 @@ macro_rules! GET_PREDICATELOCKTARGETTAG_TYPE {
                                                     $crate::__pgrx_c_macros::CValue::<
                                                         $crate::__pgrx_c_macros::CInt
                                                     >::new(
-                                                        $crate::PredicateLockTargetType::PREDLOCKTAG_PAGE as i32
+                                                        $crate::__pgrx_c_bindings::PredicateLockTargetType::PREDLOCKTAG_PAGE as i32
                                                     )
                                                 )
                                             )
@@ -1472,7 +1474,7 @@ macro_rules! GET_PREDICATELOCKTARGETTAG_TYPE {
                                                         $crate::__pgrx_c_macros::CValue::<
                                                             $crate::__pgrx_c_macros::CInt
                                                         >::new(
-                                                            $crate::PredicateLockTargetType::PREDLOCKTAG_RELATION as i32
+                                                            $crate::__pgrx_c_bindings::PredicateLockTargetType::PREDLOCKTAG_RELATION as i32
                                                         )
                                                     )
                                                 )
@@ -1554,10 +1556,11 @@ macro_rules! GET_PREDICATELOCKTARGETTAG_TYPE {
                                                     _
                                                 >(
                                                     $crate::__pgrx_c_macros::expression::null_constant(
-                                                        /* PGRX: InvalidOffsetNumber remains expanded because no integer constant binding is available in the defining Rust crate. */
                                                         $crate::__pgrx_c_macros::CValue::<
                                                             $crate::__pgrx_c_macros::CUnsignedShort
-                                                        >::new(0u16)
+                                                        >::new(
+                                                            $crate::__pgrx_c_bindings::InvalidOffsetNumber as u16
+                                                        )
                                                     )
                                                 )
                                             )
@@ -1572,7 +1575,7 @@ macro_rules! GET_PREDICATELOCKTARGETTAG_TYPE {
                                             $crate::__pgrx_c_macros::CValue::<
                                                 $crate::__pgrx_c_macros::CInt
                                             >::new(
-                                                $crate::PredicateLockTargetType::PREDLOCKTAG_TUPLE as i32
+                                                $crate::__pgrx_c_bindings::PredicateLockTargetType::PREDLOCKTAG_TUPLE as i32
                                             )
                                         )
                                     )
@@ -1614,10 +1617,11 @@ macro_rules! GET_PREDICATELOCKTARGETTAG_TYPE {
                                                                         true,
                                                                         _
                                                                     >(
-                                                                        /* PGRX: InvalidBlockNumber remains expanded because no integer constant binding is available in the defining Rust crate. */
                                                                         $crate::__pgrx_c_macros::CValue::<
                                                                             $crate::__pgrx_c_macros::CUnsignedInt
-                                                                        >::new(4294967295u32)
+                                                                        >::new(
+                                                                            $crate::__pgrx_c_bindings::InvalidBlockNumber as u32
+                                                                        )
                                                                     )
                                                                 )
                                                             )
@@ -1631,7 +1635,7 @@ macro_rules! GET_PREDICATELOCKTARGETTAG_TYPE {
                                                                 $crate::__pgrx_c_macros::CValue::<
                                                                     $crate::__pgrx_c_macros::CInt
                                                                 >::new(
-                                                                    $crate::PredicateLockTargetType::PREDLOCKTAG_PAGE as i32
+                                                                    $crate::__pgrx_c_bindings::PredicateLockTargetType::PREDLOCKTAG_PAGE as i32
                                                                 )
                                                             )
                                                         )
@@ -1645,7 +1649,7 @@ macro_rules! GET_PREDICATELOCKTARGETTAG_TYPE {
                                                                     $crate::__pgrx_c_macros::CValue::<
                                                                         $crate::__pgrx_c_macros::CInt
                                                                     >::new(
-                                                                        $crate::PredicateLockTargetType::PREDLOCKTAG_RELATION as i32
+                                                                        $crate::__pgrx_c_bindings::PredicateLockTargetType::PREDLOCKTAG_RELATION as i32
                                                                     )
                                                                 )
                                                             )
@@ -1690,10 +1694,11 @@ macro_rules! GET_PREDICATELOCKTARGETTAG_TYPE {
                                     ),
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::expression::null_constant(
-                                            /* PGRX: InvalidOffsetNumber remains expanded because no integer constant binding is available in the defining Rust crate. */
                                             $crate::__pgrx_c_macros::CValue::<
                                                 $crate::__pgrx_c_macros::CUnsignedShort
-                                            >::new(0u16)
+                                            >::new(
+                                                $crate::__pgrx_c_bindings::InvalidOffsetNumber as u16
+                                            )
                                         )
                                     )
                                 )
@@ -1703,7 +1708,7 @@ macro_rules! GET_PREDICATELOCKTARGETTAG_TYPE {
                         $crate::__pgrx_c_macros::Either::Left(
                             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                 $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                    $crate::PredicateLockTargetType::PREDLOCKTAG_TUPLE as i32
+                                    $crate::__pgrx_c_bindings::PredicateLockTargetType::PREDLOCKTAG_TUPLE as i32
                                 )
                             )
                         )
@@ -1742,10 +1747,11 @@ macro_rules! GET_PREDICATELOCKTARGETTAG_TYPE {
                                                             true,
                                                             _
                                                         >(
-                                                            /* PGRX: InvalidBlockNumber remains expanded because no integer constant binding is available in the defining Rust crate. */
                                                             $crate::__pgrx_c_macros::CValue::<
                                                                 $crate::__pgrx_c_macros::CUnsignedInt
-                                                            >::new(4294967295u32)
+                                                            >::new(
+                                                                $crate::__pgrx_c_bindings::InvalidBlockNumber as u32
+                                                            )
                                                         )
                                                     )
                                                 )
@@ -1759,7 +1765,7 @@ macro_rules! GET_PREDICATELOCKTARGETTAG_TYPE {
                                                     $crate::__pgrx_c_macros::CValue::<
                                                         $crate::__pgrx_c_macros::CInt
                                                     >::new(
-                                                        $crate::PredicateLockTargetType::PREDLOCKTAG_PAGE as i32
+                                                        $crate::__pgrx_c_bindings::PredicateLockTargetType::PREDLOCKTAG_PAGE as i32
                                                     )
                                                 )
                                             )
@@ -1773,7 +1779,7 @@ macro_rules! GET_PREDICATELOCKTARGETTAG_TYPE {
                                                         $crate::__pgrx_c_macros::CValue::<
                                                             $crate::__pgrx_c_macros::CInt
                                                         >::new(
-                                                            $crate::PredicateLockTargetType::PREDLOCKTAG_RELATION as i32
+                                                            $crate::__pgrx_c_bindings::PredicateLockTargetType::PREDLOCKTAG_RELATION as i32
                                                         )
                                                     )
                                                 )
@@ -1803,8 +1809,8 @@ macro_rules! GET_PREDICATELOCKTARGETTAG_TYPE {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -1835,13 +1841,13 @@ macro_rules! __pgrx_c_args_SET_PREDICATELOCKTARGETTAG_PAGE {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_PREDICATELOCKTARGETTAG_PAGE!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_PREDICATELOCKTARGETTAG_PAGE!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -1853,7 +1859,7 @@ macro_rules! __pgrx_c_args_SET_PREDICATELOCKTARGETTAG_PAGE {
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_PREDICATELOCKTARGETTAG_PAGE!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -1880,25 +1886,25 @@ macro_rules! __pgrx_c_args_SET_PREDICATELOCKTARGETTAG_PAGE {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_PREDICATELOCKTARGETTAG_PAGE!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_PREDICATELOCKTARGETTAG_PAGE!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_PREDICATELOCKTARGETTAG_PAGE!(
-            @p2 $mode [$($done)* (@literal [- $argument]),];
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_PREDICATELOCKTARGETTAG_PAGE!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -1910,7 +1916,7 @@ macro_rules! __pgrx_c_args_SET_PREDICATELOCKTARGETTAG_PAGE {
     };
     (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_PREDICATELOCKTARGETTAG_PAGE!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -1937,25 +1943,25 @@ macro_rules! __pgrx_c_args_SET_PREDICATELOCKTARGETTAG_PAGE {
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_PREDICATELOCKTARGETTAG_PAGE!(
-            @p2 $mode [$($done)* (@literal [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_PREDICATELOCKTARGETTAG_PAGE!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
     (@p2 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_PREDICATELOCKTARGETTAG_PAGE!(
-            @p3 $mode [$($done)* (@literal [- $argument]),];
+            @p3 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative2 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_PREDICATELOCKTARGETTAG_PAGE!(
-            @p3 $mode [$($done)* (@native [$argument]),];
+            @p3 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -1967,7 +1973,7 @@ macro_rules! __pgrx_c_args_SET_PREDICATELOCKTARGETTAG_PAGE {
     };
     (@p2 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_PREDICATELOCKTARGETTAG_PAGE!(
-            @p3 $mode [$($done)* (@native [$argument]),];
+            @p3 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -1994,35 +2000,35 @@ macro_rules! __pgrx_c_args_SET_PREDICATELOCKTARGETTAG_PAGE {
     };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_PREDICATELOCKTARGETTAG_PAGE!(
-            @p3 $mode [$($done)* (@literal [$argument]),];
+            @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p2 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_PREDICATELOCKTARGETTAG_PAGE!(
-            @p3 $mode [$($done)* (@native [$argument]),];
+            @p3 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
     (@p3 $mode:ident [$($done:tt)*]; - $argument:literal) => {
         $crate::__pgrx_c_args_SET_PREDICATELOCKTARGETTAG_PAGE!(
-            @p4 $mode [$($done)* (@literal [- $argument]),];
+            @p4 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
         )
     };
     (@negative3 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_SET_PREDICATELOCKTARGETTAG_PAGE!(
-            @p4 $mode [$($done)* (@native [$argument]),];
+            @p4 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p3 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_PREDICATELOCKTARGETTAG_PAGE!(
-            @p4 $mode [$($done)* (@literal [- $argument]),];
+            @p4 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative3 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_PREDICATELOCKTARGETTAG_PAGE!(
-            @p4 $mode [$($done)* (@native [$argument]),];
+            @p4 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -2034,7 +2040,7 @@ macro_rules! __pgrx_c_args_SET_PREDICATELOCKTARGETTAG_PAGE {
     };
     (@p3 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
         $crate::__pgrx_c_args_SET_PREDICATELOCKTARGETTAG_PAGE!(
-            @p4 $mode [$($done)* (@native [$argument]),];
+            @p4 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p3 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
@@ -2060,17 +2066,17 @@ macro_rules! __pgrx_c_args_SET_PREDICATELOCKTARGETTAG_PAGE {
     };
     (@p3 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_SET_PREDICATELOCKTARGETTAG_PAGE!(
-            @p4 $mode [$($done)* (@literal [$argument]),];
+            @p4 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
         )
     };
     (@p3 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_SET_PREDICATELOCKTARGETTAG_PAGE!(
-            @p4 $mode [$($done)* (@native [$argument]),];
+            @p4 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p3 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_PREDICATELOCKTARGETTAG_PAGE!(
-            @p4 $mode [$($done)* (@native [$argument]),];
+            @p4 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -2097,13 +2103,13 @@ macro_rules! __pgrx_c_args_SET_PREDICATELOCKTARGETTAG_PAGE {
     };
     (@p3 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_PREDICATELOCKTARGETTAG_PAGE!(
-            @p4 $mode [$($done)* (@literal [$argument]),];
+            @p4 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p3 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_PREDICATELOCKTARGETTAG_PAGE!(
-            @p4 $mode [$($done)* (@native [$argument]),];
+            @p4 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -2251,10 +2257,9 @@ macro_rules! SET_PREDICATELOCKTARGETTAG_PAGE {
                             >(($crate::__pgrx_c_operand!(@place; $locktag))),
                             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                 $crate::__pgrx_c_macros::expression::null_constant(
-                                    /* PGRX: InvalidOffsetNumber remains expanded because no integer constant binding is available in the defining Rust crate. */
                                     $crate::__pgrx_c_macros::CValue::<
                                         $crate::__pgrx_c_macros::CUnsignedShort
-                                    >::new(0u16)
+                                    >::new($crate::__pgrx_c_bindings::InvalidOffsetNumber as u16)
                                 )
                             )
                         )
@@ -2417,10 +2422,11 @@ macro_rules! SET_PREDICATELOCKTARGETTAG_PAGE {
                                             _
                                         >(
                                             $crate::__pgrx_c_macros::expression::null_constant(
-                                                /* PGRX: InvalidOffsetNumber remains expanded because no integer constant binding is available in the defining Rust crate. */
                                                 $crate::__pgrx_c_macros::CValue::<
                                                     $crate::__pgrx_c_macros::CUnsignedShort
-                                                >::new(0u16)
+                                                >::new(
+                                                    $crate::__pgrx_c_bindings::InvalidOffsetNumber as u16
+                                                )
                                             )
                                         )
                                     )
@@ -2538,10 +2544,9 @@ macro_rules! SET_PREDICATELOCKTARGETTAG_PAGE {
                             >(($crate::__pgrx_c_operand!(@place; $locktag))),
                             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                 $crate::__pgrx_c_macros::expression::null_constant(
-                                    /* PGRX: InvalidOffsetNumber remains expanded because no integer constant binding is available in the defining Rust crate. */
                                     $crate::__pgrx_c_macros::CValue::<
                                         $crate::__pgrx_c_macros::CUnsignedShort
-                                    >::new(0u16)
+                                    >::new($crate::__pgrx_c_bindings::InvalidOffsetNumber as u16)
                                 )
                             )
                         )
@@ -2565,8 +2570,8 @@ macro_rules! SET_PREDICATELOCKTARGETTAG_PAGE {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -2597,13 +2602,13 @@ macro_rules! __pgrx_c_args_SET_PREDICATELOCKTARGETTAG_RELATION {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_PREDICATELOCKTARGETTAG_RELATION!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_PREDICATELOCKTARGETTAG_RELATION!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -2615,7 +2620,7 @@ macro_rules! __pgrx_c_args_SET_PREDICATELOCKTARGETTAG_RELATION {
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_PREDICATELOCKTARGETTAG_RELATION!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -2642,25 +2647,25 @@ macro_rules! __pgrx_c_args_SET_PREDICATELOCKTARGETTAG_RELATION {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_PREDICATELOCKTARGETTAG_RELATION!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_PREDICATELOCKTARGETTAG_RELATION!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_PREDICATELOCKTARGETTAG_RELATION!(
-            @p2 $mode [$($done)* (@literal [- $argument]),];
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_PREDICATELOCKTARGETTAG_RELATION!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -2672,7 +2677,7 @@ macro_rules! __pgrx_c_args_SET_PREDICATELOCKTARGETTAG_RELATION {
     };
     (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_PREDICATELOCKTARGETTAG_RELATION!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -2699,35 +2704,35 @@ macro_rules! __pgrx_c_args_SET_PREDICATELOCKTARGETTAG_RELATION {
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_PREDICATELOCKTARGETTAG_RELATION!(
-            @p2 $mode [$($done)* (@literal [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_PREDICATELOCKTARGETTAG_RELATION!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
     (@p2 $mode:ident [$($done:tt)*]; - $argument:literal) => {
         $crate::__pgrx_c_args_SET_PREDICATELOCKTARGETTAG_RELATION!(
-            @p3 $mode [$($done)* (@literal [- $argument]),];
+            @p3 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
         )
     };
     (@negative2 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_SET_PREDICATELOCKTARGETTAG_RELATION!(
-            @p3 $mode [$($done)* (@native [$argument]),];
+            @p3 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p2 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_PREDICATELOCKTARGETTAG_RELATION!(
-            @p3 $mode [$($done)* (@literal [- $argument]),];
+            @p3 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative2 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_PREDICATELOCKTARGETTAG_RELATION!(
-            @p3 $mode [$($done)* (@native [$argument]),];
+            @p3 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -2739,7 +2744,7 @@ macro_rules! __pgrx_c_args_SET_PREDICATELOCKTARGETTAG_RELATION {
     };
     (@p2 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
         $crate::__pgrx_c_args_SET_PREDICATELOCKTARGETTAG_RELATION!(
-            @p3 $mode [$($done)* (@native [$argument]),];
+            @p3 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p2 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
@@ -2765,17 +2770,17 @@ macro_rules! __pgrx_c_args_SET_PREDICATELOCKTARGETTAG_RELATION {
     };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_SET_PREDICATELOCKTARGETTAG_RELATION!(
-            @p3 $mode [$($done)* (@literal [$argument]),];
+            @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
         )
     };
     (@p2 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_SET_PREDICATELOCKTARGETTAG_RELATION!(
-            @p3 $mode [$($done)* (@native [$argument]),];
+            @p3 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p2 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_PREDICATELOCKTARGETTAG_RELATION!(
-            @p3 $mode [$($done)* (@native [$argument]),];
+            @p3 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -2802,13 +2807,13 @@ macro_rules! __pgrx_c_args_SET_PREDICATELOCKTARGETTAG_RELATION {
     };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_PREDICATELOCKTARGETTAG_RELATION!(
-            @p3 $mode [$($done)* (@literal [$argument]),];
+            @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p2 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_PREDICATELOCKTARGETTAG_RELATION!(
-            @p3 $mode [$($done)* (@native [$argument]),];
+            @p3 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -2938,10 +2943,11 @@ macro_rules! SET_PREDICATELOCKTARGETTAG_RELATION {
                                             true,
                                             _
                                         >(
-                                            /* PGRX: InvalidBlockNumber remains expanded because no integer constant binding is available in the defining Rust crate. */
                                             $crate::__pgrx_c_macros::CValue::<
                                                 $crate::__pgrx_c_macros::CUnsignedInt
-                                            >::new(4294967295u32)
+                                            >::new(
+                                                $crate::__pgrx_c_bindings::InvalidBlockNumber as u32
+                                            )
                                         )
                                     )
                                 )
@@ -2957,10 +2963,9 @@ macro_rules! SET_PREDICATELOCKTARGETTAG_RELATION {
                             >(($crate::__pgrx_c_operand!(@place; $locktag))),
                             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                 $crate::__pgrx_c_macros::expression::null_constant(
-                                    /* PGRX: InvalidOffsetNumber remains expanded because no integer constant binding is available in the defining Rust crate. */
                                     $crate::__pgrx_c_macros::CValue::<
                                         $crate::__pgrx_c_macros::CUnsignedShort
-                                    >::new(0u16)
+                                    >::new($crate::__pgrx_c_bindings::InvalidOffsetNumber as u16)
                                 )
                             )
                         )
@@ -3098,10 +3103,11 @@ macro_rules! SET_PREDICATELOCKTARGETTAG_RELATION {
                                                         true,
                                                         _
                                                     >(
-                                                        /* PGRX: InvalidBlockNumber remains expanded because no integer constant binding is available in the defining Rust crate. */
                                                         $crate::__pgrx_c_macros::CValue::<
                                                             $crate::__pgrx_c_macros::CUnsignedInt
-                                                        >::new(4294967295u32)
+                                                        >::new(
+                                                            $crate::__pgrx_c_bindings::InvalidBlockNumber as u32
+                                                        )
                                                     )
                                                 )
                                             )
@@ -3120,10 +3126,11 @@ macro_rules! SET_PREDICATELOCKTARGETTAG_RELATION {
                                             _
                                         >(
                                             $crate::__pgrx_c_macros::expression::null_constant(
-                                                /* PGRX: InvalidOffsetNumber remains expanded because no integer constant binding is available in the defining Rust crate. */
                                                 $crate::__pgrx_c_macros::CValue::<
                                                     $crate::__pgrx_c_macros::CUnsignedShort
-                                                >::new(0u16)
+                                                >::new(
+                                                    $crate::__pgrx_c_bindings::InvalidOffsetNumber as u16
+                                                )
                                             )
                                         )
                                     )
@@ -3225,10 +3232,11 @@ macro_rules! SET_PREDICATELOCKTARGETTAG_RELATION {
                                             true,
                                             _
                                         >(
-                                            /* PGRX: InvalidBlockNumber remains expanded because no integer constant binding is available in the defining Rust crate. */
                                             $crate::__pgrx_c_macros::CValue::<
                                                 $crate::__pgrx_c_macros::CUnsignedInt
-                                            >::new(4294967295u32)
+                                            >::new(
+                                                $crate::__pgrx_c_bindings::InvalidBlockNumber as u32
+                                            )
                                         )
                                     )
                                 )
@@ -3244,10 +3252,9 @@ macro_rules! SET_PREDICATELOCKTARGETTAG_RELATION {
                             >(($crate::__pgrx_c_operand!(@place; $locktag))),
                             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                 $crate::__pgrx_c_macros::expression::null_constant(
-                                    /* PGRX: InvalidOffsetNumber remains expanded because no integer constant binding is available in the defining Rust crate. */
                                     $crate::__pgrx_c_macros::CValue::<
                                         $crate::__pgrx_c_macros::CUnsignedShort
-                                    >::new(0u16)
+                                    >::new($crate::__pgrx_c_bindings::InvalidOffsetNumber as u16)
                                 )
                             )
                         )
@@ -3271,8 +3278,8 @@ macro_rules! SET_PREDICATELOCKTARGETTAG_RELATION {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -3303,13 +3310,13 @@ macro_rules! __pgrx_c_args_SET_PREDICATELOCKTARGETTAG_TUPLE {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_PREDICATELOCKTARGETTAG_TUPLE!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_PREDICATELOCKTARGETTAG_TUPLE!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -3321,7 +3328,7 @@ macro_rules! __pgrx_c_args_SET_PREDICATELOCKTARGETTAG_TUPLE {
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_PREDICATELOCKTARGETTAG_TUPLE!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -3348,25 +3355,25 @@ macro_rules! __pgrx_c_args_SET_PREDICATELOCKTARGETTAG_TUPLE {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_PREDICATELOCKTARGETTAG_TUPLE!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_PREDICATELOCKTARGETTAG_TUPLE!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_PREDICATELOCKTARGETTAG_TUPLE!(
-            @p2 $mode [$($done)* (@literal [- $argument]),];
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_PREDICATELOCKTARGETTAG_TUPLE!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -3378,7 +3385,7 @@ macro_rules! __pgrx_c_args_SET_PREDICATELOCKTARGETTAG_TUPLE {
     };
     (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_PREDICATELOCKTARGETTAG_TUPLE!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -3405,25 +3412,25 @@ macro_rules! __pgrx_c_args_SET_PREDICATELOCKTARGETTAG_TUPLE {
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_PREDICATELOCKTARGETTAG_TUPLE!(
-            @p2 $mode [$($done)* (@literal [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_PREDICATELOCKTARGETTAG_TUPLE!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
     (@p2 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_PREDICATELOCKTARGETTAG_TUPLE!(
-            @p3 $mode [$($done)* (@literal [- $argument]),];
+            @p3 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative2 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_PREDICATELOCKTARGETTAG_TUPLE!(
-            @p3 $mode [$($done)* (@native [$argument]),];
+            @p3 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -3435,7 +3442,7 @@ macro_rules! __pgrx_c_args_SET_PREDICATELOCKTARGETTAG_TUPLE {
     };
     (@p2 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_PREDICATELOCKTARGETTAG_TUPLE!(
-            @p3 $mode [$($done)* (@native [$argument]),];
+            @p3 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -3462,25 +3469,25 @@ macro_rules! __pgrx_c_args_SET_PREDICATELOCKTARGETTAG_TUPLE {
     };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_PREDICATELOCKTARGETTAG_TUPLE!(
-            @p3 $mode [$($done)* (@literal [$argument]),];
+            @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p2 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_PREDICATELOCKTARGETTAG_TUPLE!(
-            @p3 $mode [$($done)* (@native [$argument]),];
+            @p3 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
     (@p3 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_PREDICATELOCKTARGETTAG_TUPLE!(
-            @p4 $mode [$($done)* (@literal [- $argument]),];
+            @p4 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative3 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_PREDICATELOCKTARGETTAG_TUPLE!(
-            @p4 $mode [$($done)* (@native [$argument]),];
+            @p4 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -3492,7 +3499,7 @@ macro_rules! __pgrx_c_args_SET_PREDICATELOCKTARGETTAG_TUPLE {
     };
     (@p3 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_PREDICATELOCKTARGETTAG_TUPLE!(
-            @p4 $mode [$($done)* (@native [$argument]),];
+            @p4 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -3519,35 +3526,35 @@ macro_rules! __pgrx_c_args_SET_PREDICATELOCKTARGETTAG_TUPLE {
     };
     (@p3 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_PREDICATELOCKTARGETTAG_TUPLE!(
-            @p4 $mode [$($done)* (@literal [$argument]),];
+            @p4 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p3 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_PREDICATELOCKTARGETTAG_TUPLE!(
-            @p4 $mode [$($done)* (@native [$argument]),];
+            @p4 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
     (@p4 $mode:ident [$($done:tt)*]; - $argument:literal) => {
         $crate::__pgrx_c_args_SET_PREDICATELOCKTARGETTAG_TUPLE!(
-            @p5 $mode [$($done)* (@literal [- $argument]),];
+            @p5 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
         )
     };
     (@negative4 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_SET_PREDICATELOCKTARGETTAG_TUPLE!(
-            @p5 $mode [$($done)* (@native [$argument]),];
+            @p5 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p4 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_PREDICATELOCKTARGETTAG_TUPLE!(
-            @p5 $mode [$($done)* (@literal [- $argument]),];
+            @p5 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative4 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_PREDICATELOCKTARGETTAG_TUPLE!(
-            @p5 $mode [$($done)* (@native [$argument]),];
+            @p5 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -3559,7 +3566,7 @@ macro_rules! __pgrx_c_args_SET_PREDICATELOCKTARGETTAG_TUPLE {
     };
     (@p4 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
         $crate::__pgrx_c_args_SET_PREDICATELOCKTARGETTAG_TUPLE!(
-            @p5 $mode [$($done)* (@native [$argument]),];
+            @p5 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p4 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
@@ -3585,17 +3592,17 @@ macro_rules! __pgrx_c_args_SET_PREDICATELOCKTARGETTAG_TUPLE {
     };
     (@p4 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_SET_PREDICATELOCKTARGETTAG_TUPLE!(
-            @p5 $mode [$($done)* (@literal [$argument]),];
+            @p5 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
         )
     };
     (@p4 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_SET_PREDICATELOCKTARGETTAG_TUPLE!(
-            @p5 $mode [$($done)* (@native [$argument]),];
+            @p5 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p4 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_PREDICATELOCKTARGETTAG_TUPLE!(
-            @p5 $mode [$($done)* (@native [$argument]),];
+            @p5 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -3622,13 +3629,13 @@ macro_rules! __pgrx_c_args_SET_PREDICATELOCKTARGETTAG_TUPLE {
     };
     (@p4 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_PREDICATELOCKTARGETTAG_TUPLE!(
-            @p5 $mode [$($done)* (@literal [$argument]),];
+            @p5 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p4 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_PREDICATELOCKTARGETTAG_TUPLE!(
-            @p5 $mode [$($done)* (@native [$argument]),];
+            @p5 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };

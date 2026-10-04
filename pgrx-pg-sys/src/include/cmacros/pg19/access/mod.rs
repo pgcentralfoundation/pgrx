@@ -6,6 +6,10 @@ This code is generated for documentation purposes, so that it is easy to referen
 mod attnum;
 #[allow(unused_imports)]
 pub use attnum::*;
+#[path = "brin.rs"]
+mod brin;
+#[allow(unused_imports)]
+pub use brin::*;
 #[path = "brin_internal.rs"]
 mod brin_internal;
 #[allow(unused_imports)]
@@ -18,10 +22,22 @@ pub use brin_page::*;
 mod brin_tuple;
 #[allow(unused_imports)]
 pub use brin_tuple::*;
+#[path = "detoast.rs"]
+mod detoast;
+#[allow(unused_imports)]
+pub use detoast::*;
 #[path = "gin.rs"]
 mod gin;
 #[allow(unused_imports)]
 pub use gin::*;
+#[path = "gin_private.rs"]
+mod gin_private;
+#[allow(unused_imports)]
+pub use gin_private::*;
+#[path = "gin_tuple.rs"]
+mod gin_tuple;
+#[allow(unused_imports)]
+pub use gin_tuple::*;
 #[path = "ginblock.rs"]
 mod ginblock;
 #[allow(unused_imports)]
@@ -38,6 +54,10 @@ pub use gist_private::*;
 mod hash;
 #[allow(unused_imports)]
 pub use hash::*;
+#[path = "heapam.rs"]
+mod heapam;
+#[allow(unused_imports)]
+pub use heapam::*;
 #[path = "heaptoast.rs"]
 mod heaptoast;
 #[allow(unused_imports)]
@@ -50,10 +70,18 @@ pub use htup::*;
 mod htup_details;
 #[allow(unused_imports)]
 pub use htup_details::*;
+#[path = "itup.rs"]
+mod itup;
+#[allow(unused_imports)]
+pub use itup::*;
 #[path = "multixact.rs"]
 mod multixact;
 #[allow(unused_imports)]
 pub use multixact::*;
+#[path = "multixact_internal.rs"]
+mod multixact_internal;
+#[allow(unused_imports)]
+pub use multixact_internal::*;
 #[path = "nbtree.rs"]
 mod nbtree;
 #[allow(unused_imports)]
@@ -74,10 +102,18 @@ pub use rmgr::*;
 mod sdir;
 #[allow(unused_imports)]
 pub use sdir::*;
+#[path = "slru.rs"]
+mod slru;
+#[allow(unused_imports)]
+pub use slru::*;
 #[path = "spgist_private.rs"]
 mod spgist_private;
 #[allow(unused_imports)]
 pub use spgist_private::*;
+#[path = "tableam.rs"]
+mod tableam;
+#[allow(unused_imports)]
+pub use tableam::*;
 #[path = "toast_compression.rs"]
 mod toast_compression;
 #[allow(unused_imports)]
@@ -98,6 +134,10 @@ pub use tupdesc::*;
 mod tupmacs;
 #[allow(unused_imports)]
 pub use tupmacs::*;
+#[path = "valid.rs"]
+mod valid;
+#[allow(unused_imports)]
+pub use valid::*;
 #[path = "visibilitymap.rs"]
 mod visibilitymap;
 #[allow(unused_imports)]
@@ -126,3 +166,7 @@ pub use xlogreader::*;
 mod xlogrecord;
 #[allow(unused_imports)]
 pub use xlogrecord::*;
+#[path = "xlogutils.rs"]
+mod xlogutils;
+#[allow(unused_imports)]
+pub use xlogutils::*;

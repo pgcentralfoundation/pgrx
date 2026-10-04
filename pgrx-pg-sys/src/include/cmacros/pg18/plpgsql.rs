@@ -5,8 +5,8 @@ This code is generated for documentation purposes, so that it is easy to referen
 // C macros from plpgsql.h.
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -33,20 +33,24 @@ macro_rules! __pgrx_c_args___pgrx_c_macro_5f {
         $crate::__pgrx_c_args___pgrx_c_macro_5f!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args___pgrx_c_macro_5f!(@p1 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args___pgrx_c_macro_5f!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args___pgrx_c_macro_5f!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args___pgrx_c_macro_5f!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args___pgrx_c_macro_5f!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args___pgrx_c_macro_5f!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -54,7 +58,9 @@ macro_rules! __pgrx_c_args___pgrx_c_macro_5f {
         $crate::__pgrx_c_args___pgrx_c_macro_5f!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args___pgrx_c_macro_5f!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args___pgrx_c_macro_5f!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -76,14 +82,18 @@ macro_rules! __pgrx_c_args___pgrx_c_macro_5f {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args___pgrx_c_macro_5f!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args___pgrx_c_macro_5f!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args___pgrx_c_macro_5f!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args___pgrx_c_macro_5f!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args___pgrx_c_macro_5f!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -110,13 +120,13 @@ macro_rules! __pgrx_c_args___pgrx_c_macro_5f {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args___pgrx_c_macro_5f!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args___pgrx_c_macro_5f!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -132,11 +142,15 @@ macro_rules! __pgrx_c_args___pgrx_c_macro_5f {
 /// ```text
 /// #define _( x ) dgettext ( TEXTDOMAIN , x )
 /// ```
-///
+///  String arrays retain their complete char-array extent for size and address operations, and decay to read-only pointers for values. Literal mutation is rejected because C string-literal writes are undefined.
 ///
 /// # Safety
 ///
 /// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pgrx_c_macro_5f {
@@ -156,10 +170,86 @@ macro_rules! __pgrx_c_macro_5f {
         )
     };
     (@__pgrx_emit_value; $x:tt $(,)?) => {
-        /* PGRX: PG_MAJORVERSION remains expanded because object macro is not a supported pure integer expression: only integer and verified basic character literals are supported; string and floating literals are deferred. */ /* PGRX: TEXTDOMAIN remains expanded because object macro is not a supported pure integer expression: only integer and verified basic character literals are supported; string and floating literals are deferred. */ /* PGRX: _ remains expanded because dgettext has an unused argument whose expression cannot be recovered. */
-        (
-            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                $crate::__pgrx_c_operand!(@value [true]; $x)
+        /* PGRX: PG_MAJORVERSION remains expanded because object macro is not a supported pure integer expression: constant probes cannot evaluate calls, variables, memory or mutation. */ /* PGRX: TEXTDOMAIN remains expanded because object macro is not a supported pure integer expression: constant probes cannot evaluate calls, variables, memory or mutation. */ /* PGRX: _ remains expanded because dgettext has no supported prepared macro body. */
+        $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+            <
+                $crate::__pgrx_c_macros::expression::CPointer<
+                    $crate::__pgrx_c_macros::CChar,
+                    $crate::__pgrx_c_macros::expression::ReadWrite
+                > as $crate::__pgrx_c_macros::expression::CType
+            >::from_storage(
+                $crate::__pgrx_c_generated::Inline_d74a193e43bc75fb1c2b0cb9ccc8bebd(
+                    <
+                        $crate::__pgrx_c_macros::expression::CPointer<
+                            $crate::__pgrx_c_macros::CChar,
+                            $crate::__pgrx_c_macros::expression::ReadOnly
+                        > as $crate::__pgrx_c_macros::expression::CType
+                    >::into_storage(
+                        $crate::__pgrx_c_macros::expression::implicit::<
+                            $crate::__pgrx_c_macros::expression::CPointer<
+                                $crate::__pgrx_c_macros::CChar,
+                                $crate::__pgrx_c_macros::expression::ReadOnly
+                            >,
+                            _
+                        >(
+                            (
+                                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                    $crate::__pgrx_c_macros::expression::decay(
+                                        {
+                                            const __PGRX_C_STRING: &[u8; 11] = &[
+                                                112,
+                                                108,
+                                                112,
+                                                103,
+                                                115,
+                                                113,
+                                                108,
+                                                45,
+                                                49,
+                                                56,
+                                                0
+                                            ];
+                                            $crate::__pgrx_c_macros::expression::string_literal(
+                                                __PGRX_C_STRING
+                                            )
+                                        }
+                                    )
+                                )
+                            )
+                        )
+                    ),
+                    <
+                        $crate::__pgrx_c_macros::expression::CPointer<
+                            $crate::__pgrx_c_macros::CChar,
+                            $crate::__pgrx_c_macros::expression::ReadOnly
+                        > as $crate::__pgrx_c_macros::expression::CType
+                    >::into_storage(
+                        $crate::__pgrx_c_macros::expression::implicit::<
+                            $crate::__pgrx_c_macros::expression::CPointer<
+                                $crate::__pgrx_c_macros::CChar,
+                                $crate::__pgrx_c_macros::expression::ReadOnly
+                            >,
+                            _
+                        >(
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_operand!(@value [true]; $x)
+                            )
+                        )
+                    ),
+                    <$crate::__pgrx_c_macros::CInt as $crate::__pgrx_c_macros::expression::CType>::into_storage(
+                        $crate::__pgrx_c_macros::expression::implicit::<
+                            $crate::__pgrx_c_macros::CInt,
+                            _
+                        >(
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                /* PGRX: LC_MESSAGES remains expanded because no integer constant binding is available in the defining Rust crate. */
+                                $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
+                                    5i32
+                                )
+                            )
+                        )
+                    ),
+                )
             )
         )
     };
@@ -167,29 +257,215 @@ macro_rules! __pgrx_c_macro_5f {
         $crate::__pgrx_c_args___pgrx_c_macro_5f!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $x:tt $(,)?) => {
-        /* PGRX: PG_MAJORVERSION remains expanded because object macro is not a supported pure integer expression: only integer and verified basic character literals are supported; string and floating literals are deferred. */ /* PGRX: TEXTDOMAIN remains expanded because object macro is not a supported pure integer expression: only integer and verified basic character literals are supported; string and floating literals are deferred. */ /* PGRX: _ remains expanded because dgettext has an unused argument whose expression cannot be recovered. */
-        ($crate::__pgrx_c_operand!(@place; $x))
+        compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args___pgrx_c_macro_5f!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $x:tt $(,)?) => {
-        /* PGRX: PG_MAJORVERSION remains expanded because object macro is not a supported pure integer expression: only integer and verified basic character literals are supported; string and floating literals are deferred. */ /* PGRX: TEXTDOMAIN remains expanded because object macro is not a supported pure integer expression: only integer and verified basic character literals are supported; string and floating literals are deferred. */ /* PGRX: _ remains expanded because dgettext has an unused argument whose expression cannot be recovered. */
-        ($crate::__pgrx_c_operand!(@read_place; $x))
+        compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args___pgrx_c_macro_5f!(@collect __pgrx_emit_read_place []; $($raw)*)
     };
     (@__pgrx_emit_size; $x:tt $(,)?) => {
-        /* PGRX: PG_MAJORVERSION remains expanded because object macro is not a supported pure integer expression: only integer and verified basic character literals are supported; string and floating literals are deferred. */ /* PGRX: TEXTDOMAIN remains expanded because object macro is not a supported pure integer expression: only integer and verified basic character literals are supported; string and floating literals are deferred. */ /* PGRX: _ remains expanded because dgettext has an unused argument whose expression cannot be recovered. */
-        $crate::__pgrx_c_operand!(@size; $x)
+        /* PGRX: PG_MAJORVERSION remains expanded because object macro is not a supported pure integer expression: constant probes cannot evaluate calls, variables, memory or mutation. */ /* PGRX: TEXTDOMAIN remains expanded because object macro is not a supported pure integer expression: constant probes cannot evaluate calls, variables, memory or mutation. */ /* PGRX: _ remains expanded because dgettext has no supported prepared macro body. */
+        $crate::__pgrx_c_macros::expression::size_of_value_type(
+            if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $x);
+                    }
+                }
+                Some(
+                    unsafe {
+                        $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                            <
+                                $crate::__pgrx_c_macros::expression::CPointer<
+                                    $crate::__pgrx_c_macros::CChar,
+                                    $crate::__pgrx_c_macros::expression::ReadWrite
+                                > as $crate::__pgrx_c_macros::expression::CType
+                            >::from_storage(
+                                $crate::__pgrx_c_generated::Inline_d74a193e43bc75fb1c2b0cb9ccc8bebd(
+                                    <
+                                        $crate::__pgrx_c_macros::expression::CPointer<
+                                            $crate::__pgrx_c_macros::CChar,
+                                            $crate::__pgrx_c_macros::expression::ReadOnly
+                                        > as $crate::__pgrx_c_macros::expression::CType
+                                    >::into_storage(
+                                        $crate::__pgrx_c_macros::expression::implicit::<
+                                            $crate::__pgrx_c_macros::expression::CPointer<
+                                                $crate::__pgrx_c_macros::CChar,
+                                                $crate::__pgrx_c_macros::expression::ReadOnly
+                                            >,
+                                            _
+                                        >(
+                                            (
+                                                $crate::__pgrx_c_macros::expression::profile_value::<
+                                                    true,
+                                                    _
+                                                >(
+                                                    $crate::__pgrx_c_macros::expression::decay(
+                                                        {
+                                                            const __PGRX_C_STRING: &[u8; 11] = &[
+                                                                112,
+                                                                108,
+                                                                112,
+                                                                103,
+                                                                115,
+                                                                113,
+                                                                108,
+                                                                45,
+                                                                49,
+                                                                56,
+                                                                0
+                                                            ];
+                                                            $crate::__pgrx_c_macros::expression::string_literal(
+                                                                __PGRX_C_STRING
+                                                            )
+                                                        }
+                                                    )
+                                                )
+                                            )
+                                        )
+                                    ),
+                                    <
+                                        $crate::__pgrx_c_macros::expression::CPointer<
+                                            $crate::__pgrx_c_macros::CChar,
+                                            $crate::__pgrx_c_macros::expression::ReadOnly
+                                        > as $crate::__pgrx_c_macros::expression::CType
+                                    >::into_storage(
+                                        $crate::__pgrx_c_macros::expression::implicit::<
+                                            $crate::__pgrx_c_macros::expression::CPointer<
+                                                $crate::__pgrx_c_macros::CChar,
+                                                $crate::__pgrx_c_macros::expression::ReadOnly
+                                            >,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_macros::expression::profile_value::<
+                                                true,
+                                                _
+                                            >($crate::__pgrx_c_operand!(@value [true]; $x))
+                                        )
+                                    ),
+                                    <
+                                        $crate::__pgrx_c_macros::CInt as $crate::__pgrx_c_macros::expression::CType
+                                    >::into_storage(
+                                        $crate::__pgrx_c_macros::expression::implicit::<
+                                            $crate::__pgrx_c_macros::CInt,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_macros::expression::profile_value::<
+                                                true,
+                                                _
+                                            >(
+                                                /* PGRX: LC_MESSAGES remains expanded because no integer constant binding is available in the defining Rust crate. */
+                                                $crate::__pgrx_c_macros::CValue::<
+                                                    $crate::__pgrx_c_macros::CInt
+                                                >::new(5i32)
+                                            )
+                                        )
+                                    ),
+                                )
+                            )
+                        )
+                    }
+                )
+            } else {
+                None
+            }
+        )
     };
     (@__pgrx_c_size; $($raw:tt)*) => {
         $crate::__pgrx_c_args___pgrx_c_macro_5f!(@collect __pgrx_emit_size []; $($raw)*)
     };
     (@__pgrx_emit_discard; $x:tt $(,)?) => {
-        /* PGRX: PG_MAJORVERSION remains expanded because object macro is not a supported pure integer expression: only integer and verified basic character literals are supported; string and floating literals are deferred. */ /* PGRX: TEXTDOMAIN remains expanded because object macro is not a supported pure integer expression: only integer and verified basic character literals are supported; string and floating literals are deferred. */ /* PGRX: _ remains expanded because dgettext has an unused argument whose expression cannot be recovered. */
-        $crate::__pgrx_c_operand!(@discard [true]; $x)
+        /* PGRX: PG_MAJORVERSION remains expanded because object macro is not a supported pure integer expression: constant probes cannot evaluate calls, variables, memory or mutation. */ /* PGRX: TEXTDOMAIN remains expanded because object macro is not a supported pure integer expression: constant probes cannot evaluate calls, variables, memory or mutation. */ /* PGRX: _ remains expanded because dgettext has no supported prepared macro body. */
+        {
+            let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                <
+                    $crate::__pgrx_c_macros::expression::CPointer<
+                        $crate::__pgrx_c_macros::CChar,
+                        $crate::__pgrx_c_macros::expression::ReadWrite
+                    > as $crate::__pgrx_c_macros::expression::CType
+                >::from_storage(
+                    $crate::__pgrx_c_generated::Inline_d74a193e43bc75fb1c2b0cb9ccc8bebd(
+                        <
+                            $crate::__pgrx_c_macros::expression::CPointer<
+                                $crate::__pgrx_c_macros::CChar,
+                                $crate::__pgrx_c_macros::expression::ReadOnly
+                            > as $crate::__pgrx_c_macros::expression::CType
+                        >::into_storage(
+                            $crate::__pgrx_c_macros::expression::implicit::<
+                                $crate::__pgrx_c_macros::expression::CPointer<
+                                    $crate::__pgrx_c_macros::CChar,
+                                    $crate::__pgrx_c_macros::expression::ReadOnly
+                                >,
+                                _
+                            >(
+                                (
+                                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                        $crate::__pgrx_c_macros::expression::decay(
+                                            {
+                                                const __PGRX_C_STRING: &[u8; 11] = &[
+                                                    112,
+                                                    108,
+                                                    112,
+                                                    103,
+                                                    115,
+                                                    113,
+                                                    108,
+                                                    45,
+                                                    49,
+                                                    56,
+                                                    0
+                                                ];
+                                                $crate::__pgrx_c_macros::expression::string_literal(
+                                                    __PGRX_C_STRING
+                                                )
+                                            }
+                                        )
+                                    )
+                                )
+                            )
+                        ),
+                        <
+                            $crate::__pgrx_c_macros::expression::CPointer<
+                                $crate::__pgrx_c_macros::CChar,
+                                $crate::__pgrx_c_macros::expression::ReadOnly
+                            > as $crate::__pgrx_c_macros::expression::CType
+                        >::into_storage(
+                            $crate::__pgrx_c_macros::expression::implicit::<
+                                $crate::__pgrx_c_macros::expression::CPointer<
+                                    $crate::__pgrx_c_macros::CChar,
+                                    $crate::__pgrx_c_macros::expression::ReadOnly
+                                >,
+                                _
+                            >(
+                                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                    $crate::__pgrx_c_operand!(@value [true]; $x)
+                                )
+                            )
+                        ),
+                        <
+                            $crate::__pgrx_c_macros::CInt as $crate::__pgrx_c_macros::expression::CType
+                        >::into_storage(
+                            $crate::__pgrx_c_macros::expression::implicit::<
+                                $crate::__pgrx_c_macros::CInt,
+                                _
+                            >(
+                                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                    /* PGRX: LC_MESSAGES remains expanded because no integer constant binding is available in the defining Rust crate. */
+                                    $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
+                                        5i32
+                                    )
+                                )
+                            )
+                        ),
+                    )
+                )
+            );
+        }
     };
     (@__pgrx_c_discard; $($raw:tt)*) => {
         $crate::__pgrx_c_args___pgrx_c_macro_5f!(@collect __pgrx_emit_discard []; $($raw)*)

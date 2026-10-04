@@ -31,7 +31,7 @@ mod oracle;
 mod rust_oracle;
 
 use pgrx_c_macros::{
-    AnalysisSession, EmissionStatus, IntegerKind, MacroScanner, emit_batch_with_bindings,
+    AnalysisSession, EmissionStatus, MacroScanner, emit_batch_with_bindings,
     emit_support_with_bindings, inspect, pg_sys_integer_bridges,
 };
 use std::path::PathBuf;
@@ -89,7 +89,11 @@ fn actual_datum_storage_preserves_native_integer_abi_and_pointer_roundtrips() {
     else {
         panic!("native Datum integer");
     };
-    assert_eq!(kind, IntegerKind::UnsignedLong, "supported LP64 target");
+    assert_eq!(
+        kind,
+        frontend.profile().target.size_type,
+        "Datum has native pointer-width unsigned storage"
+    );
     catalog.integer_storage.insert("Datum".into(), kind);
     let support = directory.join("../pgrx-pg-sys/src/c_macros/support.rs").canonicalize().unwrap();
     let datum = directory.join("../pgrx-pg-sys/src/submodules/datum.rs").canonicalize().unwrap();

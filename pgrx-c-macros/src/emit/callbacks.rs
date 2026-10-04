@@ -8,6 +8,8 @@
 //! representation. This pass validates the complete C/Rust witness catalog before
 //! pruning requested operations, rejects ambiguous raw-input bridges, and shares
 //! physical call machinery without merging distinct C identities.
+//! Explicit typedef wrappers preserve a selected C identity when the complete
+//! catalog cannot justify inferring that identity from raw Rust storage alone.
 
 use super::types::{LoweredType, Lowering, rust_path};
 use crate::{
@@ -29,6 +31,8 @@ const DEPTH_LIMIT: usize = 64;
 pub(super) struct CallbackAdapters {
     /// Nominal signature markers, physical pointer families, and selected call adapters.
     pub rust: String,
+    /// Whether selected, validated typedef wrappers need a defining-crate re-export.
+    pub has_typedefs: bool,
     /// Compiler canonical function types mapped to verified nullable Rust pointer storage.
     pub markers: BTreeMap<String, CallbackBinding>,
     /// Rejected signature witnesses retained even when demand would omit their code.
@@ -123,7 +127,7 @@ pub(super) fn generate(
     };
     for (name, alias) in &bindings.types {
         collect(
-            declarations.types.get(name),
+            bindings.relative_type_name(name).and_then(|name| declarations.types.get(name)),
             &alias.target,
             declarations,
             bindings,
@@ -353,6 +357,7 @@ pub(super) fn generate(
     }
     let mut output = CallbackAdapters {
         rust: String::new(),
+        has_typedefs: false,
         markers: BTreeMap::new(),
         unsupported,
         required_types: Vec::new(),
@@ -494,7 +499,98 @@ pub(super) fn generate(
         }
     }
     output.required_types = required_types.into_values().collect();
+    let aliases = typedef_aliases(declarations, bindings, &output.markers, &emitted)?;
+    output.has_typedefs = !aliases.is_empty();
+    output.rust.push_str(&aliases);
+    if output.rust.len() > SOURCE_LIMIT {
+        return Err("generated callback adapters exceed the 16 MiB source budget".into());
+    }
     Ok(output)
+}
+
+/// Expose selected, validated C typedef identities without inferring a raw storage identity.
+///
+/// `FunctionValue::new` accepts only its signature's exact native representation.
+/// The explicit typedef therefore adds no ABI cast and cannot bypass missing or
+/// rejected prototype evidence. Nested modules mirror the actual binding path.
+fn typedef_aliases(
+    declarations: &DeclarationCatalog,
+    bindings: &BindingCatalog,
+    markers: &BTreeMap<String, CallbackBinding>,
+    emitted: &BTreeSet<String>,
+) -> Result<String, String> {
+    let mut aliases = BTreeMap::new();
+    for (name, alias) in &bindings.types {
+        let Some(name) = bindings.relative_type_name(name) else { continue };
+        let Some(ty) = declarations.types.get(name) else { continue };
+        let Some(binding) = markers.get(&ty.canonical_spelling) else { continue };
+        let Some(marker) = binding.marker.strip_prefix("$crate::__pgrx_c_generated::") else {
+            continue;
+        };
+        if !emitted.contains(marker)
+            || alias.path.len() > DEPTH_LIMIT
+            || rust_path(&alias.path).is_err()
+        {
+            continue;
+        }
+        let Ok(storage) = normalize_storage(&alias.target, bindings, 0) else { continue };
+        if storage != binding.storage {
+            continue;
+        }
+        let Some(path) = bindings.relative_path(&alias.path) else { continue };
+        if let Some(previous) = aliases.insert(path.to_vec(), (name, marker))
+            && previous.1 != marker
+        {
+            return Err("callback typedefs have conflicting actual Rust binding paths".into());
+        }
+    }
+    if aliases.is_empty() {
+        return Ok(String::new());
+    }
+    let mut rust = String::from(
+        "/// Explicit C typedef identities for the selected native callback capabilities.\n\
+         pub mod __pgrx_c_callbacks {\n",
+    );
+    render_typedef_aliases(&mut rust, &aliases, 0)?;
+    rust.push_str("}\n");
+    Ok(rust)
+}
+
+/// Render one level of validated typedef paths without flattening distinct binding modules.
+fn render_typedef_aliases(
+    rust: &mut String,
+    aliases: &BTreeMap<Vec<String>, (&str, &str)>,
+    depth: usize,
+) -> Result<(), String> {
+    let mut modules = BTreeMap::<&str, BTreeMap<Vec<String>, (&str, &str)>>::new();
+    let mut names = BTreeSet::new();
+    for (path, (name, marker)) in aliases {
+        let identifier = &path[depth];
+        if path.len() == depth + 1 {
+            names.insert(identifier.as_str());
+            writeln!(
+                rust,
+                "#[doc = {:?}]\npub type {identifier} = crate::__pgrx_c_macros::expression::FunctionValue<crate::__pgrx_c_generated::{marker}>;",
+                format!("Explicit C callback typedef `{name}` with its exact native binding storage.")
+            )
+            .expect("String output");
+        } else {
+            modules.entry(identifier).or_default().insert(path.clone(), (*name, *marker));
+        }
+    }
+    for (module, aliases) in modules {
+        if names.contains(module) {
+            return Err("callback typedef path conflicts with a binding module".into());
+        }
+        writeln!(
+            rust,
+            "/// Callback typedef identities from the corresponding binding module.\npub mod {module} {{"
+        )
+        .expect("String output");
+        render_typedef_aliases(rust, &aliases, depth + 1)?;
+        rust.push_str("}\n");
+    }
+    Ok(())
 }
 
 /// Walk matching C/Rust edges, retaining usable callbacks and negative uniqueness evidence.
@@ -1293,6 +1389,63 @@ mod tests {
         assert!(!output.rust.contains("::Call<"));
         assert!(!output.rust.contains("transmute"));
         assert!(output.required_types.is_empty());
+    }
+
+    /// Keep explicit typedef constructors when unrelated evidence prevents global raw-input inference.
+    #[test]
+    fn explicit_typedefs_do_not_require_catalog_wide_native_uniqueness() {
+        let (mut declarations, mut bindings, target) = fixture();
+        declarations.types.insert("Alias".into(), declarations.types["One"].clone());
+        bindings.types.insert(
+            "Alias".into(),
+            AliasBinding {
+                path: vec!["nested".into(), "r#type".into()],
+                target: RustBindingType::Named { path: vec!["One".into()] },
+            },
+        );
+        bindings.types.insert(
+            "Unresolved".into(),
+            AliasBinding {
+                path: vec!["Unresolved".into()],
+                target: RustBindingType::Named { path: vec!["MissingAlias".into()] },
+            },
+        );
+        let requests = CallbackRequests {
+            native_input_types: [declarations.types["One"].canonical_spelling.clone()].into(),
+            ..Default::default()
+        };
+        let output =
+            generate(&declarations, &bindings, &target, &BTreeSet::new(), &requests).unwrap();
+        assert!(output.has_typedefs);
+        assert!(output.rust.contains("pub type One ="));
+        assert!(output.rust.contains("pub mod nested {"));
+        assert!(output.rust.contains("pub type r#type ="));
+        assert!(!output.rust.contains("pub type Two ="));
+        assert!(!output.rust.contains("pub type Unresolved ="));
+        assert!(!output.rust.contains("::NativeType for"));
+        assert!(!output.rust.contains("::IntoExpression for"));
+        assert!(!output.rust.contains("transmute"));
+    }
+
+    /// An explicit typedef cannot admit an incompatible or unproven callback ABI.
+    #[test]
+    fn rejected_prototypes_have_no_explicit_typedef_constructor() {
+        let (declarations, mut bindings, target) = fixture();
+        let RustBindingType::Option { value } = &mut bindings.types.get_mut("One").unwrap().target
+        else {
+            unreachable!()
+        };
+        let RustBindingType::Function { abi, .. } = value.as_mut() else { unreachable!() };
+        *abi = "Rust".into();
+        let requests = CallbackRequests {
+            native_input_types: [declarations.types["One"].canonical_spelling.clone()].into(),
+            ..Default::default()
+        };
+        let output =
+            generate(&declarations, &bindings, &target, &BTreeSet::new(), &requests).unwrap();
+        assert!(output.unsupported.contains_key(&declarations.types["One"].canonical_spelling));
+        assert!(!output.has_typedefs);
+        assert!(!output.rust.contains("pub type One ="));
     }
 
     /// Construct equal-width long and long long callback types with distinct C arithmetic ranks.

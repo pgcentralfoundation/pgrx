@@ -5,8 +5,8 @@ This code is generated for documentation purposes, so that it is easy to referen
 // C macros from date.h.
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -33,20 +33,24 @@ macro_rules! __pgrx_c_args_DATE_IS_NOBEGIN {
         $crate::__pgrx_c_args_DATE_IS_NOBEGIN!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_DATE_IS_NOBEGIN!(@p1 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_DATE_IS_NOBEGIN!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_DATE_IS_NOBEGIN!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_DATE_IS_NOBEGIN!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_DATE_IS_NOBEGIN!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_DATE_IS_NOBEGIN!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -54,7 +58,9 @@ macro_rules! __pgrx_c_args_DATE_IS_NOBEGIN {
         $crate::__pgrx_c_args_DATE_IS_NOBEGIN!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_DATE_IS_NOBEGIN!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_DATE_IS_NOBEGIN!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -76,14 +82,18 @@ macro_rules! __pgrx_c_args_DATE_IS_NOBEGIN {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_DATE_IS_NOBEGIN!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_DATE_IS_NOBEGIN!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_DATE_IS_NOBEGIN!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_DATE_IS_NOBEGIN!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_DATE_IS_NOBEGIN!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -110,13 +120,13 @@ macro_rules! __pgrx_c_args_DATE_IS_NOBEGIN {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_DATE_IS_NOBEGIN!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_DATE_IS_NOBEGIN!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -164,9 +174,8 @@ macro_rules! DATE_IS_NOBEGIN {
                         )
                     ),
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                        /* PGRX: DATEVAL_NOBEGIN remains expanded because no integer constant binding is available in the defining Rust crate. */
                         $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                            -2147483648i32
+                            $crate::__pgrx_c_bindings::DATEVAL_NOBEGIN as i32
                         )
                     )
                 )
@@ -206,9 +215,8 @@ macro_rules! DATE_IS_NOBEGIN {
                                     )
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                                    /* PGRX: DATEVAL_NOBEGIN remains expanded because no integer constant binding is available in the defining Rust crate. */
                                     $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                        -2147483648i32
+                                        $crate::__pgrx_c_bindings::DATEVAL_NOBEGIN as i32
                                     )
                                 )
                             )
@@ -233,9 +241,8 @@ macro_rules! DATE_IS_NOBEGIN {
                         )
                     ),
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                        /* PGRX: DATEVAL_NOBEGIN remains expanded because no integer constant binding is available in the defining Rust crate. */
                         $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                            -2147483648i32
+                            $crate::__pgrx_c_bindings::DATEVAL_NOBEGIN as i32
                         )
                     )
                 )
@@ -251,8 +258,8 @@ macro_rules! DATE_IS_NOBEGIN {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -279,20 +286,24 @@ macro_rules! __pgrx_c_args_DATE_IS_NOEND {
         $crate::__pgrx_c_args_DATE_IS_NOEND!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_DATE_IS_NOEND!(@p1 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_DATE_IS_NOEND!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_DATE_IS_NOEND!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_DATE_IS_NOEND!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_DATE_IS_NOEND!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_DATE_IS_NOEND!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -300,7 +311,9 @@ macro_rules! __pgrx_c_args_DATE_IS_NOEND {
         $crate::__pgrx_c_args_DATE_IS_NOEND!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_DATE_IS_NOEND!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_DATE_IS_NOEND!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -322,14 +335,18 @@ macro_rules! __pgrx_c_args_DATE_IS_NOEND {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_DATE_IS_NOEND!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_DATE_IS_NOEND!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_DATE_IS_NOEND!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_DATE_IS_NOEND!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_DATE_IS_NOEND!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -356,13 +373,13 @@ macro_rules! __pgrx_c_args_DATE_IS_NOEND {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_DATE_IS_NOEND!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_DATE_IS_NOEND!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -410,9 +427,8 @@ macro_rules! DATE_IS_NOEND {
                         )
                     ),
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                        /* PGRX: DATEVAL_NOEND remains expanded because no integer constant binding is available in the defining Rust crate. */
                         $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                            2147483647i32
+                            $crate::__pgrx_c_bindings::DATEVAL_NOEND as i32
                         )
                     )
                 )
@@ -452,9 +468,8 @@ macro_rules! DATE_IS_NOEND {
                                     )
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                                    /* PGRX: DATEVAL_NOEND remains expanded because no integer constant binding is available in the defining Rust crate. */
                                     $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                        2147483647i32
+                                        $crate::__pgrx_c_bindings::DATEVAL_NOEND as i32
                                     )
                                 )
                             )
@@ -479,9 +494,8 @@ macro_rules! DATE_IS_NOEND {
                         )
                     ),
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                        /* PGRX: DATEVAL_NOEND remains expanded because no integer constant binding is available in the defining Rust crate. */
                         $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                            2147483647i32
+                            $crate::__pgrx_c_bindings::DATEVAL_NOEND as i32
                         )
                     )
                 )
@@ -497,8 +511,8 @@ macro_rules! DATE_IS_NOEND {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -525,25 +539,34 @@ macro_rules! __pgrx_c_args_DATE_NOBEGIN {
         $crate::__pgrx_c_args_DATE_NOBEGIN!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_DATE_NOBEGIN!(@p1 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_DATE_NOBEGIN!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_DATE_NOBEGIN!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_DATE_NOBEGIN!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_DATE_NOBEGIN!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_DATE_NOBEGIN!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_DATE_NOBEGIN!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $($raw:tt)*) => {
         $crate::__pgrx_c_args_DATE_NOBEGIN!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_DATE_NOBEGIN!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_DATE_NOBEGIN!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -565,13 +588,20 @@ macro_rules! __pgrx_c_args_DATE_NOBEGIN {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_DATE_NOBEGIN!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_DATE_NOBEGIN!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_DATE_NOBEGIN!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_DATE_NOBEGIN!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
-        $crate::__pgrx_c_args_DATE_NOBEGIN!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_DATE_NOBEGIN!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
         $crate::__pgrx_c_classify!(
@@ -594,12 +624,15 @@ macro_rules! __pgrx_c_args_DATE_NOBEGIN {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_DATE_NOBEGIN!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_DATE_NOBEGIN!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_DATE_NOBEGIN!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p1 $mode:ident [$($done:tt)*];) => {
         $crate::DATE_NOBEGIN!(@$mode; $($done)*)
@@ -641,9 +674,8 @@ macro_rules! DATE_NOBEGIN {
                 $crate::__pgrx_c_macros::expression::assign(
                     ($crate::__pgrx_c_operand!(@place; $j)),
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                        /* PGRX: DATEVAL_NOBEGIN remains expanded because no integer constant binding is available in the defining Rust crate. */
                         $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                            -2147483648i32
+                            $crate::__pgrx_c_bindings::DATEVAL_NOBEGIN as i32
                         )
                     )
                 )
@@ -679,9 +711,8 @@ macro_rules! DATE_NOBEGIN {
                             $crate::__pgrx_c_macros::expression::assign(
                                 ($crate::__pgrx_c_operand!(@place; $j)),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                                    /* PGRX: DATEVAL_NOBEGIN remains expanded because no integer constant binding is available in the defining Rust crate. */
                                     $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                        -2147483648i32
+                                        $crate::__pgrx_c_bindings::DATEVAL_NOBEGIN as i32
                                     )
                                 )
                             )
@@ -702,9 +733,8 @@ macro_rules! DATE_NOBEGIN {
                 $crate::__pgrx_c_macros::expression::assign(
                     ($crate::__pgrx_c_operand!(@place; $j)),
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                        /* PGRX: DATEVAL_NOBEGIN remains expanded because no integer constant binding is available in the defining Rust crate. */
                         $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                            -2147483648i32
+                            $crate::__pgrx_c_bindings::DATEVAL_NOBEGIN as i32
                         )
                     )
                 )
@@ -720,8 +750,8 @@ macro_rules! DATE_NOBEGIN {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -748,25 +778,34 @@ macro_rules! __pgrx_c_args_DATE_NOEND {
         $crate::__pgrx_c_args_DATE_NOEND!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_DATE_NOEND!(@p1 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_DATE_NOEND!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_DATE_NOEND!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_DATE_NOEND!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_DATE_NOEND!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_DATE_NOEND!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_DATE_NOEND!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $($raw:tt)*) => {
         $crate::__pgrx_c_args_DATE_NOEND!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_DATE_NOEND!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_DATE_NOEND!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -788,13 +827,20 @@ macro_rules! __pgrx_c_args_DATE_NOEND {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_DATE_NOEND!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_DATE_NOEND!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_DATE_NOEND!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_DATE_NOEND!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
-        $crate::__pgrx_c_args_DATE_NOEND!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_DATE_NOEND!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
         $crate::__pgrx_c_classify!(
@@ -816,10 +862,16 @@ macro_rules! __pgrx_c_args_DATE_NOEND {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_DATE_NOEND!(@p1 $mode [$($done)* (@literal [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_DATE_NOEND!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+            $($rest)*
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_DATE_NOEND!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_DATE_NOEND!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p1 $mode:ident [$($done:tt)*];) => {
         $crate::DATE_NOEND!(@$mode; $($done)*)
@@ -861,9 +913,8 @@ macro_rules! DATE_NOEND {
                 $crate::__pgrx_c_macros::expression::assign(
                     ($crate::__pgrx_c_operand!(@place; $j)),
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                        /* PGRX: DATEVAL_NOEND remains expanded because no integer constant binding is available in the defining Rust crate. */
                         $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                            2147483647i32
+                            $crate::__pgrx_c_bindings::DATEVAL_NOEND as i32
                         )
                     )
                 )
@@ -899,9 +950,8 @@ macro_rules! DATE_NOEND {
                             $crate::__pgrx_c_macros::expression::assign(
                                 ($crate::__pgrx_c_operand!(@place; $j)),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                                    /* PGRX: DATEVAL_NOEND remains expanded because no integer constant binding is available in the defining Rust crate. */
                                     $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                        2147483647i32
+                                        $crate::__pgrx_c_bindings::DATEVAL_NOEND as i32
                                     )
                                 )
                             )
@@ -922,9 +972,8 @@ macro_rules! DATE_NOEND {
                 $crate::__pgrx_c_macros::expression::assign(
                     ($crate::__pgrx_c_operand!(@place; $j)),
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                        /* PGRX: DATEVAL_NOEND remains expanded because no integer constant binding is available in the defining Rust crate. */
                         $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                            2147483647i32
+                            $crate::__pgrx_c_bindings::DATEVAL_NOEND as i32
                         )
                     )
                 )
@@ -940,8 +989,8 @@ macro_rules! DATE_NOEND {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -968,20 +1017,24 @@ macro_rules! __pgrx_c_args_DATE_NOT_FINITE {
         $crate::__pgrx_c_args_DATE_NOT_FINITE!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_DATE_NOT_FINITE!(@p1 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_DATE_NOT_FINITE!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_DATE_NOT_FINITE!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_DATE_NOT_FINITE!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_DATE_NOT_FINITE!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_DATE_NOT_FINITE!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -989,7 +1042,9 @@ macro_rules! __pgrx_c_args_DATE_NOT_FINITE {
         $crate::__pgrx_c_args_DATE_NOT_FINITE!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_DATE_NOT_FINITE!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_DATE_NOT_FINITE!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -1011,14 +1066,18 @@ macro_rules! __pgrx_c_args_DATE_NOT_FINITE {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_DATE_NOT_FINITE!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_DATE_NOT_FINITE!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_DATE_NOT_FINITE!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_DATE_NOT_FINITE!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_DATE_NOT_FINITE!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -1045,13 +1104,13 @@ macro_rules! __pgrx_c_args_DATE_NOT_FINITE {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_DATE_NOT_FINITE!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_DATE_NOT_FINITE!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -1105,10 +1164,9 @@ macro_rules! DATE_NOT_FINITE {
                                         >($crate::__pgrx_c_operand!(@value [true]; $j))
                                     ),
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                                        /* PGRX: DATEVAL_NOBEGIN remains expanded because no integer constant binding is available in the defining Rust crate. */
                                         $crate::__pgrx_c_macros::CValue::<
                                             $crate::__pgrx_c_macros::CInt
-                                        >::new(-2147483648i32)
+                                        >::new($crate::__pgrx_c_bindings::DATEVAL_NOBEGIN as i32)
                                     )
                                 )
                             )
@@ -1124,10 +1182,9 @@ macro_rules! DATE_NOT_FINITE {
                                         >($crate::__pgrx_c_operand!(@value [true]; $j))
                                     ),
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                                        /* PGRX: DATEVAL_NOEND remains expanded because no integer constant binding is available in the defining Rust crate. */
                                         $crate::__pgrx_c_macros::CValue::<
                                             $crate::__pgrx_c_macros::CInt
-                                        >::new(2147483647i32)
+                                        >::new($crate::__pgrx_c_bindings::DATEVAL_NOEND as i32)
                                     )
                                 )
                             )
@@ -1186,10 +1243,11 @@ macro_rules! DATE_NOT_FINITE {
                                                     true,
                                                     _
                                                 >(
-                                                    /* PGRX: DATEVAL_NOBEGIN remains expanded because no integer constant binding is available in the defining Rust crate. */
                                                     $crate::__pgrx_c_macros::CValue::<
                                                         $crate::__pgrx_c_macros::CInt
-                                                    >::new(-2147483648i32)
+                                                    >::new(
+                                                        $crate::__pgrx_c_bindings::DATEVAL_NOBEGIN as i32
+                                                    )
                                                 )
                                             )
                                         )
@@ -1211,10 +1269,11 @@ macro_rules! DATE_NOT_FINITE {
                                                     true,
                                                     _
                                                 >(
-                                                    /* PGRX: DATEVAL_NOEND remains expanded because no integer constant binding is available in the defining Rust crate. */
                                                     $crate::__pgrx_c_macros::CValue::<
                                                         $crate::__pgrx_c_macros::CInt
-                                                    >::new(2147483647i32)
+                                                    >::new(
+                                                        $crate::__pgrx_c_bindings::DATEVAL_NOEND as i32
+                                                    )
                                                 )
                                             )
                                         )
@@ -1252,10 +1311,9 @@ macro_rules! DATE_NOT_FINITE {
                                         >($crate::__pgrx_c_operand!(@value [true]; $j))
                                     ),
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                                        /* PGRX: DATEVAL_NOBEGIN remains expanded because no integer constant binding is available in the defining Rust crate. */
                                         $crate::__pgrx_c_macros::CValue::<
                                             $crate::__pgrx_c_macros::CInt
-                                        >::new(-2147483648i32)
+                                        >::new($crate::__pgrx_c_bindings::DATEVAL_NOBEGIN as i32)
                                     )
                                 )
                             )
@@ -1271,10 +1329,9 @@ macro_rules! DATE_NOT_FINITE {
                                         >($crate::__pgrx_c_operand!(@value [true]; $j))
                                     ),
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                                        /* PGRX: DATEVAL_NOEND remains expanded because no integer constant binding is available in the defining Rust crate. */
                                         $crate::__pgrx_c_macros::CValue::<
                                             $crate::__pgrx_c_macros::CInt
-                                        >::new(2147483647i32)
+                                        >::new($crate::__pgrx_c_bindings::DATEVAL_NOEND as i32)
                                     )
                                 )
                             )
@@ -1297,8 +1354,1196 @@ macro_rules! DATE_NOT_FINITE {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
+    target_pointer_width = "64",
+    target_endian = "little"
+)))]
+#[cfg(not(docsrs))]
+compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
+#[doc(hidden)]
+#[macro_export]
+macro_rules! __pgrx_c_args_DateADTGetDatum {
+    (@collect $mode:ident [$($done:tt)*]; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_DateADTGetDatum!(@p0 $mode [$($done)*]; $($raw)*)
+    };
+    (@classified [$next:ident $mode:ident [$($done:tt)*] [$($rest:tt)*]] $descriptor:tt) => {
+        $crate::__pgrx_c_args_DateADTGetDatum!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
+    };
+    (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
+        $crate::__pgrx_c_args_DateADTGetDatum!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
+    };
+    (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
+        $crate::__pgrx_c_args_DateADTGetDatum!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_DateADTGetDatum!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+            $($rest)*
+        )
+    };
+    (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_DateADTGetDatum!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; - $($raw:tt)*) => {
+        $crate::__pgrx_c_args_DateADTGetDatum!(@negative0 $mode [$($done)*]; - $($raw)*)
+    };
+    (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
+        $crate::__pgrx_c_args_DateADTGetDatum!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_DateADTGetDatum] [p1 $mode [$($done)*] []] [
+                $head $(::$tail)* ! $group
+            ]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; ::$head:ident $(::$tail:ident)* ! $group:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_DateADTGetDatum] [p1 $mode [$($done)*] []] [
+                ::$head $(::$tail)* ! $group
+            ]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; ($($inner:tt)*)) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_DateADTGetDatum] [p1 $mode [$($done)*] []] [($($inner)*)]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
+        $crate::__pgrx_c_args_DateADTGetDatum!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
+        $crate::__pgrx_c_args_DateADTGetDatum!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
+        $crate::__pgrx_c_args_DateADTGetDatum!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_DateADTGetDatum] [p1 $mode [$($done)*] [$($rest)*]] [
+                $head $(::$tail)* ! $group
+            ]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; ::$head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_DateADTGetDatum] [p1 $mode [$($done)*] [$($rest)*]] [
+                ::$head $(::$tail)* ! $group
+            ]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; ($($inner:tt)*), $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_DateADTGetDatum] [p1 $mode [$($done)*] [$($rest)*]] [
+                ($($inner)*)
+            ]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_DateADTGetDatum!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_DateADTGetDatum!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*];) => {
+        $crate::DateADTGetDatum!(@$mode; $($done)*)
+    };
+    ($($invalid:tt)*) => {
+        compile_error!("arguments do not satisfy this C macro's invocation contract")
+    };
+}
+/// Typed call adapter for C inline function DateADTGetDatum from date.h:71
+///
+/// ```c
+/// static inline Datum
+/// DateADTGetDatum(DateADT X)
+/// {
+/// 	return Int32GetDatum(X);
+/// }
+/// ```
+///
+///
+/// Calls the original function through its inspected C prototype. Each operand is evaluated once and converted using C parameter assignment rules. The result retains the function's original C type; `.get()` extracts its native storage, including `()` for a void result. Native calls retain the backend thread, PostgreSQL error, and caller safety contracts of the generated guarded binding.
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+#[macro_export]
+macro_rules! DateADTGetDatum {
+    (@__pgrx_emit_check_safety; $X:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $X);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_DateADTGetDatum!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
+    (@__pgrx_emit_public; $X:tt $(,)?) => {
+        $crate::__pgrx_c_macros::expression_result::finish(
+            $crate::DateADTGetDatum!(@__pgrx_emit_value; $X)
+        )
+    };
+    (@__pgrx_emit_value; $X:tt $(,)?) => {
+        $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+            <
+                $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                    $crate::__pgrx_c_macros::CUnsignedLong,
+                    $crate::__pgrx_c_bindings::Datum
+                > as $crate::__pgrx_c_macros::expression::CType
+            >::from_storage(
+                $crate::__pgrx_c_bindings::DateADTGetDatum(
+                    <$crate::__pgrx_c_macros::CInt as $crate::__pgrx_c_macros::expression::CType>::into_storage(
+                        $crate::__pgrx_c_macros::expression::implicit::<
+                            $crate::__pgrx_c_macros::CInt,
+                            _
+                        >(
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_operand!(@value [true]; $X)
+                            )
+                        )
+                    ),
+                )
+            )
+        )
+    };
+    (@__pgrx_c_value; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_DateADTGetDatum!(@collect __pgrx_emit_value []; $($raw)*)
+    };
+    (@__pgrx_emit_place; $X:tt $(,)?) => {
+        compile_error!("C expression is not a place in this operation")
+    };
+    (@__pgrx_c_place; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_DateADTGetDatum!(@collect __pgrx_emit_place []; $($raw)*)
+    };
+    (@__pgrx_emit_read_place; $X:tt $(,)?) => {
+        compile_error!("C expression is not a place in this operation")
+    };
+    (@__pgrx_c_read_place; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_DateADTGetDatum!(@collect __pgrx_emit_read_place []; $($raw)*)
+    };
+    (@__pgrx_emit_size; $X:tt $(,)?) => {
+        $crate::__pgrx_c_macros::expression::size_of_value_type(
+            if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $X);
+                    }
+                }
+                Some(
+                    unsafe {
+                        $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                            <
+                                $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                    $crate::__pgrx_c_macros::CUnsignedLong,
+                                    $crate::__pgrx_c_bindings::Datum
+                                > as $crate::__pgrx_c_macros::expression::CType
+                            >::from_storage(
+                                $crate::__pgrx_c_bindings::DateADTGetDatum(
+                                    <
+                                        $crate::__pgrx_c_macros::CInt as $crate::__pgrx_c_macros::expression::CType
+                                    >::into_storage(
+                                        $crate::__pgrx_c_macros::expression::implicit::<
+                                            $crate::__pgrx_c_macros::CInt,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_macros::expression::profile_value::<
+                                                true,
+                                                _
+                                            >($crate::__pgrx_c_operand!(@value [true]; $X))
+                                        )
+                                    ),
+                                )
+                            )
+                        )
+                    }
+                )
+            } else {
+                None
+            }
+        )
+    };
+    (@__pgrx_c_size; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_DateADTGetDatum!(@collect __pgrx_emit_size []; $($raw)*)
+    };
+    (@__pgrx_emit_discard; $X:tt $(,)?) => {
+        {
+            let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                <
+                    $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                        $crate::__pgrx_c_macros::CUnsignedLong,
+                        $crate::__pgrx_c_bindings::Datum
+                    > as $crate::__pgrx_c_macros::expression::CType
+                >::from_storage(
+                    $crate::__pgrx_c_bindings::DateADTGetDatum(
+                        <
+                            $crate::__pgrx_c_macros::CInt as $crate::__pgrx_c_macros::expression::CType
+                        >::into_storage(
+                            $crate::__pgrx_c_macros::expression::implicit::<
+                                $crate::__pgrx_c_macros::CInt,
+                                _
+                            >(
+                                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                    $crate::__pgrx_c_operand!(@value [true]; $X)
+                                )
+                            )
+                        ),
+                    )
+                )
+            );
+        }
+    };
+    (@__pgrx_c_discard; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_DateADTGetDatum!(@collect __pgrx_emit_discard []; $($raw)*)
+    };
+    ($($raw:tt)*) => {
+        $crate::__pgrx_c_args_DateADTGetDatum!(@collect __pgrx_emit_public []; $($raw)*)
+    };
+}
+
+#[cfg(not(all(
+    target_arch = "x86_64",
+    target_os = "linux",
+    target_pointer_width = "64",
+    target_endian = "little"
+)))]
+#[cfg(not(docsrs))]
+compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
+#[doc(hidden)]
+#[macro_export]
+macro_rules! __pgrx_c_args_DatumGetDateADT {
+    (@collect $mode:ident [$($done:tt)*]; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_DatumGetDateADT!(@p0 $mode [$($done)*]; $($raw)*)
+    };
+    (@classified [$next:ident $mode:ident [$($done:tt)*] [$($rest:tt)*]] $descriptor:tt) => {
+        $crate::__pgrx_c_args_DatumGetDateADT!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
+    };
+    (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
+        $crate::__pgrx_c_args_DatumGetDateADT!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
+    };
+    (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
+        $crate::__pgrx_c_args_DatumGetDateADT!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_DatumGetDateADT!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+            $($rest)*
+        )
+    };
+    (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_DatumGetDateADT!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; - $($raw:tt)*) => {
+        $crate::__pgrx_c_args_DatumGetDateADT!(@negative0 $mode [$($done)*]; - $($raw)*)
+    };
+    (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
+        $crate::__pgrx_c_args_DatumGetDateADT!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_DatumGetDateADT] [p1 $mode [$($done)*] []] [
+                $head $(::$tail)* ! $group
+            ]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; ::$head:ident $(::$tail:ident)* ! $group:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_DatumGetDateADT] [p1 $mode [$($done)*] []] [
+                ::$head $(::$tail)* ! $group
+            ]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; ($($inner:tt)*)) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_DatumGetDateADT] [p1 $mode [$($done)*] []] [($($inner)*)]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
+        $crate::__pgrx_c_args_DatumGetDateADT!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
+        $crate::__pgrx_c_args_DatumGetDateADT!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
+        $crate::__pgrx_c_args_DatumGetDateADT!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_DatumGetDateADT] [p1 $mode [$($done)*] [$($rest)*]] [
+                $head $(::$tail)* ! $group
+            ]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; ::$head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_DatumGetDateADT] [p1 $mode [$($done)*] [$($rest)*]] [
+                ::$head $(::$tail)* ! $group
+            ]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; ($($inner:tt)*), $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_DatumGetDateADT] [p1 $mode [$($done)*] [$($rest)*]] [
+                ($($inner)*)
+            ]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_DatumGetDateADT!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_DatumGetDateADT!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*];) => {
+        $crate::DatumGetDateADT!(@$mode; $($done)*)
+    };
+    ($($invalid:tt)*) => {
+        compile_error!("arguments do not satisfy this C macro's invocation contract")
+    };
+}
+/// Typed call adapter for C inline function DatumGetDateADT from date.h:53
+///
+/// ```c
+/// static inline DateADT
+/// DatumGetDateADT(Datum X)
+/// {
+/// 	return (DateADT) DatumGetInt32(X);
+/// }
+/// ```
+///
+///
+/// Calls the original function through its inspected C prototype. Each operand is evaluated once and converted using C parameter assignment rules. The result retains the function's original C type; `.get()` extracts its native storage, including `()` for a void result. Native calls retain the backend thread, PostgreSQL error, and caller safety contracts of the generated guarded binding.
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+#[macro_export]
+macro_rules! DatumGetDateADT {
+    (@__pgrx_emit_check_safety; $X:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $X);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_DatumGetDateADT!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
+    (@__pgrx_emit_public; $X:tt $(,)?) => {
+        $crate::__pgrx_c_macros::expression_result::finish(
+            $crate::DatumGetDateADT!(@__pgrx_emit_value; $X)
+        )
+    };
+    (@__pgrx_emit_value; $X:tt $(,)?) => {
+        $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+            <$crate::__pgrx_c_macros::CInt as $crate::__pgrx_c_macros::expression::CType>::from_storage(
+                $crate::__pgrx_c_bindings::DatumGetDateADT(
+                    <
+                        $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                            $crate::__pgrx_c_macros::CUnsignedLong,
+                            $crate::__pgrx_c_bindings::Datum
+                        > as $crate::__pgrx_c_macros::expression::CType
+                    >::into_storage(
+                        $crate::__pgrx_c_macros::expression::implicit::<
+                            $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                $crate::__pgrx_c_macros::CUnsignedLong,
+                                $crate::__pgrx_c_bindings::Datum
+                            >,
+                            _
+                        >(
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_operand!(@value [true]; $X)
+                            )
+                        )
+                    ),
+                )
+            )
+        )
+    };
+    (@__pgrx_c_value; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_DatumGetDateADT!(@collect __pgrx_emit_value []; $($raw)*)
+    };
+    (@__pgrx_emit_place; $X:tt $(,)?) => {
+        compile_error!("C expression is not a place in this operation")
+    };
+    (@__pgrx_c_place; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_DatumGetDateADT!(@collect __pgrx_emit_place []; $($raw)*)
+    };
+    (@__pgrx_emit_read_place; $X:tt $(,)?) => {
+        compile_error!("C expression is not a place in this operation")
+    };
+    (@__pgrx_c_read_place; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_DatumGetDateADT!(@collect __pgrx_emit_read_place []; $($raw)*)
+    };
+    (@__pgrx_emit_size; $X:tt $(,)?) => {
+        $crate::__pgrx_c_macros::expression::size_of_value_type(
+            if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $X);
+                    }
+                }
+                Some(
+                    unsafe {
+                        $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                            <
+                                $crate::__pgrx_c_macros::CInt as $crate::__pgrx_c_macros::expression::CType
+                            >::from_storage(
+                                $crate::__pgrx_c_bindings::DatumGetDateADT(
+                                    <
+                                        $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                            $crate::__pgrx_c_macros::CUnsignedLong,
+                                            $crate::__pgrx_c_bindings::Datum
+                                        > as $crate::__pgrx_c_macros::expression::CType
+                                    >::into_storage(
+                                        $crate::__pgrx_c_macros::expression::implicit::<
+                                            $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                $crate::__pgrx_c_macros::CUnsignedLong,
+                                                $crate::__pgrx_c_bindings::Datum
+                                            >,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_macros::expression::profile_value::<
+                                                true,
+                                                _
+                                            >($crate::__pgrx_c_operand!(@value [true]; $X))
+                                        )
+                                    ),
+                                )
+                            )
+                        )
+                    }
+                )
+            } else {
+                None
+            }
+        )
+    };
+    (@__pgrx_c_size; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_DatumGetDateADT!(@collect __pgrx_emit_size []; $($raw)*)
+    };
+    (@__pgrx_emit_discard; $X:tt $(,)?) => {
+        {
+            let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                <$crate::__pgrx_c_macros::CInt as $crate::__pgrx_c_macros::expression::CType>::from_storage(
+                    $crate::__pgrx_c_bindings::DatumGetDateADT(
+                        <
+                            $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                $crate::__pgrx_c_macros::CUnsignedLong,
+                                $crate::__pgrx_c_bindings::Datum
+                            > as $crate::__pgrx_c_macros::expression::CType
+                        >::into_storage(
+                            $crate::__pgrx_c_macros::expression::implicit::<
+                                $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                    $crate::__pgrx_c_macros::CUnsignedLong,
+                                    $crate::__pgrx_c_bindings::Datum
+                                >,
+                                _
+                            >(
+                                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                    $crate::__pgrx_c_operand!(@value [true]; $X)
+                                )
+                            )
+                        ),
+                    )
+                )
+            );
+        }
+    };
+    (@__pgrx_c_discard; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_DatumGetDateADT!(@collect __pgrx_emit_discard []; $($raw)*)
+    };
+    ($($raw:tt)*) => {
+        $crate::__pgrx_c_args_DatumGetDateADT!(@collect __pgrx_emit_public []; $($raw)*)
+    };
+}
+
+#[cfg(not(all(
+    target_arch = "x86_64",
+    target_os = "linux",
+    target_pointer_width = "64",
+    target_endian = "little"
+)))]
+#[cfg(not(docsrs))]
+compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
+#[doc(hidden)]
+#[macro_export]
+macro_rules! __pgrx_c_args_DatumGetTimeADT {
+    (@collect $mode:ident [$($done:tt)*]; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_DatumGetTimeADT!(@p0 $mode [$($done)*]; $($raw)*)
+    };
+    (@classified [$next:ident $mode:ident [$($done:tt)*] [$($rest:tt)*]] $descriptor:tt) => {
+        $crate::__pgrx_c_args_DatumGetTimeADT!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
+    };
+    (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
+        $crate::__pgrx_c_args_DatumGetTimeADT!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
+    };
+    (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
+        $crate::__pgrx_c_args_DatumGetTimeADT!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_DatumGetTimeADT!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+            $($rest)*
+        )
+    };
+    (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_DatumGetTimeADT!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; - $($raw:tt)*) => {
+        $crate::__pgrx_c_args_DatumGetTimeADT!(@negative0 $mode [$($done)*]; - $($raw)*)
+    };
+    (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
+        $crate::__pgrx_c_args_DatumGetTimeADT!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_DatumGetTimeADT] [p1 $mode [$($done)*] []] [
+                $head $(::$tail)* ! $group
+            ]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; ::$head:ident $(::$tail:ident)* ! $group:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_DatumGetTimeADT] [p1 $mode [$($done)*] []] [
+                ::$head $(::$tail)* ! $group
+            ]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; ($($inner:tt)*)) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_DatumGetTimeADT] [p1 $mode [$($done)*] []] [($($inner)*)]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
+        $crate::__pgrx_c_args_DatumGetTimeADT!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
+        $crate::__pgrx_c_args_DatumGetTimeADT!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
+        $crate::__pgrx_c_args_DatumGetTimeADT!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_DatumGetTimeADT] [p1 $mode [$($done)*] [$($rest)*]] [
+                $head $(::$tail)* ! $group
+            ]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; ::$head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_DatumGetTimeADT] [p1 $mode [$($done)*] [$($rest)*]] [
+                ::$head $(::$tail)* ! $group
+            ]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; ($($inner:tt)*), $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_DatumGetTimeADT] [p1 $mode [$($done)*] [$($rest)*]] [
+                ($($inner)*)
+            ]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_DatumGetTimeADT!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_DatumGetTimeADT!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*];) => {
+        $crate::DatumGetTimeADT!(@$mode; $($done)*)
+    };
+    ($($invalid:tt)*) => {
+        compile_error!("arguments do not satisfy this C macro's invocation contract")
+    };
+}
+/// Typed call adapter for C inline function DatumGetTimeADT from date.h:59
+///
+/// ```c
+/// static inline TimeADT
+/// DatumGetTimeADT(Datum X)
+/// {
+/// 	return (TimeADT) DatumGetInt64(X);
+/// }
+/// ```
+///
+///
+/// Calls the original function through its inspected C prototype. Each operand is evaluated once and converted using C parameter assignment rules. The result retains the function's original C type; `.get()` extracts its native storage, including `()` for a void result. Native calls retain the backend thread, PostgreSQL error, and caller safety contracts of the generated guarded binding.
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+#[macro_export]
+macro_rules! DatumGetTimeADT {
+    (@__pgrx_emit_check_safety; $X:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $X);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_DatumGetTimeADT!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
+    (@__pgrx_emit_public; $X:tt $(,)?) => {
+        $crate::__pgrx_c_macros::expression_result::finish(
+            $crate::DatumGetTimeADT!(@__pgrx_emit_value; $X)
+        )
+    };
+    (@__pgrx_emit_value; $X:tt $(,)?) => {
+        $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+            <$crate::__pgrx_c_macros::CLong as $crate::__pgrx_c_macros::expression::CType>::from_storage(
+                $crate::__pgrx_c_bindings::DatumGetTimeADT(
+                    <
+                        $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                            $crate::__pgrx_c_macros::CUnsignedLong,
+                            $crate::__pgrx_c_bindings::Datum
+                        > as $crate::__pgrx_c_macros::expression::CType
+                    >::into_storage(
+                        $crate::__pgrx_c_macros::expression::implicit::<
+                            $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                $crate::__pgrx_c_macros::CUnsignedLong,
+                                $crate::__pgrx_c_bindings::Datum
+                            >,
+                            _
+                        >(
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_operand!(@value [true]; $X)
+                            )
+                        )
+                    ),
+                )
+            )
+        )
+    };
+    (@__pgrx_c_value; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_DatumGetTimeADT!(@collect __pgrx_emit_value []; $($raw)*)
+    };
+    (@__pgrx_emit_place; $X:tt $(,)?) => {
+        compile_error!("C expression is not a place in this operation")
+    };
+    (@__pgrx_c_place; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_DatumGetTimeADT!(@collect __pgrx_emit_place []; $($raw)*)
+    };
+    (@__pgrx_emit_read_place; $X:tt $(,)?) => {
+        compile_error!("C expression is not a place in this operation")
+    };
+    (@__pgrx_c_read_place; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_DatumGetTimeADT!(@collect __pgrx_emit_read_place []; $($raw)*)
+    };
+    (@__pgrx_emit_size; $X:tt $(,)?) => {
+        $crate::__pgrx_c_macros::expression::size_of_value_type(
+            if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $X);
+                    }
+                }
+                Some(
+                    unsafe {
+                        $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                            <
+                                $crate::__pgrx_c_macros::CLong as $crate::__pgrx_c_macros::expression::CType
+                            >::from_storage(
+                                $crate::__pgrx_c_bindings::DatumGetTimeADT(
+                                    <
+                                        $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                            $crate::__pgrx_c_macros::CUnsignedLong,
+                                            $crate::__pgrx_c_bindings::Datum
+                                        > as $crate::__pgrx_c_macros::expression::CType
+                                    >::into_storage(
+                                        $crate::__pgrx_c_macros::expression::implicit::<
+                                            $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                $crate::__pgrx_c_macros::CUnsignedLong,
+                                                $crate::__pgrx_c_bindings::Datum
+                                            >,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_macros::expression::profile_value::<
+                                                true,
+                                                _
+                                            >($crate::__pgrx_c_operand!(@value [true]; $X))
+                                        )
+                                    ),
+                                )
+                            )
+                        )
+                    }
+                )
+            } else {
+                None
+            }
+        )
+    };
+    (@__pgrx_c_size; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_DatumGetTimeADT!(@collect __pgrx_emit_size []; $($raw)*)
+    };
+    (@__pgrx_emit_discard; $X:tt $(,)?) => {
+        {
+            let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                <$crate::__pgrx_c_macros::CLong as $crate::__pgrx_c_macros::expression::CType>::from_storage(
+                    $crate::__pgrx_c_bindings::DatumGetTimeADT(
+                        <
+                            $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                $crate::__pgrx_c_macros::CUnsignedLong,
+                                $crate::__pgrx_c_bindings::Datum
+                            > as $crate::__pgrx_c_macros::expression::CType
+                        >::into_storage(
+                            $crate::__pgrx_c_macros::expression::implicit::<
+                                $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                    $crate::__pgrx_c_macros::CUnsignedLong,
+                                    $crate::__pgrx_c_bindings::Datum
+                                >,
+                                _
+                            >(
+                                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                    $crate::__pgrx_c_operand!(@value [true]; $X)
+                                )
+                            )
+                        ),
+                    )
+                )
+            );
+        }
+    };
+    (@__pgrx_c_discard; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_DatumGetTimeADT!(@collect __pgrx_emit_discard []; $($raw)*)
+    };
+    ($($raw:tt)*) => {
+        $crate::__pgrx_c_args_DatumGetTimeADT!(@collect __pgrx_emit_public []; $($raw)*)
+    };
+}
+
+#[cfg(not(all(
+    target_arch = "x86_64",
+    target_os = "linux",
+    target_pointer_width = "64",
+    target_endian = "little"
+)))]
+#[cfg(not(docsrs))]
+compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
+#[doc(hidden)]
+#[macro_export]
+macro_rules! __pgrx_c_args_DatumGetTimeTzADTP {
+    (@collect $mode:ident [$($done:tt)*]; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_DatumGetTimeTzADTP!(@p0 $mode [$($done)*]; $($raw)*)
+    };
+    (@classified [$next:ident $mode:ident [$($done:tt)*] [$($rest:tt)*]] $descriptor:tt) => {
+        $crate::__pgrx_c_args_DatumGetTimeTzADTP!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
+    };
+    (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
+        $crate::__pgrx_c_args_DatumGetTimeTzADTP!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
+    };
+    (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
+        $crate::__pgrx_c_args_DatumGetTimeTzADTP!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_DatumGetTimeTzADTP!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+            $($rest)*
+        )
+    };
+    (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_DatumGetTimeTzADTP!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; - $($raw:tt)*) => {
+        $crate::__pgrx_c_args_DatumGetTimeTzADTP!(@negative0 $mode [$($done)*]; - $($raw)*)
+    };
+    (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
+        $crate::__pgrx_c_args_DatumGetTimeTzADTP!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_DatumGetTimeTzADTP] [p1 $mode [$($done)*] []] [
+                $head $(::$tail)* ! $group
+            ]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; ::$head:ident $(::$tail:ident)* ! $group:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_DatumGetTimeTzADTP] [p1 $mode [$($done)*] []] [
+                ::$head $(::$tail)* ! $group
+            ]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; ($($inner:tt)*)) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_DatumGetTimeTzADTP] [p1 $mode [$($done)*] []] [($($inner)*)]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
+        $crate::__pgrx_c_args_DatumGetTimeTzADTP!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
+        $crate::__pgrx_c_args_DatumGetTimeTzADTP!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
+        $crate::__pgrx_c_args_DatumGetTimeTzADTP!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_DatumGetTimeTzADTP] [p1 $mode [$($done)*] [$($rest)*]] [
+                $head $(::$tail)* ! $group
+            ]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; ::$head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_DatumGetTimeTzADTP] [p1 $mode [$($done)*] [$($rest)*]] [
+                ::$head $(::$tail)* ! $group
+            ]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; ($($inner:tt)*), $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_DatumGetTimeTzADTP] [p1 $mode [$($done)*] [$($rest)*]] [
+                ($($inner)*)
+            ]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_DatumGetTimeTzADTP!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_DatumGetTimeTzADTP!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*];) => {
+        $crate::DatumGetTimeTzADTP!(@$mode; $($done)*)
+    };
+    ($($invalid:tt)*) => {
+        compile_error!("arguments do not satisfy this C macro's invocation contract")
+    };
+}
+/// Typed call adapter for C inline function DatumGetTimeTzADTP from date.h:65
+///
+/// ```c
+/// static inline TimeTzADT *
+/// DatumGetTimeTzADTP(Datum X)
+/// {
+/// 	return (TimeTzADT *) DatumGetPointer(X);
+/// }
+/// ```
+///
+///
+/// Calls the original function through its inspected C prototype. Each operand is evaluated once and converted using C parameter assignment rules. The result retains the function's original C type; `.get()` extracts its native storage, including `()` for a void result. Native calls retain the backend thread, PostgreSQL error, and caller safety contracts of the generated guarded binding.
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+#[macro_export]
+macro_rules! DatumGetTimeTzADTP {
+    (@__pgrx_emit_check_safety; $X:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $X);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_DatumGetTimeTzADTP!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
+    (@__pgrx_emit_public; $X:tt $(,)?) => {
+        $crate::__pgrx_c_macros::expression_result::finish(
+            $crate::DatumGetTimeTzADTP!(@__pgrx_emit_value; $X)
+        )
+    };
+    (@__pgrx_emit_value; $X:tt $(,)?) => {
+        $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+            <
+                $crate::__pgrx_c_macros::expression::CPointer<
+                    $crate::__pgrx_c_macros::expression::CRecord<
+                        $crate::__pgrx_c_bindings::TimeTzADT
+                    >,
+                    $crate::__pgrx_c_macros::expression::ReadWrite
+                > as $crate::__pgrx_c_macros::expression::CType
+            >::from_storage(
+                $crate::__pgrx_c_bindings::DatumGetTimeTzADTP(
+                    <
+                        $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                            $crate::__pgrx_c_macros::CUnsignedLong,
+                            $crate::__pgrx_c_bindings::Datum
+                        > as $crate::__pgrx_c_macros::expression::CType
+                    >::into_storage(
+                        $crate::__pgrx_c_macros::expression::implicit::<
+                            $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                $crate::__pgrx_c_macros::CUnsignedLong,
+                                $crate::__pgrx_c_bindings::Datum
+                            >,
+                            _
+                        >(
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_operand!(@value [true]; $X)
+                            )
+                        )
+                    ),
+                )
+            )
+        )
+    };
+    (@__pgrx_c_value; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_DatumGetTimeTzADTP!(@collect __pgrx_emit_value []; $($raw)*)
+    };
+    (@__pgrx_emit_place; $X:tt $(,)?) => {
+        compile_error!("C expression is not a place in this operation")
+    };
+    (@__pgrx_c_place; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_DatumGetTimeTzADTP!(@collect __pgrx_emit_place []; $($raw)*)
+    };
+    (@__pgrx_emit_read_place; $X:tt $(,)?) => {
+        compile_error!("C expression is not a place in this operation")
+    };
+    (@__pgrx_c_read_place; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_DatumGetTimeTzADTP!(@collect __pgrx_emit_read_place []; $($raw)*)
+    };
+    (@__pgrx_emit_size; $X:tt $(,)?) => {
+        $crate::__pgrx_c_macros::expression::size_of_value_type(
+            if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $X);
+                    }
+                }
+                Some(
+                    unsafe {
+                        $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                            <
+                                $crate::__pgrx_c_macros::expression::CPointer<
+                                    $crate::__pgrx_c_macros::expression::CRecord<
+                                        $crate::__pgrx_c_bindings::TimeTzADT
+                                    >,
+                                    $crate::__pgrx_c_macros::expression::ReadWrite
+                                > as $crate::__pgrx_c_macros::expression::CType
+                            >::from_storage(
+                                $crate::__pgrx_c_bindings::DatumGetTimeTzADTP(
+                                    <
+                                        $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                            $crate::__pgrx_c_macros::CUnsignedLong,
+                                            $crate::__pgrx_c_bindings::Datum
+                                        > as $crate::__pgrx_c_macros::expression::CType
+                                    >::into_storage(
+                                        $crate::__pgrx_c_macros::expression::implicit::<
+                                            $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                $crate::__pgrx_c_macros::CUnsignedLong,
+                                                $crate::__pgrx_c_bindings::Datum
+                                            >,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_macros::expression::profile_value::<
+                                                true,
+                                                _
+                                            >($crate::__pgrx_c_operand!(@value [true]; $X))
+                                        )
+                                    ),
+                                )
+                            )
+                        )
+                    }
+                )
+            } else {
+                None
+            }
+        )
+    };
+    (@__pgrx_c_size; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_DatumGetTimeTzADTP!(@collect __pgrx_emit_size []; $($raw)*)
+    };
+    (@__pgrx_emit_discard; $X:tt $(,)?) => {
+        {
+            let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                <
+                    $crate::__pgrx_c_macros::expression::CPointer<
+                        $crate::__pgrx_c_macros::expression::CRecord<
+                            $crate::__pgrx_c_bindings::TimeTzADT
+                        >,
+                        $crate::__pgrx_c_macros::expression::ReadWrite
+                    > as $crate::__pgrx_c_macros::expression::CType
+                >::from_storage(
+                    $crate::__pgrx_c_bindings::DatumGetTimeTzADTP(
+                        <
+                            $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                $crate::__pgrx_c_macros::CUnsignedLong,
+                                $crate::__pgrx_c_bindings::Datum
+                            > as $crate::__pgrx_c_macros::expression::CType
+                        >::into_storage(
+                            $crate::__pgrx_c_macros::expression::implicit::<
+                                $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                    $crate::__pgrx_c_macros::CUnsignedLong,
+                                    $crate::__pgrx_c_bindings::Datum
+                                >,
+                                _
+                            >(
+                                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                    $crate::__pgrx_c_operand!(@value [true]; $X)
+                                )
+                            )
+                        ),
+                    )
+                )
+            );
+        }
+    };
+    (@__pgrx_c_discard; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_DatumGetTimeTzADTP!(@collect __pgrx_emit_discard []; $($raw)*)
+    };
+    ($($raw:tt)*) => {
+        $crate::__pgrx_c_args_DatumGetTimeTzADTP!(@collect __pgrx_emit_public []; $($raw)*)
+    };
+}
+
+#[cfg(not(all(
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -1329,7 +2574,7 @@ macro_rules! __pgrx_c_args_PG_GETARG_DATEADT {
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_PG_GETARG_DATEADT!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -1338,7 +2583,7 @@ macro_rules! __pgrx_c_args_PG_GETARG_DATEADT {
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_PG_GETARG_DATEADT!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -1365,31 +2610,35 @@ macro_rules! __pgrx_c_args_PG_GETARG_DATEADT {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_PG_GETARG_DATEADT!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:tt, $($rest:tt)*) => {
         $crate::__pgrx_c_args_PG_GETARG_DATEADT!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_PG_GETARG_DATEADT!(@p2 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_PG_GETARG_DATEADT!(
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative1 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_PG_GETARG_DATEADT!(@p2 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_PG_GETARG_DATEADT!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_PG_GETARG_DATEADT!(
-            @p2 $mode [$($done)* (@literal [- $argument]),];
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_PG_GETARG_DATEADT!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -1397,7 +2646,9 @@ macro_rules! __pgrx_c_args_PG_GETARG_DATEADT {
         $crate::__pgrx_c_args_PG_GETARG_DATEADT!(@negative1 $mode [$($done)*]; - $($raw)*)
     };
     (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_PG_GETARG_DATEADT!(@p2 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_PG_GETARG_DATEADT!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -1419,14 +2670,18 @@ macro_rules! __pgrx_c_args_PG_GETARG_DATEADT {
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_PG_GETARG_DATEADT!(@p2 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_PG_GETARG_DATEADT!(
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_PG_GETARG_DATEADT!(@p2 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_PG_GETARG_DATEADT!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_PG_GETARG_DATEADT!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -1453,13 +2708,13 @@ macro_rules! __pgrx_c_args_PG_GETARG_DATEADT {
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_PG_GETARG_DATEADT!(
-            @p2 $mode [$($done)* (@literal [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_PG_GETARG_DATEADT!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -1508,17 +2763,17 @@ macro_rules! PG_GETARG_DATEADT {
         /* PGRX: PG_GETARG_DATEADT remains expanded because DatumGetDateADT is not an active function-like macro. */
         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
             <$crate::__pgrx_c_macros::CInt as $crate::__pgrx_c_macros::expression::CType>::from_storage(
-                $crate::DatumGetDateADT(
+                $crate::__pgrx_c_bindings::DatumGetDateADT(
                     <
                         $crate::__pgrx_c_macros::expression::CIntegerStorage<
                             $crate::__pgrx_c_macros::CUnsignedLong,
-                            $crate::Datum
+                            $crate::__pgrx_c_bindings::Datum
                         > as $crate::__pgrx_c_macros::expression::CType
                     >::into_storage(
                         $crate::__pgrx_c_macros::expression::implicit::<
                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                 $crate::__pgrx_c_macros::CUnsignedLong,
-                                $crate::Datum
+                                $crate::__pgrx_c_bindings::Datum
                             >,
                             _
                         >(
@@ -1601,17 +2856,17 @@ macro_rules! PG_GETARG_DATEADT {
                             <
                                 $crate::__pgrx_c_macros::CInt as $crate::__pgrx_c_macros::expression::CType
                             >::from_storage(
-                                $crate::DatumGetDateADT(
+                                $crate::__pgrx_c_bindings::DatumGetDateADT(
                                     <
                                         $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                             $crate::__pgrx_c_macros::CUnsignedLong,
-                                            $crate::Datum
+                                            $crate::__pgrx_c_bindings::Datum
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::into_storage(
                                         $crate::__pgrx_c_macros::expression::implicit::<
                                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                 $crate::__pgrx_c_macros::CUnsignedLong,
-                                                $crate::Datum
+                                                $crate::__pgrx_c_bindings::Datum
                                             >,
                                             _
                                         >(
@@ -1687,17 +2942,17 @@ macro_rules! PG_GETARG_DATEADT {
         {
             let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 <$crate::__pgrx_c_macros::CInt as $crate::__pgrx_c_macros::expression::CType>::from_storage(
-                    $crate::DatumGetDateADT(
+                    $crate::__pgrx_c_bindings::DatumGetDateADT(
                         <
                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                 $crate::__pgrx_c_macros::CUnsignedLong,
-                                $crate::Datum
+                                $crate::__pgrx_c_bindings::Datum
                             > as $crate::__pgrx_c_macros::expression::CType
                         >::into_storage(
                             $crate::__pgrx_c_macros::expression::implicit::<
                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                     $crate::__pgrx_c_macros::CUnsignedLong,
-                                    $crate::Datum
+                                    $crate::__pgrx_c_bindings::Datum
                                 >,
                                 _
                             >(
@@ -1759,8 +3014,8 @@ macro_rules! PG_GETARG_DATEADT {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -1791,7 +3046,7 @@ macro_rules! __pgrx_c_args_PG_GETARG_TIMEADT {
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_PG_GETARG_TIMEADT!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -1800,7 +3055,7 @@ macro_rules! __pgrx_c_args_PG_GETARG_TIMEADT {
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_PG_GETARG_TIMEADT!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -1827,31 +3082,35 @@ macro_rules! __pgrx_c_args_PG_GETARG_TIMEADT {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_PG_GETARG_TIMEADT!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:tt, $($rest:tt)*) => {
         $crate::__pgrx_c_args_PG_GETARG_TIMEADT!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_PG_GETARG_TIMEADT!(@p2 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_PG_GETARG_TIMEADT!(
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative1 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_PG_GETARG_TIMEADT!(@p2 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_PG_GETARG_TIMEADT!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_PG_GETARG_TIMEADT!(
-            @p2 $mode [$($done)* (@literal [- $argument]),];
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_PG_GETARG_TIMEADT!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -1859,7 +3118,9 @@ macro_rules! __pgrx_c_args_PG_GETARG_TIMEADT {
         $crate::__pgrx_c_args_PG_GETARG_TIMEADT!(@negative1 $mode [$($done)*]; - $($raw)*)
     };
     (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_PG_GETARG_TIMEADT!(@p2 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_PG_GETARG_TIMEADT!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -1881,14 +3142,18 @@ macro_rules! __pgrx_c_args_PG_GETARG_TIMEADT {
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_PG_GETARG_TIMEADT!(@p2 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_PG_GETARG_TIMEADT!(
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_PG_GETARG_TIMEADT!(@p2 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_PG_GETARG_TIMEADT!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_PG_GETARG_TIMEADT!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -1915,13 +3180,13 @@ macro_rules! __pgrx_c_args_PG_GETARG_TIMEADT {
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_PG_GETARG_TIMEADT!(
-            @p2 $mode [$($done)* (@literal [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_PG_GETARG_TIMEADT!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -1969,18 +3234,18 @@ macro_rules! PG_GETARG_TIMEADT {
     (@__pgrx_emit_value; $n:tt, $fcinfo:tt $(,)?) => {
         /* PGRX: PG_GETARG_TIMEADT remains expanded because DatumGetTimeADT is not an active function-like macro. */
         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-            <$crate::__pgrx_c_macros::CLongLong as $crate::__pgrx_c_macros::expression::CType>::from_storage(
-                $crate::DatumGetTimeADT(
+            <$crate::__pgrx_c_macros::CLong as $crate::__pgrx_c_macros::expression::CType>::from_storage(
+                $crate::__pgrx_c_bindings::DatumGetTimeADT(
                     <
                         $crate::__pgrx_c_macros::expression::CIntegerStorage<
                             $crate::__pgrx_c_macros::CUnsignedLong,
-                            $crate::Datum
+                            $crate::__pgrx_c_bindings::Datum
                         > as $crate::__pgrx_c_macros::expression::CType
                     >::into_storage(
                         $crate::__pgrx_c_macros::expression::implicit::<
                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                 $crate::__pgrx_c_macros::CUnsignedLong,
-                                $crate::Datum
+                                $crate::__pgrx_c_bindings::Datum
                             >,
                             _
                         >(
@@ -2061,19 +3326,19 @@ macro_rules! PG_GETARG_TIMEADT {
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
-                                $crate::__pgrx_c_macros::CLongLong as $crate::__pgrx_c_macros::expression::CType
+                                $crate::__pgrx_c_macros::CLong as $crate::__pgrx_c_macros::expression::CType
                             >::from_storage(
-                                $crate::DatumGetTimeADT(
+                                $crate::__pgrx_c_bindings::DatumGetTimeADT(
                                     <
                                         $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                             $crate::__pgrx_c_macros::CUnsignedLong,
-                                            $crate::Datum
+                                            $crate::__pgrx_c_bindings::Datum
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::into_storage(
                                         $crate::__pgrx_c_macros::expression::implicit::<
                                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                 $crate::__pgrx_c_macros::CUnsignedLong,
-                                                $crate::Datum
+                                                $crate::__pgrx_c_bindings::Datum
                                             >,
                                             _
                                         >(
@@ -2148,18 +3413,18 @@ macro_rules! PG_GETARG_TIMEADT {
         /* PGRX: PG_GETARG_TIMEADT remains expanded because DatumGetTimeADT is not an active function-like macro. */
         {
             let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                <$crate::__pgrx_c_macros::CLongLong as $crate::__pgrx_c_macros::expression::CType>::from_storage(
-                    $crate::DatumGetTimeADT(
+                <$crate::__pgrx_c_macros::CLong as $crate::__pgrx_c_macros::expression::CType>::from_storage(
+                    $crate::__pgrx_c_bindings::DatumGetTimeADT(
                         <
                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                 $crate::__pgrx_c_macros::CUnsignedLong,
-                                $crate::Datum
+                                $crate::__pgrx_c_bindings::Datum
                             > as $crate::__pgrx_c_macros::expression::CType
                         >::into_storage(
                             $crate::__pgrx_c_macros::expression::implicit::<
                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                     $crate::__pgrx_c_macros::CUnsignedLong,
-                                    $crate::Datum
+                                    $crate::__pgrx_c_bindings::Datum
                                 >,
                                 _
                             >(
@@ -2221,8 +3486,8 @@ macro_rules! PG_GETARG_TIMEADT {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -2256,7 +3521,7 @@ macro_rules! __pgrx_c_args_PG_GETARG_TIMETZADT_P {
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_PG_GETARG_TIMETZADT_P!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -2265,7 +3530,7 @@ macro_rules! __pgrx_c_args_PG_GETARG_TIMETZADT_P {
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_PG_GETARG_TIMETZADT_P!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -2292,33 +3557,35 @@ macro_rules! __pgrx_c_args_PG_GETARG_TIMETZADT_P {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_PG_GETARG_TIMETZADT_P!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:tt, $($rest:tt)*) => {
         $crate::__pgrx_c_args_PG_GETARG_TIMETZADT_P!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $argument:literal) => {
         $crate::__pgrx_c_args_PG_GETARG_TIMETZADT_P!(
-            @p2 $mode [$($done)* (@literal [- $argument]),];
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
         )
     };
     (@negative1 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_PG_GETARG_TIMETZADT_P!(@p2 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_PG_GETARG_TIMETZADT_P!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_PG_GETARG_TIMETZADT_P!(
-            @p2 $mode [$($done)* (@literal [- $argument]),];
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_PG_GETARG_TIMETZADT_P!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -2326,7 +3593,9 @@ macro_rules! __pgrx_c_args_PG_GETARG_TIMETZADT_P {
         $crate::__pgrx_c_args_PG_GETARG_TIMETZADT_P!(@negative1 $mode [$($done)*]; - $($raw)*)
     };
     (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_PG_GETARG_TIMETZADT_P!(@p2 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_PG_GETARG_TIMETZADT_P!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -2348,14 +3617,18 @@ macro_rules! __pgrx_c_args_PG_GETARG_TIMETZADT_P {
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_PG_GETARG_TIMETZADT_P!(@p2 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_PG_GETARG_TIMETZADT_P!(
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_PG_GETARG_TIMETZADT_P!(@p2 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_PG_GETARG_TIMETZADT_P!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_PG_GETARG_TIMETZADT_P!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -2382,13 +3655,13 @@ macro_rules! __pgrx_c_args_PG_GETARG_TIMETZADT_P {
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_PG_GETARG_TIMETZADT_P!(
-            @p2 $mode [$($done)* (@literal [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_PG_GETARG_TIMETZADT_P!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -2438,21 +3711,23 @@ macro_rules! PG_GETARG_TIMETZADT_P {
         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
             <
                 $crate::__pgrx_c_macros::expression::CPointer<
-                    $crate::__pgrx_c_macros::expression::CRecord<$crate::TimeTzADT>,
+                    $crate::__pgrx_c_macros::expression::CRecord<
+                        $crate::__pgrx_c_bindings::TimeTzADT
+                    >,
                     $crate::__pgrx_c_macros::expression::ReadWrite
                 > as $crate::__pgrx_c_macros::expression::CType
             >::from_storage(
-                $crate::DatumGetTimeTzADTP(
+                $crate::__pgrx_c_bindings::DatumGetTimeTzADTP(
                     <
                         $crate::__pgrx_c_macros::expression::CIntegerStorage<
                             $crate::__pgrx_c_macros::CUnsignedLong,
-                            $crate::Datum
+                            $crate::__pgrx_c_bindings::Datum
                         > as $crate::__pgrx_c_macros::expression::CType
                     >::into_storage(
                         $crate::__pgrx_c_macros::expression::implicit::<
                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                 $crate::__pgrx_c_macros::CUnsignedLong,
-                                $crate::Datum
+                                $crate::__pgrx_c_bindings::Datum
                             >,
                             _
                         >(
@@ -2534,21 +3809,23 @@ macro_rules! PG_GETARG_TIMETZADT_P {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
                                 $crate::__pgrx_c_macros::expression::CPointer<
-                                    $crate::__pgrx_c_macros::expression::CRecord<$crate::TimeTzADT>,
+                                    $crate::__pgrx_c_macros::expression::CRecord<
+                                        $crate::__pgrx_c_bindings::TimeTzADT
+                                    >,
                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                 > as $crate::__pgrx_c_macros::expression::CType
                             >::from_storage(
-                                $crate::DatumGetTimeTzADTP(
+                                $crate::__pgrx_c_bindings::DatumGetTimeTzADTP(
                                     <
                                         $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                             $crate::__pgrx_c_macros::CUnsignedLong,
-                                            $crate::Datum
+                                            $crate::__pgrx_c_bindings::Datum
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::into_storage(
                                         $crate::__pgrx_c_macros::expression::implicit::<
                                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                 $crate::__pgrx_c_macros::CUnsignedLong,
-                                                $crate::Datum
+                                                $crate::__pgrx_c_bindings::Datum
                                             >,
                                             _
                                         >(
@@ -2625,21 +3902,23 @@ macro_rules! PG_GETARG_TIMETZADT_P {
             let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 <
                     $crate::__pgrx_c_macros::expression::CPointer<
-                        $crate::__pgrx_c_macros::expression::CRecord<$crate::TimeTzADT>,
+                        $crate::__pgrx_c_macros::expression::CRecord<
+                            $crate::__pgrx_c_bindings::TimeTzADT
+                        >,
                         $crate::__pgrx_c_macros::expression::ReadWrite
                     > as $crate::__pgrx_c_macros::expression::CType
                 >::from_storage(
-                    $crate::DatumGetTimeTzADTP(
+                    $crate::__pgrx_c_bindings::DatumGetTimeTzADTP(
                         <
                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                 $crate::__pgrx_c_macros::CUnsignedLong,
-                                $crate::Datum
+                                $crate::__pgrx_c_bindings::Datum
                             > as $crate::__pgrx_c_macros::expression::CType
                         >::into_storage(
                             $crate::__pgrx_c_macros::expression::implicit::<
                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                     $crate::__pgrx_c_macros::CUnsignedLong,
-                                    $crate::Datum
+                                    $crate::__pgrx_c_bindings::Datum
                                 >,
                                 _
                             >(
@@ -2701,8 +3980,8 @@ macro_rules! PG_GETARG_TIMETZADT_P {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -2729,20 +4008,24 @@ macro_rules! __pgrx_c_args_PG_RETURN_DATEADT {
         $crate::__pgrx_c_args_PG_RETURN_DATEADT!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_PG_RETURN_DATEADT!(@p1 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_PG_RETURN_DATEADT!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_PG_RETURN_DATEADT!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_PG_RETURN_DATEADT!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_PG_RETURN_DATEADT!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_PG_RETURN_DATEADT!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -2750,7 +4033,9 @@ macro_rules! __pgrx_c_args_PG_RETURN_DATEADT {
         $crate::__pgrx_c_args_PG_RETURN_DATEADT!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_PG_RETURN_DATEADT!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_PG_RETURN_DATEADT!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -2772,14 +4057,18 @@ macro_rules! __pgrx_c_args_PG_RETURN_DATEADT {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_PG_RETURN_DATEADT!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_PG_RETURN_DATEADT!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_PG_RETURN_DATEADT!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_PG_RETURN_DATEADT!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_PG_RETURN_DATEADT!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -2806,13 +4095,13 @@ macro_rules! __pgrx_c_args_PG_RETURN_DATEADT {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_PG_RETURN_DATEADT!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_PG_RETURN_DATEADT!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -2858,10 +4147,10 @@ macro_rules! PG_RETURN_DATEADT {
                     <
                         $crate::__pgrx_c_macros::expression::CIntegerStorage<
                             $crate::__pgrx_c_macros::CUnsignedLong,
-                            $crate::Datum
+                            $crate::__pgrx_c_bindings::Datum
                         > as $crate::__pgrx_c_macros::expression::CType
                     >::from_storage(
-                        $crate::DateADTGetDatum(
+                        $crate::__pgrx_c_bindings::DateADTGetDatum(
                             <
                                 $crate::__pgrx_c_macros::CInt as $crate::__pgrx_c_macros::expression::CType
                             >::into_storage(
@@ -2890,10 +4179,10 @@ macro_rules! PG_RETURN_DATEADT {
                     <
                         $crate::__pgrx_c_macros::expression::CIntegerStorage<
                             $crate::__pgrx_c_macros::CUnsignedLong,
-                            $crate::Datum
+                            $crate::__pgrx_c_bindings::Datum
                         > as $crate::__pgrx_c_macros::expression::CType
                     >::from_storage(
-                        $crate::DateADTGetDatum(
+                        $crate::__pgrx_c_bindings::DateADTGetDatum(
                             <
                                 $crate::__pgrx_c_macros::CInt as $crate::__pgrx_c_macros::expression::CType
                             >::into_storage(
@@ -2927,8 +4216,8 @@ macro_rules! PG_RETURN_DATEADT {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -2955,20 +4244,24 @@ macro_rules! __pgrx_c_args_PG_RETURN_TIMEADT {
         $crate::__pgrx_c_args_PG_RETURN_TIMEADT!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_PG_RETURN_TIMEADT!(@p1 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_PG_RETURN_TIMEADT!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_PG_RETURN_TIMEADT!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_PG_RETURN_TIMEADT!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_PG_RETURN_TIMEADT!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_PG_RETURN_TIMEADT!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -2976,7 +4269,9 @@ macro_rules! __pgrx_c_args_PG_RETURN_TIMEADT {
         $crate::__pgrx_c_args_PG_RETURN_TIMEADT!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_PG_RETURN_TIMEADT!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_PG_RETURN_TIMEADT!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -2998,14 +4293,18 @@ macro_rules! __pgrx_c_args_PG_RETURN_TIMEADT {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_PG_RETURN_TIMEADT!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_PG_RETURN_TIMEADT!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_PG_RETURN_TIMEADT!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_PG_RETURN_TIMEADT!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_PG_RETURN_TIMEADT!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -3032,13 +4331,13 @@ macro_rules! __pgrx_c_args_PG_RETURN_TIMEADT {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_PG_RETURN_TIMEADT!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_PG_RETURN_TIMEADT!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -3084,15 +4383,15 @@ macro_rules! PG_RETURN_TIMEADT {
                     <
                         $crate::__pgrx_c_macros::expression::CIntegerStorage<
                             $crate::__pgrx_c_macros::CUnsignedLong,
-                            $crate::Datum
+                            $crate::__pgrx_c_bindings::Datum
                         > as $crate::__pgrx_c_macros::expression::CType
                     >::from_storage(
-                        $crate::TimeADTGetDatum(
+                        $crate::__pgrx_c_bindings::TimeADTGetDatum(
                             <
-                                $crate::__pgrx_c_macros::CLongLong as $crate::__pgrx_c_macros::expression::CType
+                                $crate::__pgrx_c_macros::CLong as $crate::__pgrx_c_macros::expression::CType
                             >::into_storage(
                                 $crate::__pgrx_c_macros::expression::implicit::<
-                                    $crate::__pgrx_c_macros::CLongLong,
+                                    $crate::__pgrx_c_macros::CLong,
                                     _
                                 >(
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -3116,15 +4415,15 @@ macro_rules! PG_RETURN_TIMEADT {
                     <
                         $crate::__pgrx_c_macros::expression::CIntegerStorage<
                             $crate::__pgrx_c_macros::CUnsignedLong,
-                            $crate::Datum
+                            $crate::__pgrx_c_bindings::Datum
                         > as $crate::__pgrx_c_macros::expression::CType
                     >::from_storage(
-                        $crate::TimeADTGetDatum(
+                        $crate::__pgrx_c_bindings::TimeADTGetDatum(
                             <
-                                $crate::__pgrx_c_macros::CLongLong as $crate::__pgrx_c_macros::expression::CType
+                                $crate::__pgrx_c_macros::CLong as $crate::__pgrx_c_macros::expression::CType
                             >::into_storage(
                                 $crate::__pgrx_c_macros::expression::implicit::<
-                                    $crate::__pgrx_c_macros::CLongLong,
+                                    $crate::__pgrx_c_macros::CLong,
                                     _
                                 >(
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -3153,8 +4452,8 @@ macro_rules! PG_RETURN_TIMEADT {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -3185,21 +4484,23 @@ macro_rules! __pgrx_c_args_PG_RETURN_TIMETZADT_P {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
         $crate::__pgrx_c_args_PG_RETURN_TIMETZADT_P!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_PG_RETURN_TIMETZADT_P!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_PG_RETURN_TIMETZADT_P!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_PG_RETURN_TIMETZADT_P!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_PG_RETURN_TIMETZADT_P!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -3207,7 +4508,9 @@ macro_rules! __pgrx_c_args_PG_RETURN_TIMETZADT_P {
         $crate::__pgrx_c_args_PG_RETURN_TIMETZADT_P!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_PG_RETURN_TIMETZADT_P!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_PG_RETURN_TIMETZADT_P!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -3229,14 +4532,18 @@ macro_rules! __pgrx_c_args_PG_RETURN_TIMETZADT_P {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_PG_RETURN_TIMETZADT_P!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_PG_RETURN_TIMETZADT_P!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_PG_RETURN_TIMETZADT_P!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_PG_RETURN_TIMETZADT_P!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_PG_RETURN_TIMETZADT_P!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -3263,13 +4570,13 @@ macro_rules! __pgrx_c_args_PG_RETURN_TIMETZADT_P {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_PG_RETURN_TIMETZADT_P!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_PG_RETURN_TIMETZADT_P!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -3315,20 +4622,22 @@ macro_rules! PG_RETURN_TIMETZADT_P {
                     <
                         $crate::__pgrx_c_macros::expression::CIntegerStorage<
                             $crate::__pgrx_c_macros::CUnsignedLong,
-                            $crate::Datum
+                            $crate::__pgrx_c_bindings::Datum
                         > as $crate::__pgrx_c_macros::expression::CType
                     >::from_storage(
-                        $crate::TimeTzADTPGetDatum(
+                        $crate::__pgrx_c_bindings::TimeTzADTPGetDatum(
                             <
                                 $crate::__pgrx_c_macros::expression::CPointer<
-                                    $crate::__pgrx_c_macros::expression::CRecord<$crate::TimeTzADT>,
+                                    $crate::__pgrx_c_macros::expression::CRecord<
+                                        $crate::__pgrx_c_bindings::TimeTzADT
+                                    >,
                                     $crate::__pgrx_c_macros::expression::ReadOnly
                                 > as $crate::__pgrx_c_macros::expression::CType
                             >::into_storage(
                                 $crate::__pgrx_c_macros::expression::implicit::<
                                     $crate::__pgrx_c_macros::expression::CPointer<
                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                            $crate::TimeTzADT
+                                            $crate::__pgrx_c_bindings::TimeTzADT
                                         >,
                                         $crate::__pgrx_c_macros::expression::ReadOnly
                                     >,
@@ -3355,20 +4664,22 @@ macro_rules! PG_RETURN_TIMETZADT_P {
                     <
                         $crate::__pgrx_c_macros::expression::CIntegerStorage<
                             $crate::__pgrx_c_macros::CUnsignedLong,
-                            $crate::Datum
+                            $crate::__pgrx_c_bindings::Datum
                         > as $crate::__pgrx_c_macros::expression::CType
                     >::from_storage(
-                        $crate::TimeTzADTPGetDatum(
+                        $crate::__pgrx_c_bindings::TimeTzADTPGetDatum(
                             <
                                 $crate::__pgrx_c_macros::expression::CPointer<
-                                    $crate::__pgrx_c_macros::expression::CRecord<$crate::TimeTzADT>,
+                                    $crate::__pgrx_c_macros::expression::CRecord<
+                                        $crate::__pgrx_c_bindings::TimeTzADT
+                                    >,
                                     $crate::__pgrx_c_macros::expression::ReadOnly
                                 > as $crate::__pgrx_c_macros::expression::CType
                             >::into_storage(
                                 $crate::__pgrx_c_macros::expression::implicit::<
                                     $crate::__pgrx_c_macros::expression::CPointer<
                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                            $crate::TimeTzADT
+                                            $crate::__pgrx_c_bindings::TimeTzADT
                                         >,
                                         $crate::__pgrx_c_macros::expression::ReadOnly
                                     >,
@@ -3399,14 +4710,626 @@ macro_rules! PG_RETURN_TIMETZADT_P {
     };
 }
 
+#[cfg(not(all(
+    target_arch = "x86_64",
+    target_os = "linux",
+    target_pointer_width = "64",
+    target_endian = "little"
+)))]
+#[cfg(not(docsrs))]
+compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
+#[doc(hidden)]
+#[macro_export]
+macro_rules! __pgrx_c_args_TimeADTGetDatum {
+    (@collect $mode:ident [$($done:tt)*]; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_TimeADTGetDatum!(@p0 $mode [$($done)*]; $($raw)*)
+    };
+    (@classified [$next:ident $mode:ident [$($done:tt)*] [$($rest:tt)*]] $descriptor:tt) => {
+        $crate::__pgrx_c_args_TimeADTGetDatum!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
+    };
+    (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
+        $crate::__pgrx_c_args_TimeADTGetDatum!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
+    };
+    (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
+        $crate::__pgrx_c_args_TimeADTGetDatum!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_TimeADTGetDatum!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+            $($rest)*
+        )
+    };
+    (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_TimeADTGetDatum!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; - $($raw:tt)*) => {
+        $crate::__pgrx_c_args_TimeADTGetDatum!(@negative0 $mode [$($done)*]; - $($raw)*)
+    };
+    (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
+        $crate::__pgrx_c_args_TimeADTGetDatum!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_TimeADTGetDatum] [p1 $mode [$($done)*] []] [
+                $head $(::$tail)* ! $group
+            ]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; ::$head:ident $(::$tail:ident)* ! $group:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_TimeADTGetDatum] [p1 $mode [$($done)*] []] [
+                ::$head $(::$tail)* ! $group
+            ]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; ($($inner:tt)*)) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_TimeADTGetDatum] [p1 $mode [$($done)*] []] [($($inner)*)]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
+        $crate::__pgrx_c_args_TimeADTGetDatum!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
+        $crate::__pgrx_c_args_TimeADTGetDatum!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
+        $crate::__pgrx_c_args_TimeADTGetDatum!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_TimeADTGetDatum] [p1 $mode [$($done)*] [$($rest)*]] [
+                $head $(::$tail)* ! $group
+            ]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; ::$head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_TimeADTGetDatum] [p1 $mode [$($done)*] [$($rest)*]] [
+                ::$head $(::$tail)* ! $group
+            ]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; ($($inner:tt)*), $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_TimeADTGetDatum] [p1 $mode [$($done)*] [$($rest)*]] [
+                ($($inner)*)
+            ]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_TimeADTGetDatum!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_TimeADTGetDatum!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*];) => {
+        $crate::TimeADTGetDatum!(@$mode; $($done)*)
+    };
+    ($($invalid:tt)*) => {
+        compile_error!("arguments do not satisfy this C macro's invocation contract")
+    };
+}
+/// Typed call adapter for C inline function TimeADTGetDatum from date.h:77
+///
+/// ```c
+/// static inline Datum
+/// TimeADTGetDatum(TimeADT X)
+/// {
+/// 	return Int64GetDatum(X);
+/// }
+/// ```
+///
+///
+/// Calls the original function through its inspected C prototype. Each operand is evaluated once and converted using C parameter assignment rules. The result retains the function's original C type; `.get()` extracts its native storage, including `()` for a void result. Native calls retain the backend thread, PostgreSQL error, and caller safety contracts of the generated guarded binding.
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+#[macro_export]
+macro_rules! TimeADTGetDatum {
+    (@__pgrx_emit_check_safety; $X:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $X);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_TimeADTGetDatum!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
+    (@__pgrx_emit_public; $X:tt $(,)?) => {
+        $crate::__pgrx_c_macros::expression_result::finish(
+            $crate::TimeADTGetDatum!(@__pgrx_emit_value; $X)
+        )
+    };
+    (@__pgrx_emit_value; $X:tt $(,)?) => {
+        $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+            <
+                $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                    $crate::__pgrx_c_macros::CUnsignedLong,
+                    $crate::__pgrx_c_bindings::Datum
+                > as $crate::__pgrx_c_macros::expression::CType
+            >::from_storage(
+                $crate::__pgrx_c_bindings::TimeADTGetDatum(
+                    <$crate::__pgrx_c_macros::CLong as $crate::__pgrx_c_macros::expression::CType>::into_storage(
+                        $crate::__pgrx_c_macros::expression::implicit::<
+                            $crate::__pgrx_c_macros::CLong,
+                            _
+                        >(
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_operand!(@value [true]; $X)
+                            )
+                        )
+                    ),
+                )
+            )
+        )
+    };
+    (@__pgrx_c_value; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_TimeADTGetDatum!(@collect __pgrx_emit_value []; $($raw)*)
+    };
+    (@__pgrx_emit_place; $X:tt $(,)?) => {
+        compile_error!("C expression is not a place in this operation")
+    };
+    (@__pgrx_c_place; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_TimeADTGetDatum!(@collect __pgrx_emit_place []; $($raw)*)
+    };
+    (@__pgrx_emit_read_place; $X:tt $(,)?) => {
+        compile_error!("C expression is not a place in this operation")
+    };
+    (@__pgrx_c_read_place; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_TimeADTGetDatum!(@collect __pgrx_emit_read_place []; $($raw)*)
+    };
+    (@__pgrx_emit_size; $X:tt $(,)?) => {
+        $crate::__pgrx_c_macros::expression::size_of_value_type(
+            if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $X);
+                    }
+                }
+                Some(
+                    unsafe {
+                        $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                            <
+                                $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                    $crate::__pgrx_c_macros::CUnsignedLong,
+                                    $crate::__pgrx_c_bindings::Datum
+                                > as $crate::__pgrx_c_macros::expression::CType
+                            >::from_storage(
+                                $crate::__pgrx_c_bindings::TimeADTGetDatum(
+                                    <
+                                        $crate::__pgrx_c_macros::CLong as $crate::__pgrx_c_macros::expression::CType
+                                    >::into_storage(
+                                        $crate::__pgrx_c_macros::expression::implicit::<
+                                            $crate::__pgrx_c_macros::CLong,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_macros::expression::profile_value::<
+                                                true,
+                                                _
+                                            >($crate::__pgrx_c_operand!(@value [true]; $X))
+                                        )
+                                    ),
+                                )
+                            )
+                        )
+                    }
+                )
+            } else {
+                None
+            }
+        )
+    };
+    (@__pgrx_c_size; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_TimeADTGetDatum!(@collect __pgrx_emit_size []; $($raw)*)
+    };
+    (@__pgrx_emit_discard; $X:tt $(,)?) => {
+        {
+            let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                <
+                    $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                        $crate::__pgrx_c_macros::CUnsignedLong,
+                        $crate::__pgrx_c_bindings::Datum
+                    > as $crate::__pgrx_c_macros::expression::CType
+                >::from_storage(
+                    $crate::__pgrx_c_bindings::TimeADTGetDatum(
+                        <
+                            $crate::__pgrx_c_macros::CLong as $crate::__pgrx_c_macros::expression::CType
+                        >::into_storage(
+                            $crate::__pgrx_c_macros::expression::implicit::<
+                                $crate::__pgrx_c_macros::CLong,
+                                _
+                            >(
+                                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                    $crate::__pgrx_c_operand!(@value [true]; $X)
+                                )
+                            )
+                        ),
+                    )
+                )
+            );
+        }
+    };
+    (@__pgrx_c_discard; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_TimeADTGetDatum!(@collect __pgrx_emit_discard []; $($raw)*)
+    };
+    ($($raw:tt)*) => {
+        $crate::__pgrx_c_args_TimeADTGetDatum!(@collect __pgrx_emit_public []; $($raw)*)
+    };
+}
+
+#[cfg(not(all(
+    target_arch = "x86_64",
+    target_os = "linux",
+    target_pointer_width = "64",
+    target_endian = "little"
+)))]
+#[cfg(not(docsrs))]
+compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
+#[doc(hidden)]
+#[macro_export]
+macro_rules! __pgrx_c_args_TimeTzADTPGetDatum {
+    (@collect $mode:ident [$($done:tt)*]; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_TimeTzADTPGetDatum!(@p0 $mode [$($done)*]; $($raw)*)
+    };
+    (@classified [$next:ident $mode:ident [$($done:tt)*] [$($rest:tt)*]] $descriptor:tt) => {
+        $crate::__pgrx_c_args_TimeTzADTPGetDatum!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
+    };
+    (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
+        $crate::__pgrx_c_args_TimeTzADTPGetDatum!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
+    };
+    (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
+        $crate::__pgrx_c_args_TimeTzADTPGetDatum!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_TimeTzADTPGetDatum!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+            $($rest)*
+        )
+    };
+    (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_TimeTzADTPGetDatum!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; - $($raw:tt)*) => {
+        $crate::__pgrx_c_args_TimeTzADTPGetDatum!(@negative0 $mode [$($done)*]; - $($raw)*)
+    };
+    (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
+        $crate::__pgrx_c_args_TimeTzADTPGetDatum!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_TimeTzADTPGetDatum] [p1 $mode [$($done)*] []] [
+                $head $(::$tail)* ! $group
+            ]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; ::$head:ident $(::$tail:ident)* ! $group:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_TimeTzADTPGetDatum] [p1 $mode [$($done)*] []] [
+                ::$head $(::$tail)* ! $group
+            ]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; ($($inner:tt)*)) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_TimeTzADTPGetDatum] [p1 $mode [$($done)*] []] [($($inner)*)]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
+        $crate::__pgrx_c_args_TimeTzADTPGetDatum!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
+        $crate::__pgrx_c_args_TimeTzADTPGetDatum!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
+        $crate::__pgrx_c_args_TimeTzADTPGetDatum!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_TimeTzADTPGetDatum] [p1 $mode [$($done)*] [$($rest)*]] [
+                $head $(::$tail)* ! $group
+            ]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; ::$head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_TimeTzADTPGetDatum] [p1 $mode [$($done)*] [$($rest)*]] [
+                ::$head $(::$tail)* ! $group
+            ]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; ($($inner:tt)*), $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_TimeTzADTPGetDatum] [p1 $mode [$($done)*] [$($rest)*]] [
+                ($($inner)*)
+            ]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_TimeTzADTPGetDatum!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_TimeTzADTPGetDatum!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*];) => {
+        $crate::TimeTzADTPGetDatum!(@$mode; $($done)*)
+    };
+    ($($invalid:tt)*) => {
+        compile_error!("arguments do not satisfy this C macro's invocation contract")
+    };
+}
+/// Typed call adapter for C inline function TimeTzADTPGetDatum from date.h:83
+///
+/// ```c
+/// static inline Datum
+/// TimeTzADTPGetDatum(const TimeTzADT *X)
+/// {
+/// 	return PointerGetDatum(X);
+/// }
+/// ```
+///
+///
+/// Calls the original function through its inspected C prototype. Each operand is evaluated once and converted using C parameter assignment rules. The result retains the function's original C type; `.get()` extracts its native storage, including `()` for a void result. Native calls retain the backend thread, PostgreSQL error, and caller safety contracts of the generated guarded binding.
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+#[macro_export]
+macro_rules! TimeTzADTPGetDatum {
+    (@__pgrx_emit_check_safety; $X:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $X);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_TimeTzADTPGetDatum!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
+    (@__pgrx_emit_public; $X:tt $(,)?) => {
+        $crate::__pgrx_c_macros::expression_result::finish(
+            $crate::TimeTzADTPGetDatum!(@__pgrx_emit_value; $X)
+        )
+    };
+    (@__pgrx_emit_value; $X:tt $(,)?) => {
+        $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+            <
+                $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                    $crate::__pgrx_c_macros::CUnsignedLong,
+                    $crate::__pgrx_c_bindings::Datum
+                > as $crate::__pgrx_c_macros::expression::CType
+            >::from_storage(
+                $crate::__pgrx_c_bindings::TimeTzADTPGetDatum(
+                    <
+                        $crate::__pgrx_c_macros::expression::CPointer<
+                            $crate::__pgrx_c_macros::expression::CRecord<
+                                $crate::__pgrx_c_bindings::TimeTzADT
+                            >,
+                            $crate::__pgrx_c_macros::expression::ReadOnly
+                        > as $crate::__pgrx_c_macros::expression::CType
+                    >::into_storage(
+                        $crate::__pgrx_c_macros::expression::implicit::<
+                            $crate::__pgrx_c_macros::expression::CPointer<
+                                $crate::__pgrx_c_macros::expression::CRecord<
+                                    $crate::__pgrx_c_bindings::TimeTzADT
+                                >,
+                                $crate::__pgrx_c_macros::expression::ReadOnly
+                            >,
+                            _
+                        >(
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_operand!(@value [true]; $X)
+                            )
+                        )
+                    ),
+                )
+            )
+        )
+    };
+    (@__pgrx_c_value; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_TimeTzADTPGetDatum!(@collect __pgrx_emit_value []; $($raw)*)
+    };
+    (@__pgrx_emit_place; $X:tt $(,)?) => {
+        compile_error!("C expression is not a place in this operation")
+    };
+    (@__pgrx_c_place; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_TimeTzADTPGetDatum!(@collect __pgrx_emit_place []; $($raw)*)
+    };
+    (@__pgrx_emit_read_place; $X:tt $(,)?) => {
+        compile_error!("C expression is not a place in this operation")
+    };
+    (@__pgrx_c_read_place; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_TimeTzADTPGetDatum!(@collect __pgrx_emit_read_place []; $($raw)*)
+    };
+    (@__pgrx_emit_size; $X:tt $(,)?) => {
+        $crate::__pgrx_c_macros::expression::size_of_value_type(
+            if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $X);
+                    }
+                }
+                Some(
+                    unsafe {
+                        $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                            <
+                                $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                    $crate::__pgrx_c_macros::CUnsignedLong,
+                                    $crate::__pgrx_c_bindings::Datum
+                                > as $crate::__pgrx_c_macros::expression::CType
+                            >::from_storage(
+                                $crate::__pgrx_c_bindings::TimeTzADTPGetDatum(
+                                    <
+                                        $crate::__pgrx_c_macros::expression::CPointer<
+                                            $crate::__pgrx_c_macros::expression::CRecord<
+                                                $crate::__pgrx_c_bindings::TimeTzADT
+                                            >,
+                                            $crate::__pgrx_c_macros::expression::ReadOnly
+                                        > as $crate::__pgrx_c_macros::expression::CType
+                                    >::into_storage(
+                                        $crate::__pgrx_c_macros::expression::implicit::<
+                                            $crate::__pgrx_c_macros::expression::CPointer<
+                                                $crate::__pgrx_c_macros::expression::CRecord<
+                                                    $crate::__pgrx_c_bindings::TimeTzADT
+                                                >,
+                                                $crate::__pgrx_c_macros::expression::ReadOnly
+                                            >,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_macros::expression::profile_value::<
+                                                true,
+                                                _
+                                            >($crate::__pgrx_c_operand!(@value [true]; $X))
+                                        )
+                                    ),
+                                )
+                            )
+                        )
+                    }
+                )
+            } else {
+                None
+            }
+        )
+    };
+    (@__pgrx_c_size; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_TimeTzADTPGetDatum!(@collect __pgrx_emit_size []; $($raw)*)
+    };
+    (@__pgrx_emit_discard; $X:tt $(,)?) => {
+        {
+            let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                <
+                    $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                        $crate::__pgrx_c_macros::CUnsignedLong,
+                        $crate::__pgrx_c_bindings::Datum
+                    > as $crate::__pgrx_c_macros::expression::CType
+                >::from_storage(
+                    $crate::__pgrx_c_bindings::TimeTzADTPGetDatum(
+                        <
+                            $crate::__pgrx_c_macros::expression::CPointer<
+                                $crate::__pgrx_c_macros::expression::CRecord<
+                                    $crate::__pgrx_c_bindings::TimeTzADT
+                                >,
+                                $crate::__pgrx_c_macros::expression::ReadOnly
+                            > as $crate::__pgrx_c_macros::expression::CType
+                        >::into_storage(
+                            $crate::__pgrx_c_macros::expression::implicit::<
+                                $crate::__pgrx_c_macros::expression::CPointer<
+                                    $crate::__pgrx_c_macros::expression::CRecord<
+                                        $crate::__pgrx_c_bindings::TimeTzADT
+                                    >,
+                                    $crate::__pgrx_c_macros::expression::ReadOnly
+                                >,
+                                _
+                            >(
+                                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                    $crate::__pgrx_c_operand!(@value [true]; $X)
+                                )
+                            )
+                        ),
+                    )
+                )
+            );
+        }
+    };
+    (@__pgrx_c_discard; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_TimeTzADTPGetDatum!(@collect __pgrx_emit_discard []; $($raw)*)
+    };
+    ($($raw:tt)*) => {
+        $crate::__pgrx_c_args_TimeTzADTPGetDatum!(@collect __pgrx_emit_public []; $($raw)*)
+    };
+}
+
 pub use DATE_IS_NOBEGIN;
 pub use DATE_IS_NOEND;
 pub use DATE_NOBEGIN;
 pub use DATE_NOEND;
 pub use DATE_NOT_FINITE;
+pub use DateADTGetDatum;
+pub use DatumGetDateADT;
+pub use DatumGetTimeADT;
+pub use DatumGetTimeTzADTP;
 pub use PG_GETARG_DATEADT;
 pub use PG_GETARG_TIMEADT;
 pub use PG_GETARG_TIMETZADT_P;
 pub use PG_RETURN_DATEADT;
 pub use PG_RETURN_TIMEADT;
 pub use PG_RETURN_TIMETZADT_P;
+pub use TimeADTGetDatum;
+pub use TimeTzADTPGetDatum;

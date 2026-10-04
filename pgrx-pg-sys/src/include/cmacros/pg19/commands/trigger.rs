@@ -5,8 +5,8 @@ This code is generated for documentation purposes, so that it is easy to referen
 // C macros from trigger.h.
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -33,20 +33,24 @@ macro_rules! __pgrx_c_args_CALLED_AS_TRIGGER {
         $crate::__pgrx_c_args_CALLED_AS_TRIGGER!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_CALLED_AS_TRIGGER!(@p1 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_CALLED_AS_TRIGGER!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_CALLED_AS_TRIGGER!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_CALLED_AS_TRIGGER!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_CALLED_AS_TRIGGER!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_CALLED_AS_TRIGGER!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -54,7 +58,9 @@ macro_rules! __pgrx_c_args_CALLED_AS_TRIGGER {
         $crate::__pgrx_c_args_CALLED_AS_TRIGGER!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_CALLED_AS_TRIGGER!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_CALLED_AS_TRIGGER!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -76,14 +82,18 @@ macro_rules! __pgrx_c_args_CALLED_AS_TRIGGER {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_CALLED_AS_TRIGGER!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_CALLED_AS_TRIGGER!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_CALLED_AS_TRIGGER!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_CALLED_AS_TRIGGER!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_CALLED_AS_TRIGGER!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -110,13 +120,13 @@ macro_rules! __pgrx_c_args_CALLED_AS_TRIGGER {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_CALLED_AS_TRIGGER!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_CALLED_AS_TRIGGER!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -237,10 +247,10 @@ macro_rules! CALLED_AS_TRIGGER {
                                                                 _
                                                             >(
                                                                 $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                    *const $crate::Node,
+                                                                    *const $crate::__pgrx_c_bindings::Node,
                                                                     $crate::__pgrx_c_macros::expression::CPointer<
                                                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                                                            $crate::Node
+                                                                            $crate::__pgrx_c_bindings::Node
                                                                         >,
                                                                         $crate::__pgrx_c_macros::expression::ReadOnly
                                                                     >,
@@ -287,7 +297,9 @@ macro_rules! CALLED_AS_TRIGGER {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::CValue::<
                                             $crate::__pgrx_c_macros::CInt
-                                        >::new($crate::NodeTag::T_TriggerData as i32)
+                                        >::new(
+                                            $crate::__pgrx_c_bindings::NodeTag::T_TriggerData as i32
+                                        )
                                     )
                                 )
                             )
@@ -412,10 +424,10 @@ macro_rules! CALLED_AS_TRIGGER {
                                                                             _
                                                                         >(
                                                                             $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                                *const $crate::Node,
+                                                                                *const $crate::__pgrx_c_bindings::Node,
                                                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                        $crate::Node
+                                                                                        $crate::__pgrx_c_bindings::Node
                                                                                     >,
                                                                                     $crate::__pgrx_c_macros::expression::ReadOnly
                                                                                 >,
@@ -465,7 +477,9 @@ macro_rules! CALLED_AS_TRIGGER {
                                                 >(
                                                     $crate::__pgrx_c_macros::CValue::<
                                                         $crate::__pgrx_c_macros::CInt
-                                                    >::new($crate::NodeTag::T_TriggerData as i32)
+                                                    >::new(
+                                                        $crate::__pgrx_c_bindings::NodeTag::T_TriggerData as i32
+                                                    )
                                                 )
                                             )
                                         )
@@ -566,10 +580,10 @@ macro_rules! CALLED_AS_TRIGGER {
                                                                 _
                                                             >(
                                                                 $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                    *const $crate::Node,
+                                                                    *const $crate::__pgrx_c_bindings::Node,
                                                                     $crate::__pgrx_c_macros::expression::CPointer<
                                                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                                                            $crate::Node
+                                                                            $crate::__pgrx_c_bindings::Node
                                                                         >,
                                                                         $crate::__pgrx_c_macros::expression::ReadOnly
                                                                     >,
@@ -616,7 +630,9 @@ macro_rules! CALLED_AS_TRIGGER {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::CValue::<
                                             $crate::__pgrx_c_macros::CInt
-                                        >::new($crate::NodeTag::T_TriggerData as i32)
+                                        >::new(
+                                            $crate::__pgrx_c_bindings::NodeTag::T_TriggerData as i32
+                                        )
                                     )
                                 )
                             )
@@ -639,8 +655,8 @@ macro_rules! CALLED_AS_TRIGGER {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -667,20 +683,24 @@ macro_rules! __pgrx_c_args_TRIGGER_FIRED_AFTER {
         $crate::__pgrx_c_args_TRIGGER_FIRED_AFTER!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_TRIGGER_FIRED_AFTER!(@p1 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_TRIGGER_FIRED_AFTER!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_TRIGGER_FIRED_AFTER!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_TRIGGER_FIRED_AFTER!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_TRIGGER_FIRED_AFTER!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_TRIGGER_FIRED_AFTER!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -688,7 +708,9 @@ macro_rules! __pgrx_c_args_TRIGGER_FIRED_AFTER {
         $crate::__pgrx_c_args_TRIGGER_FIRED_AFTER!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_TRIGGER_FIRED_AFTER!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_TRIGGER_FIRED_AFTER!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -710,14 +732,18 @@ macro_rules! __pgrx_c_args_TRIGGER_FIRED_AFTER {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_TRIGGER_FIRED_AFTER!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_TRIGGER_FIRED_AFTER!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_TRIGGER_FIRED_AFTER!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_TRIGGER_FIRED_AFTER!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_TRIGGER_FIRED_AFTER!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -744,13 +770,13 @@ macro_rules! __pgrx_c_args_TRIGGER_FIRED_AFTER {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_TRIGGER_FIRED_AFTER!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_TRIGGER_FIRED_AFTER!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -802,7 +828,7 @@ macro_rules! TRIGGER_FIRED_AFTER {
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                        $crate::TRIGGER_EVENT_TIMINGMASK as i32
+                                        $crate::__pgrx_c_bindings::TRIGGER_EVENT_TIMINGMASK as i32
                                     )
                                 )
                             )
@@ -811,7 +837,7 @@ macro_rules! TRIGGER_FIRED_AFTER {
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::expression::null_constant(
                             $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                $crate::TRIGGER_EVENT_AFTER as i32
+                                $crate::__pgrx_c_bindings::TRIGGER_EVENT_AFTER as i32
                             )
                         )
                     )
@@ -861,7 +887,9 @@ macro_rules! TRIGGER_FIRED_AFTER {
                                             >(
                                                 $crate::__pgrx_c_macros::CValue::<
                                                     $crate::__pgrx_c_macros::CInt
-                                                >::new($crate::TRIGGER_EVENT_TIMINGMASK as i32)
+                                                >::new(
+                                                    $crate::__pgrx_c_bindings::TRIGGER_EVENT_TIMINGMASK as i32
+                                                )
                                             )
                                         )
                                     )
@@ -870,7 +898,9 @@ macro_rules! TRIGGER_FIRED_AFTER {
                                     $crate::__pgrx_c_macros::expression::null_constant(
                                         $crate::__pgrx_c_macros::CValue::<
                                             $crate::__pgrx_c_macros::CInt
-                                        >::new($crate::TRIGGER_EVENT_AFTER as i32)
+                                        >::new(
+                                            $crate::__pgrx_c_bindings::TRIGGER_EVENT_AFTER as i32
+                                        )
                                     )
                                 )
                             )
@@ -899,7 +929,7 @@ macro_rules! TRIGGER_FIRED_AFTER {
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                        $crate::TRIGGER_EVENT_TIMINGMASK as i32
+                                        $crate::__pgrx_c_bindings::TRIGGER_EVENT_TIMINGMASK as i32
                                     )
                                 )
                             )
@@ -908,7 +938,7 @@ macro_rules! TRIGGER_FIRED_AFTER {
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::expression::null_constant(
                             $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                $crate::TRIGGER_EVENT_AFTER as i32
+                                $crate::__pgrx_c_bindings::TRIGGER_EVENT_AFTER as i32
                             )
                         )
                     )
@@ -925,8 +955,8 @@ macro_rules! TRIGGER_FIRED_AFTER {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -957,21 +987,23 @@ macro_rules! __pgrx_c_args_TRIGGER_FIRED_BEFORE {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
         $crate::__pgrx_c_args_TRIGGER_FIRED_BEFORE!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_TRIGGER_FIRED_BEFORE!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_TRIGGER_FIRED_BEFORE!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_TRIGGER_FIRED_BEFORE!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_TRIGGER_FIRED_BEFORE!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -979,7 +1011,9 @@ macro_rules! __pgrx_c_args_TRIGGER_FIRED_BEFORE {
         $crate::__pgrx_c_args_TRIGGER_FIRED_BEFORE!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_TRIGGER_FIRED_BEFORE!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_TRIGGER_FIRED_BEFORE!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -1001,14 +1035,18 @@ macro_rules! __pgrx_c_args_TRIGGER_FIRED_BEFORE {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_TRIGGER_FIRED_BEFORE!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_TRIGGER_FIRED_BEFORE!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_TRIGGER_FIRED_BEFORE!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_TRIGGER_FIRED_BEFORE!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_TRIGGER_FIRED_BEFORE!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -1035,13 +1073,13 @@ macro_rules! __pgrx_c_args_TRIGGER_FIRED_BEFORE {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_TRIGGER_FIRED_BEFORE!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_TRIGGER_FIRED_BEFORE!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -1093,7 +1131,7 @@ macro_rules! TRIGGER_FIRED_BEFORE {
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                        $crate::TRIGGER_EVENT_TIMINGMASK as i32
+                                        $crate::__pgrx_c_bindings::TRIGGER_EVENT_TIMINGMASK as i32
                                     )
                                 )
                             )
@@ -1101,7 +1139,7 @@ macro_rules! TRIGGER_FIRED_BEFORE {
                     ),
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                            $crate::TRIGGER_EVENT_BEFORE as i32
+                            $crate::__pgrx_c_bindings::TRIGGER_EVENT_BEFORE as i32
                         )
                     )
                 )
@@ -1150,14 +1188,16 @@ macro_rules! TRIGGER_FIRED_BEFORE {
                                             >(
                                                 $crate::__pgrx_c_macros::CValue::<
                                                     $crate::__pgrx_c_macros::CInt
-                                                >::new($crate::TRIGGER_EVENT_TIMINGMASK as i32)
+                                                >::new(
+                                                    $crate::__pgrx_c_bindings::TRIGGER_EVENT_TIMINGMASK as i32
+                                                )
                                             )
                                         )
                                     )
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                        $crate::TRIGGER_EVENT_BEFORE as i32
+                                        $crate::__pgrx_c_bindings::TRIGGER_EVENT_BEFORE as i32
                                     )
                                 )
                             )
@@ -1186,7 +1226,7 @@ macro_rules! TRIGGER_FIRED_BEFORE {
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                        $crate::TRIGGER_EVENT_TIMINGMASK as i32
+                                        $crate::__pgrx_c_bindings::TRIGGER_EVENT_TIMINGMASK as i32
                                     )
                                 )
                             )
@@ -1194,7 +1234,7 @@ macro_rules! TRIGGER_FIRED_BEFORE {
                     ),
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                            $crate::TRIGGER_EVENT_BEFORE as i32
+                            $crate::__pgrx_c_bindings::TRIGGER_EVENT_BEFORE as i32
                         )
                     )
                 )
@@ -1210,8 +1250,8 @@ macro_rules! TRIGGER_FIRED_BEFORE {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -1242,23 +1282,23 @@ macro_rules! __pgrx_c_args_TRIGGER_FIRED_BY_DELETE {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
         $crate::__pgrx_c_args_TRIGGER_FIRED_BY_DELETE!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_TRIGGER_FIRED_BY_DELETE!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_TRIGGER_FIRED_BY_DELETE!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_TRIGGER_FIRED_BY_DELETE!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -1267,7 +1307,7 @@ macro_rules! __pgrx_c_args_TRIGGER_FIRED_BY_DELETE {
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
         $crate::__pgrx_c_args_TRIGGER_FIRED_BY_DELETE!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
@@ -1293,17 +1333,17 @@ macro_rules! __pgrx_c_args_TRIGGER_FIRED_BY_DELETE {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_TRIGGER_FIRED_BY_DELETE!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_TRIGGER_FIRED_BY_DELETE!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_TRIGGER_FIRED_BY_DELETE!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -1330,13 +1370,13 @@ macro_rules! __pgrx_c_args_TRIGGER_FIRED_BY_DELETE {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_TRIGGER_FIRED_BY_DELETE!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_TRIGGER_FIRED_BY_DELETE!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -1391,7 +1431,7 @@ macro_rules! TRIGGER_FIRED_BY_DELETE {
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                        $crate::TRIGGER_EVENT_OPMASK as i32
+                                        $crate::__pgrx_c_bindings::TRIGGER_EVENT_OPMASK as i32
                                     )
                                 )
                             )
@@ -1399,7 +1439,7 @@ macro_rules! TRIGGER_FIRED_BY_DELETE {
                     ),
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                            $crate::TRIGGER_EVENT_DELETE as i32
+                            $crate::__pgrx_c_bindings::TRIGGER_EVENT_DELETE as i32
                         )
                     )
                 )
@@ -1448,14 +1488,16 @@ macro_rules! TRIGGER_FIRED_BY_DELETE {
                                             >(
                                                 $crate::__pgrx_c_macros::CValue::<
                                                     $crate::__pgrx_c_macros::CInt
-                                                >::new($crate::TRIGGER_EVENT_OPMASK as i32)
+                                                >::new(
+                                                    $crate::__pgrx_c_bindings::TRIGGER_EVENT_OPMASK as i32
+                                                )
                                             )
                                         )
                                     )
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                        $crate::TRIGGER_EVENT_DELETE as i32
+                                        $crate::__pgrx_c_bindings::TRIGGER_EVENT_DELETE as i32
                                     )
                                 )
                             )
@@ -1484,7 +1526,7 @@ macro_rules! TRIGGER_FIRED_BY_DELETE {
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                        $crate::TRIGGER_EVENT_OPMASK as i32
+                                        $crate::__pgrx_c_bindings::TRIGGER_EVENT_OPMASK as i32
                                     )
                                 )
                             )
@@ -1492,7 +1534,7 @@ macro_rules! TRIGGER_FIRED_BY_DELETE {
                     ),
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                            $crate::TRIGGER_EVENT_DELETE as i32
+                            $crate::__pgrx_c_bindings::TRIGGER_EVENT_DELETE as i32
                         )
                     )
                 )
@@ -1508,8 +1550,8 @@ macro_rules! TRIGGER_FIRED_BY_DELETE {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -1540,23 +1582,23 @@ macro_rules! __pgrx_c_args_TRIGGER_FIRED_BY_INSERT {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
         $crate::__pgrx_c_args_TRIGGER_FIRED_BY_INSERT!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_TRIGGER_FIRED_BY_INSERT!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_TRIGGER_FIRED_BY_INSERT!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_TRIGGER_FIRED_BY_INSERT!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -1565,7 +1607,7 @@ macro_rules! __pgrx_c_args_TRIGGER_FIRED_BY_INSERT {
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
         $crate::__pgrx_c_args_TRIGGER_FIRED_BY_INSERT!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
@@ -1591,17 +1633,17 @@ macro_rules! __pgrx_c_args_TRIGGER_FIRED_BY_INSERT {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_TRIGGER_FIRED_BY_INSERT!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_TRIGGER_FIRED_BY_INSERT!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_TRIGGER_FIRED_BY_INSERT!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -1628,13 +1670,13 @@ macro_rules! __pgrx_c_args_TRIGGER_FIRED_BY_INSERT {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_TRIGGER_FIRED_BY_INSERT!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_TRIGGER_FIRED_BY_INSERT!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -1689,7 +1731,7 @@ macro_rules! TRIGGER_FIRED_BY_INSERT {
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                        $crate::TRIGGER_EVENT_OPMASK as i32
+                                        $crate::__pgrx_c_bindings::TRIGGER_EVENT_OPMASK as i32
                                     )
                                 )
                             )
@@ -1698,7 +1740,7 @@ macro_rules! TRIGGER_FIRED_BY_INSERT {
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::expression::null_constant(
                             $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                $crate::TRIGGER_EVENT_INSERT as i32
+                                $crate::__pgrx_c_bindings::TRIGGER_EVENT_INSERT as i32
                             )
                         )
                     )
@@ -1748,7 +1790,9 @@ macro_rules! TRIGGER_FIRED_BY_INSERT {
                                             >(
                                                 $crate::__pgrx_c_macros::CValue::<
                                                     $crate::__pgrx_c_macros::CInt
-                                                >::new($crate::TRIGGER_EVENT_OPMASK as i32)
+                                                >::new(
+                                                    $crate::__pgrx_c_bindings::TRIGGER_EVENT_OPMASK as i32
+                                                )
                                             )
                                         )
                                     )
@@ -1757,7 +1801,9 @@ macro_rules! TRIGGER_FIRED_BY_INSERT {
                                     $crate::__pgrx_c_macros::expression::null_constant(
                                         $crate::__pgrx_c_macros::CValue::<
                                             $crate::__pgrx_c_macros::CInt
-                                        >::new($crate::TRIGGER_EVENT_INSERT as i32)
+                                        >::new(
+                                            $crate::__pgrx_c_bindings::TRIGGER_EVENT_INSERT as i32
+                                        )
                                     )
                                 )
                             )
@@ -1786,7 +1832,7 @@ macro_rules! TRIGGER_FIRED_BY_INSERT {
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                        $crate::TRIGGER_EVENT_OPMASK as i32
+                                        $crate::__pgrx_c_bindings::TRIGGER_EVENT_OPMASK as i32
                                     )
                                 )
                             )
@@ -1795,7 +1841,7 @@ macro_rules! TRIGGER_FIRED_BY_INSERT {
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::expression::null_constant(
                             $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                $crate::TRIGGER_EVENT_INSERT as i32
+                                $crate::__pgrx_c_bindings::TRIGGER_EVENT_INSERT as i32
                             )
                         )
                     )
@@ -1812,8 +1858,8 @@ macro_rules! TRIGGER_FIRED_BY_INSERT {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -1844,23 +1890,23 @@ macro_rules! __pgrx_c_args_TRIGGER_FIRED_BY_TRUNCATE {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
         $crate::__pgrx_c_args_TRIGGER_FIRED_BY_TRUNCATE!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_TRIGGER_FIRED_BY_TRUNCATE!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_TRIGGER_FIRED_BY_TRUNCATE!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_TRIGGER_FIRED_BY_TRUNCATE!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -1869,7 +1915,7 @@ macro_rules! __pgrx_c_args_TRIGGER_FIRED_BY_TRUNCATE {
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
         $crate::__pgrx_c_args_TRIGGER_FIRED_BY_TRUNCATE!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
@@ -1895,17 +1941,17 @@ macro_rules! __pgrx_c_args_TRIGGER_FIRED_BY_TRUNCATE {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_TRIGGER_FIRED_BY_TRUNCATE!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_TRIGGER_FIRED_BY_TRUNCATE!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_TRIGGER_FIRED_BY_TRUNCATE!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -1932,13 +1978,13 @@ macro_rules! __pgrx_c_args_TRIGGER_FIRED_BY_TRUNCATE {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_TRIGGER_FIRED_BY_TRUNCATE!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_TRIGGER_FIRED_BY_TRUNCATE!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -1993,7 +2039,7 @@ macro_rules! TRIGGER_FIRED_BY_TRUNCATE {
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                        $crate::TRIGGER_EVENT_OPMASK as i32
+                                        $crate::__pgrx_c_bindings::TRIGGER_EVENT_OPMASK as i32
                                     )
                                 )
                             )
@@ -2001,7 +2047,7 @@ macro_rules! TRIGGER_FIRED_BY_TRUNCATE {
                     ),
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                            $crate::TRIGGER_EVENT_TRUNCATE as i32
+                            $crate::__pgrx_c_bindings::TRIGGER_EVENT_TRUNCATE as i32
                         )
                     )
                 )
@@ -2053,14 +2099,16 @@ macro_rules! TRIGGER_FIRED_BY_TRUNCATE {
                                             >(
                                                 $crate::__pgrx_c_macros::CValue::<
                                                     $crate::__pgrx_c_macros::CInt
-                                                >::new($crate::TRIGGER_EVENT_OPMASK as i32)
+                                                >::new(
+                                                    $crate::__pgrx_c_bindings::TRIGGER_EVENT_OPMASK as i32
+                                                )
                                             )
                                         )
                                     )
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                        $crate::TRIGGER_EVENT_TRUNCATE as i32
+                                        $crate::__pgrx_c_bindings::TRIGGER_EVENT_TRUNCATE as i32
                                     )
                                 )
                             )
@@ -2089,7 +2137,7 @@ macro_rules! TRIGGER_FIRED_BY_TRUNCATE {
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                        $crate::TRIGGER_EVENT_OPMASK as i32
+                                        $crate::__pgrx_c_bindings::TRIGGER_EVENT_OPMASK as i32
                                     )
                                 )
                             )
@@ -2097,7 +2145,7 @@ macro_rules! TRIGGER_FIRED_BY_TRUNCATE {
                     ),
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                            $crate::TRIGGER_EVENT_TRUNCATE as i32
+                            $crate::__pgrx_c_bindings::TRIGGER_EVENT_TRUNCATE as i32
                         )
                     )
                 )
@@ -2113,8 +2161,8 @@ macro_rules! TRIGGER_FIRED_BY_TRUNCATE {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -2145,23 +2193,23 @@ macro_rules! __pgrx_c_args_TRIGGER_FIRED_BY_UPDATE {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
         $crate::__pgrx_c_args_TRIGGER_FIRED_BY_UPDATE!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_TRIGGER_FIRED_BY_UPDATE!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_TRIGGER_FIRED_BY_UPDATE!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_TRIGGER_FIRED_BY_UPDATE!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -2170,7 +2218,7 @@ macro_rules! __pgrx_c_args_TRIGGER_FIRED_BY_UPDATE {
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
         $crate::__pgrx_c_args_TRIGGER_FIRED_BY_UPDATE!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
@@ -2196,17 +2244,17 @@ macro_rules! __pgrx_c_args_TRIGGER_FIRED_BY_UPDATE {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_TRIGGER_FIRED_BY_UPDATE!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_TRIGGER_FIRED_BY_UPDATE!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_TRIGGER_FIRED_BY_UPDATE!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -2233,13 +2281,13 @@ macro_rules! __pgrx_c_args_TRIGGER_FIRED_BY_UPDATE {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_TRIGGER_FIRED_BY_UPDATE!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_TRIGGER_FIRED_BY_UPDATE!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -2294,7 +2342,7 @@ macro_rules! TRIGGER_FIRED_BY_UPDATE {
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                        $crate::TRIGGER_EVENT_OPMASK as i32
+                                        $crate::__pgrx_c_bindings::TRIGGER_EVENT_OPMASK as i32
                                     )
                                 )
                             )
@@ -2302,7 +2350,7 @@ macro_rules! TRIGGER_FIRED_BY_UPDATE {
                     ),
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                            $crate::TRIGGER_EVENT_UPDATE as i32
+                            $crate::__pgrx_c_bindings::TRIGGER_EVENT_UPDATE as i32
                         )
                     )
                 )
@@ -2351,14 +2399,16 @@ macro_rules! TRIGGER_FIRED_BY_UPDATE {
                                             >(
                                                 $crate::__pgrx_c_macros::CValue::<
                                                     $crate::__pgrx_c_macros::CInt
-                                                >::new($crate::TRIGGER_EVENT_OPMASK as i32)
+                                                >::new(
+                                                    $crate::__pgrx_c_bindings::TRIGGER_EVENT_OPMASK as i32
+                                                )
                                             )
                                         )
                                     )
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                        $crate::TRIGGER_EVENT_UPDATE as i32
+                                        $crate::__pgrx_c_bindings::TRIGGER_EVENT_UPDATE as i32
                                     )
                                 )
                             )
@@ -2387,7 +2437,7 @@ macro_rules! TRIGGER_FIRED_BY_UPDATE {
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                        $crate::TRIGGER_EVENT_OPMASK as i32
+                                        $crate::__pgrx_c_bindings::TRIGGER_EVENT_OPMASK as i32
                                     )
                                 )
                             )
@@ -2395,7 +2445,7 @@ macro_rules! TRIGGER_FIRED_BY_UPDATE {
                     ),
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                            $crate::TRIGGER_EVENT_UPDATE as i32
+                            $crate::__pgrx_c_bindings::TRIGGER_EVENT_UPDATE as i32
                         )
                     )
                 )
@@ -2411,8 +2461,8 @@ macro_rules! TRIGGER_FIRED_BY_UPDATE {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -2443,21 +2493,23 @@ macro_rules! __pgrx_c_args_TRIGGER_FIRED_FOR_ROW {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
         $crate::__pgrx_c_args_TRIGGER_FIRED_FOR_ROW!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_TRIGGER_FIRED_FOR_ROW!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_TRIGGER_FIRED_FOR_ROW!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_TRIGGER_FIRED_FOR_ROW!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_TRIGGER_FIRED_FOR_ROW!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -2465,7 +2517,9 @@ macro_rules! __pgrx_c_args_TRIGGER_FIRED_FOR_ROW {
         $crate::__pgrx_c_args_TRIGGER_FIRED_FOR_ROW!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_TRIGGER_FIRED_FOR_ROW!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_TRIGGER_FIRED_FOR_ROW!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -2487,14 +2541,18 @@ macro_rules! __pgrx_c_args_TRIGGER_FIRED_FOR_ROW {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_TRIGGER_FIRED_FOR_ROW!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_TRIGGER_FIRED_FOR_ROW!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_TRIGGER_FIRED_FOR_ROW!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_TRIGGER_FIRED_FOR_ROW!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_TRIGGER_FIRED_FOR_ROW!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -2521,13 +2579,13 @@ macro_rules! __pgrx_c_args_TRIGGER_FIRED_FOR_ROW {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_TRIGGER_FIRED_FOR_ROW!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_TRIGGER_FIRED_FOR_ROW!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -2576,7 +2634,7 @@ macro_rules! TRIGGER_FIRED_FOR_ROW {
                     ),
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                            $crate::TRIGGER_EVENT_ROW as i32
+                            $crate::__pgrx_c_bindings::TRIGGER_EVENT_ROW as i32
                         )
                     )
                 )
@@ -2617,7 +2675,7 @@ macro_rules! TRIGGER_FIRED_FOR_ROW {
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                        $crate::TRIGGER_EVENT_ROW as i32
+                                        $crate::__pgrx_c_bindings::TRIGGER_EVENT_ROW as i32
                                     )
                                 )
                             )
@@ -2643,7 +2701,7 @@ macro_rules! TRIGGER_FIRED_FOR_ROW {
                     ),
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                            $crate::TRIGGER_EVENT_ROW as i32
+                            $crate::__pgrx_c_bindings::TRIGGER_EVENT_ROW as i32
                         )
                     )
                 )
@@ -2659,8 +2717,8 @@ macro_rules! TRIGGER_FIRED_FOR_ROW {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -2691,23 +2749,23 @@ macro_rules! __pgrx_c_args_TRIGGER_FIRED_FOR_STATEMENT {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
         $crate::__pgrx_c_args_TRIGGER_FIRED_FOR_STATEMENT!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_TRIGGER_FIRED_FOR_STATEMENT!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_TRIGGER_FIRED_FOR_STATEMENT!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_TRIGGER_FIRED_FOR_STATEMENT!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -2716,7 +2774,7 @@ macro_rules! __pgrx_c_args_TRIGGER_FIRED_FOR_STATEMENT {
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
         $crate::__pgrx_c_args_TRIGGER_FIRED_FOR_STATEMENT!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
@@ -2742,17 +2800,17 @@ macro_rules! __pgrx_c_args_TRIGGER_FIRED_FOR_STATEMENT {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_TRIGGER_FIRED_FOR_STATEMENT!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_TRIGGER_FIRED_FOR_STATEMENT!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_TRIGGER_FIRED_FOR_STATEMENT!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -2779,13 +2837,13 @@ macro_rules! __pgrx_c_args_TRIGGER_FIRED_FOR_STATEMENT {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_TRIGGER_FIRED_FOR_STATEMENT!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_TRIGGER_FIRED_FOR_STATEMENT!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -2841,7 +2899,7 @@ macro_rules! TRIGGER_FIRED_FOR_STATEMENT {
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                        $crate::TRIGGER_EVENT_ROW as i32
+                                        $crate::__pgrx_c_bindings::TRIGGER_EVENT_ROW as i32
                                     )
                                 )
                             )
@@ -2897,7 +2955,9 @@ macro_rules! TRIGGER_FIRED_FOR_STATEMENT {
                                             >(
                                                 $crate::__pgrx_c_macros::CValue::<
                                                     $crate::__pgrx_c_macros::CInt
-                                                >::new($crate::TRIGGER_EVENT_ROW as i32)
+                                                >::new(
+                                                    $crate::__pgrx_c_bindings::TRIGGER_EVENT_ROW as i32
+                                                )
                                             )
                                         )
                                     )
@@ -2929,7 +2989,7 @@ macro_rules! TRIGGER_FIRED_FOR_STATEMENT {
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                        $crate::TRIGGER_EVENT_ROW as i32
+                                        $crate::__pgrx_c_bindings::TRIGGER_EVENT_ROW as i32
                                     )
                                 )
                             )
@@ -2951,8 +3011,8 @@ macro_rules! TRIGGER_FIRED_FOR_STATEMENT {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -2983,21 +3043,23 @@ macro_rules! __pgrx_c_args_TRIGGER_FIRED_INSTEAD {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
         $crate::__pgrx_c_args_TRIGGER_FIRED_INSTEAD!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_TRIGGER_FIRED_INSTEAD!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_TRIGGER_FIRED_INSTEAD!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_TRIGGER_FIRED_INSTEAD!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_TRIGGER_FIRED_INSTEAD!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -3005,7 +3067,9 @@ macro_rules! __pgrx_c_args_TRIGGER_FIRED_INSTEAD {
         $crate::__pgrx_c_args_TRIGGER_FIRED_INSTEAD!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_TRIGGER_FIRED_INSTEAD!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_TRIGGER_FIRED_INSTEAD!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -3027,14 +3091,18 @@ macro_rules! __pgrx_c_args_TRIGGER_FIRED_INSTEAD {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_TRIGGER_FIRED_INSTEAD!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_TRIGGER_FIRED_INSTEAD!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_TRIGGER_FIRED_INSTEAD!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_TRIGGER_FIRED_INSTEAD!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_TRIGGER_FIRED_INSTEAD!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -3061,13 +3129,13 @@ macro_rules! __pgrx_c_args_TRIGGER_FIRED_INSTEAD {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_TRIGGER_FIRED_INSTEAD!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_TRIGGER_FIRED_INSTEAD!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -3119,7 +3187,7 @@ macro_rules! TRIGGER_FIRED_INSTEAD {
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                        $crate::TRIGGER_EVENT_TIMINGMASK as i32
+                                        $crate::__pgrx_c_bindings::TRIGGER_EVENT_TIMINGMASK as i32
                                     )
                                 )
                             )
@@ -3127,7 +3195,7 @@ macro_rules! TRIGGER_FIRED_INSTEAD {
                     ),
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                            $crate::TRIGGER_EVENT_INSTEAD as i32
+                            $crate::__pgrx_c_bindings::TRIGGER_EVENT_INSTEAD as i32
                         )
                     )
                 )
@@ -3176,14 +3244,16 @@ macro_rules! TRIGGER_FIRED_INSTEAD {
                                             >(
                                                 $crate::__pgrx_c_macros::CValue::<
                                                     $crate::__pgrx_c_macros::CInt
-                                                >::new($crate::TRIGGER_EVENT_TIMINGMASK as i32)
+                                                >::new(
+                                                    $crate::__pgrx_c_bindings::TRIGGER_EVENT_TIMINGMASK as i32
+                                                )
                                             )
                                         )
                                     )
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                        $crate::TRIGGER_EVENT_INSTEAD as i32
+                                        $crate::__pgrx_c_bindings::TRIGGER_EVENT_INSTEAD as i32
                                     )
                                 )
                             )
@@ -3212,7 +3282,7 @@ macro_rules! TRIGGER_FIRED_INSTEAD {
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                        $crate::TRIGGER_EVENT_TIMINGMASK as i32
+                                        $crate::__pgrx_c_bindings::TRIGGER_EVENT_TIMINGMASK as i32
                                     )
                                 )
                             )
@@ -3220,7 +3290,7 @@ macro_rules! TRIGGER_FIRED_INSTEAD {
                     ),
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                            $crate::TRIGGER_EVENT_INSTEAD as i32
+                            $crate::__pgrx_c_bindings::TRIGGER_EVENT_INSTEAD as i32
                         )
                     )
                 )

@@ -5,8 +5,8 @@ This code is generated for documentation purposes, so that it is easy to referen
 // C macros from parse_type.h.
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -33,22 +33,34 @@ macro_rules! __pgrx_c_args_ISCOMPLEX {
         $crate::__pgrx_c_args_ISCOMPLEX!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_ISCOMPLEX!(@p1 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_ISCOMPLEX!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_ISCOMPLEX!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_ISCOMPLEX!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_ISCOMPLEX!(@p1 $mode [$($done)* (@literal [- $argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_ISCOMPLEX!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+            $($rest)*
+        )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_ISCOMPLEX!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_ISCOMPLEX!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $($raw:tt)*) => {
         $crate::__pgrx_c_args_ISCOMPLEX!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_ISCOMPLEX!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_ISCOMPLEX!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -70,13 +82,20 @@ macro_rules! __pgrx_c_args_ISCOMPLEX {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_ISCOMPLEX!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_ISCOMPLEX!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_ISCOMPLEX!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_ISCOMPLEX!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
-        $crate::__pgrx_c_args_ISCOMPLEX!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_ISCOMPLEX!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
         $crate::__pgrx_c_classify!(
@@ -98,10 +117,16 @@ macro_rules! __pgrx_c_args_ISCOMPLEX {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_ISCOMPLEX!(@p1 $mode [$($done)* (@literal [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_ISCOMPLEX!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+            $($rest)*
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_ISCOMPLEX!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_ISCOMPLEX!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p1 $mode:ident [$($done:tt)*];) => {
         $crate::ISCOMPLEX!(@$mode; $($done)*)
@@ -149,20 +174,20 @@ macro_rules! ISCOMPLEX {
                         <
                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                 $crate::__pgrx_c_macros::CUnsignedInt,
-                                $crate::Oid
+                                $crate::__pgrx_c_bindings::Oid
                             > as $crate::__pgrx_c_macros::expression::CType
                         >::from_storage(
-                            $crate::typeOrDomainTypeRelid(
+                            $crate::__pgrx_c_bindings::typeOrDomainTypeRelid(
                                 <
                                     $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                         $crate::__pgrx_c_macros::CUnsignedInt,
-                                        $crate::Oid
+                                        $crate::__pgrx_c_bindings::Oid
                                     > as $crate::__pgrx_c_macros::expression::CType
                                 >::into_storage(
                                     $crate::__pgrx_c_macros::expression::implicit::<
                                         $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                             $crate::__pgrx_c_macros::CUnsignedInt,
-                                            $crate::Oid
+                                            $crate::__pgrx_c_bindings::Oid
                                         >,
                                         _
                                     >(
@@ -177,9 +202,8 @@ macro_rules! ISCOMPLEX {
                     ),
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::expression::null_constant(
-                            /* PGRX: InvalidOid remains expanded because no integer constant binding is available in the defining Rust crate. */
                             $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CUnsignedInt>::new(
-                                0u32
+                                $crate::__pgrx_c_bindings::InvalidOid as u32
                             )
                         )
                     )
@@ -218,20 +242,20 @@ macro_rules! ISCOMPLEX {
                                     <
                                         $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                             $crate::__pgrx_c_macros::CUnsignedInt,
-                                            $crate::Oid
+                                            $crate::__pgrx_c_bindings::Oid
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::from_storage(
-                                        $crate::typeOrDomainTypeRelid(
+                                        $crate::__pgrx_c_bindings::typeOrDomainTypeRelid(
                                             <
                                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                     $crate::__pgrx_c_macros::CUnsignedInt,
-                                                    $crate::Oid
+                                                    $crate::__pgrx_c_bindings::Oid
                                                 > as $crate::__pgrx_c_macros::expression::CType
                                             >::into_storage(
                                                 $crate::__pgrx_c_macros::expression::implicit::<
                                                     $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                         $crate::__pgrx_c_macros::CUnsignedInt,
-                                                        $crate::Oid
+                                                        $crate::__pgrx_c_bindings::Oid
                                                     >,
                                                     _
                                                 >(
@@ -251,10 +275,9 @@ macro_rules! ISCOMPLEX {
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::null_constant(
-                                        /* PGRX: InvalidOid remains expanded because no integer constant binding is available in the defining Rust crate. */
                                         $crate::__pgrx_c_macros::CValue::<
                                             $crate::__pgrx_c_macros::CUnsignedInt
-                                        >::new(0u32)
+                                        >::new($crate::__pgrx_c_bindings::InvalidOid as u32)
                                     )
                                 )
                             )
@@ -277,20 +300,20 @@ macro_rules! ISCOMPLEX {
                         <
                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                 $crate::__pgrx_c_macros::CUnsignedInt,
-                                $crate::Oid
+                                $crate::__pgrx_c_bindings::Oid
                             > as $crate::__pgrx_c_macros::expression::CType
                         >::from_storage(
-                            $crate::typeOrDomainTypeRelid(
+                            $crate::__pgrx_c_bindings::typeOrDomainTypeRelid(
                                 <
                                     $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                         $crate::__pgrx_c_macros::CUnsignedInt,
-                                        $crate::Oid
+                                        $crate::__pgrx_c_bindings::Oid
                                     > as $crate::__pgrx_c_macros::expression::CType
                                 >::into_storage(
                                     $crate::__pgrx_c_macros::expression::implicit::<
                                         $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                             $crate::__pgrx_c_macros::CUnsignedInt,
-                                            $crate::Oid
+                                            $crate::__pgrx_c_bindings::Oid
                                         >,
                                         _
                                     >(
@@ -305,9 +328,8 @@ macro_rules! ISCOMPLEX {
                     ),
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::expression::null_constant(
-                            /* PGRX: InvalidOid remains expanded because no integer constant binding is available in the defining Rust crate. */
                             $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CUnsignedInt>::new(
-                                0u32
+                                $crate::__pgrx_c_bindings::InvalidOid as u32
                             )
                         )
                     )

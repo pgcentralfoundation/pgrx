@@ -5,8 +5,8 @@ This code is generated for documentation purposes, so that it is easy to referen
 // C macros from pgstat.h.
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -37,23 +37,23 @@ macro_rules! __pgrx_c_args_pgstat_count_buffer_hit {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
         $crate::__pgrx_c_args_pgstat_count_buffer_hit!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_pgstat_count_buffer_hit!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_pgstat_count_buffer_hit!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_pgstat_count_buffer_hit!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -62,7 +62,7 @@ macro_rules! __pgrx_c_args_pgstat_count_buffer_hit {
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
         $crate::__pgrx_c_args_pgstat_count_buffer_hit!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
@@ -88,17 +88,17 @@ macro_rules! __pgrx_c_args_pgstat_count_buffer_hit {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_pgstat_count_buffer_hit!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_pgstat_count_buffer_hit!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_pgstat_count_buffer_hit!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -125,13 +125,13 @@ macro_rules! __pgrx_c_args_pgstat_count_buffer_hit {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_pgstat_count_buffer_hit!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_pgstat_count_buffer_hit!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -346,11 +346,11 @@ macro_rules! pgstat_count_buffer_hit {
                                                                             true,
                                                                             _
                                                                         >(
-                                                                            $crate::pgstat_assoc_relation(
+                                                                            $crate::__pgrx_c_bindings::pgstat_assoc_relation(
                                                                                 <
                                                                                     $crate::__pgrx_c_macros::expression::CPointer<
                                                                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                            $crate::RelationData
+                                                                                            $crate::__pgrx_c_bindings::RelationData
                                                                                         >,
                                                                                         $crate::__pgrx_c_macros::expression::ReadWrite
                                                                                     > as $crate::__pgrx_c_macros::expression::CType
@@ -358,7 +358,7 @@ macro_rules! pgstat_count_buffer_hit {
                                                                                     $crate::__pgrx_c_macros::expression::implicit::<
                                                                                         $crate::__pgrx_c_macros::expression::CPointer<
                                                                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                $crate::RelationData
+                                                                                                $crate::__pgrx_c_bindings::RelationData
                                                                                             >,
                                                                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                                                                         >,
@@ -490,8 +490,8 @@ macro_rules! pgstat_count_buffer_hit {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -522,23 +522,23 @@ macro_rules! __pgrx_c_args_pgstat_count_buffer_read {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
         $crate::__pgrx_c_args_pgstat_count_buffer_read!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_pgstat_count_buffer_read!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_pgstat_count_buffer_read!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_pgstat_count_buffer_read!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -547,7 +547,7 @@ macro_rules! __pgrx_c_args_pgstat_count_buffer_read {
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
         $crate::__pgrx_c_args_pgstat_count_buffer_read!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
@@ -573,17 +573,17 @@ macro_rules! __pgrx_c_args_pgstat_count_buffer_read {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_pgstat_count_buffer_read!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_pgstat_count_buffer_read!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_pgstat_count_buffer_read!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -610,13 +610,13 @@ macro_rules! __pgrx_c_args_pgstat_count_buffer_read {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_pgstat_count_buffer_read!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_pgstat_count_buffer_read!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -831,11 +831,11 @@ macro_rules! pgstat_count_buffer_read {
                                                                             true,
                                                                             _
                                                                         >(
-                                                                            $crate::pgstat_assoc_relation(
+                                                                            $crate::__pgrx_c_bindings::pgstat_assoc_relation(
                                                                                 <
                                                                                     $crate::__pgrx_c_macros::expression::CPointer<
                                                                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                            $crate::RelationData
+                                                                                            $crate::__pgrx_c_bindings::RelationData
                                                                                         >,
                                                                                         $crate::__pgrx_c_macros::expression::ReadWrite
                                                                                     > as $crate::__pgrx_c_macros::expression::CType
@@ -843,7 +843,7 @@ macro_rules! pgstat_count_buffer_read {
                                                                                     $crate::__pgrx_c_macros::expression::implicit::<
                                                                                         $crate::__pgrx_c_macros::expression::CPointer<
                                                                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                $crate::RelationData
+                                                                                                $crate::__pgrx_c_bindings::RelationData
                                                                                             >,
                                                                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                                                                         >,
@@ -975,8 +975,8 @@ macro_rules! pgstat_count_buffer_read {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -1007,23 +1007,23 @@ macro_rules! __pgrx_c_args_pgstat_count_buffer_read_time {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
         $crate::__pgrx_c_args_pgstat_count_buffer_read_time!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_pgstat_count_buffer_read_time!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_pgstat_count_buffer_read_time!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_pgstat_count_buffer_read_time!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -1035,7 +1035,7 @@ macro_rules! __pgrx_c_args_pgstat_count_buffer_read_time {
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
         $crate::__pgrx_c_args_pgstat_count_buffer_read_time!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
@@ -1061,17 +1061,17 @@ macro_rules! __pgrx_c_args_pgstat_count_buffer_read_time {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_pgstat_count_buffer_read_time!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_pgstat_count_buffer_read_time!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_pgstat_count_buffer_read_time!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -1098,13 +1098,13 @@ macro_rules! __pgrx_c_args_pgstat_count_buffer_read_time {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_pgstat_count_buffer_read_time!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_pgstat_count_buffer_read_time!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -1153,8 +1153,8 @@ macro_rules! pgstat_count_buffer_read_time {
         (
             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::modify(
-                    $crate::__pgrx_c_macros::expression::place::<$crate::__pgrx_c_macros::CLongLong>(
-                        ::core::ptr::addr_of_mut!($crate::pgStatBlockReadTime)
+                    $crate::__pgrx_c_macros::expression::place::<$crate::__pgrx_c_macros::CLong>(
+                        ::core::ptr::addr_of_mut!($crate::__pgrx_c_bindings::pgStatBlockReadTime)
                     ),
                     (
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -1208,8 +1208,12 @@ macro_rules! pgstat_count_buffer_read_time {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::modify(
                                 $crate::__pgrx_c_macros::expression::place::<
-                                    $crate::__pgrx_c_macros::CLongLong
-                                >(::core::ptr::addr_of_mut!($crate::pgStatBlockReadTime)),
+                                    $crate::__pgrx_c_macros::CLong
+                                >(
+                                    ::core::ptr::addr_of_mut!(
+                                        $crate::__pgrx_c_bindings::pgStatBlockReadTime
+                                    )
+                                ),
                                 (
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_operand!(@value [true]; $n)
@@ -1237,8 +1241,8 @@ macro_rules! pgstat_count_buffer_read_time {
         {
             let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::modify(
-                    $crate::__pgrx_c_macros::expression::place::<$crate::__pgrx_c_macros::CLongLong>(
-                        ::core::ptr::addr_of_mut!($crate::pgStatBlockReadTime)
+                    $crate::__pgrx_c_macros::expression::place::<$crate::__pgrx_c_macros::CLong>(
+                        ::core::ptr::addr_of_mut!($crate::__pgrx_c_bindings::pgStatBlockReadTime)
                     ),
                     (
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -1270,8 +1274,8 @@ macro_rules! pgstat_count_buffer_read_time {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -1302,23 +1306,23 @@ macro_rules! __pgrx_c_args_pgstat_count_buffer_write_time {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
         $crate::__pgrx_c_args_pgstat_count_buffer_write_time!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_pgstat_count_buffer_write_time!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_pgstat_count_buffer_write_time!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_pgstat_count_buffer_write_time!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -1330,7 +1334,7 @@ macro_rules! __pgrx_c_args_pgstat_count_buffer_write_time {
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
         $crate::__pgrx_c_args_pgstat_count_buffer_write_time!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
@@ -1356,17 +1360,17 @@ macro_rules! __pgrx_c_args_pgstat_count_buffer_write_time {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_pgstat_count_buffer_write_time!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_pgstat_count_buffer_write_time!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_pgstat_count_buffer_write_time!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -1393,13 +1397,13 @@ macro_rules! __pgrx_c_args_pgstat_count_buffer_write_time {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_pgstat_count_buffer_write_time!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_pgstat_count_buffer_write_time!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -1448,8 +1452,8 @@ macro_rules! pgstat_count_buffer_write_time {
         (
             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::modify(
-                    $crate::__pgrx_c_macros::expression::place::<$crate::__pgrx_c_macros::CLongLong>(
-                        ::core::ptr::addr_of_mut!($crate::pgStatBlockWriteTime)
+                    $crate::__pgrx_c_macros::expression::place::<$crate::__pgrx_c_macros::CLong>(
+                        ::core::ptr::addr_of_mut!($crate::__pgrx_c_bindings::pgStatBlockWriteTime)
                     ),
                     (
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -1503,8 +1507,12 @@ macro_rules! pgstat_count_buffer_write_time {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::modify(
                                 $crate::__pgrx_c_macros::expression::place::<
-                                    $crate::__pgrx_c_macros::CLongLong
-                                >(::core::ptr::addr_of_mut!($crate::pgStatBlockWriteTime)),
+                                    $crate::__pgrx_c_macros::CLong
+                                >(
+                                    ::core::ptr::addr_of_mut!(
+                                        $crate::__pgrx_c_bindings::pgStatBlockWriteTime
+                                    )
+                                ),
                                 (
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_operand!(@value [true]; $n)
@@ -1535,8 +1543,8 @@ macro_rules! pgstat_count_buffer_write_time {
         {
             let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::modify(
-                    $crate::__pgrx_c_macros::expression::place::<$crate::__pgrx_c_macros::CLongLong>(
-                        ::core::ptr::addr_of_mut!($crate::pgStatBlockWriteTime)
+                    $crate::__pgrx_c_macros::expression::place::<$crate::__pgrx_c_macros::CLong>(
+                        ::core::ptr::addr_of_mut!($crate::__pgrx_c_bindings::pgStatBlockWriteTime)
                     ),
                     (
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -1568,8 +1576,8 @@ macro_rules! pgstat_count_buffer_write_time {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -1600,23 +1608,23 @@ macro_rules! __pgrx_c_args_pgstat_count_conn_active_time {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
         $crate::__pgrx_c_args_pgstat_count_conn_active_time!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_pgstat_count_conn_active_time!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_pgstat_count_conn_active_time!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_pgstat_count_conn_active_time!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -1628,7 +1636,7 @@ macro_rules! __pgrx_c_args_pgstat_count_conn_active_time {
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
         $crate::__pgrx_c_args_pgstat_count_conn_active_time!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
@@ -1654,17 +1662,17 @@ macro_rules! __pgrx_c_args_pgstat_count_conn_active_time {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_pgstat_count_conn_active_time!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_pgstat_count_conn_active_time!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_pgstat_count_conn_active_time!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -1691,13 +1699,13 @@ macro_rules! __pgrx_c_args_pgstat_count_conn_active_time {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_pgstat_count_conn_active_time!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_pgstat_count_conn_active_time!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -1746,8 +1754,8 @@ macro_rules! pgstat_count_conn_active_time {
         (
             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::modify(
-                    $crate::__pgrx_c_macros::expression::place::<$crate::__pgrx_c_macros::CLongLong>(
-                        ::core::ptr::addr_of_mut!($crate::pgStatActiveTime)
+                    $crate::__pgrx_c_macros::expression::place::<$crate::__pgrx_c_macros::CLong>(
+                        ::core::ptr::addr_of_mut!($crate::__pgrx_c_bindings::pgStatActiveTime)
                     ),
                     (
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -1801,8 +1809,12 @@ macro_rules! pgstat_count_conn_active_time {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::modify(
                                 $crate::__pgrx_c_macros::expression::place::<
-                                    $crate::__pgrx_c_macros::CLongLong
-                                >(::core::ptr::addr_of_mut!($crate::pgStatActiveTime)),
+                                    $crate::__pgrx_c_macros::CLong
+                                >(
+                                    ::core::ptr::addr_of_mut!(
+                                        $crate::__pgrx_c_bindings::pgStatActiveTime
+                                    )
+                                ),
                                 (
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_operand!(@value [true]; $n)
@@ -1830,8 +1842,8 @@ macro_rules! pgstat_count_conn_active_time {
         {
             let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::modify(
-                    $crate::__pgrx_c_macros::expression::place::<$crate::__pgrx_c_macros::CLongLong>(
-                        ::core::ptr::addr_of_mut!($crate::pgStatActiveTime)
+                    $crate::__pgrx_c_macros::expression::place::<$crate::__pgrx_c_macros::CLong>(
+                        ::core::ptr::addr_of_mut!($crate::__pgrx_c_bindings::pgStatActiveTime)
                     ),
                     (
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -1863,8 +1875,8 @@ macro_rules! pgstat_count_conn_active_time {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -1895,23 +1907,23 @@ macro_rules! __pgrx_c_args_pgstat_count_conn_txn_idle_time {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
         $crate::__pgrx_c_args_pgstat_count_conn_txn_idle_time!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_pgstat_count_conn_txn_idle_time!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_pgstat_count_conn_txn_idle_time!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_pgstat_count_conn_txn_idle_time!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -1923,7 +1935,7 @@ macro_rules! __pgrx_c_args_pgstat_count_conn_txn_idle_time {
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
         $crate::__pgrx_c_args_pgstat_count_conn_txn_idle_time!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
@@ -1949,17 +1961,17 @@ macro_rules! __pgrx_c_args_pgstat_count_conn_txn_idle_time {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_pgstat_count_conn_txn_idle_time!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_pgstat_count_conn_txn_idle_time!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_pgstat_count_conn_txn_idle_time!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -1986,13 +1998,13 @@ macro_rules! __pgrx_c_args_pgstat_count_conn_txn_idle_time {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_pgstat_count_conn_txn_idle_time!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_pgstat_count_conn_txn_idle_time!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -2041,8 +2053,10 @@ macro_rules! pgstat_count_conn_txn_idle_time {
         (
             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::modify(
-                    $crate::__pgrx_c_macros::expression::place::<$crate::__pgrx_c_macros::CLongLong>(
-                        ::core::ptr::addr_of_mut!($crate::pgStatTransactionIdleTime)
+                    $crate::__pgrx_c_macros::expression::place::<$crate::__pgrx_c_macros::CLong>(
+                        ::core::ptr::addr_of_mut!(
+                            $crate::__pgrx_c_bindings::pgStatTransactionIdleTime
+                        )
                     ),
                     (
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -2096,8 +2110,12 @@ macro_rules! pgstat_count_conn_txn_idle_time {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::modify(
                                 $crate::__pgrx_c_macros::expression::place::<
-                                    $crate::__pgrx_c_macros::CLongLong
-                                >(::core::ptr::addr_of_mut!($crate::pgStatTransactionIdleTime)),
+                                    $crate::__pgrx_c_macros::CLong
+                                >(
+                                    ::core::ptr::addr_of_mut!(
+                                        $crate::__pgrx_c_bindings::pgStatTransactionIdleTime
+                                    )
+                                ),
                                 (
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_operand!(@value [true]; $n)
@@ -2128,8 +2146,10 @@ macro_rules! pgstat_count_conn_txn_idle_time {
         {
             let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::modify(
-                    $crate::__pgrx_c_macros::expression::place::<$crate::__pgrx_c_macros::CLongLong>(
-                        ::core::ptr::addr_of_mut!($crate::pgStatTransactionIdleTime)
+                    $crate::__pgrx_c_macros::expression::place::<$crate::__pgrx_c_macros::CLong>(
+                        ::core::ptr::addr_of_mut!(
+                            $crate::__pgrx_c_bindings::pgStatTransactionIdleTime
+                        )
                     ),
                     (
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -2161,8 +2181,8 @@ macro_rules! pgstat_count_conn_txn_idle_time {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -2193,23 +2213,23 @@ macro_rules! __pgrx_c_args_pgstat_count_heap_fetch {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
         $crate::__pgrx_c_args_pgstat_count_heap_fetch!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_pgstat_count_heap_fetch!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_pgstat_count_heap_fetch!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_pgstat_count_heap_fetch!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -2218,7 +2238,7 @@ macro_rules! __pgrx_c_args_pgstat_count_heap_fetch {
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
         $crate::__pgrx_c_args_pgstat_count_heap_fetch!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
@@ -2244,17 +2264,17 @@ macro_rules! __pgrx_c_args_pgstat_count_heap_fetch {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_pgstat_count_heap_fetch!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_pgstat_count_heap_fetch!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_pgstat_count_heap_fetch!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -2281,13 +2301,13 @@ macro_rules! __pgrx_c_args_pgstat_count_heap_fetch {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_pgstat_count_heap_fetch!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_pgstat_count_heap_fetch!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -2502,11 +2522,11 @@ macro_rules! pgstat_count_heap_fetch {
                                                                             true,
                                                                             _
                                                                         >(
-                                                                            $crate::pgstat_assoc_relation(
+                                                                            $crate::__pgrx_c_bindings::pgstat_assoc_relation(
                                                                                 <
                                                                                     $crate::__pgrx_c_macros::expression::CPointer<
                                                                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                            $crate::RelationData
+                                                                                            $crate::__pgrx_c_bindings::RelationData
                                                                                         >,
                                                                                         $crate::__pgrx_c_macros::expression::ReadWrite
                                                                                     > as $crate::__pgrx_c_macros::expression::CType
@@ -2514,7 +2534,7 @@ macro_rules! pgstat_count_heap_fetch {
                                                                                     $crate::__pgrx_c_macros::expression::implicit::<
                                                                                         $crate::__pgrx_c_macros::expression::CPointer<
                                                                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                $crate::RelationData
+                                                                                                $crate::__pgrx_c_bindings::RelationData
                                                                                             >,
                                                                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                                                                         >,
@@ -2646,8 +2666,8 @@ macro_rules! pgstat_count_heap_fetch {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -2678,23 +2698,23 @@ macro_rules! __pgrx_c_args_pgstat_count_heap_getnext {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
         $crate::__pgrx_c_args_pgstat_count_heap_getnext!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_pgstat_count_heap_getnext!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_pgstat_count_heap_getnext!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_pgstat_count_heap_getnext!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -2703,7 +2723,7 @@ macro_rules! __pgrx_c_args_pgstat_count_heap_getnext {
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
         $crate::__pgrx_c_args_pgstat_count_heap_getnext!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
@@ -2729,17 +2749,17 @@ macro_rules! __pgrx_c_args_pgstat_count_heap_getnext {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_pgstat_count_heap_getnext!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_pgstat_count_heap_getnext!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_pgstat_count_heap_getnext!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -2766,13 +2786,13 @@ macro_rules! __pgrx_c_args_pgstat_count_heap_getnext {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_pgstat_count_heap_getnext!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_pgstat_count_heap_getnext!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -2987,11 +3007,11 @@ macro_rules! pgstat_count_heap_getnext {
                                                                             true,
                                                                             _
                                                                         >(
-                                                                            $crate::pgstat_assoc_relation(
+                                                                            $crate::__pgrx_c_bindings::pgstat_assoc_relation(
                                                                                 <
                                                                                     $crate::__pgrx_c_macros::expression::CPointer<
                                                                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                            $crate::RelationData
+                                                                                            $crate::__pgrx_c_bindings::RelationData
                                                                                         >,
                                                                                         $crate::__pgrx_c_macros::expression::ReadWrite
                                                                                     > as $crate::__pgrx_c_macros::expression::CType
@@ -2999,7 +3019,7 @@ macro_rules! pgstat_count_heap_getnext {
                                                                                     $crate::__pgrx_c_macros::expression::implicit::<
                                                                                         $crate::__pgrx_c_macros::expression::CPointer<
                                                                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                $crate::RelationData
+                                                                                                $crate::__pgrx_c_bindings::RelationData
                                                                                             >,
                                                                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                                                                         >,
@@ -3131,8 +3151,8 @@ macro_rules! pgstat_count_heap_getnext {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -3163,21 +3183,23 @@ macro_rules! __pgrx_c_args_pgstat_count_heap_scan {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
         $crate::__pgrx_c_args_pgstat_count_heap_scan!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_pgstat_count_heap_scan!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_pgstat_count_heap_scan!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_pgstat_count_heap_scan!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_pgstat_count_heap_scan!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -3185,7 +3207,9 @@ macro_rules! __pgrx_c_args_pgstat_count_heap_scan {
         $crate::__pgrx_c_args_pgstat_count_heap_scan!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_pgstat_count_heap_scan!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_pgstat_count_heap_scan!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -3210,15 +3234,17 @@ macro_rules! __pgrx_c_args_pgstat_count_heap_scan {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_pgstat_count_heap_scan!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_pgstat_count_heap_scan!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_pgstat_count_heap_scan!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_pgstat_count_heap_scan!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -3245,13 +3271,13 @@ macro_rules! __pgrx_c_args_pgstat_count_heap_scan {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_pgstat_count_heap_scan!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_pgstat_count_heap_scan!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -3466,11 +3492,11 @@ macro_rules! pgstat_count_heap_scan {
                                                                             true,
                                                                             _
                                                                         >(
-                                                                            $crate::pgstat_assoc_relation(
+                                                                            $crate::__pgrx_c_bindings::pgstat_assoc_relation(
                                                                                 <
                                                                                     $crate::__pgrx_c_macros::expression::CPointer<
                                                                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                            $crate::RelationData
+                                                                                            $crate::__pgrx_c_bindings::RelationData
                                                                                         >,
                                                                                         $crate::__pgrx_c_macros::expression::ReadWrite
                                                                                     > as $crate::__pgrx_c_macros::expression::CType
@@ -3478,7 +3504,7 @@ macro_rules! pgstat_count_heap_scan {
                                                                                     $crate::__pgrx_c_macros::expression::implicit::<
                                                                                         $crate::__pgrx_c_macros::expression::CPointer<
                                                                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                $crate::RelationData
+                                                                                                $crate::__pgrx_c_bindings::RelationData
                                                                                             >,
                                                                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                                                                         >,
@@ -3610,8 +3636,8 @@ macro_rules! pgstat_count_heap_scan {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -3642,23 +3668,23 @@ macro_rules! __pgrx_c_args_pgstat_count_index_scan {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
         $crate::__pgrx_c_args_pgstat_count_index_scan!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_pgstat_count_index_scan!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_pgstat_count_index_scan!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_pgstat_count_index_scan!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -3667,7 +3693,7 @@ macro_rules! __pgrx_c_args_pgstat_count_index_scan {
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
         $crate::__pgrx_c_args_pgstat_count_index_scan!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
@@ -3693,17 +3719,17 @@ macro_rules! __pgrx_c_args_pgstat_count_index_scan {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_pgstat_count_index_scan!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_pgstat_count_index_scan!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_pgstat_count_index_scan!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -3730,13 +3756,13 @@ macro_rules! __pgrx_c_args_pgstat_count_index_scan {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_pgstat_count_index_scan!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_pgstat_count_index_scan!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -3951,11 +3977,11 @@ macro_rules! pgstat_count_index_scan {
                                                                             true,
                                                                             _
                                                                         >(
-                                                                            $crate::pgstat_assoc_relation(
+                                                                            $crate::__pgrx_c_bindings::pgstat_assoc_relation(
                                                                                 <
                                                                                     $crate::__pgrx_c_macros::expression::CPointer<
                                                                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                            $crate::RelationData
+                                                                                            $crate::__pgrx_c_bindings::RelationData
                                                                                         >,
                                                                                         $crate::__pgrx_c_macros::expression::ReadWrite
                                                                                     > as $crate::__pgrx_c_macros::expression::CType
@@ -3963,7 +3989,7 @@ macro_rules! pgstat_count_index_scan {
                                                                                     $crate::__pgrx_c_macros::expression::implicit::<
                                                                                         $crate::__pgrx_c_macros::expression::CPointer<
                                                                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                $crate::RelationData
+                                                                                                $crate::__pgrx_c_bindings::RelationData
                                                                                             >,
                                                                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                                                                         >,
@@ -4095,8 +4121,8 @@ macro_rules! pgstat_count_index_scan {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -4127,13 +4153,13 @@ macro_rules! __pgrx_c_args_pgstat_count_index_tuples {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_pgstat_count_index_tuples!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_pgstat_count_index_tuples!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -4142,7 +4168,7 @@ macro_rules! __pgrx_c_args_pgstat_count_index_tuples {
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_pgstat_count_index_tuples!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -4169,35 +4195,35 @@ macro_rules! __pgrx_c_args_pgstat_count_index_tuples {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_pgstat_count_index_tuples!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_pgstat_count_index_tuples!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $argument:literal) => {
         $crate::__pgrx_c_args_pgstat_count_index_tuples!(
-            @p2 $mode [$($done)* (@literal [- $argument]),];
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
         )
     };
     (@negative1 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_pgstat_count_index_tuples!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_pgstat_count_index_tuples!(
-            @p2 $mode [$($done)* (@literal [- $argument]),];
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_pgstat_count_index_tuples!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -4206,7 +4232,7 @@ macro_rules! __pgrx_c_args_pgstat_count_index_tuples {
     };
     (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
         $crate::__pgrx_c_args_pgstat_count_index_tuples!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
@@ -4232,17 +4258,17 @@ macro_rules! __pgrx_c_args_pgstat_count_index_tuples {
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_pgstat_count_index_tuples!(
-            @p2 $mode [$($done)* (@literal [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_pgstat_count_index_tuples!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_pgstat_count_index_tuples!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -4269,13 +4295,13 @@ macro_rules! __pgrx_c_args_pgstat_count_index_tuples {
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_pgstat_count_index_tuples!(
-            @p2 $mode [$($done)* (@literal [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_pgstat_count_index_tuples!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -4491,11 +4517,11 @@ macro_rules! pgstat_count_index_tuples {
                                                                             true,
                                                                             _
                                                                         >(
-                                                                            $crate::pgstat_assoc_relation(
+                                                                            $crate::__pgrx_c_bindings::pgstat_assoc_relation(
                                                                                 <
                                                                                     $crate::__pgrx_c_macros::expression::CPointer<
                                                                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                            $crate::RelationData
+                                                                                            $crate::__pgrx_c_bindings::RelationData
                                                                                         >,
                                                                                         $crate::__pgrx_c_macros::expression::ReadWrite
                                                                                     > as $crate::__pgrx_c_macros::expression::CType
@@ -4503,7 +4529,7 @@ macro_rules! pgstat_count_index_tuples {
                                                                                     $crate::__pgrx_c_macros::expression::implicit::<
                                                                                         $crate::__pgrx_c_macros::expression::CPointer<
                                                                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                $crate::RelationData
+                                                                                                $crate::__pgrx_c_bindings::RelationData
                                                                                             >,
                                                                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                                                                         >,
@@ -4637,8 +4663,8 @@ macro_rules! pgstat_count_index_tuples {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -4669,23 +4695,23 @@ macro_rules! __pgrx_c_args_pgstat_is_ioop_tracked_in_bytes {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
         $crate::__pgrx_c_args_pgstat_is_ioop_tracked_in_bytes!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_pgstat_is_ioop_tracked_in_bytes!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_pgstat_is_ioop_tracked_in_bytes!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_pgstat_is_ioop_tracked_in_bytes!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -4697,7 +4723,7 @@ macro_rules! __pgrx_c_args_pgstat_is_ioop_tracked_in_bytes {
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
         $crate::__pgrx_c_args_pgstat_is_ioop_tracked_in_bytes!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
@@ -4723,17 +4749,17 @@ macro_rules! __pgrx_c_args_pgstat_is_ioop_tracked_in_bytes {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_pgstat_is_ioop_tracked_in_bytes!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_pgstat_is_ioop_tracked_in_bytes!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_pgstat_is_ioop_tracked_in_bytes!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -4760,13 +4786,13 @@ macro_rules! __pgrx_c_args_pgstat_is_ioop_tracked_in_bytes {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_pgstat_is_ioop_tracked_in_bytes!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_pgstat_is_ioop_tracked_in_bytes!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -4834,9 +4860,8 @@ macro_rules! pgstat_is_ioop_tracked_in_bytes {
                                     )
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                                    /* PGRX: IOOP_NUM_TYPES remains expanded because no integer constant binding is available in the defining Rust crate. */
                                     $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                        8i32
+                                        $crate::__pgrx_c_bindings::IOOP_NUM_TYPES as i32
                                     )
                                 )
                             )
@@ -4861,7 +4886,7 @@ macro_rules! pgstat_is_ioop_tracked_in_bytes {
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                        $crate::IOOp::IOOP_EXTEND as i32
+                                        $crate::__pgrx_c_bindings::IOOp::IOOP_EXTEND as i32
                                     )
                                 )
                             )
@@ -4941,10 +4966,11 @@ macro_rules! pgstat_is_ioop_tracked_in_bytes {
                                                 true,
                                                 _
                                             >(
-                                                /* PGRX: IOOP_NUM_TYPES remains expanded because no integer constant binding is available in the defining Rust crate. */
                                                 $crate::__pgrx_c_macros::CValue::<
                                                     $crate::__pgrx_c_macros::CInt
-                                                >::new(8i32)
+                                                >::new(
+                                                    $crate::__pgrx_c_bindings::IOOP_NUM_TYPES as i32
+                                                )
                                             )
                                         )
                                     )
@@ -4980,7 +5006,9 @@ macro_rules! pgstat_is_ioop_tracked_in_bytes {
                                             >(
                                                 $crate::__pgrx_c_macros::CValue::<
                                                     $crate::__pgrx_c_macros::CInt
-                                                >::new($crate::IOOp::IOOP_EXTEND as i32)
+                                                >::new(
+                                                    $crate::__pgrx_c_bindings::IOOp::IOOP_EXTEND as i32
+                                                )
                                             )
                                         )
                                     )
@@ -5027,9 +5055,8 @@ macro_rules! pgstat_is_ioop_tracked_in_bytes {
                                     )
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                                    /* PGRX: IOOP_NUM_TYPES remains expanded because no integer constant binding is available in the defining Rust crate. */
                                     $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                        8i32
+                                        $crate::__pgrx_c_bindings::IOOP_NUM_TYPES as i32
                                     )
                                 )
                             )
@@ -5054,7 +5081,7 @@ macro_rules! pgstat_is_ioop_tracked_in_bytes {
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                        $crate::IOOp::IOOP_EXTEND as i32
+                                        $crate::__pgrx_c_bindings::IOOp::IOOP_EXTEND as i32
                                     )
                                 )
                             )
@@ -5083,8 +5110,8 @@ macro_rules! pgstat_is_ioop_tracked_in_bytes {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -5115,23 +5142,23 @@ macro_rules! __pgrx_c_args_pgstat_should_count_relation {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
         $crate::__pgrx_c_args_pgstat_should_count_relation!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_pgstat_should_count_relation!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_pgstat_should_count_relation!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_pgstat_should_count_relation!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -5143,7 +5170,7 @@ macro_rules! __pgrx_c_args_pgstat_should_count_relation {
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
         $crate::__pgrx_c_args_pgstat_should_count_relation!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
@@ -5169,17 +5196,17 @@ macro_rules! __pgrx_c_args_pgstat_should_count_relation {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_pgstat_should_count_relation!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_pgstat_should_count_relation!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_pgstat_should_count_relation!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -5206,13 +5233,13 @@ macro_rules! __pgrx_c_args_pgstat_should_count_relation {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_pgstat_should_count_relation!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_pgstat_should_count_relation!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -5411,11 +5438,11 @@ macro_rules! pgstat_should_count_relation {
                                                                 true,
                                                                 _
                                                             >(
-                                                                $crate::pgstat_assoc_relation(
+                                                                $crate::__pgrx_c_bindings::pgstat_assoc_relation(
                                                                     <
                                                                         $crate::__pgrx_c_macros::expression::CPointer<
                                                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                $crate::RelationData
+                                                                                $crate::__pgrx_c_bindings::RelationData
                                                                             >,
                                                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                                                         > as $crate::__pgrx_c_macros::expression::CType
@@ -5423,7 +5450,7 @@ macro_rules! pgstat_should_count_relation {
                                                                         $crate::__pgrx_c_macros::expression::implicit::<
                                                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                    $crate::RelationData
+                                                                                    $crate::__pgrx_c_bindings::RelationData
                                                                                 >,
                                                                                 $crate::__pgrx_c_macros::expression::ReadWrite
                                                                             >,
@@ -5675,11 +5702,11 @@ macro_rules! pgstat_should_count_relation {
                                                                             true,
                                                                             _
                                                                         >(
-                                                                            $crate::pgstat_assoc_relation(
+                                                                            $crate::__pgrx_c_bindings::pgstat_assoc_relation(
                                                                                 <
                                                                                     $crate::__pgrx_c_macros::expression::CPointer<
                                                                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                            $crate::RelationData
+                                                                                            $crate::__pgrx_c_bindings::RelationData
                                                                                         >,
                                                                                         $crate::__pgrx_c_macros::expression::ReadWrite
                                                                                     > as $crate::__pgrx_c_macros::expression::CType
@@ -5687,7 +5714,7 @@ macro_rules! pgstat_should_count_relation {
                                                                                     $crate::__pgrx_c_macros::expression::implicit::<
                                                                                         $crate::__pgrx_c_macros::expression::CPointer<
                                                                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                $crate::RelationData
+                                                                                                $crate::__pgrx_c_bindings::RelationData
                                                                                             >,
                                                                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                                                                         >,
@@ -5907,11 +5934,11 @@ macro_rules! pgstat_should_count_relation {
                                                                 true,
                                                                 _
                                                             >(
-                                                                $crate::pgstat_assoc_relation(
+                                                                $crate::__pgrx_c_bindings::pgstat_assoc_relation(
                                                                     <
                                                                         $crate::__pgrx_c_macros::expression::CPointer<
                                                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                $crate::RelationData
+                                                                                $crate::__pgrx_c_bindings::RelationData
                                                                             >,
                                                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                                                         > as $crate::__pgrx_c_macros::expression::CType
@@ -5919,7 +5946,7 @@ macro_rules! pgstat_should_count_relation {
                                                                         $crate::__pgrx_c_macros::expression::implicit::<
                                                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                    $crate::RelationData
+                                                                                    $crate::__pgrx_c_bindings::RelationData
                                                                                 >,
                                                                                 $crate::__pgrx_c_macros::expression::ReadWrite
                                                                             >,

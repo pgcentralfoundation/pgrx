@@ -6,6 +6,10 @@ This code is generated for documentation purposes, so that it is easy to referen
 mod backendid;
 #[allow(unused_imports)]
 pub use backendid::*;
+#[path = "block.rs"]
+mod block;
+#[allow(unused_imports)]
+pub use block::*;
 #[path = "buf.rs"]
 mod buf;
 #[allow(unused_imports)]
@@ -42,6 +46,10 @@ pub use itemptr::*;
 mod lock;
 #[allow(unused_imports)]
 pub use lock::*;
+#[path = "lwlocknames.rs"]
+mod lwlocknames;
+#[allow(unused_imports)]
+pub use lwlocknames::*;
 #[path = "off.rs"]
 mod off;
 #[allow(unused_imports)]

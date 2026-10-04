@@ -5,8 +5,8 @@ This code is generated for documentation purposes, so that it is easy to referen
 // C macros from guc.h.
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -37,23 +37,23 @@ macro_rules! __pgrx_c_args_EmitWarningsOnPlaceholders {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
         $crate::__pgrx_c_args_EmitWarningsOnPlaceholders!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_EmitWarningsOnPlaceholders!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_EmitWarningsOnPlaceholders!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_EmitWarningsOnPlaceholders!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -62,7 +62,7 @@ macro_rules! __pgrx_c_args_EmitWarningsOnPlaceholders {
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
         $crate::__pgrx_c_args_EmitWarningsOnPlaceholders!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
@@ -88,17 +88,17 @@ macro_rules! __pgrx_c_args_EmitWarningsOnPlaceholders {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_EmitWarningsOnPlaceholders!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_EmitWarningsOnPlaceholders!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_EmitWarningsOnPlaceholders!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -125,13 +125,13 @@ macro_rules! __pgrx_c_args_EmitWarningsOnPlaceholders {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_EmitWarningsOnPlaceholders!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_EmitWarningsOnPlaceholders!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -142,7 +142,7 @@ macro_rules! __pgrx_c_args_EmitWarningsOnPlaceholders {
         compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
-/// C macro EmitWarningsOnPlaceholders from guc.h:365
+/// C macro EmitWarningsOnPlaceholders from guc.h:366
 ///
 /// ```text
 /// #define EmitWarningsOnPlaceholders( className ) MarkGUCPrefixReserved ( className )
@@ -179,7 +179,7 @@ macro_rules! EmitWarningsOnPlaceholders {
     (@__pgrx_emit_value; $className:tt $(,)?) => {
         /* PGRX: EmitWarningsOnPlaceholders remains expanded because MarkGUCPrefixReserved is not an active function-like macro. */
         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-            $crate::MarkGUCPrefixReserved(
+            $crate::__pgrx_c_bindings::MarkGUCPrefixReserved(
                 <
                     $crate::__pgrx_c_macros::expression::CPointer<
                         $crate::__pgrx_c_macros::expression::CIntegerStorage<
@@ -237,7 +237,7 @@ macro_rules! EmitWarningsOnPlaceholders {
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                            $crate::MarkGUCPrefixReserved(
+                            $crate::__pgrx_c_bindings::MarkGUCPrefixReserved(
                                 <
                                     $crate::__pgrx_c_macros::expression::CPointer<
                                         $crate::__pgrx_c_macros::expression::CIntegerStorage<
@@ -279,7 +279,7 @@ macro_rules! EmitWarningsOnPlaceholders {
         /* PGRX: EmitWarningsOnPlaceholders remains expanded because MarkGUCPrefixReserved is not an active function-like macro. */
         {
             let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                $crate::MarkGUCPrefixReserved(
+                $crate::__pgrx_c_bindings::MarkGUCPrefixReserved(
                     <
                         $crate::__pgrx_c_macros::expression::CPointer<
                             $crate::__pgrx_c_macros::expression::CIntegerStorage<

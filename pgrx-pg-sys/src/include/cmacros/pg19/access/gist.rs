@@ -5,8 +5,8 @@ This code is generated for documentation purposes, so that it is easy to referen
 // C macros from gist.h.
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -33,22 +33,34 @@ macro_rules! __pgrx_c_args_GIST_LEAF {
         $crate::__pgrx_c_args_GIST_LEAF!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_GIST_LEAF!(@p1 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_GIST_LEAF!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_GIST_LEAF!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_GIST_LEAF!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_GIST_LEAF!(@p1 $mode [$($done)* (@literal [- $argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_GIST_LEAF!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+            $($rest)*
+        )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_GIST_LEAF!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_GIST_LEAF!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $($raw:tt)*) => {
         $crate::__pgrx_c_args_GIST_LEAF!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_GIST_LEAF!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_GIST_LEAF!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -70,13 +82,20 @@ macro_rules! __pgrx_c_args_GIST_LEAF {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_GIST_LEAF!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_GIST_LEAF!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_GIST_LEAF!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_GIST_LEAF!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
-        $crate::__pgrx_c_args_GIST_LEAF!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_GIST_LEAF!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
         $crate::__pgrx_c_classify!(
@@ -98,10 +117,16 @@ macro_rules! __pgrx_c_args_GIST_LEAF {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_GIST_LEAF!(@p1 $mode [$($done)* (@literal [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_GIST_LEAF!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+            $($rest)*
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_GIST_LEAF!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_GIST_LEAF!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p1 $mode:ident [$($done:tt)*];) => {
         $crate::GIST_LEAF!(@$mode; $($done)*)
@@ -161,10 +186,10 @@ macro_rules! GIST_LEAF {
                                                 _
                                             >(
                                                 $crate::__pgrx_c_macros::expression::cast_as::<
-                                                    $crate::GISTPageOpaque,
+                                                    $crate::__pgrx_c_bindings::GISTPageOpaque,
                                                     $crate::__pgrx_c_macros::expression::CPointer<
                                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                                            $crate::GISTPageOpaqueData
+                                                            $crate::__pgrx_c_bindings::GISTPageOpaqueData
                                                         >,
                                                         $crate::__pgrx_c_macros::expression::ReadWrite
                                                     >,
@@ -181,16 +206,22 @@ macro_rules! GIST_LEAF {
                                                                         true,
                                                                         _
                                                                     >(
-                                                                        $crate::__pgrx_c_generated::Inline_777d7ad23546580e873e0206a9a6e1cd(
+                                                                        $crate::__pgrx_c_bindings::PageValidateSpecialPointer(
                                                                             <
                                                                                 $crate::__pgrx_c_macros::expression::CPointer<
-                                                                                    $crate::__pgrx_c_macros::CChar,
+                                                                                    $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                                        $crate::__pgrx_c_macros::CChar,
+                                                                                        ::core::ffi::c_char
+                                                                                    >,
                                                                                     $crate::__pgrx_c_macros::expression::ReadOnly
                                                                                 > as $crate::__pgrx_c_macros::expression::CType
                                                                             >::into_storage(
                                                                                 $crate::__pgrx_c_macros::expression::implicit::<
                                                                                     $crate::__pgrx_c_macros::expression::CPointer<
-                                                                                        $crate::__pgrx_c_macros::CChar,
+                                                                                        $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                                            $crate::__pgrx_c_macros::CChar,
+                                                                                            ::core::ffi::c_char
+                                                                                        >,
                                                                                         $crate::__pgrx_c_macros::expression::ReadOnly
                                                                                     >,
                                                                                     _
@@ -285,10 +316,10 @@ macro_rules! GIST_LEAF {
                                                                                                     _
                                                                                                 >(
                                                                                                     $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                                                        $crate::PageHeader,
+                                                                                                        $crate::__pgrx_c_bindings::PageHeader,
                                                                                                         $crate::__pgrx_c_macros::expression::CPointer<
                                                                                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                                $crate::PageHeaderData
+                                                                                                                $crate::__pgrx_c_bindings::PageHeaderData
                                                                                                             >,
                                                                                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                                                                                         >,
@@ -346,7 +377,7 @@ macro_rules! GIST_LEAF {
                         ),
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                $crate::F_LEAF as i32
+                                $crate::__pgrx_c_bindings::F_LEAF as i32
                             )
                         )
                     )
@@ -396,10 +427,10 @@ macro_rules! GIST_LEAF {
                                                         _
                                                     >(
                                                         $crate::__pgrx_c_macros::expression::cast_as::<
-                                                            $crate::GISTPageOpaque,
+                                                            $crate::__pgrx_c_bindings::GISTPageOpaque,
                                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                                    $crate::GISTPageOpaqueData
+                                                                    $crate::__pgrx_c_bindings::GISTPageOpaqueData
                                                                 >,
                                                                 $crate::__pgrx_c_macros::expression::ReadWrite
                                                             >,
@@ -416,16 +447,22 @@ macro_rules! GIST_LEAF {
                                                                                 true,
                                                                                 _
                                                                             >(
-                                                                                $crate::__pgrx_c_generated::Inline_777d7ad23546580e873e0206a9a6e1cd(
+                                                                                $crate::__pgrx_c_bindings::PageValidateSpecialPointer(
                                                                                     <
                                                                                         $crate::__pgrx_c_macros::expression::CPointer<
-                                                                                            $crate::__pgrx_c_macros::CChar,
+                                                                                            $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                                                $crate::__pgrx_c_macros::CChar,
+                                                                                                ::core::ffi::c_char
+                                                                                            >,
                                                                                             $crate::__pgrx_c_macros::expression::ReadOnly
                                                                                         > as $crate::__pgrx_c_macros::expression::CType
                                                                                     >::into_storage(
                                                                                         $crate::__pgrx_c_macros::expression::implicit::<
                                                                                             $crate::__pgrx_c_macros::expression::CPointer<
-                                                                                                $crate::__pgrx_c_macros::CChar,
+                                                                                                $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                                                    $crate::__pgrx_c_macros::CChar,
+                                                                                                    ::core::ffi::c_char
+                                                                                                >,
                                                                                                 $crate::__pgrx_c_macros::expression::ReadOnly
                                                                                             >,
                                                                                             _
@@ -520,10 +557,10 @@ macro_rules! GIST_LEAF {
                                                                                                             _
                                                                                                         >(
                                                                                                             $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                                                                $crate::PageHeader,
+                                                                                                                $crate::__pgrx_c_bindings::PageHeader,
                                                                                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                                                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                                        $crate::PageHeaderData
+                                                                                                                        $crate::__pgrx_c_bindings::PageHeaderData
                                                                                                                     >,
                                                                                                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                                                                                                 >,
@@ -581,7 +618,7 @@ macro_rules! GIST_LEAF {
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                        $crate::F_LEAF as i32
+                                        $crate::__pgrx_c_bindings::F_LEAF as i32
                                     )
                                 )
                             )
@@ -615,10 +652,10 @@ macro_rules! GIST_LEAF {
                                             _
                                         >(
                                             $crate::__pgrx_c_macros::expression::cast_as::<
-                                                $crate::GISTPageOpaque,
+                                                $crate::__pgrx_c_bindings::GISTPageOpaque,
                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                        $crate::GISTPageOpaqueData
+                                                        $crate::__pgrx_c_bindings::GISTPageOpaqueData
                                                     >,
                                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                                 >,
@@ -635,16 +672,22 @@ macro_rules! GIST_LEAF {
                                                                     true,
                                                                     _
                                                                 >(
-                                                                    $crate::__pgrx_c_generated::Inline_777d7ad23546580e873e0206a9a6e1cd(
+                                                                    $crate::__pgrx_c_bindings::PageValidateSpecialPointer(
                                                                         <
                                                                             $crate::__pgrx_c_macros::expression::CPointer<
-                                                                                $crate::__pgrx_c_macros::CChar,
+                                                                                $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                                    $crate::__pgrx_c_macros::CChar,
+                                                                                    ::core::ffi::c_char
+                                                                                >,
                                                                                 $crate::__pgrx_c_macros::expression::ReadOnly
                                                                             > as $crate::__pgrx_c_macros::expression::CType
                                                                         >::into_storage(
                                                                             $crate::__pgrx_c_macros::expression::implicit::<
                                                                                 $crate::__pgrx_c_macros::expression::CPointer<
-                                                                                    $crate::__pgrx_c_macros::CChar,
+                                                                                    $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                                        $crate::__pgrx_c_macros::CChar,
+                                                                                        ::core::ffi::c_char
+                                                                                    >,
                                                                                     $crate::__pgrx_c_macros::expression::ReadOnly
                                                                                 >,
                                                                                 _
@@ -739,10 +782,10 @@ macro_rules! GIST_LEAF {
                                                                                                 _
                                                                                             >(
                                                                                                 $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                                                    $crate::PageHeader,
+                                                                                                    $crate::__pgrx_c_bindings::PageHeader,
                                                                                                     $crate::__pgrx_c_macros::expression::CPointer<
                                                                                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                            $crate::PageHeaderData
+                                                                                                            $crate::__pgrx_c_bindings::PageHeaderData
                                                                                                         >,
                                                                                                         $crate::__pgrx_c_macros::expression::ReadWrite
                                                                                                     >,
@@ -800,7 +843,7 @@ macro_rules! GIST_LEAF {
                     ),
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                            $crate::F_LEAF as i32
+                            $crate::__pgrx_c_bindings::F_LEAF as i32
                         )
                     )
                 )
@@ -816,8 +859,8 @@ macro_rules! GIST_LEAF {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -848,21 +891,23 @@ macro_rules! __pgrx_c_args_GistClearFollowRight {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
         $crate::__pgrx_c_args_GistClearFollowRight!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_GistClearFollowRight!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_GistClearFollowRight!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GistClearFollowRight!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GistClearFollowRight!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -870,7 +915,9 @@ macro_rules! __pgrx_c_args_GistClearFollowRight {
         $crate::__pgrx_c_args_GistClearFollowRight!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_GistClearFollowRight!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_GistClearFollowRight!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -892,14 +939,18 @@ macro_rules! __pgrx_c_args_GistClearFollowRight {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_GistClearFollowRight!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_GistClearFollowRight!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_GistClearFollowRight!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_GistClearFollowRight!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_GistClearFollowRight!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -926,13 +977,13 @@ macro_rules! __pgrx_c_args_GistClearFollowRight {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GistClearFollowRight!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GistClearFollowRight!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -943,7 +994,7 @@ macro_rules! __pgrx_c_args_GistClearFollowRight {
         compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
-/// C macro GistClearFollowRight from gist.h:187
+/// C macro GistClearFollowRight from gist.h:183
 ///
 /// ```text
 /// #define GistClearFollowRight( page ) ( GistPageGetOpaque ( page ) -> flags &= ~ F_FOLLOW_RIGHT )
@@ -988,10 +1039,10 @@ macro_rules! GistClearFollowRight {
                             (
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::cast_as::<
-                                        $crate::GISTPageOpaque,
+                                        $crate::__pgrx_c_bindings::GISTPageOpaque,
                                         $crate::__pgrx_c_macros::expression::CPointer<
                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                $crate::GISTPageOpaqueData
+                                                $crate::__pgrx_c_bindings::GISTPageOpaqueData
                                             >,
                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                         >,
@@ -1008,16 +1059,22 @@ macro_rules! GistClearFollowRight {
                                                             true,
                                                             _
                                                         >(
-                                                            $crate::__pgrx_c_generated::Inline_777d7ad23546580e873e0206a9a6e1cd(
+                                                            $crate::__pgrx_c_bindings::PageValidateSpecialPointer(
                                                                 <
                                                                     $crate::__pgrx_c_macros::expression::CPointer<
-                                                                        $crate::__pgrx_c_macros::CChar,
+                                                                        $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                            $crate::__pgrx_c_macros::CChar,
+                                                                            ::core::ffi::c_char
+                                                                        >,
                                                                         $crate::__pgrx_c_macros::expression::ReadOnly
                                                                     > as $crate::__pgrx_c_macros::expression::CType
                                                                 >::into_storage(
                                                                     $crate::__pgrx_c_macros::expression::implicit::<
                                                                         $crate::__pgrx_c_macros::expression::CPointer<
-                                                                            $crate::__pgrx_c_macros::CChar,
+                                                                            $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                                $crate::__pgrx_c_macros::CChar,
+                                                                                ::core::ffi::c_char
+                                                                            >,
                                                                             $crate::__pgrx_c_macros::expression::ReadOnly
                                                                         >,
                                                                         _
@@ -1074,10 +1131,10 @@ macro_rules! GistClearFollowRight {
                                                                                         _
                                                                                     >(
                                                                                         $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                                            $crate::PageHeader,
+                                                                                            $crate::__pgrx_c_bindings::PageHeader,
                                                                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                    $crate::PageHeaderData
+                                                                                                    $crate::__pgrx_c_bindings::PageHeaderData
                                                                                                 >,
                                                                                                 $crate::__pgrx_c_macros::expression::ReadWrite
                                                                                             >,
@@ -1118,7 +1175,7 @@ macro_rules! GistClearFollowRight {
                         $crate::__pgrx_c_macros::expression::bitnot(
                             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                 $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                    $crate::F_FOLLOW_RIGHT as i32
+                                    $crate::__pgrx_c_bindings::F_FOLLOW_RIGHT as i32
                                 )
                             )
                         )
@@ -1169,10 +1226,10 @@ macro_rules! GistClearFollowRight {
                                                 _
                                             >(
                                                 $crate::__pgrx_c_macros::expression::cast_as::<
-                                                    $crate::GISTPageOpaque,
+                                                    $crate::__pgrx_c_bindings::GISTPageOpaque,
                                                     $crate::__pgrx_c_macros::expression::CPointer<
                                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                                            $crate::GISTPageOpaqueData
+                                                            $crate::__pgrx_c_bindings::GISTPageOpaqueData
                                                         >,
                                                         $crate::__pgrx_c_macros::expression::ReadWrite
                                                     >,
@@ -1189,16 +1246,22 @@ macro_rules! GistClearFollowRight {
                                                                         true,
                                                                         _
                                                                     >(
-                                                                        $crate::__pgrx_c_generated::Inline_777d7ad23546580e873e0206a9a6e1cd(
+                                                                        $crate::__pgrx_c_bindings::PageValidateSpecialPointer(
                                                                             <
                                                                                 $crate::__pgrx_c_macros::expression::CPointer<
-                                                                                    $crate::__pgrx_c_macros::CChar,
+                                                                                    $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                                        $crate::__pgrx_c_macros::CChar,
+                                                                                        ::core::ffi::c_char
+                                                                                    >,
                                                                                     $crate::__pgrx_c_macros::expression::ReadOnly
                                                                                 > as $crate::__pgrx_c_macros::expression::CType
                                                                             >::into_storage(
                                                                                 $crate::__pgrx_c_macros::expression::implicit::<
                                                                                     $crate::__pgrx_c_macros::expression::CPointer<
-                                                                                        $crate::__pgrx_c_macros::CChar,
+                                                                                        $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                                            $crate::__pgrx_c_macros::CChar,
+                                                                                            ::core::ffi::c_char
+                                                                                        >,
                                                                                         $crate::__pgrx_c_macros::expression::ReadOnly
                                                                                     >,
                                                                                     _
@@ -1259,10 +1322,10 @@ macro_rules! GistClearFollowRight {
                                                                                                     _
                                                                                                 >(
                                                                                                     $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                                                        $crate::PageHeader,
+                                                                                                        $crate::__pgrx_c_bindings::PageHeader,
                                                                                                         $crate::__pgrx_c_macros::expression::CPointer<
                                                                                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                                $crate::PageHeaderData
+                                                                                                                $crate::__pgrx_c_bindings::PageHeaderData
                                                                                                             >,
                                                                                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                                                                                         >,
@@ -1307,7 +1370,7 @@ macro_rules! GistClearFollowRight {
                                         >(
                                             $crate::__pgrx_c_macros::CValue::<
                                                 $crate::__pgrx_c_macros::CInt
-                                            >::new($crate::F_FOLLOW_RIGHT as i32)
+                                            >::new($crate::__pgrx_c_bindings::F_FOLLOW_RIGHT as i32)
                                         )
                                     )
                                 ),
@@ -1342,10 +1405,10 @@ macro_rules! GistClearFollowRight {
                             (
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::cast_as::<
-                                        $crate::GISTPageOpaque,
+                                        $crate::__pgrx_c_bindings::GISTPageOpaque,
                                         $crate::__pgrx_c_macros::expression::CPointer<
                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                $crate::GISTPageOpaqueData
+                                                $crate::__pgrx_c_bindings::GISTPageOpaqueData
                                             >,
                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                         >,
@@ -1362,16 +1425,22 @@ macro_rules! GistClearFollowRight {
                                                             true,
                                                             _
                                                         >(
-                                                            $crate::__pgrx_c_generated::Inline_777d7ad23546580e873e0206a9a6e1cd(
+                                                            $crate::__pgrx_c_bindings::PageValidateSpecialPointer(
                                                                 <
                                                                     $crate::__pgrx_c_macros::expression::CPointer<
-                                                                        $crate::__pgrx_c_macros::CChar,
+                                                                        $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                            $crate::__pgrx_c_macros::CChar,
+                                                                            ::core::ffi::c_char
+                                                                        >,
                                                                         $crate::__pgrx_c_macros::expression::ReadOnly
                                                                     > as $crate::__pgrx_c_macros::expression::CType
                                                                 >::into_storage(
                                                                     $crate::__pgrx_c_macros::expression::implicit::<
                                                                         $crate::__pgrx_c_macros::expression::CPointer<
-                                                                            $crate::__pgrx_c_macros::CChar,
+                                                                            $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                                $crate::__pgrx_c_macros::CChar,
+                                                                                ::core::ffi::c_char
+                                                                            >,
                                                                             $crate::__pgrx_c_macros::expression::ReadOnly
                                                                         >,
                                                                         _
@@ -1428,10 +1497,10 @@ macro_rules! GistClearFollowRight {
                                                                                         _
                                                                                     >(
                                                                                         $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                                            $crate::PageHeader,
+                                                                                            $crate::__pgrx_c_bindings::PageHeader,
                                                                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                    $crate::PageHeaderData
+                                                                                                    $crate::__pgrx_c_bindings::PageHeaderData
                                                                                                 >,
                                                                                                 $crate::__pgrx_c_macros::expression::ReadWrite
                                                                                             >,
@@ -1472,7 +1541,7 @@ macro_rules! GistClearFollowRight {
                         $crate::__pgrx_c_macros::expression::bitnot(
                             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                 $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                    $crate::F_FOLLOW_RIGHT as i32
+                                    $crate::__pgrx_c_bindings::F_FOLLOW_RIGHT as i32
                                 )
                             )
                         )
@@ -1492,8 +1561,8 @@ macro_rules! GistClearFollowRight {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -1524,23 +1593,23 @@ macro_rules! __pgrx_c_args_GistClearPageHasGarbage {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
         $crate::__pgrx_c_args_GistClearPageHasGarbage!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_GistClearPageHasGarbage!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GistClearPageHasGarbage!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GistClearPageHasGarbage!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -1549,7 +1618,7 @@ macro_rules! __pgrx_c_args_GistClearPageHasGarbage {
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
         $crate::__pgrx_c_args_GistClearPageHasGarbage!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
@@ -1575,17 +1644,17 @@ macro_rules! __pgrx_c_args_GistClearPageHasGarbage {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_GistClearPageHasGarbage!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_GistClearPageHasGarbage!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_GistClearPageHasGarbage!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -1612,13 +1681,13 @@ macro_rules! __pgrx_c_args_GistClearPageHasGarbage {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GistClearPageHasGarbage!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GistClearPageHasGarbage!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -1629,7 +1698,7 @@ macro_rules! __pgrx_c_args_GistClearPageHasGarbage {
         compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
-/// C macro GistClearPageHasGarbage from gist.h:183
+/// C macro GistClearPageHasGarbage from gist.h:179
 ///
 /// ```text
 /// #define GistClearPageHasGarbage( page ) ( GistPageGetOpaque ( page ) -> flags &= ~ F_HAS_GARBAGE )
@@ -1677,10 +1746,10 @@ macro_rules! GistClearPageHasGarbage {
                             (
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::cast_as::<
-                                        $crate::GISTPageOpaque,
+                                        $crate::__pgrx_c_bindings::GISTPageOpaque,
                                         $crate::__pgrx_c_macros::expression::CPointer<
                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                $crate::GISTPageOpaqueData
+                                                $crate::__pgrx_c_bindings::GISTPageOpaqueData
                                             >,
                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                         >,
@@ -1697,16 +1766,22 @@ macro_rules! GistClearPageHasGarbage {
                                                             true,
                                                             _
                                                         >(
-                                                            $crate::__pgrx_c_generated::Inline_777d7ad23546580e873e0206a9a6e1cd(
+                                                            $crate::__pgrx_c_bindings::PageValidateSpecialPointer(
                                                                 <
                                                                     $crate::__pgrx_c_macros::expression::CPointer<
-                                                                        $crate::__pgrx_c_macros::CChar,
+                                                                        $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                            $crate::__pgrx_c_macros::CChar,
+                                                                            ::core::ffi::c_char
+                                                                        >,
                                                                         $crate::__pgrx_c_macros::expression::ReadOnly
                                                                     > as $crate::__pgrx_c_macros::expression::CType
                                                                 >::into_storage(
                                                                     $crate::__pgrx_c_macros::expression::implicit::<
                                                                         $crate::__pgrx_c_macros::expression::CPointer<
-                                                                            $crate::__pgrx_c_macros::CChar,
+                                                                            $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                                $crate::__pgrx_c_macros::CChar,
+                                                                                ::core::ffi::c_char
+                                                                            >,
                                                                             $crate::__pgrx_c_macros::expression::ReadOnly
                                                                         >,
                                                                         _
@@ -1763,10 +1838,10 @@ macro_rules! GistClearPageHasGarbage {
                                                                                         _
                                                                                     >(
                                                                                         $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                                            $crate::PageHeader,
+                                                                                            $crate::__pgrx_c_bindings::PageHeader,
                                                                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                    $crate::PageHeaderData
+                                                                                                    $crate::__pgrx_c_bindings::PageHeaderData
                                                                                                 >,
                                                                                                 $crate::__pgrx_c_macros::expression::ReadWrite
                                                                                             >,
@@ -1807,7 +1882,7 @@ macro_rules! GistClearPageHasGarbage {
                         $crate::__pgrx_c_macros::expression::bitnot(
                             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                 $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                    $crate::F_HAS_GARBAGE as i32
+                                    $crate::__pgrx_c_bindings::F_HAS_GARBAGE as i32
                                 )
                             )
                         )
@@ -1858,10 +1933,10 @@ macro_rules! GistClearPageHasGarbage {
                                                 _
                                             >(
                                                 $crate::__pgrx_c_macros::expression::cast_as::<
-                                                    $crate::GISTPageOpaque,
+                                                    $crate::__pgrx_c_bindings::GISTPageOpaque,
                                                     $crate::__pgrx_c_macros::expression::CPointer<
                                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                                            $crate::GISTPageOpaqueData
+                                                            $crate::__pgrx_c_bindings::GISTPageOpaqueData
                                                         >,
                                                         $crate::__pgrx_c_macros::expression::ReadWrite
                                                     >,
@@ -1878,16 +1953,22 @@ macro_rules! GistClearPageHasGarbage {
                                                                         true,
                                                                         _
                                                                     >(
-                                                                        $crate::__pgrx_c_generated::Inline_777d7ad23546580e873e0206a9a6e1cd(
+                                                                        $crate::__pgrx_c_bindings::PageValidateSpecialPointer(
                                                                             <
                                                                                 $crate::__pgrx_c_macros::expression::CPointer<
-                                                                                    $crate::__pgrx_c_macros::CChar,
+                                                                                    $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                                        $crate::__pgrx_c_macros::CChar,
+                                                                                        ::core::ffi::c_char
+                                                                                    >,
                                                                                     $crate::__pgrx_c_macros::expression::ReadOnly
                                                                                 > as $crate::__pgrx_c_macros::expression::CType
                                                                             >::into_storage(
                                                                                 $crate::__pgrx_c_macros::expression::implicit::<
                                                                                     $crate::__pgrx_c_macros::expression::CPointer<
-                                                                                        $crate::__pgrx_c_macros::CChar,
+                                                                                        $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                                            $crate::__pgrx_c_macros::CChar,
+                                                                                            ::core::ffi::c_char
+                                                                                        >,
                                                                                         $crate::__pgrx_c_macros::expression::ReadOnly
                                                                                     >,
                                                                                     _
@@ -1948,10 +2029,10 @@ macro_rules! GistClearPageHasGarbage {
                                                                                                     _
                                                                                                 >(
                                                                                                     $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                                                        $crate::PageHeader,
+                                                                                                        $crate::__pgrx_c_bindings::PageHeader,
                                                                                                         $crate::__pgrx_c_macros::expression::CPointer<
                                                                                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                                $crate::PageHeaderData
+                                                                                                                $crate::__pgrx_c_bindings::PageHeaderData
                                                                                                             >,
                                                                                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                                                                                         >,
@@ -1996,7 +2077,7 @@ macro_rules! GistClearPageHasGarbage {
                                         >(
                                             $crate::__pgrx_c_macros::CValue::<
                                                 $crate::__pgrx_c_macros::CInt
-                                            >::new($crate::F_HAS_GARBAGE as i32)
+                                            >::new($crate::__pgrx_c_bindings::F_HAS_GARBAGE as i32)
                                         )
                                     )
                                 ),
@@ -2031,10 +2112,10 @@ macro_rules! GistClearPageHasGarbage {
                             (
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::cast_as::<
-                                        $crate::GISTPageOpaque,
+                                        $crate::__pgrx_c_bindings::GISTPageOpaque,
                                         $crate::__pgrx_c_macros::expression::CPointer<
                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                $crate::GISTPageOpaqueData
+                                                $crate::__pgrx_c_bindings::GISTPageOpaqueData
                                             >,
                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                         >,
@@ -2051,16 +2132,22 @@ macro_rules! GistClearPageHasGarbage {
                                                             true,
                                                             _
                                                         >(
-                                                            $crate::__pgrx_c_generated::Inline_777d7ad23546580e873e0206a9a6e1cd(
+                                                            $crate::__pgrx_c_bindings::PageValidateSpecialPointer(
                                                                 <
                                                                     $crate::__pgrx_c_macros::expression::CPointer<
-                                                                        $crate::__pgrx_c_macros::CChar,
+                                                                        $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                            $crate::__pgrx_c_macros::CChar,
+                                                                            ::core::ffi::c_char
+                                                                        >,
                                                                         $crate::__pgrx_c_macros::expression::ReadOnly
                                                                     > as $crate::__pgrx_c_macros::expression::CType
                                                                 >::into_storage(
                                                                     $crate::__pgrx_c_macros::expression::implicit::<
                                                                         $crate::__pgrx_c_macros::expression::CPointer<
-                                                                            $crate::__pgrx_c_macros::CChar,
+                                                                            $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                                $crate::__pgrx_c_macros::CChar,
+                                                                                ::core::ffi::c_char
+                                                                            >,
                                                                             $crate::__pgrx_c_macros::expression::ReadOnly
                                                                         >,
                                                                         _
@@ -2117,10 +2204,10 @@ macro_rules! GistClearPageHasGarbage {
                                                                                         _
                                                                                     >(
                                                                                         $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                                            $crate::PageHeader,
+                                                                                            $crate::__pgrx_c_bindings::PageHeader,
                                                                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                    $crate::PageHeaderData
+                                                                                                    $crate::__pgrx_c_bindings::PageHeaderData
                                                                                                 >,
                                                                                                 $crate::__pgrx_c_macros::expression::ReadWrite
                                                                                             >,
@@ -2161,7 +2248,7 @@ macro_rules! GistClearPageHasGarbage {
                         $crate::__pgrx_c_macros::expression::bitnot(
                             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                 $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                    $crate::F_HAS_GARBAGE as i32
+                                    $crate::__pgrx_c_bindings::F_HAS_GARBAGE as i32
                                 )
                             )
                         )
@@ -2181,691 +2268,8 @@ macro_rules! GistClearPageHasGarbage {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
-    target_pointer_width = "64",
-    target_endian = "little"
-)))]
-#[cfg(not(docsrs))]
-compile_error!("generated C macros require their inspected C target profile");
-const _: () = {
-    use crate::__pgrx_c_macros::CInteger as _;
-    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
-    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
-    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
-    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
-    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
-    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
-    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
-    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
-};
-#[doc(hidden)]
-#[macro_export]
-macro_rules! __pgrx_c_args_GistClearTuplesDeleted {
-    (@collect $mode:ident [$($done:tt)*]; $($raw:tt)*) => {
-        $crate::__pgrx_c_args_GistClearTuplesDeleted!(@p0 $mode [$($done)*]; $($raw)*)
-    };
-    (@classified [$next:ident $mode:ident [$($done:tt)*] [$($rest:tt)*]] $descriptor:tt) => {
-        $crate::__pgrx_c_args_GistClearTuplesDeleted!(
-            @$next $mode [$($done)* $descriptor,];
-            $($rest)*
-        )
-    };
-    (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_GistClearTuplesDeleted!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
-        )
-    };
-    (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_GistClearTuplesDeleted!(@p1 $mode [$($done)* (@native [$argument]),];)
-    };
-    (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_GistClearTuplesDeleted!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
-            $($rest)*
-        )
-    };
-    (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_GistClearTuplesDeleted!(
-            @p1 $mode [$($done)* (@native [$argument]),];
-            $($rest)*
-        )
-    };
-    (@p0 $mode:ident [$($done:tt)*]; - $($raw:tt)*) => {
-        $crate::__pgrx_c_args_GistClearTuplesDeleted!(@negative0 $mode [$($done)*]; - $($raw)*)
-    };
-    (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_GistClearTuplesDeleted!(@p1 $mode [$($done)* (@native [$argument]),];)
-    };
-    (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
-        $crate::__pgrx_c_classify!(
-            @argument [__pgrx_c_args_GistClearTuplesDeleted] [p1 $mode [$($done)*] []] [
-                $head $(::$tail)* ! $group
-            ]
-        )
-    };
-    (@p0 $mode:ident [$($done:tt)*]; ::$head:ident $(::$tail:ident)* ! $group:tt) => {
-        $crate::__pgrx_c_classify!(
-            @argument [__pgrx_c_args_GistClearTuplesDeleted] [p1 $mode [$($done)*] []] [
-                ::$head $(::$tail)* ! $group
-            ]
-        )
-    };
-    (@p0 $mode:ident [$($done:tt)*]; ($($inner:tt)*)) => {
-        $crate::__pgrx_c_classify!(
-            @argument [__pgrx_c_args_GistClearTuplesDeleted] [p1 $mode [$($done)*] []] [
-                ($($inner)*)
-            ]
-        )
-    };
-    (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_GistClearTuplesDeleted!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
-        )
-    };
-    (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_GistClearTuplesDeleted!(@p1 $mode [$($done)* (@native [$argument]),];)
-    };
-    (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
-        $crate::__pgrx_c_args_GistClearTuplesDeleted!(
-            @p1 $mode [$($done)* (@native [$argument]),];
-            $($rest)*
-        )
-    };
-    (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
-        $crate::__pgrx_c_classify!(
-            @argument [__pgrx_c_args_GistClearTuplesDeleted] [p1 $mode [$($done)*] [$($rest)*]] [
-                $head $(::$tail)* ! $group
-            ]
-        )
-    };
-    (@p0 $mode:ident [$($done:tt)*]; ::$head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
-        $crate::__pgrx_c_classify!(
-            @argument [__pgrx_c_args_GistClearTuplesDeleted] [p1 $mode [$($done)*] [$($rest)*]] [
-                ::$head $(::$tail)* ! $group
-            ]
-        )
-    };
-    (@p0 $mode:ident [$($done:tt)*]; ($($inner:tt)*), $($rest:tt)*) => {
-        $crate::__pgrx_c_classify!(
-            @argument [__pgrx_c_args_GistClearTuplesDeleted] [p1 $mode [$($done)*] [$($rest)*]] [
-                ($($inner)*)
-            ]
-        )
-    };
-    (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_GistClearTuplesDeleted!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
-            $($rest)*
-        )
-    };
-    (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_GistClearTuplesDeleted!(
-            @p1 $mode [$($done)* (@native [$argument]),];
-            $($rest)*
-        )
-    };
-    (@p1 $mode:ident [$($done:tt)*];) => {
-        $crate::GistClearTuplesDeleted!(@$mode; $($done)*)
-    };
-    ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
-    };
-}
-/// C macro GistClearTuplesDeleted from gist.h:179
-///
-/// ```text
-/// #define GistClearTuplesDeleted( page ) ( GistPageGetOpaque ( page ) -> flags &= ~ F_TUPLES_DELETED )
-/// ```
-///
-///
-/// # Safety
-///
-/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
-///
-/// # Panics
-///
-/// Checked signed arithmetic rejects overflow when the recorded C profile does not define wrapping; pointer arithmetic checks representable offsets and distances but still requires valid allocation bounds. Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
-#[macro_export]
-macro_rules! GistClearTuplesDeleted {
-    (@__pgrx_emit_check_safety; $page:tt $(,)?) => {
-        {
-            if false {
-                $crate::__pgrx_c_operand!(@check_safety; $page);
-            }
-        }
-    };
-    (@__pgrx_c_check_safety; $($raw:tt)*) => {
-        $crate::__pgrx_c_args_GistClearTuplesDeleted!(
-            @collect __pgrx_emit_check_safety [];
-            $($raw)*
-        )
-    };
-    (@__pgrx_emit_public; $page:tt $(,)?) => {
-        $crate::__pgrx_c_macros::expression_result::finish(
-            $crate::GistClearTuplesDeleted!(@__pgrx_emit_value; $page)
-        )
-    };
-    (@__pgrx_emit_value; $page:tt $(,)?) => {
-        /* PGRX: GistPageGetOpaque remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */ /* PGRX: PageGetSpecialPointer remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */
-        (
-            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                $crate::__pgrx_c_macros::expression::modify(
-                    $crate::__pgrx_c_macros::expression::project::<
-                        $crate::__pgrx_c_generated::Field_flags,
-                        _,
-                        _
-                    >(
-                        $crate::__pgrx_c_macros::expression::pointee(
-                            (
-                                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                                    $crate::__pgrx_c_macros::expression::cast_as::<
-                                        $crate::GISTPageOpaque,
-                                        $crate::__pgrx_c_macros::expression::CPointer<
-                                            $crate::__pgrx_c_macros::expression::CRecord<
-                                                $crate::GISTPageOpaqueData
-                                            >,
-                                            $crate::__pgrx_c_macros::expression::ReadWrite
-                                        >,
-                                        _
-                                    >(
-                                        (
-                                            $crate::__pgrx_c_macros::expression::profile_value::<
-                                                true,
-                                                _
-                                            >(
-                                                {
-                                                    {
-                                                        let _ = $crate::__pgrx_c_macros::expression::profile_value::<
-                                                            true,
-                                                            _
-                                                        >(
-                                                            $crate::__pgrx_c_generated::Inline_777d7ad23546580e873e0206a9a6e1cd(
-                                                                <
-                                                                    $crate::__pgrx_c_macros::expression::CPointer<
-                                                                        $crate::__pgrx_c_macros::CChar,
-                                                                        $crate::__pgrx_c_macros::expression::ReadOnly
-                                                                    > as $crate::__pgrx_c_macros::expression::CType
-                                                                >::into_storage(
-                                                                    $crate::__pgrx_c_macros::expression::implicit::<
-                                                                        $crate::__pgrx_c_macros::expression::CPointer<
-                                                                            $crate::__pgrx_c_macros::CChar,
-                                                                            $crate::__pgrx_c_macros::expression::ReadOnly
-                                                                        >,
-                                                                        _
-                                                                    >(
-                                                                        $crate::__pgrx_c_macros::expression::profile_value::<
-                                                                            true,
-                                                                            _
-                                                                        >(
-                                                                            $crate::__pgrx_c_operand!(
-                                                                                @value [true];
-                                                                                $page
-                                                                            )
-                                                                        )
-                                                                    )
-                                                                ),
-                                                            )
-                                                        );
-                                                    };
-                                                    (
-                                                        $crate::__pgrx_c_macros::expression::profile_value::<
-                                                            true,
-                                                            _
-                                                        >(
-                                                            $crate::__pgrx_c_macros::expression::add::<
-                                                                $crate::__pgrx_c_macros::Wrapping,
-                                                                _,
-                                                                _
-                                                            >(
-                                                                (
-                                                                    $crate::__pgrx_c_macros::expression::profile_value::<
-                                                                        true,
-                                                                        _
-                                                                    >(
-                                                                        $crate::__pgrx_c_operand!(
-                                                                            @value [true];
-                                                                            $page
-                                                                        )
-                                                                    )
-                                                                ),
-                                                                $crate::__pgrx_c_macros::expression::profile_value::<
-                                                                    true,
-                                                                    _
-                                                                >(
-                                                                    $crate::__pgrx_c_macros::expression::load(
-                                                                        $crate::__pgrx_c_macros::expression::project::<
-                                                                            $crate::__pgrx_c_generated::Field_pd_special,
-                                                                            _,
-                                                                            _
-                                                                        >(
-                                                                            $crate::__pgrx_c_macros::expression::pointee(
-                                                                                (
-                                                                                    $crate::__pgrx_c_macros::expression::profile_value::<
-                                                                                        true,
-                                                                                        _
-                                                                                    >(
-                                                                                        $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                                            $crate::PageHeader,
-                                                                                            $crate::__pgrx_c_macros::expression::CPointer<
-                                                                                                $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                    $crate::PageHeaderData
-                                                                                                >,
-                                                                                                $crate::__pgrx_c_macros::expression::ReadWrite
-                                                                                            >,
-                                                                                            _
-                                                                                        >(
-                                                                                            (
-                                                                                                $crate::__pgrx_c_macros::expression::profile_value::<
-                                                                                                    true,
-                                                                                                    _
-                                                                                                >(
-                                                                                                    $crate::__pgrx_c_operand!(
-                                                                                                        @value [
-                                                                                                            true
-                                                                                                        ];
-                                                                                                        $page
-                                                                                                    )
-                                                                                                )
-                                                                                            )
-                                                                                        )
-                                                                                    )
-                                                                                )
-                                                                            )
-                                                                        )
-                                                                    )
-                                                                )
-                                                            )
-                                                        )
-                                                    )
-                                                }
-                                            )
-                                        )
-                                    )
-                                )
-                            )
-                        )
-                    ),
-                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                        $crate::__pgrx_c_macros::expression::bitnot(
-                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                                $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                    $crate::F_TUPLES_DELETED as i32
-                                )
-                            )
-                        )
-                    ),
-                    |__pgrx_old,
-                    __pgrx_rhs| $crate::__pgrx_c_macros::expression::bitand(__pgrx_old, __pgrx_rhs)
-                )
-            )
-        )
-    };
-    (@__pgrx_c_value; $($raw:tt)*) => {
-        $crate::__pgrx_c_args_GistClearTuplesDeleted!(@collect __pgrx_emit_value []; $($raw)*)
-    };
-    (@__pgrx_emit_place; $page:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
-    };
-    (@__pgrx_c_place; $($raw:tt)*) => {
-        $crate::__pgrx_c_args_GistClearTuplesDeleted!(@collect __pgrx_emit_place []; $($raw)*)
-    };
-    (@__pgrx_emit_read_place; $page:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
-    };
-    (@__pgrx_c_read_place; $($raw:tt)*) => {
-        $crate::__pgrx_c_args_GistClearTuplesDeleted!(@collect __pgrx_emit_read_place []; $($raw)*)
-    };
-    (@__pgrx_emit_size; $page:tt $(,)?) => {
-        /* PGRX: GistPageGetOpaque remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */ /* PGRX: PageGetSpecialPointer remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */
-        $crate::__pgrx_c_macros::expression::size_of_value_type(
-            if false {
-                {
-                    if false {
-                        $crate::__pgrx_c_operand!(@check_safety; $page);
-                    }
-                }
-                Some(
-                    unsafe {
-                        $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                            $crate::__pgrx_c_macros::expression::modify(
-                                $crate::__pgrx_c_macros::expression::project::<
-                                    $crate::__pgrx_c_generated::Field_flags,
-                                    _,
-                                    _
-                                >(
-                                    $crate::__pgrx_c_macros::expression::pointee(
-                                        (
-                                            $crate::__pgrx_c_macros::expression::profile_value::<
-                                                true,
-                                                _
-                                            >(
-                                                $crate::__pgrx_c_macros::expression::cast_as::<
-                                                    $crate::GISTPageOpaque,
-                                                    $crate::__pgrx_c_macros::expression::CPointer<
-                                                        $crate::__pgrx_c_macros::expression::CRecord<
-                                                            $crate::GISTPageOpaqueData
-                                                        >,
-                                                        $crate::__pgrx_c_macros::expression::ReadWrite
-                                                    >,
-                                                    _
-                                                >(
-                                                    (
-                                                        $crate::__pgrx_c_macros::expression::profile_value::<
-                                                            true,
-                                                            _
-                                                        >(
-                                                            {
-                                                                {
-                                                                    let _ = $crate::__pgrx_c_macros::expression::profile_value::<
-                                                                        true,
-                                                                        _
-                                                                    >(
-                                                                        $crate::__pgrx_c_generated::Inline_777d7ad23546580e873e0206a9a6e1cd(
-                                                                            <
-                                                                                $crate::__pgrx_c_macros::expression::CPointer<
-                                                                                    $crate::__pgrx_c_macros::CChar,
-                                                                                    $crate::__pgrx_c_macros::expression::ReadOnly
-                                                                                > as $crate::__pgrx_c_macros::expression::CType
-                                                                            >::into_storage(
-                                                                                $crate::__pgrx_c_macros::expression::implicit::<
-                                                                                    $crate::__pgrx_c_macros::expression::CPointer<
-                                                                                        $crate::__pgrx_c_macros::CChar,
-                                                                                        $crate::__pgrx_c_macros::expression::ReadOnly
-                                                                                    >,
-                                                                                    _
-                                                                                >(
-                                                                                    $crate::__pgrx_c_macros::expression::profile_value::<
-                                                                                        true,
-                                                                                        _
-                                                                                    >(
-                                                                                        $crate::__pgrx_c_operand!(
-                                                                                            @value [
-                                                                                                true
-                                                                                            ];
-                                                                                            $page
-                                                                                        )
-                                                                                    )
-                                                                                )
-                                                                            ),
-                                                                        )
-                                                                    );
-                                                                };
-                                                                (
-                                                                    $crate::__pgrx_c_macros::expression::profile_value::<
-                                                                        true,
-                                                                        _
-                                                                    >(
-                                                                        $crate::__pgrx_c_macros::expression::add::<
-                                                                            $crate::__pgrx_c_macros::Wrapping,
-                                                                            _,
-                                                                            _
-                                                                        >(
-                                                                            (
-                                                                                $crate::__pgrx_c_macros::expression::profile_value::<
-                                                                                    true,
-                                                                                    _
-                                                                                >(
-                                                                                    $crate::__pgrx_c_operand!(
-                                                                                        @value [
-                                                                                            true
-                                                                                        ];
-                                                                                        $page
-                                                                                    )
-                                                                                )
-                                                                            ),
-                                                                            $crate::__pgrx_c_macros::expression::profile_value::<
-                                                                                true,
-                                                                                _
-                                                                            >(
-                                                                                $crate::__pgrx_c_macros::expression::load(
-                                                                                    $crate::__pgrx_c_macros::expression::project::<
-                                                                                        $crate::__pgrx_c_generated::Field_pd_special,
-                                                                                        _,
-                                                                                        _
-                                                                                    >(
-                                                                                        $crate::__pgrx_c_macros::expression::pointee(
-                                                                                            (
-                                                                                                $crate::__pgrx_c_macros::expression::profile_value::<
-                                                                                                    true,
-                                                                                                    _
-                                                                                                >(
-                                                                                                    $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                                                        $crate::PageHeader,
-                                                                                                        $crate::__pgrx_c_macros::expression::CPointer<
-                                                                                                            $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                                $crate::PageHeaderData
-                                                                                                            >,
-                                                                                                            $crate::__pgrx_c_macros::expression::ReadWrite
-                                                                                                        >,
-                                                                                                        _
-                                                                                                    >(
-                                                                                                        (
-                                                                                                            $crate::__pgrx_c_macros::expression::profile_value::<
-                                                                                                                true,
-                                                                                                                _
-                                                                                                            >(
-                                                                                                                $crate::__pgrx_c_operand!(
-                                                                                                                    @value [
-                                                                                                                        true
-                                                                                                                    ];
-                                                                                                                    $page
-                                                                                                                )
-                                                                                                            )
-                                                                                                        )
-                                                                                                    )
-                                                                                                )
-                                                                                            )
-                                                                                        )
-                                                                                    )
-                                                                                )
-                                                                            )
-                                                                        )
-                                                                    )
-                                                                )
-                                                            }
-                                                        )
-                                                    )
-                                                )
-                                            )
-                                        )
-                                    )
-                                ),
-                                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                                    $crate::__pgrx_c_macros::expression::bitnot(
-                                        $crate::__pgrx_c_macros::expression::profile_value::<
-                                            true,
-                                            _
-                                        >(
-                                            $crate::__pgrx_c_macros::CValue::<
-                                                $crate::__pgrx_c_macros::CInt
-                                            >::new($crate::F_TUPLES_DELETED as i32)
-                                        )
-                                    )
-                                ),
-                                |__pgrx_old,
-                                __pgrx_rhs| $crate::__pgrx_c_macros::expression::bitand(
-                                    __pgrx_old,
-                                    __pgrx_rhs
-                                )
-                            )
-                        )
-                    }
-                )
-            } else {
-                None
-            }
-        )
-    };
-    (@__pgrx_c_size; $($raw:tt)*) => {
-        $crate::__pgrx_c_args_GistClearTuplesDeleted!(@collect __pgrx_emit_size []; $($raw)*)
-    };
-    (@__pgrx_emit_discard; $page:tt $(,)?) => {
-        /* PGRX: GistPageGetOpaque remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */ /* PGRX: PageGetSpecialPointer remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */
-        {
-            let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                $crate::__pgrx_c_macros::expression::modify(
-                    $crate::__pgrx_c_macros::expression::project::<
-                        $crate::__pgrx_c_generated::Field_flags,
-                        _,
-                        _
-                    >(
-                        $crate::__pgrx_c_macros::expression::pointee(
-                            (
-                                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                                    $crate::__pgrx_c_macros::expression::cast_as::<
-                                        $crate::GISTPageOpaque,
-                                        $crate::__pgrx_c_macros::expression::CPointer<
-                                            $crate::__pgrx_c_macros::expression::CRecord<
-                                                $crate::GISTPageOpaqueData
-                                            >,
-                                            $crate::__pgrx_c_macros::expression::ReadWrite
-                                        >,
-                                        _
-                                    >(
-                                        (
-                                            $crate::__pgrx_c_macros::expression::profile_value::<
-                                                true,
-                                                _
-                                            >(
-                                                {
-                                                    {
-                                                        let _ = $crate::__pgrx_c_macros::expression::profile_value::<
-                                                            true,
-                                                            _
-                                                        >(
-                                                            $crate::__pgrx_c_generated::Inline_777d7ad23546580e873e0206a9a6e1cd(
-                                                                <
-                                                                    $crate::__pgrx_c_macros::expression::CPointer<
-                                                                        $crate::__pgrx_c_macros::CChar,
-                                                                        $crate::__pgrx_c_macros::expression::ReadOnly
-                                                                    > as $crate::__pgrx_c_macros::expression::CType
-                                                                >::into_storage(
-                                                                    $crate::__pgrx_c_macros::expression::implicit::<
-                                                                        $crate::__pgrx_c_macros::expression::CPointer<
-                                                                            $crate::__pgrx_c_macros::CChar,
-                                                                            $crate::__pgrx_c_macros::expression::ReadOnly
-                                                                        >,
-                                                                        _
-                                                                    >(
-                                                                        $crate::__pgrx_c_macros::expression::profile_value::<
-                                                                            true,
-                                                                            _
-                                                                        >(
-                                                                            $crate::__pgrx_c_operand!(
-                                                                                @value [true];
-                                                                                $page
-                                                                            )
-                                                                        )
-                                                                    )
-                                                                ),
-                                                            )
-                                                        );
-                                                    };
-                                                    (
-                                                        $crate::__pgrx_c_macros::expression::profile_value::<
-                                                            true,
-                                                            _
-                                                        >(
-                                                            $crate::__pgrx_c_macros::expression::add::<
-                                                                $crate::__pgrx_c_macros::Wrapping,
-                                                                _,
-                                                                _
-                                                            >(
-                                                                (
-                                                                    $crate::__pgrx_c_macros::expression::profile_value::<
-                                                                        true,
-                                                                        _
-                                                                    >(
-                                                                        $crate::__pgrx_c_operand!(
-                                                                            @value [true];
-                                                                            $page
-                                                                        )
-                                                                    )
-                                                                ),
-                                                                $crate::__pgrx_c_macros::expression::profile_value::<
-                                                                    true,
-                                                                    _
-                                                                >(
-                                                                    $crate::__pgrx_c_macros::expression::load(
-                                                                        $crate::__pgrx_c_macros::expression::project::<
-                                                                            $crate::__pgrx_c_generated::Field_pd_special,
-                                                                            _,
-                                                                            _
-                                                                        >(
-                                                                            $crate::__pgrx_c_macros::expression::pointee(
-                                                                                (
-                                                                                    $crate::__pgrx_c_macros::expression::profile_value::<
-                                                                                        true,
-                                                                                        _
-                                                                                    >(
-                                                                                        $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                                            $crate::PageHeader,
-                                                                                            $crate::__pgrx_c_macros::expression::CPointer<
-                                                                                                $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                    $crate::PageHeaderData
-                                                                                                >,
-                                                                                                $crate::__pgrx_c_macros::expression::ReadWrite
-                                                                                            >,
-                                                                                            _
-                                                                                        >(
-                                                                                            (
-                                                                                                $crate::__pgrx_c_macros::expression::profile_value::<
-                                                                                                    true,
-                                                                                                    _
-                                                                                                >(
-                                                                                                    $crate::__pgrx_c_operand!(
-                                                                                                        @value [
-                                                                                                            true
-                                                                                                        ];
-                                                                                                        $page
-                                                                                                    )
-                                                                                                )
-                                                                                            )
-                                                                                        )
-                                                                                    )
-                                                                                )
-                                                                            )
-                                                                        )
-                                                                    )
-                                                                )
-                                                            )
-                                                        )
-                                                    )
-                                                }
-                                            )
-                                        )
-                                    )
-                                )
-                            )
-                        )
-                    ),
-                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                        $crate::__pgrx_c_macros::expression::bitnot(
-                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                                $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                    $crate::F_TUPLES_DELETED as i32
-                                )
-                            )
-                        )
-                    ),
-                    |__pgrx_old,
-                    __pgrx_rhs| $crate::__pgrx_c_macros::expression::bitand(__pgrx_old, __pgrx_rhs)
-                )
-            );
-        }
-    };
-    (@__pgrx_c_discard; $($raw:tt)*) => {
-        $crate::__pgrx_c_args_GistClearTuplesDeleted!(@collect __pgrx_emit_discard []; $($raw)*)
-    };
-    ($($raw:tt)*) => {
-        $crate::__pgrx_c_args_GistClearTuplesDeleted!(@collect __pgrx_emit_public []; $($raw)*)
-    };
-}
-
-#[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -2892,20 +2296,24 @@ macro_rules! __pgrx_c_args_GistFollowRight {
         $crate::__pgrx_c_args_GistFollowRight!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_GistFollowRight!(@p1 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_GistFollowRight!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_GistFollowRight!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_GistFollowRight!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GistFollowRight!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GistFollowRight!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -2913,7 +2321,9 @@ macro_rules! __pgrx_c_args_GistFollowRight {
         $crate::__pgrx_c_args_GistFollowRight!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_GistFollowRight!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_GistFollowRight!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -2935,14 +2345,18 @@ macro_rules! __pgrx_c_args_GistFollowRight {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_GistFollowRight!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_GistFollowRight!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_GistFollowRight!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_GistFollowRight!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_GistFollowRight!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -2969,13 +2383,13 @@ macro_rules! __pgrx_c_args_GistFollowRight {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GistFollowRight!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GistFollowRight!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -2986,7 +2400,7 @@ macro_rules! __pgrx_c_args_GistFollowRight {
         compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
-/// C macro GistFollowRight from gist.h:185
+/// C macro GistFollowRight from gist.h:181
 ///
 /// ```text
 /// #define GistFollowRight( page ) ( GistPageGetOpaque ( page ) -> flags & F_FOLLOW_RIGHT )
@@ -3036,10 +2450,10 @@ macro_rules! GistFollowRight {
                                             _
                                         >(
                                             $crate::__pgrx_c_macros::expression::cast_as::<
-                                                $crate::GISTPageOpaque,
+                                                $crate::__pgrx_c_bindings::GISTPageOpaque,
                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                        $crate::GISTPageOpaqueData
+                                                        $crate::__pgrx_c_bindings::GISTPageOpaqueData
                                                     >,
                                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                                 >,
@@ -3056,16 +2470,22 @@ macro_rules! GistFollowRight {
                                                                     true,
                                                                     _
                                                                 >(
-                                                                    $crate::__pgrx_c_generated::Inline_777d7ad23546580e873e0206a9a6e1cd(
+                                                                    $crate::__pgrx_c_bindings::PageValidateSpecialPointer(
                                                                         <
                                                                             $crate::__pgrx_c_macros::expression::CPointer<
-                                                                                $crate::__pgrx_c_macros::CChar,
+                                                                                $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                                    $crate::__pgrx_c_macros::CChar,
+                                                                                    ::core::ffi::c_char
+                                                                                >,
                                                                                 $crate::__pgrx_c_macros::expression::ReadOnly
                                                                             > as $crate::__pgrx_c_macros::expression::CType
                                                                         >::into_storage(
                                                                             $crate::__pgrx_c_macros::expression::implicit::<
                                                                                 $crate::__pgrx_c_macros::expression::CPointer<
-                                                                                    $crate::__pgrx_c_macros::CChar,
+                                                                                    $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                                        $crate::__pgrx_c_macros::CChar,
+                                                                                        ::core::ffi::c_char
+                                                                                    >,
                                                                                     $crate::__pgrx_c_macros::expression::ReadOnly
                                                                                 >,
                                                                                 _
@@ -3124,10 +2544,10 @@ macro_rules! GistFollowRight {
                                                                                                 _
                                                                                             >(
                                                                                                 $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                                                    $crate::PageHeader,
+                                                                                                    $crate::__pgrx_c_bindings::PageHeader,
                                                                                                     $crate::__pgrx_c_macros::expression::CPointer<
                                                                                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                            $crate::PageHeaderData
+                                                                                                            $crate::__pgrx_c_bindings::PageHeaderData
                                                                                                         >,
                                                                                                         $crate::__pgrx_c_macros::expression::ReadWrite
                                                                                                     >,
@@ -3168,7 +2588,7 @@ macro_rules! GistFollowRight {
                     ),
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                            $crate::F_FOLLOW_RIGHT as i32
+                            $crate::__pgrx_c_bindings::F_FOLLOW_RIGHT as i32
                         )
                     )
                 )
@@ -3217,10 +2637,10 @@ macro_rules! GistFollowRight {
                                                         _
                                                     >(
                                                         $crate::__pgrx_c_macros::expression::cast_as::<
-                                                            $crate::GISTPageOpaque,
+                                                            $crate::__pgrx_c_bindings::GISTPageOpaque,
                                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                                    $crate::GISTPageOpaqueData
+                                                                    $crate::__pgrx_c_bindings::GISTPageOpaqueData
                                                                 >,
                                                                 $crate::__pgrx_c_macros::expression::ReadWrite
                                                             >,
@@ -3237,16 +2657,22 @@ macro_rules! GistFollowRight {
                                                                                 true,
                                                                                 _
                                                                             >(
-                                                                                $crate::__pgrx_c_generated::Inline_777d7ad23546580e873e0206a9a6e1cd(
+                                                                                $crate::__pgrx_c_bindings::PageValidateSpecialPointer(
                                                                                     <
                                                                                         $crate::__pgrx_c_macros::expression::CPointer<
-                                                                                            $crate::__pgrx_c_macros::CChar,
+                                                                                            $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                                                $crate::__pgrx_c_macros::CChar,
+                                                                                                ::core::ffi::c_char
+                                                                                            >,
                                                                                             $crate::__pgrx_c_macros::expression::ReadOnly
                                                                                         > as $crate::__pgrx_c_macros::expression::CType
                                                                                     >::into_storage(
                                                                                         $crate::__pgrx_c_macros::expression::implicit::<
                                                                                             $crate::__pgrx_c_macros::expression::CPointer<
-                                                                                                $crate::__pgrx_c_macros::CChar,
+                                                                                                $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                                                    $crate::__pgrx_c_macros::CChar,
+                                                                                                    ::core::ffi::c_char
+                                                                                                >,
                                                                                                 $crate::__pgrx_c_macros::expression::ReadOnly
                                                                                             >,
                                                                                             _
@@ -3307,10 +2733,10 @@ macro_rules! GistFollowRight {
                                                                                                             _
                                                                                                         >(
                                                                                                             $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                                                                $crate::PageHeader,
+                                                                                                                $crate::__pgrx_c_bindings::PageHeader,
                                                                                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                                                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                                        $crate::PageHeaderData
+                                                                                                                        $crate::__pgrx_c_bindings::PageHeaderData
                                                                                                                     >,
                                                                                                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                                                                                                 >,
@@ -3351,7 +2777,7 @@ macro_rules! GistFollowRight {
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                        $crate::F_FOLLOW_RIGHT as i32
+                                        $crate::__pgrx_c_bindings::F_FOLLOW_RIGHT as i32
                                     )
                                 )
                             )
@@ -3385,10 +2811,10 @@ macro_rules! GistFollowRight {
                                             _
                                         >(
                                             $crate::__pgrx_c_macros::expression::cast_as::<
-                                                $crate::GISTPageOpaque,
+                                                $crate::__pgrx_c_bindings::GISTPageOpaque,
                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                        $crate::GISTPageOpaqueData
+                                                        $crate::__pgrx_c_bindings::GISTPageOpaqueData
                                                     >,
                                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                                 >,
@@ -3405,16 +2831,22 @@ macro_rules! GistFollowRight {
                                                                     true,
                                                                     _
                                                                 >(
-                                                                    $crate::__pgrx_c_generated::Inline_777d7ad23546580e873e0206a9a6e1cd(
+                                                                    $crate::__pgrx_c_bindings::PageValidateSpecialPointer(
                                                                         <
                                                                             $crate::__pgrx_c_macros::expression::CPointer<
-                                                                                $crate::__pgrx_c_macros::CChar,
+                                                                                $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                                    $crate::__pgrx_c_macros::CChar,
+                                                                                    ::core::ffi::c_char
+                                                                                >,
                                                                                 $crate::__pgrx_c_macros::expression::ReadOnly
                                                                             > as $crate::__pgrx_c_macros::expression::CType
                                                                         >::into_storage(
                                                                             $crate::__pgrx_c_macros::expression::implicit::<
                                                                                 $crate::__pgrx_c_macros::expression::CPointer<
-                                                                                    $crate::__pgrx_c_macros::CChar,
+                                                                                    $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                                        $crate::__pgrx_c_macros::CChar,
+                                                                                        ::core::ffi::c_char
+                                                                                    >,
                                                                                     $crate::__pgrx_c_macros::expression::ReadOnly
                                                                                 >,
                                                                                 _
@@ -3473,10 +2905,10 @@ macro_rules! GistFollowRight {
                                                                                                 _
                                                                                             >(
                                                                                                 $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                                                    $crate::PageHeader,
+                                                                                                    $crate::__pgrx_c_bindings::PageHeader,
                                                                                                     $crate::__pgrx_c_macros::expression::CPointer<
                                                                                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                            $crate::PageHeaderData
+                                                                                                            $crate::__pgrx_c_bindings::PageHeaderData
                                                                                                         >,
                                                                                                         $crate::__pgrx_c_macros::expression::ReadWrite
                                                                                                     >,
@@ -3517,7 +2949,7 @@ macro_rules! GistFollowRight {
                     ),
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                            $crate::F_FOLLOW_RIGHT as i32
+                            $crate::__pgrx_c_bindings::F_FOLLOW_RIGHT as i32
                         )
                     )
                 )
@@ -3533,8 +2965,8 @@ macro_rules! GistFollowRight {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -3561,20 +2993,24 @@ macro_rules! __pgrx_c_args_GistMarkFollowRight {
         $crate::__pgrx_c_args_GistMarkFollowRight!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_GistMarkFollowRight!(@p1 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_GistMarkFollowRight!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_GistMarkFollowRight!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_GistMarkFollowRight!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GistMarkFollowRight!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GistMarkFollowRight!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -3582,7 +3018,9 @@ macro_rules! __pgrx_c_args_GistMarkFollowRight {
         $crate::__pgrx_c_args_GistMarkFollowRight!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_GistMarkFollowRight!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_GistMarkFollowRight!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -3604,14 +3042,18 @@ macro_rules! __pgrx_c_args_GistMarkFollowRight {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_GistMarkFollowRight!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_GistMarkFollowRight!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_GistMarkFollowRight!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_GistMarkFollowRight!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_GistMarkFollowRight!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -3638,13 +3080,13 @@ macro_rules! __pgrx_c_args_GistMarkFollowRight {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GistMarkFollowRight!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GistMarkFollowRight!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -3655,7 +3097,7 @@ macro_rules! __pgrx_c_args_GistMarkFollowRight {
         compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
-/// C macro GistMarkFollowRight from gist.h:186
+/// C macro GistMarkFollowRight from gist.h:182
 ///
 /// ```text
 /// #define GistMarkFollowRight( page ) ( GistPageGetOpaque ( page ) -> flags |= F_FOLLOW_RIGHT )
@@ -3700,10 +3142,10 @@ macro_rules! GistMarkFollowRight {
                             (
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::cast_as::<
-                                        $crate::GISTPageOpaque,
+                                        $crate::__pgrx_c_bindings::GISTPageOpaque,
                                         $crate::__pgrx_c_macros::expression::CPointer<
                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                $crate::GISTPageOpaqueData
+                                                $crate::__pgrx_c_bindings::GISTPageOpaqueData
                                             >,
                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                         >,
@@ -3720,16 +3162,22 @@ macro_rules! GistMarkFollowRight {
                                                             true,
                                                             _
                                                         >(
-                                                            $crate::__pgrx_c_generated::Inline_777d7ad23546580e873e0206a9a6e1cd(
+                                                            $crate::__pgrx_c_bindings::PageValidateSpecialPointer(
                                                                 <
                                                                     $crate::__pgrx_c_macros::expression::CPointer<
-                                                                        $crate::__pgrx_c_macros::CChar,
+                                                                        $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                            $crate::__pgrx_c_macros::CChar,
+                                                                            ::core::ffi::c_char
+                                                                        >,
                                                                         $crate::__pgrx_c_macros::expression::ReadOnly
                                                                     > as $crate::__pgrx_c_macros::expression::CType
                                                                 >::into_storage(
                                                                     $crate::__pgrx_c_macros::expression::implicit::<
                                                                         $crate::__pgrx_c_macros::expression::CPointer<
-                                                                            $crate::__pgrx_c_macros::CChar,
+                                                                            $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                                $crate::__pgrx_c_macros::CChar,
+                                                                                ::core::ffi::c_char
+                                                                            >,
                                                                             $crate::__pgrx_c_macros::expression::ReadOnly
                                                                         >,
                                                                         _
@@ -3786,10 +3234,10 @@ macro_rules! GistMarkFollowRight {
                                                                                         _
                                                                                     >(
                                                                                         $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                                            $crate::PageHeader,
+                                                                                            $crate::__pgrx_c_bindings::PageHeader,
                                                                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                    $crate::PageHeaderData
+                                                                                                    $crate::__pgrx_c_bindings::PageHeaderData
                                                                                                 >,
                                                                                                 $crate::__pgrx_c_macros::expression::ReadWrite
                                                                                             >,
@@ -3828,7 +3276,7 @@ macro_rules! GistMarkFollowRight {
                     ),
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                            $crate::F_FOLLOW_RIGHT as i32
+                            $crate::__pgrx_c_bindings::F_FOLLOW_RIGHT as i32
                         )
                     ),
                     |__pgrx_old,
@@ -3877,10 +3325,10 @@ macro_rules! GistMarkFollowRight {
                                                 _
                                             >(
                                                 $crate::__pgrx_c_macros::expression::cast_as::<
-                                                    $crate::GISTPageOpaque,
+                                                    $crate::__pgrx_c_bindings::GISTPageOpaque,
                                                     $crate::__pgrx_c_macros::expression::CPointer<
                                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                                            $crate::GISTPageOpaqueData
+                                                            $crate::__pgrx_c_bindings::GISTPageOpaqueData
                                                         >,
                                                         $crate::__pgrx_c_macros::expression::ReadWrite
                                                     >,
@@ -3897,16 +3345,22 @@ macro_rules! GistMarkFollowRight {
                                                                         true,
                                                                         _
                                                                     >(
-                                                                        $crate::__pgrx_c_generated::Inline_777d7ad23546580e873e0206a9a6e1cd(
+                                                                        $crate::__pgrx_c_bindings::PageValidateSpecialPointer(
                                                                             <
                                                                                 $crate::__pgrx_c_macros::expression::CPointer<
-                                                                                    $crate::__pgrx_c_macros::CChar,
+                                                                                    $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                                        $crate::__pgrx_c_macros::CChar,
+                                                                                        ::core::ffi::c_char
+                                                                                    >,
                                                                                     $crate::__pgrx_c_macros::expression::ReadOnly
                                                                                 > as $crate::__pgrx_c_macros::expression::CType
                                                                             >::into_storage(
                                                                                 $crate::__pgrx_c_macros::expression::implicit::<
                                                                                     $crate::__pgrx_c_macros::expression::CPointer<
-                                                                                        $crate::__pgrx_c_macros::CChar,
+                                                                                        $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                                            $crate::__pgrx_c_macros::CChar,
+                                                                                            ::core::ffi::c_char
+                                                                                        >,
                                                                                         $crate::__pgrx_c_macros::expression::ReadOnly
                                                                                     >,
                                                                                     _
@@ -3967,10 +3421,10 @@ macro_rules! GistMarkFollowRight {
                                                                                                     _
                                                                                                 >(
                                                                                                     $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                                                        $crate::PageHeader,
+                                                                                                        $crate::__pgrx_c_bindings::PageHeader,
                                                                                                         $crate::__pgrx_c_macros::expression::CPointer<
                                                                                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                                $crate::PageHeaderData
+                                                                                                                $crate::__pgrx_c_bindings::PageHeaderData
                                                                                                             >,
                                                                                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                                                                                         >,
@@ -4009,7 +3463,7 @@ macro_rules! GistMarkFollowRight {
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                        $crate::F_FOLLOW_RIGHT as i32
+                                        $crate::__pgrx_c_bindings::F_FOLLOW_RIGHT as i32
                                     )
                                 ),
                                 |__pgrx_old,
@@ -4043,10 +3497,10 @@ macro_rules! GistMarkFollowRight {
                             (
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::cast_as::<
-                                        $crate::GISTPageOpaque,
+                                        $crate::__pgrx_c_bindings::GISTPageOpaque,
                                         $crate::__pgrx_c_macros::expression::CPointer<
                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                $crate::GISTPageOpaqueData
+                                                $crate::__pgrx_c_bindings::GISTPageOpaqueData
                                             >,
                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                         >,
@@ -4063,16 +3517,22 @@ macro_rules! GistMarkFollowRight {
                                                             true,
                                                             _
                                                         >(
-                                                            $crate::__pgrx_c_generated::Inline_777d7ad23546580e873e0206a9a6e1cd(
+                                                            $crate::__pgrx_c_bindings::PageValidateSpecialPointer(
                                                                 <
                                                                     $crate::__pgrx_c_macros::expression::CPointer<
-                                                                        $crate::__pgrx_c_macros::CChar,
+                                                                        $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                            $crate::__pgrx_c_macros::CChar,
+                                                                            ::core::ffi::c_char
+                                                                        >,
                                                                         $crate::__pgrx_c_macros::expression::ReadOnly
                                                                     > as $crate::__pgrx_c_macros::expression::CType
                                                                 >::into_storage(
                                                                     $crate::__pgrx_c_macros::expression::implicit::<
                                                                         $crate::__pgrx_c_macros::expression::CPointer<
-                                                                            $crate::__pgrx_c_macros::CChar,
+                                                                            $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                                $crate::__pgrx_c_macros::CChar,
+                                                                                ::core::ffi::c_char
+                                                                            >,
                                                                             $crate::__pgrx_c_macros::expression::ReadOnly
                                                                         >,
                                                                         _
@@ -4129,10 +3589,10 @@ macro_rules! GistMarkFollowRight {
                                                                                         _
                                                                                     >(
                                                                                         $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                                            $crate::PageHeader,
+                                                                                            $crate::__pgrx_c_bindings::PageHeader,
                                                                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                    $crate::PageHeaderData
+                                                                                                    $crate::__pgrx_c_bindings::PageHeaderData
                                                                                                 >,
                                                                                                 $crate::__pgrx_c_macros::expression::ReadWrite
                                                                                             >,
@@ -4171,7 +3631,7 @@ macro_rules! GistMarkFollowRight {
                     ),
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                            $crate::F_FOLLOW_RIGHT as i32
+                            $crate::__pgrx_c_bindings::F_FOLLOW_RIGHT as i32
                         )
                     ),
                     |__pgrx_old,
@@ -4189,8 +3649,8 @@ macro_rules! GistMarkFollowRight {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -4221,21 +3681,23 @@ macro_rules! __pgrx_c_args_GistMarkPageHasGarbage {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
         $crate::__pgrx_c_args_GistMarkPageHasGarbage!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_GistMarkPageHasGarbage!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_GistMarkPageHasGarbage!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GistMarkPageHasGarbage!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GistMarkPageHasGarbage!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -4243,7 +3705,9 @@ macro_rules! __pgrx_c_args_GistMarkPageHasGarbage {
         $crate::__pgrx_c_args_GistMarkPageHasGarbage!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_GistMarkPageHasGarbage!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_GistMarkPageHasGarbage!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -4268,15 +3732,17 @@ macro_rules! __pgrx_c_args_GistMarkPageHasGarbage {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_GistMarkPageHasGarbage!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_GistMarkPageHasGarbage!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_GistMarkPageHasGarbage!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_GistMarkPageHasGarbage!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -4303,13 +3769,13 @@ macro_rules! __pgrx_c_args_GistMarkPageHasGarbage {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GistMarkPageHasGarbage!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GistMarkPageHasGarbage!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -4320,7 +3786,7 @@ macro_rules! __pgrx_c_args_GistMarkPageHasGarbage {
         compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
-/// C macro GistMarkPageHasGarbage from gist.h:182
+/// C macro GistMarkPageHasGarbage from gist.h:178
 ///
 /// ```text
 /// #define GistMarkPageHasGarbage( page ) ( GistPageGetOpaque ( page ) -> flags |= F_HAS_GARBAGE )
@@ -4368,10 +3834,10 @@ macro_rules! GistMarkPageHasGarbage {
                             (
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::cast_as::<
-                                        $crate::GISTPageOpaque,
+                                        $crate::__pgrx_c_bindings::GISTPageOpaque,
                                         $crate::__pgrx_c_macros::expression::CPointer<
                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                $crate::GISTPageOpaqueData
+                                                $crate::__pgrx_c_bindings::GISTPageOpaqueData
                                             >,
                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                         >,
@@ -4388,16 +3854,22 @@ macro_rules! GistMarkPageHasGarbage {
                                                             true,
                                                             _
                                                         >(
-                                                            $crate::__pgrx_c_generated::Inline_777d7ad23546580e873e0206a9a6e1cd(
+                                                            $crate::__pgrx_c_bindings::PageValidateSpecialPointer(
                                                                 <
                                                                     $crate::__pgrx_c_macros::expression::CPointer<
-                                                                        $crate::__pgrx_c_macros::CChar,
+                                                                        $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                            $crate::__pgrx_c_macros::CChar,
+                                                                            ::core::ffi::c_char
+                                                                        >,
                                                                         $crate::__pgrx_c_macros::expression::ReadOnly
                                                                     > as $crate::__pgrx_c_macros::expression::CType
                                                                 >::into_storage(
                                                                     $crate::__pgrx_c_macros::expression::implicit::<
                                                                         $crate::__pgrx_c_macros::expression::CPointer<
-                                                                            $crate::__pgrx_c_macros::CChar,
+                                                                            $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                                $crate::__pgrx_c_macros::CChar,
+                                                                                ::core::ffi::c_char
+                                                                            >,
                                                                             $crate::__pgrx_c_macros::expression::ReadOnly
                                                                         >,
                                                                         _
@@ -4454,10 +3926,10 @@ macro_rules! GistMarkPageHasGarbage {
                                                                                         _
                                                                                     >(
                                                                                         $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                                            $crate::PageHeader,
+                                                                                            $crate::__pgrx_c_bindings::PageHeader,
                                                                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                    $crate::PageHeaderData
+                                                                                                    $crate::__pgrx_c_bindings::PageHeaderData
                                                                                                 >,
                                                                                                 $crate::__pgrx_c_macros::expression::ReadWrite
                                                                                             >,
@@ -4496,7 +3968,7 @@ macro_rules! GistMarkPageHasGarbage {
                     ),
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                            $crate::F_HAS_GARBAGE as i32
+                            $crate::__pgrx_c_bindings::F_HAS_GARBAGE as i32
                         )
                     ),
                     |__pgrx_old,
@@ -4545,10 +4017,10 @@ macro_rules! GistMarkPageHasGarbage {
                                                 _
                                             >(
                                                 $crate::__pgrx_c_macros::expression::cast_as::<
-                                                    $crate::GISTPageOpaque,
+                                                    $crate::__pgrx_c_bindings::GISTPageOpaque,
                                                     $crate::__pgrx_c_macros::expression::CPointer<
                                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                                            $crate::GISTPageOpaqueData
+                                                            $crate::__pgrx_c_bindings::GISTPageOpaqueData
                                                         >,
                                                         $crate::__pgrx_c_macros::expression::ReadWrite
                                                     >,
@@ -4565,16 +4037,22 @@ macro_rules! GistMarkPageHasGarbage {
                                                                         true,
                                                                         _
                                                                     >(
-                                                                        $crate::__pgrx_c_generated::Inline_777d7ad23546580e873e0206a9a6e1cd(
+                                                                        $crate::__pgrx_c_bindings::PageValidateSpecialPointer(
                                                                             <
                                                                                 $crate::__pgrx_c_macros::expression::CPointer<
-                                                                                    $crate::__pgrx_c_macros::CChar,
+                                                                                    $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                                        $crate::__pgrx_c_macros::CChar,
+                                                                                        ::core::ffi::c_char
+                                                                                    >,
                                                                                     $crate::__pgrx_c_macros::expression::ReadOnly
                                                                                 > as $crate::__pgrx_c_macros::expression::CType
                                                                             >::into_storage(
                                                                                 $crate::__pgrx_c_macros::expression::implicit::<
                                                                                     $crate::__pgrx_c_macros::expression::CPointer<
-                                                                                        $crate::__pgrx_c_macros::CChar,
+                                                                                        $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                                            $crate::__pgrx_c_macros::CChar,
+                                                                                            ::core::ffi::c_char
+                                                                                        >,
                                                                                         $crate::__pgrx_c_macros::expression::ReadOnly
                                                                                     >,
                                                                                     _
@@ -4635,10 +4113,10 @@ macro_rules! GistMarkPageHasGarbage {
                                                                                                     _
                                                                                                 >(
                                                                                                     $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                                                        $crate::PageHeader,
+                                                                                                        $crate::__pgrx_c_bindings::PageHeader,
                                                                                                         $crate::__pgrx_c_macros::expression::CPointer<
                                                                                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                                $crate::PageHeaderData
+                                                                                                                $crate::__pgrx_c_bindings::PageHeaderData
                                                                                                             >,
                                                                                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                                                                                         >,
@@ -4677,7 +4155,7 @@ macro_rules! GistMarkPageHasGarbage {
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                        $crate::F_HAS_GARBAGE as i32
+                                        $crate::__pgrx_c_bindings::F_HAS_GARBAGE as i32
                                     )
                                 ),
                                 |__pgrx_old,
@@ -4711,10 +4189,10 @@ macro_rules! GistMarkPageHasGarbage {
                             (
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::cast_as::<
-                                        $crate::GISTPageOpaque,
+                                        $crate::__pgrx_c_bindings::GISTPageOpaque,
                                         $crate::__pgrx_c_macros::expression::CPointer<
                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                $crate::GISTPageOpaqueData
+                                                $crate::__pgrx_c_bindings::GISTPageOpaqueData
                                             >,
                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                         >,
@@ -4731,16 +4209,22 @@ macro_rules! GistMarkPageHasGarbage {
                                                             true,
                                                             _
                                                         >(
-                                                            $crate::__pgrx_c_generated::Inline_777d7ad23546580e873e0206a9a6e1cd(
+                                                            $crate::__pgrx_c_bindings::PageValidateSpecialPointer(
                                                                 <
                                                                     $crate::__pgrx_c_macros::expression::CPointer<
-                                                                        $crate::__pgrx_c_macros::CChar,
+                                                                        $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                            $crate::__pgrx_c_macros::CChar,
+                                                                            ::core::ffi::c_char
+                                                                        >,
                                                                         $crate::__pgrx_c_macros::expression::ReadOnly
                                                                     > as $crate::__pgrx_c_macros::expression::CType
                                                                 >::into_storage(
                                                                     $crate::__pgrx_c_macros::expression::implicit::<
                                                                         $crate::__pgrx_c_macros::expression::CPointer<
-                                                                            $crate::__pgrx_c_macros::CChar,
+                                                                            $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                                $crate::__pgrx_c_macros::CChar,
+                                                                                ::core::ffi::c_char
+                                                                            >,
                                                                             $crate::__pgrx_c_macros::expression::ReadOnly
                                                                         >,
                                                                         _
@@ -4797,10 +4281,10 @@ macro_rules! GistMarkPageHasGarbage {
                                                                                         _
                                                                                     >(
                                                                                         $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                                            $crate::PageHeader,
+                                                                                            $crate::__pgrx_c_bindings::PageHeader,
                                                                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                    $crate::PageHeaderData
+                                                                                                    $crate::__pgrx_c_bindings::PageHeaderData
                                                                                                 >,
                                                                                                 $crate::__pgrx_c_macros::expression::ReadWrite
                                                                                             >,
@@ -4839,7 +4323,7 @@ macro_rules! GistMarkPageHasGarbage {
                     ),
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                            $crate::F_HAS_GARBAGE as i32
+                            $crate::__pgrx_c_bindings::F_HAS_GARBAGE as i32
                         )
                     ),
                     |__pgrx_old,
@@ -4857,8 +4341,8 @@ macro_rules! GistMarkPageHasGarbage {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -4877,119 +4361,142 @@ const _: () = {
 };
 #[doc(hidden)]
 #[macro_export]
-macro_rules! __pgrx_c_args_GistMarkTuplesDeleted {
+macro_rules! __pgrx_c_args_GistPageGetDeleteXid {
     (@collect $mode:ident [$($done:tt)*]; $($raw:tt)*) => {
-        $crate::__pgrx_c_args_GistMarkTuplesDeleted!(@p0 $mode [$($done)*]; $($raw)*)
+        $crate::__pgrx_c_args_GistPageGetDeleteXid!(@p0 $mode [$($done)*]; $($raw)*)
     };
     (@classified [$next:ident $mode:ident [$($done:tt)*] [$($rest:tt)*]] $descriptor:tt) => {
-        $crate::__pgrx_c_args_GistMarkTuplesDeleted!(
+        $crate::__pgrx_c_args_GistPageGetDeleteXid!(
             @$next $mode [$($done)* $descriptor,];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_GistMarkTuplesDeleted!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+        $crate::__pgrx_c_args_GistPageGetDeleteXid!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_GistMarkTuplesDeleted!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_GistPageGetDeleteXid!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_GistMarkTuplesDeleted!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+        $crate::__pgrx_c_args_GistPageGetDeleteXid!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_GistMarkTuplesDeleted!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+        $crate::__pgrx_c_args_GistPageGetDeleteXid!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $($raw:tt)*) => {
-        $crate::__pgrx_c_args_GistMarkTuplesDeleted!(@negative0 $mode [$($done)*]; - $($raw)*)
+        $crate::__pgrx_c_args_GistPageGetDeleteXid!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_GistMarkTuplesDeleted!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_GistPageGetDeleteXid!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
-            @argument [__pgrx_c_args_GistMarkTuplesDeleted] [p1 $mode [$($done)*] []] [
+            @argument [__pgrx_c_args_GistPageGetDeleteXid] [p1 $mode [$($done)*] []] [
                 $head $(::$tail)* ! $group
             ]
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; ::$head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
-            @argument [__pgrx_c_args_GistMarkTuplesDeleted] [p1 $mode [$($done)*] []] [
+            @argument [__pgrx_c_args_GistPageGetDeleteXid] [p1 $mode [$($done)*] []] [
                 ::$head $(::$tail)* ! $group
             ]
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; ($($inner:tt)*)) => {
         $crate::__pgrx_c_classify!(
-            @argument [__pgrx_c_args_GistMarkTuplesDeleted] [p1 $mode [$($done)*] []] [($($inner)*)]
+            @argument [__pgrx_c_args_GistPageGetDeleteXid] [p1 $mode [$($done)*] []] [($($inner)*)]
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_GistMarkTuplesDeleted!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_GistPageGetDeleteXid!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_GistMarkTuplesDeleted!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_GistPageGetDeleteXid!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
-        $crate::__pgrx_c_args_GistMarkTuplesDeleted!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+        $crate::__pgrx_c_args_GistPageGetDeleteXid!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
         $crate::__pgrx_c_classify!(
-            @argument [__pgrx_c_args_GistMarkTuplesDeleted] [p1 $mode [$($done)*] [$($rest)*]] [
+            @argument [__pgrx_c_args_GistPageGetDeleteXid] [p1 $mode [$($done)*] [$($rest)*]] [
                 $head $(::$tail)* ! $group
             ]
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; ::$head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
         $crate::__pgrx_c_classify!(
-            @argument [__pgrx_c_args_GistMarkTuplesDeleted] [p1 $mode [$($done)*] [$($rest)*]] [
+            @argument [__pgrx_c_args_GistPageGetDeleteXid] [p1 $mode [$($done)*] [$($rest)*]] [
                 ::$head $(::$tail)* ! $group
             ]
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; ($($inner:tt)*), $($rest:tt)*) => {
         $crate::__pgrx_c_classify!(
-            @argument [__pgrx_c_args_GistMarkTuplesDeleted] [p1 $mode [$($done)*] [$($rest)*]] [
+            @argument [__pgrx_c_args_GistPageGetDeleteXid] [p1 $mode [$($done)*] [$($rest)*]] [
                 ($($inner)*)
             ]
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_GistMarkTuplesDeleted!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+        $crate::__pgrx_c_args_GistPageGetDeleteXid!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_GistMarkTuplesDeleted!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+        $crate::__pgrx_c_args_GistPageGetDeleteXid!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
     (@p1 $mode:ident [$($done:tt)*];) => {
-        $crate::GistMarkTuplesDeleted!(@$mode; $($done)*)
+        $crate::GistPageGetDeleteXid!(@$mode; $($done)*)
     };
     ($($invalid:tt)*) => {
         compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
-/// C macro GistMarkTuplesDeleted from gist.h:178
+/// Typed call adapter for C inline function GistPageGetDeleteXid from gist.h:213
 ///
-/// ```text
-/// #define GistMarkTuplesDeleted( page ) ( GistPageGetOpaque ( page ) -> flags |= F_TUPLES_DELETED )
+/// ```c
+/// static inline FullTransactionId
+/// GistPageGetDeleteXid(Page page)
+/// {
+/// 	Assert(GistPageIsDeleted(page));
+///
+/// 	/* Is the deleteXid field present? */
+/// 	if (((PageHeader) page)->pd_lower >= MAXALIGN(SizeOfPageHeaderData) +
+/// 		offsetof(GISTDeletedPageContents, deleteXid) + sizeof(FullTransactionId))
+/// 	{
+/// 		return ((GISTDeletedPageContents *) PageGetContents(page))->deleteXid;
+/// 	}
+/// 	else
+/// 		return FullTransactionIdFromEpochAndXid(0, FirstNormalTransactionId);
+/// }
 /// ```
 ///
+///
+/// Calls the original function through its inspected C prototype. Each operand is evaluated once and converted using C parameter assignment rules. The result retains the function's original C type; `.get()` extracts its native storage, including `()` for a void result. Native calls retain the backend thread, PostgreSQL error, and caller safety contracts of the generated guarded binding.
 ///
 /// # Safety
 ///
@@ -4997,9 +4504,9 @@ macro_rules! __pgrx_c_args_GistMarkTuplesDeleted {
 ///
 /// # Panics
 ///
-/// Checked signed arithmetic rejects overflow when the recorded C profile does not define wrapping; pointer arithmetic checks representable offsets and distances but still requires valid allocation bounds. Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
 #[macro_export]
-macro_rules! GistMarkTuplesDeleted {
+macro_rules! GistPageGetDeleteXid {
     (@__pgrx_emit_check_safety; $page:tt $(,)?) => {
         {
             if false {
@@ -5008,181 +4515,65 @@ macro_rules! GistMarkTuplesDeleted {
         }
     };
     (@__pgrx_c_check_safety; $($raw:tt)*) => {
-        $crate::__pgrx_c_args_GistMarkTuplesDeleted!(@collect __pgrx_emit_check_safety []; $($raw)*)
+        $crate::__pgrx_c_args_GistPageGetDeleteXid!(@collect __pgrx_emit_check_safety []; $($raw)*)
     };
     (@__pgrx_emit_public; $page:tt $(,)?) => {
         $crate::__pgrx_c_macros::expression_result::finish(
-            $crate::GistMarkTuplesDeleted!(@__pgrx_emit_value; $page)
+            $crate::GistPageGetDeleteXid!(@__pgrx_emit_value; $page)
         )
     };
     (@__pgrx_emit_value; $page:tt $(,)?) => {
-        /* PGRX: GistPageGetOpaque remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */ /* PGRX: PageGetSpecialPointer remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */
-        (
-            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                $crate::__pgrx_c_macros::expression::modify(
-                    $crate::__pgrx_c_macros::expression::project::<
-                        $crate::__pgrx_c_generated::Field_flags,
-                        _,
-                        _
-                    >(
-                        $crate::__pgrx_c_macros::expression::pointee(
-                            (
-                                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                                    $crate::__pgrx_c_macros::expression::cast_as::<
-                                        $crate::GISTPageOpaque,
-                                        $crate::__pgrx_c_macros::expression::CPointer<
-                                            $crate::__pgrx_c_macros::expression::CRecord<
-                                                $crate::GISTPageOpaqueData
-                                            >,
-                                            $crate::__pgrx_c_macros::expression::ReadWrite
-                                        >,
-                                        _
-                                    >(
-                                        (
-                                            $crate::__pgrx_c_macros::expression::profile_value::<
-                                                true,
-                                                _
-                                            >(
-                                                {
-                                                    {
-                                                        let _ = $crate::__pgrx_c_macros::expression::profile_value::<
-                                                            true,
-                                                            _
-                                                        >(
-                                                            $crate::__pgrx_c_generated::Inline_777d7ad23546580e873e0206a9a6e1cd(
-                                                                <
-                                                                    $crate::__pgrx_c_macros::expression::CPointer<
-                                                                        $crate::__pgrx_c_macros::CChar,
-                                                                        $crate::__pgrx_c_macros::expression::ReadOnly
-                                                                    > as $crate::__pgrx_c_macros::expression::CType
-                                                                >::into_storage(
-                                                                    $crate::__pgrx_c_macros::expression::implicit::<
-                                                                        $crate::__pgrx_c_macros::expression::CPointer<
-                                                                            $crate::__pgrx_c_macros::CChar,
-                                                                            $crate::__pgrx_c_macros::expression::ReadOnly
-                                                                        >,
-                                                                        _
-                                                                    >(
-                                                                        $crate::__pgrx_c_macros::expression::profile_value::<
-                                                                            true,
-                                                                            _
-                                                                        >(
-                                                                            $crate::__pgrx_c_operand!(
-                                                                                @value [true];
-                                                                                $page
-                                                                            )
-                                                                        )
-                                                                    )
-                                                                ),
-                                                            )
-                                                        );
-                                                    };
-                                                    (
-                                                        $crate::__pgrx_c_macros::expression::profile_value::<
-                                                            true,
-                                                            _
-                                                        >(
-                                                            $crate::__pgrx_c_macros::expression::add::<
-                                                                $crate::__pgrx_c_macros::Wrapping,
-                                                                _,
-                                                                _
-                                                            >(
-                                                                (
-                                                                    $crate::__pgrx_c_macros::expression::profile_value::<
-                                                                        true,
-                                                                        _
-                                                                    >(
-                                                                        $crate::__pgrx_c_operand!(
-                                                                            @value [true];
-                                                                            $page
-                                                                        )
-                                                                    )
-                                                                ),
-                                                                $crate::__pgrx_c_macros::expression::profile_value::<
-                                                                    true,
-                                                                    _
-                                                                >(
-                                                                    $crate::__pgrx_c_macros::expression::load(
-                                                                        $crate::__pgrx_c_macros::expression::project::<
-                                                                            $crate::__pgrx_c_generated::Field_pd_special,
-                                                                            _,
-                                                                            _
-                                                                        >(
-                                                                            $crate::__pgrx_c_macros::expression::pointee(
-                                                                                (
-                                                                                    $crate::__pgrx_c_macros::expression::profile_value::<
-                                                                                        true,
-                                                                                        _
-                                                                                    >(
-                                                                                        $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                                            $crate::PageHeader,
-                                                                                            $crate::__pgrx_c_macros::expression::CPointer<
-                                                                                                $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                    $crate::PageHeaderData
-                                                                                                >,
-                                                                                                $crate::__pgrx_c_macros::expression::ReadWrite
-                                                                                            >,
-                                                                                            _
-                                                                                        >(
-                                                                                            (
-                                                                                                $crate::__pgrx_c_macros::expression::profile_value::<
-                                                                                                    true,
-                                                                                                    _
-                                                                                                >(
-                                                                                                    $crate::__pgrx_c_operand!(
-                                                                                                        @value [
-                                                                                                            true
-                                                                                                        ];
-                                                                                                        $page
-                                                                                                    )
-                                                                                                )
-                                                                                            )
-                                                                                        )
-                                                                                    )
-                                                                                )
-                                                                            )
-                                                                        )
-                                                                    )
-                                                                )
-                                                            )
-                                                        )
-                                                    )
-                                                }
-                                            )
-                                        )
-                                    )
-                                )
+        $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+            <
+                $crate::__pgrx_c_macros::expression::CRawRecord<
+                    $crate::__pgrx_c_bindings::FullTransactionId
+                > as $crate::__pgrx_c_macros::expression::CType
+            >::from_storage(
+                $crate::__pgrx_c_generated::Inline_6b324660af96747e88fb80cd2e18ff48(
+                    <
+                        $crate::__pgrx_c_macros::expression::CPointer<
+                            $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                $crate::__pgrx_c_macros::CChar,
+                                ::core::ffi::c_char
+                            >,
+                            $crate::__pgrx_c_macros::expression::ReadWrite
+                        > as $crate::__pgrx_c_macros::expression::CType
+                    >::into_storage(
+                        $crate::__pgrx_c_macros::expression::implicit::<
+                            $crate::__pgrx_c_macros::expression::CPointer<
+                                $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                    $crate::__pgrx_c_macros::CChar,
+                                    ::core::ffi::c_char
+                                >,
+                                $crate::__pgrx_c_macros::expression::ReadWrite
+                            >,
+                            _
+                        >(
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_operand!(@value [true]; $page)
                             )
                         )
                     ),
-                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                        $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                            $crate::F_TUPLES_DELETED as i32
-                        )
-                    ),
-                    |__pgrx_old,
-                    __pgrx_rhs| $crate::__pgrx_c_macros::expression::bitor(__pgrx_old, __pgrx_rhs)
                 )
             )
         )
     };
     (@__pgrx_c_value; $($raw:tt)*) => {
-        $crate::__pgrx_c_args_GistMarkTuplesDeleted!(@collect __pgrx_emit_value []; $($raw)*)
+        $crate::__pgrx_c_args_GistPageGetDeleteXid!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $page:tt $(,)?) => {
         compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
-        $crate::__pgrx_c_args_GistMarkTuplesDeleted!(@collect __pgrx_emit_place []; $($raw)*)
+        $crate::__pgrx_c_args_GistPageGetDeleteXid!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $page:tt $(,)?) => {
         compile_error!("C expression is not a place in this operation")
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
-        $crate::__pgrx_c_args_GistMarkTuplesDeleted!(@collect __pgrx_emit_read_place []; $($raw)*)
+        $crate::__pgrx_c_args_GistPageGetDeleteXid!(@collect __pgrx_emit_read_place []; $($raw)*)
     };
     (@__pgrx_emit_size; $page:tt $(,)?) => {
-        /* PGRX: GistPageGetOpaque remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */ /* PGRX: PageGetSpecialPointer remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
                 {
@@ -5193,158 +4584,37 @@ macro_rules! GistMarkTuplesDeleted {
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                            $crate::__pgrx_c_macros::expression::modify(
-                                $crate::__pgrx_c_macros::expression::project::<
-                                    $crate::__pgrx_c_generated::Field_flags,
-                                    _,
-                                    _
-                                >(
-                                    $crate::__pgrx_c_macros::expression::pointee(
-                                        (
+                            <
+                                $crate::__pgrx_c_macros::expression::CRawRecord<
+                                    $crate::__pgrx_c_bindings::FullTransactionId
+                                > as $crate::__pgrx_c_macros::expression::CType
+                            >::from_storage(
+                                $crate::__pgrx_c_generated::Inline_6b324660af96747e88fb80cd2e18ff48(
+                                    <
+                                        $crate::__pgrx_c_macros::expression::CPointer<
+                                            $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                $crate::__pgrx_c_macros::CChar,
+                                                ::core::ffi::c_char
+                                            >,
+                                            $crate::__pgrx_c_macros::expression::ReadWrite
+                                        > as $crate::__pgrx_c_macros::expression::CType
+                                    >::into_storage(
+                                        $crate::__pgrx_c_macros::expression::implicit::<
+                                            $crate::__pgrx_c_macros::expression::CPointer<
+                                                $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                    $crate::__pgrx_c_macros::CChar,
+                                                    ::core::ffi::c_char
+                                                >,
+                                                $crate::__pgrx_c_macros::expression::ReadWrite
+                                            >,
+                                            _
+                                        >(
                                             $crate::__pgrx_c_macros::expression::profile_value::<
                                                 true,
                                                 _
-                                            >(
-                                                $crate::__pgrx_c_macros::expression::cast_as::<
-                                                    $crate::GISTPageOpaque,
-                                                    $crate::__pgrx_c_macros::expression::CPointer<
-                                                        $crate::__pgrx_c_macros::expression::CRecord<
-                                                            $crate::GISTPageOpaqueData
-                                                        >,
-                                                        $crate::__pgrx_c_macros::expression::ReadWrite
-                                                    >,
-                                                    _
-                                                >(
-                                                    (
-                                                        $crate::__pgrx_c_macros::expression::profile_value::<
-                                                            true,
-                                                            _
-                                                        >(
-                                                            {
-                                                                {
-                                                                    let _ = $crate::__pgrx_c_macros::expression::profile_value::<
-                                                                        true,
-                                                                        _
-                                                                    >(
-                                                                        $crate::__pgrx_c_generated::Inline_777d7ad23546580e873e0206a9a6e1cd(
-                                                                            <
-                                                                                $crate::__pgrx_c_macros::expression::CPointer<
-                                                                                    $crate::__pgrx_c_macros::CChar,
-                                                                                    $crate::__pgrx_c_macros::expression::ReadOnly
-                                                                                > as $crate::__pgrx_c_macros::expression::CType
-                                                                            >::into_storage(
-                                                                                $crate::__pgrx_c_macros::expression::implicit::<
-                                                                                    $crate::__pgrx_c_macros::expression::CPointer<
-                                                                                        $crate::__pgrx_c_macros::CChar,
-                                                                                        $crate::__pgrx_c_macros::expression::ReadOnly
-                                                                                    >,
-                                                                                    _
-                                                                                >(
-                                                                                    $crate::__pgrx_c_macros::expression::profile_value::<
-                                                                                        true,
-                                                                                        _
-                                                                                    >(
-                                                                                        $crate::__pgrx_c_operand!(
-                                                                                            @value [
-                                                                                                true
-                                                                                            ];
-                                                                                            $page
-                                                                                        )
-                                                                                    )
-                                                                                )
-                                                                            ),
-                                                                        )
-                                                                    );
-                                                                };
-                                                                (
-                                                                    $crate::__pgrx_c_macros::expression::profile_value::<
-                                                                        true,
-                                                                        _
-                                                                    >(
-                                                                        $crate::__pgrx_c_macros::expression::add::<
-                                                                            $crate::__pgrx_c_macros::Wrapping,
-                                                                            _,
-                                                                            _
-                                                                        >(
-                                                                            (
-                                                                                $crate::__pgrx_c_macros::expression::profile_value::<
-                                                                                    true,
-                                                                                    _
-                                                                                >(
-                                                                                    $crate::__pgrx_c_operand!(
-                                                                                        @value [
-                                                                                            true
-                                                                                        ];
-                                                                                        $page
-                                                                                    )
-                                                                                )
-                                                                            ),
-                                                                            $crate::__pgrx_c_macros::expression::profile_value::<
-                                                                                true,
-                                                                                _
-                                                                            >(
-                                                                                $crate::__pgrx_c_macros::expression::load(
-                                                                                    $crate::__pgrx_c_macros::expression::project::<
-                                                                                        $crate::__pgrx_c_generated::Field_pd_special,
-                                                                                        _,
-                                                                                        _
-                                                                                    >(
-                                                                                        $crate::__pgrx_c_macros::expression::pointee(
-                                                                                            (
-                                                                                                $crate::__pgrx_c_macros::expression::profile_value::<
-                                                                                                    true,
-                                                                                                    _
-                                                                                                >(
-                                                                                                    $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                                                        $crate::PageHeader,
-                                                                                                        $crate::__pgrx_c_macros::expression::CPointer<
-                                                                                                            $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                                $crate::PageHeaderData
-                                                                                                            >,
-                                                                                                            $crate::__pgrx_c_macros::expression::ReadWrite
-                                                                                                        >,
-                                                                                                        _
-                                                                                                    >(
-                                                                                                        (
-                                                                                                            $crate::__pgrx_c_macros::expression::profile_value::<
-                                                                                                                true,
-                                                                                                                _
-                                                                                                            >(
-                                                                                                                $crate::__pgrx_c_operand!(
-                                                                                                                    @value [
-                                                                                                                        true
-                                                                                                                    ];
-                                                                                                                    $page
-                                                                                                                )
-                                                                                                            )
-                                                                                                        )
-                                                                                                    )
-                                                                                                )
-                                                                                            )
-                                                                                        )
-                                                                                    )
-                                                                                )
-                                                                            )
-                                                                        )
-                                                                    )
-                                                                )
-                                                            }
-                                                        )
-                                                    )
-                                                )
-                                            )
+                                            >($crate::__pgrx_c_operand!(@value [true]; $page))
                                         )
-                                    )
-                                ),
-                                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                                    $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                        $crate::F_TUPLES_DELETED as i32
-                                    )
-                                ),
-                                |__pgrx_old,
-                                __pgrx_rhs| $crate::__pgrx_c_macros::expression::bitor(
-                                    __pgrx_old,
-                                    __pgrx_rhs
+                                    ),
                                 )
                             )
                         )
@@ -5356,170 +4626,57 @@ macro_rules! GistMarkTuplesDeleted {
         )
     };
     (@__pgrx_c_size; $($raw:tt)*) => {
-        $crate::__pgrx_c_args_GistMarkTuplesDeleted!(@collect __pgrx_emit_size []; $($raw)*)
+        $crate::__pgrx_c_args_GistPageGetDeleteXid!(@collect __pgrx_emit_size []; $($raw)*)
     };
     (@__pgrx_emit_discard; $page:tt $(,)?) => {
-        /* PGRX: GistPageGetOpaque remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */ /* PGRX: PageGetSpecialPointer remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */
         {
             let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                $crate::__pgrx_c_macros::expression::modify(
-                    $crate::__pgrx_c_macros::expression::project::<
-                        $crate::__pgrx_c_generated::Field_flags,
-                        _,
-                        _
-                    >(
-                        $crate::__pgrx_c_macros::expression::pointee(
-                            (
+                <
+                    $crate::__pgrx_c_macros::expression::CRawRecord<
+                        $crate::__pgrx_c_bindings::FullTransactionId
+                    > as $crate::__pgrx_c_macros::expression::CType
+                >::from_storage(
+                    $crate::__pgrx_c_generated::Inline_6b324660af96747e88fb80cd2e18ff48(
+                        <
+                            $crate::__pgrx_c_macros::expression::CPointer<
+                                $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                    $crate::__pgrx_c_macros::CChar,
+                                    ::core::ffi::c_char
+                                >,
+                                $crate::__pgrx_c_macros::expression::ReadWrite
+                            > as $crate::__pgrx_c_macros::expression::CType
+                        >::into_storage(
+                            $crate::__pgrx_c_macros::expression::implicit::<
+                                $crate::__pgrx_c_macros::expression::CPointer<
+                                    $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                        $crate::__pgrx_c_macros::CChar,
+                                        ::core::ffi::c_char
+                                    >,
+                                    $crate::__pgrx_c_macros::expression::ReadWrite
+                                >,
+                                _
+                            >(
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                                    $crate::__pgrx_c_macros::expression::cast_as::<
-                                        $crate::GISTPageOpaque,
-                                        $crate::__pgrx_c_macros::expression::CPointer<
-                                            $crate::__pgrx_c_macros::expression::CRecord<
-                                                $crate::GISTPageOpaqueData
-                                            >,
-                                            $crate::__pgrx_c_macros::expression::ReadWrite
-                                        >,
-                                        _
-                                    >(
-                                        (
-                                            $crate::__pgrx_c_macros::expression::profile_value::<
-                                                true,
-                                                _
-                                            >(
-                                                {
-                                                    {
-                                                        let _ = $crate::__pgrx_c_macros::expression::profile_value::<
-                                                            true,
-                                                            _
-                                                        >(
-                                                            $crate::__pgrx_c_generated::Inline_777d7ad23546580e873e0206a9a6e1cd(
-                                                                <
-                                                                    $crate::__pgrx_c_macros::expression::CPointer<
-                                                                        $crate::__pgrx_c_macros::CChar,
-                                                                        $crate::__pgrx_c_macros::expression::ReadOnly
-                                                                    > as $crate::__pgrx_c_macros::expression::CType
-                                                                >::into_storage(
-                                                                    $crate::__pgrx_c_macros::expression::implicit::<
-                                                                        $crate::__pgrx_c_macros::expression::CPointer<
-                                                                            $crate::__pgrx_c_macros::CChar,
-                                                                            $crate::__pgrx_c_macros::expression::ReadOnly
-                                                                        >,
-                                                                        _
-                                                                    >(
-                                                                        $crate::__pgrx_c_macros::expression::profile_value::<
-                                                                            true,
-                                                                            _
-                                                                        >(
-                                                                            $crate::__pgrx_c_operand!(
-                                                                                @value [true];
-                                                                                $page
-                                                                            )
-                                                                        )
-                                                                    )
-                                                                ),
-                                                            )
-                                                        );
-                                                    };
-                                                    (
-                                                        $crate::__pgrx_c_macros::expression::profile_value::<
-                                                            true,
-                                                            _
-                                                        >(
-                                                            $crate::__pgrx_c_macros::expression::add::<
-                                                                $crate::__pgrx_c_macros::Wrapping,
-                                                                _,
-                                                                _
-                                                            >(
-                                                                (
-                                                                    $crate::__pgrx_c_macros::expression::profile_value::<
-                                                                        true,
-                                                                        _
-                                                                    >(
-                                                                        $crate::__pgrx_c_operand!(
-                                                                            @value [true];
-                                                                            $page
-                                                                        )
-                                                                    )
-                                                                ),
-                                                                $crate::__pgrx_c_macros::expression::profile_value::<
-                                                                    true,
-                                                                    _
-                                                                >(
-                                                                    $crate::__pgrx_c_macros::expression::load(
-                                                                        $crate::__pgrx_c_macros::expression::project::<
-                                                                            $crate::__pgrx_c_generated::Field_pd_special,
-                                                                            _,
-                                                                            _
-                                                                        >(
-                                                                            $crate::__pgrx_c_macros::expression::pointee(
-                                                                                (
-                                                                                    $crate::__pgrx_c_macros::expression::profile_value::<
-                                                                                        true,
-                                                                                        _
-                                                                                    >(
-                                                                                        $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                                            $crate::PageHeader,
-                                                                                            $crate::__pgrx_c_macros::expression::CPointer<
-                                                                                                $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                    $crate::PageHeaderData
-                                                                                                >,
-                                                                                                $crate::__pgrx_c_macros::expression::ReadWrite
-                                                                                            >,
-                                                                                            _
-                                                                                        >(
-                                                                                            (
-                                                                                                $crate::__pgrx_c_macros::expression::profile_value::<
-                                                                                                    true,
-                                                                                                    _
-                                                                                                >(
-                                                                                                    $crate::__pgrx_c_operand!(
-                                                                                                        @value [
-                                                                                                            true
-                                                                                                        ];
-                                                                                                        $page
-                                                                                                    )
-                                                                                                )
-                                                                                            )
-                                                                                        )
-                                                                                    )
-                                                                                )
-                                                                            )
-                                                                        )
-                                                                    )
-                                                                )
-                                                            )
-                                                        )
-                                                    )
-                                                }
-                                            )
-                                        )
-                                    )
+                                    $crate::__pgrx_c_operand!(@value [true]; $page)
                                 )
                             )
-                        )
-                    ),
-                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                        $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                            $crate::F_TUPLES_DELETED as i32
-                        )
-                    ),
-                    |__pgrx_old,
-                    __pgrx_rhs| $crate::__pgrx_c_macros::expression::bitor(__pgrx_old, __pgrx_rhs)
+                        ),
+                    )
                 )
             );
         }
     };
     (@__pgrx_c_discard; $($raw:tt)*) => {
-        $crate::__pgrx_c_args_GistMarkTuplesDeleted!(@collect __pgrx_emit_discard []; $($raw)*)
+        $crate::__pgrx_c_args_GistPageGetDeleteXid!(@collect __pgrx_emit_discard []; $($raw)*)
     };
     ($($raw:tt)*) => {
-        $crate::__pgrx_c_args_GistMarkTuplesDeleted!(@collect __pgrx_emit_public []; $($raw)*)
+        $crate::__pgrx_c_args_GistPageGetDeleteXid!(@collect __pgrx_emit_public []; $($raw)*)
     };
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -5546,20 +4703,24 @@ macro_rules! __pgrx_c_args_GistPageGetNSN {
         $crate::__pgrx_c_args_GistPageGetNSN!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_GistPageGetNSN!(@p1 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_GistPageGetNSN!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_GistPageGetNSN!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_GistPageGetNSN!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GistPageGetNSN!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GistPageGetNSN!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -5567,7 +4728,9 @@ macro_rules! __pgrx_c_args_GistPageGetNSN {
         $crate::__pgrx_c_args_GistPageGetNSN!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_GistPageGetNSN!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_GistPageGetNSN!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -5589,14 +4752,18 @@ macro_rules! __pgrx_c_args_GistPageGetNSN {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_GistPageGetNSN!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_GistPageGetNSN!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_GistPageGetNSN!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_GistPageGetNSN!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_GistPageGetNSN!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -5623,13 +4790,13 @@ macro_rules! __pgrx_c_args_GistPageGetNSN {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GistPageGetNSN!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GistPageGetNSN!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -5640,7 +4807,7 @@ macro_rules! __pgrx_c_args_GistPageGetNSN {
         compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
-/// C macro GistPageGetNSN from gist.h:189
+/// C macro GistPageGetNSN from gist.h:185
 ///
 /// ```text
 /// #define GistPageGetNSN( page ) ( PageXLogRecPtrGet ( & GistPageGetOpaque ( page ) -> nsn ) )
@@ -5676,14 +4843,14 @@ macro_rules! GistPageGetNSN {
         (
             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 <
-                    $crate::__pgrx_c_macros::CUnsignedLongLong as $crate::__pgrx_c_macros::expression::CType
+                    $crate::__pgrx_c_macros::CUnsignedLong as $crate::__pgrx_c_macros::expression::CType
                 >::from_storage(
-                    $crate::PageXLogRecPtrGet(
+                    $crate::__pgrx_c_bindings::PageXLogRecPtrGet(
                         <
                             $crate::__pgrx_c_macros::expression::CPointer<
                                 $crate::__pgrx_c_macros::expression::CVolatile<
                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                        $crate::PageXLogRecPtr
+                                        $crate::__pgrx_c_bindings::PageXLogRecPtr
                                     >>,
                                 $crate::__pgrx_c_macros::expression::ReadOnly
                             > as $crate::__pgrx_c_macros::expression::CType
@@ -5692,7 +4859,7 @@ macro_rules! GistPageGetNSN {
                                 $crate::__pgrx_c_macros::expression::CPointer<
                                     $crate::__pgrx_c_macros::expression::CVolatile<
                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                            $crate::PageXLogRecPtr
+                                            $crate::__pgrx_c_bindings::PageXLogRecPtr
                                         >>,
                                     $crate::__pgrx_c_macros::expression::ReadOnly
                                 >,
@@ -5712,10 +4879,10 @@ macro_rules! GistPageGetNSN {
                                                         _
                                                     >(
                                                         $crate::__pgrx_c_macros::expression::cast_as::<
-                                                            $crate::GISTPageOpaque,
+                                                            $crate::__pgrx_c_bindings::GISTPageOpaque,
                                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                                    $crate::GISTPageOpaqueData
+                                                                    $crate::__pgrx_c_bindings::GISTPageOpaqueData
                                                                 >,
                                                                 $crate::__pgrx_c_macros::expression::ReadWrite
                                                             >,
@@ -5732,16 +4899,22 @@ macro_rules! GistPageGetNSN {
                                                                                 true,
                                                                                 _
                                                                             >(
-                                                                                $crate::__pgrx_c_generated::Inline_777d7ad23546580e873e0206a9a6e1cd(
+                                                                                $crate::__pgrx_c_bindings::PageValidateSpecialPointer(
                                                                                     <
                                                                                         $crate::__pgrx_c_macros::expression::CPointer<
-                                                                                            $crate::__pgrx_c_macros::CChar,
+                                                                                            $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                                                $crate::__pgrx_c_macros::CChar,
+                                                                                                ::core::ffi::c_char
+                                                                                            >,
                                                                                             $crate::__pgrx_c_macros::expression::ReadOnly
                                                                                         > as $crate::__pgrx_c_macros::expression::CType
                                                                                     >::into_storage(
                                                                                         $crate::__pgrx_c_macros::expression::implicit::<
                                                                                             $crate::__pgrx_c_macros::expression::CPointer<
-                                                                                                $crate::__pgrx_c_macros::CChar,
+                                                                                                $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                                                    $crate::__pgrx_c_macros::CChar,
+                                                                                                    ::core::ffi::c_char
+                                                                                                >,
                                                                                                 $crate::__pgrx_c_macros::expression::ReadOnly
                                                                                             >,
                                                                                             _
@@ -5802,10 +4975,10 @@ macro_rules! GistPageGetNSN {
                                                                                                             _
                                                                                                         >(
                                                                                                             $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                                                                $crate::PageHeader,
+                                                                                                                $crate::__pgrx_c_bindings::PageHeader,
                                                                                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                                                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                                        $crate::PageHeaderData
+                                                                                                                        $crate::__pgrx_c_bindings::PageHeaderData
                                                                                                                     >,
                                                                                                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                                                                                                 >,
@@ -5879,14 +5052,14 @@ macro_rules! GistPageGetNSN {
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
-                                $crate::__pgrx_c_macros::CUnsignedLongLong as $crate::__pgrx_c_macros::expression::CType
+                                $crate::__pgrx_c_macros::CUnsignedLong as $crate::__pgrx_c_macros::expression::CType
                             >::from_storage(
-                                $crate::PageXLogRecPtrGet(
+                                $crate::__pgrx_c_bindings::PageXLogRecPtrGet(
                                     <
                                         $crate::__pgrx_c_macros::expression::CPointer<
                                             $crate::__pgrx_c_macros::expression::CVolatile<
                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                    $crate::PageXLogRecPtr
+                                                    $crate::__pgrx_c_bindings::PageXLogRecPtr
                                                 >>,
                                             $crate::__pgrx_c_macros::expression::ReadOnly
                                         > as $crate::__pgrx_c_macros::expression::CType
@@ -5895,7 +5068,7 @@ macro_rules! GistPageGetNSN {
                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                 $crate::__pgrx_c_macros::expression::CVolatile<
                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                        $crate::PageXLogRecPtr
+                                                        $crate::__pgrx_c_bindings::PageXLogRecPtr
                                                     >>,
                                                 $crate::__pgrx_c_macros::expression::ReadOnly
                                             >,
@@ -5918,10 +5091,10 @@ macro_rules! GistPageGetNSN {
                                                                     _
                                                                 >(
                                                                     $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                        $crate::GISTPageOpaque,
+                                                                        $crate::__pgrx_c_bindings::GISTPageOpaque,
                                                                         $crate::__pgrx_c_macros::expression::CPointer<
                                                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                $crate::GISTPageOpaqueData
+                                                                                $crate::__pgrx_c_bindings::GISTPageOpaqueData
                                                                             >,
                                                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                                                         >,
@@ -5938,16 +5111,22 @@ macro_rules! GistPageGetNSN {
                                                                                             true,
                                                                                             _
                                                                                         >(
-                                                                                            $crate::__pgrx_c_generated::Inline_777d7ad23546580e873e0206a9a6e1cd(
+                                                                                            $crate::__pgrx_c_bindings::PageValidateSpecialPointer(
                                                                                                 <
                                                                                                     $crate::__pgrx_c_macros::expression::CPointer<
-                                                                                                        $crate::__pgrx_c_macros::CChar,
+                                                                                                        $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                                                            $crate::__pgrx_c_macros::CChar,
+                                                                                                            ::core::ffi::c_char
+                                                                                                        >,
                                                                                                         $crate::__pgrx_c_macros::expression::ReadOnly
                                                                                                     > as $crate::__pgrx_c_macros::expression::CType
                                                                                                 >::into_storage(
                                                                                                     $crate::__pgrx_c_macros::expression::implicit::<
                                                                                                         $crate::__pgrx_c_macros::expression::CPointer<
-                                                                                                            $crate::__pgrx_c_macros::CChar,
+                                                                                                            $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                                                                $crate::__pgrx_c_macros::CChar,
+                                                                                                                ::core::ffi::c_char
+                                                                                                            >,
                                                                                                             $crate::__pgrx_c_macros::expression::ReadOnly
                                                                                                         >,
                                                                                                         _
@@ -6008,10 +5187,10 @@ macro_rules! GistPageGetNSN {
                                                                                                                         _
                                                                                                                     >(
                                                                                                                         $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                                                                            $crate::PageHeader,
+                                                                                                                            $crate::__pgrx_c_bindings::PageHeader,
                                                                                                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                                                                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                                                    $crate::PageHeaderData
+                                                                                                                                    $crate::__pgrx_c_bindings::PageHeaderData
                                                                                                                                 >,
                                                                                                                                 $crate::__pgrx_c_macros::expression::ReadWrite
                                                                                                                             >,
@@ -6070,14 +5249,14 @@ macro_rules! GistPageGetNSN {
         {
             let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 <
-                    $crate::__pgrx_c_macros::CUnsignedLongLong as $crate::__pgrx_c_macros::expression::CType
+                    $crate::__pgrx_c_macros::CUnsignedLong as $crate::__pgrx_c_macros::expression::CType
                 >::from_storage(
-                    $crate::PageXLogRecPtrGet(
+                    $crate::__pgrx_c_bindings::PageXLogRecPtrGet(
                         <
                             $crate::__pgrx_c_macros::expression::CPointer<
                                 $crate::__pgrx_c_macros::expression::CVolatile<
                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                        $crate::PageXLogRecPtr
+                                        $crate::__pgrx_c_bindings::PageXLogRecPtr
                                     >>,
                                 $crate::__pgrx_c_macros::expression::ReadOnly
                             > as $crate::__pgrx_c_macros::expression::CType
@@ -6086,7 +5265,7 @@ macro_rules! GistPageGetNSN {
                                 $crate::__pgrx_c_macros::expression::CPointer<
                                     $crate::__pgrx_c_macros::expression::CVolatile<
                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                            $crate::PageXLogRecPtr
+                                            $crate::__pgrx_c_bindings::PageXLogRecPtr
                                         >>,
                                     $crate::__pgrx_c_macros::expression::ReadOnly
                                 >,
@@ -6106,10 +5285,10 @@ macro_rules! GistPageGetNSN {
                                                         _
                                                     >(
                                                         $crate::__pgrx_c_macros::expression::cast_as::<
-                                                            $crate::GISTPageOpaque,
+                                                            $crate::__pgrx_c_bindings::GISTPageOpaque,
                                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                                    $crate::GISTPageOpaqueData
+                                                                    $crate::__pgrx_c_bindings::GISTPageOpaqueData
                                                                 >,
                                                                 $crate::__pgrx_c_macros::expression::ReadWrite
                                                             >,
@@ -6126,16 +5305,22 @@ macro_rules! GistPageGetNSN {
                                                                                 true,
                                                                                 _
                                                                             >(
-                                                                                $crate::__pgrx_c_generated::Inline_777d7ad23546580e873e0206a9a6e1cd(
+                                                                                $crate::__pgrx_c_bindings::PageValidateSpecialPointer(
                                                                                     <
                                                                                         $crate::__pgrx_c_macros::expression::CPointer<
-                                                                                            $crate::__pgrx_c_macros::CChar,
+                                                                                            $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                                                $crate::__pgrx_c_macros::CChar,
+                                                                                                ::core::ffi::c_char
+                                                                                            >,
                                                                                             $crate::__pgrx_c_macros::expression::ReadOnly
                                                                                         > as $crate::__pgrx_c_macros::expression::CType
                                                                                     >::into_storage(
                                                                                         $crate::__pgrx_c_macros::expression::implicit::<
                                                                                             $crate::__pgrx_c_macros::expression::CPointer<
-                                                                                                $crate::__pgrx_c_macros::CChar,
+                                                                                                $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                                                    $crate::__pgrx_c_macros::CChar,
+                                                                                                    ::core::ffi::c_char
+                                                                                                >,
                                                                                                 $crate::__pgrx_c_macros::expression::ReadOnly
                                                                                             >,
                                                                                             _
@@ -6196,10 +5381,10 @@ macro_rules! GistPageGetNSN {
                                                                                                             _
                                                                                                         >(
                                                                                                             $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                                                                $crate::PageHeader,
+                                                                                                                $crate::__pgrx_c_bindings::PageHeader,
                                                                                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                                                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                                        $crate::PageHeaderData
+                                                                                                                        $crate::__pgrx_c_bindings::PageHeaderData
                                                                                                                     >,
                                                                                                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                                                                                                 >,
@@ -6254,8 +5439,8 @@ macro_rules! GistPageGetNSN {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -6282,20 +5467,24 @@ macro_rules! __pgrx_c_args_GistPageGetOpaque {
         $crate::__pgrx_c_args_GistPageGetOpaque!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_GistPageGetOpaque!(@p1 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_GistPageGetOpaque!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_GistPageGetOpaque!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_GistPageGetOpaque!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GistPageGetOpaque!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GistPageGetOpaque!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -6303,7 +5492,9 @@ macro_rules! __pgrx_c_args_GistPageGetOpaque {
         $crate::__pgrx_c_args_GistPageGetOpaque!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_GistPageGetOpaque!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_GistPageGetOpaque!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -6325,14 +5516,18 @@ macro_rules! __pgrx_c_args_GistPageGetOpaque {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_GistPageGetOpaque!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_GistPageGetOpaque!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_GistPageGetOpaque!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_GistPageGetOpaque!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_GistPageGetOpaque!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -6359,13 +5554,13 @@ macro_rules! __pgrx_c_args_GistPageGetOpaque {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GistPageGetOpaque!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GistPageGetOpaque!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -6412,9 +5607,11 @@ macro_rules! GistPageGetOpaque {
         (
             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::cast_as::<
-                    $crate::GISTPageOpaque,
+                    $crate::__pgrx_c_bindings::GISTPageOpaque,
                     $crate::__pgrx_c_macros::expression::CPointer<
-                        $crate::__pgrx_c_macros::expression::CRecord<$crate::GISTPageOpaqueData>,
+                        $crate::__pgrx_c_macros::expression::CRecord<
+                            $crate::__pgrx_c_bindings::GISTPageOpaqueData
+                        >,
                         $crate::__pgrx_c_macros::expression::ReadWrite
                     >,
                     _
@@ -6427,16 +5624,22 @@ macro_rules! GistPageGetOpaque {
                                         true,
                                         _
                                     >(
-                                        $crate::__pgrx_c_generated::Inline_777d7ad23546580e873e0206a9a6e1cd(
+                                        $crate::__pgrx_c_bindings::PageValidateSpecialPointer(
                                             <
                                                 $crate::__pgrx_c_macros::expression::CPointer<
-                                                    $crate::__pgrx_c_macros::CChar,
+                                                    $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                        $crate::__pgrx_c_macros::CChar,
+                                                        ::core::ffi::c_char
+                                                    >,
                                                     $crate::__pgrx_c_macros::expression::ReadOnly
                                                 > as $crate::__pgrx_c_macros::expression::CType
                                             >::into_storage(
                                                 $crate::__pgrx_c_macros::expression::implicit::<
                                                     $crate::__pgrx_c_macros::expression::CPointer<
-                                                        $crate::__pgrx_c_macros::CChar,
+                                                        $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                            $crate::__pgrx_c_macros::CChar,
+                                                            ::core::ffi::c_char
+                                                        >,
                                                         $crate::__pgrx_c_macros::expression::ReadOnly
                                                     >,
                                                     _
@@ -6485,10 +5688,10 @@ macro_rules! GistPageGetOpaque {
                                                                     _
                                                                 >(
                                                                     $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                        $crate::PageHeader,
+                                                                        $crate::__pgrx_c_bindings::PageHeader,
                                                                         $crate::__pgrx_c_macros::expression::CPointer<
                                                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                $crate::PageHeaderData
+                                                                                $crate::__pgrx_c_bindings::PageHeaderData
                                                                             >,
                                                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                                                         >,
@@ -6550,10 +5753,10 @@ macro_rules! GistPageGetOpaque {
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::cast_as::<
-                                $crate::GISTPageOpaque,
+                                $crate::__pgrx_c_bindings::GISTPageOpaque,
                                 $crate::__pgrx_c_macros::expression::CPointer<
                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                        $crate::GISTPageOpaqueData
+                                        $crate::__pgrx_c_bindings::GISTPageOpaqueData
                                     >,
                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                 >,
@@ -6567,16 +5770,22 @@ macro_rules! GistPageGetOpaque {
                                                     true,
                                                     _
                                                 >(
-                                                    $crate::__pgrx_c_generated::Inline_777d7ad23546580e873e0206a9a6e1cd(
+                                                    $crate::__pgrx_c_bindings::PageValidateSpecialPointer(
                                                         <
                                                             $crate::__pgrx_c_macros::expression::CPointer<
-                                                                $crate::__pgrx_c_macros::CChar,
+                                                                $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                    $crate::__pgrx_c_macros::CChar,
+                                                                    ::core::ffi::c_char
+                                                                >,
                                                                 $crate::__pgrx_c_macros::expression::ReadOnly
                                                             > as $crate::__pgrx_c_macros::expression::CType
                                                         >::into_storage(
                                                             $crate::__pgrx_c_macros::expression::implicit::<
                                                                 $crate::__pgrx_c_macros::expression::CPointer<
-                                                                    $crate::__pgrx_c_macros::CChar,
+                                                                    $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                        $crate::__pgrx_c_macros::CChar,
+                                                                        ::core::ffi::c_char
+                                                                    >,
                                                                     $crate::__pgrx_c_macros::expression::ReadOnly
                                                                 >,
                                                                 _
@@ -6633,10 +5842,10 @@ macro_rules! GistPageGetOpaque {
                                                                                 _
                                                                             >(
                                                                                 $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                                    $crate::PageHeader,
+                                                                                    $crate::__pgrx_c_bindings::PageHeader,
                                                                                     $crate::__pgrx_c_macros::expression::CPointer<
                                                                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                            $crate::PageHeaderData
+                                                                                            $crate::__pgrx_c_bindings::PageHeaderData
                                                                                         >,
                                                                                         $crate::__pgrx_c_macros::expression::ReadWrite
                                                                                     >,
@@ -6685,9 +5894,11 @@ macro_rules! GistPageGetOpaque {
         {
             let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::cast_as::<
-                    $crate::GISTPageOpaque,
+                    $crate::__pgrx_c_bindings::GISTPageOpaque,
                     $crate::__pgrx_c_macros::expression::CPointer<
-                        $crate::__pgrx_c_macros::expression::CRecord<$crate::GISTPageOpaqueData>,
+                        $crate::__pgrx_c_macros::expression::CRecord<
+                            $crate::__pgrx_c_bindings::GISTPageOpaqueData
+                        >,
                         $crate::__pgrx_c_macros::expression::ReadWrite
                     >,
                     _
@@ -6700,16 +5911,22 @@ macro_rules! GistPageGetOpaque {
                                         true,
                                         _
                                     >(
-                                        $crate::__pgrx_c_generated::Inline_777d7ad23546580e873e0206a9a6e1cd(
+                                        $crate::__pgrx_c_bindings::PageValidateSpecialPointer(
                                             <
                                                 $crate::__pgrx_c_macros::expression::CPointer<
-                                                    $crate::__pgrx_c_macros::CChar,
+                                                    $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                        $crate::__pgrx_c_macros::CChar,
+                                                        ::core::ffi::c_char
+                                                    >,
                                                     $crate::__pgrx_c_macros::expression::ReadOnly
                                                 > as $crate::__pgrx_c_macros::expression::CType
                                             >::into_storage(
                                                 $crate::__pgrx_c_macros::expression::implicit::<
                                                     $crate::__pgrx_c_macros::expression::CPointer<
-                                                        $crate::__pgrx_c_macros::CChar,
+                                                        $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                            $crate::__pgrx_c_macros::CChar,
+                                                            ::core::ffi::c_char
+                                                        >,
                                                         $crate::__pgrx_c_macros::expression::ReadOnly
                                                     >,
                                                     _
@@ -6758,10 +5975,10 @@ macro_rules! GistPageGetOpaque {
                                                                     _
                                                                 >(
                                                                     $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                        $crate::PageHeader,
+                                                                        $crate::__pgrx_c_bindings::PageHeader,
                                                                         $crate::__pgrx_c_macros::expression::CPointer<
                                                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                $crate::PageHeaderData
+                                                                                $crate::__pgrx_c_bindings::PageHeaderData
                                                                             >,
                                                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                                                         >,
@@ -6804,8 +6021,8 @@ macro_rules! GistPageGetOpaque {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -6832,20 +6049,24 @@ macro_rules! __pgrx_c_args_GistPageHasGarbage {
         $crate::__pgrx_c_args_GistPageHasGarbage!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_GistPageHasGarbage!(@p1 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_GistPageHasGarbage!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_GistPageHasGarbage!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_GistPageHasGarbage!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GistPageHasGarbage!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GistPageHasGarbage!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -6853,7 +6074,9 @@ macro_rules! __pgrx_c_args_GistPageHasGarbage {
         $crate::__pgrx_c_args_GistPageHasGarbage!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_GistPageHasGarbage!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_GistPageHasGarbage!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -6875,14 +6098,18 @@ macro_rules! __pgrx_c_args_GistPageHasGarbage {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_GistPageHasGarbage!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_GistPageHasGarbage!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_GistPageHasGarbage!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_GistPageHasGarbage!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_GistPageHasGarbage!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -6909,13 +6136,13 @@ macro_rules! __pgrx_c_args_GistPageHasGarbage {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GistPageHasGarbage!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GistPageHasGarbage!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -6926,7 +6153,7 @@ macro_rules! __pgrx_c_args_GistPageHasGarbage {
         compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
-/// C macro GistPageHasGarbage from gist.h:181
+/// C macro GistPageHasGarbage from gist.h:177
 ///
 /// ```text
 /// #define GistPageHasGarbage( page ) ( GistPageGetOpaque ( page ) -> flags & F_HAS_GARBAGE )
@@ -6976,10 +6203,10 @@ macro_rules! GistPageHasGarbage {
                                             _
                                         >(
                                             $crate::__pgrx_c_macros::expression::cast_as::<
-                                                $crate::GISTPageOpaque,
+                                                $crate::__pgrx_c_bindings::GISTPageOpaque,
                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                        $crate::GISTPageOpaqueData
+                                                        $crate::__pgrx_c_bindings::GISTPageOpaqueData
                                                     >,
                                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                                 >,
@@ -6996,16 +6223,22 @@ macro_rules! GistPageHasGarbage {
                                                                     true,
                                                                     _
                                                                 >(
-                                                                    $crate::__pgrx_c_generated::Inline_777d7ad23546580e873e0206a9a6e1cd(
+                                                                    $crate::__pgrx_c_bindings::PageValidateSpecialPointer(
                                                                         <
                                                                             $crate::__pgrx_c_macros::expression::CPointer<
-                                                                                $crate::__pgrx_c_macros::CChar,
+                                                                                $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                                    $crate::__pgrx_c_macros::CChar,
+                                                                                    ::core::ffi::c_char
+                                                                                >,
                                                                                 $crate::__pgrx_c_macros::expression::ReadOnly
                                                                             > as $crate::__pgrx_c_macros::expression::CType
                                                                         >::into_storage(
                                                                             $crate::__pgrx_c_macros::expression::implicit::<
                                                                                 $crate::__pgrx_c_macros::expression::CPointer<
-                                                                                    $crate::__pgrx_c_macros::CChar,
+                                                                                    $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                                        $crate::__pgrx_c_macros::CChar,
+                                                                                        ::core::ffi::c_char
+                                                                                    >,
                                                                                     $crate::__pgrx_c_macros::expression::ReadOnly
                                                                                 >,
                                                                                 _
@@ -7064,10 +6297,10 @@ macro_rules! GistPageHasGarbage {
                                                                                                 _
                                                                                             >(
                                                                                                 $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                                                    $crate::PageHeader,
+                                                                                                    $crate::__pgrx_c_bindings::PageHeader,
                                                                                                     $crate::__pgrx_c_macros::expression::CPointer<
                                                                                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                            $crate::PageHeaderData
+                                                                                                            $crate::__pgrx_c_bindings::PageHeaderData
                                                                                                         >,
                                                                                                         $crate::__pgrx_c_macros::expression::ReadWrite
                                                                                                     >,
@@ -7108,7 +6341,7 @@ macro_rules! GistPageHasGarbage {
                     ),
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                            $crate::F_HAS_GARBAGE as i32
+                            $crate::__pgrx_c_bindings::F_HAS_GARBAGE as i32
                         )
                     )
                 )
@@ -7157,10 +6390,10 @@ macro_rules! GistPageHasGarbage {
                                                         _
                                                     >(
                                                         $crate::__pgrx_c_macros::expression::cast_as::<
-                                                            $crate::GISTPageOpaque,
+                                                            $crate::__pgrx_c_bindings::GISTPageOpaque,
                                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                                    $crate::GISTPageOpaqueData
+                                                                    $crate::__pgrx_c_bindings::GISTPageOpaqueData
                                                                 >,
                                                                 $crate::__pgrx_c_macros::expression::ReadWrite
                                                             >,
@@ -7177,16 +6410,22 @@ macro_rules! GistPageHasGarbage {
                                                                                 true,
                                                                                 _
                                                                             >(
-                                                                                $crate::__pgrx_c_generated::Inline_777d7ad23546580e873e0206a9a6e1cd(
+                                                                                $crate::__pgrx_c_bindings::PageValidateSpecialPointer(
                                                                                     <
                                                                                         $crate::__pgrx_c_macros::expression::CPointer<
-                                                                                            $crate::__pgrx_c_macros::CChar,
+                                                                                            $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                                                $crate::__pgrx_c_macros::CChar,
+                                                                                                ::core::ffi::c_char
+                                                                                            >,
                                                                                             $crate::__pgrx_c_macros::expression::ReadOnly
                                                                                         > as $crate::__pgrx_c_macros::expression::CType
                                                                                     >::into_storage(
                                                                                         $crate::__pgrx_c_macros::expression::implicit::<
                                                                                             $crate::__pgrx_c_macros::expression::CPointer<
-                                                                                                $crate::__pgrx_c_macros::CChar,
+                                                                                                $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                                                    $crate::__pgrx_c_macros::CChar,
+                                                                                                    ::core::ffi::c_char
+                                                                                                >,
                                                                                                 $crate::__pgrx_c_macros::expression::ReadOnly
                                                                                             >,
                                                                                             _
@@ -7247,10 +6486,10 @@ macro_rules! GistPageHasGarbage {
                                                                                                             _
                                                                                                         >(
                                                                                                             $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                                                                $crate::PageHeader,
+                                                                                                                $crate::__pgrx_c_bindings::PageHeader,
                                                                                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                                                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                                        $crate::PageHeaderData
+                                                                                                                        $crate::__pgrx_c_bindings::PageHeaderData
                                                                                                                     >,
                                                                                                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                                                                                                 >,
@@ -7291,7 +6530,7 @@ macro_rules! GistPageHasGarbage {
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                        $crate::F_HAS_GARBAGE as i32
+                                        $crate::__pgrx_c_bindings::F_HAS_GARBAGE as i32
                                     )
                                 )
                             )
@@ -7325,10 +6564,10 @@ macro_rules! GistPageHasGarbage {
                                             _
                                         >(
                                             $crate::__pgrx_c_macros::expression::cast_as::<
-                                                $crate::GISTPageOpaque,
+                                                $crate::__pgrx_c_bindings::GISTPageOpaque,
                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                        $crate::GISTPageOpaqueData
+                                                        $crate::__pgrx_c_bindings::GISTPageOpaqueData
                                                     >,
                                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                                 >,
@@ -7345,16 +6584,22 @@ macro_rules! GistPageHasGarbage {
                                                                     true,
                                                                     _
                                                                 >(
-                                                                    $crate::__pgrx_c_generated::Inline_777d7ad23546580e873e0206a9a6e1cd(
+                                                                    $crate::__pgrx_c_bindings::PageValidateSpecialPointer(
                                                                         <
                                                                             $crate::__pgrx_c_macros::expression::CPointer<
-                                                                                $crate::__pgrx_c_macros::CChar,
+                                                                                $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                                    $crate::__pgrx_c_macros::CChar,
+                                                                                    ::core::ffi::c_char
+                                                                                >,
                                                                                 $crate::__pgrx_c_macros::expression::ReadOnly
                                                                             > as $crate::__pgrx_c_macros::expression::CType
                                                                         >::into_storage(
                                                                             $crate::__pgrx_c_macros::expression::implicit::<
                                                                                 $crate::__pgrx_c_macros::expression::CPointer<
-                                                                                    $crate::__pgrx_c_macros::CChar,
+                                                                                    $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                                        $crate::__pgrx_c_macros::CChar,
+                                                                                        ::core::ffi::c_char
+                                                                                    >,
                                                                                     $crate::__pgrx_c_macros::expression::ReadOnly
                                                                                 >,
                                                                                 _
@@ -7413,10 +6658,10 @@ macro_rules! GistPageHasGarbage {
                                                                                                 _
                                                                                             >(
                                                                                                 $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                                                    $crate::PageHeader,
+                                                                                                    $crate::__pgrx_c_bindings::PageHeader,
                                                                                                     $crate::__pgrx_c_macros::expression::CPointer<
                                                                                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                            $crate::PageHeaderData
+                                                                                                            $crate::__pgrx_c_bindings::PageHeaderData
                                                                                                         >,
                                                                                                         $crate::__pgrx_c_macros::expression::ReadWrite
                                                                                                     >,
@@ -7457,7 +6702,7 @@ macro_rules! GistPageHasGarbage {
                     ),
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                            $crate::F_HAS_GARBAGE as i32
+                            $crate::__pgrx_c_bindings::F_HAS_GARBAGE as i32
                         )
                     )
                 )
@@ -7473,8 +6718,8 @@ macro_rules! GistPageHasGarbage {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -7501,20 +6746,24 @@ macro_rules! __pgrx_c_args_GistPageIsDeleted {
         $crate::__pgrx_c_args_GistPageIsDeleted!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_GistPageIsDeleted!(@p1 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_GistPageIsDeleted!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_GistPageIsDeleted!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_GistPageIsDeleted!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GistPageIsDeleted!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GistPageIsDeleted!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -7522,7 +6771,9 @@ macro_rules! __pgrx_c_args_GistPageIsDeleted {
         $crate::__pgrx_c_args_GistPageIsDeleted!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_GistPageIsDeleted!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_GistPageIsDeleted!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -7544,14 +6795,18 @@ macro_rules! __pgrx_c_args_GistPageIsDeleted {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_GistPageIsDeleted!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_GistPageIsDeleted!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_GistPageIsDeleted!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_GistPageIsDeleted!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_GistPageIsDeleted!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -7578,13 +6833,13 @@ macro_rules! __pgrx_c_args_GistPageIsDeleted {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GistPageIsDeleted!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GistPageIsDeleted!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -7645,10 +6900,10 @@ macro_rules! GistPageIsDeleted {
                                             _
                                         >(
                                             $crate::__pgrx_c_macros::expression::cast_as::<
-                                                $crate::GISTPageOpaque,
+                                                $crate::__pgrx_c_bindings::GISTPageOpaque,
                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                        $crate::GISTPageOpaqueData
+                                                        $crate::__pgrx_c_bindings::GISTPageOpaqueData
                                                     >,
                                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                                 >,
@@ -7665,16 +6920,22 @@ macro_rules! GistPageIsDeleted {
                                                                     true,
                                                                     _
                                                                 >(
-                                                                    $crate::__pgrx_c_generated::Inline_777d7ad23546580e873e0206a9a6e1cd(
+                                                                    $crate::__pgrx_c_bindings::PageValidateSpecialPointer(
                                                                         <
                                                                             $crate::__pgrx_c_macros::expression::CPointer<
-                                                                                $crate::__pgrx_c_macros::CChar,
+                                                                                $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                                    $crate::__pgrx_c_macros::CChar,
+                                                                                    ::core::ffi::c_char
+                                                                                >,
                                                                                 $crate::__pgrx_c_macros::expression::ReadOnly
                                                                             > as $crate::__pgrx_c_macros::expression::CType
                                                                         >::into_storage(
                                                                             $crate::__pgrx_c_macros::expression::implicit::<
                                                                                 $crate::__pgrx_c_macros::expression::CPointer<
-                                                                                    $crate::__pgrx_c_macros::CChar,
+                                                                                    $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                                        $crate::__pgrx_c_macros::CChar,
+                                                                                        ::core::ffi::c_char
+                                                                                    >,
                                                                                     $crate::__pgrx_c_macros::expression::ReadOnly
                                                                                 >,
                                                                                 _
@@ -7733,10 +6994,10 @@ macro_rules! GistPageIsDeleted {
                                                                                                 _
                                                                                             >(
                                                                                                 $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                                                    $crate::PageHeader,
+                                                                                                    $crate::__pgrx_c_bindings::PageHeader,
                                                                                                     $crate::__pgrx_c_macros::expression::CPointer<
                                                                                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                            $crate::PageHeaderData
+                                                                                                            $crate::__pgrx_c_bindings::PageHeaderData
                                                                                                         >,
                                                                                                         $crate::__pgrx_c_macros::expression::ReadWrite
                                                                                                     >,
@@ -7777,7 +7038,7 @@ macro_rules! GistPageIsDeleted {
                     ),
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                            $crate::F_DELETED as i32
+                            $crate::__pgrx_c_bindings::F_DELETED as i32
                         )
                     )
                 )
@@ -7826,10 +7087,10 @@ macro_rules! GistPageIsDeleted {
                                                         _
                                                     >(
                                                         $crate::__pgrx_c_macros::expression::cast_as::<
-                                                            $crate::GISTPageOpaque,
+                                                            $crate::__pgrx_c_bindings::GISTPageOpaque,
                                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                                    $crate::GISTPageOpaqueData
+                                                                    $crate::__pgrx_c_bindings::GISTPageOpaqueData
                                                                 >,
                                                                 $crate::__pgrx_c_macros::expression::ReadWrite
                                                             >,
@@ -7846,16 +7107,22 @@ macro_rules! GistPageIsDeleted {
                                                                                 true,
                                                                                 _
                                                                             >(
-                                                                                $crate::__pgrx_c_generated::Inline_777d7ad23546580e873e0206a9a6e1cd(
+                                                                                $crate::__pgrx_c_bindings::PageValidateSpecialPointer(
                                                                                     <
                                                                                         $crate::__pgrx_c_macros::expression::CPointer<
-                                                                                            $crate::__pgrx_c_macros::CChar,
+                                                                                            $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                                                $crate::__pgrx_c_macros::CChar,
+                                                                                                ::core::ffi::c_char
+                                                                                            >,
                                                                                             $crate::__pgrx_c_macros::expression::ReadOnly
                                                                                         > as $crate::__pgrx_c_macros::expression::CType
                                                                                     >::into_storage(
                                                                                         $crate::__pgrx_c_macros::expression::implicit::<
                                                                                             $crate::__pgrx_c_macros::expression::CPointer<
-                                                                                                $crate::__pgrx_c_macros::CChar,
+                                                                                                $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                                                    $crate::__pgrx_c_macros::CChar,
+                                                                                                    ::core::ffi::c_char
+                                                                                                >,
                                                                                                 $crate::__pgrx_c_macros::expression::ReadOnly
                                                                                             >,
                                                                                             _
@@ -7916,10 +7183,10 @@ macro_rules! GistPageIsDeleted {
                                                                                                             _
                                                                                                         >(
                                                                                                             $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                                                                $crate::PageHeader,
+                                                                                                                $crate::__pgrx_c_bindings::PageHeader,
                                                                                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                                                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                                        $crate::PageHeaderData
+                                                                                                                        $crate::__pgrx_c_bindings::PageHeaderData
                                                                                                                     >,
                                                                                                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                                                                                                 >,
@@ -7960,7 +7227,7 @@ macro_rules! GistPageIsDeleted {
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                        $crate::F_DELETED as i32
+                                        $crate::__pgrx_c_bindings::F_DELETED as i32
                                     )
                                 )
                             )
@@ -7994,10 +7261,10 @@ macro_rules! GistPageIsDeleted {
                                             _
                                         >(
                                             $crate::__pgrx_c_macros::expression::cast_as::<
-                                                $crate::GISTPageOpaque,
+                                                $crate::__pgrx_c_bindings::GISTPageOpaque,
                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                        $crate::GISTPageOpaqueData
+                                                        $crate::__pgrx_c_bindings::GISTPageOpaqueData
                                                     >,
                                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                                 >,
@@ -8014,16 +7281,22 @@ macro_rules! GistPageIsDeleted {
                                                                     true,
                                                                     _
                                                                 >(
-                                                                    $crate::__pgrx_c_generated::Inline_777d7ad23546580e873e0206a9a6e1cd(
+                                                                    $crate::__pgrx_c_bindings::PageValidateSpecialPointer(
                                                                         <
                                                                             $crate::__pgrx_c_macros::expression::CPointer<
-                                                                                $crate::__pgrx_c_macros::CChar,
+                                                                                $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                                    $crate::__pgrx_c_macros::CChar,
+                                                                                    ::core::ffi::c_char
+                                                                                >,
                                                                                 $crate::__pgrx_c_macros::expression::ReadOnly
                                                                             > as $crate::__pgrx_c_macros::expression::CType
                                                                         >::into_storage(
                                                                             $crate::__pgrx_c_macros::expression::implicit::<
                                                                                 $crate::__pgrx_c_macros::expression::CPointer<
-                                                                                    $crate::__pgrx_c_macros::CChar,
+                                                                                    $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                                        $crate::__pgrx_c_macros::CChar,
+                                                                                        ::core::ffi::c_char
+                                                                                    >,
                                                                                     $crate::__pgrx_c_macros::expression::ReadOnly
                                                                                 >,
                                                                                 _
@@ -8082,10 +7355,10 @@ macro_rules! GistPageIsDeleted {
                                                                                                 _
                                                                                             >(
                                                                                                 $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                                                    $crate::PageHeader,
+                                                                                                    $crate::__pgrx_c_bindings::PageHeader,
                                                                                                     $crate::__pgrx_c_macros::expression::CPointer<
                                                                                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                            $crate::PageHeaderData
+                                                                                                            $crate::__pgrx_c_bindings::PageHeaderData
                                                                                                         >,
                                                                                                         $crate::__pgrx_c_macros::expression::ReadWrite
                                                                                                     >,
@@ -8126,7 +7399,7 @@ macro_rules! GistPageIsDeleted {
                     ),
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                            $crate::F_DELETED as i32
+                            $crate::__pgrx_c_bindings::F_DELETED as i32
                         )
                     )
                 )
@@ -8142,8 +7415,8 @@ macro_rules! GistPageIsDeleted {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -8170,20 +7443,24 @@ macro_rules! __pgrx_c_args_GistPageIsLeaf {
         $crate::__pgrx_c_args_GistPageIsLeaf!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_GistPageIsLeaf!(@p1 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_GistPageIsLeaf!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_GistPageIsLeaf!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_GistPageIsLeaf!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GistPageIsLeaf!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GistPageIsLeaf!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -8191,7 +7468,9 @@ macro_rules! __pgrx_c_args_GistPageIsLeaf {
         $crate::__pgrx_c_args_GistPageIsLeaf!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_GistPageIsLeaf!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_GistPageIsLeaf!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -8213,14 +7492,18 @@ macro_rules! __pgrx_c_args_GistPageIsLeaf {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_GistPageIsLeaf!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_GistPageIsLeaf!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_GistPageIsLeaf!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_GistPageIsLeaf!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_GistPageIsLeaf!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -8247,13 +7530,13 @@ macro_rules! __pgrx_c_args_GistPageIsLeaf {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GistPageIsLeaf!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GistPageIsLeaf!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -8314,10 +7597,10 @@ macro_rules! GistPageIsLeaf {
                                             _
                                         >(
                                             $crate::__pgrx_c_macros::expression::cast_as::<
-                                                $crate::GISTPageOpaque,
+                                                $crate::__pgrx_c_bindings::GISTPageOpaque,
                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                        $crate::GISTPageOpaqueData
+                                                        $crate::__pgrx_c_bindings::GISTPageOpaqueData
                                                     >,
                                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                                 >,
@@ -8334,16 +7617,22 @@ macro_rules! GistPageIsLeaf {
                                                                     true,
                                                                     _
                                                                 >(
-                                                                    $crate::__pgrx_c_generated::Inline_777d7ad23546580e873e0206a9a6e1cd(
+                                                                    $crate::__pgrx_c_bindings::PageValidateSpecialPointer(
                                                                         <
                                                                             $crate::__pgrx_c_macros::expression::CPointer<
-                                                                                $crate::__pgrx_c_macros::CChar,
+                                                                                $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                                    $crate::__pgrx_c_macros::CChar,
+                                                                                    ::core::ffi::c_char
+                                                                                >,
                                                                                 $crate::__pgrx_c_macros::expression::ReadOnly
                                                                             > as $crate::__pgrx_c_macros::expression::CType
                                                                         >::into_storage(
                                                                             $crate::__pgrx_c_macros::expression::implicit::<
                                                                                 $crate::__pgrx_c_macros::expression::CPointer<
-                                                                                    $crate::__pgrx_c_macros::CChar,
+                                                                                    $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                                        $crate::__pgrx_c_macros::CChar,
+                                                                                        ::core::ffi::c_char
+                                                                                    >,
                                                                                     $crate::__pgrx_c_macros::expression::ReadOnly
                                                                                 >,
                                                                                 _
@@ -8402,10 +7691,10 @@ macro_rules! GistPageIsLeaf {
                                                                                                 _
                                                                                             >(
                                                                                                 $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                                                    $crate::PageHeader,
+                                                                                                    $crate::__pgrx_c_bindings::PageHeader,
                                                                                                     $crate::__pgrx_c_macros::expression::CPointer<
                                                                                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                            $crate::PageHeaderData
+                                                                                                            $crate::__pgrx_c_bindings::PageHeaderData
                                                                                                         >,
                                                                                                         $crate::__pgrx_c_macros::expression::ReadWrite
                                                                                                     >,
@@ -8446,7 +7735,7 @@ macro_rules! GistPageIsLeaf {
                     ),
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                            $crate::F_LEAF as i32
+                            $crate::__pgrx_c_bindings::F_LEAF as i32
                         )
                     )
                 )
@@ -8495,10 +7784,10 @@ macro_rules! GistPageIsLeaf {
                                                         _
                                                     >(
                                                         $crate::__pgrx_c_macros::expression::cast_as::<
-                                                            $crate::GISTPageOpaque,
+                                                            $crate::__pgrx_c_bindings::GISTPageOpaque,
                                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                                    $crate::GISTPageOpaqueData
+                                                                    $crate::__pgrx_c_bindings::GISTPageOpaqueData
                                                                 >,
                                                                 $crate::__pgrx_c_macros::expression::ReadWrite
                                                             >,
@@ -8515,16 +7804,22 @@ macro_rules! GistPageIsLeaf {
                                                                                 true,
                                                                                 _
                                                                             >(
-                                                                                $crate::__pgrx_c_generated::Inline_777d7ad23546580e873e0206a9a6e1cd(
+                                                                                $crate::__pgrx_c_bindings::PageValidateSpecialPointer(
                                                                                     <
                                                                                         $crate::__pgrx_c_macros::expression::CPointer<
-                                                                                            $crate::__pgrx_c_macros::CChar,
+                                                                                            $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                                                $crate::__pgrx_c_macros::CChar,
+                                                                                                ::core::ffi::c_char
+                                                                                            >,
                                                                                             $crate::__pgrx_c_macros::expression::ReadOnly
                                                                                         > as $crate::__pgrx_c_macros::expression::CType
                                                                                     >::into_storage(
                                                                                         $crate::__pgrx_c_macros::expression::implicit::<
                                                                                             $crate::__pgrx_c_macros::expression::CPointer<
-                                                                                                $crate::__pgrx_c_macros::CChar,
+                                                                                                $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                                                    $crate::__pgrx_c_macros::CChar,
+                                                                                                    ::core::ffi::c_char
+                                                                                                >,
                                                                                                 $crate::__pgrx_c_macros::expression::ReadOnly
                                                                                             >,
                                                                                             _
@@ -8585,10 +7880,10 @@ macro_rules! GistPageIsLeaf {
                                                                                                             _
                                                                                                         >(
                                                                                                             $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                                                                $crate::PageHeader,
+                                                                                                                $crate::__pgrx_c_bindings::PageHeader,
                                                                                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                                                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                                        $crate::PageHeaderData
+                                                                                                                        $crate::__pgrx_c_bindings::PageHeaderData
                                                                                                                     >,
                                                                                                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                                                                                                 >,
@@ -8629,7 +7924,7 @@ macro_rules! GistPageIsLeaf {
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                        $crate::F_LEAF as i32
+                                        $crate::__pgrx_c_bindings::F_LEAF as i32
                                     )
                                 )
                             )
@@ -8663,10 +7958,10 @@ macro_rules! GistPageIsLeaf {
                                             _
                                         >(
                                             $crate::__pgrx_c_macros::expression::cast_as::<
-                                                $crate::GISTPageOpaque,
+                                                $crate::__pgrx_c_bindings::GISTPageOpaque,
                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                        $crate::GISTPageOpaqueData
+                                                        $crate::__pgrx_c_bindings::GISTPageOpaqueData
                                                     >,
                                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                                 >,
@@ -8683,16 +7978,22 @@ macro_rules! GistPageIsLeaf {
                                                                     true,
                                                                     _
                                                                 >(
-                                                                    $crate::__pgrx_c_generated::Inline_777d7ad23546580e873e0206a9a6e1cd(
+                                                                    $crate::__pgrx_c_bindings::PageValidateSpecialPointer(
                                                                         <
                                                                             $crate::__pgrx_c_macros::expression::CPointer<
-                                                                                $crate::__pgrx_c_macros::CChar,
+                                                                                $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                                    $crate::__pgrx_c_macros::CChar,
+                                                                                    ::core::ffi::c_char
+                                                                                >,
                                                                                 $crate::__pgrx_c_macros::expression::ReadOnly
                                                                             > as $crate::__pgrx_c_macros::expression::CType
                                                                         >::into_storage(
                                                                             $crate::__pgrx_c_macros::expression::implicit::<
                                                                                 $crate::__pgrx_c_macros::expression::CPointer<
-                                                                                    $crate::__pgrx_c_macros::CChar,
+                                                                                    $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                                        $crate::__pgrx_c_macros::CChar,
+                                                                                        ::core::ffi::c_char
+                                                                                    >,
                                                                                     $crate::__pgrx_c_macros::expression::ReadOnly
                                                                                 >,
                                                                                 _
@@ -8751,10 +8052,10 @@ macro_rules! GistPageIsLeaf {
                                                                                                 _
                                                                                             >(
                                                                                                 $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                                                    $crate::PageHeader,
+                                                                                                    $crate::__pgrx_c_bindings::PageHeader,
                                                                                                     $crate::__pgrx_c_macros::expression::CPointer<
                                                                                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                            $crate::PageHeaderData
+                                                                                                            $crate::__pgrx_c_bindings::PageHeaderData
                                                                                                         >,
                                                                                                         $crate::__pgrx_c_macros::expression::ReadWrite
                                                                                                     >,
@@ -8795,7 +8096,7 @@ macro_rules! GistPageIsLeaf {
                     ),
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                            $crate::F_LEAF as i32
+                            $crate::__pgrx_c_bindings::F_LEAF as i32
                         )
                     )
                 )
@@ -8811,8 +8112,422 @@ macro_rules! GistPageIsLeaf {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
+    target_pointer_width = "64",
+    target_endian = "little"
+)))]
+#[cfg(not(docsrs))]
+compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
+#[doc(hidden)]
+#[macro_export]
+macro_rules! __pgrx_c_args_GistPageSetDeleted {
+    (@collect $mode:ident [$($done:tt)*]; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_GistPageSetDeleted!(@p0 $mode [$($done)*]; $($raw)*)
+    };
+    (@classified [$next:ident $mode:ident [$($done:tt)*] [$($rest:tt)*]] $descriptor:tt) => {
+        $crate::__pgrx_c_args_GistPageSetDeleted!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
+    };
+    (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_GistPageSetDeleted!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+            $($rest)*
+        )
+    };
+    (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_GistPageSetDeleted!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; - $($raw:tt)*) => {
+        $crate::__pgrx_c_args_GistPageSetDeleted!(@negative0 $mode [$($done)*]; - $($raw)*)
+    };
+    (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
+        $crate::__pgrx_c_args_GistPageSetDeleted!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_GistPageSetDeleted] [p1 $mode [$($done)*] [$($rest)*]] [
+                $head $(::$tail)* ! $group
+            ]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; ::$head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_GistPageSetDeleted] [p1 $mode [$($done)*] [$($rest)*]] [
+                ::$head $(::$tail)* ! $group
+            ]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; ($($inner:tt)*), $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_GistPageSetDeleted] [p1 $mode [$($done)*] [$($rest)*]] [
+                ($($inner)*)
+            ]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_GistPageSetDeleted!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_GistPageSetDeleted!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; - $argument:literal) => {
+        $crate::__pgrx_c_args_GistPageSetDeleted!(
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
+    };
+    (@negative1 $mode:ident [$($done:tt)*]; $argument:expr) => {
+        $crate::__pgrx_c_args_GistPageSetDeleted!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_GistPageSetDeleted!(
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+            $($rest)*
+        )
+    };
+    (@negative1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_GistPageSetDeleted!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; - $($raw:tt)*) => {
+        $crate::__pgrx_c_args_GistPageSetDeleted!(@negative1 $mode [$($done)*]; - $($raw)*)
+    };
+    (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
+        $crate::__pgrx_c_args_GistPageSetDeleted!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_GistPageSetDeleted] [p2 $mode [$($done)*] []] [
+                $head $(::$tail)* ! $group
+            ]
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; ::$head:ident $(::$tail:ident)* ! $group:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_GistPageSetDeleted] [p2 $mode [$($done)*] []] [
+                ::$head $(::$tail)* ! $group
+            ]
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; ($($inner:tt)*)) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_GistPageSetDeleted] [p2 $mode [$($done)*] []] [($($inner)*)]
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
+        $crate::__pgrx_c_args_GistPageSetDeleted!(
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; $argument:expr) => {
+        $crate::__pgrx_c_args_GistPageSetDeleted!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
+        $crate::__pgrx_c_args_GistPageSetDeleted!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_GistPageSetDeleted] [p2 $mode [$($done)*] [$($rest)*]] [
+                $head $(::$tail)* ! $group
+            ]
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; ::$head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_GistPageSetDeleted] [p2 $mode [$($done)*] [$($rest)*]] [
+                ::$head $(::$tail)* ! $group
+            ]
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; ($($inner:tt)*), $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_GistPageSetDeleted] [p2 $mode [$($done)*] [$($rest)*]] [
+                ($($inner)*)
+            ]
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_GistPageSetDeleted!(
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_GistPageSetDeleted!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p2 $mode:ident [$($done:tt)*];) => {
+        $crate::GistPageSetDeleted!(@$mode; $($done)*)
+    };
+    ($($invalid:tt)*) => {
+        compile_error!("arguments do not satisfy this C macro's invocation contract")
+    };
+}
+/// Typed call adapter for C inline function GistPageSetDeleted from gist.h:202
+///
+/// ```c
+/// static inline void
+/// GistPageSetDeleted(Page page, FullTransactionId deletexid)
+/// {
+/// 	Assert(PageIsEmpty(page));
+///
+/// 	GistPageGetOpaque(page)->flags |= F_DELETED;
+/// 	((PageHeader) page)->pd_lower = MAXALIGN(SizeOfPageHeaderData) + sizeof(GISTDeletedPageContents);
+///
+/// 	((GISTDeletedPageContents *) PageGetContents(page))->deleteXid = deletexid;
+/// }
+/// ```
+///
+///
+/// Calls the original function through its inspected C prototype. Each operand is evaluated once and converted using C parameter assignment rules. The result retains the function's original C type; `.get()` extracts its native storage, including `()` for a void result. Native calls retain the backend thread, PostgreSQL error, and caller safety contracts of the generated guarded binding.
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+#[macro_export]
+macro_rules! GistPageSetDeleted {
+    (@__pgrx_emit_check_safety; $page:tt, $deletexid:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $page);
+                $crate::__pgrx_c_operand!(@check_safety; $deletexid);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_GistPageSetDeleted!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
+    (@__pgrx_emit_public; $page:tt, $deletexid:tt $(,)?) => {
+        $crate::__pgrx_c_macros::expression_result::finish(
+            $crate::GistPageSetDeleted!(@__pgrx_emit_value; $page, $deletexid)
+        )
+    };
+    (@__pgrx_emit_value; $page:tt, $deletexid:tt $(,)?) => {
+        $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+            $crate::__pgrx_c_generated::Inline_160a329e444ee33c42d910381b438393(
+                <
+                    $crate::__pgrx_c_macros::expression::CPointer<
+                        $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                            $crate::__pgrx_c_macros::CChar,
+                            ::core::ffi::c_char
+                        >,
+                        $crate::__pgrx_c_macros::expression::ReadWrite
+                    > as $crate::__pgrx_c_macros::expression::CType
+                >::into_storage(
+                    $crate::__pgrx_c_macros::expression::implicit::<
+                        $crate::__pgrx_c_macros::expression::CPointer<
+                            $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                $crate::__pgrx_c_macros::CChar,
+                                ::core::ffi::c_char
+                            >,
+                            $crate::__pgrx_c_macros::expression::ReadWrite
+                        >,
+                        _
+                    >(
+                        $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                            $crate::__pgrx_c_operand!(@value [true]; $page)
+                        )
+                    )
+                ),
+                <
+                    $crate::__pgrx_c_macros::expression::CRawRecord<
+                        $crate::__pgrx_c_bindings::FullTransactionId
+                    > as $crate::__pgrx_c_macros::expression::CType
+                >::into_storage(
+                    $crate::__pgrx_c_macros::expression::implicit::<
+                        $crate::__pgrx_c_macros::expression::CRawRecord<
+                            $crate::__pgrx_c_bindings::FullTransactionId
+                        >,
+                        _
+                    >(
+                        $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                            $crate::__pgrx_c_operand!(@value [true]; $deletexid)
+                        )
+                    )
+                ),
+            )
+        )
+    };
+    (@__pgrx_c_value; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_GistPageSetDeleted!(@collect __pgrx_emit_value []; $($raw)*)
+    };
+    (@__pgrx_emit_place; $page:tt, $deletexid:tt $(,)?) => {
+        compile_error!("C expression is not a place in this operation")
+    };
+    (@__pgrx_c_place; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_GistPageSetDeleted!(@collect __pgrx_emit_place []; $($raw)*)
+    };
+    (@__pgrx_emit_read_place; $page:tt, $deletexid:tt $(,)?) => {
+        compile_error!("C expression is not a place in this operation")
+    };
+    (@__pgrx_c_read_place; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_GistPageSetDeleted!(@collect __pgrx_emit_read_place []; $($raw)*)
+    };
+    (@__pgrx_emit_size; $page:tt, $deletexid:tt $(,)?) => {
+        $crate::__pgrx_c_macros::expression::size_of_value_type(
+            if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $page);
+                        $crate::__pgrx_c_operand!(@check_safety; $deletexid);
+                    }
+                }
+                Some(
+                    unsafe {
+                        $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                            $crate::__pgrx_c_generated::Inline_160a329e444ee33c42d910381b438393(
+                                <
+                                    $crate::__pgrx_c_macros::expression::CPointer<
+                                        $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                            $crate::__pgrx_c_macros::CChar,
+                                            ::core::ffi::c_char
+                                        >,
+                                        $crate::__pgrx_c_macros::expression::ReadWrite
+                                    > as $crate::__pgrx_c_macros::expression::CType
+                                >::into_storage(
+                                    $crate::__pgrx_c_macros::expression::implicit::<
+                                        $crate::__pgrx_c_macros::expression::CPointer<
+                                            $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                $crate::__pgrx_c_macros::CChar,
+                                                ::core::ffi::c_char
+                                            >,
+                                            $crate::__pgrx_c_macros::expression::ReadWrite
+                                        >,
+                                        _
+                                    >(
+                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                            true,
+                                            _
+                                        >($crate::__pgrx_c_operand!(@value [true]; $page))
+                                    )
+                                ),
+                                <
+                                    $crate::__pgrx_c_macros::expression::CRawRecord<
+                                        $crate::__pgrx_c_bindings::FullTransactionId
+                                    > as $crate::__pgrx_c_macros::expression::CType
+                                >::into_storage(
+                                    $crate::__pgrx_c_macros::expression::implicit::<
+                                        $crate::__pgrx_c_macros::expression::CRawRecord<
+                                            $crate::__pgrx_c_bindings::FullTransactionId
+                                        >,
+                                        _
+                                    >(
+                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                            true,
+                                            _
+                                        >($crate::__pgrx_c_operand!(@value [true]; $deletexid))
+                                    )
+                                ),
+                            )
+                        )
+                    }
+                )
+            } else {
+                None
+            }
+        )
+    };
+    (@__pgrx_c_size; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_GistPageSetDeleted!(@collect __pgrx_emit_size []; $($raw)*)
+    };
+    (@__pgrx_emit_discard; $page:tt, $deletexid:tt $(,)?) => {
+        {
+            let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                $crate::__pgrx_c_generated::Inline_160a329e444ee33c42d910381b438393(
+                    <
+                        $crate::__pgrx_c_macros::expression::CPointer<
+                            $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                $crate::__pgrx_c_macros::CChar,
+                                ::core::ffi::c_char
+                            >,
+                            $crate::__pgrx_c_macros::expression::ReadWrite
+                        > as $crate::__pgrx_c_macros::expression::CType
+                    >::into_storage(
+                        $crate::__pgrx_c_macros::expression::implicit::<
+                            $crate::__pgrx_c_macros::expression::CPointer<
+                                $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                    $crate::__pgrx_c_macros::CChar,
+                                    ::core::ffi::c_char
+                                >,
+                                $crate::__pgrx_c_macros::expression::ReadWrite
+                            >,
+                            _
+                        >(
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_operand!(@value [true]; $page)
+                            )
+                        )
+                    ),
+                    <
+                        $crate::__pgrx_c_macros::expression::CRawRecord<
+                            $crate::__pgrx_c_bindings::FullTransactionId
+                        > as $crate::__pgrx_c_macros::expression::CType
+                    >::into_storage(
+                        $crate::__pgrx_c_macros::expression::implicit::<
+                            $crate::__pgrx_c_macros::expression::CRawRecord<
+                                $crate::__pgrx_c_bindings::FullTransactionId
+                            >,
+                            _
+                        >(
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_operand!(@value [true]; $deletexid)
+                            )
+                        )
+                    ),
+                )
+            );
+        }
+    };
+    (@__pgrx_c_discard; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_GistPageSetDeleted!(@collect __pgrx_emit_discard []; $($raw)*)
+    };
+    ($($raw:tt)*) => {
+        $crate::__pgrx_c_args_GistPageSetDeleted!(@collect __pgrx_emit_public []; $($raw)*)
+    };
+}
+
+#[cfg(not(all(
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -8840,13 +8555,13 @@ macro_rules! __pgrx_c_args_GistPageSetNSN {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GistPageSetNSN!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GistPageSetNSN!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -8855,7 +8570,7 @@ macro_rules! __pgrx_c_args_GistPageSetNSN {
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_GistPageSetNSN!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -8882,31 +8597,35 @@ macro_rules! __pgrx_c_args_GistPageSetNSN {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GistPageSetNSN!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GistPageSetNSN!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_GistPageSetNSN!(@p2 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_GistPageSetNSN!(
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative1 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_GistPageSetNSN!(@p2 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_GistPageSetNSN!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GistPageSetNSN!(
-            @p2 $mode [$($done)* (@literal [- $argument]),];
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GistPageSetNSN!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -8914,7 +8633,9 @@ macro_rules! __pgrx_c_args_GistPageSetNSN {
         $crate::__pgrx_c_args_GistPageSetNSN!(@negative1 $mode [$($done)*]; - $($raw)*)
     };
     (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_GistPageSetNSN!(@p2 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_GistPageSetNSN!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -8936,14 +8657,18 @@ macro_rules! __pgrx_c_args_GistPageSetNSN {
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_GistPageSetNSN!(@p2 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_GistPageSetNSN!(
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_GistPageSetNSN!(@p2 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_GistPageSetNSN!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_GistPageSetNSN!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -8970,13 +8695,13 @@ macro_rules! __pgrx_c_args_GistPageSetNSN {
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GistPageSetNSN!(
-            @p2 $mode [$($done)* (@literal [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GistPageSetNSN!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -8987,7 +8712,7 @@ macro_rules! __pgrx_c_args_GistPageSetNSN {
         compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
-/// C macro GistPageSetNSN from gist.h:190
+/// C macro GistPageSetNSN from gist.h:186
 ///
 /// ```text
 /// #define GistPageSetNSN( page , val ) ( PageXLogRecPtrSet ( & GistPageGetOpaque ( page ) -> nsn , val ) )
@@ -9023,11 +8748,13 @@ macro_rules! GistPageSetNSN {
         /* PGRX: GistPageSetNSN remains expanded because PageXLogRecPtrSet is not an active function-like macro. */
         (
             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                $crate::PageXLogRecPtrSet(
+                $crate::__pgrx_c_bindings::PageXLogRecPtrSet(
                     <
                         $crate::__pgrx_c_macros::expression::CPointer<
                             $crate::__pgrx_c_macros::expression::CVolatile<
-                                $crate::__pgrx_c_macros::expression::CRecord<$crate::PageXLogRecPtr>>,
+                                $crate::__pgrx_c_macros::expression::CRecord<
+                                    $crate::__pgrx_c_bindings::PageXLogRecPtr
+                                >>,
                             $crate::__pgrx_c_macros::expression::ReadWrite
                         > as $crate::__pgrx_c_macros::expression::CType
                     >::into_storage(
@@ -9035,7 +8762,7 @@ macro_rules! GistPageSetNSN {
                             $crate::__pgrx_c_macros::expression::CPointer<
                                 $crate::__pgrx_c_macros::expression::CVolatile<
                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                        $crate::PageXLogRecPtr
+                                        $crate::__pgrx_c_bindings::PageXLogRecPtr
                                     >>,
                                 $crate::__pgrx_c_macros::expression::ReadWrite
                             >,
@@ -9055,10 +8782,10 @@ macro_rules! GistPageSetNSN {
                                                     _
                                                 >(
                                                     $crate::__pgrx_c_macros::expression::cast_as::<
-                                                        $crate::GISTPageOpaque,
+                                                        $crate::__pgrx_c_bindings::GISTPageOpaque,
                                                         $crate::__pgrx_c_macros::expression::CPointer<
                                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                                $crate::GISTPageOpaqueData
+                                                                $crate::__pgrx_c_bindings::GISTPageOpaqueData
                                                             >,
                                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                                         >,
@@ -9075,16 +8802,22 @@ macro_rules! GistPageSetNSN {
                                                                             true,
                                                                             _
                                                                         >(
-                                                                            $crate::__pgrx_c_generated::Inline_777d7ad23546580e873e0206a9a6e1cd(
+                                                                            $crate::__pgrx_c_bindings::PageValidateSpecialPointer(
                                                                                 <
                                                                                     $crate::__pgrx_c_macros::expression::CPointer<
-                                                                                        $crate::__pgrx_c_macros::CChar,
+                                                                                        $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                                            $crate::__pgrx_c_macros::CChar,
+                                                                                            ::core::ffi::c_char
+                                                                                        >,
                                                                                         $crate::__pgrx_c_macros::expression::ReadOnly
                                                                                     > as $crate::__pgrx_c_macros::expression::CType
                                                                                 >::into_storage(
                                                                                     $crate::__pgrx_c_macros::expression::implicit::<
                                                                                         $crate::__pgrx_c_macros::expression::CPointer<
-                                                                                            $crate::__pgrx_c_macros::CChar,
+                                                                                            $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                                                $crate::__pgrx_c_macros::CChar,
+                                                                                                ::core::ffi::c_char
+                                                                                            >,
                                                                                             $crate::__pgrx_c_macros::expression::ReadOnly
                                                                                         >,
                                                                                         _
@@ -9145,10 +8878,10 @@ macro_rules! GistPageSetNSN {
                                                                                                         _
                                                                                                     >(
                                                                                                         $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                                                            $crate::PageHeader,
+                                                                                                            $crate::__pgrx_c_bindings::PageHeader,
                                                                                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                                                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                                    $crate::PageHeaderData
+                                                                                                                    $crate::__pgrx_c_bindings::PageHeaderData
                                                                                                                 >,
                                                                                                                 $crate::__pgrx_c_macros::expression::ReadWrite
                                                                                                             >,
@@ -9190,10 +8923,10 @@ macro_rules! GistPageSetNSN {
                         )
                     ),
                     <
-                        $crate::__pgrx_c_macros::CUnsignedLongLong as $crate::__pgrx_c_macros::expression::CType
+                        $crate::__pgrx_c_macros::CUnsignedLong as $crate::__pgrx_c_macros::expression::CType
                     >::into_storage(
                         $crate::__pgrx_c_macros::expression::implicit::<
-                            $crate::__pgrx_c_macros::CUnsignedLongLong,
+                            $crate::__pgrx_c_macros::CUnsignedLong,
                             _
                         >(
                             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -9233,12 +8966,12 @@ macro_rules! GistPageSetNSN {
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                            $crate::PageXLogRecPtrSet(
+                            $crate::__pgrx_c_bindings::PageXLogRecPtrSet(
                                 <
                                     $crate::__pgrx_c_macros::expression::CPointer<
                                         $crate::__pgrx_c_macros::expression::CVolatile<
                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                $crate::PageXLogRecPtr
+                                                $crate::__pgrx_c_bindings::PageXLogRecPtr
                                             >>,
                                         $crate::__pgrx_c_macros::expression::ReadWrite
                                     > as $crate::__pgrx_c_macros::expression::CType
@@ -9247,7 +8980,7 @@ macro_rules! GistPageSetNSN {
                                         $crate::__pgrx_c_macros::expression::CPointer<
                                             $crate::__pgrx_c_macros::expression::CVolatile<
                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                    $crate::PageXLogRecPtr
+                                                    $crate::__pgrx_c_bindings::PageXLogRecPtr
                                                 >>,
                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                         >,
@@ -9270,10 +9003,10 @@ macro_rules! GistPageSetNSN {
                                                                 _
                                                             >(
                                                                 $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                    $crate::GISTPageOpaque,
+                                                                    $crate::__pgrx_c_bindings::GISTPageOpaque,
                                                                     $crate::__pgrx_c_macros::expression::CPointer<
                                                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                                                            $crate::GISTPageOpaqueData
+                                                                            $crate::__pgrx_c_bindings::GISTPageOpaqueData
                                                                         >,
                                                                         $crate::__pgrx_c_macros::expression::ReadWrite
                                                                     >,
@@ -9290,16 +9023,22 @@ macro_rules! GistPageSetNSN {
                                                                                         true,
                                                                                         _
                                                                                     >(
-                                                                                        $crate::__pgrx_c_generated::Inline_777d7ad23546580e873e0206a9a6e1cd(
+                                                                                        $crate::__pgrx_c_bindings::PageValidateSpecialPointer(
                                                                                             <
                                                                                                 $crate::__pgrx_c_macros::expression::CPointer<
-                                                                                                    $crate::__pgrx_c_macros::CChar,
+                                                                                                    $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                                                        $crate::__pgrx_c_macros::CChar,
+                                                                                                        ::core::ffi::c_char
+                                                                                                    >,
                                                                                                     $crate::__pgrx_c_macros::expression::ReadOnly
                                                                                                 > as $crate::__pgrx_c_macros::expression::CType
                                                                                             >::into_storage(
                                                                                                 $crate::__pgrx_c_macros::expression::implicit::<
                                                                                                     $crate::__pgrx_c_macros::expression::CPointer<
-                                                                                                        $crate::__pgrx_c_macros::CChar,
+                                                                                                        $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                                                            $crate::__pgrx_c_macros::CChar,
+                                                                                                            ::core::ffi::c_char
+                                                                                                        >,
                                                                                                         $crate::__pgrx_c_macros::expression::ReadOnly
                                                                                                     >,
                                                                                                     _
@@ -9360,10 +9099,10 @@ macro_rules! GistPageSetNSN {
                                                                                                                     _
                                                                                                                 >(
                                                                                                                     $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                                                                        $crate::PageHeader,
+                                                                                                                        $crate::__pgrx_c_bindings::PageHeader,
                                                                                                                         $crate::__pgrx_c_macros::expression::CPointer<
                                                                                                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                                                $crate::PageHeaderData
+                                                                                                                                $crate::__pgrx_c_bindings::PageHeaderData
                                                                                                                             >,
                                                                                                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                                                                                                         >,
@@ -9405,10 +9144,10 @@ macro_rules! GistPageSetNSN {
                                     )
                                 ),
                                 <
-                                    $crate::__pgrx_c_macros::CUnsignedLongLong as $crate::__pgrx_c_macros::expression::CType
+                                    $crate::__pgrx_c_macros::CUnsignedLong as $crate::__pgrx_c_macros::expression::CType
                                 >::into_storage(
                                     $crate::__pgrx_c_macros::expression::implicit::<
-                                        $crate::__pgrx_c_macros::CUnsignedLongLong,
+                                        $crate::__pgrx_c_macros::CUnsignedLong,
                                         _
                                     >(
                                         $crate::__pgrx_c_macros::expression::profile_value::<
@@ -9433,11 +9172,13 @@ macro_rules! GistPageSetNSN {
         /* PGRX: GistPageSetNSN remains expanded because PageXLogRecPtrSet is not an active function-like macro. */
         {
             let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                $crate::PageXLogRecPtrSet(
+                $crate::__pgrx_c_bindings::PageXLogRecPtrSet(
                     <
                         $crate::__pgrx_c_macros::expression::CPointer<
                             $crate::__pgrx_c_macros::expression::CVolatile<
-                                $crate::__pgrx_c_macros::expression::CRecord<$crate::PageXLogRecPtr>>,
+                                $crate::__pgrx_c_macros::expression::CRecord<
+                                    $crate::__pgrx_c_bindings::PageXLogRecPtr
+                                >>,
                             $crate::__pgrx_c_macros::expression::ReadWrite
                         > as $crate::__pgrx_c_macros::expression::CType
                     >::into_storage(
@@ -9445,7 +9186,7 @@ macro_rules! GistPageSetNSN {
                             $crate::__pgrx_c_macros::expression::CPointer<
                                 $crate::__pgrx_c_macros::expression::CVolatile<
                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                        $crate::PageXLogRecPtr
+                                        $crate::__pgrx_c_bindings::PageXLogRecPtr
                                     >>,
                                 $crate::__pgrx_c_macros::expression::ReadWrite
                             >,
@@ -9465,10 +9206,10 @@ macro_rules! GistPageSetNSN {
                                                     _
                                                 >(
                                                     $crate::__pgrx_c_macros::expression::cast_as::<
-                                                        $crate::GISTPageOpaque,
+                                                        $crate::__pgrx_c_bindings::GISTPageOpaque,
                                                         $crate::__pgrx_c_macros::expression::CPointer<
                                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                                $crate::GISTPageOpaqueData
+                                                                $crate::__pgrx_c_bindings::GISTPageOpaqueData
                                                             >,
                                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                                         >,
@@ -9485,16 +9226,22 @@ macro_rules! GistPageSetNSN {
                                                                             true,
                                                                             _
                                                                         >(
-                                                                            $crate::__pgrx_c_generated::Inline_777d7ad23546580e873e0206a9a6e1cd(
+                                                                            $crate::__pgrx_c_bindings::PageValidateSpecialPointer(
                                                                                 <
                                                                                     $crate::__pgrx_c_macros::expression::CPointer<
-                                                                                        $crate::__pgrx_c_macros::CChar,
+                                                                                        $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                                            $crate::__pgrx_c_macros::CChar,
+                                                                                            ::core::ffi::c_char
+                                                                                        >,
                                                                                         $crate::__pgrx_c_macros::expression::ReadOnly
                                                                                     > as $crate::__pgrx_c_macros::expression::CType
                                                                                 >::into_storage(
                                                                                     $crate::__pgrx_c_macros::expression::implicit::<
                                                                                         $crate::__pgrx_c_macros::expression::CPointer<
-                                                                                            $crate::__pgrx_c_macros::CChar,
+                                                                                            $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                                                $crate::__pgrx_c_macros::CChar,
+                                                                                                ::core::ffi::c_char
+                                                                                            >,
                                                                                             $crate::__pgrx_c_macros::expression::ReadOnly
                                                                                         >,
                                                                                         _
@@ -9555,10 +9302,10 @@ macro_rules! GistPageSetNSN {
                                                                                                         _
                                                                                                     >(
                                                                                                         $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                                                            $crate::PageHeader,
+                                                                                                            $crate::__pgrx_c_bindings::PageHeader,
                                                                                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                                                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                                    $crate::PageHeaderData
+                                                                                                                    $crate::__pgrx_c_bindings::PageHeaderData
                                                                                                                 >,
                                                                                                                 $crate::__pgrx_c_macros::expression::ReadWrite
                                                                                                             >,
@@ -9600,10 +9347,10 @@ macro_rules! GistPageSetNSN {
                         )
                     ),
                     <
-                        $crate::__pgrx_c_macros::CUnsignedLongLong as $crate::__pgrx_c_macros::expression::CType
+                        $crate::__pgrx_c_macros::CUnsignedLong as $crate::__pgrx_c_macros::expression::CType
                     >::into_storage(
                         $crate::__pgrx_c_macros::expression::implicit::<
-                            $crate::__pgrx_c_macros::CUnsignedLongLong,
+                            $crate::__pgrx_c_macros::CUnsignedLong,
                             _
                         >(
                             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -9624,677 +9371,8 @@ macro_rules! GistPageSetNSN {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
-    target_pointer_width = "64",
-    target_endian = "little"
-)))]
-#[cfg(not(docsrs))]
-compile_error!("generated C macros require their inspected C target profile");
-const _: () = {
-    use crate::__pgrx_c_macros::CInteger as _;
-    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
-    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
-    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
-    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
-    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
-    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
-    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
-    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
-};
-#[doc(hidden)]
-#[macro_export]
-macro_rules! __pgrx_c_args_GistTuplesDeleted {
-    (@collect $mode:ident [$($done:tt)*]; $($raw:tt)*) => {
-        $crate::__pgrx_c_args_GistTuplesDeleted!(@p0 $mode [$($done)*]; $($raw)*)
-    };
-    (@classified [$next:ident $mode:ident [$($done:tt)*] [$($rest:tt)*]] $descriptor:tt) => {
-        $crate::__pgrx_c_args_GistTuplesDeleted!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
-    };
-    (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_GistTuplesDeleted!(@p1 $mode [$($done)* (@literal [- $argument]),];)
-    };
-    (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_GistTuplesDeleted!(@p1 $mode [$($done)* (@native [$argument]),];)
-    };
-    (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_GistTuplesDeleted!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
-            $($rest)*
-        )
-    };
-    (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_GistTuplesDeleted!(
-            @p1 $mode [$($done)* (@native [$argument]),];
-            $($rest)*
-        )
-    };
-    (@p0 $mode:ident [$($done:tt)*]; - $($raw:tt)*) => {
-        $crate::__pgrx_c_args_GistTuplesDeleted!(@negative0 $mode [$($done)*]; - $($raw)*)
-    };
-    (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_GistTuplesDeleted!(@p1 $mode [$($done)* (@native [$argument]),];)
-    };
-    (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
-        $crate::__pgrx_c_classify!(
-            @argument [__pgrx_c_args_GistTuplesDeleted] [p1 $mode [$($done)*] []] [
-                $head $(::$tail)* ! $group
-            ]
-        )
-    };
-    (@p0 $mode:ident [$($done:tt)*]; ::$head:ident $(::$tail:ident)* ! $group:tt) => {
-        $crate::__pgrx_c_classify!(
-            @argument [__pgrx_c_args_GistTuplesDeleted] [p1 $mode [$($done)*] []] [
-                ::$head $(::$tail)* ! $group
-            ]
-        )
-    };
-    (@p0 $mode:ident [$($done:tt)*]; ($($inner:tt)*)) => {
-        $crate::__pgrx_c_classify!(
-            @argument [__pgrx_c_args_GistTuplesDeleted] [p1 $mode [$($done)*] []] [($($inner)*)]
-        )
-    };
-    (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_GistTuplesDeleted!(@p1 $mode [$($done)* (@literal [$argument]),];)
-    };
-    (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_GistTuplesDeleted!(@p1 $mode [$($done)* (@native [$argument]),];)
-    };
-    (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
-        $crate::__pgrx_c_args_GistTuplesDeleted!(
-            @p1 $mode [$($done)* (@native [$argument]),];
-            $($rest)*
-        )
-    };
-    (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
-        $crate::__pgrx_c_classify!(
-            @argument [__pgrx_c_args_GistTuplesDeleted] [p1 $mode [$($done)*] [$($rest)*]] [
-                $head $(::$tail)* ! $group
-            ]
-        )
-    };
-    (@p0 $mode:ident [$($done:tt)*]; ::$head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
-        $crate::__pgrx_c_classify!(
-            @argument [__pgrx_c_args_GistTuplesDeleted] [p1 $mode [$($done)*] [$($rest)*]] [
-                ::$head $(::$tail)* ! $group
-            ]
-        )
-    };
-    (@p0 $mode:ident [$($done:tt)*]; ($($inner:tt)*), $($rest:tt)*) => {
-        $crate::__pgrx_c_classify!(
-            @argument [__pgrx_c_args_GistTuplesDeleted] [p1 $mode [$($done)*] [$($rest)*]] [
-                ($($inner)*)
-            ]
-        )
-    };
-    (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_GistTuplesDeleted!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
-            $($rest)*
-        )
-    };
-    (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_GistTuplesDeleted!(
-            @p1 $mode [$($done)* (@native [$argument]),];
-            $($rest)*
-        )
-    };
-    (@p1 $mode:ident [$($done:tt)*];) => {
-        $crate::GistTuplesDeleted!(@$mode; $($done)*)
-    };
-    ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
-    };
-}
-/// C macro GistTuplesDeleted from gist.h:177
-///
-/// ```text
-/// #define GistTuplesDeleted( page ) ( GistPageGetOpaque ( page ) -> flags & F_TUPLES_DELETED )
-/// ```
-///
-///
-/// # Safety
-///
-/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
-///
-/// # Panics
-///
-/// Checked signed arithmetic rejects overflow when the recorded C profile does not define wrapping; pointer arithmetic checks representable offsets and distances but still requires valid allocation bounds. Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
-#[macro_export]
-macro_rules! GistTuplesDeleted {
-    (@__pgrx_emit_check_safety; $page:tt $(,)?) => {
-        {
-            if false {
-                $crate::__pgrx_c_operand!(@check_safety; $page);
-            }
-        }
-    };
-    (@__pgrx_c_check_safety; $($raw:tt)*) => {
-        $crate::__pgrx_c_args_GistTuplesDeleted!(@collect __pgrx_emit_check_safety []; $($raw)*)
-    };
-    (@__pgrx_emit_public; $page:tt $(,)?) => {
-        $crate::__pgrx_c_macros::expression_result::finish(
-            $crate::GistTuplesDeleted!(@__pgrx_emit_value; $page)
-        )
-    };
-    (@__pgrx_emit_value; $page:tt $(,)?) => {
-        /* PGRX: GistPageGetOpaque remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */ /* PGRX: PageGetSpecialPointer remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */
-        (
-            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                $crate::__pgrx_c_macros::expression::bitand(
-                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                        $crate::__pgrx_c_macros::expression::load(
-                            $crate::__pgrx_c_macros::expression::project::<
-                                $crate::__pgrx_c_generated::Field_flags,
-                                _,
-                                _
-                            >(
-                                $crate::__pgrx_c_macros::expression::pointee(
-                                    (
-                                        $crate::__pgrx_c_macros::expression::profile_value::<
-                                            true,
-                                            _
-                                        >(
-                                            $crate::__pgrx_c_macros::expression::cast_as::<
-                                                $crate::GISTPageOpaque,
-                                                $crate::__pgrx_c_macros::expression::CPointer<
-                                                    $crate::__pgrx_c_macros::expression::CRecord<
-                                                        $crate::GISTPageOpaqueData
-                                                    >,
-                                                    $crate::__pgrx_c_macros::expression::ReadWrite
-                                                >,
-                                                _
-                                            >(
-                                                (
-                                                    $crate::__pgrx_c_macros::expression::profile_value::<
-                                                        true,
-                                                        _
-                                                    >(
-                                                        {
-                                                            {
-                                                                let _ = $crate::__pgrx_c_macros::expression::profile_value::<
-                                                                    true,
-                                                                    _
-                                                                >(
-                                                                    $crate::__pgrx_c_generated::Inline_777d7ad23546580e873e0206a9a6e1cd(
-                                                                        <
-                                                                            $crate::__pgrx_c_macros::expression::CPointer<
-                                                                                $crate::__pgrx_c_macros::CChar,
-                                                                                $crate::__pgrx_c_macros::expression::ReadOnly
-                                                                            > as $crate::__pgrx_c_macros::expression::CType
-                                                                        >::into_storage(
-                                                                            $crate::__pgrx_c_macros::expression::implicit::<
-                                                                                $crate::__pgrx_c_macros::expression::CPointer<
-                                                                                    $crate::__pgrx_c_macros::CChar,
-                                                                                    $crate::__pgrx_c_macros::expression::ReadOnly
-                                                                                >,
-                                                                                _
-                                                                            >(
-                                                                                $crate::__pgrx_c_macros::expression::profile_value::<
-                                                                                    true,
-                                                                                    _
-                                                                                >(
-                                                                                    $crate::__pgrx_c_operand!(
-                                                                                        @value [
-                                                                                            true
-                                                                                        ];
-                                                                                        $page
-                                                                                    )
-                                                                                )
-                                                                            )
-                                                                        ),
-                                                                    )
-                                                                );
-                                                            };
-                                                            (
-                                                                $crate::__pgrx_c_macros::expression::profile_value::<
-                                                                    true,
-                                                                    _
-                                                                >(
-                                                                    $crate::__pgrx_c_macros::expression::add::<
-                                                                        $crate::__pgrx_c_macros::Wrapping,
-                                                                        _,
-                                                                        _
-                                                                    >(
-                                                                        (
-                                                                            $crate::__pgrx_c_macros::expression::profile_value::<
-                                                                                true,
-                                                                                _
-                                                                            >(
-                                                                                $crate::__pgrx_c_operand!(
-                                                                                    @value [true];
-                                                                                    $page
-                                                                                )
-                                                                            )
-                                                                        ),
-                                                                        $crate::__pgrx_c_macros::expression::profile_value::<
-                                                                            true,
-                                                                            _
-                                                                        >(
-                                                                            $crate::__pgrx_c_macros::expression::load(
-                                                                                $crate::__pgrx_c_macros::expression::project::<
-                                                                                    $crate::__pgrx_c_generated::Field_pd_special,
-                                                                                    _,
-                                                                                    _
-                                                                                >(
-                                                                                    $crate::__pgrx_c_macros::expression::pointee(
-                                                                                        (
-                                                                                            $crate::__pgrx_c_macros::expression::profile_value::<
-                                                                                                true,
-                                                                                                _
-                                                                                            >(
-                                                                                                $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                                                    $crate::PageHeader,
-                                                                                                    $crate::__pgrx_c_macros::expression::CPointer<
-                                                                                                        $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                            $crate::PageHeaderData
-                                                                                                        >,
-                                                                                                        $crate::__pgrx_c_macros::expression::ReadWrite
-                                                                                                    >,
-                                                                                                    _
-                                                                                                >(
-                                                                                                    (
-                                                                                                        $crate::__pgrx_c_macros::expression::profile_value::<
-                                                                                                            true,
-                                                                                                            _
-                                                                                                        >(
-                                                                                                            $crate::__pgrx_c_operand!(
-                                                                                                                @value [
-                                                                                                                    true
-                                                                                                                ];
-                                                                                                                $page
-                                                                                                            )
-                                                                                                        )
-                                                                                                    )
-                                                                                                )
-                                                                                            )
-                                                                                        )
-                                                                                    )
-                                                                                )
-                                                                            )
-                                                                        )
-                                                                    )
-                                                                )
-                                                            )
-                                                        }
-                                                    )
-                                                )
-                                            )
-                                        )
-                                    )
-                                )
-                            )
-                        )
-                    ),
-                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                        $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                            $crate::F_TUPLES_DELETED as i32
-                        )
-                    )
-                )
-            )
-        )
-    };
-    (@__pgrx_c_value; $($raw:tt)*) => {
-        $crate::__pgrx_c_args_GistTuplesDeleted!(@collect __pgrx_emit_value []; $($raw)*)
-    };
-    (@__pgrx_emit_place; $page:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
-    };
-    (@__pgrx_c_place; $($raw:tt)*) => {
-        $crate::__pgrx_c_args_GistTuplesDeleted!(@collect __pgrx_emit_place []; $($raw)*)
-    };
-    (@__pgrx_emit_read_place; $page:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
-    };
-    (@__pgrx_c_read_place; $($raw:tt)*) => {
-        $crate::__pgrx_c_args_GistTuplesDeleted!(@collect __pgrx_emit_read_place []; $($raw)*)
-    };
-    (@__pgrx_emit_size; $page:tt $(,)?) => {
-        /* PGRX: GistPageGetOpaque remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */ /* PGRX: PageGetSpecialPointer remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */
-        $crate::__pgrx_c_macros::expression::size_of_value_type(
-            if false {
-                {
-                    if false {
-                        $crate::__pgrx_c_operand!(@check_safety; $page);
-                    }
-                }
-                Some(
-                    unsafe {
-                        $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                            $crate::__pgrx_c_macros::expression::bitand(
-                                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                                    $crate::__pgrx_c_macros::expression::load(
-                                        $crate::__pgrx_c_macros::expression::project::<
-                                            $crate::__pgrx_c_generated::Field_flags,
-                                            _,
-                                            _
-                                        >(
-                                            $crate::__pgrx_c_macros::expression::pointee(
-                                                (
-                                                    $crate::__pgrx_c_macros::expression::profile_value::<
-                                                        true,
-                                                        _
-                                                    >(
-                                                        $crate::__pgrx_c_macros::expression::cast_as::<
-                                                            $crate::GISTPageOpaque,
-                                                            $crate::__pgrx_c_macros::expression::CPointer<
-                                                                $crate::__pgrx_c_macros::expression::CRecord<
-                                                                    $crate::GISTPageOpaqueData
-                                                                >,
-                                                                $crate::__pgrx_c_macros::expression::ReadWrite
-                                                            >,
-                                                            _
-                                                        >(
-                                                            (
-                                                                $crate::__pgrx_c_macros::expression::profile_value::<
-                                                                    true,
-                                                                    _
-                                                                >(
-                                                                    {
-                                                                        {
-                                                                            let _ = $crate::__pgrx_c_macros::expression::profile_value::<
-                                                                                true,
-                                                                                _
-                                                                            >(
-                                                                                $crate::__pgrx_c_generated::Inline_777d7ad23546580e873e0206a9a6e1cd(
-                                                                                    <
-                                                                                        $crate::__pgrx_c_macros::expression::CPointer<
-                                                                                            $crate::__pgrx_c_macros::CChar,
-                                                                                            $crate::__pgrx_c_macros::expression::ReadOnly
-                                                                                        > as $crate::__pgrx_c_macros::expression::CType
-                                                                                    >::into_storage(
-                                                                                        $crate::__pgrx_c_macros::expression::implicit::<
-                                                                                            $crate::__pgrx_c_macros::expression::CPointer<
-                                                                                                $crate::__pgrx_c_macros::CChar,
-                                                                                                $crate::__pgrx_c_macros::expression::ReadOnly
-                                                                                            >,
-                                                                                            _
-                                                                                        >(
-                                                                                            $crate::__pgrx_c_macros::expression::profile_value::<
-                                                                                                true,
-                                                                                                _
-                                                                                            >(
-                                                                                                $crate::__pgrx_c_operand!(
-                                                                                                    @value [
-                                                                                                        true
-                                                                                                    ];
-                                                                                                    $page
-                                                                                                )
-                                                                                            )
-                                                                                        )
-                                                                                    ),
-                                                                                )
-                                                                            );
-                                                                        };
-                                                                        (
-                                                                            $crate::__pgrx_c_macros::expression::profile_value::<
-                                                                                true,
-                                                                                _
-                                                                            >(
-                                                                                $crate::__pgrx_c_macros::expression::add::<
-                                                                                    $crate::__pgrx_c_macros::Wrapping,
-                                                                                    _,
-                                                                                    _
-                                                                                >(
-                                                                                    (
-                                                                                        $crate::__pgrx_c_macros::expression::profile_value::<
-                                                                                            true,
-                                                                                            _
-                                                                                        >(
-                                                                                            $crate::__pgrx_c_operand!(
-                                                                                                @value [
-                                                                                                    true
-                                                                                                ];
-                                                                                                $page
-                                                                                            )
-                                                                                        )
-                                                                                    ),
-                                                                                    $crate::__pgrx_c_macros::expression::profile_value::<
-                                                                                        true,
-                                                                                        _
-                                                                                    >(
-                                                                                        $crate::__pgrx_c_macros::expression::load(
-                                                                                            $crate::__pgrx_c_macros::expression::project::<
-                                                                                                $crate::__pgrx_c_generated::Field_pd_special,
-                                                                                                _,
-                                                                                                _
-                                                                                            >(
-                                                                                                $crate::__pgrx_c_macros::expression::pointee(
-                                                                                                    (
-                                                                                                        $crate::__pgrx_c_macros::expression::profile_value::<
-                                                                                                            true,
-                                                                                                            _
-                                                                                                        >(
-                                                                                                            $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                                                                $crate::PageHeader,
-                                                                                                                $crate::__pgrx_c_macros::expression::CPointer<
-                                                                                                                    $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                                        $crate::PageHeaderData
-                                                                                                                    >,
-                                                                                                                    $crate::__pgrx_c_macros::expression::ReadWrite
-                                                                                                                >,
-                                                                                                                _
-                                                                                                            >(
-                                                                                                                (
-                                                                                                                    $crate::__pgrx_c_macros::expression::profile_value::<
-                                                                                                                        true,
-                                                                                                                        _
-                                                                                                                    >(
-                                                                                                                        $crate::__pgrx_c_operand!(
-                                                                                                                            @value [
-                                                                                                                                true
-                                                                                                                            ];
-                                                                                                                            $page
-                                                                                                                        )
-                                                                                                                    )
-                                                                                                                )
-                                                                                                            )
-                                                                                                        )
-                                                                                                    )
-                                                                                                )
-                                                                                            )
-                                                                                        )
-                                                                                    )
-                                                                                )
-                                                                            )
-                                                                        )
-                                                                    }
-                                                                )
-                                                            )
-                                                        )
-                                                    )
-                                                )
-                                            )
-                                        )
-                                    )
-                                ),
-                                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                                    $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                        $crate::F_TUPLES_DELETED as i32
-                                    )
-                                )
-                            )
-                        )
-                    }
-                )
-            } else {
-                None
-            }
-        )
-    };
-    (@__pgrx_c_size; $($raw:tt)*) => {
-        $crate::__pgrx_c_args_GistTuplesDeleted!(@collect __pgrx_emit_size []; $($raw)*)
-    };
-    (@__pgrx_emit_discard; $page:tt $(,)?) => {
-        /* PGRX: GistPageGetOpaque remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */ /* PGRX: PageGetSpecialPointer remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */
-        {
-            let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                $crate::__pgrx_c_macros::expression::bitand(
-                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                        $crate::__pgrx_c_macros::expression::load(
-                            $crate::__pgrx_c_macros::expression::project::<
-                                $crate::__pgrx_c_generated::Field_flags,
-                                _,
-                                _
-                            >(
-                                $crate::__pgrx_c_macros::expression::pointee(
-                                    (
-                                        $crate::__pgrx_c_macros::expression::profile_value::<
-                                            true,
-                                            _
-                                        >(
-                                            $crate::__pgrx_c_macros::expression::cast_as::<
-                                                $crate::GISTPageOpaque,
-                                                $crate::__pgrx_c_macros::expression::CPointer<
-                                                    $crate::__pgrx_c_macros::expression::CRecord<
-                                                        $crate::GISTPageOpaqueData
-                                                    >,
-                                                    $crate::__pgrx_c_macros::expression::ReadWrite
-                                                >,
-                                                _
-                                            >(
-                                                (
-                                                    $crate::__pgrx_c_macros::expression::profile_value::<
-                                                        true,
-                                                        _
-                                                    >(
-                                                        {
-                                                            {
-                                                                let _ = $crate::__pgrx_c_macros::expression::profile_value::<
-                                                                    true,
-                                                                    _
-                                                                >(
-                                                                    $crate::__pgrx_c_generated::Inline_777d7ad23546580e873e0206a9a6e1cd(
-                                                                        <
-                                                                            $crate::__pgrx_c_macros::expression::CPointer<
-                                                                                $crate::__pgrx_c_macros::CChar,
-                                                                                $crate::__pgrx_c_macros::expression::ReadOnly
-                                                                            > as $crate::__pgrx_c_macros::expression::CType
-                                                                        >::into_storage(
-                                                                            $crate::__pgrx_c_macros::expression::implicit::<
-                                                                                $crate::__pgrx_c_macros::expression::CPointer<
-                                                                                    $crate::__pgrx_c_macros::CChar,
-                                                                                    $crate::__pgrx_c_macros::expression::ReadOnly
-                                                                                >,
-                                                                                _
-                                                                            >(
-                                                                                $crate::__pgrx_c_macros::expression::profile_value::<
-                                                                                    true,
-                                                                                    _
-                                                                                >(
-                                                                                    $crate::__pgrx_c_operand!(
-                                                                                        @value [
-                                                                                            true
-                                                                                        ];
-                                                                                        $page
-                                                                                    )
-                                                                                )
-                                                                            )
-                                                                        ),
-                                                                    )
-                                                                );
-                                                            };
-                                                            (
-                                                                $crate::__pgrx_c_macros::expression::profile_value::<
-                                                                    true,
-                                                                    _
-                                                                >(
-                                                                    $crate::__pgrx_c_macros::expression::add::<
-                                                                        $crate::__pgrx_c_macros::Wrapping,
-                                                                        _,
-                                                                        _
-                                                                    >(
-                                                                        (
-                                                                            $crate::__pgrx_c_macros::expression::profile_value::<
-                                                                                true,
-                                                                                _
-                                                                            >(
-                                                                                $crate::__pgrx_c_operand!(
-                                                                                    @value [true];
-                                                                                    $page
-                                                                                )
-                                                                            )
-                                                                        ),
-                                                                        $crate::__pgrx_c_macros::expression::profile_value::<
-                                                                            true,
-                                                                            _
-                                                                        >(
-                                                                            $crate::__pgrx_c_macros::expression::load(
-                                                                                $crate::__pgrx_c_macros::expression::project::<
-                                                                                    $crate::__pgrx_c_generated::Field_pd_special,
-                                                                                    _,
-                                                                                    _
-                                                                                >(
-                                                                                    $crate::__pgrx_c_macros::expression::pointee(
-                                                                                        (
-                                                                                            $crate::__pgrx_c_macros::expression::profile_value::<
-                                                                                                true,
-                                                                                                _
-                                                                                            >(
-                                                                                                $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                                                    $crate::PageHeader,
-                                                                                                    $crate::__pgrx_c_macros::expression::CPointer<
-                                                                                                        $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                            $crate::PageHeaderData
-                                                                                                        >,
-                                                                                                        $crate::__pgrx_c_macros::expression::ReadWrite
-                                                                                                    >,
-                                                                                                    _
-                                                                                                >(
-                                                                                                    (
-                                                                                                        $crate::__pgrx_c_macros::expression::profile_value::<
-                                                                                                            true,
-                                                                                                            _
-                                                                                                        >(
-                                                                                                            $crate::__pgrx_c_operand!(
-                                                                                                                @value [
-                                                                                                                    true
-                                                                                                                ];
-                                                                                                                $page
-                                                                                                            )
-                                                                                                        )
-                                                                                                    )
-                                                                                                )
-                                                                                            )
-                                                                                        )
-                                                                                    )
-                                                                                )
-                                                                            )
-                                                                        )
-                                                                    )
-                                                                )
-                                                            )
-                                                        }
-                                                    )
-                                                )
-                                            )
-                                        )
-                                    )
-                                )
-                            )
-                        )
-                    ),
-                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                        $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                            $crate::F_TUPLES_DELETED as i32
-                        )
-                    )
-                )
-            );
-        }
-    };
-    (@__pgrx_c_discard; $($raw:tt)*) => {
-        $crate::__pgrx_c_args_GistTuplesDeleted!(@collect __pgrx_emit_discard []; $($raw)*)
-    };
-    ($($raw:tt)*) => {
-        $crate::__pgrx_c_args_GistTuplesDeleted!(@collect __pgrx_emit_public []; $($raw)*)
-    };
-}
-
-#[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -10322,13 +9400,13 @@ macro_rules! __pgrx_c_args_gistentryinit {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_gistentryinit!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_gistentryinit!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -10337,7 +9415,7 @@ macro_rules! __pgrx_c_args_gistentryinit {
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_gistentryinit!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -10364,25 +9442,25 @@ macro_rules! __pgrx_c_args_gistentryinit {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_gistentryinit!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_gistentryinit!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_gistentryinit!(
-            @p2 $mode [$($done)* (@literal [- $argument]),];
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_gistentryinit!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -10391,7 +9469,7 @@ macro_rules! __pgrx_c_args_gistentryinit {
     };
     (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_gistentryinit!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -10418,25 +9496,25 @@ macro_rules! __pgrx_c_args_gistentryinit {
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_gistentryinit!(
-            @p2 $mode [$($done)* (@literal [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_gistentryinit!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
     (@p2 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_gistentryinit!(
-            @p3 $mode [$($done)* (@literal [- $argument]),];
+            @p3 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative2 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_gistentryinit!(
-            @p3 $mode [$($done)* (@native [$argument]),];
+            @p3 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -10445,7 +9523,7 @@ macro_rules! __pgrx_c_args_gistentryinit {
     };
     (@p2 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_gistentryinit!(
-            @p3 $mode [$($done)* (@native [$argument]),];
+            @p3 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -10472,25 +9550,25 @@ macro_rules! __pgrx_c_args_gistentryinit {
     };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_gistentryinit!(
-            @p3 $mode [$($done)* (@literal [$argument]),];
+            @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p2 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_gistentryinit!(
-            @p3 $mode [$($done)* (@native [$argument]),];
+            @p3 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
     (@p3 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_gistentryinit!(
-            @p4 $mode [$($done)* (@literal [- $argument]),];
+            @p4 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative3 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_gistentryinit!(
-            @p4 $mode [$($done)* (@native [$argument]),];
+            @p4 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -10499,7 +9577,7 @@ macro_rules! __pgrx_c_args_gistentryinit {
     };
     (@p3 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_gistentryinit!(
-            @p4 $mode [$($done)* (@native [$argument]),];
+            @p4 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -10526,25 +9604,25 @@ macro_rules! __pgrx_c_args_gistentryinit {
     };
     (@p3 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_gistentryinit!(
-            @p4 $mode [$($done)* (@literal [$argument]),];
+            @p4 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p3 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_gistentryinit!(
-            @p4 $mode [$($done)* (@native [$argument]),];
+            @p4 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
     (@p4 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_gistentryinit!(
-            @p5 $mode [$($done)* (@literal [- $argument]),];
+            @p5 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative4 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_gistentryinit!(
-            @p5 $mode [$($done)* (@native [$argument]),];
+            @p5 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -10553,7 +9631,7 @@ macro_rules! __pgrx_c_args_gistentryinit {
     };
     (@p4 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_gistentryinit!(
-            @p5 $mode [$($done)* (@native [$argument]),];
+            @p5 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -10580,31 +9658,35 @@ macro_rules! __pgrx_c_args_gistentryinit {
     };
     (@p4 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_gistentryinit!(
-            @p5 $mode [$($done)* (@literal [$argument]),];
+            @p5 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p4 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_gistentryinit!(
-            @p5 $mode [$($done)* (@native [$argument]),];
+            @p5 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
     (@p5 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_gistentryinit!(@p6 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_gistentryinit!(
+            @p6 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative5 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_gistentryinit!(@p6 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_gistentryinit!(
+            @p6 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p5 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_gistentryinit!(
-            @p6 $mode [$($done)* (@literal [- $argument]),];
+            @p6 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative5 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_gistentryinit!(
-            @p6 $mode [$($done)* (@native [$argument]),];
+            @p6 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -10612,7 +9694,9 @@ macro_rules! __pgrx_c_args_gistentryinit {
         $crate::__pgrx_c_args_gistentryinit!(@negative5 $mode [$($done)*]; - $($raw)*)
     };
     (@p5 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_gistentryinit!(@p6 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_gistentryinit!(
+            @p6 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p5 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -10634,14 +9718,18 @@ macro_rules! __pgrx_c_args_gistentryinit {
         )
     };
     (@p5 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_gistentryinit!(@p6 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_gistentryinit!(
+            @p6 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p5 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_gistentryinit!(@p6 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_gistentryinit!(
+            @p6 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p5 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_gistentryinit!(
-            @p6 $mode [$($done)* (@native [$argument]),];
+            @p6 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -10668,13 +9756,13 @@ macro_rules! __pgrx_c_args_gistentryinit {
     };
     (@p5 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_gistentryinit!(
-            @p6 $mode [$($done)* (@literal [$argument]),];
+            @p6 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p5 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_gistentryinit!(
-            @p6 $mode [$($done)* (@native [$argument]),];
+            @p6 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -10685,7 +9773,7 @@ macro_rules! __pgrx_c_args_gistentryinit {
         compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
-/// C macro gistentryinit from gist.h:247
+/// C macro gistentryinit from gist.h:243
 ///
 /// ```text
 /// #define gistentryinit( e , k , r , pg , o , l ) do { ( e ) . key = ( k ) ; ( e ) . rel = ( r ) ; ( e ) . page = ( pg ) ; ( e ) . offset = ( o ) ; ( e ) . leafkey = ( l ) ; } while ( 0 )
@@ -10815,16 +9903,15 @@ macro_rules! gistentryinit {
 pub use GIST_LEAF;
 pub use GistClearFollowRight;
 pub use GistClearPageHasGarbage;
-pub use GistClearTuplesDeleted;
 pub use GistFollowRight;
 pub use GistMarkFollowRight;
 pub use GistMarkPageHasGarbage;
-pub use GistMarkTuplesDeleted;
+pub use GistPageGetDeleteXid;
 pub use GistPageGetNSN;
 pub use GistPageGetOpaque;
 pub use GistPageHasGarbage;
 pub use GistPageIsDeleted;
 pub use GistPageIsLeaf;
+pub use GistPageSetDeleted;
 pub use GistPageSetNSN;
-pub use GistTuplesDeleted;
 pub use gistentryinit;

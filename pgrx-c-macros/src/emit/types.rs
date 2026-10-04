@@ -162,7 +162,7 @@ impl<'a> Lowering<'a> {
                 continue;
             }
             let storage =
-                self.bindings.types.get(name).map(|alias| alias.target.clone()).or_else(|| {
+                self.bindings.type_alias(name).map(|alias| alias.target.clone()).or_else(|| {
                     self.bindings
                         .enums
                         .get(name)
@@ -309,7 +309,7 @@ impl<'a> Lowering<'a> {
                 continue;
             }
             let storage =
-                self.bindings.types.get(name).map(|alias| alias.target.clone()).or_else(|| {
+                self.bindings.type_alias(name).map(|alias| alias.target.clone()).or_else(|| {
                     self.bindings
                         .records
                         .get(name)
@@ -581,7 +581,7 @@ impl<'a> Lowering<'a> {
         }
         if let Some(ty) = self.declarations.types.get(name) {
             return Some((|| {
-                let path = if let Some(alias) = self.bindings.types.get(name) {
+                let path = if let Some(alias) = self.bindings.type_alias(name) {
                     alias.path.clone()
                 } else if self.bindings.integer_storage.contains_key(name) {
                     // The binding generator may replace this typedef with an
@@ -922,7 +922,7 @@ impl<'a> Lowering<'a> {
                 return self.resolve_with_storage_at(ty, &alias.target, depth + 1);
             }
             if let TypeCategory::Integer(kind) = ty.category
-                && self.bindings.integer_storage.get(&key) == Some(&kind)
+                && self.bindings.integer_kind(path) == Some(kind)
             {
                 let storage = rust_path(path)?;
                 let marker = format!(

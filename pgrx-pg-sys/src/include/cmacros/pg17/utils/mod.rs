@@ -42,6 +42,10 @@ pub use expandeddatum::*;
 mod expandedrecord;
 #[allow(unused_imports)]
 pub use expandedrecord::*;
+#[path = "float.rs"]
+mod float;
+#[allow(unused_imports)]
+pub use float::*;
 #[path = "geo_decls.rs"]
 mod geo_decls;
 #[allow(unused_imports)]
@@ -74,6 +78,10 @@ pub use palloc::*;
 mod portal;
 #[allow(unused_imports)]
 pub use portal::*;
+#[path = "ps_status.rs"]
+mod ps_status;
+#[allow(unused_imports)]
+pub use ps_status::*;
 #[path = "rangetypes.rs"]
 mod rangetypes;
 #[allow(unused_imports)]
@@ -82,6 +90,10 @@ pub use rangetypes::*;
 mod rel;
 #[allow(unused_imports)]
 pub use rel::*;
+#[path = "relcache.rs"]
+mod relcache;
+#[allow(unused_imports)]
+pub use relcache::*;
 #[path = "selfuncs.rs"]
 mod selfuncs;
 #[allow(unused_imports)]
@@ -90,6 +102,10 @@ pub use selfuncs::*;
 mod snapmgr;
 #[allow(unused_imports)]
 pub use snapmgr::*;
+#[path = "sortsupport.rs"]
+mod sortsupport;
+#[allow(unused_imports)]
+pub use sortsupport::*;
 #[path = "syscache.rs"]
 mod syscache;
 #[allow(unused_imports)]
@@ -102,3 +118,7 @@ pub use timestamp::*;
 mod tuplesort;
 #[allow(unused_imports)]
 pub use tuplesort::*;
+#[path = "wait_event.rs"]
+mod wait_event;
+#[allow(unused_imports)]
+pub use wait_event::*;

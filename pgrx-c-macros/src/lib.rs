@@ -40,9 +40,13 @@ use std::sync::Arc;
 /// Resolve pgrx-managed installations and separate PostgreSQL-owned macros from retained expansion
 /// context.
 mod postgres;
+/// Decode recorded GNU or MSVC build options before inspecting C semantics.
+mod postgres_flags;
 pub use postgres::{
     PostgresConfig, PostgresError, PostgresInventory, postgres_function_macro_names,
+    postgres_inline_function_names, postgres_object_macro_names,
 };
+pub use postgres_flags::{lower_msvc_runtime_flags, postgres_clang_flags};
 /// Own compiler profiles, preprocessing state, and declaration identities independently of Clang
 /// handles.
 mod model;
@@ -59,7 +63,8 @@ pub use frontend::{
 mod syntax;
 pub use syntax::{
     BinaryOperator, Expression, ExpressionKind, ExpressionNode, IntegerLiteral, IntegerSuffix,
-    NodeId, OffsetComponent, OffsetRecord, Statement, StatementBody, TokenRange, UnaryOperator,
+    NodeId, OffsetComponent, OffsetRecord, Statement, StatementBody, StringPart, TokenRange,
+    UnaryOperator,
 };
 /// Describe symbolic C types and invocation contracts before Rust lowering claims support.
 mod analysis;
@@ -73,8 +78,8 @@ pub(crate) static SCANNER_LOCK: std::sync::Mutex<()> = std::sync::Mutex::new(())
 mod expansion;
 pub use expansion::{
     ConstantFallback, ExpandedMacro, ExpansionBatch, ExpansionDependency, ExpansionLimits,
-    ExpansionResult, ExpansionSkip, ExpansionSkipCode, ParameterOccurrence, prepare_expansions,
-    prepare_expansions_with_limits,
+    ExpansionResult, ExpansionSkip, ExpansionSkipCode, ObjectIntegerConstants, ParameterOccurrence,
+    prepare_expansions, prepare_expansions_with_limits, probe_integer_object_constants,
 };
 /// Tie expansion, constant proofs, and analysis to one verified inspection snapshot.
 mod session;
@@ -167,7 +172,7 @@ pub struct SourceSpan {
 impl SourceSpan {
     /// Convert Clang exclusive endpoints into an inclusive physical line span for auditing and module
     /// grouping.
-    fn from_range(
+    pub(crate) fn from_range(
         range: clang::source::SourceRange<'_>,
         directory: &Path,
     ) -> Result<Option<Self>, String> {

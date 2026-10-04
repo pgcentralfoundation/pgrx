@@ -374,13 +374,14 @@ impl<K: CInteger> IntoCValue for CValue<K> {
     }
 }
 
-/// Admit only native integer widths with an unambiguous modeled C identity.
+/// Give primitive byte inputs their explicit signed/unsigned-char identity.
+/// Plain C char remains nominally separate and requires a CChar tag despite sharing storage.
 macro_rules! raw_inputs {
     ($(($repr:ty, $kind:ident)),+ $(,)?) => {
         $(
             /// Keep this admitted scalar or type-marker family under crate-owned capability registration.
             impl sealed::Sealed for $repr {}
-            /// Admit this native scalar only because the modeled C identity is unambiguous.
+            /// Preserve the primitive input's selected C identity without inferring plain char from aliases.
             impl IntoCValue for $repr {
                 /// Unique modeled C integer kind associated with this admitted native input.
                 type Kind = $kind;
@@ -471,7 +472,6 @@ common_pairs!(
     (CUnsignedLongLong, CUnsignedInt128, CUnsignedInt128),
     (CInt128, CUnsignedInt128, CUnsignedInt128),
 );
-
 // On LP64 signed long contains every unsigned int value; equal-width signed
 // long long cannot contain every unsigned long value.
 #[cfg(all(not(windows), target_pointer_width = "64"))]
@@ -878,6 +878,52 @@ mod tests {
                         3
                     }
             );
+        }
+    }
+
+    /// Preserve every inspected plain-char bit pattern and promote all byte families to C int.
+    #[test]
+    fn native_plain_char_preserves_bits_without_erasing_byte_identity() {
+        assert_eq!(CChar::SIGNED, CCharRepr::MIN != 0);
+        assert_eq!(CChar::RANK, CSignedChar::RANK);
+        assert_eq!(CChar::RANK, CUnsignedChar::RANK);
+        for byte in 0..=u8::MAX {
+            let plain = CValue::<CChar>::new(byte as CCharRepr);
+            assert_eq!(cast::<CUnsignedChar, _>(plain).get(), byte);
+            let promoted: CValue<CInt> = promote(plain);
+            assert_eq!(promoted.get(), i32::from(byte as CCharRepr));
+            let signed: CValue<CSignedChar> = value(byte as i8);
+            let unsigned: CValue<CUnsignedChar> = value(byte);
+            assert_eq!(promote(signed).get(), i32::from(byte as i8));
+            assert_eq!(promote(unsigned).get(), i32::from(byte));
+        }
+    }
+
+    /// Verify equal-width identities retain rank while common conversion follows value ranges.
+    #[test]
+    fn target_family_controls_long_common_conversions() {
+        let mixed = add::<Undefined, _, _>(CValue::<CLong>::new(-1), u32::MAX);
+        let higher = add::<Undefined, _, _>(
+            CValue::<CUnsignedLong>::new(u32::MAX as _),
+            CValue::<CLongLong>::new(-1),
+        );
+        assert_eq!(CLong::RANK, 4);
+        assert_eq!(CLongLong::RANK, 5);
+        #[cfg(any(windows, target_pointer_width = "32"))]
+        {
+            let mixed: CValue<CUnsignedLong> = mixed;
+            let higher: CValue<CLongLong> = higher;
+            assert_eq!(CLong::BITS, 32);
+            assert_eq!(mixed.get(), u32::MAX - 1);
+            assert_eq!(higher.get(), i64::from(u32::MAX) - 1);
+        }
+        #[cfg(all(not(windows), target_pointer_width = "64"))]
+        {
+            let mixed: CValue<CLong> = mixed;
+            let higher: CValue<CUnsignedLongLong> = higher;
+            assert_eq!(CLong::BITS, 64);
+            assert_eq!(mixed.get(), i64::from(u32::MAX) - 1);
+            assert_eq!(higher.get(), u64::from(u32::MAX) - 1);
         }
     }
 

@@ -218,8 +218,16 @@ pub enum Ppc64ElfAbi {
     V2,
 }
 
-/// Gate floating support on the verified byte representation and C evaluation mode.
+/// Inspect target ABI conventions and gate floating support on verified C facts.
 impl TargetFacts {
+    /// Identify the inspected Windows MSVC ABI, including Clang's numeric version suffix.
+    ///
+    /// This selects native object/archive conventions, not runtime profile admission.
+    /// The runtime gate still proves the supported architecture and complete data model.
+    pub fn uses_msvc_abi(&self) -> bool {
+        is_msvc_triple(&self.triple)
+    }
+
     /// Reject unsupported storage, excess-precision, or semantic modes before accepting ordinary Rust
     /// float values.
     pub fn supports_float_values(&self) -> Result<(), String> {
@@ -237,6 +245,27 @@ impl TargetFacts {
         }
         self.floating_point.supports_float_expressions()
     }
+}
+
+/// Recognize the Windows target spellings whose native objects require COFF conventions.
+/// This controls code generation and archive tools; it does not admit a runtime ABI profile.
+pub(crate) fn is_windows_triple(triple: &str) -> bool {
+    triple.split('-').any(|part| matches!(part, "windows" | "win32" | "mingw32"))
+}
+
+/// Recognize MSVC environment spellings, including numeric versions, before argument folding.
+/// Inspection still independently verifies the actual compiler/libclang target and C ABI facts.
+pub(crate) fn is_msvc_triple(triple: &str) -> bool {
+    let mut components = triple.split('-');
+    let _arch = components.next();
+    let _vendor = components.next();
+    components.next() == Some("windows")
+        && components.next().is_some_and(|environment| {
+            environment.strip_prefix("msvc").is_some_and(|version| {
+                version.bytes().all(|byte| byte.is_ascii_digit() || byte == b'.')
+            })
+        })
+        && components.next().is_none()
 }
 
 /// Preserve the distinct fundamental C floating types before checking which representations are
@@ -680,6 +709,19 @@ pub struct FunctionInfo {
     pub is_inline: bool,
     /// A definition exposed in this AST. Skipped function bodies can hide definitions.
     pub definition_available: bool,
+    /// Verified original inline definition retained for explicit invocation-root selection.
+    pub definition: Option<InlineFunctionDefinition>,
+}
+
+/// Physical source and formals from one compiler-proved original static inline definition.
+#[derive(Clone, Debug, Serialize)]
+pub struct InlineFunctionDefinition {
+    /// Physical definition span, independent of presumed locations or wrapper include spelling.
+    pub provenance: crate::SourceSpan,
+    /// Definition parameter names in prototype order; unnamed parameters retain their absence.
+    pub parameters: Vec<Option<String>>,
+    /// Original C definition text within the bounded retention budget, never a synthesized macro.
+    pub source: Option<String>,
 }
 
 /// C declaration linkage used to choose external calls or verified local-definition adapters.

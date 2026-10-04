@@ -51,7 +51,14 @@ struct Kind {
 /// matrix.
 const KINDS: &[Kind] = &[
     Kind { c: "_Bool", marker: "CBool", repr: "bool", cast_macro: "BOOL", bits: 1, signed: false },
-    Kind { c: "char", marker: "CChar", repr: "i8", cast_macro: "CHAR", bits: 8, signed: true },
+    Kind {
+        c: "char",
+        marker: "CChar",
+        repr: if (core::ffi::c_char::MIN as i16) < 0 { "i8" } else { "u8" },
+        cast_macro: "CHAR",
+        bits: 8,
+        signed: (core::ffi::c_char::MIN as i16) < 0,
+    },
     Kind {
         c: "signed char",
         marker: "CSignedChar",

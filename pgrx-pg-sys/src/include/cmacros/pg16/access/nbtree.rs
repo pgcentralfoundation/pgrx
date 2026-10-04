@@ -5,8 +5,8 @@ This code is generated for documentation purposes, so that it is easy to referen
 // C macros from nbtree.h.
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -37,23 +37,23 @@ macro_rules! __pgrx_c_args_BTCommuteStrategyNumber {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
         $crate::__pgrx_c_args_BTCommuteStrategyNumber!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_BTCommuteStrategyNumber!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_BTCommuteStrategyNumber!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_BTCommuteStrategyNumber!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -62,7 +62,7 @@ macro_rules! __pgrx_c_args_BTCommuteStrategyNumber {
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
         $crate::__pgrx_c_args_BTCommuteStrategyNumber!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
@@ -88,17 +88,17 @@ macro_rules! __pgrx_c_args_BTCommuteStrategyNumber {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_BTCommuteStrategyNumber!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_BTCommuteStrategyNumber!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_BTCommuteStrategyNumber!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -125,13 +125,13 @@ macro_rules! __pgrx_c_args_BTCommuteStrategyNumber {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_BTCommuteStrategyNumber!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_BTCommuteStrategyNumber!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -188,7 +188,7 @@ macro_rules! BTCommuteStrategyNumber {
                         >(
                             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                 $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                    $crate::BTMaxStrategyNumber as i32
+                                    $crate::__pgrx_c_bindings::BTMaxStrategyNumber as i32
                                 )
                             ),
                             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -250,7 +250,9 @@ macro_rules! BTCommuteStrategyNumber {
                                         >(
                                             $crate::__pgrx_c_macros::CValue::<
                                                 $crate::__pgrx_c_macros::CInt
-                                            >::new($crate::BTMaxStrategyNumber as i32)
+                                            >::new(
+                                                $crate::__pgrx_c_bindings::BTMaxStrategyNumber as i32
+                                            )
                                         ),
                                         $crate::__pgrx_c_macros::expression::profile_value::<
                                             true,
@@ -291,7 +293,7 @@ macro_rules! BTCommuteStrategyNumber {
                         >(
                             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                 $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                    $crate::BTMaxStrategyNumber as i32
+                                    $crate::__pgrx_c_bindings::BTMaxStrategyNumber as i32
                                 )
                             ),
                             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -319,8 +321,1996 @@ macro_rules! BTCommuteStrategyNumber {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
+    target_pointer_width = "64",
+    target_endian = "little"
+)))]
+#[cfg(not(docsrs))]
+compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
+#[doc(hidden)]
+#[macro_export]
+macro_rules! __pgrx_c_args_BTGetDeduplicateItems {
+    (@collect $mode:ident [$($done:tt)*]; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_BTGetDeduplicateItems!(@p0 $mode [$($done)*]; $($raw)*)
+    };
+    (@classified [$next:ident $mode:ident [$($done:tt)*] [$($rest:tt)*]] $descriptor:tt) => {
+        $crate::__pgrx_c_args_BTGetDeduplicateItems!(
+            @$next $mode [$($done)* $descriptor,];
+            $($rest)*
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
+        $crate::__pgrx_c_args_BTGetDeduplicateItems!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
+    };
+    (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
+        $crate::__pgrx_c_args_BTGetDeduplicateItems!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_BTGetDeduplicateItems!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+            $($rest)*
+        )
+    };
+    (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_BTGetDeduplicateItems!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; - $($raw:tt)*) => {
+        $crate::__pgrx_c_args_BTGetDeduplicateItems!(@negative0 $mode [$($done)*]; - $($raw)*)
+    };
+    (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
+        $crate::__pgrx_c_args_BTGetDeduplicateItems!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BTGetDeduplicateItems] [p1 $mode [$($done)*] []] [
+                $head $(::$tail)* ! $group
+            ]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; ::$head:ident $(::$tail:ident)* ! $group:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BTGetDeduplicateItems] [p1 $mode [$($done)*] []] [
+                ::$head $(::$tail)* ! $group
+            ]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; ($($inner:tt)*)) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BTGetDeduplicateItems] [p1 $mode [$($done)*] []] [($($inner)*)]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
+        $crate::__pgrx_c_args_BTGetDeduplicateItems!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
+        $crate::__pgrx_c_args_BTGetDeduplicateItems!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
+        $crate::__pgrx_c_args_BTGetDeduplicateItems!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BTGetDeduplicateItems] [p1 $mode [$($done)*] [$($rest)*]] [
+                $head $(::$tail)* ! $group
+            ]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; ::$head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BTGetDeduplicateItems] [p1 $mode [$($done)*] [$($rest)*]] [
+                ::$head $(::$tail)* ! $group
+            ]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; ($($inner:tt)*), $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BTGetDeduplicateItems] [p1 $mode [$($done)*] [$($rest)*]] [
+                ($($inner)*)
+            ]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_BTGetDeduplicateItems!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_BTGetDeduplicateItems!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*];) => {
+        $crate::BTGetDeduplicateItems!(@$mode; $($done)*)
+    };
+    ($($invalid:tt)*) => {
+        compile_error!("arguments do not satisfy this C macro's invocation contract")
+    };
+}
+/// C macro BTGetDeduplicateItems from nbtree.h:1110
+///
+/// ```text
+/// #define BTGetDeduplicateItems( relation ) ( AssertMacro ( relation -> rd_rel -> relkind == RELKIND_INDEX && relation -> rd_rel -> relam == BTREE_AM_OID ) , ( ( relation ) -> rd_options ? ( ( BTOptions * ) ( relation ) -> rd_options ) -> deduplicate_items : true ) )
+/// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+#[macro_export]
+macro_rules! BTGetDeduplicateItems {
+    (@__pgrx_emit_check_safety; $relation:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $relation);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_BTGetDeduplicateItems!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
+    (@__pgrx_emit_public; $relation:tt $(,)?) => {
+        $crate::__pgrx_c_macros::expression_result::finish(
+            $crate::BTGetDeduplicateItems!(@__pgrx_emit_value; $relation)
+        )
+    };
+    (@__pgrx_emit_value; $relation:tt $(,)?) => {
+        /* PGRX: AssertMacro remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */
+        (
+            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                {
+                    {
+                        let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                            {
+                                {
+                                    let _ = $crate::__pgrx_c_macros::expression::profile_value::<
+                                        true,
+                                        _
+                                    >(
+                                        /* PGRX: true remains expanded because no integer constant binding is available in the defining Rust crate. */
+                                        $crate::__pgrx_c_macros::CValue::<
+                                            $crate::__pgrx_c_macros::CInt
+                                        >::new(1i32)
+                                    );
+                                }
+                            }
+                        );
+                    };
+                    (
+                        $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                            $crate::__pgrx_c_macros::expression::select(
+                                if $crate::__pgrx_c_macros::expression::truth(
+                                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                        $crate::__pgrx_c_macros::expression::load(
+                                            $crate::__pgrx_c_macros::expression::project::<
+                                                $crate::__pgrx_c_generated::Field_rd_options,
+                                                _,
+                                                _
+                                            >(
+                                                $crate::__pgrx_c_macros::expression::pointee(
+                                                    (
+                                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                                            true,
+                                                            _
+                                                        >(
+                                                            $crate::__pgrx_c_operand!(
+                                                                @value [true];
+                                                                $relation
+                                                            )
+                                                        )
+                                                    )
+                                                )
+                                            )
+                                        )
+                                    )
+                                ) {
+                                    $crate::__pgrx_c_macros::Either::Left(
+                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                            true,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_macros::expression::load(
+                                                $crate::__pgrx_c_macros::expression::project::<
+                                                    $crate::__pgrx_c_generated::Field_deduplicate_items,
+                                                    _,
+                                                    _
+                                                >(
+                                                    $crate::__pgrx_c_macros::expression::pointee(
+                                                        (
+                                                            $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                true,
+                                                                _
+                                                            >(
+                                                                $crate::__pgrx_c_macros::expression::cast_as::<
+                                                                    *mut $crate::__pgrx_c_bindings::BTOptions,
+                                                                    $crate::__pgrx_c_macros::expression::CPointer<
+                                                                        $crate::__pgrx_c_macros::expression::CRecord<
+                                                                            $crate::__pgrx_c_bindings::BTOptions
+                                                                        >,
+                                                                        $crate::__pgrx_c_macros::expression::ReadWrite
+                                                                    >,
+                                                                    _
+                                                                >(
+                                                                    $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                        true,
+                                                                        _
+                                                                    >(
+                                                                        $crate::__pgrx_c_macros::expression::load(
+                                                                            $crate::__pgrx_c_macros::expression::project::<
+                                                                                $crate::__pgrx_c_generated::Field_rd_options,
+                                                                                _,
+                                                                                _
+                                                                            >(
+                                                                                $crate::__pgrx_c_macros::expression::pointee(
+                                                                                    (
+                                                                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                            true,
+                                                                                            _
+                                                                                        >(
+                                                                                            $crate::__pgrx_c_operand!(
+                                                                                                @value [
+                                                                                                    true
+                                                                                                ];
+                                                                                                $relation
+                                                                                            )
+                                                                                        )
+                                                                                    )
+                                                                                )
+                                                                            )
+                                                                        )
+                                                                    )
+                                                                )
+                                                            )
+                                                        )
+                                                    )
+                                                )
+                                            )
+                                        )
+                                    )
+                                } else {
+                                    $crate::__pgrx_c_macros::Either::Right(
+                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                            true,
+                                            _
+                                        >(
+                                            /* PGRX: true remains expanded because no integer constant binding is available in the defining Rust crate. */
+                                            $crate::__pgrx_c_macros::CValue::<
+                                                $crate::__pgrx_c_macros::CInt
+                                            >::new(1i32)
+                                        )
+                                    )
+                                }
+                            )
+                        )
+                    )
+                }
+            )
+        )
+    };
+    (@__pgrx_c_value; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_BTGetDeduplicateItems!(@collect __pgrx_emit_value []; $($raw)*)
+    };
+    (@__pgrx_emit_place; $relation:tt $(,)?) => {
+        compile_error!("C expression is not a place in this operation")
+    };
+    (@__pgrx_c_place; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_BTGetDeduplicateItems!(@collect __pgrx_emit_place []; $($raw)*)
+    };
+    (@__pgrx_emit_read_place; $relation:tt $(,)?) => {
+        compile_error!("C expression is not a place in this operation")
+    };
+    (@__pgrx_c_read_place; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_BTGetDeduplicateItems!(@collect __pgrx_emit_read_place []; $($raw)*)
+    };
+    (@__pgrx_emit_size; $relation:tt $(,)?) => {
+        /* PGRX: AssertMacro remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */
+        $crate::__pgrx_c_macros::expression::size_of_value_type(
+            if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $relation);
+                    }
+                }
+                Some(
+                    unsafe {
+                        $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                            {
+                                {
+                                    let _ = $crate::__pgrx_c_macros::expression::profile_value::<
+                                        true,
+                                        _
+                                    >(
+                                        {
+                                            {
+                                                let _ = $crate::__pgrx_c_macros::expression::profile_value::<
+                                                    true,
+                                                    _
+                                                >(
+                                                    /* PGRX: true remains expanded because no integer constant binding is available in the defining Rust crate. */
+                                                    $crate::__pgrx_c_macros::CValue::<
+                                                        $crate::__pgrx_c_macros::CInt
+                                                    >::new(1i32)
+                                                );
+                                            }
+                                        }
+                                    );
+                                };
+                                (
+                                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                        $crate::__pgrx_c_macros::expression::select(
+                                            if $crate::__pgrx_c_macros::expression::truth(
+                                                $crate::__pgrx_c_macros::expression::profile_value::<
+                                                    true,
+                                                    _
+                                                >(
+                                                    $crate::__pgrx_c_macros::expression::load(
+                                                        $crate::__pgrx_c_macros::expression::project::<
+                                                            $crate::__pgrx_c_generated::Field_rd_options,
+                                                            _,
+                                                            _
+                                                        >(
+                                                            $crate::__pgrx_c_macros::expression::pointee(
+                                                                (
+                                                                    $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                        true,
+                                                                        _
+                                                                    >(
+                                                                        $crate::__pgrx_c_operand!(
+                                                                            @value [true];
+                                                                            $relation
+                                                                        )
+                                                                    )
+                                                                )
+                                                            )
+                                                        )
+                                                    )
+                                                )
+                                            ) {
+                                                $crate::__pgrx_c_macros::Either::Left(
+                                                    $crate::__pgrx_c_macros::expression::profile_value::<
+                                                        true,
+                                                        _
+                                                    >(
+                                                        $crate::__pgrx_c_macros::expression::load(
+                                                            $crate::__pgrx_c_macros::expression::project::<
+                                                                $crate::__pgrx_c_generated::Field_deduplicate_items,
+                                                                _,
+                                                                _
+                                                            >(
+                                                                $crate::__pgrx_c_macros::expression::pointee(
+                                                                    (
+                                                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                            true,
+                                                                            _
+                                                                        >(
+                                                                            $crate::__pgrx_c_macros::expression::cast_as::<
+                                                                                *mut $crate::__pgrx_c_bindings::BTOptions,
+                                                                                $crate::__pgrx_c_macros::expression::CPointer<
+                                                                                    $crate::__pgrx_c_macros::expression::CRecord<
+                                                                                        $crate::__pgrx_c_bindings::BTOptions
+                                                                                    >,
+                                                                                    $crate::__pgrx_c_macros::expression::ReadWrite
+                                                                                >,
+                                                                                _
+                                                                            >(
+                                                                                $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                    true,
+                                                                                    _
+                                                                                >(
+                                                                                    $crate::__pgrx_c_macros::expression::load(
+                                                                                        $crate::__pgrx_c_macros::expression::project::<
+                                                                                            $crate::__pgrx_c_generated::Field_rd_options,
+                                                                                            _,
+                                                                                            _
+                                                                                        >(
+                                                                                            $crate::__pgrx_c_macros::expression::pointee(
+                                                                                                (
+                                                                                                    $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                                        true,
+                                                                                                        _
+                                                                                                    >(
+                                                                                                        $crate::__pgrx_c_operand!(
+                                                                                                            @value [
+                                                                                                                true
+                                                                                                            ];
+                                                                                                            $relation
+                                                                                                        )
+                                                                                                    )
+                                                                                                )
+                                                                                            )
+                                                                                        )
+                                                                                    )
+                                                                                )
+                                                                            )
+                                                                        )
+                                                                    )
+                                                                )
+                                                            )
+                                                        )
+                                                    )
+                                                )
+                                            } else {
+                                                $crate::__pgrx_c_macros::Either::Right(
+                                                    $crate::__pgrx_c_macros::expression::profile_value::<
+                                                        true,
+                                                        _
+                                                    >(
+                                                        /* PGRX: true remains expanded because no integer constant binding is available in the defining Rust crate. */
+                                                        $crate::__pgrx_c_macros::CValue::<
+                                                            $crate::__pgrx_c_macros::CInt
+                                                        >::new(1i32)
+                                                    )
+                                                )
+                                            }
+                                        )
+                                    )
+                                )
+                            }
+                        )
+                    }
+                )
+            } else {
+                None
+            }
+        )
+    };
+    (@__pgrx_c_size; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_BTGetDeduplicateItems!(@collect __pgrx_emit_size []; $($raw)*)
+    };
+    (@__pgrx_emit_discard; $relation:tt $(,)?) => {
+        /* PGRX: AssertMacro remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */
+        {
+            let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                {
+                    {
+                        let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                            {
+                                {
+                                    let _ = $crate::__pgrx_c_macros::expression::profile_value::<
+                                        true,
+                                        _
+                                    >(
+                                        /* PGRX: true remains expanded because no integer constant binding is available in the defining Rust crate. */
+                                        $crate::__pgrx_c_macros::CValue::<
+                                            $crate::__pgrx_c_macros::CInt
+                                        >::new(1i32)
+                                    );
+                                }
+                            }
+                        );
+                    };
+                    (
+                        $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                            $crate::__pgrx_c_macros::expression::select(
+                                if $crate::__pgrx_c_macros::expression::truth(
+                                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                        $crate::__pgrx_c_macros::expression::load(
+                                            $crate::__pgrx_c_macros::expression::project::<
+                                                $crate::__pgrx_c_generated::Field_rd_options,
+                                                _,
+                                                _
+                                            >(
+                                                $crate::__pgrx_c_macros::expression::pointee(
+                                                    (
+                                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                                            true,
+                                                            _
+                                                        >(
+                                                            $crate::__pgrx_c_operand!(
+                                                                @value [true];
+                                                                $relation
+                                                            )
+                                                        )
+                                                    )
+                                                )
+                                            )
+                                        )
+                                    )
+                                ) {
+                                    $crate::__pgrx_c_macros::Either::Left(
+                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                            true,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_macros::expression::load(
+                                                $crate::__pgrx_c_macros::expression::project::<
+                                                    $crate::__pgrx_c_generated::Field_deduplicate_items,
+                                                    _,
+                                                    _
+                                                >(
+                                                    $crate::__pgrx_c_macros::expression::pointee(
+                                                        (
+                                                            $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                true,
+                                                                _
+                                                            >(
+                                                                $crate::__pgrx_c_macros::expression::cast_as::<
+                                                                    *mut $crate::__pgrx_c_bindings::BTOptions,
+                                                                    $crate::__pgrx_c_macros::expression::CPointer<
+                                                                        $crate::__pgrx_c_macros::expression::CRecord<
+                                                                            $crate::__pgrx_c_bindings::BTOptions
+                                                                        >,
+                                                                        $crate::__pgrx_c_macros::expression::ReadWrite
+                                                                    >,
+                                                                    _
+                                                                >(
+                                                                    $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                        true,
+                                                                        _
+                                                                    >(
+                                                                        $crate::__pgrx_c_macros::expression::load(
+                                                                            $crate::__pgrx_c_macros::expression::project::<
+                                                                                $crate::__pgrx_c_generated::Field_rd_options,
+                                                                                _,
+                                                                                _
+                                                                            >(
+                                                                                $crate::__pgrx_c_macros::expression::pointee(
+                                                                                    (
+                                                                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                            true,
+                                                                                            _
+                                                                                        >(
+                                                                                            $crate::__pgrx_c_operand!(
+                                                                                                @value [
+                                                                                                    true
+                                                                                                ];
+                                                                                                $relation
+                                                                                            )
+                                                                                        )
+                                                                                    )
+                                                                                )
+                                                                            )
+                                                                        )
+                                                                    )
+                                                                )
+                                                            )
+                                                        )
+                                                    )
+                                                )
+                                            )
+                                        )
+                                    )
+                                } else {
+                                    $crate::__pgrx_c_macros::Either::Right(
+                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                            true,
+                                            _
+                                        >(
+                                            /* PGRX: true remains expanded because no integer constant binding is available in the defining Rust crate. */
+                                            $crate::__pgrx_c_macros::CValue::<
+                                                $crate::__pgrx_c_macros::CInt
+                                            >::new(1i32)
+                                        )
+                                    )
+                                }
+                            )
+                        )
+                    )
+                }
+            );
+        }
+    };
+    (@__pgrx_c_discard; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_BTGetDeduplicateItems!(@collect __pgrx_emit_discard []; $($raw)*)
+    };
+    ($($raw:tt)*) => {
+        $crate::__pgrx_c_args_BTGetDeduplicateItems!(@collect __pgrx_emit_public []; $($raw)*)
+    };
+}
+
+#[cfg(not(all(
+    target_arch = "x86_64",
+    target_os = "linux",
+    target_pointer_width = "64",
+    target_endian = "little"
+)))]
+#[cfg(not(docsrs))]
+compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
+#[doc(hidden)]
+#[macro_export]
+macro_rules! __pgrx_c_args_BTGetFillFactor {
+    (@collect $mode:ident [$($done:tt)*]; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_BTGetFillFactor!(@p0 $mode [$($done)*]; $($raw)*)
+    };
+    (@classified [$next:ident $mode:ident [$($done:tt)*] [$($rest:tt)*]] $descriptor:tt) => {
+        $crate::__pgrx_c_args_BTGetFillFactor!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
+    };
+    (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
+        $crate::__pgrx_c_args_BTGetFillFactor!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
+    };
+    (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
+        $crate::__pgrx_c_args_BTGetFillFactor!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_BTGetFillFactor!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+            $($rest)*
+        )
+    };
+    (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_BTGetFillFactor!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; - $($raw:tt)*) => {
+        $crate::__pgrx_c_args_BTGetFillFactor!(@negative0 $mode [$($done)*]; - $($raw)*)
+    };
+    (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
+        $crate::__pgrx_c_args_BTGetFillFactor!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BTGetFillFactor] [p1 $mode [$($done)*] []] [
+                $head $(::$tail)* ! $group
+            ]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; ::$head:ident $(::$tail:ident)* ! $group:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BTGetFillFactor] [p1 $mode [$($done)*] []] [
+                ::$head $(::$tail)* ! $group
+            ]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; ($($inner:tt)*)) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BTGetFillFactor] [p1 $mode [$($done)*] []] [($($inner)*)]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
+        $crate::__pgrx_c_args_BTGetFillFactor!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
+        $crate::__pgrx_c_args_BTGetFillFactor!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
+        $crate::__pgrx_c_args_BTGetFillFactor!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BTGetFillFactor] [p1 $mode [$($done)*] [$($rest)*]] [
+                $head $(::$tail)* ! $group
+            ]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; ::$head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BTGetFillFactor] [p1 $mode [$($done)*] [$($rest)*]] [
+                ::$head $(::$tail)* ! $group
+            ]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; ($($inner:tt)*), $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BTGetFillFactor] [p1 $mode [$($done)*] [$($rest)*]] [
+                ($($inner)*)
+            ]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_BTGetFillFactor!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_BTGetFillFactor!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*];) => {
+        $crate::BTGetFillFactor!(@$mode; $($done)*)
+    };
+    ($($invalid:tt)*) => {
+        compile_error!("arguments do not satisfy this C macro's invocation contract")
+    };
+}
+/// C macro BTGetFillFactor from nbtree.h:1102
+///
+/// ```text
+/// #define BTGetFillFactor( relation ) ( AssertMacro ( relation -> rd_rel -> relkind == RELKIND_INDEX && relation -> rd_rel -> relam == BTREE_AM_OID ) , ( relation ) -> rd_options ? ( ( BTOptions * ) ( relation ) -> rd_options ) -> fillfactor : BTREE_DEFAULT_FILLFACTOR )
+/// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+#[macro_export]
+macro_rules! BTGetFillFactor {
+    (@__pgrx_emit_check_safety; $relation:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $relation);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_BTGetFillFactor!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
+    (@__pgrx_emit_public; $relation:tt $(,)?) => {
+        $crate::__pgrx_c_macros::expression_result::finish(
+            $crate::BTGetFillFactor!(@__pgrx_emit_value; $relation)
+        )
+    };
+    (@__pgrx_emit_value; $relation:tt $(,)?) => {
+        /* PGRX: AssertMacro remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */
+        (
+            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                {
+                    {
+                        let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                            {
+                                {
+                                    let _ = $crate::__pgrx_c_macros::expression::profile_value::<
+                                        true,
+                                        _
+                                    >(
+                                        /* PGRX: true remains expanded because no integer constant binding is available in the defining Rust crate. */
+                                        $crate::__pgrx_c_macros::CValue::<
+                                            $crate::__pgrx_c_macros::CInt
+                                        >::new(1i32)
+                                    );
+                                }
+                            }
+                        );
+                    };
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::select(
+                            if $crate::__pgrx_c_macros::expression::truth(
+                                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                    $crate::__pgrx_c_macros::expression::load(
+                                        $crate::__pgrx_c_macros::expression::project::<
+                                            $crate::__pgrx_c_generated::Field_rd_options,
+                                            _,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_macros::expression::pointee(
+                                                (
+                                                    $crate::__pgrx_c_macros::expression::profile_value::<
+                                                        true,
+                                                        _
+                                                    >(
+                                                        $crate::__pgrx_c_operand!(
+                                                            @value [true];
+                                                            $relation
+                                                        )
+                                                    )
+                                                )
+                                            )
+                                        )
+                                    )
+                                )
+                            ) {
+                                $crate::__pgrx_c_macros::Either::Left(
+                                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                        $crate::__pgrx_c_macros::expression::load(
+                                            $crate::__pgrx_c_macros::expression::project::<
+                                                $crate::__pgrx_c_generated::Field_fillfactor,
+                                                _,
+                                                _
+                                            >(
+                                                $crate::__pgrx_c_macros::expression::pointee(
+                                                    (
+                                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                                            true,
+                                                            _
+                                                        >(
+                                                            $crate::__pgrx_c_macros::expression::cast_as::<
+                                                                *mut $crate::__pgrx_c_bindings::BTOptions,
+                                                                $crate::__pgrx_c_macros::expression::CPointer<
+                                                                    $crate::__pgrx_c_macros::expression::CRecord<
+                                                                        $crate::__pgrx_c_bindings::BTOptions
+                                                                    >,
+                                                                    $crate::__pgrx_c_macros::expression::ReadWrite
+                                                                >,
+                                                                _
+                                                            >(
+                                                                $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                    true,
+                                                                    _
+                                                                >(
+                                                                    $crate::__pgrx_c_macros::expression::load(
+                                                                        $crate::__pgrx_c_macros::expression::project::<
+                                                                            $crate::__pgrx_c_generated::Field_rd_options,
+                                                                            _,
+                                                                            _
+                                                                        >(
+                                                                            $crate::__pgrx_c_macros::expression::pointee(
+                                                                                (
+                                                                                    $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                        true,
+                                                                                        _
+                                                                                    >(
+                                                                                        $crate::__pgrx_c_operand!(
+                                                                                            @value [
+                                                                                                true
+                                                                                            ];
+                                                                                            $relation
+                                                                                        )
+                                                                                    )
+                                                                                )
+                                                                            )
+                                                                        )
+                                                                    )
+                                                                )
+                                                            )
+                                                        )
+                                                    )
+                                                )
+                                            )
+                                        )
+                                    )
+                                )
+                            } else {
+                                $crate::__pgrx_c_macros::Either::Right(
+                                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                        $crate::__pgrx_c_macros::CValue::<
+                                            $crate::__pgrx_c_macros::CInt
+                                        >::new(
+                                            $crate::__pgrx_c_bindings::BTREE_DEFAULT_FILLFACTOR as i32
+                                        )
+                                    )
+                                )
+                            }
+                        )
+                    )
+                }
+            )
+        )
+    };
+    (@__pgrx_c_value; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_BTGetFillFactor!(@collect __pgrx_emit_value []; $($raw)*)
+    };
+    (@__pgrx_emit_place; $relation:tt $(,)?) => {
+        compile_error!("C expression is not a place in this operation")
+    };
+    (@__pgrx_c_place; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_BTGetFillFactor!(@collect __pgrx_emit_place []; $($raw)*)
+    };
+    (@__pgrx_emit_read_place; $relation:tt $(,)?) => {
+        compile_error!("C expression is not a place in this operation")
+    };
+    (@__pgrx_c_read_place; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_BTGetFillFactor!(@collect __pgrx_emit_read_place []; $($raw)*)
+    };
+    (@__pgrx_emit_size; $relation:tt $(,)?) => {
+        /* PGRX: AssertMacro remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */
+        $crate::__pgrx_c_macros::expression::size_of_value_type(
+            if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $relation);
+                    }
+                }
+                Some(
+                    unsafe {
+                        $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                            {
+                                {
+                                    let _ = $crate::__pgrx_c_macros::expression::profile_value::<
+                                        true,
+                                        _
+                                    >(
+                                        {
+                                            {
+                                                let _ = $crate::__pgrx_c_macros::expression::profile_value::<
+                                                    true,
+                                                    _
+                                                >(
+                                                    /* PGRX: true remains expanded because no integer constant binding is available in the defining Rust crate. */
+                                                    $crate::__pgrx_c_macros::CValue::<
+                                                        $crate::__pgrx_c_macros::CInt
+                                                    >::new(1i32)
+                                                );
+                                            }
+                                        }
+                                    );
+                                };
+                                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                    $crate::__pgrx_c_macros::expression::select(
+                                        if $crate::__pgrx_c_macros::expression::truth(
+                                            $crate::__pgrx_c_macros::expression::profile_value::<
+                                                true,
+                                                _
+                                            >(
+                                                $crate::__pgrx_c_macros::expression::load(
+                                                    $crate::__pgrx_c_macros::expression::project::<
+                                                        $crate::__pgrx_c_generated::Field_rd_options,
+                                                        _,
+                                                        _
+                                                    >(
+                                                        $crate::__pgrx_c_macros::expression::pointee(
+                                                            (
+                                                                $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                    true,
+                                                                    _
+                                                                >(
+                                                                    $crate::__pgrx_c_operand!(
+                                                                        @value [true];
+                                                                        $relation
+                                                                    )
+                                                                )
+                                                            )
+                                                        )
+                                                    )
+                                                )
+                                            )
+                                        ) {
+                                            $crate::__pgrx_c_macros::Either::Left(
+                                                $crate::__pgrx_c_macros::expression::profile_value::<
+                                                    true,
+                                                    _
+                                                >(
+                                                    $crate::__pgrx_c_macros::expression::load(
+                                                        $crate::__pgrx_c_macros::expression::project::<
+                                                            $crate::__pgrx_c_generated::Field_fillfactor,
+                                                            _,
+                                                            _
+                                                        >(
+                                                            $crate::__pgrx_c_macros::expression::pointee(
+                                                                (
+                                                                    $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                        true,
+                                                                        _
+                                                                    >(
+                                                                        $crate::__pgrx_c_macros::expression::cast_as::<
+                                                                            *mut $crate::__pgrx_c_bindings::BTOptions,
+                                                                            $crate::__pgrx_c_macros::expression::CPointer<
+                                                                                $crate::__pgrx_c_macros::expression::CRecord<
+                                                                                    $crate::__pgrx_c_bindings::BTOptions
+                                                                                >,
+                                                                                $crate::__pgrx_c_macros::expression::ReadWrite
+                                                                            >,
+                                                                            _
+                                                                        >(
+                                                                            $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                true,
+                                                                                _
+                                                                            >(
+                                                                                $crate::__pgrx_c_macros::expression::load(
+                                                                                    $crate::__pgrx_c_macros::expression::project::<
+                                                                                        $crate::__pgrx_c_generated::Field_rd_options,
+                                                                                        _,
+                                                                                        _
+                                                                                    >(
+                                                                                        $crate::__pgrx_c_macros::expression::pointee(
+                                                                                            (
+                                                                                                $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                                    true,
+                                                                                                    _
+                                                                                                >(
+                                                                                                    $crate::__pgrx_c_operand!(
+                                                                                                        @value [
+                                                                                                            true
+                                                                                                        ];
+                                                                                                        $relation
+                                                                                                    )
+                                                                                                )
+                                                                                            )
+                                                                                        )
+                                                                                    )
+                                                                                )
+                                                                            )
+                                                                        )
+                                                                    )
+                                                                )
+                                                            )
+                                                        )
+                                                    )
+                                                )
+                                            )
+                                        } else {
+                                            $crate::__pgrx_c_macros::Either::Right(
+                                                $crate::__pgrx_c_macros::expression::profile_value::<
+                                                    true,
+                                                    _
+                                                >(
+                                                    $crate::__pgrx_c_macros::CValue::<
+                                                        $crate::__pgrx_c_macros::CInt
+                                                    >::new(
+                                                        $crate::__pgrx_c_bindings::BTREE_DEFAULT_FILLFACTOR as i32
+                                                    )
+                                                )
+                                            )
+                                        }
+                                    )
+                                )
+                            }
+                        )
+                    }
+                )
+            } else {
+                None
+            }
+        )
+    };
+    (@__pgrx_c_size; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_BTGetFillFactor!(@collect __pgrx_emit_size []; $($raw)*)
+    };
+    (@__pgrx_emit_discard; $relation:tt $(,)?) => {
+        /* PGRX: AssertMacro remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */
+        {
+            let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                {
+                    {
+                        let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                            {
+                                {
+                                    let _ = $crate::__pgrx_c_macros::expression::profile_value::<
+                                        true,
+                                        _
+                                    >(
+                                        /* PGRX: true remains expanded because no integer constant binding is available in the defining Rust crate. */
+                                        $crate::__pgrx_c_macros::CValue::<
+                                            $crate::__pgrx_c_macros::CInt
+                                        >::new(1i32)
+                                    );
+                                }
+                            }
+                        );
+                    };
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::select(
+                            if $crate::__pgrx_c_macros::expression::truth(
+                                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                    $crate::__pgrx_c_macros::expression::load(
+                                        $crate::__pgrx_c_macros::expression::project::<
+                                            $crate::__pgrx_c_generated::Field_rd_options,
+                                            _,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_macros::expression::pointee(
+                                                (
+                                                    $crate::__pgrx_c_macros::expression::profile_value::<
+                                                        true,
+                                                        _
+                                                    >(
+                                                        $crate::__pgrx_c_operand!(
+                                                            @value [true];
+                                                            $relation
+                                                        )
+                                                    )
+                                                )
+                                            )
+                                        )
+                                    )
+                                )
+                            ) {
+                                $crate::__pgrx_c_macros::Either::Left(
+                                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                        $crate::__pgrx_c_macros::expression::load(
+                                            $crate::__pgrx_c_macros::expression::project::<
+                                                $crate::__pgrx_c_generated::Field_fillfactor,
+                                                _,
+                                                _
+                                            >(
+                                                $crate::__pgrx_c_macros::expression::pointee(
+                                                    (
+                                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                                            true,
+                                                            _
+                                                        >(
+                                                            $crate::__pgrx_c_macros::expression::cast_as::<
+                                                                *mut $crate::__pgrx_c_bindings::BTOptions,
+                                                                $crate::__pgrx_c_macros::expression::CPointer<
+                                                                    $crate::__pgrx_c_macros::expression::CRecord<
+                                                                        $crate::__pgrx_c_bindings::BTOptions
+                                                                    >,
+                                                                    $crate::__pgrx_c_macros::expression::ReadWrite
+                                                                >,
+                                                                _
+                                                            >(
+                                                                $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                    true,
+                                                                    _
+                                                                >(
+                                                                    $crate::__pgrx_c_macros::expression::load(
+                                                                        $crate::__pgrx_c_macros::expression::project::<
+                                                                            $crate::__pgrx_c_generated::Field_rd_options,
+                                                                            _,
+                                                                            _
+                                                                        >(
+                                                                            $crate::__pgrx_c_macros::expression::pointee(
+                                                                                (
+                                                                                    $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                        true,
+                                                                                        _
+                                                                                    >(
+                                                                                        $crate::__pgrx_c_operand!(
+                                                                                            @value [
+                                                                                                true
+                                                                                            ];
+                                                                                            $relation
+                                                                                        )
+                                                                                    )
+                                                                                )
+                                                                            )
+                                                                        )
+                                                                    )
+                                                                )
+                                                            )
+                                                        )
+                                                    )
+                                                )
+                                            )
+                                        )
+                                    )
+                                )
+                            } else {
+                                $crate::__pgrx_c_macros::Either::Right(
+                                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                        $crate::__pgrx_c_macros::CValue::<
+                                            $crate::__pgrx_c_macros::CInt
+                                        >::new(
+                                            $crate::__pgrx_c_bindings::BTREE_DEFAULT_FILLFACTOR as i32
+                                        )
+                                    )
+                                )
+                            }
+                        )
+                    )
+                }
+            );
+        }
+    };
+    (@__pgrx_c_discard; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_BTGetFillFactor!(@collect __pgrx_emit_discard []; $($raw)*)
+    };
+    ($($raw:tt)*) => {
+        $crate::__pgrx_c_args_BTGetFillFactor!(@collect __pgrx_emit_public []; $($raw)*)
+    };
+}
+
+#[cfg(not(all(
+    target_arch = "x86_64",
+    target_os = "linux",
+    target_pointer_width = "64",
+    target_endian = "little"
+)))]
+#[cfg(not(docsrs))]
+compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
+#[doc(hidden)]
+#[macro_export]
+macro_rules! __pgrx_c_args_BTGetTargetPageFreeSpace {
+    (@collect $mode:ident [$($done:tt)*]; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_BTGetTargetPageFreeSpace!(@p0 $mode [$($done)*]; $($raw)*)
+    };
+    (@classified [$next:ident $mode:ident [$($done:tt)*] [$($rest:tt)*]] $descriptor:tt) => {
+        $crate::__pgrx_c_args_BTGetTargetPageFreeSpace!(
+            @$next $mode [$($done)* $descriptor,];
+            $($rest)*
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
+        $crate::__pgrx_c_args_BTGetTargetPageFreeSpace!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
+    };
+    (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
+        $crate::__pgrx_c_args_BTGetTargetPageFreeSpace!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_BTGetTargetPageFreeSpace!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+            $($rest)*
+        )
+    };
+    (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_BTGetTargetPageFreeSpace!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; - $($raw:tt)*) => {
+        $crate::__pgrx_c_args_BTGetTargetPageFreeSpace!(@negative0 $mode [$($done)*]; - $($raw)*)
+    };
+    (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
+        $crate::__pgrx_c_args_BTGetTargetPageFreeSpace!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BTGetTargetPageFreeSpace] [p1 $mode [$($done)*] []] [
+                $head $(::$tail)* ! $group
+            ]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; ::$head:ident $(::$tail:ident)* ! $group:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BTGetTargetPageFreeSpace] [p1 $mode [$($done)*] []] [
+                ::$head $(::$tail)* ! $group
+            ]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; ($($inner:tt)*)) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BTGetTargetPageFreeSpace] [p1 $mode [$($done)*] []] [
+                ($($inner)*)
+            ]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
+        $crate::__pgrx_c_args_BTGetTargetPageFreeSpace!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
+        $crate::__pgrx_c_args_BTGetTargetPageFreeSpace!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
+        $crate::__pgrx_c_args_BTGetTargetPageFreeSpace!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BTGetTargetPageFreeSpace] [p1 $mode [$($done)*] [$($rest)*]] [
+                $head $(::$tail)* ! $group
+            ]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; ::$head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BTGetTargetPageFreeSpace] [p1 $mode [$($done)*] [$($rest)*]] [
+                ::$head $(::$tail)* ! $group
+            ]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; ($($inner:tt)*), $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BTGetTargetPageFreeSpace] [p1 $mode [$($done)*] [$($rest)*]] [
+                ($($inner)*)
+            ]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_BTGetTargetPageFreeSpace!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_BTGetTargetPageFreeSpace!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*];) => {
+        $crate::BTGetTargetPageFreeSpace!(@$mode; $($done)*)
+    };
+    ($($invalid:tt)*) => {
+        compile_error!("arguments do not satisfy this C macro's invocation contract")
+    };
+}
+/// C macro BTGetTargetPageFreeSpace from nbtree.h:1108
+///
+/// ```text
+/// #define BTGetTargetPageFreeSpace( relation ) ( BLCKSZ * ( 100 - BTGetFillFactor ( relation ) ) / 100 )
+/// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Checked signed arithmetic rejects overflow when the recorded C profile does not define wrapping; pointer arithmetic checks representable offsets and distances but still requires valid allocation bounds. Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Integer division/remainder rejects zero divisors and signed MIN / -1 overflow. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+#[macro_export]
+macro_rules! BTGetTargetPageFreeSpace {
+    (@__pgrx_emit_check_safety; $relation:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $relation);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_BTGetTargetPageFreeSpace!(
+            @collect __pgrx_emit_check_safety [];
+            $($raw)*
+        )
+    };
+    (@__pgrx_emit_public; $relation:tt $(,)?) => {
+        $crate::__pgrx_c_macros::expression_result::finish(
+            $crate::BTGetTargetPageFreeSpace!(@__pgrx_emit_value; $relation)
+        )
+    };
+    (@__pgrx_emit_value; $relation:tt $(,)?) => {
+        /* PGRX: AssertMacro remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */ /* PGRX: BTGetFillFactor remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */
+        (
+            $crate::__pgrx_c_macros::expression::profile_value::<false, _>(
+                $crate::__pgrx_c_macros::expression::div(
+                    $crate::__pgrx_c_macros::expression::profile_value::<false, _>(
+                        $crate::__pgrx_c_macros::expression::mul::<
+                            $crate::__pgrx_c_macros::Wrapping,
+                            _,
+                            _
+                        >(
+                            $crate::__pgrx_c_macros::expression::profile_value::<false, _>(
+                                $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
+                                    $crate::__pgrx_c_bindings::BLCKSZ as i32
+                                )
+                            ),
+                            (
+                                $crate::__pgrx_c_macros::expression::profile_value::<false, _>(
+                                    $crate::__pgrx_c_macros::expression::sub::<
+                                        $crate::__pgrx_c_macros::Wrapping,
+                                        _,
+                                        _
+                                    >(
+                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                            false,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_macros::CValue::<
+                                                $crate::__pgrx_c_macros::CInt
+                                            >::new(100i32)
+                                        ),
+                                        (
+                                            $crate::__pgrx_c_macros::expression::profile_value::<
+                                                false,
+                                                _
+                                            >(
+                                                {
+                                                    {
+                                                        let _ = $crate::__pgrx_c_macros::expression::profile_value::<
+                                                            false,
+                                                            _
+                                                        >(
+                                                            {
+                                                                {
+                                                                    let _ = $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                        false,
+                                                                        _
+                                                                    >(
+                                                                        /* PGRX: true remains expanded because no integer constant binding is available in the defining Rust crate. */
+                                                                        $crate::__pgrx_c_macros::CValue::<
+                                                                            $crate::__pgrx_c_macros::CInt
+                                                                        >::new(1i32)
+                                                                    );
+                                                                }
+                                                            }
+                                                        );
+                                                    };
+                                                    $crate::__pgrx_c_macros::expression::profile_value::<
+                                                        false,
+                                                        _
+                                                    >(
+                                                        $crate::__pgrx_c_macros::expression::select(
+                                                            if $crate::__pgrx_c_macros::expression::truth(
+                                                                $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                    false,
+                                                                    _
+                                                                >(
+                                                                    $crate::__pgrx_c_macros::expression::load(
+                                                                        $crate::__pgrx_c_macros::expression::project::<
+                                                                            $crate::__pgrx_c_generated::Field_rd_options,
+                                                                            _,
+                                                                            _
+                                                                        >(
+                                                                            $crate::__pgrx_c_macros::expression::pointee(
+                                                                                (
+                                                                                    $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                        false,
+                                                                                        _
+                                                                                    >(
+                                                                                        $crate::__pgrx_c_operand!(
+                                                                                            @value [
+                                                                                                false
+                                                                                            ];
+                                                                                            $relation
+                                                                                        )
+                                                                                    )
+                                                                                )
+                                                                            )
+                                                                        )
+                                                                    )
+                                                                )
+                                                            ) {
+                                                                $crate::__pgrx_c_macros::Either::Left(
+                                                                    $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                        false,
+                                                                        _
+                                                                    >(
+                                                                        $crate::__pgrx_c_macros::expression::load(
+                                                                            $crate::__pgrx_c_macros::expression::project::<
+                                                                                $crate::__pgrx_c_generated::Field_fillfactor,
+                                                                                _,
+                                                                                _
+                                                                            >(
+                                                                                $crate::__pgrx_c_macros::expression::pointee(
+                                                                                    (
+                                                                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                            false,
+                                                                                            _
+                                                                                        >(
+                                                                                            $crate::__pgrx_c_macros::expression::cast_as::<
+                                                                                                *mut $crate::__pgrx_c_bindings::BTOptions,
+                                                                                                $crate::__pgrx_c_macros::expression::CPointer<
+                                                                                                    $crate::__pgrx_c_macros::expression::CRecord<
+                                                                                                        $crate::__pgrx_c_bindings::BTOptions
+                                                                                                    >,
+                                                                                                    $crate::__pgrx_c_macros::expression::ReadWrite
+                                                                                                >,
+                                                                                                _
+                                                                                            >(
+                                                                                                $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                                    false,
+                                                                                                    _
+                                                                                                >(
+                                                                                                    $crate::__pgrx_c_macros::expression::load(
+                                                                                                        $crate::__pgrx_c_macros::expression::project::<
+                                                                                                            $crate::__pgrx_c_generated::Field_rd_options,
+                                                                                                            _,
+                                                                                                            _
+                                                                                                        >(
+                                                                                                            $crate::__pgrx_c_macros::expression::pointee(
+                                                                                                                (
+                                                                                                                    $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                                                        false,
+                                                                                                                        _
+                                                                                                                    >(
+                                                                                                                        $crate::__pgrx_c_operand!(
+                                                                                                                            @value [
+                                                                                                                                false
+                                                                                                                            ];
+                                                                                                                            $relation
+                                                                                                                        )
+                                                                                                                    )
+                                                                                                                )
+                                                                                                            )
+                                                                                                        )
+                                                                                                    )
+                                                                                                )
+                                                                                            )
+                                                                                        )
+                                                                                    )
+                                                                                )
+                                                                            )
+                                                                        )
+                                                                    )
+                                                                )
+                                                            } else {
+                                                                $crate::__pgrx_c_macros::Either::Right(
+                                                                    $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                        false,
+                                                                        _
+                                                                    >(
+                                                                        $crate::__pgrx_c_macros::CValue::<
+                                                                            $crate::__pgrx_c_macros::CInt
+                                                                        >::new(
+                                                                            $crate::__pgrx_c_bindings::BTREE_DEFAULT_FILLFACTOR as i32
+                                                                        )
+                                                                    )
+                                                                )
+                                                            }
+                                                        )
+                                                    )
+                                                }
+                                            )
+                                        )
+                                    )
+                                )
+                            )
+                        )
+                    ),
+                    $crate::__pgrx_c_macros::expression::profile_value::<false, _>(
+                        $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
+                            100i32
+                        )
+                    )
+                )
+            )
+        )
+    };
+    (@__pgrx_c_value; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_BTGetTargetPageFreeSpace!(@collect __pgrx_emit_value []; $($raw)*)
+    };
+    (@__pgrx_emit_place; $relation:tt $(,)?) => {
+        compile_error!("C expression is not a place in this operation")
+    };
+    (@__pgrx_c_place; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_BTGetTargetPageFreeSpace!(@collect __pgrx_emit_place []; $($raw)*)
+    };
+    (@__pgrx_emit_read_place; $relation:tt $(,)?) => {
+        compile_error!("C expression is not a place in this operation")
+    };
+    (@__pgrx_c_read_place; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_BTGetTargetPageFreeSpace!(
+            @collect __pgrx_emit_read_place [];
+            $($raw)*
+        )
+    };
+    (@__pgrx_emit_size; $relation:tt $(,)?) => {
+        /* PGRX: AssertMacro remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */ /* PGRX: BTGetFillFactor remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */
+        $crate::__pgrx_c_macros::expression::size_of_value_type(
+            if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $relation);
+                    }
+                }
+                Some(
+                    unsafe {
+                        $crate::__pgrx_c_macros::expression::profile_value::<false, _>(
+                            $crate::__pgrx_c_macros::expression::div(
+                                $crate::__pgrx_c_macros::expression::profile_value::<false, _>(
+                                    $crate::__pgrx_c_macros::expression::mul::<
+                                        $crate::__pgrx_c_macros::Wrapping,
+                                        _,
+                                        _
+                                    >(
+                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                            false,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_macros::CValue::<
+                                                $crate::__pgrx_c_macros::CInt
+                                            >::new($crate::__pgrx_c_bindings::BLCKSZ as i32)
+                                        ),
+                                        (
+                                            $crate::__pgrx_c_macros::expression::profile_value::<
+                                                false,
+                                                _
+                                            >(
+                                                $crate::__pgrx_c_macros::expression::sub::<
+                                                    $crate::__pgrx_c_macros::Wrapping,
+                                                    _,
+                                                    _
+                                                >(
+                                                    $crate::__pgrx_c_macros::expression::profile_value::<
+                                                        false,
+                                                        _
+                                                    >(
+                                                        $crate::__pgrx_c_macros::CValue::<
+                                                            $crate::__pgrx_c_macros::CInt
+                                                        >::new(100i32)
+                                                    ),
+                                                    (
+                                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                                            false,
+                                                            _
+                                                        >(
+                                                            {
+                                                                {
+                                                                    let _ = $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                        false,
+                                                                        _
+                                                                    >(
+                                                                        {
+                                                                            {
+                                                                                let _ = $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                    false,
+                                                                                    _
+                                                                                >(
+                                                                                    /* PGRX: true remains expanded because no integer constant binding is available in the defining Rust crate. */
+                                                                                    $crate::__pgrx_c_macros::CValue::<
+                                                                                        $crate::__pgrx_c_macros::CInt
+                                                                                    >::new(1i32)
+                                                                                );
+                                                                            }
+                                                                        }
+                                                                    );
+                                                                };
+                                                                $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                    false,
+                                                                    _
+                                                                >(
+                                                                    $crate::__pgrx_c_macros::expression::select(
+                                                                        if $crate::__pgrx_c_macros::expression::truth(
+                                                                            $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                false,
+                                                                                _
+                                                                            >(
+                                                                                $crate::__pgrx_c_macros::expression::load(
+                                                                                    $crate::__pgrx_c_macros::expression::project::<
+                                                                                        $crate::__pgrx_c_generated::Field_rd_options,
+                                                                                        _,
+                                                                                        _
+                                                                                    >(
+                                                                                        $crate::__pgrx_c_macros::expression::pointee(
+                                                                                            (
+                                                                                                $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                                    false,
+                                                                                                    _
+                                                                                                >(
+                                                                                                    $crate::__pgrx_c_operand!(
+                                                                                                        @value [
+                                                                                                            false
+                                                                                                        ];
+                                                                                                        $relation
+                                                                                                    )
+                                                                                                )
+                                                                                            )
+                                                                                        )
+                                                                                    )
+                                                                                )
+                                                                            )
+                                                                        ) {
+                                                                            $crate::__pgrx_c_macros::Either::Left(
+                                                                                $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                    false,
+                                                                                    _
+                                                                                >(
+                                                                                    $crate::__pgrx_c_macros::expression::load(
+                                                                                        $crate::__pgrx_c_macros::expression::project::<
+                                                                                            $crate::__pgrx_c_generated::Field_fillfactor,
+                                                                                            _,
+                                                                                            _
+                                                                                        >(
+                                                                                            $crate::__pgrx_c_macros::expression::pointee(
+                                                                                                (
+                                                                                                    $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                                        false,
+                                                                                                        _
+                                                                                                    >(
+                                                                                                        $crate::__pgrx_c_macros::expression::cast_as::<
+                                                                                                            *mut $crate::__pgrx_c_bindings::BTOptions,
+                                                                                                            $crate::__pgrx_c_macros::expression::CPointer<
+                                                                                                                $crate::__pgrx_c_macros::expression::CRecord<
+                                                                                                                    $crate::__pgrx_c_bindings::BTOptions
+                                                                                                                >,
+                                                                                                                $crate::__pgrx_c_macros::expression::ReadWrite
+                                                                                                            >,
+                                                                                                            _
+                                                                                                        >(
+                                                                                                            $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                                                false,
+                                                                                                                _
+                                                                                                            >(
+                                                                                                                $crate::__pgrx_c_macros::expression::load(
+                                                                                                                    $crate::__pgrx_c_macros::expression::project::<
+                                                                                                                        $crate::__pgrx_c_generated::Field_rd_options,
+                                                                                                                        _,
+                                                                                                                        _
+                                                                                                                    >(
+                                                                                                                        $crate::__pgrx_c_macros::expression::pointee(
+                                                                                                                            (
+                                                                                                                                $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                                                                    false,
+                                                                                                                                    _
+                                                                                                                                >(
+                                                                                                                                    $crate::__pgrx_c_operand!(
+                                                                                                                                        @value [
+                                                                                                                                            false
+                                                                                                                                        ];
+                                                                                                                                        $relation
+                                                                                                                                    )
+                                                                                                                                )
+                                                                                                                            )
+                                                                                                                        )
+                                                                                                                    )
+                                                                                                                )
+                                                                                                            )
+                                                                                                        )
+                                                                                                    )
+                                                                                                )
+                                                                                            )
+                                                                                        )
+                                                                                    )
+                                                                                )
+                                                                            )
+                                                                        } else {
+                                                                            $crate::__pgrx_c_macros::Either::Right(
+                                                                                $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                    false,
+                                                                                    _
+                                                                                >(
+                                                                                    $crate::__pgrx_c_macros::CValue::<
+                                                                                        $crate::__pgrx_c_macros::CInt
+                                                                                    >::new(
+                                                                                        $crate::__pgrx_c_bindings::BTREE_DEFAULT_FILLFACTOR as i32
+                                                                                    )
+                                                                                )
+                                                                            )
+                                                                        }
+                                                                    )
+                                                                )
+                                                            }
+                                                        )
+                                                    )
+                                                )
+                                            )
+                                        )
+                                    )
+                                ),
+                                $crate::__pgrx_c_macros::expression::profile_value::<false, _>(
+                                    $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
+                                        100i32
+                                    )
+                                )
+                            )
+                        )
+                    }
+                )
+            } else {
+                None
+            }
+        )
+    };
+    (@__pgrx_c_size; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_BTGetTargetPageFreeSpace!(@collect __pgrx_emit_size []; $($raw)*)
+    };
+    (@__pgrx_emit_discard; $relation:tt $(,)?) => {
+        /* PGRX: AssertMacro remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */ /* PGRX: BTGetFillFactor remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */
+        {
+            let _ = $crate::__pgrx_c_macros::expression::profile_value::<false, _>(
+                $crate::__pgrx_c_macros::expression::div(
+                    $crate::__pgrx_c_macros::expression::profile_value::<false, _>(
+                        $crate::__pgrx_c_macros::expression::mul::<
+                            $crate::__pgrx_c_macros::Wrapping,
+                            _,
+                            _
+                        >(
+                            $crate::__pgrx_c_macros::expression::profile_value::<false, _>(
+                                $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
+                                    $crate::__pgrx_c_bindings::BLCKSZ as i32
+                                )
+                            ),
+                            (
+                                $crate::__pgrx_c_macros::expression::profile_value::<false, _>(
+                                    $crate::__pgrx_c_macros::expression::sub::<
+                                        $crate::__pgrx_c_macros::Wrapping,
+                                        _,
+                                        _
+                                    >(
+                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                            false,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_macros::CValue::<
+                                                $crate::__pgrx_c_macros::CInt
+                                            >::new(100i32)
+                                        ),
+                                        (
+                                            $crate::__pgrx_c_macros::expression::profile_value::<
+                                                false,
+                                                _
+                                            >(
+                                                {
+                                                    {
+                                                        let _ = $crate::__pgrx_c_macros::expression::profile_value::<
+                                                            false,
+                                                            _
+                                                        >(
+                                                            {
+                                                                {
+                                                                    let _ = $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                        false,
+                                                                        _
+                                                                    >(
+                                                                        /* PGRX: true remains expanded because no integer constant binding is available in the defining Rust crate. */
+                                                                        $crate::__pgrx_c_macros::CValue::<
+                                                                            $crate::__pgrx_c_macros::CInt
+                                                                        >::new(1i32)
+                                                                    );
+                                                                }
+                                                            }
+                                                        );
+                                                    };
+                                                    $crate::__pgrx_c_macros::expression::profile_value::<
+                                                        false,
+                                                        _
+                                                    >(
+                                                        $crate::__pgrx_c_macros::expression::select(
+                                                            if $crate::__pgrx_c_macros::expression::truth(
+                                                                $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                    false,
+                                                                    _
+                                                                >(
+                                                                    $crate::__pgrx_c_macros::expression::load(
+                                                                        $crate::__pgrx_c_macros::expression::project::<
+                                                                            $crate::__pgrx_c_generated::Field_rd_options,
+                                                                            _,
+                                                                            _
+                                                                        >(
+                                                                            $crate::__pgrx_c_macros::expression::pointee(
+                                                                                (
+                                                                                    $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                        false,
+                                                                                        _
+                                                                                    >(
+                                                                                        $crate::__pgrx_c_operand!(
+                                                                                            @value [
+                                                                                                false
+                                                                                            ];
+                                                                                            $relation
+                                                                                        )
+                                                                                    )
+                                                                                )
+                                                                            )
+                                                                        )
+                                                                    )
+                                                                )
+                                                            ) {
+                                                                $crate::__pgrx_c_macros::Either::Left(
+                                                                    $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                        false,
+                                                                        _
+                                                                    >(
+                                                                        $crate::__pgrx_c_macros::expression::load(
+                                                                            $crate::__pgrx_c_macros::expression::project::<
+                                                                                $crate::__pgrx_c_generated::Field_fillfactor,
+                                                                                _,
+                                                                                _
+                                                                            >(
+                                                                                $crate::__pgrx_c_macros::expression::pointee(
+                                                                                    (
+                                                                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                            false,
+                                                                                            _
+                                                                                        >(
+                                                                                            $crate::__pgrx_c_macros::expression::cast_as::<
+                                                                                                *mut $crate::__pgrx_c_bindings::BTOptions,
+                                                                                                $crate::__pgrx_c_macros::expression::CPointer<
+                                                                                                    $crate::__pgrx_c_macros::expression::CRecord<
+                                                                                                        $crate::__pgrx_c_bindings::BTOptions
+                                                                                                    >,
+                                                                                                    $crate::__pgrx_c_macros::expression::ReadWrite
+                                                                                                >,
+                                                                                                _
+                                                                                            >(
+                                                                                                $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                                    false,
+                                                                                                    _
+                                                                                                >(
+                                                                                                    $crate::__pgrx_c_macros::expression::load(
+                                                                                                        $crate::__pgrx_c_macros::expression::project::<
+                                                                                                            $crate::__pgrx_c_generated::Field_rd_options,
+                                                                                                            _,
+                                                                                                            _
+                                                                                                        >(
+                                                                                                            $crate::__pgrx_c_macros::expression::pointee(
+                                                                                                                (
+                                                                                                                    $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                                                        false,
+                                                                                                                        _
+                                                                                                                    >(
+                                                                                                                        $crate::__pgrx_c_operand!(
+                                                                                                                            @value [
+                                                                                                                                false
+                                                                                                                            ];
+                                                                                                                            $relation
+                                                                                                                        )
+                                                                                                                    )
+                                                                                                                )
+                                                                                                            )
+                                                                                                        )
+                                                                                                    )
+                                                                                                )
+                                                                                            )
+                                                                                        )
+                                                                                    )
+                                                                                )
+                                                                            )
+                                                                        )
+                                                                    )
+                                                                )
+                                                            } else {
+                                                                $crate::__pgrx_c_macros::Either::Right(
+                                                                    $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                        false,
+                                                                        _
+                                                                    >(
+                                                                        $crate::__pgrx_c_macros::CValue::<
+                                                                            $crate::__pgrx_c_macros::CInt
+                                                                        >::new(
+                                                                            $crate::__pgrx_c_bindings::BTREE_DEFAULT_FILLFACTOR as i32
+                                                                        )
+                                                                    )
+                                                                )
+                                                            }
+                                                        )
+                                                    )
+                                                }
+                                            )
+                                        )
+                                    )
+                                )
+                            )
+                        )
+                    ),
+                    $crate::__pgrx_c_macros::expression::profile_value::<false, _>(
+                        $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
+                            100i32
+                        )
+                    )
+                )
+            );
+        }
+    };
+    (@__pgrx_c_discard; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_BTGetTargetPageFreeSpace!(@collect __pgrx_emit_discard []; $($raw)*)
+    };
+    ($($raw:tt)*) => {
+        $crate::__pgrx_c_args_BTGetTargetPageFreeSpace!(@collect __pgrx_emit_public []; $($raw)*)
+    };
+}
+
+#[cfg(not(all(
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -347,20 +2337,24 @@ macro_rules! __pgrx_c_args_BTMaxItemSize {
         $crate::__pgrx_c_args_BTMaxItemSize!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_BTMaxItemSize!(@p1 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_BTMaxItemSize!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_BTMaxItemSize!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_BTMaxItemSize!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_BTMaxItemSize!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_BTMaxItemSize!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -368,7 +2362,9 @@ macro_rules! __pgrx_c_args_BTMaxItemSize {
         $crate::__pgrx_c_args_BTMaxItemSize!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_BTMaxItemSize!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_BTMaxItemSize!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -390,14 +2386,18 @@ macro_rules! __pgrx_c_args_BTMaxItemSize {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_BTMaxItemSize!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_BTMaxItemSize!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_BTMaxItemSize!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_BTMaxItemSize!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_BTMaxItemSize!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -424,13 +2424,13 @@ macro_rules! __pgrx_c_args_BTMaxItemSize {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_BTMaxItemSize!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_BTMaxItemSize!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -523,7 +2523,7 @@ macro_rules! BTMaxItemSize {
                                                                                             usize
                                                                                         > as $crate::__pgrx_c_macros::expression::CType
                                                                                     >::from_storage(
-                                                                                        $crate::PageGetPageSize(
+                                                                                        $crate::__pgrx_c_bindings::PageGetPageSize(
                                                                                             <
                                                                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                                                                     $crate::__pgrx_c_macros::expression::CIntegerStorage<
@@ -602,7 +2602,7 @@ macro_rules! BTMaxItemSize {
                                                                                                                                     >(
                                                                                                                                         $crate::__pgrx_c_macros::expression::offset_of::<
                                                                                                                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                                                                $crate::PageHeaderData
+                                                                                                                                                $crate::__pgrx_c_bindings::PageHeaderData
                                                                                                                                             >,
                                                                                                                                             $crate::__pgrx_c_field_marker!(
                                                                                                                                                 @path;
@@ -636,7 +2636,7 @@ macro_rules! BTMaxItemSize {
                                                                                                                                         >(
                                                                                                                                             $crate::__pgrx_c_macros::expression::size_of::<
                                                                                                                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                                                                    $crate::ItemIdData
+                                                                                                                                                    $crate::__pgrx_c_bindings::ItemIdData
                                                                                                                                                 >>()
                                                                                                                                         )
                                                                                                                                     )
@@ -665,7 +2665,7 @@ macro_rules! BTMaxItemSize {
                                                                                                                             $crate::__pgrx_c_macros::CValue::<
                                                                                                                                 $crate::__pgrx_c_macros::CInt
                                                                                                                             >::new(
-                                                                                                                                $crate::MAXIMUM_ALIGNOF as i32
+                                                                                                                                $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                                                                             )
                                                                                                                         )
                                                                                                                     ),
@@ -718,7 +2718,7 @@ macro_rules! BTMaxItemSize {
                                                                                                                                     $crate::__pgrx_c_macros::CValue::<
                                                                                                                                         $crate::__pgrx_c_macros::CInt
                                                                                                                                     >::new(
-                                                                                                                                        $crate::MAXIMUM_ALIGNOF as i32
+                                                                                                                                        $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                                                                                     )
                                                                                                                                 )
                                                                                                                             ),
@@ -778,7 +2778,7 @@ macro_rules! BTMaxItemSize {
                                                                                                                 >(
                                                                                                                     $crate::__pgrx_c_macros::expression::size_of::<
                                                                                                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                                            $crate::BTPageOpaqueData
+                                                                                                                            $crate::__pgrx_c_bindings::BTPageOpaqueData
                                                                                                                         >>()
                                                                                                                 )
                                                                                                             )
@@ -803,7 +2803,7 @@ macro_rules! BTMaxItemSize {
                                                                                                                     $crate::__pgrx_c_macros::CValue::<
                                                                                                                         $crate::__pgrx_c_macros::CInt
                                                                                                                     >::new(
-                                                                                                                        $crate::MAXIMUM_ALIGNOF as i32
+                                                                                                                        $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                                                                     )
                                                                                                                 )
                                                                                                             ),
@@ -856,7 +2856,7 @@ macro_rules! BTMaxItemSize {
                                                                                                                             $crate::__pgrx_c_macros::CValue::<
                                                                                                                                 $crate::__pgrx_c_macros::CInt
                                                                                                                             >::new(
-                                                                                                                                $crate::MAXIMUM_ALIGNOF as i32
+                                                                                                                                $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                                                                             )
                                                                                                                         )
                                                                                                                     ),
@@ -929,7 +2929,7 @@ macro_rules! BTMaxItemSize {
                                                                         $crate::__pgrx_c_macros::CValue::<
                                                                             $crate::__pgrx_c_macros::CInt
                                                                         >::new(
-                                                                            $crate::MAXIMUM_ALIGNOF as i32
+                                                                            $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                         )
                                                                     )
                                                                 ),
@@ -979,7 +2979,7 @@ macro_rules! BTMaxItemSize {
                                                             >(
                                                                 $crate::__pgrx_c_macros::expression::size_of::<
                                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                                        $crate::ItemPointerData
+                                                                        $crate::__pgrx_c_bindings::ItemPointerData
                                                                     >>()
                                                             )
                                                         )
@@ -1004,7 +3004,7 @@ macro_rules! BTMaxItemSize {
                                                                 $crate::__pgrx_c_macros::CValue::<
                                                                     $crate::__pgrx_c_macros::CInt
                                                                 >::new(
-                                                                    $crate::MAXIMUM_ALIGNOF as i32
+                                                                    $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                 )
                                                             )
                                                         ),
@@ -1052,7 +3052,7 @@ macro_rules! BTMaxItemSize {
                                                                         $crate::__pgrx_c_macros::CValue::<
                                                                             $crate::__pgrx_c_macros::CInt
                                                                         >::new(
-                                                                            $crate::MAXIMUM_ALIGNOF as i32
+                                                                            $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                         )
                                                                     )
                                                                 ),
@@ -1160,7 +3160,7 @@ macro_rules! BTMaxItemSize {
                                                                                                         usize
                                                                                                     > as $crate::__pgrx_c_macros::expression::CType
                                                                                                 >::from_storage(
-                                                                                                    $crate::PageGetPageSize(
+                                                                                                    $crate::__pgrx_c_bindings::PageGetPageSize(
                                                                                                         <
                                                                                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                                                                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
@@ -1239,7 +3239,7 @@ macro_rules! BTMaxItemSize {
                                                                                                                                                 >(
                                                                                                                                                     $crate::__pgrx_c_macros::expression::offset_of::<
                                                                                                                                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                                                                            $crate::PageHeaderData
+                                                                                                                                                            $crate::__pgrx_c_bindings::PageHeaderData
                                                                                                                                                         >,
                                                                                                                                                         $crate::__pgrx_c_field_marker!(
                                                                                                                                                             @path;
@@ -1273,7 +3273,7 @@ macro_rules! BTMaxItemSize {
                                                                                                                                                     >(
                                                                                                                                                         $crate::__pgrx_c_macros::expression::size_of::<
                                                                                                                                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                                                                                $crate::ItemIdData
+                                                                                                                                                                $crate::__pgrx_c_bindings::ItemIdData
                                                                                                                                                             >>()
                                                                                                                                                     )
                                                                                                                                                 )
@@ -1302,7 +3302,7 @@ macro_rules! BTMaxItemSize {
                                                                                                                                         $crate::__pgrx_c_macros::CValue::<
                                                                                                                                             $crate::__pgrx_c_macros::CInt
                                                                                                                                         >::new(
-                                                                                                                                            $crate::MAXIMUM_ALIGNOF as i32
+                                                                                                                                            $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                                                                                         )
                                                                                                                                     )
                                                                                                                                 ),
@@ -1355,7 +3355,7 @@ macro_rules! BTMaxItemSize {
                                                                                                                                                 $crate::__pgrx_c_macros::CValue::<
                                                                                                                                                     $crate::__pgrx_c_macros::CInt
                                                                                                                                                 >::new(
-                                                                                                                                                    $crate::MAXIMUM_ALIGNOF as i32
+                                                                                                                                                    $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                                                                                                 )
                                                                                                                                             )
                                                                                                                                         ),
@@ -1415,7 +3415,7 @@ macro_rules! BTMaxItemSize {
                                                                                                                             >(
                                                                                                                                 $crate::__pgrx_c_macros::expression::size_of::<
                                                                                                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                                                        $crate::BTPageOpaqueData
+                                                                                                                                        $crate::__pgrx_c_bindings::BTPageOpaqueData
                                                                                                                                     >>()
                                                                                                                             )
                                                                                                                         )
@@ -1440,7 +3440,7 @@ macro_rules! BTMaxItemSize {
                                                                                                                                 $crate::__pgrx_c_macros::CValue::<
                                                                                                                                     $crate::__pgrx_c_macros::CInt
                                                                                                                                 >::new(
-                                                                                                                                    $crate::MAXIMUM_ALIGNOF as i32
+                                                                                                                                    $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                                                                                 )
                                                                                                                             )
                                                                                                                         ),
@@ -1493,7 +3493,7 @@ macro_rules! BTMaxItemSize {
                                                                                                                                         $crate::__pgrx_c_macros::CValue::<
                                                                                                                                             $crate::__pgrx_c_macros::CInt
                                                                                                                                         >::new(
-                                                                                                                                            $crate::MAXIMUM_ALIGNOF as i32
+                                                                                                                                            $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                                                                                         )
                                                                                                                                     )
                                                                                                                                 ),
@@ -1569,7 +3569,7 @@ macro_rules! BTMaxItemSize {
                                                                                     $crate::__pgrx_c_macros::CValue::<
                                                                                         $crate::__pgrx_c_macros::CInt
                                                                                     >::new(
-                                                                                        $crate::MAXIMUM_ALIGNOF as i32
+                                                                                        $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                                     )
                                                                                 )
                                                                             ),
@@ -1622,7 +3622,7 @@ macro_rules! BTMaxItemSize {
                                                                         >(
                                                                             $crate::__pgrx_c_macros::expression::size_of::<
                                                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                    $crate::ItemPointerData
+                                                                                    $crate::__pgrx_c_bindings::ItemPointerData
                                                                                 >>()
                                                                         )
                                                                     )
@@ -1647,7 +3647,7 @@ macro_rules! BTMaxItemSize {
                                                                             $crate::__pgrx_c_macros::CValue::<
                                                                                 $crate::__pgrx_c_macros::CInt
                                                                             >::new(
-                                                                                $crate::MAXIMUM_ALIGNOF as i32
+                                                                                $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                             )
                                                                         )
                                                                     ),
@@ -1698,7 +3698,7 @@ macro_rules! BTMaxItemSize {
                                                                                     $crate::__pgrx_c_macros::CValue::<
                                                                                         $crate::__pgrx_c_macros::CInt
                                                                                     >::new(
-                                                                                        $crate::MAXIMUM_ALIGNOF as i32
+                                                                                        $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                                     )
                                                                                 )
                                                                             ),
@@ -1784,7 +3784,7 @@ macro_rules! BTMaxItemSize {
                                                                                             usize
                                                                                         > as $crate::__pgrx_c_macros::expression::CType
                                                                                     >::from_storage(
-                                                                                        $crate::PageGetPageSize(
+                                                                                        $crate::__pgrx_c_bindings::PageGetPageSize(
                                                                                             <
                                                                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                                                                     $crate::__pgrx_c_macros::expression::CIntegerStorage<
@@ -1863,7 +3863,7 @@ macro_rules! BTMaxItemSize {
                                                                                                                                     >(
                                                                                                                                         $crate::__pgrx_c_macros::expression::offset_of::<
                                                                                                                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                                                                $crate::PageHeaderData
+                                                                                                                                                $crate::__pgrx_c_bindings::PageHeaderData
                                                                                                                                             >,
                                                                                                                                             $crate::__pgrx_c_field_marker!(
                                                                                                                                                 @path;
@@ -1897,7 +3897,7 @@ macro_rules! BTMaxItemSize {
                                                                                                                                         >(
                                                                                                                                             $crate::__pgrx_c_macros::expression::size_of::<
                                                                                                                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                                                                    $crate::ItemIdData
+                                                                                                                                                    $crate::__pgrx_c_bindings::ItemIdData
                                                                                                                                                 >>()
                                                                                                                                         )
                                                                                                                                     )
@@ -1926,7 +3926,7 @@ macro_rules! BTMaxItemSize {
                                                                                                                             $crate::__pgrx_c_macros::CValue::<
                                                                                                                                 $crate::__pgrx_c_macros::CInt
                                                                                                                             >::new(
-                                                                                                                                $crate::MAXIMUM_ALIGNOF as i32
+                                                                                                                                $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                                                                             )
                                                                                                                         )
                                                                                                                     ),
@@ -1979,7 +3979,7 @@ macro_rules! BTMaxItemSize {
                                                                                                                                     $crate::__pgrx_c_macros::CValue::<
                                                                                                                                         $crate::__pgrx_c_macros::CInt
                                                                                                                                     >::new(
-                                                                                                                                        $crate::MAXIMUM_ALIGNOF as i32
+                                                                                                                                        $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                                                                                     )
                                                                                                                                 )
                                                                                                                             ),
@@ -2039,7 +4039,7 @@ macro_rules! BTMaxItemSize {
                                                                                                                 >(
                                                                                                                     $crate::__pgrx_c_macros::expression::size_of::<
                                                                                                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                                            $crate::BTPageOpaqueData
+                                                                                                                            $crate::__pgrx_c_bindings::BTPageOpaqueData
                                                                                                                         >>()
                                                                                                                 )
                                                                                                             )
@@ -2064,7 +4064,7 @@ macro_rules! BTMaxItemSize {
                                                                                                                     $crate::__pgrx_c_macros::CValue::<
                                                                                                                         $crate::__pgrx_c_macros::CInt
                                                                                                                     >::new(
-                                                                                                                        $crate::MAXIMUM_ALIGNOF as i32
+                                                                                                                        $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                                                                     )
                                                                                                                 )
                                                                                                             ),
@@ -2117,7 +4117,7 @@ macro_rules! BTMaxItemSize {
                                                                                                                             $crate::__pgrx_c_macros::CValue::<
                                                                                                                                 $crate::__pgrx_c_macros::CInt
                                                                                                                             >::new(
-                                                                                                                                $crate::MAXIMUM_ALIGNOF as i32
+                                                                                                                                $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                                                                             )
                                                                                                                         )
                                                                                                                     ),
@@ -2190,7 +4190,7 @@ macro_rules! BTMaxItemSize {
                                                                         $crate::__pgrx_c_macros::CValue::<
                                                                             $crate::__pgrx_c_macros::CInt
                                                                         >::new(
-                                                                            $crate::MAXIMUM_ALIGNOF as i32
+                                                                            $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                         )
                                                                     )
                                                                 ),
@@ -2240,7 +4240,7 @@ macro_rules! BTMaxItemSize {
                                                             >(
                                                                 $crate::__pgrx_c_macros::expression::size_of::<
                                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                                        $crate::ItemPointerData
+                                                                        $crate::__pgrx_c_bindings::ItemPointerData
                                                                     >>()
                                                             )
                                                         )
@@ -2265,7 +4265,7 @@ macro_rules! BTMaxItemSize {
                                                                 $crate::__pgrx_c_macros::CValue::<
                                                                     $crate::__pgrx_c_macros::CInt
                                                                 >::new(
-                                                                    $crate::MAXIMUM_ALIGNOF as i32
+                                                                    $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                 )
                                                             )
                                                         ),
@@ -2313,7 +4313,7 @@ macro_rules! BTMaxItemSize {
                                                                         $crate::__pgrx_c_macros::CValue::<
                                                                             $crate::__pgrx_c_macros::CInt
                                                                         >::new(
-                                                                            $crate::MAXIMUM_ALIGNOF as i32
+                                                                            $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                         )
                                                                     )
                                                                 ),
@@ -2349,8 +4349,8 @@ macro_rules! BTMaxItemSize {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -2381,21 +4381,23 @@ macro_rules! __pgrx_c_args_BTMaxItemSizeNoHeapTid {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
         $crate::__pgrx_c_args_BTMaxItemSizeNoHeapTid!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_BTMaxItemSizeNoHeapTid!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_BTMaxItemSizeNoHeapTid!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_BTMaxItemSizeNoHeapTid!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_BTMaxItemSizeNoHeapTid!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -2403,7 +4405,9 @@ macro_rules! __pgrx_c_args_BTMaxItemSizeNoHeapTid {
         $crate::__pgrx_c_args_BTMaxItemSizeNoHeapTid!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_BTMaxItemSizeNoHeapTid!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_BTMaxItemSizeNoHeapTid!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -2428,15 +4432,17 @@ macro_rules! __pgrx_c_args_BTMaxItemSizeNoHeapTid {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_BTMaxItemSizeNoHeapTid!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_BTMaxItemSizeNoHeapTid!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_BTMaxItemSizeNoHeapTid!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_BTMaxItemSizeNoHeapTid!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -2463,13 +4469,13 @@ macro_rules! __pgrx_c_args_BTMaxItemSizeNoHeapTid {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_BTMaxItemSizeNoHeapTid!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_BTMaxItemSizeNoHeapTid!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -2548,7 +4554,7 @@ macro_rules! BTMaxItemSizeNoHeapTid {
                                                             usize
                                                         > as $crate::__pgrx_c_macros::expression::CType
                                                     >::from_storage(
-                                                        $crate::PageGetPageSize(
+                                                        $crate::__pgrx_c_bindings::PageGetPageSize(
                                                             <
                                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                                     $crate::__pgrx_c_macros::expression::CIntegerStorage<
@@ -2625,7 +4631,7 @@ macro_rules! BTMaxItemSizeNoHeapTid {
                                                                                                     >(
                                                                                                         $crate::__pgrx_c_macros::expression::offset_of::<
                                                                                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                                $crate::PageHeaderData
+                                                                                                                $crate::__pgrx_c_bindings::PageHeaderData
                                                                                                             >,
                                                                                                             $crate::__pgrx_c_field_marker!(
                                                                                                                 @path;
@@ -2659,7 +4665,7 @@ macro_rules! BTMaxItemSizeNoHeapTid {
                                                                                                         >(
                                                                                                             $crate::__pgrx_c_macros::expression::size_of::<
                                                                                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                                    $crate::ItemIdData
+                                                                                                                    $crate::__pgrx_c_bindings::ItemIdData
                                                                                                                 >>()
                                                                                                         )
                                                                                                     )
@@ -2688,7 +4694,7 @@ macro_rules! BTMaxItemSizeNoHeapTid {
                                                                                             $crate::__pgrx_c_macros::CValue::<
                                                                                                 $crate::__pgrx_c_macros::CInt
                                                                                             >::new(
-                                                                                                $crate::MAXIMUM_ALIGNOF as i32
+                                                                                                $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                                             )
                                                                                         )
                                                                                     ),
@@ -2739,7 +4745,7 @@ macro_rules! BTMaxItemSizeNoHeapTid {
                                                                                                     $crate::__pgrx_c_macros::CValue::<
                                                                                                         $crate::__pgrx_c_macros::CInt
                                                                                                     >::new(
-                                                                                                        $crate::MAXIMUM_ALIGNOF as i32
+                                                                                                        $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                                                     )
                                                                                                 )
                                                                                             ),
@@ -2799,7 +4805,7 @@ macro_rules! BTMaxItemSizeNoHeapTid {
                                                                                 >(
                                                                                     $crate::__pgrx_c_macros::expression::size_of::<
                                                                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                            $crate::BTPageOpaqueData
+                                                                                            $crate::__pgrx_c_bindings::BTPageOpaqueData
                                                                                         >>()
                                                                                 )
                                                                             )
@@ -2824,7 +4830,7 @@ macro_rules! BTMaxItemSizeNoHeapTid {
                                                                                     $crate::__pgrx_c_macros::CValue::<
                                                                                         $crate::__pgrx_c_macros::CInt
                                                                                     >::new(
-                                                                                        $crate::MAXIMUM_ALIGNOF as i32
+                                                                                        $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                                     )
                                                                                 )
                                                                             ),
@@ -2875,7 +4881,7 @@ macro_rules! BTMaxItemSizeNoHeapTid {
                                                                                             $crate::__pgrx_c_macros::CValue::<
                                                                                                 $crate::__pgrx_c_macros::CInt
                                                                                             >::new(
-                                                                                                $crate::MAXIMUM_ALIGNOF as i32
+                                                                                                $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                                             )
                                                                                         )
                                                                                     ),
@@ -2951,7 +4957,7 @@ macro_rules! BTMaxItemSizeNoHeapTid {
                                                                             usize
                                                                         > as $crate::__pgrx_c_macros::expression::CType
                                                                     >::from_storage(
-                                                                        $crate::PageGetPageSize(
+                                                                        $crate::__pgrx_c_bindings::PageGetPageSize(
                                                                             <
                                                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                                                     $crate::__pgrx_c_macros::expression::CIntegerStorage<
@@ -3030,7 +5036,7 @@ macro_rules! BTMaxItemSizeNoHeapTid {
                                                                                                                     >(
                                                                                                                         $crate::__pgrx_c_macros::expression::offset_of::<
                                                                                                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                                                $crate::PageHeaderData
+                                                                                                                                $crate::__pgrx_c_bindings::PageHeaderData
                                                                                                                             >,
                                                                                                                             $crate::__pgrx_c_field_marker!(
                                                                                                                                 @path;
@@ -3064,7 +5070,7 @@ macro_rules! BTMaxItemSizeNoHeapTid {
                                                                                                                         >(
                                                                                                                             $crate::__pgrx_c_macros::expression::size_of::<
                                                                                                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                                                    $crate::ItemIdData
+                                                                                                                                    $crate::__pgrx_c_bindings::ItemIdData
                                                                                                                                 >>()
                                                                                                                         )
                                                                                                                     )
@@ -3093,7 +5099,7 @@ macro_rules! BTMaxItemSizeNoHeapTid {
                                                                                                             $crate::__pgrx_c_macros::CValue::<
                                                                                                                 $crate::__pgrx_c_macros::CInt
                                                                                                             >::new(
-                                                                                                                $crate::MAXIMUM_ALIGNOF as i32
+                                                                                                                $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                                                             )
                                                                                                         )
                                                                                                     ),
@@ -3146,7 +5152,7 @@ macro_rules! BTMaxItemSizeNoHeapTid {
                                                                                                                     $crate::__pgrx_c_macros::CValue::<
                                                                                                                         $crate::__pgrx_c_macros::CInt
                                                                                                                     >::new(
-                                                                                                                        $crate::MAXIMUM_ALIGNOF as i32
+                                                                                                                        $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                                                                     )
                                                                                                                 )
                                                                                                             ),
@@ -3206,7 +5212,7 @@ macro_rules! BTMaxItemSizeNoHeapTid {
                                                                                                 >(
                                                                                                     $crate::__pgrx_c_macros::expression::size_of::<
                                                                                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                            $crate::BTPageOpaqueData
+                                                                                                            $crate::__pgrx_c_bindings::BTPageOpaqueData
                                                                                                         >>()
                                                                                                 )
                                                                                             )
@@ -3231,7 +5237,7 @@ macro_rules! BTMaxItemSizeNoHeapTid {
                                                                                                     $crate::__pgrx_c_macros::CValue::<
                                                                                                         $crate::__pgrx_c_macros::CInt
                                                                                                     >::new(
-                                                                                                        $crate::MAXIMUM_ALIGNOF as i32
+                                                                                                        $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                                                     )
                                                                                                 )
                                                                                             ),
@@ -3284,7 +5290,7 @@ macro_rules! BTMaxItemSizeNoHeapTid {
                                                                                                             $crate::__pgrx_c_macros::CValue::<
                                                                                                                 $crate::__pgrx_c_macros::CInt
                                                                                                             >::new(
-                                                                                                                $crate::MAXIMUM_ALIGNOF as i32
+                                                                                                                $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                                                             )
                                                                                                         )
                                                                                                     ),
@@ -3369,7 +5375,7 @@ macro_rules! BTMaxItemSizeNoHeapTid {
                                                             usize
                                                         > as $crate::__pgrx_c_macros::expression::CType
                                                     >::from_storage(
-                                                        $crate::PageGetPageSize(
+                                                        $crate::__pgrx_c_bindings::PageGetPageSize(
                                                             <
                                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                                     $crate::__pgrx_c_macros::expression::CIntegerStorage<
@@ -3446,7 +5452,7 @@ macro_rules! BTMaxItemSizeNoHeapTid {
                                                                                                     >(
                                                                                                         $crate::__pgrx_c_macros::expression::offset_of::<
                                                                                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                                $crate::PageHeaderData
+                                                                                                                $crate::__pgrx_c_bindings::PageHeaderData
                                                                                                             >,
                                                                                                             $crate::__pgrx_c_field_marker!(
                                                                                                                 @path;
@@ -3480,7 +5486,7 @@ macro_rules! BTMaxItemSizeNoHeapTid {
                                                                                                         >(
                                                                                                             $crate::__pgrx_c_macros::expression::size_of::<
                                                                                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                                    $crate::ItemIdData
+                                                                                                                    $crate::__pgrx_c_bindings::ItemIdData
                                                                                                                 >>()
                                                                                                         )
                                                                                                     )
@@ -3509,7 +5515,7 @@ macro_rules! BTMaxItemSizeNoHeapTid {
                                                                                             $crate::__pgrx_c_macros::CValue::<
                                                                                                 $crate::__pgrx_c_macros::CInt
                                                                                             >::new(
-                                                                                                $crate::MAXIMUM_ALIGNOF as i32
+                                                                                                $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                                             )
                                                                                         )
                                                                                     ),
@@ -3560,7 +5566,7 @@ macro_rules! BTMaxItemSizeNoHeapTid {
                                                                                                     $crate::__pgrx_c_macros::CValue::<
                                                                                                         $crate::__pgrx_c_macros::CInt
                                                                                                     >::new(
-                                                                                                        $crate::MAXIMUM_ALIGNOF as i32
+                                                                                                        $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                                                     )
                                                                                                 )
                                                                                             ),
@@ -3620,7 +5626,7 @@ macro_rules! BTMaxItemSizeNoHeapTid {
                                                                                 >(
                                                                                     $crate::__pgrx_c_macros::expression::size_of::<
                                                                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                            $crate::BTPageOpaqueData
+                                                                                            $crate::__pgrx_c_bindings::BTPageOpaqueData
                                                                                         >>()
                                                                                 )
                                                                             )
@@ -3645,7 +5651,7 @@ macro_rules! BTMaxItemSizeNoHeapTid {
                                                                                     $crate::__pgrx_c_macros::CValue::<
                                                                                         $crate::__pgrx_c_macros::CInt
                                                                                     >::new(
-                                                                                        $crate::MAXIMUM_ALIGNOF as i32
+                                                                                        $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                                     )
                                                                                 )
                                                                             ),
@@ -3696,7 +5702,7 @@ macro_rules! BTMaxItemSizeNoHeapTid {
                                                                                             $crate::__pgrx_c_macros::CValue::<
                                                                                                 $crate::__pgrx_c_macros::CInt
                                                                                             >::new(
-                                                                                                $crate::MAXIMUM_ALIGNOF as i32
+                                                                                                $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                                             )
                                                                                         )
                                                                                     ),
@@ -3772,7 +5778,7 @@ macro_rules! BTMaxItemSizeNoHeapTid {
                                                                             usize
                                                                         > as $crate::__pgrx_c_macros::expression::CType
                                                                     >::from_storage(
-                                                                        $crate::PageGetPageSize(
+                                                                        $crate::__pgrx_c_bindings::PageGetPageSize(
                                                                             <
                                                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                                                     $crate::__pgrx_c_macros::expression::CIntegerStorage<
@@ -3851,7 +5857,7 @@ macro_rules! BTMaxItemSizeNoHeapTid {
                                                                                                                     >(
                                                                                                                         $crate::__pgrx_c_macros::expression::offset_of::<
                                                                                                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                                                $crate::PageHeaderData
+                                                                                                                                $crate::__pgrx_c_bindings::PageHeaderData
                                                                                                                             >,
                                                                                                                             $crate::__pgrx_c_field_marker!(
                                                                                                                                 @path;
@@ -3885,7 +5891,7 @@ macro_rules! BTMaxItemSizeNoHeapTid {
                                                                                                                         >(
                                                                                                                             $crate::__pgrx_c_macros::expression::size_of::<
                                                                                                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                                                    $crate::ItemIdData
+                                                                                                                                    $crate::__pgrx_c_bindings::ItemIdData
                                                                                                                                 >>()
                                                                                                                         )
                                                                                                                     )
@@ -3914,7 +5920,7 @@ macro_rules! BTMaxItemSizeNoHeapTid {
                                                                                                             $crate::__pgrx_c_macros::CValue::<
                                                                                                                 $crate::__pgrx_c_macros::CInt
                                                                                                             >::new(
-                                                                                                                $crate::MAXIMUM_ALIGNOF as i32
+                                                                                                                $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                                                             )
                                                                                                         )
                                                                                                     ),
@@ -3967,7 +5973,7 @@ macro_rules! BTMaxItemSizeNoHeapTid {
                                                                                                                     $crate::__pgrx_c_macros::CValue::<
                                                                                                                         $crate::__pgrx_c_macros::CInt
                                                                                                                     >::new(
-                                                                                                                        $crate::MAXIMUM_ALIGNOF as i32
+                                                                                                                        $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                                                                     )
                                                                                                                 )
                                                                                                             ),
@@ -4027,7 +6033,7 @@ macro_rules! BTMaxItemSizeNoHeapTid {
                                                                                                 >(
                                                                                                     $crate::__pgrx_c_macros::expression::size_of::<
                                                                                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                            $crate::BTPageOpaqueData
+                                                                                                            $crate::__pgrx_c_bindings::BTPageOpaqueData
                                                                                                         >>()
                                                                                                 )
                                                                                             )
@@ -4052,7 +6058,7 @@ macro_rules! BTMaxItemSizeNoHeapTid {
                                                                                                     $crate::__pgrx_c_macros::CValue::<
                                                                                                         $crate::__pgrx_c_macros::CInt
                                                                                                     >::new(
-                                                                                                        $crate::MAXIMUM_ALIGNOF as i32
+                                                                                                        $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                                                     )
                                                                                                 )
                                                                                             ),
@@ -4105,7 +6111,7 @@ macro_rules! BTMaxItemSizeNoHeapTid {
                                                                                                             $crate::__pgrx_c_macros::CValue::<
                                                                                                                 $crate::__pgrx_c_macros::CInt
                                                                                                             >::new(
-                                                                                                                $crate::MAXIMUM_ALIGNOF as i32
+                                                                                                                $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                                                             )
                                                                                                         )
                                                                                                     ),
@@ -4190,7 +6196,7 @@ macro_rules! BTMaxItemSizeNoHeapTid {
                                                             usize
                                                         > as $crate::__pgrx_c_macros::expression::CType
                                                     >::from_storage(
-                                                        $crate::PageGetPageSize(
+                                                        $crate::__pgrx_c_bindings::PageGetPageSize(
                                                             <
                                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                                     $crate::__pgrx_c_macros::expression::CIntegerStorage<
@@ -4267,7 +6273,7 @@ macro_rules! BTMaxItemSizeNoHeapTid {
                                                                                                     >(
                                                                                                         $crate::__pgrx_c_macros::expression::offset_of::<
                                                                                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                                $crate::PageHeaderData
+                                                                                                                $crate::__pgrx_c_bindings::PageHeaderData
                                                                                                             >,
                                                                                                             $crate::__pgrx_c_field_marker!(
                                                                                                                 @path;
@@ -4301,7 +6307,7 @@ macro_rules! BTMaxItemSizeNoHeapTid {
                                                                                                         >(
                                                                                                             $crate::__pgrx_c_macros::expression::size_of::<
                                                                                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                                    $crate::ItemIdData
+                                                                                                                    $crate::__pgrx_c_bindings::ItemIdData
                                                                                                                 >>()
                                                                                                         )
                                                                                                     )
@@ -4330,7 +6336,7 @@ macro_rules! BTMaxItemSizeNoHeapTid {
                                                                                             $crate::__pgrx_c_macros::CValue::<
                                                                                                 $crate::__pgrx_c_macros::CInt
                                                                                             >::new(
-                                                                                                $crate::MAXIMUM_ALIGNOF as i32
+                                                                                                $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                                             )
                                                                                         )
                                                                                     ),
@@ -4381,7 +6387,7 @@ macro_rules! BTMaxItemSizeNoHeapTid {
                                                                                                     $crate::__pgrx_c_macros::CValue::<
                                                                                                         $crate::__pgrx_c_macros::CInt
                                                                                                     >::new(
-                                                                                                        $crate::MAXIMUM_ALIGNOF as i32
+                                                                                                        $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                                                     )
                                                                                                 )
                                                                                             ),
@@ -4441,7 +6447,7 @@ macro_rules! BTMaxItemSizeNoHeapTid {
                                                                                 >(
                                                                                     $crate::__pgrx_c_macros::expression::size_of::<
                                                                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                            $crate::BTPageOpaqueData
+                                                                                            $crate::__pgrx_c_bindings::BTPageOpaqueData
                                                                                         >>()
                                                                                 )
                                                                             )
@@ -4466,7 +6472,7 @@ macro_rules! BTMaxItemSizeNoHeapTid {
                                                                                     $crate::__pgrx_c_macros::CValue::<
                                                                                         $crate::__pgrx_c_macros::CInt
                                                                                     >::new(
-                                                                                        $crate::MAXIMUM_ALIGNOF as i32
+                                                                                        $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                                     )
                                                                                 )
                                                                             ),
@@ -4517,7 +6523,7 @@ macro_rules! BTMaxItemSizeNoHeapTid {
                                                                                             $crate::__pgrx_c_macros::CValue::<
                                                                                                 $crate::__pgrx_c_macros::CInt
                                                                                             >::new(
-                                                                                                $crate::MAXIMUM_ALIGNOF as i32
+                                                                                                $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                                             )
                                                                                         )
                                                                                     ),
@@ -4593,7 +6599,7 @@ macro_rules! BTMaxItemSizeNoHeapTid {
                                                                             usize
                                                                         > as $crate::__pgrx_c_macros::expression::CType
                                                                     >::from_storage(
-                                                                        $crate::PageGetPageSize(
+                                                                        $crate::__pgrx_c_bindings::PageGetPageSize(
                                                                             <
                                                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                                                     $crate::__pgrx_c_macros::expression::CIntegerStorage<
@@ -4672,7 +6678,7 @@ macro_rules! BTMaxItemSizeNoHeapTid {
                                                                                                                     >(
                                                                                                                         $crate::__pgrx_c_macros::expression::offset_of::<
                                                                                                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                                                $crate::PageHeaderData
+                                                                                                                                $crate::__pgrx_c_bindings::PageHeaderData
                                                                                                                             >,
                                                                                                                             $crate::__pgrx_c_field_marker!(
                                                                                                                                 @path;
@@ -4706,7 +6712,7 @@ macro_rules! BTMaxItemSizeNoHeapTid {
                                                                                                                         >(
                                                                                                                             $crate::__pgrx_c_macros::expression::size_of::<
                                                                                                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                                                    $crate::ItemIdData
+                                                                                                                                    $crate::__pgrx_c_bindings::ItemIdData
                                                                                                                                 >>()
                                                                                                                         )
                                                                                                                     )
@@ -4735,7 +6741,7 @@ macro_rules! BTMaxItemSizeNoHeapTid {
                                                                                                             $crate::__pgrx_c_macros::CValue::<
                                                                                                                 $crate::__pgrx_c_macros::CInt
                                                                                                             >::new(
-                                                                                                                $crate::MAXIMUM_ALIGNOF as i32
+                                                                                                                $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                                                             )
                                                                                                         )
                                                                                                     ),
@@ -4788,7 +6794,7 @@ macro_rules! BTMaxItemSizeNoHeapTid {
                                                                                                                     $crate::__pgrx_c_macros::CValue::<
                                                                                                                         $crate::__pgrx_c_macros::CInt
                                                                                                                     >::new(
-                                                                                                                        $crate::MAXIMUM_ALIGNOF as i32
+                                                                                                                        $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                                                                     )
                                                                                                                 )
                                                                                                             ),
@@ -4848,7 +6854,7 @@ macro_rules! BTMaxItemSizeNoHeapTid {
                                                                                                 >(
                                                                                                     $crate::__pgrx_c_macros::expression::size_of::<
                                                                                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                            $crate::BTPageOpaqueData
+                                                                                                            $crate::__pgrx_c_bindings::BTPageOpaqueData
                                                                                                         >>()
                                                                                                 )
                                                                                             )
@@ -4873,7 +6879,7 @@ macro_rules! BTMaxItemSizeNoHeapTid {
                                                                                                     $crate::__pgrx_c_macros::CValue::<
                                                                                                         $crate::__pgrx_c_macros::CInt
                                                                                                     >::new(
-                                                                                                        $crate::MAXIMUM_ALIGNOF as i32
+                                                                                                        $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                                                     )
                                                                                                 )
                                                                                             ),
@@ -4926,7 +6932,7 @@ macro_rules! BTMaxItemSizeNoHeapTid {
                                                                                                             $crate::__pgrx_c_macros::CValue::<
                                                                                                                 $crate::__pgrx_c_macros::CInt
                                                                                                             >::new(
-                                                                                                                $crate::MAXIMUM_ALIGNOF as i32
+                                                                                                                $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                                                             )
                                                                                                         )
                                                                                                     ),
@@ -5011,7 +7017,7 @@ macro_rules! BTMaxItemSizeNoHeapTid {
                                                             usize
                                                         > as $crate::__pgrx_c_macros::expression::CType
                                                     >::from_storage(
-                                                        $crate::PageGetPageSize(
+                                                        $crate::__pgrx_c_bindings::PageGetPageSize(
                                                             <
                                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                                     $crate::__pgrx_c_macros::expression::CIntegerStorage<
@@ -5088,7 +7094,7 @@ macro_rules! BTMaxItemSizeNoHeapTid {
                                                                                                     >(
                                                                                                         $crate::__pgrx_c_macros::expression::offset_of::<
                                                                                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                                $crate::PageHeaderData
+                                                                                                                $crate::__pgrx_c_bindings::PageHeaderData
                                                                                                             >,
                                                                                                             $crate::__pgrx_c_field_marker!(
                                                                                                                 @path;
@@ -5122,7 +7128,7 @@ macro_rules! BTMaxItemSizeNoHeapTid {
                                                                                                         >(
                                                                                                             $crate::__pgrx_c_macros::expression::size_of::<
                                                                                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                                    $crate::ItemIdData
+                                                                                                                    $crate::__pgrx_c_bindings::ItemIdData
                                                                                                                 >>()
                                                                                                         )
                                                                                                     )
@@ -5151,7 +7157,7 @@ macro_rules! BTMaxItemSizeNoHeapTid {
                                                                                             $crate::__pgrx_c_macros::CValue::<
                                                                                                 $crate::__pgrx_c_macros::CInt
                                                                                             >::new(
-                                                                                                $crate::MAXIMUM_ALIGNOF as i32
+                                                                                                $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                                             )
                                                                                         )
                                                                                     ),
@@ -5202,7 +7208,7 @@ macro_rules! BTMaxItemSizeNoHeapTid {
                                                                                                     $crate::__pgrx_c_macros::CValue::<
                                                                                                         $crate::__pgrx_c_macros::CInt
                                                                                                     >::new(
-                                                                                                        $crate::MAXIMUM_ALIGNOF as i32
+                                                                                                        $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                                                     )
                                                                                                 )
                                                                                             ),
@@ -5262,7 +7268,7 @@ macro_rules! BTMaxItemSizeNoHeapTid {
                                                                                 >(
                                                                                     $crate::__pgrx_c_macros::expression::size_of::<
                                                                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                            $crate::BTPageOpaqueData
+                                                                                            $crate::__pgrx_c_bindings::BTPageOpaqueData
                                                                                         >>()
                                                                                 )
                                                                             )
@@ -5287,7 +7293,7 @@ macro_rules! BTMaxItemSizeNoHeapTid {
                                                                                     $crate::__pgrx_c_macros::CValue::<
                                                                                         $crate::__pgrx_c_macros::CInt
                                                                                     >::new(
-                                                                                        $crate::MAXIMUM_ALIGNOF as i32
+                                                                                        $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                                     )
                                                                                 )
                                                                             ),
@@ -5338,7 +7344,7 @@ macro_rules! BTMaxItemSizeNoHeapTid {
                                                                                             $crate::__pgrx_c_macros::CValue::<
                                                                                                 $crate::__pgrx_c_macros::CInt
                                                                                             >::new(
-                                                                                                $crate::MAXIMUM_ALIGNOF as i32
+                                                                                                $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                                             )
                                                                                         )
                                                                                     ),
@@ -5414,7 +7420,7 @@ macro_rules! BTMaxItemSizeNoHeapTid {
                                                                             usize
                                                                         > as $crate::__pgrx_c_macros::expression::CType
                                                                     >::from_storage(
-                                                                        $crate::PageGetPageSize(
+                                                                        $crate::__pgrx_c_bindings::PageGetPageSize(
                                                                             <
                                                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                                                     $crate::__pgrx_c_macros::expression::CIntegerStorage<
@@ -5493,7 +7499,7 @@ macro_rules! BTMaxItemSizeNoHeapTid {
                                                                                                                     >(
                                                                                                                         $crate::__pgrx_c_macros::expression::offset_of::<
                                                                                                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                                                $crate::PageHeaderData
+                                                                                                                                $crate::__pgrx_c_bindings::PageHeaderData
                                                                                                                             >,
                                                                                                                             $crate::__pgrx_c_field_marker!(
                                                                                                                                 @path;
@@ -5527,7 +7533,7 @@ macro_rules! BTMaxItemSizeNoHeapTid {
                                                                                                                         >(
                                                                                                                             $crate::__pgrx_c_macros::expression::size_of::<
                                                                                                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                                                    $crate::ItemIdData
+                                                                                                                                    $crate::__pgrx_c_bindings::ItemIdData
                                                                                                                                 >>()
                                                                                                                         )
                                                                                                                     )
@@ -5556,7 +7562,7 @@ macro_rules! BTMaxItemSizeNoHeapTid {
                                                                                                             $crate::__pgrx_c_macros::CValue::<
                                                                                                                 $crate::__pgrx_c_macros::CInt
                                                                                                             >::new(
-                                                                                                                $crate::MAXIMUM_ALIGNOF as i32
+                                                                                                                $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                                                             )
                                                                                                         )
                                                                                                     ),
@@ -5609,7 +7615,7 @@ macro_rules! BTMaxItemSizeNoHeapTid {
                                                                                                                     $crate::__pgrx_c_macros::CValue::<
                                                                                                                         $crate::__pgrx_c_macros::CInt
                                                                                                                     >::new(
-                                                                                                                        $crate::MAXIMUM_ALIGNOF as i32
+                                                                                                                        $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                                                                     )
                                                                                                                 )
                                                                                                             ),
@@ -5669,7 +7675,7 @@ macro_rules! BTMaxItemSizeNoHeapTid {
                                                                                                 >(
                                                                                                     $crate::__pgrx_c_macros::expression::size_of::<
                                                                                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                            $crate::BTPageOpaqueData
+                                                                                                            $crate::__pgrx_c_bindings::BTPageOpaqueData
                                                                                                         >>()
                                                                                                 )
                                                                                             )
@@ -5694,7 +7700,7 @@ macro_rules! BTMaxItemSizeNoHeapTid {
                                                                                                     $crate::__pgrx_c_macros::CValue::<
                                                                                                         $crate::__pgrx_c_macros::CInt
                                                                                                     >::new(
-                                                                                                        $crate::MAXIMUM_ALIGNOF as i32
+                                                                                                        $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                                                     )
                                                                                                 )
                                                                                             ),
@@ -5747,7 +7753,7 @@ macro_rules! BTMaxItemSizeNoHeapTid {
                                                                                                             $crate::__pgrx_c_macros::CValue::<
                                                                                                                 $crate::__pgrx_c_macros::CInt
                                                                                                             >::new(
-                                                                                                                $crate::MAXIMUM_ALIGNOF as i32
+                                                                                                                $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                                                             )
                                                                                                         )
                                                                                                     ),
@@ -5832,7 +7838,7 @@ macro_rules! BTMaxItemSizeNoHeapTid {
                                                             usize
                                                         > as $crate::__pgrx_c_macros::expression::CType
                                                     >::from_storage(
-                                                        $crate::PageGetPageSize(
+                                                        $crate::__pgrx_c_bindings::PageGetPageSize(
                                                             <
                                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                                     $crate::__pgrx_c_macros::expression::CIntegerStorage<
@@ -5909,7 +7915,7 @@ macro_rules! BTMaxItemSizeNoHeapTid {
                                                                                                     >(
                                                                                                         $crate::__pgrx_c_macros::expression::offset_of::<
                                                                                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                                $crate::PageHeaderData
+                                                                                                                $crate::__pgrx_c_bindings::PageHeaderData
                                                                                                             >,
                                                                                                             $crate::__pgrx_c_field_marker!(
                                                                                                                 @path;
@@ -5943,7 +7949,7 @@ macro_rules! BTMaxItemSizeNoHeapTid {
                                                                                                         >(
                                                                                                             $crate::__pgrx_c_macros::expression::size_of::<
                                                                                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                                    $crate::ItemIdData
+                                                                                                                    $crate::__pgrx_c_bindings::ItemIdData
                                                                                                                 >>()
                                                                                                         )
                                                                                                     )
@@ -5972,7 +7978,7 @@ macro_rules! BTMaxItemSizeNoHeapTid {
                                                                                             $crate::__pgrx_c_macros::CValue::<
                                                                                                 $crate::__pgrx_c_macros::CInt
                                                                                             >::new(
-                                                                                                $crate::MAXIMUM_ALIGNOF as i32
+                                                                                                $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                                             )
                                                                                         )
                                                                                     ),
@@ -6023,7 +8029,7 @@ macro_rules! BTMaxItemSizeNoHeapTid {
                                                                                                     $crate::__pgrx_c_macros::CValue::<
                                                                                                         $crate::__pgrx_c_macros::CInt
                                                                                                     >::new(
-                                                                                                        $crate::MAXIMUM_ALIGNOF as i32
+                                                                                                        $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                                                     )
                                                                                                 )
                                                                                             ),
@@ -6083,7 +8089,7 @@ macro_rules! BTMaxItemSizeNoHeapTid {
                                                                                 >(
                                                                                     $crate::__pgrx_c_macros::expression::size_of::<
                                                                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                            $crate::BTPageOpaqueData
+                                                                                            $crate::__pgrx_c_bindings::BTPageOpaqueData
                                                                                         >>()
                                                                                 )
                                                                             )
@@ -6108,7 +8114,7 @@ macro_rules! BTMaxItemSizeNoHeapTid {
                                                                                     $crate::__pgrx_c_macros::CValue::<
                                                                                         $crate::__pgrx_c_macros::CInt
                                                                                     >::new(
-                                                                                        $crate::MAXIMUM_ALIGNOF as i32
+                                                                                        $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                                     )
                                                                                 )
                                                                             ),
@@ -6159,7 +8165,7 @@ macro_rules! BTMaxItemSizeNoHeapTid {
                                                                                             $crate::__pgrx_c_macros::CValue::<
                                                                                                 $crate::__pgrx_c_macros::CInt
                                                                                             >::new(
-                                                                                                $crate::MAXIMUM_ALIGNOF as i32
+                                                                                                $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                                             )
                                                                                         )
                                                                                     ),
@@ -6235,7 +8241,7 @@ macro_rules! BTMaxItemSizeNoHeapTid {
                                                                             usize
                                                                         > as $crate::__pgrx_c_macros::expression::CType
                                                                     >::from_storage(
-                                                                        $crate::PageGetPageSize(
+                                                                        $crate::__pgrx_c_bindings::PageGetPageSize(
                                                                             <
                                                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                                                     $crate::__pgrx_c_macros::expression::CIntegerStorage<
@@ -6314,7 +8320,7 @@ macro_rules! BTMaxItemSizeNoHeapTid {
                                                                                                                     >(
                                                                                                                         $crate::__pgrx_c_macros::expression::offset_of::<
                                                                                                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                                                $crate::PageHeaderData
+                                                                                                                                $crate::__pgrx_c_bindings::PageHeaderData
                                                                                                                             >,
                                                                                                                             $crate::__pgrx_c_field_marker!(
                                                                                                                                 @path;
@@ -6348,7 +8354,7 @@ macro_rules! BTMaxItemSizeNoHeapTid {
                                                                                                                         >(
                                                                                                                             $crate::__pgrx_c_macros::expression::size_of::<
                                                                                                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                                                    $crate::ItemIdData
+                                                                                                                                    $crate::__pgrx_c_bindings::ItemIdData
                                                                                                                                 >>()
                                                                                                                         )
                                                                                                                     )
@@ -6377,7 +8383,7 @@ macro_rules! BTMaxItemSizeNoHeapTid {
                                                                                                             $crate::__pgrx_c_macros::CValue::<
                                                                                                                 $crate::__pgrx_c_macros::CInt
                                                                                                             >::new(
-                                                                                                                $crate::MAXIMUM_ALIGNOF as i32
+                                                                                                                $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                                                             )
                                                                                                         )
                                                                                                     ),
@@ -6430,7 +8436,7 @@ macro_rules! BTMaxItemSizeNoHeapTid {
                                                                                                                     $crate::__pgrx_c_macros::CValue::<
                                                                                                                         $crate::__pgrx_c_macros::CInt
                                                                                                                     >::new(
-                                                                                                                        $crate::MAXIMUM_ALIGNOF as i32
+                                                                                                                        $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                                                                     )
                                                                                                                 )
                                                                                                             ),
@@ -6490,7 +8496,7 @@ macro_rules! BTMaxItemSizeNoHeapTid {
                                                                                                 >(
                                                                                                     $crate::__pgrx_c_macros::expression::size_of::<
                                                                                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                            $crate::BTPageOpaqueData
+                                                                                                            $crate::__pgrx_c_bindings::BTPageOpaqueData
                                                                                                         >>()
                                                                                                 )
                                                                                             )
@@ -6515,7 +8521,7 @@ macro_rules! BTMaxItemSizeNoHeapTid {
                                                                                                     $crate::__pgrx_c_macros::CValue::<
                                                                                                         $crate::__pgrx_c_macros::CInt
                                                                                                     >::new(
-                                                                                                        $crate::MAXIMUM_ALIGNOF as i32
+                                                                                                        $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                                                     )
                                                                                                 )
                                                                                             ),
@@ -6568,7 +8574,7 @@ macro_rules! BTMaxItemSizeNoHeapTid {
                                                                                                             $crate::__pgrx_c_macros::CValue::<
                                                                                                                 $crate::__pgrx_c_macros::CInt
                                                                                                             >::new(
-                                                                                                                $crate::MAXIMUM_ALIGNOF as i32
+                                                                                                                $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                                                             )
                                                                                                         )
                                                                                                     ),
@@ -6625,8 +8631,344 @@ macro_rules! BTMaxItemSizeNoHeapTid {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
+    target_pointer_width = "64",
+    target_endian = "little"
+)))]
+#[cfg(not(docsrs))]
+compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
+#[doc(hidden)]
+#[macro_export]
+macro_rules! __pgrx_c_args_BTPageGetDeleteXid {
+    (@collect $mode:ident [$($done:tt)*]; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_BTPageGetDeleteXid!(@p0 $mode [$($done)*]; $($raw)*)
+    };
+    (@classified [$next:ident $mode:ident [$($done:tt)*] [$($rest:tt)*]] $descriptor:tt) => {
+        $crate::__pgrx_c_args_BTPageGetDeleteXid!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
+    };
+    (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
+        $crate::__pgrx_c_args_BTPageGetDeleteXid!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
+    };
+    (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
+        $crate::__pgrx_c_args_BTPageGetDeleteXid!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_BTPageGetDeleteXid!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+            $($rest)*
+        )
+    };
+    (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_BTPageGetDeleteXid!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; - $($raw:tt)*) => {
+        $crate::__pgrx_c_args_BTPageGetDeleteXid!(@negative0 $mode [$($done)*]; - $($raw)*)
+    };
+    (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
+        $crate::__pgrx_c_args_BTPageGetDeleteXid!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BTPageGetDeleteXid] [p1 $mode [$($done)*] []] [
+                $head $(::$tail)* ! $group
+            ]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; ::$head:ident $(::$tail:ident)* ! $group:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BTPageGetDeleteXid] [p1 $mode [$($done)*] []] [
+                ::$head $(::$tail)* ! $group
+            ]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; ($($inner:tt)*)) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BTPageGetDeleteXid] [p1 $mode [$($done)*] []] [($($inner)*)]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
+        $crate::__pgrx_c_args_BTPageGetDeleteXid!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
+        $crate::__pgrx_c_args_BTPageGetDeleteXid!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
+        $crate::__pgrx_c_args_BTPageGetDeleteXid!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BTPageGetDeleteXid] [p1 $mode [$($done)*] [$($rest)*]] [
+                $head $(::$tail)* ! $group
+            ]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; ::$head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BTPageGetDeleteXid] [p1 $mode [$($done)*] [$($rest)*]] [
+                ::$head $(::$tail)* ! $group
+            ]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; ($($inner:tt)*), $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BTPageGetDeleteXid] [p1 $mode [$($done)*] [$($rest)*]] [
+                ($($inner)*)
+            ]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_BTPageGetDeleteXid!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_BTPageGetDeleteXid!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*];) => {
+        $crate::BTPageGetDeleteXid!(@$mode; $($done)*)
+    };
+    ($($invalid:tt)*) => {
+        compile_error!("arguments do not satisfy this C macro's invocation contract")
+    };
+}
+/// Typed call adapter for C inline function BTPageGetDeleteXid from nbtree.h:259
+///
+/// ```c
+/// static inline FullTransactionId
+/// BTPageGetDeleteXid(Page page)
+/// {
+/// 	BTPageOpaque opaque;
+/// 	BTDeletedPageData *contents;
+///
+/// 	/* We only expect to be called with a deleted page */
+/// 	Assert(!PageIsNew(page));
+/// 	opaque = BTPageGetOpaque(page);
+/// 	Assert(P_ISDELETED(opaque));
+///
+/// 	/* pg_upgrade'd deleted page -- must be safe to delete now */
+/// 	if (!P_HAS_FULLXID(opaque))
+/// 		return FirstNormalFullTransactionId;
+///
+/// 	/* Get safexid from deleted page */
+/// 	contents = ((BTDeletedPageData *) PageGetContents(page));
+/// 	return contents->safexid;
+/// }
+/// ```
+///
+///
+/// Calls the original function through its inspected C prototype. Each operand is evaluated once and converted using C parameter assignment rules. The result retains the function's original C type; `.get()` extracts its native storage, including `()` for a void result. Native calls retain the backend thread, PostgreSQL error, and caller safety contracts of the generated guarded binding.
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+#[macro_export]
+macro_rules! BTPageGetDeleteXid {
+    (@__pgrx_emit_check_safety; $page:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $page);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_BTPageGetDeleteXid!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
+    (@__pgrx_emit_public; $page:tt $(,)?) => {
+        $crate::__pgrx_c_macros::expression_result::finish(
+            $crate::BTPageGetDeleteXid!(@__pgrx_emit_value; $page)
+        )
+    };
+    (@__pgrx_emit_value; $page:tt $(,)?) => {
+        $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+            <
+                $crate::__pgrx_c_macros::expression::CRawRecord<
+                    $crate::__pgrx_c_bindings::FullTransactionId
+                > as $crate::__pgrx_c_macros::expression::CType
+            >::from_storage(
+                $crate::__pgrx_c_generated::Inline_0b07c08dd55cce32b17a3e4a985dcda6(
+                    <
+                        $crate::__pgrx_c_macros::expression::CPointer<
+                            $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                $crate::__pgrx_c_macros::CChar,
+                                ::core::ffi::c_char
+                            >,
+                            $crate::__pgrx_c_macros::expression::ReadWrite
+                        > as $crate::__pgrx_c_macros::expression::CType
+                    >::into_storage(
+                        $crate::__pgrx_c_macros::expression::implicit::<
+                            $crate::__pgrx_c_macros::expression::CPointer<
+                                $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                    $crate::__pgrx_c_macros::CChar,
+                                    ::core::ffi::c_char
+                                >,
+                                $crate::__pgrx_c_macros::expression::ReadWrite
+                            >,
+                            _
+                        >(
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_operand!(@value [true]; $page)
+                            )
+                        )
+                    ),
+                )
+            )
+        )
+    };
+    (@__pgrx_c_value; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_BTPageGetDeleteXid!(@collect __pgrx_emit_value []; $($raw)*)
+    };
+    (@__pgrx_emit_place; $page:tt $(,)?) => {
+        compile_error!("C expression is not a place in this operation")
+    };
+    (@__pgrx_c_place; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_BTPageGetDeleteXid!(@collect __pgrx_emit_place []; $($raw)*)
+    };
+    (@__pgrx_emit_read_place; $page:tt $(,)?) => {
+        compile_error!("C expression is not a place in this operation")
+    };
+    (@__pgrx_c_read_place; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_BTPageGetDeleteXid!(@collect __pgrx_emit_read_place []; $($raw)*)
+    };
+    (@__pgrx_emit_size; $page:tt $(,)?) => {
+        $crate::__pgrx_c_macros::expression::size_of_value_type(
+            if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $page);
+                    }
+                }
+                Some(
+                    unsafe {
+                        $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                            <
+                                $crate::__pgrx_c_macros::expression::CRawRecord<
+                                    $crate::__pgrx_c_bindings::FullTransactionId
+                                > as $crate::__pgrx_c_macros::expression::CType
+                            >::from_storage(
+                                $crate::__pgrx_c_generated::Inline_0b07c08dd55cce32b17a3e4a985dcda6(
+                                    <
+                                        $crate::__pgrx_c_macros::expression::CPointer<
+                                            $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                $crate::__pgrx_c_macros::CChar,
+                                                ::core::ffi::c_char
+                                            >,
+                                            $crate::__pgrx_c_macros::expression::ReadWrite
+                                        > as $crate::__pgrx_c_macros::expression::CType
+                                    >::into_storage(
+                                        $crate::__pgrx_c_macros::expression::implicit::<
+                                            $crate::__pgrx_c_macros::expression::CPointer<
+                                                $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                    $crate::__pgrx_c_macros::CChar,
+                                                    ::core::ffi::c_char
+                                                >,
+                                                $crate::__pgrx_c_macros::expression::ReadWrite
+                                            >,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_macros::expression::profile_value::<
+                                                true,
+                                                _
+                                            >($crate::__pgrx_c_operand!(@value [true]; $page))
+                                        )
+                                    ),
+                                )
+                            )
+                        )
+                    }
+                )
+            } else {
+                None
+            }
+        )
+    };
+    (@__pgrx_c_size; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_BTPageGetDeleteXid!(@collect __pgrx_emit_size []; $($raw)*)
+    };
+    (@__pgrx_emit_discard; $page:tt $(,)?) => {
+        {
+            let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                <
+                    $crate::__pgrx_c_macros::expression::CRawRecord<
+                        $crate::__pgrx_c_bindings::FullTransactionId
+                    > as $crate::__pgrx_c_macros::expression::CType
+                >::from_storage(
+                    $crate::__pgrx_c_generated::Inline_0b07c08dd55cce32b17a3e4a985dcda6(
+                        <
+                            $crate::__pgrx_c_macros::expression::CPointer<
+                                $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                    $crate::__pgrx_c_macros::CChar,
+                                    ::core::ffi::c_char
+                                >,
+                                $crate::__pgrx_c_macros::expression::ReadWrite
+                            > as $crate::__pgrx_c_macros::expression::CType
+                        >::into_storage(
+                            $crate::__pgrx_c_macros::expression::implicit::<
+                                $crate::__pgrx_c_macros::expression::CPointer<
+                                    $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                        $crate::__pgrx_c_macros::CChar,
+                                        ::core::ffi::c_char
+                                    >,
+                                    $crate::__pgrx_c_macros::expression::ReadWrite
+                                >,
+                                _
+                            >(
+                                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                    $crate::__pgrx_c_operand!(@value [true]; $page)
+                                )
+                            )
+                        ),
+                    )
+                )
+            );
+        }
+    };
+    (@__pgrx_c_discard; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_BTPageGetDeleteXid!(@collect __pgrx_emit_discard []; $($raw)*)
+    };
+    ($($raw:tt)*) => {
+        $crate::__pgrx_c_args_BTPageGetDeleteXid!(@collect __pgrx_emit_public []; $($raw)*)
+    };
+}
+
+#[cfg(not(all(
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -6653,20 +8995,24 @@ macro_rules! __pgrx_c_args_BTPageGetMeta {
         $crate::__pgrx_c_args_BTPageGetMeta!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_BTPageGetMeta!(@p1 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_BTPageGetMeta!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_BTPageGetMeta!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_BTPageGetMeta!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_BTPageGetMeta!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_BTPageGetMeta!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -6674,7 +9020,9 @@ macro_rules! __pgrx_c_args_BTPageGetMeta {
         $crate::__pgrx_c_args_BTPageGetMeta!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_BTPageGetMeta!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_BTPageGetMeta!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -6696,14 +9044,18 @@ macro_rules! __pgrx_c_args_BTPageGetMeta {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_BTPageGetMeta!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_BTPageGetMeta!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_BTPageGetMeta!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_BTPageGetMeta!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_BTPageGetMeta!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -6730,13 +9082,13 @@ macro_rules! __pgrx_c_args_BTPageGetMeta {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_BTPageGetMeta!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_BTPageGetMeta!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -6782,9 +9134,11 @@ macro_rules! BTPageGetMeta {
         (
             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::cast_as::<
-                    *mut $crate::BTMetaPageData,
+                    *mut $crate::__pgrx_c_bindings::BTMetaPageData,
                     $crate::__pgrx_c_macros::expression::CPointer<
-                        $crate::__pgrx_c_macros::expression::CRecord<$crate::BTMetaPageData>,
+                        $crate::__pgrx_c_macros::expression::CRecord<
+                            $crate::__pgrx_c_bindings::BTMetaPageData
+                        >,
                         $crate::__pgrx_c_macros::expression::ReadWrite
                     >,
                     _
@@ -6799,7 +9153,7 @@ macro_rules! BTPageGetMeta {
                                 $crate::__pgrx_c_macros::expression::ReadWrite
                             > as $crate::__pgrx_c_macros::expression::CType
                         >::from_storage(
-                            $crate::PageGetContents(
+                            $crate::__pgrx_c_bindings::PageGetContents(
                                 <
                                     $crate::__pgrx_c_macros::expression::CPointer<
                                         $crate::__pgrx_c_macros::expression::CIntegerStorage<
@@ -6859,10 +9213,10 @@ macro_rules! BTPageGetMeta {
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::cast_as::<
-                                *mut $crate::BTMetaPageData,
+                                *mut $crate::__pgrx_c_bindings::BTMetaPageData,
                                 $crate::__pgrx_c_macros::expression::CPointer<
                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                        $crate::BTMetaPageData
+                                        $crate::__pgrx_c_bindings::BTMetaPageData
                                     >,
                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                 >,
@@ -6878,7 +9232,7 @@ macro_rules! BTPageGetMeta {
                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::from_storage(
-                                        $crate::PageGetContents(
+                                        $crate::__pgrx_c_bindings::PageGetContents(
                                             <
                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                     $crate::__pgrx_c_macros::expression::CIntegerStorage<
@@ -6923,9 +9277,11 @@ macro_rules! BTPageGetMeta {
         {
             let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::cast_as::<
-                    *mut $crate::BTMetaPageData,
+                    *mut $crate::__pgrx_c_bindings::BTMetaPageData,
                     $crate::__pgrx_c_macros::expression::CPointer<
-                        $crate::__pgrx_c_macros::expression::CRecord<$crate::BTMetaPageData>,
+                        $crate::__pgrx_c_macros::expression::CRecord<
+                            $crate::__pgrx_c_bindings::BTMetaPageData
+                        >,
                         $crate::__pgrx_c_macros::expression::ReadWrite
                     >,
                     _
@@ -6940,7 +9296,7 @@ macro_rules! BTPageGetMeta {
                                 $crate::__pgrx_c_macros::expression::ReadWrite
                             > as $crate::__pgrx_c_macros::expression::CType
                         >::from_storage(
-                            $crate::PageGetContents(
+                            $crate::__pgrx_c_bindings::PageGetContents(
                                 <
                                     $crate::__pgrx_c_macros::expression::CPointer<
                                         $crate::__pgrx_c_macros::expression::CIntegerStorage<
@@ -6982,8 +9338,8 @@ macro_rules! BTPageGetMeta {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -7010,20 +9366,24 @@ macro_rules! __pgrx_c_args_BTPageGetOpaque {
         $crate::__pgrx_c_args_BTPageGetOpaque!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_BTPageGetOpaque!(@p1 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_BTPageGetOpaque!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_BTPageGetOpaque!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_BTPageGetOpaque!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_BTPageGetOpaque!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_BTPageGetOpaque!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -7031,7 +9391,9 @@ macro_rules! __pgrx_c_args_BTPageGetOpaque {
         $crate::__pgrx_c_args_BTPageGetOpaque!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_BTPageGetOpaque!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_BTPageGetOpaque!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -7053,14 +9415,18 @@ macro_rules! __pgrx_c_args_BTPageGetOpaque {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_BTPageGetOpaque!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_BTPageGetOpaque!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_BTPageGetOpaque!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_BTPageGetOpaque!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_BTPageGetOpaque!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -7087,13 +9453,13 @@ macro_rules! __pgrx_c_args_BTPageGetOpaque {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_BTPageGetOpaque!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_BTPageGetOpaque!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -7139,9 +9505,11 @@ macro_rules! BTPageGetOpaque {
         (
             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::cast_as::<
-                    $crate::BTPageOpaque,
+                    $crate::__pgrx_c_bindings::BTPageOpaque,
                     $crate::__pgrx_c_macros::expression::CPointer<
-                        $crate::__pgrx_c_macros::expression::CRecord<$crate::BTPageOpaqueData>,
+                        $crate::__pgrx_c_macros::expression::CRecord<
+                            $crate::__pgrx_c_bindings::BTPageOpaqueData
+                        >,
                         $crate::__pgrx_c_macros::expression::ReadWrite
                     >,
                     _
@@ -7156,7 +9524,7 @@ macro_rules! BTPageGetOpaque {
                                 $crate::__pgrx_c_macros::expression::ReadWrite
                             > as $crate::__pgrx_c_macros::expression::CType
                         >::from_storage(
-                            $crate::PageGetSpecialPointer(
+                            $crate::__pgrx_c_bindings::PageGetSpecialPointer(
                                 <
                                     $crate::__pgrx_c_macros::expression::CPointer<
                                         $crate::__pgrx_c_macros::expression::CIntegerStorage<
@@ -7216,10 +9584,10 @@ macro_rules! BTPageGetOpaque {
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::cast_as::<
-                                $crate::BTPageOpaque,
+                                $crate::__pgrx_c_bindings::BTPageOpaque,
                                 $crate::__pgrx_c_macros::expression::CPointer<
                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                        $crate::BTPageOpaqueData
+                                        $crate::__pgrx_c_bindings::BTPageOpaqueData
                                     >,
                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                 >,
@@ -7235,7 +9603,7 @@ macro_rules! BTPageGetOpaque {
                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::from_storage(
-                                        $crate::PageGetSpecialPointer(
+                                        $crate::__pgrx_c_bindings::PageGetSpecialPointer(
                                             <
                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                     $crate::__pgrx_c_macros::expression::CIntegerStorage<
@@ -7285,9 +9653,11 @@ macro_rules! BTPageGetOpaque {
         {
             let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::cast_as::<
-                    $crate::BTPageOpaque,
+                    $crate::__pgrx_c_bindings::BTPageOpaque,
                     $crate::__pgrx_c_macros::expression::CPointer<
-                        $crate::__pgrx_c_macros::expression::CRecord<$crate::BTPageOpaqueData>,
+                        $crate::__pgrx_c_macros::expression::CRecord<
+                            $crate::__pgrx_c_bindings::BTPageOpaqueData
+                        >,
                         $crate::__pgrx_c_macros::expression::ReadWrite
                     >,
                     _
@@ -7302,7 +9672,7 @@ macro_rules! BTPageGetOpaque {
                                 $crate::__pgrx_c_macros::expression::ReadWrite
                             > as $crate::__pgrx_c_macros::expression::CType
                         >::from_storage(
-                            $crate::PageGetSpecialPointer(
+                            $crate::__pgrx_c_bindings::PageGetSpecialPointer(
                                 <
                                     $crate::__pgrx_c_macros::expression::CPointer<
                                         $crate::__pgrx_c_macros::expression::CIntegerStorage<
@@ -7344,8 +9714,891 @@ macro_rules! BTPageGetOpaque {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
+    target_pointer_width = "64",
+    target_endian = "little"
+)))]
+#[cfg(not(docsrs))]
+compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
+#[doc(hidden)]
+#[macro_export]
+macro_rules! __pgrx_c_args_BTPageIsRecyclable {
+    (@collect $mode:ident [$($done:tt)*]; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_BTPageIsRecyclable!(@p0 $mode [$($done)*]; $($raw)*)
+    };
+    (@classified [$next:ident $mode:ident [$($done:tt)*] [$($rest:tt)*]] $descriptor:tt) => {
+        $crate::__pgrx_c_args_BTPageIsRecyclable!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
+    };
+    (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_BTPageIsRecyclable!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+            $($rest)*
+        )
+    };
+    (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_BTPageIsRecyclable!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; - $($raw:tt)*) => {
+        $crate::__pgrx_c_args_BTPageIsRecyclable!(@negative0 $mode [$($done)*]; - $($raw)*)
+    };
+    (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
+        $crate::__pgrx_c_args_BTPageIsRecyclable!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BTPageIsRecyclable] [p1 $mode [$($done)*] [$($rest)*]] [
+                $head $(::$tail)* ! $group
+            ]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; ::$head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BTPageIsRecyclable] [p1 $mode [$($done)*] [$($rest)*]] [
+                ::$head $(::$tail)* ! $group
+            ]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; ($($inner:tt)*), $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BTPageIsRecyclable] [p1 $mode [$($done)*] [$($rest)*]] [
+                ($($inner)*)
+            ]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_BTPageIsRecyclable!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_BTPageIsRecyclable!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; - $argument:literal) => {
+        $crate::__pgrx_c_args_BTPageIsRecyclable!(
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
+    };
+    (@negative1 $mode:ident [$($done:tt)*]; $argument:expr) => {
+        $crate::__pgrx_c_args_BTPageIsRecyclable!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_BTPageIsRecyclable!(
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+            $($rest)*
+        )
+    };
+    (@negative1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_BTPageIsRecyclable!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; - $($raw:tt)*) => {
+        $crate::__pgrx_c_args_BTPageIsRecyclable!(@negative1 $mode [$($done)*]; - $($raw)*)
+    };
+    (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
+        $crate::__pgrx_c_args_BTPageIsRecyclable!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BTPageIsRecyclable] [p2 $mode [$($done)*] []] [
+                $head $(::$tail)* ! $group
+            ]
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; ::$head:ident $(::$tail:ident)* ! $group:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BTPageIsRecyclable] [p2 $mode [$($done)*] []] [
+                ::$head $(::$tail)* ! $group
+            ]
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; ($($inner:tt)*)) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BTPageIsRecyclable] [p2 $mode [$($done)*] []] [($($inner)*)]
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
+        $crate::__pgrx_c_args_BTPageIsRecyclable!(
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; $argument:expr) => {
+        $crate::__pgrx_c_args_BTPageIsRecyclable!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
+        $crate::__pgrx_c_args_BTPageIsRecyclable!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BTPageIsRecyclable] [p2 $mode [$($done)*] [$($rest)*]] [
+                $head $(::$tail)* ! $group
+            ]
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; ::$head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BTPageIsRecyclable] [p2 $mode [$($done)*] [$($rest)*]] [
+                ::$head $(::$tail)* ! $group
+            ]
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; ($($inner:tt)*), $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BTPageIsRecyclable] [p2 $mode [$($done)*] [$($rest)*]] [
+                ($($inner)*)
+            ]
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_BTPageIsRecyclable!(
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_BTPageIsRecyclable!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p2 $mode:ident [$($done:tt)*];) => {
+        $crate::BTPageIsRecyclable!(@$mode; $($done)*)
+    };
+    ($($invalid:tt)*) => {
+        compile_error!("arguments do not satisfy this C macro's invocation contract")
+    };
+}
+/// Typed call adapter for C inline function BTPageIsRecyclable from nbtree.h:290
+///
+/// ```c
+/// static inline bool
+/// BTPageIsRecyclable(Page page, Relation heaprel)
+/// {
+/// 	BTPageOpaque opaque;
+///
+/// 	Assert(!PageIsNew(page));
+/// 	Assert(heaprel != NULL);
+///
+/// 	/* Recycling okay iff page is deleted and safexid is old enough */
+/// 	opaque = BTPageGetOpaque(page);
+/// 	if (P_ISDELETED(opaque))
+/// 	{
+/// 		FullTransactionId safexid = BTPageGetDeleteXid(page);
+///
+/// 		/*
+/// 		 * The page was deleted, but when? If it was just deleted, a scan
+/// 		 * might have seen the downlink to it, and will read the page later.
+/// 		 * As long as that can happen, we must keep the deleted page around as
+/// 		 * a tombstone.
+/// 		 *
+/// 		 * For that check if the deletion XID could still be visible to
+/// 		 * anyone. If not, then no scan that's still in progress could have
+/// 		 * seen its downlink, and we can recycle it.
+/// 		 */
+/// 		return GlobalVisCheckRemovableFullXid(heaprel, safexid);
+/// 	}
+///
+/// 	return false;
+/// }
+/// ```
+///
+///
+/// Calls the original function through its inspected C prototype. Each operand is evaluated once and converted using C parameter assignment rules. The result retains the function's original C type; `.get()` extracts its native storage, including `()` for a void result. Native calls retain the backend thread, PostgreSQL error, and caller safety contracts of the generated guarded binding.
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+#[macro_export]
+macro_rules! BTPageIsRecyclable {
+    (@__pgrx_emit_check_safety; $page:tt, $heaprel:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $page);
+                $crate::__pgrx_c_operand!(@check_safety; $heaprel);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_BTPageIsRecyclable!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
+    (@__pgrx_emit_public; $page:tt, $heaprel:tt $(,)?) => {
+        $crate::__pgrx_c_macros::expression_result::finish(
+            $crate::BTPageIsRecyclable!(@__pgrx_emit_value; $page, $heaprel)
+        )
+    };
+    (@__pgrx_emit_value; $page:tt, $heaprel:tt $(,)?) => {
+        $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+            <$crate::__pgrx_c_macros::CBool as $crate::__pgrx_c_macros::expression::CType>::from_storage(
+                $crate::__pgrx_c_bindings::BTPageIsRecyclable(
+                    <
+                        $crate::__pgrx_c_macros::expression::CPointer<
+                            $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                $crate::__pgrx_c_macros::CChar,
+                                ::core::ffi::c_char
+                            >,
+                            $crate::__pgrx_c_macros::expression::ReadWrite
+                        > as $crate::__pgrx_c_macros::expression::CType
+                    >::into_storage(
+                        $crate::__pgrx_c_macros::expression::implicit::<
+                            $crate::__pgrx_c_macros::expression::CPointer<
+                                $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                    $crate::__pgrx_c_macros::CChar,
+                                    ::core::ffi::c_char
+                                >,
+                                $crate::__pgrx_c_macros::expression::ReadWrite
+                            >,
+                            _
+                        >(
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_operand!(@value [true]; $page)
+                            )
+                        )
+                    ),
+                    <
+                        $crate::__pgrx_c_macros::expression::CPointer<
+                            $crate::__pgrx_c_macros::expression::CRecord<
+                                $crate::__pgrx_c_bindings::RelationData
+                            >,
+                            $crate::__pgrx_c_macros::expression::ReadWrite
+                        > as $crate::__pgrx_c_macros::expression::CType
+                    >::into_storage(
+                        $crate::__pgrx_c_macros::expression::implicit::<
+                            $crate::__pgrx_c_macros::expression::CPointer<
+                                $crate::__pgrx_c_macros::expression::CRecord<
+                                    $crate::__pgrx_c_bindings::RelationData
+                                >,
+                                $crate::__pgrx_c_macros::expression::ReadWrite
+                            >,
+                            _
+                        >(
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_operand!(@value [true]; $heaprel)
+                            )
+                        )
+                    ),
+                )
+            )
+        )
+    };
+    (@__pgrx_c_value; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_BTPageIsRecyclable!(@collect __pgrx_emit_value []; $($raw)*)
+    };
+    (@__pgrx_emit_place; $page:tt, $heaprel:tt $(,)?) => {
+        compile_error!("C expression is not a place in this operation")
+    };
+    (@__pgrx_c_place; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_BTPageIsRecyclable!(@collect __pgrx_emit_place []; $($raw)*)
+    };
+    (@__pgrx_emit_read_place; $page:tt, $heaprel:tt $(,)?) => {
+        compile_error!("C expression is not a place in this operation")
+    };
+    (@__pgrx_c_read_place; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_BTPageIsRecyclable!(@collect __pgrx_emit_read_place []; $($raw)*)
+    };
+    (@__pgrx_emit_size; $page:tt, $heaprel:tt $(,)?) => {
+        $crate::__pgrx_c_macros::expression::size_of_value_type(
+            if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $page);
+                        $crate::__pgrx_c_operand!(@check_safety; $heaprel);
+                    }
+                }
+                Some(
+                    unsafe {
+                        $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                            <
+                                $crate::__pgrx_c_macros::CBool as $crate::__pgrx_c_macros::expression::CType
+                            >::from_storage(
+                                $crate::__pgrx_c_bindings::BTPageIsRecyclable(
+                                    <
+                                        $crate::__pgrx_c_macros::expression::CPointer<
+                                            $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                $crate::__pgrx_c_macros::CChar,
+                                                ::core::ffi::c_char
+                                            >,
+                                            $crate::__pgrx_c_macros::expression::ReadWrite
+                                        > as $crate::__pgrx_c_macros::expression::CType
+                                    >::into_storage(
+                                        $crate::__pgrx_c_macros::expression::implicit::<
+                                            $crate::__pgrx_c_macros::expression::CPointer<
+                                                $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                    $crate::__pgrx_c_macros::CChar,
+                                                    ::core::ffi::c_char
+                                                >,
+                                                $crate::__pgrx_c_macros::expression::ReadWrite
+                                            >,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_macros::expression::profile_value::<
+                                                true,
+                                                _
+                                            >($crate::__pgrx_c_operand!(@value [true]; $page))
+                                        )
+                                    ),
+                                    <
+                                        $crate::__pgrx_c_macros::expression::CPointer<
+                                            $crate::__pgrx_c_macros::expression::CRecord<
+                                                $crate::__pgrx_c_bindings::RelationData
+                                            >,
+                                            $crate::__pgrx_c_macros::expression::ReadWrite
+                                        > as $crate::__pgrx_c_macros::expression::CType
+                                    >::into_storage(
+                                        $crate::__pgrx_c_macros::expression::implicit::<
+                                            $crate::__pgrx_c_macros::expression::CPointer<
+                                                $crate::__pgrx_c_macros::expression::CRecord<
+                                                    $crate::__pgrx_c_bindings::RelationData
+                                                >,
+                                                $crate::__pgrx_c_macros::expression::ReadWrite
+                                            >,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_macros::expression::profile_value::<
+                                                true,
+                                                _
+                                            >($crate::__pgrx_c_operand!(@value [true]; $heaprel))
+                                        )
+                                    ),
+                                )
+                            )
+                        )
+                    }
+                )
+            } else {
+                None
+            }
+        )
+    };
+    (@__pgrx_c_size; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_BTPageIsRecyclable!(@collect __pgrx_emit_size []; $($raw)*)
+    };
+    (@__pgrx_emit_discard; $page:tt, $heaprel:tt $(,)?) => {
+        {
+            let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                <$crate::__pgrx_c_macros::CBool as $crate::__pgrx_c_macros::expression::CType>::from_storage(
+                    $crate::__pgrx_c_bindings::BTPageIsRecyclable(
+                        <
+                            $crate::__pgrx_c_macros::expression::CPointer<
+                                $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                    $crate::__pgrx_c_macros::CChar,
+                                    ::core::ffi::c_char
+                                >,
+                                $crate::__pgrx_c_macros::expression::ReadWrite
+                            > as $crate::__pgrx_c_macros::expression::CType
+                        >::into_storage(
+                            $crate::__pgrx_c_macros::expression::implicit::<
+                                $crate::__pgrx_c_macros::expression::CPointer<
+                                    $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                        $crate::__pgrx_c_macros::CChar,
+                                        ::core::ffi::c_char
+                                    >,
+                                    $crate::__pgrx_c_macros::expression::ReadWrite
+                                >,
+                                _
+                            >(
+                                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                    $crate::__pgrx_c_operand!(@value [true]; $page)
+                                )
+                            )
+                        ),
+                        <
+                            $crate::__pgrx_c_macros::expression::CPointer<
+                                $crate::__pgrx_c_macros::expression::CRecord<
+                                    $crate::__pgrx_c_bindings::RelationData
+                                >,
+                                $crate::__pgrx_c_macros::expression::ReadWrite
+                            > as $crate::__pgrx_c_macros::expression::CType
+                        >::into_storage(
+                            $crate::__pgrx_c_macros::expression::implicit::<
+                                $crate::__pgrx_c_macros::expression::CPointer<
+                                    $crate::__pgrx_c_macros::expression::CRecord<
+                                        $crate::__pgrx_c_bindings::RelationData
+                                    >,
+                                    $crate::__pgrx_c_macros::expression::ReadWrite
+                                >,
+                                _
+                            >(
+                                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                    $crate::__pgrx_c_operand!(@value [true]; $heaprel)
+                                )
+                            )
+                        ),
+                    )
+                )
+            );
+        }
+    };
+    (@__pgrx_c_discard; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_BTPageIsRecyclable!(@collect __pgrx_emit_discard []; $($raw)*)
+    };
+    ($($raw:tt)*) => {
+        $crate::__pgrx_c_args_BTPageIsRecyclable!(@collect __pgrx_emit_public []; $($raw)*)
+    };
+}
+
+#[cfg(not(all(
+    target_arch = "x86_64",
+    target_os = "linux",
+    target_pointer_width = "64",
+    target_endian = "little"
+)))]
+#[cfg(not(docsrs))]
+compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
+#[doc(hidden)]
+#[macro_export]
+macro_rules! __pgrx_c_args_BTPageSetDeleted {
+    (@collect $mode:ident [$($done:tt)*]; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_BTPageSetDeleted!(@p0 $mode [$($done)*]; $($raw)*)
+    };
+    (@classified [$next:ident $mode:ident [$($done:tt)*] [$($rest:tt)*]] $descriptor:tt) => {
+        $crate::__pgrx_c_args_BTPageSetDeleted!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
+    };
+    (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_BTPageSetDeleted!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+            $($rest)*
+        )
+    };
+    (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_BTPageSetDeleted!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; - $($raw:tt)*) => {
+        $crate::__pgrx_c_args_BTPageSetDeleted!(@negative0 $mode [$($done)*]; - $($raw)*)
+    };
+    (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
+        $crate::__pgrx_c_args_BTPageSetDeleted!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BTPageSetDeleted] [p1 $mode [$($done)*] [$($rest)*]] [
+                $head $(::$tail)* ! $group
+            ]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; ::$head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BTPageSetDeleted] [p1 $mode [$($done)*] [$($rest)*]] [
+                ::$head $(::$tail)* ! $group
+            ]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; ($($inner:tt)*), $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BTPageSetDeleted] [p1 $mode [$($done)*] [$($rest)*]] [
+                ($($inner)*)
+            ]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_BTPageSetDeleted!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_BTPageSetDeleted!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; - $argument:literal) => {
+        $crate::__pgrx_c_args_BTPageSetDeleted!(
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
+    };
+    (@negative1 $mode:ident [$($done:tt)*]; $argument:expr) => {
+        $crate::__pgrx_c_args_BTPageSetDeleted!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_BTPageSetDeleted!(
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+            $($rest)*
+        )
+    };
+    (@negative1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_BTPageSetDeleted!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; - $($raw:tt)*) => {
+        $crate::__pgrx_c_args_BTPageSetDeleted!(@negative1 $mode [$($done)*]; - $($raw)*)
+    };
+    (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
+        $crate::__pgrx_c_args_BTPageSetDeleted!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BTPageSetDeleted] [p2 $mode [$($done)*] []] [
+                $head $(::$tail)* ! $group
+            ]
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; ::$head:ident $(::$tail:ident)* ! $group:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BTPageSetDeleted] [p2 $mode [$($done)*] []] [
+                ::$head $(::$tail)* ! $group
+            ]
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; ($($inner:tt)*)) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BTPageSetDeleted] [p2 $mode [$($done)*] []] [($($inner)*)]
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
+        $crate::__pgrx_c_args_BTPageSetDeleted!(
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; $argument:expr) => {
+        $crate::__pgrx_c_args_BTPageSetDeleted!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
+        $crate::__pgrx_c_args_BTPageSetDeleted!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BTPageSetDeleted] [p2 $mode [$($done)*] [$($rest)*]] [
+                $head $(::$tail)* ! $group
+            ]
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; ::$head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BTPageSetDeleted] [p2 $mode [$($done)*] [$($rest)*]] [
+                ::$head $(::$tail)* ! $group
+            ]
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; ($($inner:tt)*), $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BTPageSetDeleted] [p2 $mode [$($done)*] [$($rest)*]] [
+                ($($inner)*)
+            ]
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_BTPageSetDeleted!(
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_BTPageSetDeleted!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p2 $mode:ident [$($done:tt)*];) => {
+        $crate::BTPageSetDeleted!(@$mode; $($done)*)
+    };
+    ($($invalid:tt)*) => {
+        compile_error!("arguments do not satisfy this C macro's invocation contract")
+    };
+}
+/// Typed call adapter for C inline function BTPageSetDeleted from nbtree.h:238
+///
+/// ```c
+/// static inline void
+/// BTPageSetDeleted(Page page, FullTransactionId safexid)
+/// {
+/// 	BTPageOpaque opaque;
+/// 	PageHeader	header;
+/// 	BTDeletedPageData *contents;
+///
+/// 	opaque = BTPageGetOpaque(page);
+/// 	header = ((PageHeader) page);
+///
+/// 	opaque->btpo_flags &= ~BTP_HALF_DEAD;
+/// 	opaque->btpo_flags |= BTP_DELETED | BTP_HAS_FULLXID;
+/// 	header->pd_lower = MAXALIGN(SizeOfPageHeaderData) +
+/// 		sizeof(BTDeletedPageData);
+/// 	header->pd_upper = header->pd_special;
+///
+/// 	/* Set safexid in deleted page */
+/// 	contents = ((BTDeletedPageData *) PageGetContents(page));
+/// 	contents->safexid = safexid;
+/// }
+/// ```
+///
+///
+/// Calls the original function through its inspected C prototype. Each operand is evaluated once and converted using C parameter assignment rules. The result retains the function's original C type; `.get()` extracts its native storage, including `()` for a void result. Native calls retain the backend thread, PostgreSQL error, and caller safety contracts of the generated guarded binding.
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+#[macro_export]
+macro_rules! BTPageSetDeleted {
+    (@__pgrx_emit_check_safety; $page:tt, $safexid:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $page);
+                $crate::__pgrx_c_operand!(@check_safety; $safexid);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_BTPageSetDeleted!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
+    (@__pgrx_emit_public; $page:tt, $safexid:tt $(,)?) => {
+        $crate::__pgrx_c_macros::expression_result::finish(
+            $crate::BTPageSetDeleted!(@__pgrx_emit_value; $page, $safexid)
+        )
+    };
+    (@__pgrx_emit_value; $page:tt, $safexid:tt $(,)?) => {
+        $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+            $crate::__pgrx_c_generated::Inline_7e76710026056aecd36398e38d1347da(
+                <
+                    $crate::__pgrx_c_macros::expression::CPointer<
+                        $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                            $crate::__pgrx_c_macros::CChar,
+                            ::core::ffi::c_char
+                        >,
+                        $crate::__pgrx_c_macros::expression::ReadWrite
+                    > as $crate::__pgrx_c_macros::expression::CType
+                >::into_storage(
+                    $crate::__pgrx_c_macros::expression::implicit::<
+                        $crate::__pgrx_c_macros::expression::CPointer<
+                            $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                $crate::__pgrx_c_macros::CChar,
+                                ::core::ffi::c_char
+                            >,
+                            $crate::__pgrx_c_macros::expression::ReadWrite
+                        >,
+                        _
+                    >(
+                        $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                            $crate::__pgrx_c_operand!(@value [true]; $page)
+                        )
+                    )
+                ),
+                <
+                    $crate::__pgrx_c_macros::expression::CRawRecord<
+                        $crate::__pgrx_c_bindings::FullTransactionId
+                    > as $crate::__pgrx_c_macros::expression::CType
+                >::into_storage(
+                    $crate::__pgrx_c_macros::expression::implicit::<
+                        $crate::__pgrx_c_macros::expression::CRawRecord<
+                            $crate::__pgrx_c_bindings::FullTransactionId
+                        >,
+                        _
+                    >(
+                        $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                            $crate::__pgrx_c_operand!(@value [true]; $safexid)
+                        )
+                    )
+                ),
+            )
+        )
+    };
+    (@__pgrx_c_value; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_BTPageSetDeleted!(@collect __pgrx_emit_value []; $($raw)*)
+    };
+    (@__pgrx_emit_place; $page:tt, $safexid:tt $(,)?) => {
+        compile_error!("C expression is not a place in this operation")
+    };
+    (@__pgrx_c_place; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_BTPageSetDeleted!(@collect __pgrx_emit_place []; $($raw)*)
+    };
+    (@__pgrx_emit_read_place; $page:tt, $safexid:tt $(,)?) => {
+        compile_error!("C expression is not a place in this operation")
+    };
+    (@__pgrx_c_read_place; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_BTPageSetDeleted!(@collect __pgrx_emit_read_place []; $($raw)*)
+    };
+    (@__pgrx_emit_size; $page:tt, $safexid:tt $(,)?) => {
+        $crate::__pgrx_c_macros::expression::size_of_value_type(
+            if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $page);
+                        $crate::__pgrx_c_operand!(@check_safety; $safexid);
+                    }
+                }
+                Some(
+                    unsafe {
+                        $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                            $crate::__pgrx_c_generated::Inline_7e76710026056aecd36398e38d1347da(
+                                <
+                                    $crate::__pgrx_c_macros::expression::CPointer<
+                                        $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                            $crate::__pgrx_c_macros::CChar,
+                                            ::core::ffi::c_char
+                                        >,
+                                        $crate::__pgrx_c_macros::expression::ReadWrite
+                                    > as $crate::__pgrx_c_macros::expression::CType
+                                >::into_storage(
+                                    $crate::__pgrx_c_macros::expression::implicit::<
+                                        $crate::__pgrx_c_macros::expression::CPointer<
+                                            $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                $crate::__pgrx_c_macros::CChar,
+                                                ::core::ffi::c_char
+                                            >,
+                                            $crate::__pgrx_c_macros::expression::ReadWrite
+                                        >,
+                                        _
+                                    >(
+                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                            true,
+                                            _
+                                        >($crate::__pgrx_c_operand!(@value [true]; $page))
+                                    )
+                                ),
+                                <
+                                    $crate::__pgrx_c_macros::expression::CRawRecord<
+                                        $crate::__pgrx_c_bindings::FullTransactionId
+                                    > as $crate::__pgrx_c_macros::expression::CType
+                                >::into_storage(
+                                    $crate::__pgrx_c_macros::expression::implicit::<
+                                        $crate::__pgrx_c_macros::expression::CRawRecord<
+                                            $crate::__pgrx_c_bindings::FullTransactionId
+                                        >,
+                                        _
+                                    >(
+                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                            true,
+                                            _
+                                        >($crate::__pgrx_c_operand!(@value [true]; $safexid))
+                                    )
+                                ),
+                            )
+                        )
+                    }
+                )
+            } else {
+                None
+            }
+        )
+    };
+    (@__pgrx_c_size; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_BTPageSetDeleted!(@collect __pgrx_emit_size []; $($raw)*)
+    };
+    (@__pgrx_emit_discard; $page:tt, $safexid:tt $(,)?) => {
+        {
+            let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                $crate::__pgrx_c_generated::Inline_7e76710026056aecd36398e38d1347da(
+                    <
+                        $crate::__pgrx_c_macros::expression::CPointer<
+                            $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                $crate::__pgrx_c_macros::CChar,
+                                ::core::ffi::c_char
+                            >,
+                            $crate::__pgrx_c_macros::expression::ReadWrite
+                        > as $crate::__pgrx_c_macros::expression::CType
+                    >::into_storage(
+                        $crate::__pgrx_c_macros::expression::implicit::<
+                            $crate::__pgrx_c_macros::expression::CPointer<
+                                $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                    $crate::__pgrx_c_macros::CChar,
+                                    ::core::ffi::c_char
+                                >,
+                                $crate::__pgrx_c_macros::expression::ReadWrite
+                            >,
+                            _
+                        >(
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_operand!(@value [true]; $page)
+                            )
+                        )
+                    ),
+                    <
+                        $crate::__pgrx_c_macros::expression::CRawRecord<
+                            $crate::__pgrx_c_bindings::FullTransactionId
+                        > as $crate::__pgrx_c_macros::expression::CType
+                    >::into_storage(
+                        $crate::__pgrx_c_macros::expression::implicit::<
+                            $crate::__pgrx_c_macros::expression::CRawRecord<
+                                $crate::__pgrx_c_bindings::FullTransactionId
+                            >,
+                            _
+                        >(
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_operand!(@value [true]; $safexid)
+                            )
+                        )
+                    ),
+                )
+            );
+        }
+    };
+    (@__pgrx_c_discard; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_BTPageSetDeleted!(@collect __pgrx_emit_discard []; $($raw)*)
+    };
+    ($($raw:tt)*) => {
+        $crate::__pgrx_c_args_BTPageSetDeleted!(@collect __pgrx_emit_public []; $($raw)*)
+    };
+}
+
+#[cfg(not(all(
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -7372,20 +10625,24 @@ macro_rules! __pgrx_c_args_BTScanPosInvalidate {
         $crate::__pgrx_c_args_BTScanPosInvalidate!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_BTScanPosInvalidate!(@p1 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_BTScanPosInvalidate!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_BTScanPosInvalidate!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_BTScanPosInvalidate!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_BTScanPosInvalidate!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_BTScanPosInvalidate!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -7393,7 +10650,9 @@ macro_rules! __pgrx_c_args_BTScanPosInvalidate {
         $crate::__pgrx_c_args_BTScanPosInvalidate!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_BTScanPosInvalidate!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_BTScanPosInvalidate!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -7415,14 +10674,18 @@ macro_rules! __pgrx_c_args_BTScanPosInvalidate {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_BTScanPosInvalidate!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_BTScanPosInvalidate!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_BTScanPosInvalidate!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_BTScanPosInvalidate!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_BTScanPosInvalidate!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -7449,13 +10712,13 @@ macro_rules! __pgrx_c_args_BTScanPosInvalidate {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_BTScanPosInvalidate!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_BTScanPosInvalidate!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -7501,9 +10764,8 @@ macro_rules! BTScanPosInvalidate {
                             _
                         >(($crate::__pgrx_c_operand!(@place; $scanpos))),
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                            /* PGRX: InvalidBlockNumber remains expanded because no integer constant binding is available in the defining Rust crate. */
                             $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CUnsignedInt>::new(
-                                4294967295u32
+                                $crate::__pgrx_c_bindings::InvalidBlockNumber as u32
                             )
                         )
                     )
@@ -7518,9 +10780,8 @@ macro_rules! BTScanPosInvalidate {
                             _
                         >(($crate::__pgrx_c_operand!(@place; $scanpos))),
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                            /* PGRX: InvalidBlockNumber remains expanded because no integer constant binding is available in the defining Rust crate. */
                             $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CUnsignedInt>::new(
-                                4294967295u32
+                                $crate::__pgrx_c_bindings::InvalidBlockNumber as u32
                             )
                         )
                     )
@@ -7537,7 +10798,7 @@ macro_rules! BTScanPosInvalidate {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::null_constant(
                                 $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                    $crate::InvalidBuffer as i32
+                                    $crate::__pgrx_c_bindings::InvalidBuffer as i32
                                 )
                             )
                         )
@@ -7555,7 +10816,7 @@ macro_rules! BTScanPosInvalidate {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::null_constant(
                                 $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                    $crate::InvalidXLogRecPtr as i32
+                                    $crate::__pgrx_c_bindings::InvalidXLogRecPtr as i32
                                 )
                             )
                         )
@@ -7597,8 +10858,792 @@ macro_rules! BTScanPosInvalidate {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
+    target_pointer_width = "64",
+    target_endian = "little"
+)))]
+#[cfg(not(docsrs))]
+compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
+#[doc(hidden)]
+#[macro_export]
+macro_rules! __pgrx_c_args_BTScanPosIsPinned {
+    (@collect $mode:ident [$($done:tt)*]; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_BTScanPosIsPinned!(@p0 $mode [$($done)*]; $($raw)*)
+    };
+    (@classified [$next:ident $mode:ident [$($done:tt)*] [$($rest:tt)*]] $descriptor:tt) => {
+        $crate::__pgrx_c_args_BTScanPosIsPinned!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
+    };
+    (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
+        $crate::__pgrx_c_args_BTScanPosIsPinned!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
+    };
+    (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
+        $crate::__pgrx_c_args_BTScanPosIsPinned!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_BTScanPosIsPinned!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+            $($rest)*
+        )
+    };
+    (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_BTScanPosIsPinned!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; - $($raw:tt)*) => {
+        $crate::__pgrx_c_args_BTScanPosIsPinned!(@negative0 $mode [$($done)*]; - $($raw)*)
+    };
+    (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
+        $crate::__pgrx_c_args_BTScanPosIsPinned!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BTScanPosIsPinned] [p1 $mode [$($done)*] []] [
+                $head $(::$tail)* ! $group
+            ]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; ::$head:ident $(::$tail:ident)* ! $group:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BTScanPosIsPinned] [p1 $mode [$($done)*] []] [
+                ::$head $(::$tail)* ! $group
+            ]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; ($($inner:tt)*)) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BTScanPosIsPinned] [p1 $mode [$($done)*] []] [($($inner)*)]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
+        $crate::__pgrx_c_args_BTScanPosIsPinned!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
+        $crate::__pgrx_c_args_BTScanPosIsPinned!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
+        $crate::__pgrx_c_args_BTScanPosIsPinned!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BTScanPosIsPinned] [p1 $mode [$($done)*] [$($rest)*]] [
+                $head $(::$tail)* ! $group
+            ]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; ::$head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BTScanPosIsPinned] [p1 $mode [$($done)*] [$($rest)*]] [
+                ::$head $(::$tail)* ! $group
+            ]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; ($($inner:tt)*), $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BTScanPosIsPinned] [p1 $mode [$($done)*] [$($rest)*]] [
+                ($($inner)*)
+            ]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_BTScanPosIsPinned!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_BTScanPosIsPinned!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*];) => {
+        $crate::BTScanPosIsPinned!(@$mode; $($done)*)
+    };
+    ($($invalid:tt)*) => {
+        compile_error!("arguments do not satisfy this C macro's invocation contract")
+    };
+}
+/// C macro BTScanPosIsPinned from nbtree.h:995
+///
+/// ```text
+/// #define BTScanPosIsPinned( scanpos ) ( AssertMacro ( BlockNumberIsValid ( ( scanpos ) . currPage ) || ! BufferIsValid ( ( scanpos ) . buf ) ) , BufferIsValid ( ( scanpos ) . buf ) )
+/// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+#[macro_export]
+macro_rules! BTScanPosIsPinned {
+    (@__pgrx_emit_check_safety; $scanpos:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $scanpos);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_BTScanPosIsPinned!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
+    (@__pgrx_emit_public; $scanpos:tt $(,)?) => {
+        $crate::__pgrx_c_macros::expression_result::finish(
+            $crate::BTScanPosIsPinned!(@__pgrx_emit_value; $scanpos)
+        )
+    };
+    (@__pgrx_emit_value; $scanpos:tt $(,)?) => {
+        /* PGRX: AssertMacro remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */
+        (
+            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                {
+                    {
+                        let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                            {
+                                {
+                                    let _ = $crate::__pgrx_c_macros::expression::profile_value::<
+                                        true,
+                                        _
+                                    >(
+                                        /* PGRX: true remains expanded because no integer constant binding is available in the defining Rust crate. */
+                                        $crate::__pgrx_c_macros::CValue::<
+                                            $crate::__pgrx_c_macros::CInt
+                                        >::new(1i32)
+                                    );
+                                }
+                            }
+                        );
+                    };
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        <
+                            $crate::__pgrx_c_macros::CBool as $crate::__pgrx_c_macros::expression::CType
+                        >::from_storage(
+                            $crate::__pgrx_c_bindings::BufferIsValid(
+                                <
+                                    $crate::__pgrx_c_macros::CInt as $crate::__pgrx_c_macros::expression::CType
+                                >::into_storage(
+                                    $crate::__pgrx_c_macros::expression::implicit::<
+                                        $crate::__pgrx_c_macros::CInt,
+                                        _
+                                    >(
+                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                            true,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_macros::expression::load(
+                                                $crate::__pgrx_c_macros::expression::project::<
+                                                    $crate::__pgrx_c_generated::Field_buf,
+                                                    _,
+                                                    _
+                                                >(
+                                                    (
+                                                        $crate::__pgrx_c_operand!(
+                                                            @read_place;
+                                                            $scanpos
+                                                        )
+                                                    )
+                                                )
+                                            )
+                                        )
+                                    )
+                                ),
+                            )
+                        )
+                    )
+                }
+            )
+        )
+    };
+    (@__pgrx_c_value; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_BTScanPosIsPinned!(@collect __pgrx_emit_value []; $($raw)*)
+    };
+    (@__pgrx_emit_place; $scanpos:tt $(,)?) => {
+        compile_error!("C expression is not a place in this operation")
+    };
+    (@__pgrx_c_place; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_BTScanPosIsPinned!(@collect __pgrx_emit_place []; $($raw)*)
+    };
+    (@__pgrx_emit_read_place; $scanpos:tt $(,)?) => {
+        compile_error!("C expression is not a place in this operation")
+    };
+    (@__pgrx_c_read_place; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_BTScanPosIsPinned!(@collect __pgrx_emit_read_place []; $($raw)*)
+    };
+    (@__pgrx_emit_size; $scanpos:tt $(,)?) => {
+        /* PGRX: AssertMacro remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */
+        $crate::__pgrx_c_macros::expression::size_of_value_type(
+            if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $scanpos);
+                    }
+                }
+                Some(
+                    unsafe {
+                        $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                            {
+                                {
+                                    let _ = $crate::__pgrx_c_macros::expression::profile_value::<
+                                        true,
+                                        _
+                                    >(
+                                        {
+                                            {
+                                                let _ = $crate::__pgrx_c_macros::expression::profile_value::<
+                                                    true,
+                                                    _
+                                                >(
+                                                    /* PGRX: true remains expanded because no integer constant binding is available in the defining Rust crate. */
+                                                    $crate::__pgrx_c_macros::CValue::<
+                                                        $crate::__pgrx_c_macros::CInt
+                                                    >::new(1i32)
+                                                );
+                                            }
+                                        }
+                                    );
+                                };
+                                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                    <
+                                        $crate::__pgrx_c_macros::CBool as $crate::__pgrx_c_macros::expression::CType
+                                    >::from_storage(
+                                        $crate::__pgrx_c_bindings::BufferIsValid(
+                                            <
+                                                $crate::__pgrx_c_macros::CInt as $crate::__pgrx_c_macros::expression::CType
+                                            >::into_storage(
+                                                $crate::__pgrx_c_macros::expression::implicit::<
+                                                    $crate::__pgrx_c_macros::CInt,
+                                                    _
+                                                >(
+                                                    $crate::__pgrx_c_macros::expression::profile_value::<
+                                                        true,
+                                                        _
+                                                    >(
+                                                        $crate::__pgrx_c_macros::expression::load(
+                                                            $crate::__pgrx_c_macros::expression::project::<
+                                                                $crate::__pgrx_c_generated::Field_buf,
+                                                                _,
+                                                                _
+                                                            >(
+                                                                (
+                                                                    $crate::__pgrx_c_operand!(
+                                                                        @read_place;
+                                                                        $scanpos
+                                                                    )
+                                                                )
+                                                            )
+                                                        )
+                                                    )
+                                                )
+                                            ),
+                                        )
+                                    )
+                                )
+                            }
+                        )
+                    }
+                )
+            } else {
+                None
+            }
+        )
+    };
+    (@__pgrx_c_size; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_BTScanPosIsPinned!(@collect __pgrx_emit_size []; $($raw)*)
+    };
+    (@__pgrx_emit_discard; $scanpos:tt $(,)?) => {
+        /* PGRX: AssertMacro remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */
+        {
+            let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                {
+                    {
+                        let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                            {
+                                {
+                                    let _ = $crate::__pgrx_c_macros::expression::profile_value::<
+                                        true,
+                                        _
+                                    >(
+                                        /* PGRX: true remains expanded because no integer constant binding is available in the defining Rust crate. */
+                                        $crate::__pgrx_c_macros::CValue::<
+                                            $crate::__pgrx_c_macros::CInt
+                                        >::new(1i32)
+                                    );
+                                }
+                            }
+                        );
+                    };
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        <
+                            $crate::__pgrx_c_macros::CBool as $crate::__pgrx_c_macros::expression::CType
+                        >::from_storage(
+                            $crate::__pgrx_c_bindings::BufferIsValid(
+                                <
+                                    $crate::__pgrx_c_macros::CInt as $crate::__pgrx_c_macros::expression::CType
+                                >::into_storage(
+                                    $crate::__pgrx_c_macros::expression::implicit::<
+                                        $crate::__pgrx_c_macros::CInt,
+                                        _
+                                    >(
+                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                            true,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_macros::expression::load(
+                                                $crate::__pgrx_c_macros::expression::project::<
+                                                    $crate::__pgrx_c_generated::Field_buf,
+                                                    _,
+                                                    _
+                                                >(
+                                                    (
+                                                        $crate::__pgrx_c_operand!(
+                                                            @read_place;
+                                                            $scanpos
+                                                        )
+                                                    )
+                                                )
+                                            )
+                                        )
+                                    )
+                                ),
+                            )
+                        )
+                    )
+                }
+            );
+        }
+    };
+    (@__pgrx_c_discard; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_BTScanPosIsPinned!(@collect __pgrx_emit_discard []; $($raw)*)
+    };
+    ($($raw:tt)*) => {
+        $crate::__pgrx_c_args_BTScanPosIsPinned!(@collect __pgrx_emit_public []; $($raw)*)
+    };
+}
+
+#[cfg(not(all(
+    target_arch = "x86_64",
+    target_os = "linux",
+    target_pointer_width = "64",
+    target_endian = "little"
+)))]
+#[cfg(not(docsrs))]
+compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
+#[doc(hidden)]
+#[macro_export]
+macro_rules! __pgrx_c_args_BTScanPosIsValid {
+    (@collect $mode:ident [$($done:tt)*]; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_BTScanPosIsValid!(@p0 $mode [$($done)*]; $($raw)*)
+    };
+    (@classified [$next:ident $mode:ident [$($done:tt)*] [$($rest:tt)*]] $descriptor:tt) => {
+        $crate::__pgrx_c_args_BTScanPosIsValid!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
+    };
+    (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
+        $crate::__pgrx_c_args_BTScanPosIsValid!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
+    };
+    (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
+        $crate::__pgrx_c_args_BTScanPosIsValid!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_BTScanPosIsValid!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+            $($rest)*
+        )
+    };
+    (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_BTScanPosIsValid!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; - $($raw:tt)*) => {
+        $crate::__pgrx_c_args_BTScanPosIsValid!(@negative0 $mode [$($done)*]; - $($raw)*)
+    };
+    (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
+        $crate::__pgrx_c_args_BTScanPosIsValid!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BTScanPosIsValid] [p1 $mode [$($done)*] []] [
+                $head $(::$tail)* ! $group
+            ]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; ::$head:ident $(::$tail:ident)* ! $group:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BTScanPosIsValid] [p1 $mode [$($done)*] []] [
+                ::$head $(::$tail)* ! $group
+            ]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; ($($inner:tt)*)) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BTScanPosIsValid] [p1 $mode [$($done)*] []] [($($inner)*)]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
+        $crate::__pgrx_c_args_BTScanPosIsValid!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
+        $crate::__pgrx_c_args_BTScanPosIsValid!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
+        $crate::__pgrx_c_args_BTScanPosIsValid!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BTScanPosIsValid] [p1 $mode [$($done)*] [$($rest)*]] [
+                $head $(::$tail)* ! $group
+            ]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; ::$head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BTScanPosIsValid] [p1 $mode [$($done)*] [$($rest)*]] [
+                ::$head $(::$tail)* ! $group
+            ]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; ($($inner:tt)*), $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BTScanPosIsValid] [p1 $mode [$($done)*] [$($rest)*]] [
+                ($($inner)*)
+            ]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_BTScanPosIsValid!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_BTScanPosIsValid!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*];) => {
+        $crate::BTScanPosIsValid!(@$mode; $($done)*)
+    };
+    ($($invalid:tt)*) => {
+        compile_error!("arguments do not satisfy this C macro's invocation contract")
+    };
+}
+/// C macro BTScanPosIsValid from nbtree.h:1012
+///
+/// ```text
+/// #define BTScanPosIsValid( scanpos ) ( AssertMacro ( BlockNumberIsValid ( ( scanpos ) . currPage ) || ! BufferIsValid ( ( scanpos ) . buf ) ) , BlockNumberIsValid ( ( scanpos ) . currPage ) )
+/// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+#[macro_export]
+macro_rules! BTScanPosIsValid {
+    (@__pgrx_emit_check_safety; $scanpos:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $scanpos);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_BTScanPosIsValid!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
+    (@__pgrx_emit_public; $scanpos:tt $(,)?) => {
+        $crate::__pgrx_c_macros::expression_result::finish(
+            $crate::BTScanPosIsValid!(@__pgrx_emit_value; $scanpos)
+        )
+    };
+    (@__pgrx_emit_value; $scanpos:tt $(,)?) => {
+        /* PGRX: AssertMacro remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */
+        (
+            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                {
+                    {
+                        let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                            {
+                                {
+                                    let _ = $crate::__pgrx_c_macros::expression::profile_value::<
+                                        true,
+                                        _
+                                    >(
+                                        /* PGRX: true remains expanded because no integer constant binding is available in the defining Rust crate. */
+                                        $crate::__pgrx_c_macros::CValue::<
+                                            $crate::__pgrx_c_macros::CInt
+                                        >::new(1i32)
+                                    );
+                                }
+                            }
+                        );
+                    };
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        <
+                            $crate::__pgrx_c_macros::CBool as $crate::__pgrx_c_macros::expression::CType
+                        >::from_storage(
+                            $crate::__pgrx_c_bindings::BlockNumberIsValid(
+                                <
+                                    $crate::__pgrx_c_macros::CUnsignedInt as $crate::__pgrx_c_macros::expression::CType
+                                >::into_storage(
+                                    $crate::__pgrx_c_macros::expression::implicit::<
+                                        $crate::__pgrx_c_macros::CUnsignedInt,
+                                        _
+                                    >(
+                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                            true,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_macros::expression::load(
+                                                $crate::__pgrx_c_macros::expression::project::<
+                                                    $crate::__pgrx_c_generated::Field_currPage,
+                                                    _,
+                                                    _
+                                                >(
+                                                    (
+                                                        $crate::__pgrx_c_operand!(
+                                                            @read_place;
+                                                            $scanpos
+                                                        )
+                                                    )
+                                                )
+                                            )
+                                        )
+                                    )
+                                ),
+                            )
+                        )
+                    )
+                }
+            )
+        )
+    };
+    (@__pgrx_c_value; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_BTScanPosIsValid!(@collect __pgrx_emit_value []; $($raw)*)
+    };
+    (@__pgrx_emit_place; $scanpos:tt $(,)?) => {
+        compile_error!("C expression is not a place in this operation")
+    };
+    (@__pgrx_c_place; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_BTScanPosIsValid!(@collect __pgrx_emit_place []; $($raw)*)
+    };
+    (@__pgrx_emit_read_place; $scanpos:tt $(,)?) => {
+        compile_error!("C expression is not a place in this operation")
+    };
+    (@__pgrx_c_read_place; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_BTScanPosIsValid!(@collect __pgrx_emit_read_place []; $($raw)*)
+    };
+    (@__pgrx_emit_size; $scanpos:tt $(,)?) => {
+        /* PGRX: AssertMacro remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */
+        $crate::__pgrx_c_macros::expression::size_of_value_type(
+            if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $scanpos);
+                    }
+                }
+                Some(
+                    unsafe {
+                        $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                            {
+                                {
+                                    let _ = $crate::__pgrx_c_macros::expression::profile_value::<
+                                        true,
+                                        _
+                                    >(
+                                        {
+                                            {
+                                                let _ = $crate::__pgrx_c_macros::expression::profile_value::<
+                                                    true,
+                                                    _
+                                                >(
+                                                    /* PGRX: true remains expanded because no integer constant binding is available in the defining Rust crate. */
+                                                    $crate::__pgrx_c_macros::CValue::<
+                                                        $crate::__pgrx_c_macros::CInt
+                                                    >::new(1i32)
+                                                );
+                                            }
+                                        }
+                                    );
+                                };
+                                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                    <
+                                        $crate::__pgrx_c_macros::CBool as $crate::__pgrx_c_macros::expression::CType
+                                    >::from_storage(
+                                        $crate::__pgrx_c_bindings::BlockNumberIsValid(
+                                            <
+                                                $crate::__pgrx_c_macros::CUnsignedInt as $crate::__pgrx_c_macros::expression::CType
+                                            >::into_storage(
+                                                $crate::__pgrx_c_macros::expression::implicit::<
+                                                    $crate::__pgrx_c_macros::CUnsignedInt,
+                                                    _
+                                                >(
+                                                    $crate::__pgrx_c_macros::expression::profile_value::<
+                                                        true,
+                                                        _
+                                                    >(
+                                                        $crate::__pgrx_c_macros::expression::load(
+                                                            $crate::__pgrx_c_macros::expression::project::<
+                                                                $crate::__pgrx_c_generated::Field_currPage,
+                                                                _,
+                                                                _
+                                                            >(
+                                                                (
+                                                                    $crate::__pgrx_c_operand!(
+                                                                        @read_place;
+                                                                        $scanpos
+                                                                    )
+                                                                )
+                                                            )
+                                                        )
+                                                    )
+                                                )
+                                            ),
+                                        )
+                                    )
+                                )
+                            }
+                        )
+                    }
+                )
+            } else {
+                None
+            }
+        )
+    };
+    (@__pgrx_c_size; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_BTScanPosIsValid!(@collect __pgrx_emit_size []; $($raw)*)
+    };
+    (@__pgrx_emit_discard; $scanpos:tt $(,)?) => {
+        /* PGRX: AssertMacro remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */
+        {
+            let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                {
+                    {
+                        let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                            {
+                                {
+                                    let _ = $crate::__pgrx_c_macros::expression::profile_value::<
+                                        true,
+                                        _
+                                    >(
+                                        /* PGRX: true remains expanded because no integer constant binding is available in the defining Rust crate. */
+                                        $crate::__pgrx_c_macros::CValue::<
+                                            $crate::__pgrx_c_macros::CInt
+                                        >::new(1i32)
+                                    );
+                                }
+                            }
+                        );
+                    };
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        <
+                            $crate::__pgrx_c_macros::CBool as $crate::__pgrx_c_macros::expression::CType
+                        >::from_storage(
+                            $crate::__pgrx_c_bindings::BlockNumberIsValid(
+                                <
+                                    $crate::__pgrx_c_macros::CUnsignedInt as $crate::__pgrx_c_macros::expression::CType
+                                >::into_storage(
+                                    $crate::__pgrx_c_macros::expression::implicit::<
+                                        $crate::__pgrx_c_macros::CUnsignedInt,
+                                        _
+                                    >(
+                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                            true,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_macros::expression::load(
+                                                $crate::__pgrx_c_macros::expression::project::<
+                                                    $crate::__pgrx_c_generated::Field_currPage,
+                                                    _,
+                                                    _
+                                                >(
+                                                    (
+                                                        $crate::__pgrx_c_operand!(
+                                                            @read_place;
+                                                            $scanpos
+                                                        )
+                                                    )
+                                                )
+                                            )
+                                        )
+                                    )
+                                ),
+                            )
+                        )
+                    )
+                }
+            );
+        }
+    };
+    (@__pgrx_c_discard; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_BTScanPosIsValid!(@collect __pgrx_emit_discard []; $($raw)*)
+    };
+    ($($raw:tt)*) => {
+        $crate::__pgrx_c_args_BTScanPosIsValid!(@collect __pgrx_emit_public []; $($raw)*)
+    };
+}
+
+#[cfg(not(all(
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -7625,20 +11670,24 @@ macro_rules! __pgrx_c_args_BTScanPosUnpin {
         $crate::__pgrx_c_args_BTScanPosUnpin!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_BTScanPosUnpin!(@p1 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_BTScanPosUnpin!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_BTScanPosUnpin!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_BTScanPosUnpin!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_BTScanPosUnpin!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_BTScanPosUnpin!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -7646,7 +11695,9 @@ macro_rules! __pgrx_c_args_BTScanPosUnpin {
         $crate::__pgrx_c_args_BTScanPosUnpin!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_BTScanPosUnpin!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_BTScanPosUnpin!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -7668,14 +11719,18 @@ macro_rules! __pgrx_c_args_BTScanPosUnpin {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_BTScanPosUnpin!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_BTScanPosUnpin!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_BTScanPosUnpin!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_BTScanPosUnpin!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_BTScanPosUnpin!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -7702,13 +11757,13 @@ macro_rules! __pgrx_c_args_BTScanPosUnpin {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_BTScanPosUnpin!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_BTScanPosUnpin!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -7751,7 +11806,7 @@ macro_rules! BTScanPosUnpin {
         {
             {
                 let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                    $crate::ReleaseBuffer(
+                    $crate::__pgrx_c_bindings::ReleaseBuffer(
                         <
                             $crate::__pgrx_c_macros::CInt as $crate::__pgrx_c_macros::expression::CType
                         >::into_storage(
@@ -7784,7 +11839,7 @@ macro_rules! BTScanPosUnpin {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::null_constant(
                                 $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                    $crate::InvalidBuffer as i32
+                                    $crate::__pgrx_c_bindings::InvalidBuffer as i32
                                 )
                             )
                         )
@@ -7808,8 +11863,1312 @@ macro_rules! BTScanPosUnpin {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
+    target_pointer_width = "64",
+    target_endian = "little"
+)))]
+#[cfg(not(docsrs))]
+compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
+#[doc(hidden)]
+#[macro_export]
+macro_rules! __pgrx_c_args_BTScanPosUnpinIfPinned {
+    (@collect $mode:ident [$($done:tt)*]; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_BTScanPosUnpinIfPinned!(@p0 $mode [$($done)*]; $($raw)*)
+    };
+    (@classified [$next:ident $mode:ident [$($done:tt)*] [$($rest:tt)*]] $descriptor:tt) => {
+        $crate::__pgrx_c_args_BTScanPosUnpinIfPinned!(
+            @$next $mode [$($done)* $descriptor,];
+            $($rest)*
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
+        $crate::__pgrx_c_args_BTScanPosUnpinIfPinned!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
+    };
+    (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
+        $crate::__pgrx_c_args_BTScanPosUnpinIfPinned!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_BTScanPosUnpinIfPinned!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+            $($rest)*
+        )
+    };
+    (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_BTScanPosUnpinIfPinned!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; - $($raw:tt)*) => {
+        $crate::__pgrx_c_args_BTScanPosUnpinIfPinned!(@negative0 $mode [$($done)*]; - $($raw)*)
+    };
+    (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
+        $crate::__pgrx_c_args_BTScanPosUnpinIfPinned!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BTScanPosUnpinIfPinned] [p1 $mode [$($done)*] []] [
+                $head $(::$tail)* ! $group
+            ]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; ::$head:ident $(::$tail:ident)* ! $group:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BTScanPosUnpinIfPinned] [p1 $mode [$($done)*] []] [
+                ::$head $(::$tail)* ! $group
+            ]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; ($($inner:tt)*)) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BTScanPosUnpinIfPinned] [p1 $mode [$($done)*] []] [
+                ($($inner)*)
+            ]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
+        $crate::__pgrx_c_args_BTScanPosUnpinIfPinned!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
+        $crate::__pgrx_c_args_BTScanPosUnpinIfPinned!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
+        $crate::__pgrx_c_args_BTScanPosUnpinIfPinned!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BTScanPosUnpinIfPinned] [p1 $mode [$($done)*] [$($rest)*]] [
+                $head $(::$tail)* ! $group
+            ]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; ::$head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BTScanPosUnpinIfPinned] [p1 $mode [$($done)*] [$($rest)*]] [
+                ::$head $(::$tail)* ! $group
+            ]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; ($($inner:tt)*), $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BTScanPosUnpinIfPinned] [p1 $mode [$($done)*] [$($rest)*]] [
+                ($($inner)*)
+            ]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_BTScanPosUnpinIfPinned!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_BTScanPosUnpinIfPinned!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*];) => {
+        $crate::BTScanPosUnpinIfPinned!(@$mode; $($done)*)
+    };
+    ($($invalid:tt)*) => {
+        compile_error!("arguments do not satisfy this C macro's invocation contract")
+    };
+}
+/// C macro BTScanPosUnpinIfPinned from nbtree.h:1006
+///
+/// ```text
+/// #define BTScanPosUnpinIfPinned( scanpos ) do { if ( BTScanPosIsPinned ( scanpos ) ) BTScanPosUnpin ( scanpos ) ; } while ( 0 )
+/// ```
+///
+///
+/// This macro executes C statements in order and yields no value. Local blocks retain their C scope. Pointer access and native calls keep their usual caller safety obligations.
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+#[macro_export]
+macro_rules! BTScanPosUnpinIfPinned {
+    (@__pgrx_emit_check_safety; $scanpos:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $scanpos);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_BTScanPosUnpinIfPinned!(
+            @collect __pgrx_emit_check_safety [];
+            $($raw)*
+        )
+    };
+    (@__pgrx_emit_public; $scanpos:tt $(,)?) => {
+        {
+            /* PGRX: AssertMacro remains expanded because preserving the complete statement body and its order has not been proved equivalent to C substitution. */ /* PGRX: BTScanPosIsPinned remains expanded because preserving the complete statement body and its order has not been proved equivalent to C substitution. */ /* PGRX: BTScanPosUnpin remains expanded because preserving the complete statement body and its order has not been proved equivalent to C substitution. */
+            if $crate::__pgrx_c_macros::expression::truth(
+                (
+                    (
+                        $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                            {
+                                {
+                                    let _ = $crate::__pgrx_c_macros::expression::profile_value::<
+                                        true,
+                                        _
+                                    >(
+                                        {
+                                            {
+                                                let _ = $crate::__pgrx_c_macros::expression::profile_value::<
+                                                    true,
+                                                    _
+                                                >(
+                                                    /* PGRX: true remains expanded because no integer constant binding is available in the defining Rust crate. */
+                                                    $crate::__pgrx_c_macros::CValue::<
+                                                        $crate::__pgrx_c_macros::CInt
+                                                    >::new(1i32)
+                                                );
+                                            }
+                                        }
+                                    );
+                                };
+                                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                    <
+                                        $crate::__pgrx_c_macros::CBool as $crate::__pgrx_c_macros::expression::CType
+                                    >::from_storage(
+                                        $crate::__pgrx_c_bindings::BufferIsValid(
+                                            <
+                                                $crate::__pgrx_c_macros::CInt as $crate::__pgrx_c_macros::expression::CType
+                                            >::into_storage(
+                                                $crate::__pgrx_c_macros::expression::implicit::<
+                                                    $crate::__pgrx_c_macros::CInt,
+                                                    _
+                                                >(
+                                                    $crate::__pgrx_c_macros::expression::profile_value::<
+                                                        true,
+                                                        _
+                                                    >(
+                                                        $crate::__pgrx_c_macros::expression::load(
+                                                            $crate::__pgrx_c_macros::expression::project::<
+                                                                $crate::__pgrx_c_generated::Field_buf,
+                                                                _,
+                                                                _
+                                                            >(
+                                                                (
+                                                                    $crate::__pgrx_c_operand!(
+                                                                        @read_place;
+                                                                        $scanpos
+                                                                    )
+                                                                )
+                                                            )
+                                                        )
+                                                    )
+                                                )
+                                            ),
+                                        )
+                                    )
+                                )
+                            }
+                        )
+                    )
+                )
+            ) {
+                {
+                    {
+                        let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                            $crate::__pgrx_c_bindings::ReleaseBuffer(
+                                <
+                                    $crate::__pgrx_c_macros::CInt as $crate::__pgrx_c_macros::expression::CType
+                                >::into_storage(
+                                    $crate::__pgrx_c_macros::expression::implicit::<
+                                        $crate::__pgrx_c_macros::CInt,
+                                        _
+                                    >(
+                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                            true,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_macros::expression::load(
+                                                $crate::__pgrx_c_macros::expression::project::<
+                                                    $crate::__pgrx_c_generated::Field_buf,
+                                                    _,
+                                                    _
+                                                >(
+                                                    (
+                                                        $crate::__pgrx_c_operand!(
+                                                            @read_place;
+                                                            $scanpos
+                                                        )
+                                                    )
+                                                )
+                                            )
+                                        )
+                                    )
+                                ),
+                            )
+                        );
+                    };
+                    {
+                        let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                            $crate::__pgrx_c_macros::expression::assign(
+                                $crate::__pgrx_c_macros::expression::project::<
+                                    $crate::__pgrx_c_generated::Field_buf,
+                                    _,
+                                    _
+                                >(($crate::__pgrx_c_operand!(@place; $scanpos))),
+                                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                    $crate::__pgrx_c_macros::expression::null_constant(
+                                        $crate::__pgrx_c_macros::CValue::<
+                                            $crate::__pgrx_c_macros::CInt
+                                        >::new($crate::__pgrx_c_bindings::InvalidBuffer as i32)
+                                    )
+                                )
+                            )
+                        );
+                    };
+                }
+            }
+        }
+    };
+    (@__pgrx_emit_discard; $scanpos:tt $(,)?) => {
+        $crate::BTScanPosUnpinIfPinned!(@__pgrx_emit_public; $scanpos)
+    };
+    (@__pgrx_c_discard; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_BTScanPosUnpinIfPinned!(@collect __pgrx_emit_discard []; $($raw)*)
+    };
+    (@$mode:ident; $($raw:tt)*) => {
+        compile_error!("a C statement body is not an expression operand")
+    };
+    ($($raw:tt)*) => {
+        $crate::__pgrx_c_args_BTScanPosUnpinIfPinned!(@collect __pgrx_emit_public []; $($raw)*)
+    };
+}
+
+#[cfg(not(all(
+    target_arch = "x86_64",
+    target_os = "linux",
+    target_pointer_width = "64",
+    target_endian = "little"
+)))]
+#[cfg(not(docsrs))]
+compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
+#[doc(hidden)]
+#[macro_export]
+macro_rules! __pgrx_c_args_BTreeTupleGetDownLink {
+    (@collect $mode:ident [$($done:tt)*]; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_BTreeTupleGetDownLink!(@p0 $mode [$($done)*]; $($raw)*)
+    };
+    (@classified [$next:ident $mode:ident [$($done:tt)*] [$($rest:tt)*]] $descriptor:tt) => {
+        $crate::__pgrx_c_args_BTreeTupleGetDownLink!(
+            @$next $mode [$($done)* $descriptor,];
+            $($rest)*
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
+        $crate::__pgrx_c_args_BTreeTupleGetDownLink!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
+    };
+    (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
+        $crate::__pgrx_c_args_BTreeTupleGetDownLink!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_BTreeTupleGetDownLink!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+            $($rest)*
+        )
+    };
+    (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_BTreeTupleGetDownLink!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; - $($raw:tt)*) => {
+        $crate::__pgrx_c_args_BTreeTupleGetDownLink!(@negative0 $mode [$($done)*]; - $($raw)*)
+    };
+    (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
+        $crate::__pgrx_c_args_BTreeTupleGetDownLink!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BTreeTupleGetDownLink] [p1 $mode [$($done)*] []] [
+                $head $(::$tail)* ! $group
+            ]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; ::$head:ident $(::$tail:ident)* ! $group:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BTreeTupleGetDownLink] [p1 $mode [$($done)*] []] [
+                ::$head $(::$tail)* ! $group
+            ]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; ($($inner:tt)*)) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BTreeTupleGetDownLink] [p1 $mode [$($done)*] []] [($($inner)*)]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
+        $crate::__pgrx_c_args_BTreeTupleGetDownLink!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
+        $crate::__pgrx_c_args_BTreeTupleGetDownLink!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
+        $crate::__pgrx_c_args_BTreeTupleGetDownLink!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BTreeTupleGetDownLink] [p1 $mode [$($done)*] [$($rest)*]] [
+                $head $(::$tail)* ! $group
+            ]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; ::$head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BTreeTupleGetDownLink] [p1 $mode [$($done)*] [$($rest)*]] [
+                ::$head $(::$tail)* ! $group
+            ]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; ($($inner:tt)*), $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BTreeTupleGetDownLink] [p1 $mode [$($done)*] [$($rest)*]] [
+                ($($inner)*)
+            ]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_BTreeTupleGetDownLink!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_BTreeTupleGetDownLink!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*];) => {
+        $crate::BTreeTupleGetDownLink!(@$mode; $($done)*)
+    };
+    ($($invalid:tt)*) => {
+        compile_error!("arguments do not satisfy this C macro's invocation contract")
+    };
+}
+/// Typed call adapter for C inline function BTreeTupleGetDownLink from nbtree.h:555
+///
+/// ```c
+/// static inline BlockNumber
+/// BTreeTupleGetDownLink(IndexTuple pivot)
+/// {
+/// 	return ItemPointerGetBlockNumberNoCheck(&pivot->t_tid);
+/// }
+/// ```
+///
+///
+/// Calls the original function through its inspected C prototype. Each operand is evaluated once and converted using C parameter assignment rules. The result retains the function's original C type; `.get()` extracts its native storage, including `()` for a void result. Native calls retain the backend thread, PostgreSQL error, and caller safety contracts of the generated guarded binding.
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+#[macro_export]
+macro_rules! BTreeTupleGetDownLink {
+    (@__pgrx_emit_check_safety; $pivot:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $pivot);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_BTreeTupleGetDownLink!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
+    (@__pgrx_emit_public; $pivot:tt $(,)?) => {
+        $crate::__pgrx_c_macros::expression_result::finish(
+            $crate::BTreeTupleGetDownLink!(@__pgrx_emit_value; $pivot)
+        )
+    };
+    (@__pgrx_emit_value; $pivot:tt $(,)?) => {
+        $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+            <$crate::__pgrx_c_macros::CUnsignedInt as $crate::__pgrx_c_macros::expression::CType>::from_storage(
+                $crate::__pgrx_c_bindings::BTreeTupleGetDownLink(
+                    <
+                        $crate::__pgrx_c_macros::expression::CPointer<
+                            $crate::__pgrx_c_macros::expression::CRecord<
+                                $crate::__pgrx_c_bindings::IndexTupleData
+                            >,
+                            $crate::__pgrx_c_macros::expression::ReadWrite
+                        > as $crate::__pgrx_c_macros::expression::CType
+                    >::into_storage(
+                        $crate::__pgrx_c_macros::expression::implicit::<
+                            $crate::__pgrx_c_macros::expression::CPointer<
+                                $crate::__pgrx_c_macros::expression::CRecord<
+                                    $crate::__pgrx_c_bindings::IndexTupleData
+                                >,
+                                $crate::__pgrx_c_macros::expression::ReadWrite
+                            >,
+                            _
+                        >(
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_operand!(@value [true]; $pivot)
+                            )
+                        )
+                    ),
+                )
+            )
+        )
+    };
+    (@__pgrx_c_value; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_BTreeTupleGetDownLink!(@collect __pgrx_emit_value []; $($raw)*)
+    };
+    (@__pgrx_emit_place; $pivot:tt $(,)?) => {
+        compile_error!("C expression is not a place in this operation")
+    };
+    (@__pgrx_c_place; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_BTreeTupleGetDownLink!(@collect __pgrx_emit_place []; $($raw)*)
+    };
+    (@__pgrx_emit_read_place; $pivot:tt $(,)?) => {
+        compile_error!("C expression is not a place in this operation")
+    };
+    (@__pgrx_c_read_place; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_BTreeTupleGetDownLink!(@collect __pgrx_emit_read_place []; $($raw)*)
+    };
+    (@__pgrx_emit_size; $pivot:tt $(,)?) => {
+        $crate::__pgrx_c_macros::expression::size_of_value_type(
+            if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $pivot);
+                    }
+                }
+                Some(
+                    unsafe {
+                        $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                            <
+                                $crate::__pgrx_c_macros::CUnsignedInt as $crate::__pgrx_c_macros::expression::CType
+                            >::from_storage(
+                                $crate::__pgrx_c_bindings::BTreeTupleGetDownLink(
+                                    <
+                                        $crate::__pgrx_c_macros::expression::CPointer<
+                                            $crate::__pgrx_c_macros::expression::CRecord<
+                                                $crate::__pgrx_c_bindings::IndexTupleData
+                                            >,
+                                            $crate::__pgrx_c_macros::expression::ReadWrite
+                                        > as $crate::__pgrx_c_macros::expression::CType
+                                    >::into_storage(
+                                        $crate::__pgrx_c_macros::expression::implicit::<
+                                            $crate::__pgrx_c_macros::expression::CPointer<
+                                                $crate::__pgrx_c_macros::expression::CRecord<
+                                                    $crate::__pgrx_c_bindings::IndexTupleData
+                                                >,
+                                                $crate::__pgrx_c_macros::expression::ReadWrite
+                                            >,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_macros::expression::profile_value::<
+                                                true,
+                                                _
+                                            >($crate::__pgrx_c_operand!(@value [true]; $pivot))
+                                        )
+                                    ),
+                                )
+                            )
+                        )
+                    }
+                )
+            } else {
+                None
+            }
+        )
+    };
+    (@__pgrx_c_size; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_BTreeTupleGetDownLink!(@collect __pgrx_emit_size []; $($raw)*)
+    };
+    (@__pgrx_emit_discard; $pivot:tt $(,)?) => {
+        {
+            let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                <
+                    $crate::__pgrx_c_macros::CUnsignedInt as $crate::__pgrx_c_macros::expression::CType
+                >::from_storage(
+                    $crate::__pgrx_c_bindings::BTreeTupleGetDownLink(
+                        <
+                            $crate::__pgrx_c_macros::expression::CPointer<
+                                $crate::__pgrx_c_macros::expression::CRecord<
+                                    $crate::__pgrx_c_bindings::IndexTupleData
+                                >,
+                                $crate::__pgrx_c_macros::expression::ReadWrite
+                            > as $crate::__pgrx_c_macros::expression::CType
+                        >::into_storage(
+                            $crate::__pgrx_c_macros::expression::implicit::<
+                                $crate::__pgrx_c_macros::expression::CPointer<
+                                    $crate::__pgrx_c_macros::expression::CRecord<
+                                        $crate::__pgrx_c_bindings::IndexTupleData
+                                    >,
+                                    $crate::__pgrx_c_macros::expression::ReadWrite
+                                >,
+                                _
+                            >(
+                                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                    $crate::__pgrx_c_operand!(@value [true]; $pivot)
+                                )
+                            )
+                        ),
+                    )
+                )
+            );
+        }
+    };
+    (@__pgrx_c_discard; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_BTreeTupleGetDownLink!(@collect __pgrx_emit_discard []; $($raw)*)
+    };
+    ($($raw:tt)*) => {
+        $crate::__pgrx_c_args_BTreeTupleGetDownLink!(@collect __pgrx_emit_public []; $($raw)*)
+    };
+}
+
+#[cfg(not(all(
+    target_arch = "x86_64",
+    target_os = "linux",
+    target_pointer_width = "64",
+    target_endian = "little"
+)))]
+#[cfg(not(docsrs))]
+compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
+#[doc(hidden)]
+#[macro_export]
+macro_rules! __pgrx_c_args_BTreeTupleGetHeapTID {
+    (@collect $mode:ident [$($done:tt)*]; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_BTreeTupleGetHeapTID!(@p0 $mode [$($done)*]; $($raw)*)
+    };
+    (@classified [$next:ident $mode:ident [$($done:tt)*] [$($rest:tt)*]] $descriptor:tt) => {
+        $crate::__pgrx_c_args_BTreeTupleGetHeapTID!(
+            @$next $mode [$($done)* $descriptor,];
+            $($rest)*
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
+        $crate::__pgrx_c_args_BTreeTupleGetHeapTID!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
+    };
+    (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
+        $crate::__pgrx_c_args_BTreeTupleGetHeapTID!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_BTreeTupleGetHeapTID!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+            $($rest)*
+        )
+    };
+    (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_BTreeTupleGetHeapTID!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; - $($raw:tt)*) => {
+        $crate::__pgrx_c_args_BTreeTupleGetHeapTID!(@negative0 $mode [$($done)*]; - $($raw)*)
+    };
+    (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
+        $crate::__pgrx_c_args_BTreeTupleGetHeapTID!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BTreeTupleGetHeapTID] [p1 $mode [$($done)*] []] [
+                $head $(::$tail)* ! $group
+            ]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; ::$head:ident $(::$tail:ident)* ! $group:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BTreeTupleGetHeapTID] [p1 $mode [$($done)*] []] [
+                ::$head $(::$tail)* ! $group
+            ]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; ($($inner:tt)*)) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BTreeTupleGetHeapTID] [p1 $mode [$($done)*] []] [($($inner)*)]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
+        $crate::__pgrx_c_args_BTreeTupleGetHeapTID!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
+        $crate::__pgrx_c_args_BTreeTupleGetHeapTID!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
+        $crate::__pgrx_c_args_BTreeTupleGetHeapTID!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BTreeTupleGetHeapTID] [p1 $mode [$($done)*] [$($rest)*]] [
+                $head $(::$tail)* ! $group
+            ]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; ::$head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BTreeTupleGetHeapTID] [p1 $mode [$($done)*] [$($rest)*]] [
+                ::$head $(::$tail)* ! $group
+            ]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; ($($inner:tt)*), $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BTreeTupleGetHeapTID] [p1 $mode [$($done)*] [$($rest)*]] [
+                ($($inner)*)
+            ]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_BTreeTupleGetHeapTID!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_BTreeTupleGetHeapTID!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*];) => {
+        $crate::BTreeTupleGetHeapTID!(@$mode; $($done)*)
+    };
+    ($($invalid:tt)*) => {
+        compile_error!("arguments do not satisfy this C macro's invocation contract")
+    };
+}
+/// Typed call adapter for C inline function BTreeTupleGetHeapTID from nbtree.h:637
+///
+/// ```c
+/// static inline ItemPointer
+/// BTreeTupleGetHeapTID(IndexTuple itup)
+/// {
+/// 	if (BTreeTupleIsPivot(itup))
+/// 	{
+/// 		/* Pivot tuple heap TID representation? */
+/// 		if ((ItemPointerGetOffsetNumberNoCheck(&itup->t_tid) &
+/// 			 BT_PIVOT_HEAP_TID_ATTR) != 0)
+/// 			return (ItemPointer) ((char *) itup + IndexTupleSize(itup) -
+/// 								  sizeof(ItemPointerData));
+///
+/// 		/* Heap TID attribute was truncated */
+/// 		return NULL;
+/// 	}
+/// 	else if (BTreeTupleIsPosting(itup))
+/// 		return BTreeTupleGetPosting(itup);
+///
+/// 	return &itup->t_tid;
+/// }
+/// ```
+///
+///
+/// Calls the original function through its inspected C prototype. Each operand is evaluated once and converted using C parameter assignment rules. The result retains the function's original C type; `.get()` extracts its native storage, including `()` for a void result. Native calls retain the backend thread, PostgreSQL error, and caller safety contracts of the generated guarded binding.
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+#[macro_export]
+macro_rules! BTreeTupleGetHeapTID {
+    (@__pgrx_emit_check_safety; $itup:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $itup);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_BTreeTupleGetHeapTID!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
+    (@__pgrx_emit_public; $itup:tt $(,)?) => {
+        $crate::__pgrx_c_macros::expression_result::finish(
+            $crate::BTreeTupleGetHeapTID!(@__pgrx_emit_value; $itup)
+        )
+    };
+    (@__pgrx_emit_value; $itup:tt $(,)?) => {
+        $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+            <
+                $crate::__pgrx_c_macros::expression::CPointer<
+                    $crate::__pgrx_c_macros::expression::CRecord<
+                        $crate::__pgrx_c_bindings::ItemPointerData
+                    >,
+                    $crate::__pgrx_c_macros::expression::ReadWrite
+                > as $crate::__pgrx_c_macros::expression::CType
+            >::from_storage(
+                $crate::__pgrx_c_bindings::BTreeTupleGetHeapTID(
+                    <
+                        $crate::__pgrx_c_macros::expression::CPointer<
+                            $crate::__pgrx_c_macros::expression::CRecord<
+                                $crate::__pgrx_c_bindings::IndexTupleData
+                            >,
+                            $crate::__pgrx_c_macros::expression::ReadWrite
+                        > as $crate::__pgrx_c_macros::expression::CType
+                    >::into_storage(
+                        $crate::__pgrx_c_macros::expression::implicit::<
+                            $crate::__pgrx_c_macros::expression::CPointer<
+                                $crate::__pgrx_c_macros::expression::CRecord<
+                                    $crate::__pgrx_c_bindings::IndexTupleData
+                                >,
+                                $crate::__pgrx_c_macros::expression::ReadWrite
+                            >,
+                            _
+                        >(
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_operand!(@value [true]; $itup)
+                            )
+                        )
+                    ),
+                )
+            )
+        )
+    };
+    (@__pgrx_c_value; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_BTreeTupleGetHeapTID!(@collect __pgrx_emit_value []; $($raw)*)
+    };
+    (@__pgrx_emit_place; $itup:tt $(,)?) => {
+        compile_error!("C expression is not a place in this operation")
+    };
+    (@__pgrx_c_place; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_BTreeTupleGetHeapTID!(@collect __pgrx_emit_place []; $($raw)*)
+    };
+    (@__pgrx_emit_read_place; $itup:tt $(,)?) => {
+        compile_error!("C expression is not a place in this operation")
+    };
+    (@__pgrx_c_read_place; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_BTreeTupleGetHeapTID!(@collect __pgrx_emit_read_place []; $($raw)*)
+    };
+    (@__pgrx_emit_size; $itup:tt $(,)?) => {
+        $crate::__pgrx_c_macros::expression::size_of_value_type(
+            if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $itup);
+                    }
+                }
+                Some(
+                    unsafe {
+                        $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                            <
+                                $crate::__pgrx_c_macros::expression::CPointer<
+                                    $crate::__pgrx_c_macros::expression::CRecord<
+                                        $crate::__pgrx_c_bindings::ItemPointerData
+                                    >,
+                                    $crate::__pgrx_c_macros::expression::ReadWrite
+                                > as $crate::__pgrx_c_macros::expression::CType
+                            >::from_storage(
+                                $crate::__pgrx_c_bindings::BTreeTupleGetHeapTID(
+                                    <
+                                        $crate::__pgrx_c_macros::expression::CPointer<
+                                            $crate::__pgrx_c_macros::expression::CRecord<
+                                                $crate::__pgrx_c_bindings::IndexTupleData
+                                            >,
+                                            $crate::__pgrx_c_macros::expression::ReadWrite
+                                        > as $crate::__pgrx_c_macros::expression::CType
+                                    >::into_storage(
+                                        $crate::__pgrx_c_macros::expression::implicit::<
+                                            $crate::__pgrx_c_macros::expression::CPointer<
+                                                $crate::__pgrx_c_macros::expression::CRecord<
+                                                    $crate::__pgrx_c_bindings::IndexTupleData
+                                                >,
+                                                $crate::__pgrx_c_macros::expression::ReadWrite
+                                            >,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_macros::expression::profile_value::<
+                                                true,
+                                                _
+                                            >($crate::__pgrx_c_operand!(@value [true]; $itup))
+                                        )
+                                    ),
+                                )
+                            )
+                        )
+                    }
+                )
+            } else {
+                None
+            }
+        )
+    };
+    (@__pgrx_c_size; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_BTreeTupleGetHeapTID!(@collect __pgrx_emit_size []; $($raw)*)
+    };
+    (@__pgrx_emit_discard; $itup:tt $(,)?) => {
+        {
+            let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                <
+                    $crate::__pgrx_c_macros::expression::CPointer<
+                        $crate::__pgrx_c_macros::expression::CRecord<
+                            $crate::__pgrx_c_bindings::ItemPointerData
+                        >,
+                        $crate::__pgrx_c_macros::expression::ReadWrite
+                    > as $crate::__pgrx_c_macros::expression::CType
+                >::from_storage(
+                    $crate::__pgrx_c_bindings::BTreeTupleGetHeapTID(
+                        <
+                            $crate::__pgrx_c_macros::expression::CPointer<
+                                $crate::__pgrx_c_macros::expression::CRecord<
+                                    $crate::__pgrx_c_bindings::IndexTupleData
+                                >,
+                                $crate::__pgrx_c_macros::expression::ReadWrite
+                            > as $crate::__pgrx_c_macros::expression::CType
+                        >::into_storage(
+                            $crate::__pgrx_c_macros::expression::implicit::<
+                                $crate::__pgrx_c_macros::expression::CPointer<
+                                    $crate::__pgrx_c_macros::expression::CRecord<
+                                        $crate::__pgrx_c_bindings::IndexTupleData
+                                    >,
+                                    $crate::__pgrx_c_macros::expression::ReadWrite
+                                >,
+                                _
+                            >(
+                                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                    $crate::__pgrx_c_operand!(@value [true]; $itup)
+                                )
+                            )
+                        ),
+                    )
+                )
+            );
+        }
+    };
+    (@__pgrx_c_discard; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_BTreeTupleGetHeapTID!(@collect __pgrx_emit_discard []; $($raw)*)
+    };
+    ($($raw:tt)*) => {
+        $crate::__pgrx_c_args_BTreeTupleGetHeapTID!(@collect __pgrx_emit_public []; $($raw)*)
+    };
+}
+
+#[cfg(not(all(
+    target_arch = "x86_64",
+    target_os = "linux",
+    target_pointer_width = "64",
+    target_endian = "little"
+)))]
+#[cfg(not(docsrs))]
+compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
+#[doc(hidden)]
+#[macro_export]
+macro_rules! __pgrx_c_args_BTreeTupleGetMaxHeapTID {
+    (@collect $mode:ident [$($done:tt)*]; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_BTreeTupleGetMaxHeapTID!(@p0 $mode [$($done)*]; $($raw)*)
+    };
+    (@classified [$next:ident $mode:ident [$($done:tt)*] [$($rest:tt)*]] $descriptor:tt) => {
+        $crate::__pgrx_c_args_BTreeTupleGetMaxHeapTID!(
+            @$next $mode [$($done)* $descriptor,];
+            $($rest)*
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
+        $crate::__pgrx_c_args_BTreeTupleGetMaxHeapTID!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
+    };
+    (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
+        $crate::__pgrx_c_args_BTreeTupleGetMaxHeapTID!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_BTreeTupleGetMaxHeapTID!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+            $($rest)*
+        )
+    };
+    (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_BTreeTupleGetMaxHeapTID!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; - $($raw:tt)*) => {
+        $crate::__pgrx_c_args_BTreeTupleGetMaxHeapTID!(@negative0 $mode [$($done)*]; - $($raw)*)
+    };
+    (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
+        $crate::__pgrx_c_args_BTreeTupleGetMaxHeapTID!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BTreeTupleGetMaxHeapTID] [p1 $mode [$($done)*] []] [
+                $head $(::$tail)* ! $group
+            ]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; ::$head:ident $(::$tail:ident)* ! $group:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BTreeTupleGetMaxHeapTID] [p1 $mode [$($done)*] []] [
+                ::$head $(::$tail)* ! $group
+            ]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; ($($inner:tt)*)) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BTreeTupleGetMaxHeapTID] [p1 $mode [$($done)*] []] [
+                ($($inner)*)
+            ]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
+        $crate::__pgrx_c_args_BTreeTupleGetMaxHeapTID!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
+        $crate::__pgrx_c_args_BTreeTupleGetMaxHeapTID!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
+        $crate::__pgrx_c_args_BTreeTupleGetMaxHeapTID!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BTreeTupleGetMaxHeapTID] [p1 $mode [$($done)*] [$($rest)*]] [
+                $head $(::$tail)* ! $group
+            ]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; ::$head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BTreeTupleGetMaxHeapTID] [p1 $mode [$($done)*] [$($rest)*]] [
+                ::$head $(::$tail)* ! $group
+            ]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; ($($inner:tt)*), $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BTreeTupleGetMaxHeapTID] [p1 $mode [$($done)*] [$($rest)*]] [
+                ($($inner)*)
+            ]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_BTreeTupleGetMaxHeapTID!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_BTreeTupleGetMaxHeapTID!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*];) => {
+        $crate::BTreeTupleGetMaxHeapTID!(@$mode; $($done)*)
+    };
+    ($($invalid:tt)*) => {
+        compile_error!("arguments do not satisfy this C macro's invocation contract")
+    };
+}
+/// Typed call adapter for C inline function BTreeTupleGetMaxHeapTID from nbtree.h:663
+///
+/// ```c
+/// static inline ItemPointer
+/// BTreeTupleGetMaxHeapTID(IndexTuple itup)
+/// {
+/// 	Assert(!BTreeTupleIsPivot(itup));
+///
+/// 	if (BTreeTupleIsPosting(itup))
+/// 	{
+/// 		uint16		nposting = BTreeTupleGetNPosting(itup);
+///
+/// 		return BTreeTupleGetPostingN(itup, nposting - 1);
+/// 	}
+///
+/// 	return &itup->t_tid;
+/// }
+/// ```
+///
+///
+/// Calls the original function through its inspected C prototype. Each operand is evaluated once and converted using C parameter assignment rules. The result retains the function's original C type; `.get()` extracts its native storage, including `()` for a void result. Native calls retain the backend thread, PostgreSQL error, and caller safety contracts of the generated guarded binding.
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+#[macro_export]
+macro_rules! BTreeTupleGetMaxHeapTID {
+    (@__pgrx_emit_check_safety; $itup:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $itup);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_BTreeTupleGetMaxHeapTID!(
+            @collect __pgrx_emit_check_safety [];
+            $($raw)*
+        )
+    };
+    (@__pgrx_emit_public; $itup:tt $(,)?) => {
+        $crate::__pgrx_c_macros::expression_result::finish(
+            $crate::BTreeTupleGetMaxHeapTID!(@__pgrx_emit_value; $itup)
+        )
+    };
+    (@__pgrx_emit_value; $itup:tt $(,)?) => {
+        $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+            <
+                $crate::__pgrx_c_macros::expression::CPointer<
+                    $crate::__pgrx_c_macros::expression::CRecord<
+                        $crate::__pgrx_c_bindings::ItemPointerData
+                    >,
+                    $crate::__pgrx_c_macros::expression::ReadWrite
+                > as $crate::__pgrx_c_macros::expression::CType
+            >::from_storage(
+                $crate::__pgrx_c_bindings::BTreeTupleGetMaxHeapTID(
+                    <
+                        $crate::__pgrx_c_macros::expression::CPointer<
+                            $crate::__pgrx_c_macros::expression::CRecord<
+                                $crate::__pgrx_c_bindings::IndexTupleData
+                            >,
+                            $crate::__pgrx_c_macros::expression::ReadWrite
+                        > as $crate::__pgrx_c_macros::expression::CType
+                    >::into_storage(
+                        $crate::__pgrx_c_macros::expression::implicit::<
+                            $crate::__pgrx_c_macros::expression::CPointer<
+                                $crate::__pgrx_c_macros::expression::CRecord<
+                                    $crate::__pgrx_c_bindings::IndexTupleData
+                                >,
+                                $crate::__pgrx_c_macros::expression::ReadWrite
+                            >,
+                            _
+                        >(
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_operand!(@value [true]; $itup)
+                            )
+                        )
+                    ),
+                )
+            )
+        )
+    };
+    (@__pgrx_c_value; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_BTreeTupleGetMaxHeapTID!(@collect __pgrx_emit_value []; $($raw)*)
+    };
+    (@__pgrx_emit_place; $itup:tt $(,)?) => {
+        compile_error!("C expression is not a place in this operation")
+    };
+    (@__pgrx_c_place; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_BTreeTupleGetMaxHeapTID!(@collect __pgrx_emit_place []; $($raw)*)
+    };
+    (@__pgrx_emit_read_place; $itup:tt $(,)?) => {
+        compile_error!("C expression is not a place in this operation")
+    };
+    (@__pgrx_c_read_place; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_BTreeTupleGetMaxHeapTID!(@collect __pgrx_emit_read_place []; $($raw)*)
+    };
+    (@__pgrx_emit_size; $itup:tt $(,)?) => {
+        $crate::__pgrx_c_macros::expression::size_of_value_type(
+            if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $itup);
+                    }
+                }
+                Some(
+                    unsafe {
+                        $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                            <
+                                $crate::__pgrx_c_macros::expression::CPointer<
+                                    $crate::__pgrx_c_macros::expression::CRecord<
+                                        $crate::__pgrx_c_bindings::ItemPointerData
+                                    >,
+                                    $crate::__pgrx_c_macros::expression::ReadWrite
+                                > as $crate::__pgrx_c_macros::expression::CType
+                            >::from_storage(
+                                $crate::__pgrx_c_bindings::BTreeTupleGetMaxHeapTID(
+                                    <
+                                        $crate::__pgrx_c_macros::expression::CPointer<
+                                            $crate::__pgrx_c_macros::expression::CRecord<
+                                                $crate::__pgrx_c_bindings::IndexTupleData
+                                            >,
+                                            $crate::__pgrx_c_macros::expression::ReadWrite
+                                        > as $crate::__pgrx_c_macros::expression::CType
+                                    >::into_storage(
+                                        $crate::__pgrx_c_macros::expression::implicit::<
+                                            $crate::__pgrx_c_macros::expression::CPointer<
+                                                $crate::__pgrx_c_macros::expression::CRecord<
+                                                    $crate::__pgrx_c_bindings::IndexTupleData
+                                                >,
+                                                $crate::__pgrx_c_macros::expression::ReadWrite
+                                            >,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_macros::expression::profile_value::<
+                                                true,
+                                                _
+                                            >($crate::__pgrx_c_operand!(@value [true]; $itup))
+                                        )
+                                    ),
+                                )
+                            )
+                        )
+                    }
+                )
+            } else {
+                None
+            }
+        )
+    };
+    (@__pgrx_c_size; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_BTreeTupleGetMaxHeapTID!(@collect __pgrx_emit_size []; $($raw)*)
+    };
+    (@__pgrx_emit_discard; $itup:tt $(,)?) => {
+        {
+            let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                <
+                    $crate::__pgrx_c_macros::expression::CPointer<
+                        $crate::__pgrx_c_macros::expression::CRecord<
+                            $crate::__pgrx_c_bindings::ItemPointerData
+                        >,
+                        $crate::__pgrx_c_macros::expression::ReadWrite
+                    > as $crate::__pgrx_c_macros::expression::CType
+                >::from_storage(
+                    $crate::__pgrx_c_bindings::BTreeTupleGetMaxHeapTID(
+                        <
+                            $crate::__pgrx_c_macros::expression::CPointer<
+                                $crate::__pgrx_c_macros::expression::CRecord<
+                                    $crate::__pgrx_c_bindings::IndexTupleData
+                                >,
+                                $crate::__pgrx_c_macros::expression::ReadWrite
+                            > as $crate::__pgrx_c_macros::expression::CType
+                        >::into_storage(
+                            $crate::__pgrx_c_macros::expression::implicit::<
+                                $crate::__pgrx_c_macros::expression::CPointer<
+                                    $crate::__pgrx_c_macros::expression::CRecord<
+                                        $crate::__pgrx_c_bindings::IndexTupleData
+                                    >,
+                                    $crate::__pgrx_c_macros::expression::ReadWrite
+                                >,
+                                _
+                            >(
+                                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                    $crate::__pgrx_c_operand!(@value [true]; $itup)
+                                )
+                            )
+                        ),
+                    )
+                )
+            );
+        }
+    };
+    (@__pgrx_c_discard; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_BTreeTupleGetMaxHeapTID!(@collect __pgrx_emit_discard []; $($raw)*)
+    };
+    ($($raw:tt)*) => {
+        $crate::__pgrx_c_args_BTreeTupleGetMaxHeapTID!(@collect __pgrx_emit_public []; $($raw)*)
+    };
+}
+
+#[cfg(not(all(
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -7837,13 +13196,13 @@ macro_rules! __pgrx_c_args_BTreeTupleGetNAtts {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_BTreeTupleGetNAtts!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_BTreeTupleGetNAtts!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -7852,7 +13211,7 @@ macro_rules! __pgrx_c_args_BTreeTupleGetNAtts {
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_BTreeTupleGetNAtts!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -7879,31 +13238,35 @@ macro_rules! __pgrx_c_args_BTreeTupleGetNAtts {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_BTreeTupleGetNAtts!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_BTreeTupleGetNAtts!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_BTreeTupleGetNAtts!(@p2 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_BTreeTupleGetNAtts!(
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative1 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_BTreeTupleGetNAtts!(@p2 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_BTreeTupleGetNAtts!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_BTreeTupleGetNAtts!(
-            @p2 $mode [$($done)* (@literal [- $argument]),];
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_BTreeTupleGetNAtts!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -7911,7 +13274,9 @@ macro_rules! __pgrx_c_args_BTreeTupleGetNAtts {
         $crate::__pgrx_c_args_BTreeTupleGetNAtts!(@negative1 $mode [$($done)*]; - $($raw)*)
     };
     (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_BTreeTupleGetNAtts!(@p2 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_BTreeTupleGetNAtts!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -7933,14 +13298,18 @@ macro_rules! __pgrx_c_args_BTreeTupleGetNAtts {
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_BTreeTupleGetNAtts!(@p2 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_BTreeTupleGetNAtts!(
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_BTreeTupleGetNAtts!(@p2 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_BTreeTupleGetNAtts!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_BTreeTupleGetNAtts!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -7967,13 +13336,13 @@ macro_rules! __pgrx_c_args_BTreeTupleGetNAtts {
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_BTreeTupleGetNAtts!(
-            @p2 $mode [$($done)* (@literal [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_BTreeTupleGetNAtts!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -8027,11 +13396,11 @@ macro_rules! BTreeTupleGetNAtts {
                                 <
                                     $crate::__pgrx_c_macros::CBool as $crate::__pgrx_c_macros::expression::CType
                                 >::from_storage(
-                                    $crate::BTreeTupleIsPivot(
+                                    $crate::__pgrx_c_bindings::BTreeTupleIsPivot(
                                         <
                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                    $crate::IndexTupleData
+                                                    $crate::__pgrx_c_bindings::IndexTupleData
                                                 >,
                                                 $crate::__pgrx_c_macros::expression::ReadWrite
                                             > as $crate::__pgrx_c_macros::expression::CType
@@ -8039,7 +13408,7 @@ macro_rules! BTreeTupleGetNAtts {
                                             $crate::__pgrx_c_macros::expression::implicit::<
                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                        $crate::IndexTupleData
+                                                        $crate::__pgrx_c_bindings::IndexTupleData
                                                     >,
                                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                                 >,
@@ -8067,11 +13436,11 @@ macro_rules! BTreeTupleGetNAtts {
                                             <
                                                 $crate::__pgrx_c_macros::CUnsignedShort as $crate::__pgrx_c_macros::expression::CType
                                             >::from_storage(
-                                                $crate::ItemPointerGetOffsetNumberNoCheck(
+                                                $crate::__pgrx_c_bindings::ItemPointerGetOffsetNumberNoCheck(
                                                     <
                                                         $crate::__pgrx_c_macros::expression::CPointer<
                                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                                $crate::ItemPointerData
+                                                                $crate::__pgrx_c_bindings::ItemPointerData
                                                             >,
                                                             $crate::__pgrx_c_macros::expression::ReadOnly
                                                         > as $crate::__pgrx_c_macros::expression::CType
@@ -8079,7 +13448,7 @@ macro_rules! BTreeTupleGetNAtts {
                                                         $crate::__pgrx_c_macros::expression::implicit::<
                                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                                    $crate::ItemPointerData
+                                                                    $crate::__pgrx_c_bindings::ItemPointerData
                                                                 >,
                                                                 $crate::__pgrx_c_macros::expression::ReadOnly
                                                             >,
@@ -8124,7 +13493,7 @@ macro_rules! BTreeTupleGetNAtts {
                                         >(
                                             $crate::__pgrx_c_macros::CValue::<
                                                 $crate::__pgrx_c_macros::CInt
-                                            >::new($crate::BT_OFFSET_MASK as i32)
+                                            >::new($crate::__pgrx_c_bindings::BT_OFFSET_MASK as i32)
                                         )
                                     )
                                 )
@@ -8216,11 +13585,11 @@ macro_rules! BTreeTupleGetNAtts {
                                             <
                                                 $crate::__pgrx_c_macros::CBool as $crate::__pgrx_c_macros::expression::CType
                                             >::from_storage(
-                                                $crate::BTreeTupleIsPivot(
+                                                $crate::__pgrx_c_bindings::BTreeTupleIsPivot(
                                                     <
                                                         $crate::__pgrx_c_macros::expression::CPointer<
                                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                                $crate::IndexTupleData
+                                                                $crate::__pgrx_c_bindings::IndexTupleData
                                                             >,
                                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                                         > as $crate::__pgrx_c_macros::expression::CType
@@ -8228,7 +13597,7 @@ macro_rules! BTreeTupleGetNAtts {
                                                         $crate::__pgrx_c_macros::expression::implicit::<
                                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                                    $crate::IndexTupleData
+                                                                    $crate::__pgrx_c_bindings::IndexTupleData
                                                                 >,
                                                                 $crate::__pgrx_c_macros::expression::ReadWrite
                                                             >,
@@ -8264,11 +13633,11 @@ macro_rules! BTreeTupleGetNAtts {
                                                         <
                                                             $crate::__pgrx_c_macros::CUnsignedShort as $crate::__pgrx_c_macros::expression::CType
                                                         >::from_storage(
-                                                            $crate::ItemPointerGetOffsetNumberNoCheck(
+                                                            $crate::__pgrx_c_bindings::ItemPointerGetOffsetNumberNoCheck(
                                                                 <
                                                                     $crate::__pgrx_c_macros::expression::CPointer<
                                                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                                                            $crate::ItemPointerData
+                                                                            $crate::__pgrx_c_bindings::ItemPointerData
                                                                         >,
                                                                         $crate::__pgrx_c_macros::expression::ReadOnly
                                                                     > as $crate::__pgrx_c_macros::expression::CType
@@ -8276,7 +13645,7 @@ macro_rules! BTreeTupleGetNAtts {
                                                                     $crate::__pgrx_c_macros::expression::implicit::<
                                                                         $crate::__pgrx_c_macros::expression::CPointer<
                                                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                $crate::ItemPointerData
+                                                                                $crate::__pgrx_c_bindings::ItemPointerData
                                                                             >,
                                                                             $crate::__pgrx_c_macros::expression::ReadOnly
                                                                         >,
@@ -8321,7 +13690,9 @@ macro_rules! BTreeTupleGetNAtts {
                                                     >(
                                                         $crate::__pgrx_c_macros::CValue::<
                                                             $crate::__pgrx_c_macros::CInt
-                                                        >::new($crate::BT_OFFSET_MASK as i32)
+                                                        >::new(
+                                                            $crate::__pgrx_c_bindings::BT_OFFSET_MASK as i32
+                                                        )
                                                     )
                                                 )
                                             )
@@ -8399,11 +13770,11 @@ macro_rules! BTreeTupleGetNAtts {
                                 <
                                     $crate::__pgrx_c_macros::CBool as $crate::__pgrx_c_macros::expression::CType
                                 >::from_storage(
-                                    $crate::BTreeTupleIsPivot(
+                                    $crate::__pgrx_c_bindings::BTreeTupleIsPivot(
                                         <
                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                    $crate::IndexTupleData
+                                                    $crate::__pgrx_c_bindings::IndexTupleData
                                                 >,
                                                 $crate::__pgrx_c_macros::expression::ReadWrite
                                             > as $crate::__pgrx_c_macros::expression::CType
@@ -8411,7 +13782,7 @@ macro_rules! BTreeTupleGetNAtts {
                                             $crate::__pgrx_c_macros::expression::implicit::<
                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                        $crate::IndexTupleData
+                                                        $crate::__pgrx_c_bindings::IndexTupleData
                                                     >,
                                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                                 >,
@@ -8439,11 +13810,11 @@ macro_rules! BTreeTupleGetNAtts {
                                             <
                                                 $crate::__pgrx_c_macros::CUnsignedShort as $crate::__pgrx_c_macros::expression::CType
                                             >::from_storage(
-                                                $crate::ItemPointerGetOffsetNumberNoCheck(
+                                                $crate::__pgrx_c_bindings::ItemPointerGetOffsetNumberNoCheck(
                                                     <
                                                         $crate::__pgrx_c_macros::expression::CPointer<
                                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                                $crate::ItemPointerData
+                                                                $crate::__pgrx_c_bindings::ItemPointerData
                                                             >,
                                                             $crate::__pgrx_c_macros::expression::ReadOnly
                                                         > as $crate::__pgrx_c_macros::expression::CType
@@ -8451,7 +13822,7 @@ macro_rules! BTreeTupleGetNAtts {
                                                         $crate::__pgrx_c_macros::expression::implicit::<
                                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                                    $crate::ItemPointerData
+                                                                    $crate::__pgrx_c_bindings::ItemPointerData
                                                                 >,
                                                                 $crate::__pgrx_c_macros::expression::ReadOnly
                                                             >,
@@ -8496,7 +13867,7 @@ macro_rules! BTreeTupleGetNAtts {
                                         >(
                                             $crate::__pgrx_c_macros::CValue::<
                                                 $crate::__pgrx_c_macros::CInt
-                                            >::new($crate::BT_OFFSET_MASK as i32)
+                                            >::new($crate::__pgrx_c_bindings::BT_OFFSET_MASK as i32)
                                         )
                                     )
                                 )
@@ -8559,8 +13930,4110 @@ macro_rules! BTreeTupleGetNAtts {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
+    target_pointer_width = "64",
+    target_endian = "little"
+)))]
+#[cfg(not(docsrs))]
+compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
+#[doc(hidden)]
+#[macro_export]
+macro_rules! __pgrx_c_args_BTreeTupleGetNPosting {
+    (@collect $mode:ident [$($done:tt)*]; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_BTreeTupleGetNPosting!(@p0 $mode [$($done)*]; $($raw)*)
+    };
+    (@classified [$next:ident $mode:ident [$($done:tt)*] [$($rest:tt)*]] $descriptor:tt) => {
+        $crate::__pgrx_c_args_BTreeTupleGetNPosting!(
+            @$next $mode [$($done)* $descriptor,];
+            $($rest)*
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
+        $crate::__pgrx_c_args_BTreeTupleGetNPosting!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
+    };
+    (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
+        $crate::__pgrx_c_args_BTreeTupleGetNPosting!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_BTreeTupleGetNPosting!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+            $($rest)*
+        )
+    };
+    (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_BTreeTupleGetNPosting!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; - $($raw:tt)*) => {
+        $crate::__pgrx_c_args_BTreeTupleGetNPosting!(@negative0 $mode [$($done)*]; - $($raw)*)
+    };
+    (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
+        $crate::__pgrx_c_args_BTreeTupleGetNPosting!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BTreeTupleGetNPosting] [p1 $mode [$($done)*] []] [
+                $head $(::$tail)* ! $group
+            ]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; ::$head:ident $(::$tail:ident)* ! $group:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BTreeTupleGetNPosting] [p1 $mode [$($done)*] []] [
+                ::$head $(::$tail)* ! $group
+            ]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; ($($inner:tt)*)) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BTreeTupleGetNPosting] [p1 $mode [$($done)*] []] [($($inner)*)]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
+        $crate::__pgrx_c_args_BTreeTupleGetNPosting!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
+        $crate::__pgrx_c_args_BTreeTupleGetNPosting!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
+        $crate::__pgrx_c_args_BTreeTupleGetNPosting!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BTreeTupleGetNPosting] [p1 $mode [$($done)*] [$($rest)*]] [
+                $head $(::$tail)* ! $group
+            ]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; ::$head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BTreeTupleGetNPosting] [p1 $mode [$($done)*] [$($rest)*]] [
+                ::$head $(::$tail)* ! $group
+            ]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; ($($inner:tt)*), $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BTreeTupleGetNPosting] [p1 $mode [$($done)*] [$($rest)*]] [
+                ($($inner)*)
+            ]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_BTreeTupleGetNPosting!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_BTreeTupleGetNPosting!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*];) => {
+        $crate::BTreeTupleGetNPosting!(@$mode; $($done)*)
+    };
+    ($($invalid:tt)*) => {
+        compile_error!("arguments do not satisfy this C macro's invocation contract")
+    };
+}
+/// Typed call adapter for C inline function BTreeTupleGetNPosting from nbtree.h:517
+///
+/// ```c
+/// static inline uint16
+/// BTreeTupleGetNPosting(IndexTuple posting)
+/// {
+/// 	OffsetNumber existing;
+///
+/// 	Assert(BTreeTupleIsPosting(posting));
+///
+/// 	existing = ItemPointerGetOffsetNumberNoCheck(&posting->t_tid);
+/// 	return (existing & BT_OFFSET_MASK);
+/// }
+/// ```
+///
+///
+/// Calls the original function through its inspected C prototype. Each operand is evaluated once and converted using C parameter assignment rules. The result retains the function's original C type; `.get()` extracts its native storage, including `()` for a void result. Native calls retain the backend thread, PostgreSQL error, and caller safety contracts of the generated guarded binding.
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+#[macro_export]
+macro_rules! BTreeTupleGetNPosting {
+    (@__pgrx_emit_check_safety; $posting:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $posting);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_BTreeTupleGetNPosting!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
+    (@__pgrx_emit_public; $posting:tt $(,)?) => {
+        $crate::__pgrx_c_macros::expression_result::finish(
+            $crate::BTreeTupleGetNPosting!(@__pgrx_emit_value; $posting)
+        )
+    };
+    (@__pgrx_emit_value; $posting:tt $(,)?) => {
+        $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+            <$crate::__pgrx_c_macros::CUnsignedShort as $crate::__pgrx_c_macros::expression::CType>::from_storage(
+                $crate::__pgrx_c_bindings::BTreeTupleGetNPosting(
+                    <
+                        $crate::__pgrx_c_macros::expression::CPointer<
+                            $crate::__pgrx_c_macros::expression::CRecord<
+                                $crate::__pgrx_c_bindings::IndexTupleData
+                            >,
+                            $crate::__pgrx_c_macros::expression::ReadWrite
+                        > as $crate::__pgrx_c_macros::expression::CType
+                    >::into_storage(
+                        $crate::__pgrx_c_macros::expression::implicit::<
+                            $crate::__pgrx_c_macros::expression::CPointer<
+                                $crate::__pgrx_c_macros::expression::CRecord<
+                                    $crate::__pgrx_c_bindings::IndexTupleData
+                                >,
+                                $crate::__pgrx_c_macros::expression::ReadWrite
+                            >,
+                            _
+                        >(
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_operand!(@value [true]; $posting)
+                            )
+                        )
+                    ),
+                )
+            )
+        )
+    };
+    (@__pgrx_c_value; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_BTreeTupleGetNPosting!(@collect __pgrx_emit_value []; $($raw)*)
+    };
+    (@__pgrx_emit_place; $posting:tt $(,)?) => {
+        compile_error!("C expression is not a place in this operation")
+    };
+    (@__pgrx_c_place; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_BTreeTupleGetNPosting!(@collect __pgrx_emit_place []; $($raw)*)
+    };
+    (@__pgrx_emit_read_place; $posting:tt $(,)?) => {
+        compile_error!("C expression is not a place in this operation")
+    };
+    (@__pgrx_c_read_place; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_BTreeTupleGetNPosting!(@collect __pgrx_emit_read_place []; $($raw)*)
+    };
+    (@__pgrx_emit_size; $posting:tt $(,)?) => {
+        $crate::__pgrx_c_macros::expression::size_of_value_type(
+            if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $posting);
+                    }
+                }
+                Some(
+                    unsafe {
+                        $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                            <
+                                $crate::__pgrx_c_macros::CUnsignedShort as $crate::__pgrx_c_macros::expression::CType
+                            >::from_storage(
+                                $crate::__pgrx_c_bindings::BTreeTupleGetNPosting(
+                                    <
+                                        $crate::__pgrx_c_macros::expression::CPointer<
+                                            $crate::__pgrx_c_macros::expression::CRecord<
+                                                $crate::__pgrx_c_bindings::IndexTupleData
+                                            >,
+                                            $crate::__pgrx_c_macros::expression::ReadWrite
+                                        > as $crate::__pgrx_c_macros::expression::CType
+                                    >::into_storage(
+                                        $crate::__pgrx_c_macros::expression::implicit::<
+                                            $crate::__pgrx_c_macros::expression::CPointer<
+                                                $crate::__pgrx_c_macros::expression::CRecord<
+                                                    $crate::__pgrx_c_bindings::IndexTupleData
+                                                >,
+                                                $crate::__pgrx_c_macros::expression::ReadWrite
+                                            >,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_macros::expression::profile_value::<
+                                                true,
+                                                _
+                                            >($crate::__pgrx_c_operand!(@value [true]; $posting))
+                                        )
+                                    ),
+                                )
+                            )
+                        )
+                    }
+                )
+            } else {
+                None
+            }
+        )
+    };
+    (@__pgrx_c_size; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_BTreeTupleGetNPosting!(@collect __pgrx_emit_size []; $($raw)*)
+    };
+    (@__pgrx_emit_discard; $posting:tt $(,)?) => {
+        {
+            let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                <
+                    $crate::__pgrx_c_macros::CUnsignedShort as $crate::__pgrx_c_macros::expression::CType
+                >::from_storage(
+                    $crate::__pgrx_c_bindings::BTreeTupleGetNPosting(
+                        <
+                            $crate::__pgrx_c_macros::expression::CPointer<
+                                $crate::__pgrx_c_macros::expression::CRecord<
+                                    $crate::__pgrx_c_bindings::IndexTupleData
+                                >,
+                                $crate::__pgrx_c_macros::expression::ReadWrite
+                            > as $crate::__pgrx_c_macros::expression::CType
+                        >::into_storage(
+                            $crate::__pgrx_c_macros::expression::implicit::<
+                                $crate::__pgrx_c_macros::expression::CPointer<
+                                    $crate::__pgrx_c_macros::expression::CRecord<
+                                        $crate::__pgrx_c_bindings::IndexTupleData
+                                    >,
+                                    $crate::__pgrx_c_macros::expression::ReadWrite
+                                >,
+                                _
+                            >(
+                                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                    $crate::__pgrx_c_operand!(@value [true]; $posting)
+                                )
+                            )
+                        ),
+                    )
+                )
+            );
+        }
+    };
+    (@__pgrx_c_discard; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_BTreeTupleGetNPosting!(@collect __pgrx_emit_discard []; $($raw)*)
+    };
+    ($($raw:tt)*) => {
+        $crate::__pgrx_c_args_BTreeTupleGetNPosting!(@collect __pgrx_emit_public []; $($raw)*)
+    };
+}
+
+#[cfg(not(all(
+    target_arch = "x86_64",
+    target_os = "linux",
+    target_pointer_width = "64",
+    target_endian = "little"
+)))]
+#[cfg(not(docsrs))]
+compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
+#[doc(hidden)]
+#[macro_export]
+macro_rules! __pgrx_c_args_BTreeTupleGetPosting {
+    (@collect $mode:ident [$($done:tt)*]; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_BTreeTupleGetPosting!(@p0 $mode [$($done)*]; $($raw)*)
+    };
+    (@classified [$next:ident $mode:ident [$($done:tt)*] [$($rest:tt)*]] $descriptor:tt) => {
+        $crate::__pgrx_c_args_BTreeTupleGetPosting!(
+            @$next $mode [$($done)* $descriptor,];
+            $($rest)*
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
+        $crate::__pgrx_c_args_BTreeTupleGetPosting!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
+    };
+    (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
+        $crate::__pgrx_c_args_BTreeTupleGetPosting!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_BTreeTupleGetPosting!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+            $($rest)*
+        )
+    };
+    (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_BTreeTupleGetPosting!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; - $($raw:tt)*) => {
+        $crate::__pgrx_c_args_BTreeTupleGetPosting!(@negative0 $mode [$($done)*]; - $($raw)*)
+    };
+    (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
+        $crate::__pgrx_c_args_BTreeTupleGetPosting!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BTreeTupleGetPosting] [p1 $mode [$($done)*] []] [
+                $head $(::$tail)* ! $group
+            ]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; ::$head:ident $(::$tail:ident)* ! $group:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BTreeTupleGetPosting] [p1 $mode [$($done)*] []] [
+                ::$head $(::$tail)* ! $group
+            ]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; ($($inner:tt)*)) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BTreeTupleGetPosting] [p1 $mode [$($done)*] []] [($($inner)*)]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
+        $crate::__pgrx_c_args_BTreeTupleGetPosting!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
+        $crate::__pgrx_c_args_BTreeTupleGetPosting!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
+        $crate::__pgrx_c_args_BTreeTupleGetPosting!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BTreeTupleGetPosting] [p1 $mode [$($done)*] [$($rest)*]] [
+                $head $(::$tail)* ! $group
+            ]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; ::$head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BTreeTupleGetPosting] [p1 $mode [$($done)*] [$($rest)*]] [
+                ::$head $(::$tail)* ! $group
+            ]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; ($($inner:tt)*), $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BTreeTupleGetPosting] [p1 $mode [$($done)*] [$($rest)*]] [
+                ($($inner)*)
+            ]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_BTreeTupleGetPosting!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_BTreeTupleGetPosting!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*];) => {
+        $crate::BTreeTupleGetPosting!(@$mode; $($done)*)
+    };
+    ($($invalid:tt)*) => {
+        compile_error!("arguments do not satisfy this C macro's invocation contract")
+    };
+}
+/// Typed call adapter for C inline function BTreeTupleGetPosting from nbtree.h:536
+///
+/// ```c
+/// static inline ItemPointer
+/// BTreeTupleGetPosting(IndexTuple posting)
+/// {
+/// 	return (ItemPointer) ((char *) posting +
+/// 						  BTreeTupleGetPostingOffset(posting));
+/// }
+/// ```
+///
+///
+/// Calls the original function through its inspected C prototype. Each operand is evaluated once and converted using C parameter assignment rules. The result retains the function's original C type; `.get()` extracts its native storage, including `()` for a void result. Native calls retain the backend thread, PostgreSQL error, and caller safety contracts of the generated guarded binding.
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+#[macro_export]
+macro_rules! BTreeTupleGetPosting {
+    (@__pgrx_emit_check_safety; $posting:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $posting);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_BTreeTupleGetPosting!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
+    (@__pgrx_emit_public; $posting:tt $(,)?) => {
+        $crate::__pgrx_c_macros::expression_result::finish(
+            $crate::BTreeTupleGetPosting!(@__pgrx_emit_value; $posting)
+        )
+    };
+    (@__pgrx_emit_value; $posting:tt $(,)?) => {
+        $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+            <
+                $crate::__pgrx_c_macros::expression::CPointer<
+                    $crate::__pgrx_c_macros::expression::CRecord<
+                        $crate::__pgrx_c_bindings::ItemPointerData
+                    >,
+                    $crate::__pgrx_c_macros::expression::ReadWrite
+                > as $crate::__pgrx_c_macros::expression::CType
+            >::from_storage(
+                $crate::__pgrx_c_bindings::BTreeTupleGetPosting(
+                    <
+                        $crate::__pgrx_c_macros::expression::CPointer<
+                            $crate::__pgrx_c_macros::expression::CRecord<
+                                $crate::__pgrx_c_bindings::IndexTupleData
+                            >,
+                            $crate::__pgrx_c_macros::expression::ReadWrite
+                        > as $crate::__pgrx_c_macros::expression::CType
+                    >::into_storage(
+                        $crate::__pgrx_c_macros::expression::implicit::<
+                            $crate::__pgrx_c_macros::expression::CPointer<
+                                $crate::__pgrx_c_macros::expression::CRecord<
+                                    $crate::__pgrx_c_bindings::IndexTupleData
+                                >,
+                                $crate::__pgrx_c_macros::expression::ReadWrite
+                            >,
+                            _
+                        >(
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_operand!(@value [true]; $posting)
+                            )
+                        )
+                    ),
+                )
+            )
+        )
+    };
+    (@__pgrx_c_value; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_BTreeTupleGetPosting!(@collect __pgrx_emit_value []; $($raw)*)
+    };
+    (@__pgrx_emit_place; $posting:tt $(,)?) => {
+        compile_error!("C expression is not a place in this operation")
+    };
+    (@__pgrx_c_place; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_BTreeTupleGetPosting!(@collect __pgrx_emit_place []; $($raw)*)
+    };
+    (@__pgrx_emit_read_place; $posting:tt $(,)?) => {
+        compile_error!("C expression is not a place in this operation")
+    };
+    (@__pgrx_c_read_place; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_BTreeTupleGetPosting!(@collect __pgrx_emit_read_place []; $($raw)*)
+    };
+    (@__pgrx_emit_size; $posting:tt $(,)?) => {
+        $crate::__pgrx_c_macros::expression::size_of_value_type(
+            if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $posting);
+                    }
+                }
+                Some(
+                    unsafe {
+                        $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                            <
+                                $crate::__pgrx_c_macros::expression::CPointer<
+                                    $crate::__pgrx_c_macros::expression::CRecord<
+                                        $crate::__pgrx_c_bindings::ItemPointerData
+                                    >,
+                                    $crate::__pgrx_c_macros::expression::ReadWrite
+                                > as $crate::__pgrx_c_macros::expression::CType
+                            >::from_storage(
+                                $crate::__pgrx_c_bindings::BTreeTupleGetPosting(
+                                    <
+                                        $crate::__pgrx_c_macros::expression::CPointer<
+                                            $crate::__pgrx_c_macros::expression::CRecord<
+                                                $crate::__pgrx_c_bindings::IndexTupleData
+                                            >,
+                                            $crate::__pgrx_c_macros::expression::ReadWrite
+                                        > as $crate::__pgrx_c_macros::expression::CType
+                                    >::into_storage(
+                                        $crate::__pgrx_c_macros::expression::implicit::<
+                                            $crate::__pgrx_c_macros::expression::CPointer<
+                                                $crate::__pgrx_c_macros::expression::CRecord<
+                                                    $crate::__pgrx_c_bindings::IndexTupleData
+                                                >,
+                                                $crate::__pgrx_c_macros::expression::ReadWrite
+                                            >,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_macros::expression::profile_value::<
+                                                true,
+                                                _
+                                            >($crate::__pgrx_c_operand!(@value [true]; $posting))
+                                        )
+                                    ),
+                                )
+                            )
+                        )
+                    }
+                )
+            } else {
+                None
+            }
+        )
+    };
+    (@__pgrx_c_size; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_BTreeTupleGetPosting!(@collect __pgrx_emit_size []; $($raw)*)
+    };
+    (@__pgrx_emit_discard; $posting:tt $(,)?) => {
+        {
+            let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                <
+                    $crate::__pgrx_c_macros::expression::CPointer<
+                        $crate::__pgrx_c_macros::expression::CRecord<
+                            $crate::__pgrx_c_bindings::ItemPointerData
+                        >,
+                        $crate::__pgrx_c_macros::expression::ReadWrite
+                    > as $crate::__pgrx_c_macros::expression::CType
+                >::from_storage(
+                    $crate::__pgrx_c_bindings::BTreeTupleGetPosting(
+                        <
+                            $crate::__pgrx_c_macros::expression::CPointer<
+                                $crate::__pgrx_c_macros::expression::CRecord<
+                                    $crate::__pgrx_c_bindings::IndexTupleData
+                                >,
+                                $crate::__pgrx_c_macros::expression::ReadWrite
+                            > as $crate::__pgrx_c_macros::expression::CType
+                        >::into_storage(
+                            $crate::__pgrx_c_macros::expression::implicit::<
+                                $crate::__pgrx_c_macros::expression::CPointer<
+                                    $crate::__pgrx_c_macros::expression::CRecord<
+                                        $crate::__pgrx_c_bindings::IndexTupleData
+                                    >,
+                                    $crate::__pgrx_c_macros::expression::ReadWrite
+                                >,
+                                _
+                            >(
+                                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                    $crate::__pgrx_c_operand!(@value [true]; $posting)
+                                )
+                            )
+                        ),
+                    )
+                )
+            );
+        }
+    };
+    (@__pgrx_c_discard; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_BTreeTupleGetPosting!(@collect __pgrx_emit_discard []; $($raw)*)
+    };
+    ($($raw:tt)*) => {
+        $crate::__pgrx_c_args_BTreeTupleGetPosting!(@collect __pgrx_emit_public []; $($raw)*)
+    };
+}
+
+#[cfg(not(all(
+    target_arch = "x86_64",
+    target_os = "linux",
+    target_pointer_width = "64",
+    target_endian = "little"
+)))]
+#[cfg(not(docsrs))]
+compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
+#[doc(hidden)]
+#[macro_export]
+macro_rules! __pgrx_c_args_BTreeTupleGetPostingN {
+    (@collect $mode:ident [$($done:tt)*]; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_BTreeTupleGetPostingN!(@p0 $mode [$($done)*]; $($raw)*)
+    };
+    (@classified [$next:ident $mode:ident [$($done:tt)*] [$($rest:tt)*]] $descriptor:tt) => {
+        $crate::__pgrx_c_args_BTreeTupleGetPostingN!(
+            @$next $mode [$($done)* $descriptor,];
+            $($rest)*
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_BTreeTupleGetPostingN!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+            $($rest)*
+        )
+    };
+    (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_BTreeTupleGetPostingN!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; - $($raw:tt)*) => {
+        $crate::__pgrx_c_args_BTreeTupleGetPostingN!(@negative0 $mode [$($done)*]; - $($raw)*)
+    };
+    (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
+        $crate::__pgrx_c_args_BTreeTupleGetPostingN!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BTreeTupleGetPostingN] [p1 $mode [$($done)*] [$($rest)*]] [
+                $head $(::$tail)* ! $group
+            ]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; ::$head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BTreeTupleGetPostingN] [p1 $mode [$($done)*] [$($rest)*]] [
+                ::$head $(::$tail)* ! $group
+            ]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; ($($inner:tt)*), $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BTreeTupleGetPostingN] [p1 $mode [$($done)*] [$($rest)*]] [
+                ($($inner)*)
+            ]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_BTreeTupleGetPostingN!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_BTreeTupleGetPostingN!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; - $argument:literal) => {
+        $crate::__pgrx_c_args_BTreeTupleGetPostingN!(
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
+    };
+    (@negative1 $mode:ident [$($done:tt)*]; $argument:expr) => {
+        $crate::__pgrx_c_args_BTreeTupleGetPostingN!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_BTreeTupleGetPostingN!(
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+            $($rest)*
+        )
+    };
+    (@negative1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_BTreeTupleGetPostingN!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; - $($raw:tt)*) => {
+        $crate::__pgrx_c_args_BTreeTupleGetPostingN!(@negative1 $mode [$($done)*]; - $($raw)*)
+    };
+    (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
+        $crate::__pgrx_c_args_BTreeTupleGetPostingN!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BTreeTupleGetPostingN] [p2 $mode [$($done)*] []] [
+                $head $(::$tail)* ! $group
+            ]
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; ::$head:ident $(::$tail:ident)* ! $group:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BTreeTupleGetPostingN] [p2 $mode [$($done)*] []] [
+                ::$head $(::$tail)* ! $group
+            ]
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; ($($inner:tt)*)) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BTreeTupleGetPostingN] [p2 $mode [$($done)*] []] [($($inner)*)]
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
+        $crate::__pgrx_c_args_BTreeTupleGetPostingN!(
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; $argument:expr) => {
+        $crate::__pgrx_c_args_BTreeTupleGetPostingN!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
+        $crate::__pgrx_c_args_BTreeTupleGetPostingN!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BTreeTupleGetPostingN] [p2 $mode [$($done)*] [$($rest)*]] [
+                $head $(::$tail)* ! $group
+            ]
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; ::$head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BTreeTupleGetPostingN] [p2 $mode [$($done)*] [$($rest)*]] [
+                ::$head $(::$tail)* ! $group
+            ]
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; ($($inner:tt)*), $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BTreeTupleGetPostingN] [p2 $mode [$($done)*] [$($rest)*]] [
+                ($($inner)*)
+            ]
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_BTreeTupleGetPostingN!(
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_BTreeTupleGetPostingN!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p2 $mode:ident [$($done:tt)*];) => {
+        $crate::BTreeTupleGetPostingN!(@$mode; $($done)*)
+    };
+    ($($invalid:tt)*) => {
+        compile_error!("arguments do not satisfy this C macro's invocation contract")
+    };
+}
+/// Typed call adapter for C inline function BTreeTupleGetPostingN from nbtree.h:543
+///
+/// ```c
+/// static inline ItemPointer
+/// BTreeTupleGetPostingN(IndexTuple posting, int n)
+/// {
+/// 	return BTreeTupleGetPosting(posting) + n;
+/// }
+/// ```
+///
+///
+/// Calls the original function through its inspected C prototype. Each operand is evaluated once and converted using C parameter assignment rules. The result retains the function's original C type; `.get()` extracts its native storage, including `()` for a void result. Native calls retain the backend thread, PostgreSQL error, and caller safety contracts of the generated guarded binding.
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+#[macro_export]
+macro_rules! BTreeTupleGetPostingN {
+    (@__pgrx_emit_check_safety; $posting:tt, $n:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $posting);
+                $crate::__pgrx_c_operand!(@check_safety; $n);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_BTreeTupleGetPostingN!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
+    (@__pgrx_emit_public; $posting:tt, $n:tt $(,)?) => {
+        $crate::__pgrx_c_macros::expression_result::finish(
+            $crate::BTreeTupleGetPostingN!(@__pgrx_emit_value; $posting, $n)
+        )
+    };
+    (@__pgrx_emit_value; $posting:tt, $n:tt $(,)?) => {
+        $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+            <
+                $crate::__pgrx_c_macros::expression::CPointer<
+                    $crate::__pgrx_c_macros::expression::CRecord<
+                        $crate::__pgrx_c_bindings::ItemPointerData
+                    >,
+                    $crate::__pgrx_c_macros::expression::ReadWrite
+                > as $crate::__pgrx_c_macros::expression::CType
+            >::from_storage(
+                $crate::__pgrx_c_bindings::BTreeTupleGetPostingN(
+                    <
+                        $crate::__pgrx_c_macros::expression::CPointer<
+                            $crate::__pgrx_c_macros::expression::CRecord<
+                                $crate::__pgrx_c_bindings::IndexTupleData
+                            >,
+                            $crate::__pgrx_c_macros::expression::ReadWrite
+                        > as $crate::__pgrx_c_macros::expression::CType
+                    >::into_storage(
+                        $crate::__pgrx_c_macros::expression::implicit::<
+                            $crate::__pgrx_c_macros::expression::CPointer<
+                                $crate::__pgrx_c_macros::expression::CRecord<
+                                    $crate::__pgrx_c_bindings::IndexTupleData
+                                >,
+                                $crate::__pgrx_c_macros::expression::ReadWrite
+                            >,
+                            _
+                        >(
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_operand!(@value [true]; $posting)
+                            )
+                        )
+                    ),
+                    <$crate::__pgrx_c_macros::CInt as $crate::__pgrx_c_macros::expression::CType>::into_storage(
+                        $crate::__pgrx_c_macros::expression::implicit::<
+                            $crate::__pgrx_c_macros::CInt,
+                            _
+                        >(
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_operand!(@value [true]; $n)
+                            )
+                        )
+                    ),
+                )
+            )
+        )
+    };
+    (@__pgrx_c_value; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_BTreeTupleGetPostingN!(@collect __pgrx_emit_value []; $($raw)*)
+    };
+    (@__pgrx_emit_place; $posting:tt, $n:tt $(,)?) => {
+        compile_error!("C expression is not a place in this operation")
+    };
+    (@__pgrx_c_place; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_BTreeTupleGetPostingN!(@collect __pgrx_emit_place []; $($raw)*)
+    };
+    (@__pgrx_emit_read_place; $posting:tt, $n:tt $(,)?) => {
+        compile_error!("C expression is not a place in this operation")
+    };
+    (@__pgrx_c_read_place; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_BTreeTupleGetPostingN!(@collect __pgrx_emit_read_place []; $($raw)*)
+    };
+    (@__pgrx_emit_size; $posting:tt, $n:tt $(,)?) => {
+        $crate::__pgrx_c_macros::expression::size_of_value_type(
+            if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $posting);
+                        $crate::__pgrx_c_operand!(@check_safety; $n);
+                    }
+                }
+                Some(
+                    unsafe {
+                        $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                            <
+                                $crate::__pgrx_c_macros::expression::CPointer<
+                                    $crate::__pgrx_c_macros::expression::CRecord<
+                                        $crate::__pgrx_c_bindings::ItemPointerData
+                                    >,
+                                    $crate::__pgrx_c_macros::expression::ReadWrite
+                                > as $crate::__pgrx_c_macros::expression::CType
+                            >::from_storage(
+                                $crate::__pgrx_c_bindings::BTreeTupleGetPostingN(
+                                    <
+                                        $crate::__pgrx_c_macros::expression::CPointer<
+                                            $crate::__pgrx_c_macros::expression::CRecord<
+                                                $crate::__pgrx_c_bindings::IndexTupleData
+                                            >,
+                                            $crate::__pgrx_c_macros::expression::ReadWrite
+                                        > as $crate::__pgrx_c_macros::expression::CType
+                                    >::into_storage(
+                                        $crate::__pgrx_c_macros::expression::implicit::<
+                                            $crate::__pgrx_c_macros::expression::CPointer<
+                                                $crate::__pgrx_c_macros::expression::CRecord<
+                                                    $crate::__pgrx_c_bindings::IndexTupleData
+                                                >,
+                                                $crate::__pgrx_c_macros::expression::ReadWrite
+                                            >,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_macros::expression::profile_value::<
+                                                true,
+                                                _
+                                            >($crate::__pgrx_c_operand!(@value [true]; $posting))
+                                        )
+                                    ),
+                                    <
+                                        $crate::__pgrx_c_macros::CInt as $crate::__pgrx_c_macros::expression::CType
+                                    >::into_storage(
+                                        $crate::__pgrx_c_macros::expression::implicit::<
+                                            $crate::__pgrx_c_macros::CInt,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_macros::expression::profile_value::<
+                                                true,
+                                                _
+                                            >($crate::__pgrx_c_operand!(@value [true]; $n))
+                                        )
+                                    ),
+                                )
+                            )
+                        )
+                    }
+                )
+            } else {
+                None
+            }
+        )
+    };
+    (@__pgrx_c_size; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_BTreeTupleGetPostingN!(@collect __pgrx_emit_size []; $($raw)*)
+    };
+    (@__pgrx_emit_discard; $posting:tt, $n:tt $(,)?) => {
+        {
+            let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                <
+                    $crate::__pgrx_c_macros::expression::CPointer<
+                        $crate::__pgrx_c_macros::expression::CRecord<
+                            $crate::__pgrx_c_bindings::ItemPointerData
+                        >,
+                        $crate::__pgrx_c_macros::expression::ReadWrite
+                    > as $crate::__pgrx_c_macros::expression::CType
+                >::from_storage(
+                    $crate::__pgrx_c_bindings::BTreeTupleGetPostingN(
+                        <
+                            $crate::__pgrx_c_macros::expression::CPointer<
+                                $crate::__pgrx_c_macros::expression::CRecord<
+                                    $crate::__pgrx_c_bindings::IndexTupleData
+                                >,
+                                $crate::__pgrx_c_macros::expression::ReadWrite
+                            > as $crate::__pgrx_c_macros::expression::CType
+                        >::into_storage(
+                            $crate::__pgrx_c_macros::expression::implicit::<
+                                $crate::__pgrx_c_macros::expression::CPointer<
+                                    $crate::__pgrx_c_macros::expression::CRecord<
+                                        $crate::__pgrx_c_bindings::IndexTupleData
+                                    >,
+                                    $crate::__pgrx_c_macros::expression::ReadWrite
+                                >,
+                                _
+                            >(
+                                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                    $crate::__pgrx_c_operand!(@value [true]; $posting)
+                                )
+                            )
+                        ),
+                        <
+                            $crate::__pgrx_c_macros::CInt as $crate::__pgrx_c_macros::expression::CType
+                        >::into_storage(
+                            $crate::__pgrx_c_macros::expression::implicit::<
+                                $crate::__pgrx_c_macros::CInt,
+                                _
+                            >(
+                                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                    $crate::__pgrx_c_operand!(@value [true]; $n)
+                                )
+                            )
+                        ),
+                    )
+                )
+            );
+        }
+    };
+    (@__pgrx_c_discard; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_BTreeTupleGetPostingN!(@collect __pgrx_emit_discard []; $($raw)*)
+    };
+    ($($raw:tt)*) => {
+        $crate::__pgrx_c_args_BTreeTupleGetPostingN!(@collect __pgrx_emit_public []; $($raw)*)
+    };
+}
+
+#[cfg(not(all(
+    target_arch = "x86_64",
+    target_os = "linux",
+    target_pointer_width = "64",
+    target_endian = "little"
+)))]
+#[cfg(not(docsrs))]
+compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
+#[doc(hidden)]
+#[macro_export]
+macro_rules! __pgrx_c_args_BTreeTupleGetPostingOffset {
+    (@collect $mode:ident [$($done:tt)*]; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_BTreeTupleGetPostingOffset!(@p0 $mode [$($done)*]; $($raw)*)
+    };
+    (@classified [$next:ident $mode:ident [$($done:tt)*] [$($rest:tt)*]] $descriptor:tt) => {
+        $crate::__pgrx_c_args_BTreeTupleGetPostingOffset!(
+            @$next $mode [$($done)* $descriptor,];
+            $($rest)*
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
+        $crate::__pgrx_c_args_BTreeTupleGetPostingOffset!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
+    };
+    (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
+        $crate::__pgrx_c_args_BTreeTupleGetPostingOffset!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_BTreeTupleGetPostingOffset!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+            $($rest)*
+        )
+    };
+    (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_BTreeTupleGetPostingOffset!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; - $($raw:tt)*) => {
+        $crate::__pgrx_c_args_BTreeTupleGetPostingOffset!(@negative0 $mode [$($done)*]; - $($raw)*)
+    };
+    (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
+        $crate::__pgrx_c_args_BTreeTupleGetPostingOffset!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BTreeTupleGetPostingOffset] [p1 $mode [$($done)*] []] [
+                $head $(::$tail)* ! $group
+            ]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; ::$head:ident $(::$tail:ident)* ! $group:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BTreeTupleGetPostingOffset] [p1 $mode [$($done)*] []] [
+                ::$head $(::$tail)* ! $group
+            ]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; ($($inner:tt)*)) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BTreeTupleGetPostingOffset] [p1 $mode [$($done)*] []] [
+                ($($inner)*)
+            ]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
+        $crate::__pgrx_c_args_BTreeTupleGetPostingOffset!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
+        $crate::__pgrx_c_args_BTreeTupleGetPostingOffset!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
+        $crate::__pgrx_c_args_BTreeTupleGetPostingOffset!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BTreeTupleGetPostingOffset] [p1 $mode [$($done)*] [$($rest)*]] [
+                $head $(::$tail)* ! $group
+            ]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; ::$head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BTreeTupleGetPostingOffset] [p1 $mode [$($done)*] [$($rest)*]] [
+                ::$head $(::$tail)* ! $group
+            ]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; ($($inner:tt)*), $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BTreeTupleGetPostingOffset] [p1 $mode [$($done)*] [$($rest)*]] [
+                ($($inner)*)
+            ]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_BTreeTupleGetPostingOffset!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_BTreeTupleGetPostingOffset!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*];) => {
+        $crate::BTreeTupleGetPostingOffset!(@$mode; $($done)*)
+    };
+    ($($invalid:tt)*) => {
+        compile_error!("arguments do not satisfy this C macro's invocation contract")
+    };
+}
+/// Typed call adapter for C inline function BTreeTupleGetPostingOffset from nbtree.h:528
+///
+/// ```c
+/// static inline uint32
+/// BTreeTupleGetPostingOffset(IndexTuple posting)
+/// {
+/// 	Assert(BTreeTupleIsPosting(posting));
+///
+/// 	return ItemPointerGetBlockNumberNoCheck(&posting->t_tid);
+/// }
+/// ```
+///
+///
+/// Calls the original function through its inspected C prototype. Each operand is evaluated once and converted using C parameter assignment rules. The result retains the function's original C type; `.get()` extracts its native storage, including `()` for a void result. Native calls retain the backend thread, PostgreSQL error, and caller safety contracts of the generated guarded binding.
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+#[macro_export]
+macro_rules! BTreeTupleGetPostingOffset {
+    (@__pgrx_emit_check_safety; $posting:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $posting);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_BTreeTupleGetPostingOffset!(
+            @collect __pgrx_emit_check_safety [];
+            $($raw)*
+        )
+    };
+    (@__pgrx_emit_public; $posting:tt $(,)?) => {
+        $crate::__pgrx_c_macros::expression_result::finish(
+            $crate::BTreeTupleGetPostingOffset!(@__pgrx_emit_value; $posting)
+        )
+    };
+    (@__pgrx_emit_value; $posting:tt $(,)?) => {
+        $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+            <$crate::__pgrx_c_macros::CUnsignedInt as $crate::__pgrx_c_macros::expression::CType>::from_storage(
+                $crate::__pgrx_c_bindings::BTreeTupleGetPostingOffset(
+                    <
+                        $crate::__pgrx_c_macros::expression::CPointer<
+                            $crate::__pgrx_c_macros::expression::CRecord<
+                                $crate::__pgrx_c_bindings::IndexTupleData
+                            >,
+                            $crate::__pgrx_c_macros::expression::ReadWrite
+                        > as $crate::__pgrx_c_macros::expression::CType
+                    >::into_storage(
+                        $crate::__pgrx_c_macros::expression::implicit::<
+                            $crate::__pgrx_c_macros::expression::CPointer<
+                                $crate::__pgrx_c_macros::expression::CRecord<
+                                    $crate::__pgrx_c_bindings::IndexTupleData
+                                >,
+                                $crate::__pgrx_c_macros::expression::ReadWrite
+                            >,
+                            _
+                        >(
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_operand!(@value [true]; $posting)
+                            )
+                        )
+                    ),
+                )
+            )
+        )
+    };
+    (@__pgrx_c_value; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_BTreeTupleGetPostingOffset!(@collect __pgrx_emit_value []; $($raw)*)
+    };
+    (@__pgrx_emit_place; $posting:tt $(,)?) => {
+        compile_error!("C expression is not a place in this operation")
+    };
+    (@__pgrx_c_place; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_BTreeTupleGetPostingOffset!(@collect __pgrx_emit_place []; $($raw)*)
+    };
+    (@__pgrx_emit_read_place; $posting:tt $(,)?) => {
+        compile_error!("C expression is not a place in this operation")
+    };
+    (@__pgrx_c_read_place; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_BTreeTupleGetPostingOffset!(
+            @collect __pgrx_emit_read_place [];
+            $($raw)*
+        )
+    };
+    (@__pgrx_emit_size; $posting:tt $(,)?) => {
+        $crate::__pgrx_c_macros::expression::size_of_value_type(
+            if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $posting);
+                    }
+                }
+                Some(
+                    unsafe {
+                        $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                            <
+                                $crate::__pgrx_c_macros::CUnsignedInt as $crate::__pgrx_c_macros::expression::CType
+                            >::from_storage(
+                                $crate::__pgrx_c_bindings::BTreeTupleGetPostingOffset(
+                                    <
+                                        $crate::__pgrx_c_macros::expression::CPointer<
+                                            $crate::__pgrx_c_macros::expression::CRecord<
+                                                $crate::__pgrx_c_bindings::IndexTupleData
+                                            >,
+                                            $crate::__pgrx_c_macros::expression::ReadWrite
+                                        > as $crate::__pgrx_c_macros::expression::CType
+                                    >::into_storage(
+                                        $crate::__pgrx_c_macros::expression::implicit::<
+                                            $crate::__pgrx_c_macros::expression::CPointer<
+                                                $crate::__pgrx_c_macros::expression::CRecord<
+                                                    $crate::__pgrx_c_bindings::IndexTupleData
+                                                >,
+                                                $crate::__pgrx_c_macros::expression::ReadWrite
+                                            >,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_macros::expression::profile_value::<
+                                                true,
+                                                _
+                                            >($crate::__pgrx_c_operand!(@value [true]; $posting))
+                                        )
+                                    ),
+                                )
+                            )
+                        )
+                    }
+                )
+            } else {
+                None
+            }
+        )
+    };
+    (@__pgrx_c_size; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_BTreeTupleGetPostingOffset!(@collect __pgrx_emit_size []; $($raw)*)
+    };
+    (@__pgrx_emit_discard; $posting:tt $(,)?) => {
+        {
+            let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                <
+                    $crate::__pgrx_c_macros::CUnsignedInt as $crate::__pgrx_c_macros::expression::CType
+                >::from_storage(
+                    $crate::__pgrx_c_bindings::BTreeTupleGetPostingOffset(
+                        <
+                            $crate::__pgrx_c_macros::expression::CPointer<
+                                $crate::__pgrx_c_macros::expression::CRecord<
+                                    $crate::__pgrx_c_bindings::IndexTupleData
+                                >,
+                                $crate::__pgrx_c_macros::expression::ReadWrite
+                            > as $crate::__pgrx_c_macros::expression::CType
+                        >::into_storage(
+                            $crate::__pgrx_c_macros::expression::implicit::<
+                                $crate::__pgrx_c_macros::expression::CPointer<
+                                    $crate::__pgrx_c_macros::expression::CRecord<
+                                        $crate::__pgrx_c_bindings::IndexTupleData
+                                    >,
+                                    $crate::__pgrx_c_macros::expression::ReadWrite
+                                >,
+                                _
+                            >(
+                                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                    $crate::__pgrx_c_operand!(@value [true]; $posting)
+                                )
+                            )
+                        ),
+                    )
+                )
+            );
+        }
+    };
+    (@__pgrx_c_discard; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_BTreeTupleGetPostingOffset!(@collect __pgrx_emit_discard []; $($raw)*)
+    };
+    ($($raw:tt)*) => {
+        $crate::__pgrx_c_args_BTreeTupleGetPostingOffset!(@collect __pgrx_emit_public []; $($raw)*)
+    };
+}
+
+#[cfg(not(all(
+    target_arch = "x86_64",
+    target_os = "linux",
+    target_pointer_width = "64",
+    target_endian = "little"
+)))]
+#[cfg(not(docsrs))]
+compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
+#[doc(hidden)]
+#[macro_export]
+macro_rules! __pgrx_c_args_BTreeTupleGetTopParent {
+    (@collect $mode:ident [$($done:tt)*]; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_BTreeTupleGetTopParent!(@p0 $mode [$($done)*]; $($raw)*)
+    };
+    (@classified [$next:ident $mode:ident [$($done:tt)*] [$($rest:tt)*]] $descriptor:tt) => {
+        $crate::__pgrx_c_args_BTreeTupleGetTopParent!(
+            @$next $mode [$($done)* $descriptor,];
+            $($rest)*
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
+        $crate::__pgrx_c_args_BTreeTupleGetTopParent!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
+    };
+    (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
+        $crate::__pgrx_c_args_BTreeTupleGetTopParent!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_BTreeTupleGetTopParent!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+            $($rest)*
+        )
+    };
+    (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_BTreeTupleGetTopParent!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; - $($raw:tt)*) => {
+        $crate::__pgrx_c_args_BTreeTupleGetTopParent!(@negative0 $mode [$($done)*]; - $($raw)*)
+    };
+    (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
+        $crate::__pgrx_c_args_BTreeTupleGetTopParent!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BTreeTupleGetTopParent] [p1 $mode [$($done)*] []] [
+                $head $(::$tail)* ! $group
+            ]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; ::$head:ident $(::$tail:ident)* ! $group:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BTreeTupleGetTopParent] [p1 $mode [$($done)*] []] [
+                ::$head $(::$tail)* ! $group
+            ]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; ($($inner:tt)*)) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BTreeTupleGetTopParent] [p1 $mode [$($done)*] []] [
+                ($($inner)*)
+            ]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
+        $crate::__pgrx_c_args_BTreeTupleGetTopParent!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
+        $crate::__pgrx_c_args_BTreeTupleGetTopParent!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
+        $crate::__pgrx_c_args_BTreeTupleGetTopParent!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BTreeTupleGetTopParent] [p1 $mode [$($done)*] [$($rest)*]] [
+                $head $(::$tail)* ! $group
+            ]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; ::$head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BTreeTupleGetTopParent] [p1 $mode [$($done)*] [$($rest)*]] [
+                ::$head $(::$tail)* ! $group
+            ]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; ($($inner:tt)*), $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BTreeTupleGetTopParent] [p1 $mode [$($done)*] [$($rest)*]] [
+                ($($inner)*)
+            ]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_BTreeTupleGetTopParent!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_BTreeTupleGetTopParent!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*];) => {
+        $crate::BTreeTupleGetTopParent!(@$mode; $($done)*)
+    };
+    ($($invalid:tt)*) => {
+        compile_error!("arguments do not satisfy this C macro's invocation contract")
+    };
+}
+/// Typed call adapter for C inline function BTreeTupleGetTopParent from nbtree.h:619
+///
+/// ```c
+/// static inline BlockNumber
+/// BTreeTupleGetTopParent(IndexTuple leafhikey)
+/// {
+/// 	return ItemPointerGetBlockNumberNoCheck(&leafhikey->t_tid);
+/// }
+/// ```
+///
+///
+/// Calls the original function through its inspected C prototype. Each operand is evaluated once and converted using C parameter assignment rules. The result retains the function's original C type; `.get()` extracts its native storage, including `()` for a void result. Native calls retain the backend thread, PostgreSQL error, and caller safety contracts of the generated guarded binding.
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+#[macro_export]
+macro_rules! BTreeTupleGetTopParent {
+    (@__pgrx_emit_check_safety; $leafhikey:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $leafhikey);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_BTreeTupleGetTopParent!(
+            @collect __pgrx_emit_check_safety [];
+            $($raw)*
+        )
+    };
+    (@__pgrx_emit_public; $leafhikey:tt $(,)?) => {
+        $crate::__pgrx_c_macros::expression_result::finish(
+            $crate::BTreeTupleGetTopParent!(@__pgrx_emit_value; $leafhikey)
+        )
+    };
+    (@__pgrx_emit_value; $leafhikey:tt $(,)?) => {
+        $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+            <$crate::__pgrx_c_macros::CUnsignedInt as $crate::__pgrx_c_macros::expression::CType>::from_storage(
+                $crate::__pgrx_c_bindings::BTreeTupleGetTopParent(
+                    <
+                        $crate::__pgrx_c_macros::expression::CPointer<
+                            $crate::__pgrx_c_macros::expression::CRecord<
+                                $crate::__pgrx_c_bindings::IndexTupleData
+                            >,
+                            $crate::__pgrx_c_macros::expression::ReadWrite
+                        > as $crate::__pgrx_c_macros::expression::CType
+                    >::into_storage(
+                        $crate::__pgrx_c_macros::expression::implicit::<
+                            $crate::__pgrx_c_macros::expression::CPointer<
+                                $crate::__pgrx_c_macros::expression::CRecord<
+                                    $crate::__pgrx_c_bindings::IndexTupleData
+                                >,
+                                $crate::__pgrx_c_macros::expression::ReadWrite
+                            >,
+                            _
+                        >(
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_operand!(@value [true]; $leafhikey)
+                            )
+                        )
+                    ),
+                )
+            )
+        )
+    };
+    (@__pgrx_c_value; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_BTreeTupleGetTopParent!(@collect __pgrx_emit_value []; $($raw)*)
+    };
+    (@__pgrx_emit_place; $leafhikey:tt $(,)?) => {
+        compile_error!("C expression is not a place in this operation")
+    };
+    (@__pgrx_c_place; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_BTreeTupleGetTopParent!(@collect __pgrx_emit_place []; $($raw)*)
+    };
+    (@__pgrx_emit_read_place; $leafhikey:tt $(,)?) => {
+        compile_error!("C expression is not a place in this operation")
+    };
+    (@__pgrx_c_read_place; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_BTreeTupleGetTopParent!(@collect __pgrx_emit_read_place []; $($raw)*)
+    };
+    (@__pgrx_emit_size; $leafhikey:tt $(,)?) => {
+        $crate::__pgrx_c_macros::expression::size_of_value_type(
+            if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $leafhikey);
+                    }
+                }
+                Some(
+                    unsafe {
+                        $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                            <
+                                $crate::__pgrx_c_macros::CUnsignedInt as $crate::__pgrx_c_macros::expression::CType
+                            >::from_storage(
+                                $crate::__pgrx_c_bindings::BTreeTupleGetTopParent(
+                                    <
+                                        $crate::__pgrx_c_macros::expression::CPointer<
+                                            $crate::__pgrx_c_macros::expression::CRecord<
+                                                $crate::__pgrx_c_bindings::IndexTupleData
+                                            >,
+                                            $crate::__pgrx_c_macros::expression::ReadWrite
+                                        > as $crate::__pgrx_c_macros::expression::CType
+                                    >::into_storage(
+                                        $crate::__pgrx_c_macros::expression::implicit::<
+                                            $crate::__pgrx_c_macros::expression::CPointer<
+                                                $crate::__pgrx_c_macros::expression::CRecord<
+                                                    $crate::__pgrx_c_bindings::IndexTupleData
+                                                >,
+                                                $crate::__pgrx_c_macros::expression::ReadWrite
+                                            >,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_macros::expression::profile_value::<
+                                                true,
+                                                _
+                                            >($crate::__pgrx_c_operand!(@value [true]; $leafhikey))
+                                        )
+                                    ),
+                                )
+                            )
+                        )
+                    }
+                )
+            } else {
+                None
+            }
+        )
+    };
+    (@__pgrx_c_size; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_BTreeTupleGetTopParent!(@collect __pgrx_emit_size []; $($raw)*)
+    };
+    (@__pgrx_emit_discard; $leafhikey:tt $(,)?) => {
+        {
+            let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                <
+                    $crate::__pgrx_c_macros::CUnsignedInt as $crate::__pgrx_c_macros::expression::CType
+                >::from_storage(
+                    $crate::__pgrx_c_bindings::BTreeTupleGetTopParent(
+                        <
+                            $crate::__pgrx_c_macros::expression::CPointer<
+                                $crate::__pgrx_c_macros::expression::CRecord<
+                                    $crate::__pgrx_c_bindings::IndexTupleData
+                                >,
+                                $crate::__pgrx_c_macros::expression::ReadWrite
+                            > as $crate::__pgrx_c_macros::expression::CType
+                        >::into_storage(
+                            $crate::__pgrx_c_macros::expression::implicit::<
+                                $crate::__pgrx_c_macros::expression::CPointer<
+                                    $crate::__pgrx_c_macros::expression::CRecord<
+                                        $crate::__pgrx_c_bindings::IndexTupleData
+                                    >,
+                                    $crate::__pgrx_c_macros::expression::ReadWrite
+                                >,
+                                _
+                            >(
+                                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                    $crate::__pgrx_c_operand!(@value [true]; $leafhikey)
+                                )
+                            )
+                        ),
+                    )
+                )
+            );
+        }
+    };
+    (@__pgrx_c_discard; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_BTreeTupleGetTopParent!(@collect __pgrx_emit_discard []; $($raw)*)
+    };
+    ($($raw:tt)*) => {
+        $crate::__pgrx_c_args_BTreeTupleGetTopParent!(@collect __pgrx_emit_public []; $($raw)*)
+    };
+}
+
+#[cfg(not(all(
+    target_arch = "x86_64",
+    target_os = "linux",
+    target_pointer_width = "64",
+    target_endian = "little"
+)))]
+#[cfg(not(docsrs))]
+compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
+#[doc(hidden)]
+#[macro_export]
+macro_rules! __pgrx_c_args_BTreeTupleIsPivot {
+    (@collect $mode:ident [$($done:tt)*]; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_BTreeTupleIsPivot!(@p0 $mode [$($done)*]; $($raw)*)
+    };
+    (@classified [$next:ident $mode:ident [$($done:tt)*] [$($rest:tt)*]] $descriptor:tt) => {
+        $crate::__pgrx_c_args_BTreeTupleIsPivot!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
+    };
+    (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
+        $crate::__pgrx_c_args_BTreeTupleIsPivot!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
+    };
+    (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
+        $crate::__pgrx_c_args_BTreeTupleIsPivot!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_BTreeTupleIsPivot!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+            $($rest)*
+        )
+    };
+    (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_BTreeTupleIsPivot!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; - $($raw:tt)*) => {
+        $crate::__pgrx_c_args_BTreeTupleIsPivot!(@negative0 $mode [$($done)*]; - $($raw)*)
+    };
+    (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
+        $crate::__pgrx_c_args_BTreeTupleIsPivot!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BTreeTupleIsPivot] [p1 $mode [$($done)*] []] [
+                $head $(::$tail)* ! $group
+            ]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; ::$head:ident $(::$tail:ident)* ! $group:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BTreeTupleIsPivot] [p1 $mode [$($done)*] []] [
+                ::$head $(::$tail)* ! $group
+            ]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; ($($inner:tt)*)) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BTreeTupleIsPivot] [p1 $mode [$($done)*] []] [($($inner)*)]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
+        $crate::__pgrx_c_args_BTreeTupleIsPivot!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
+        $crate::__pgrx_c_args_BTreeTupleIsPivot!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
+        $crate::__pgrx_c_args_BTreeTupleIsPivot!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BTreeTupleIsPivot] [p1 $mode [$($done)*] [$($rest)*]] [
+                $head $(::$tail)* ! $group
+            ]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; ::$head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BTreeTupleIsPivot] [p1 $mode [$($done)*] [$($rest)*]] [
+                ::$head $(::$tail)* ! $group
+            ]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; ($($inner:tt)*), $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BTreeTupleIsPivot] [p1 $mode [$($done)*] [$($rest)*]] [
+                ($($inner)*)
+            ]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_BTreeTupleIsPivot!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_BTreeTupleIsPivot!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*];) => {
+        $crate::BTreeTupleIsPivot!(@$mode; $($done)*)
+    };
+    ($($invalid:tt)*) => {
+        compile_error!("arguments do not satisfy this C macro's invocation contract")
+    };
+}
+/// Typed call adapter for C inline function BTreeTupleIsPivot from nbtree.h:479
+///
+/// ```c
+/// static inline bool
+/// BTreeTupleIsPivot(IndexTuple itup)
+/// {
+/// 	if ((itup->t_info & INDEX_ALT_TID_MASK) == 0)
+/// 		return false;
+/// 	/* absence of BT_IS_POSTING in offset number indicates pivot tuple */
+/// 	if ((ItemPointerGetOffsetNumberNoCheck(&itup->t_tid) & BT_IS_POSTING) != 0)
+/// 		return false;
+///
+/// 	return true;
+/// }
+/// ```
+///
+///
+/// Calls the original function through its inspected C prototype. Each operand is evaluated once and converted using C parameter assignment rules. The result retains the function's original C type; `.get()` extracts its native storage, including `()` for a void result. Native calls retain the backend thread, PostgreSQL error, and caller safety contracts of the generated guarded binding.
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+#[macro_export]
+macro_rules! BTreeTupleIsPivot {
+    (@__pgrx_emit_check_safety; $itup:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $itup);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_BTreeTupleIsPivot!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
+    (@__pgrx_emit_public; $itup:tt $(,)?) => {
+        $crate::__pgrx_c_macros::expression_result::finish(
+            $crate::BTreeTupleIsPivot!(@__pgrx_emit_value; $itup)
+        )
+    };
+    (@__pgrx_emit_value; $itup:tt $(,)?) => {
+        $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+            <$crate::__pgrx_c_macros::CBool as $crate::__pgrx_c_macros::expression::CType>::from_storage(
+                $crate::__pgrx_c_bindings::BTreeTupleIsPivot(
+                    <
+                        $crate::__pgrx_c_macros::expression::CPointer<
+                            $crate::__pgrx_c_macros::expression::CRecord<
+                                $crate::__pgrx_c_bindings::IndexTupleData
+                            >,
+                            $crate::__pgrx_c_macros::expression::ReadWrite
+                        > as $crate::__pgrx_c_macros::expression::CType
+                    >::into_storage(
+                        $crate::__pgrx_c_macros::expression::implicit::<
+                            $crate::__pgrx_c_macros::expression::CPointer<
+                                $crate::__pgrx_c_macros::expression::CRecord<
+                                    $crate::__pgrx_c_bindings::IndexTupleData
+                                >,
+                                $crate::__pgrx_c_macros::expression::ReadWrite
+                            >,
+                            _
+                        >(
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_operand!(@value [true]; $itup)
+                            )
+                        )
+                    ),
+                )
+            )
+        )
+    };
+    (@__pgrx_c_value; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_BTreeTupleIsPivot!(@collect __pgrx_emit_value []; $($raw)*)
+    };
+    (@__pgrx_emit_place; $itup:tt $(,)?) => {
+        compile_error!("C expression is not a place in this operation")
+    };
+    (@__pgrx_c_place; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_BTreeTupleIsPivot!(@collect __pgrx_emit_place []; $($raw)*)
+    };
+    (@__pgrx_emit_read_place; $itup:tt $(,)?) => {
+        compile_error!("C expression is not a place in this operation")
+    };
+    (@__pgrx_c_read_place; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_BTreeTupleIsPivot!(@collect __pgrx_emit_read_place []; $($raw)*)
+    };
+    (@__pgrx_emit_size; $itup:tt $(,)?) => {
+        $crate::__pgrx_c_macros::expression::size_of_value_type(
+            if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $itup);
+                    }
+                }
+                Some(
+                    unsafe {
+                        $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                            <
+                                $crate::__pgrx_c_macros::CBool as $crate::__pgrx_c_macros::expression::CType
+                            >::from_storage(
+                                $crate::__pgrx_c_bindings::BTreeTupleIsPivot(
+                                    <
+                                        $crate::__pgrx_c_macros::expression::CPointer<
+                                            $crate::__pgrx_c_macros::expression::CRecord<
+                                                $crate::__pgrx_c_bindings::IndexTupleData
+                                            >,
+                                            $crate::__pgrx_c_macros::expression::ReadWrite
+                                        > as $crate::__pgrx_c_macros::expression::CType
+                                    >::into_storage(
+                                        $crate::__pgrx_c_macros::expression::implicit::<
+                                            $crate::__pgrx_c_macros::expression::CPointer<
+                                                $crate::__pgrx_c_macros::expression::CRecord<
+                                                    $crate::__pgrx_c_bindings::IndexTupleData
+                                                >,
+                                                $crate::__pgrx_c_macros::expression::ReadWrite
+                                            >,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_macros::expression::profile_value::<
+                                                true,
+                                                _
+                                            >($crate::__pgrx_c_operand!(@value [true]; $itup))
+                                        )
+                                    ),
+                                )
+                            )
+                        )
+                    }
+                )
+            } else {
+                None
+            }
+        )
+    };
+    (@__pgrx_c_size; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_BTreeTupleIsPivot!(@collect __pgrx_emit_size []; $($raw)*)
+    };
+    (@__pgrx_emit_discard; $itup:tt $(,)?) => {
+        {
+            let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                <$crate::__pgrx_c_macros::CBool as $crate::__pgrx_c_macros::expression::CType>::from_storage(
+                    $crate::__pgrx_c_bindings::BTreeTupleIsPivot(
+                        <
+                            $crate::__pgrx_c_macros::expression::CPointer<
+                                $crate::__pgrx_c_macros::expression::CRecord<
+                                    $crate::__pgrx_c_bindings::IndexTupleData
+                                >,
+                                $crate::__pgrx_c_macros::expression::ReadWrite
+                            > as $crate::__pgrx_c_macros::expression::CType
+                        >::into_storage(
+                            $crate::__pgrx_c_macros::expression::implicit::<
+                                $crate::__pgrx_c_macros::expression::CPointer<
+                                    $crate::__pgrx_c_macros::expression::CRecord<
+                                        $crate::__pgrx_c_bindings::IndexTupleData
+                                    >,
+                                    $crate::__pgrx_c_macros::expression::ReadWrite
+                                >,
+                                _
+                            >(
+                                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                    $crate::__pgrx_c_operand!(@value [true]; $itup)
+                                )
+                            )
+                        ),
+                    )
+                )
+            );
+        }
+    };
+    (@__pgrx_c_discard; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_BTreeTupleIsPivot!(@collect __pgrx_emit_discard []; $($raw)*)
+    };
+    ($($raw:tt)*) => {
+        $crate::__pgrx_c_args_BTreeTupleIsPivot!(@collect __pgrx_emit_public []; $($raw)*)
+    };
+}
+
+#[cfg(not(all(
+    target_arch = "x86_64",
+    target_os = "linux",
+    target_pointer_width = "64",
+    target_endian = "little"
+)))]
+#[cfg(not(docsrs))]
+compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
+#[doc(hidden)]
+#[macro_export]
+macro_rules! __pgrx_c_args_BTreeTupleIsPosting {
+    (@collect $mode:ident [$($done:tt)*]; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_BTreeTupleIsPosting!(@p0 $mode [$($done)*]; $($raw)*)
+    };
+    (@classified [$next:ident $mode:ident [$($done:tt)*] [$($rest:tt)*]] $descriptor:tt) => {
+        $crate::__pgrx_c_args_BTreeTupleIsPosting!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
+    };
+    (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
+        $crate::__pgrx_c_args_BTreeTupleIsPosting!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
+    };
+    (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
+        $crate::__pgrx_c_args_BTreeTupleIsPosting!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_BTreeTupleIsPosting!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+            $($rest)*
+        )
+    };
+    (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_BTreeTupleIsPosting!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; - $($raw:tt)*) => {
+        $crate::__pgrx_c_args_BTreeTupleIsPosting!(@negative0 $mode [$($done)*]; - $($raw)*)
+    };
+    (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
+        $crate::__pgrx_c_args_BTreeTupleIsPosting!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BTreeTupleIsPosting] [p1 $mode [$($done)*] []] [
+                $head $(::$tail)* ! $group
+            ]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; ::$head:ident $(::$tail:ident)* ! $group:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BTreeTupleIsPosting] [p1 $mode [$($done)*] []] [
+                ::$head $(::$tail)* ! $group
+            ]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; ($($inner:tt)*)) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BTreeTupleIsPosting] [p1 $mode [$($done)*] []] [($($inner)*)]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
+        $crate::__pgrx_c_args_BTreeTupleIsPosting!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
+        $crate::__pgrx_c_args_BTreeTupleIsPosting!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
+        $crate::__pgrx_c_args_BTreeTupleIsPosting!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BTreeTupleIsPosting] [p1 $mode [$($done)*] [$($rest)*]] [
+                $head $(::$tail)* ! $group
+            ]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; ::$head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BTreeTupleIsPosting] [p1 $mode [$($done)*] [$($rest)*]] [
+                ::$head $(::$tail)* ! $group
+            ]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; ($($inner:tt)*), $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BTreeTupleIsPosting] [p1 $mode [$($done)*] [$($rest)*]] [
+                ($($inner)*)
+            ]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_BTreeTupleIsPosting!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_BTreeTupleIsPosting!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*];) => {
+        $crate::BTreeTupleIsPosting!(@$mode; $($done)*)
+    };
+    ($($invalid:tt)*) => {
+        compile_error!("arguments do not satisfy this C macro's invocation contract")
+    };
+}
+/// Typed call adapter for C inline function BTreeTupleIsPosting from nbtree.h:491
+///
+/// ```c
+/// static inline bool
+/// BTreeTupleIsPosting(IndexTuple itup)
+/// {
+/// 	if ((itup->t_info & INDEX_ALT_TID_MASK) == 0)
+/// 		return false;
+/// 	/* presence of BT_IS_POSTING in offset number indicates posting tuple */
+/// 	if ((ItemPointerGetOffsetNumberNoCheck(&itup->t_tid) & BT_IS_POSTING) == 0)
+/// 		return false;
+///
+/// 	return true;
+/// }
+/// ```
+///
+///
+/// Calls the original function through its inspected C prototype. Each operand is evaluated once and converted using C parameter assignment rules. The result retains the function's original C type; `.get()` extracts its native storage, including `()` for a void result. Native calls retain the backend thread, PostgreSQL error, and caller safety contracts of the generated guarded binding.
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+#[macro_export]
+macro_rules! BTreeTupleIsPosting {
+    (@__pgrx_emit_check_safety; $itup:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $itup);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_BTreeTupleIsPosting!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
+    (@__pgrx_emit_public; $itup:tt $(,)?) => {
+        $crate::__pgrx_c_macros::expression_result::finish(
+            $crate::BTreeTupleIsPosting!(@__pgrx_emit_value; $itup)
+        )
+    };
+    (@__pgrx_emit_value; $itup:tt $(,)?) => {
+        $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+            <$crate::__pgrx_c_macros::CBool as $crate::__pgrx_c_macros::expression::CType>::from_storage(
+                $crate::__pgrx_c_bindings::BTreeTupleIsPosting(
+                    <
+                        $crate::__pgrx_c_macros::expression::CPointer<
+                            $crate::__pgrx_c_macros::expression::CRecord<
+                                $crate::__pgrx_c_bindings::IndexTupleData
+                            >,
+                            $crate::__pgrx_c_macros::expression::ReadWrite
+                        > as $crate::__pgrx_c_macros::expression::CType
+                    >::into_storage(
+                        $crate::__pgrx_c_macros::expression::implicit::<
+                            $crate::__pgrx_c_macros::expression::CPointer<
+                                $crate::__pgrx_c_macros::expression::CRecord<
+                                    $crate::__pgrx_c_bindings::IndexTupleData
+                                >,
+                                $crate::__pgrx_c_macros::expression::ReadWrite
+                            >,
+                            _
+                        >(
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_operand!(@value [true]; $itup)
+                            )
+                        )
+                    ),
+                )
+            )
+        )
+    };
+    (@__pgrx_c_value; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_BTreeTupleIsPosting!(@collect __pgrx_emit_value []; $($raw)*)
+    };
+    (@__pgrx_emit_place; $itup:tt $(,)?) => {
+        compile_error!("C expression is not a place in this operation")
+    };
+    (@__pgrx_c_place; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_BTreeTupleIsPosting!(@collect __pgrx_emit_place []; $($raw)*)
+    };
+    (@__pgrx_emit_read_place; $itup:tt $(,)?) => {
+        compile_error!("C expression is not a place in this operation")
+    };
+    (@__pgrx_c_read_place; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_BTreeTupleIsPosting!(@collect __pgrx_emit_read_place []; $($raw)*)
+    };
+    (@__pgrx_emit_size; $itup:tt $(,)?) => {
+        $crate::__pgrx_c_macros::expression::size_of_value_type(
+            if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $itup);
+                    }
+                }
+                Some(
+                    unsafe {
+                        $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                            <
+                                $crate::__pgrx_c_macros::CBool as $crate::__pgrx_c_macros::expression::CType
+                            >::from_storage(
+                                $crate::__pgrx_c_bindings::BTreeTupleIsPosting(
+                                    <
+                                        $crate::__pgrx_c_macros::expression::CPointer<
+                                            $crate::__pgrx_c_macros::expression::CRecord<
+                                                $crate::__pgrx_c_bindings::IndexTupleData
+                                            >,
+                                            $crate::__pgrx_c_macros::expression::ReadWrite
+                                        > as $crate::__pgrx_c_macros::expression::CType
+                                    >::into_storage(
+                                        $crate::__pgrx_c_macros::expression::implicit::<
+                                            $crate::__pgrx_c_macros::expression::CPointer<
+                                                $crate::__pgrx_c_macros::expression::CRecord<
+                                                    $crate::__pgrx_c_bindings::IndexTupleData
+                                                >,
+                                                $crate::__pgrx_c_macros::expression::ReadWrite
+                                            >,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_macros::expression::profile_value::<
+                                                true,
+                                                _
+                                            >($crate::__pgrx_c_operand!(@value [true]; $itup))
+                                        )
+                                    ),
+                                )
+                            )
+                        )
+                    }
+                )
+            } else {
+                None
+            }
+        )
+    };
+    (@__pgrx_c_size; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_BTreeTupleIsPosting!(@collect __pgrx_emit_size []; $($raw)*)
+    };
+    (@__pgrx_emit_discard; $itup:tt $(,)?) => {
+        {
+            let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                <$crate::__pgrx_c_macros::CBool as $crate::__pgrx_c_macros::expression::CType>::from_storage(
+                    $crate::__pgrx_c_bindings::BTreeTupleIsPosting(
+                        <
+                            $crate::__pgrx_c_macros::expression::CPointer<
+                                $crate::__pgrx_c_macros::expression::CRecord<
+                                    $crate::__pgrx_c_bindings::IndexTupleData
+                                >,
+                                $crate::__pgrx_c_macros::expression::ReadWrite
+                            > as $crate::__pgrx_c_macros::expression::CType
+                        >::into_storage(
+                            $crate::__pgrx_c_macros::expression::implicit::<
+                                $crate::__pgrx_c_macros::expression::CPointer<
+                                    $crate::__pgrx_c_macros::expression::CRecord<
+                                        $crate::__pgrx_c_bindings::IndexTupleData
+                                    >,
+                                    $crate::__pgrx_c_macros::expression::ReadWrite
+                                >,
+                                _
+                            >(
+                                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                    $crate::__pgrx_c_operand!(@value [true]; $itup)
+                                )
+                            )
+                        ),
+                    )
+                )
+            );
+        }
+    };
+    (@__pgrx_c_discard; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_BTreeTupleIsPosting!(@collect __pgrx_emit_discard []; $($raw)*)
+    };
+    ($($raw:tt)*) => {
+        $crate::__pgrx_c_args_BTreeTupleIsPosting!(@collect __pgrx_emit_public []; $($raw)*)
+    };
+}
+
+#[cfg(not(all(
+    target_arch = "x86_64",
+    target_os = "linux",
+    target_pointer_width = "64",
+    target_endian = "little"
+)))]
+#[cfg(not(docsrs))]
+compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
+#[doc(hidden)]
+#[macro_export]
+macro_rules! __pgrx_c_args_BTreeTupleSetDownLink {
+    (@collect $mode:ident [$($done:tt)*]; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_BTreeTupleSetDownLink!(@p0 $mode [$($done)*]; $($raw)*)
+    };
+    (@classified [$next:ident $mode:ident [$($done:tt)*] [$($rest:tt)*]] $descriptor:tt) => {
+        $crate::__pgrx_c_args_BTreeTupleSetDownLink!(
+            @$next $mode [$($done)* $descriptor,];
+            $($rest)*
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_BTreeTupleSetDownLink!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+            $($rest)*
+        )
+    };
+    (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_BTreeTupleSetDownLink!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; - $($raw:tt)*) => {
+        $crate::__pgrx_c_args_BTreeTupleSetDownLink!(@negative0 $mode [$($done)*]; - $($raw)*)
+    };
+    (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
+        $crate::__pgrx_c_args_BTreeTupleSetDownLink!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BTreeTupleSetDownLink] [p1 $mode [$($done)*] [$($rest)*]] [
+                $head $(::$tail)* ! $group
+            ]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; ::$head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BTreeTupleSetDownLink] [p1 $mode [$($done)*] [$($rest)*]] [
+                ::$head $(::$tail)* ! $group
+            ]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; ($($inner:tt)*), $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BTreeTupleSetDownLink] [p1 $mode [$($done)*] [$($rest)*]] [
+                ($($inner)*)
+            ]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_BTreeTupleSetDownLink!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_BTreeTupleSetDownLink!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; - $argument:literal) => {
+        $crate::__pgrx_c_args_BTreeTupleSetDownLink!(
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
+    };
+    (@negative1 $mode:ident [$($done:tt)*]; $argument:expr) => {
+        $crate::__pgrx_c_args_BTreeTupleSetDownLink!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_BTreeTupleSetDownLink!(
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+            $($rest)*
+        )
+    };
+    (@negative1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_BTreeTupleSetDownLink!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; - $($raw:tt)*) => {
+        $crate::__pgrx_c_args_BTreeTupleSetDownLink!(@negative1 $mode [$($done)*]; - $($raw)*)
+    };
+    (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
+        $crate::__pgrx_c_args_BTreeTupleSetDownLink!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BTreeTupleSetDownLink] [p2 $mode [$($done)*] []] [
+                $head $(::$tail)* ! $group
+            ]
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; ::$head:ident $(::$tail:ident)* ! $group:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BTreeTupleSetDownLink] [p2 $mode [$($done)*] []] [
+                ::$head $(::$tail)* ! $group
+            ]
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; ($($inner:tt)*)) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BTreeTupleSetDownLink] [p2 $mode [$($done)*] []] [($($inner)*)]
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
+        $crate::__pgrx_c_args_BTreeTupleSetDownLink!(
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; $argument:expr) => {
+        $crate::__pgrx_c_args_BTreeTupleSetDownLink!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
+        $crate::__pgrx_c_args_BTreeTupleSetDownLink!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BTreeTupleSetDownLink] [p2 $mode [$($done)*] [$($rest)*]] [
+                $head $(::$tail)* ! $group
+            ]
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; ::$head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BTreeTupleSetDownLink] [p2 $mode [$($done)*] [$($rest)*]] [
+                ::$head $(::$tail)* ! $group
+            ]
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; ($($inner:tt)*), $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BTreeTupleSetDownLink] [p2 $mode [$($done)*] [$($rest)*]] [
+                ($($inner)*)
+            ]
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_BTreeTupleSetDownLink!(
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_BTreeTupleSetDownLink!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p2 $mode:ident [$($done:tt)*];) => {
+        $crate::BTreeTupleSetDownLink!(@$mode; $($done)*)
+    };
+    ($($invalid:tt)*) => {
+        compile_error!("arguments do not satisfy this C macro's invocation contract")
+    };
+}
+/// Typed call adapter for C inline function BTreeTupleSetDownLink from nbtree.h:561
+///
+/// ```c
+/// static inline void
+/// BTreeTupleSetDownLink(IndexTuple pivot, BlockNumber blkno)
+/// {
+/// 	ItemPointerSetBlockNumber(&pivot->t_tid, blkno);
+/// }
+/// ```
+///
+///
+/// Calls the original function through its inspected C prototype. Each operand is evaluated once and converted using C parameter assignment rules. The result retains the function's original C type; `.get()` extracts its native storage, including `()` for a void result. Native calls retain the backend thread, PostgreSQL error, and caller safety contracts of the generated guarded binding.
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+#[macro_export]
+macro_rules! BTreeTupleSetDownLink {
+    (@__pgrx_emit_check_safety; $pivot:tt, $blkno:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $pivot);
+                $crate::__pgrx_c_operand!(@check_safety; $blkno);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_BTreeTupleSetDownLink!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
+    (@__pgrx_emit_public; $pivot:tt, $blkno:tt $(,)?) => {
+        $crate::__pgrx_c_macros::expression_result::finish(
+            $crate::BTreeTupleSetDownLink!(@__pgrx_emit_value; $pivot, $blkno)
+        )
+    };
+    (@__pgrx_emit_value; $pivot:tt, $blkno:tt $(,)?) => {
+        $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+            $crate::__pgrx_c_bindings::BTreeTupleSetDownLink(
+                <
+                    $crate::__pgrx_c_macros::expression::CPointer<
+                        $crate::__pgrx_c_macros::expression::CRecord<
+                            $crate::__pgrx_c_bindings::IndexTupleData
+                        >,
+                        $crate::__pgrx_c_macros::expression::ReadWrite
+                    > as $crate::__pgrx_c_macros::expression::CType
+                >::into_storage(
+                    $crate::__pgrx_c_macros::expression::implicit::<
+                        $crate::__pgrx_c_macros::expression::CPointer<
+                            $crate::__pgrx_c_macros::expression::CRecord<
+                                $crate::__pgrx_c_bindings::IndexTupleData
+                            >,
+                            $crate::__pgrx_c_macros::expression::ReadWrite
+                        >,
+                        _
+                    >(
+                        $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                            $crate::__pgrx_c_operand!(@value [true]; $pivot)
+                        )
+                    )
+                ),
+                <
+                    $crate::__pgrx_c_macros::CUnsignedInt as $crate::__pgrx_c_macros::expression::CType
+                >::into_storage(
+                    $crate::__pgrx_c_macros::expression::implicit::<
+                        $crate::__pgrx_c_macros::CUnsignedInt,
+                        _
+                    >(
+                        $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                            $crate::__pgrx_c_operand!(@value [true]; $blkno)
+                        )
+                    )
+                ),
+            )
+        )
+    };
+    (@__pgrx_c_value; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_BTreeTupleSetDownLink!(@collect __pgrx_emit_value []; $($raw)*)
+    };
+    (@__pgrx_emit_place; $pivot:tt, $blkno:tt $(,)?) => {
+        compile_error!("C expression is not a place in this operation")
+    };
+    (@__pgrx_c_place; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_BTreeTupleSetDownLink!(@collect __pgrx_emit_place []; $($raw)*)
+    };
+    (@__pgrx_emit_read_place; $pivot:tt, $blkno:tt $(,)?) => {
+        compile_error!("C expression is not a place in this operation")
+    };
+    (@__pgrx_c_read_place; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_BTreeTupleSetDownLink!(@collect __pgrx_emit_read_place []; $($raw)*)
+    };
+    (@__pgrx_emit_size; $pivot:tt, $blkno:tt $(,)?) => {
+        $crate::__pgrx_c_macros::expression::size_of_value_type(
+            if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $pivot);
+                        $crate::__pgrx_c_operand!(@check_safety; $blkno);
+                    }
+                }
+                Some(
+                    unsafe {
+                        $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                            $crate::__pgrx_c_bindings::BTreeTupleSetDownLink(
+                                <
+                                    $crate::__pgrx_c_macros::expression::CPointer<
+                                        $crate::__pgrx_c_macros::expression::CRecord<
+                                            $crate::__pgrx_c_bindings::IndexTupleData
+                                        >,
+                                        $crate::__pgrx_c_macros::expression::ReadWrite
+                                    > as $crate::__pgrx_c_macros::expression::CType
+                                >::into_storage(
+                                    $crate::__pgrx_c_macros::expression::implicit::<
+                                        $crate::__pgrx_c_macros::expression::CPointer<
+                                            $crate::__pgrx_c_macros::expression::CRecord<
+                                                $crate::__pgrx_c_bindings::IndexTupleData
+                                            >,
+                                            $crate::__pgrx_c_macros::expression::ReadWrite
+                                        >,
+                                        _
+                                    >(
+                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                            true,
+                                            _
+                                        >($crate::__pgrx_c_operand!(@value [true]; $pivot))
+                                    )
+                                ),
+                                <
+                                    $crate::__pgrx_c_macros::CUnsignedInt as $crate::__pgrx_c_macros::expression::CType
+                                >::into_storage(
+                                    $crate::__pgrx_c_macros::expression::implicit::<
+                                        $crate::__pgrx_c_macros::CUnsignedInt,
+                                        _
+                                    >(
+                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                            true,
+                                            _
+                                        >($crate::__pgrx_c_operand!(@value [true]; $blkno))
+                                    )
+                                ),
+                            )
+                        )
+                    }
+                )
+            } else {
+                None
+            }
+        )
+    };
+    (@__pgrx_c_size; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_BTreeTupleSetDownLink!(@collect __pgrx_emit_size []; $($raw)*)
+    };
+    (@__pgrx_emit_discard; $pivot:tt, $blkno:tt $(,)?) => {
+        {
+            let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                $crate::__pgrx_c_bindings::BTreeTupleSetDownLink(
+                    <
+                        $crate::__pgrx_c_macros::expression::CPointer<
+                            $crate::__pgrx_c_macros::expression::CRecord<
+                                $crate::__pgrx_c_bindings::IndexTupleData
+                            >,
+                            $crate::__pgrx_c_macros::expression::ReadWrite
+                        > as $crate::__pgrx_c_macros::expression::CType
+                    >::into_storage(
+                        $crate::__pgrx_c_macros::expression::implicit::<
+                            $crate::__pgrx_c_macros::expression::CPointer<
+                                $crate::__pgrx_c_macros::expression::CRecord<
+                                    $crate::__pgrx_c_bindings::IndexTupleData
+                                >,
+                                $crate::__pgrx_c_macros::expression::ReadWrite
+                            >,
+                            _
+                        >(
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_operand!(@value [true]; $pivot)
+                            )
+                        )
+                    ),
+                    <
+                        $crate::__pgrx_c_macros::CUnsignedInt as $crate::__pgrx_c_macros::expression::CType
+                    >::into_storage(
+                        $crate::__pgrx_c_macros::expression::implicit::<
+                            $crate::__pgrx_c_macros::CUnsignedInt,
+                            _
+                        >(
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_operand!(@value [true]; $blkno)
+                            )
+                        )
+                    ),
+                )
+            );
+        }
+    };
+    (@__pgrx_c_discard; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_BTreeTupleSetDownLink!(@collect __pgrx_emit_discard []; $($raw)*)
+    };
+    ($($raw:tt)*) => {
+        $crate::__pgrx_c_args_BTreeTupleSetDownLink!(@collect __pgrx_emit_public []; $($raw)*)
+    };
+}
+
+#[cfg(not(all(
+    target_arch = "x86_64",
+    target_os = "linux",
+    target_pointer_width = "64",
+    target_endian = "little"
+)))]
+#[cfg(not(docsrs))]
+compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
+#[doc(hidden)]
+#[macro_export]
+macro_rules! __pgrx_c_args_BTreeTupleSetNAtts {
+    (@collect $mode:ident [$($done:tt)*]; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_BTreeTupleSetNAtts!(@p0 $mode [$($done)*]; $($raw)*)
+    };
+    (@classified [$next:ident $mode:ident [$($done:tt)*] [$($rest:tt)*]] $descriptor:tt) => {
+        $crate::__pgrx_c_args_BTreeTupleSetNAtts!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
+    };
+    (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_BTreeTupleSetNAtts!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+            $($rest)*
+        )
+    };
+    (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_BTreeTupleSetNAtts!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; - $($raw:tt)*) => {
+        $crate::__pgrx_c_args_BTreeTupleSetNAtts!(@negative0 $mode [$($done)*]; - $($raw)*)
+    };
+    (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
+        $crate::__pgrx_c_args_BTreeTupleSetNAtts!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BTreeTupleSetNAtts] [p1 $mode [$($done)*] [$($rest)*]] [
+                $head $(::$tail)* ! $group
+            ]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; ::$head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BTreeTupleSetNAtts] [p1 $mode [$($done)*] [$($rest)*]] [
+                ::$head $(::$tail)* ! $group
+            ]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; ($($inner:tt)*), $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BTreeTupleSetNAtts] [p1 $mode [$($done)*] [$($rest)*]] [
+                ($($inner)*)
+            ]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_BTreeTupleSetNAtts!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_BTreeTupleSetNAtts!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_BTreeTupleSetNAtts!(
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+            $($rest)*
+        )
+    };
+    (@negative1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_BTreeTupleSetNAtts!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; - $($raw:tt)*) => {
+        $crate::__pgrx_c_args_BTreeTupleSetNAtts!(@negative1 $mode [$($done)*]; - $($raw)*)
+    };
+    (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
+        $crate::__pgrx_c_args_BTreeTupleSetNAtts!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BTreeTupleSetNAtts] [p2 $mode [$($done)*] [$($rest)*]] [
+                $head $(::$tail)* ! $group
+            ]
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; ::$head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BTreeTupleSetNAtts] [p2 $mode [$($done)*] [$($rest)*]] [
+                ::$head $(::$tail)* ! $group
+            ]
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; ($($inner:tt)*), $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BTreeTupleSetNAtts] [p2 $mode [$($done)*] [$($rest)*]] [
+                ($($inner)*)
+            ]
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_BTreeTupleSetNAtts!(
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_BTreeTupleSetNAtts!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p2 $mode:ident [$($done:tt)*]; - $argument:literal) => {
+        $crate::__pgrx_c_args_BTreeTupleSetNAtts!(
+            @p3 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
+    };
+    (@negative2 $mode:ident [$($done:tt)*]; $argument:expr) => {
+        $crate::__pgrx_c_args_BTreeTupleSetNAtts!(
+            @p3 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
+    };
+    (@p2 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_BTreeTupleSetNAtts!(
+            @p3 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+            $($rest)*
+        )
+    };
+    (@negative2 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_BTreeTupleSetNAtts!(
+            @p3 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p2 $mode:ident [$($done:tt)*]; - $($raw:tt)*) => {
+        $crate::__pgrx_c_args_BTreeTupleSetNAtts!(@negative2 $mode [$($done)*]; - $($raw)*)
+    };
+    (@p2 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
+        $crate::__pgrx_c_args_BTreeTupleSetNAtts!(
+            @p3 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
+    };
+    (@p2 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BTreeTupleSetNAtts] [p3 $mode [$($done)*] []] [
+                $head $(::$tail)* ! $group
+            ]
+        )
+    };
+    (@p2 $mode:ident [$($done:tt)*]; ::$head:ident $(::$tail:ident)* ! $group:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BTreeTupleSetNAtts] [p3 $mode [$($done)*] []] [
+                ::$head $(::$tail)* ! $group
+            ]
+        )
+    };
+    (@p2 $mode:ident [$($done:tt)*]; ($($inner:tt)*)) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BTreeTupleSetNAtts] [p3 $mode [$($done)*] []] [($($inner)*)]
+        )
+    };
+    (@p2 $mode:ident [$($done:tt)*]; $argument:literal) => {
+        $crate::__pgrx_c_args_BTreeTupleSetNAtts!(
+            @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
+    };
+    (@p2 $mode:ident [$($done:tt)*]; $argument:expr) => {
+        $crate::__pgrx_c_args_BTreeTupleSetNAtts!(
+            @p3 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
+    };
+    (@p2 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
+        $crate::__pgrx_c_args_BTreeTupleSetNAtts!(
+            @p3 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p2 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BTreeTupleSetNAtts] [p3 $mode [$($done)*] [$($rest)*]] [
+                $head $(::$tail)* ! $group
+            ]
+        )
+    };
+    (@p2 $mode:ident [$($done:tt)*]; ::$head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BTreeTupleSetNAtts] [p3 $mode [$($done)*] [$($rest)*]] [
+                ::$head $(::$tail)* ! $group
+            ]
+        )
+    };
+    (@p2 $mode:ident [$($done:tt)*]; ($($inner:tt)*), $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BTreeTupleSetNAtts] [p3 $mode [$($done)*] [$($rest)*]] [
+                ($($inner)*)
+            ]
+        )
+    };
+    (@p2 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_BTreeTupleSetNAtts!(
+            @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p2 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_BTreeTupleSetNAtts!(
+            @p3 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p3 $mode:ident [$($done:tt)*];) => {
+        $crate::BTreeTupleSetNAtts!(@$mode; $($done)*)
+    };
+    ($($invalid:tt)*) => {
+        compile_error!("arguments do not satisfy this C macro's invocation contract")
+    };
+}
+/// Typed call adapter for C inline function BTreeTupleSetNAtts from nbtree.h:594
+///
+/// ```c
+/// static inline void
+/// BTreeTupleSetNAtts(IndexTuple itup, uint16 nkeyatts, bool heaptid)
+/// {
+/// 	Assert(nkeyatts <= INDEX_MAX_KEYS);
+/// 	Assert((nkeyatts & BT_STATUS_OFFSET_MASK) == 0);
+/// 	Assert(!heaptid || nkeyatts > 0);
+/// 	Assert(!BTreeTupleIsPivot(itup) || nkeyatts == 0);
+///
+/// 	itup->t_info |= INDEX_ALT_TID_MASK;
+///
+/// 	if (heaptid)
+/// 		nkeyatts |= BT_PIVOT_HEAP_TID_ATTR;
+///
+/// 	/* BT_IS_POSTING bit is deliberately unset here */
+/// 	ItemPointerSetOffsetNumber(&itup->t_tid, nkeyatts);
+/// 	Assert(BTreeTupleIsPivot(itup));
+/// }
+/// ```
+///
+///
+/// Calls the original function through its inspected C prototype. Each operand is evaluated once and converted using C parameter assignment rules. The result retains the function's original C type; `.get()` extracts its native storage, including `()` for a void result. Native calls retain the backend thread, PostgreSQL error, and caller safety contracts of the generated guarded binding.
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+#[macro_export]
+macro_rules! BTreeTupleSetNAtts {
+    (@__pgrx_emit_check_safety; $itup:tt, $nkeyatts:tt, $heaptid:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $itup);
+                $crate::__pgrx_c_operand!(@check_safety; $nkeyatts);
+                $crate::__pgrx_c_operand!(@check_safety; $heaptid);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_BTreeTupleSetNAtts!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
+    (@__pgrx_emit_public; $itup:tt, $nkeyatts:tt, $heaptid:tt $(,)?) => {
+        $crate::__pgrx_c_macros::expression_result::finish(
+            $crate::BTreeTupleSetNAtts!(@__pgrx_emit_value; $itup, $nkeyatts, $heaptid)
+        )
+    };
+    (@__pgrx_emit_value; $itup:tt, $nkeyatts:tt, $heaptid:tt $(,)?) => {
+        $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+            $crate::__pgrx_c_bindings::BTreeTupleSetNAtts(
+                <
+                    $crate::__pgrx_c_macros::expression::CPointer<
+                        $crate::__pgrx_c_macros::expression::CRecord<
+                            $crate::__pgrx_c_bindings::IndexTupleData
+                        >,
+                        $crate::__pgrx_c_macros::expression::ReadWrite
+                    > as $crate::__pgrx_c_macros::expression::CType
+                >::into_storage(
+                    $crate::__pgrx_c_macros::expression::implicit::<
+                        $crate::__pgrx_c_macros::expression::CPointer<
+                            $crate::__pgrx_c_macros::expression::CRecord<
+                                $crate::__pgrx_c_bindings::IndexTupleData
+                            >,
+                            $crate::__pgrx_c_macros::expression::ReadWrite
+                        >,
+                        _
+                    >(
+                        $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                            $crate::__pgrx_c_operand!(@value [true]; $itup)
+                        )
+                    )
+                ),
+                <
+                    $crate::__pgrx_c_macros::CUnsignedShort as $crate::__pgrx_c_macros::expression::CType
+                >::into_storage(
+                    $crate::__pgrx_c_macros::expression::implicit::<
+                        $crate::__pgrx_c_macros::CUnsignedShort,
+                        _
+                    >(
+                        $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                            $crate::__pgrx_c_operand!(@value [true]; $nkeyatts)
+                        )
+                    )
+                ),
+                <$crate::__pgrx_c_macros::CBool as $crate::__pgrx_c_macros::expression::CType>::into_storage(
+                    $crate::__pgrx_c_macros::expression::implicit::<
+                        $crate::__pgrx_c_macros::CBool,
+                        _
+                    >(
+                        $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                            $crate::__pgrx_c_operand!(@value [true]; $heaptid)
+                        )
+                    )
+                ),
+            )
+        )
+    };
+    (@__pgrx_c_value; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_BTreeTupleSetNAtts!(@collect __pgrx_emit_value []; $($raw)*)
+    };
+    (@__pgrx_emit_place; $itup:tt, $nkeyatts:tt, $heaptid:tt $(,)?) => {
+        compile_error!("C expression is not a place in this operation")
+    };
+    (@__pgrx_c_place; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_BTreeTupleSetNAtts!(@collect __pgrx_emit_place []; $($raw)*)
+    };
+    (@__pgrx_emit_read_place; $itup:tt, $nkeyatts:tt, $heaptid:tt $(,)?) => {
+        compile_error!("C expression is not a place in this operation")
+    };
+    (@__pgrx_c_read_place; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_BTreeTupleSetNAtts!(@collect __pgrx_emit_read_place []; $($raw)*)
+    };
+    (@__pgrx_emit_size; $itup:tt, $nkeyatts:tt, $heaptid:tt $(,)?) => {
+        $crate::__pgrx_c_macros::expression::size_of_value_type(
+            if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $itup);
+                        $crate::__pgrx_c_operand!(@check_safety; $nkeyatts);
+                        $crate::__pgrx_c_operand!(@check_safety; $heaptid);
+                    }
+                }
+                Some(
+                    unsafe {
+                        $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                            $crate::__pgrx_c_bindings::BTreeTupleSetNAtts(
+                                <
+                                    $crate::__pgrx_c_macros::expression::CPointer<
+                                        $crate::__pgrx_c_macros::expression::CRecord<
+                                            $crate::__pgrx_c_bindings::IndexTupleData
+                                        >,
+                                        $crate::__pgrx_c_macros::expression::ReadWrite
+                                    > as $crate::__pgrx_c_macros::expression::CType
+                                >::into_storage(
+                                    $crate::__pgrx_c_macros::expression::implicit::<
+                                        $crate::__pgrx_c_macros::expression::CPointer<
+                                            $crate::__pgrx_c_macros::expression::CRecord<
+                                                $crate::__pgrx_c_bindings::IndexTupleData
+                                            >,
+                                            $crate::__pgrx_c_macros::expression::ReadWrite
+                                        >,
+                                        _
+                                    >(
+                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                            true,
+                                            _
+                                        >($crate::__pgrx_c_operand!(@value [true]; $itup))
+                                    )
+                                ),
+                                <
+                                    $crate::__pgrx_c_macros::CUnsignedShort as $crate::__pgrx_c_macros::expression::CType
+                                >::into_storage(
+                                    $crate::__pgrx_c_macros::expression::implicit::<
+                                        $crate::__pgrx_c_macros::CUnsignedShort,
+                                        _
+                                    >(
+                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                            true,
+                                            _
+                                        >($crate::__pgrx_c_operand!(@value [true]; $nkeyatts))
+                                    )
+                                ),
+                                <
+                                    $crate::__pgrx_c_macros::CBool as $crate::__pgrx_c_macros::expression::CType
+                                >::into_storage(
+                                    $crate::__pgrx_c_macros::expression::implicit::<
+                                        $crate::__pgrx_c_macros::CBool,
+                                        _
+                                    >(
+                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                            true,
+                                            _
+                                        >($crate::__pgrx_c_operand!(@value [true]; $heaptid))
+                                    )
+                                ),
+                            )
+                        )
+                    }
+                )
+            } else {
+                None
+            }
+        )
+    };
+    (@__pgrx_c_size; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_BTreeTupleSetNAtts!(@collect __pgrx_emit_size []; $($raw)*)
+    };
+    (@__pgrx_emit_discard; $itup:tt, $nkeyatts:tt, $heaptid:tt $(,)?) => {
+        {
+            let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                $crate::__pgrx_c_bindings::BTreeTupleSetNAtts(
+                    <
+                        $crate::__pgrx_c_macros::expression::CPointer<
+                            $crate::__pgrx_c_macros::expression::CRecord<
+                                $crate::__pgrx_c_bindings::IndexTupleData
+                            >,
+                            $crate::__pgrx_c_macros::expression::ReadWrite
+                        > as $crate::__pgrx_c_macros::expression::CType
+                    >::into_storage(
+                        $crate::__pgrx_c_macros::expression::implicit::<
+                            $crate::__pgrx_c_macros::expression::CPointer<
+                                $crate::__pgrx_c_macros::expression::CRecord<
+                                    $crate::__pgrx_c_bindings::IndexTupleData
+                                >,
+                                $crate::__pgrx_c_macros::expression::ReadWrite
+                            >,
+                            _
+                        >(
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_operand!(@value [true]; $itup)
+                            )
+                        )
+                    ),
+                    <
+                        $crate::__pgrx_c_macros::CUnsignedShort as $crate::__pgrx_c_macros::expression::CType
+                    >::into_storage(
+                        $crate::__pgrx_c_macros::expression::implicit::<
+                            $crate::__pgrx_c_macros::CUnsignedShort,
+                            _
+                        >(
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_operand!(@value [true]; $nkeyatts)
+                            )
+                        )
+                    ),
+                    <$crate::__pgrx_c_macros::CBool as $crate::__pgrx_c_macros::expression::CType>::into_storage(
+                        $crate::__pgrx_c_macros::expression::implicit::<
+                            $crate::__pgrx_c_macros::CBool,
+                            _
+                        >(
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_operand!(@value [true]; $heaptid)
+                            )
+                        )
+                    ),
+                )
+            );
+        }
+    };
+    (@__pgrx_c_discard; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_BTreeTupleSetNAtts!(@collect __pgrx_emit_discard []; $($raw)*)
+    };
+    ($($raw:tt)*) => {
+        $crate::__pgrx_c_args_BTreeTupleSetNAtts!(@collect __pgrx_emit_public []; $($raw)*)
+    };
+}
+
+#[cfg(not(all(
+    target_arch = "x86_64",
+    target_os = "linux",
+    target_pointer_width = "64",
+    target_endian = "little"
+)))]
+#[cfg(not(docsrs))]
+compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
+#[doc(hidden)]
+#[macro_export]
+macro_rules! __pgrx_c_args_BTreeTupleSetPosting {
+    (@collect $mode:ident [$($done:tt)*]; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_BTreeTupleSetPosting!(@p0 $mode [$($done)*]; $($raw)*)
+    };
+    (@classified [$next:ident $mode:ident [$($done:tt)*] [$($rest:tt)*]] $descriptor:tt) => {
+        $crate::__pgrx_c_args_BTreeTupleSetPosting!(
+            @$next $mode [$($done)* $descriptor,];
+            $($rest)*
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_BTreeTupleSetPosting!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+            $($rest)*
+        )
+    };
+    (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_BTreeTupleSetPosting!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; - $($raw:tt)*) => {
+        $crate::__pgrx_c_args_BTreeTupleSetPosting!(@negative0 $mode [$($done)*]; - $($raw)*)
+    };
+    (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
+        $crate::__pgrx_c_args_BTreeTupleSetPosting!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BTreeTupleSetPosting] [p1 $mode [$($done)*] [$($rest)*]] [
+                $head $(::$tail)* ! $group
+            ]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; ::$head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BTreeTupleSetPosting] [p1 $mode [$($done)*] [$($rest)*]] [
+                ::$head $(::$tail)* ! $group
+            ]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; ($($inner:tt)*), $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BTreeTupleSetPosting] [p1 $mode [$($done)*] [$($rest)*]] [
+                ($($inner)*)
+            ]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_BTreeTupleSetPosting!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_BTreeTupleSetPosting!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_BTreeTupleSetPosting!(
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+            $($rest)*
+        )
+    };
+    (@negative1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_BTreeTupleSetPosting!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; - $($raw:tt)*) => {
+        $crate::__pgrx_c_args_BTreeTupleSetPosting!(@negative1 $mode [$($done)*]; - $($raw)*)
+    };
+    (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
+        $crate::__pgrx_c_args_BTreeTupleSetPosting!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BTreeTupleSetPosting] [p2 $mode [$($done)*] [$($rest)*]] [
+                $head $(::$tail)* ! $group
+            ]
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; ::$head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BTreeTupleSetPosting] [p2 $mode [$($done)*] [$($rest)*]] [
+                ::$head $(::$tail)* ! $group
+            ]
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; ($($inner:tt)*), $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BTreeTupleSetPosting] [p2 $mode [$($done)*] [$($rest)*]] [
+                ($($inner)*)
+            ]
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_BTreeTupleSetPosting!(
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_BTreeTupleSetPosting!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p2 $mode:ident [$($done:tt)*]; - $argument:literal) => {
+        $crate::__pgrx_c_args_BTreeTupleSetPosting!(
+            @p3 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
+    };
+    (@negative2 $mode:ident [$($done:tt)*]; $argument:expr) => {
+        $crate::__pgrx_c_args_BTreeTupleSetPosting!(
+            @p3 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
+    };
+    (@p2 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_BTreeTupleSetPosting!(
+            @p3 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+            $($rest)*
+        )
+    };
+    (@negative2 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_BTreeTupleSetPosting!(
+            @p3 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p2 $mode:ident [$($done:tt)*]; - $($raw:tt)*) => {
+        $crate::__pgrx_c_args_BTreeTupleSetPosting!(@negative2 $mode [$($done)*]; - $($raw)*)
+    };
+    (@p2 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
+        $crate::__pgrx_c_args_BTreeTupleSetPosting!(
+            @p3 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
+    };
+    (@p2 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BTreeTupleSetPosting] [p3 $mode [$($done)*] []] [
+                $head $(::$tail)* ! $group
+            ]
+        )
+    };
+    (@p2 $mode:ident [$($done:tt)*]; ::$head:ident $(::$tail:ident)* ! $group:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BTreeTupleSetPosting] [p3 $mode [$($done)*] []] [
+                ::$head $(::$tail)* ! $group
+            ]
+        )
+    };
+    (@p2 $mode:ident [$($done:tt)*]; ($($inner:tt)*)) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BTreeTupleSetPosting] [p3 $mode [$($done)*] []] [($($inner)*)]
+        )
+    };
+    (@p2 $mode:ident [$($done:tt)*]; $argument:literal) => {
+        $crate::__pgrx_c_args_BTreeTupleSetPosting!(
+            @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
+    };
+    (@p2 $mode:ident [$($done:tt)*]; $argument:expr) => {
+        $crate::__pgrx_c_args_BTreeTupleSetPosting!(
+            @p3 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
+    };
+    (@p2 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
+        $crate::__pgrx_c_args_BTreeTupleSetPosting!(
+            @p3 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p2 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BTreeTupleSetPosting] [p3 $mode [$($done)*] [$($rest)*]] [
+                $head $(::$tail)* ! $group
+            ]
+        )
+    };
+    (@p2 $mode:ident [$($done:tt)*]; ::$head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BTreeTupleSetPosting] [p3 $mode [$($done)*] [$($rest)*]] [
+                ::$head $(::$tail)* ! $group
+            ]
+        )
+    };
+    (@p2 $mode:ident [$($done:tt)*]; ($($inner:tt)*), $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BTreeTupleSetPosting] [p3 $mode [$($done)*] [$($rest)*]] [
+                ($($inner)*)
+            ]
+        )
+    };
+    (@p2 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_BTreeTupleSetPosting!(
+            @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p2 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_BTreeTupleSetPosting!(
+            @p3 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p3 $mode:ident [$($done:tt)*];) => {
+        $crate::BTreeTupleSetPosting!(@$mode; $($done)*)
+    };
+    ($($invalid:tt)*) => {
+        compile_error!("arguments do not satisfy this C macro's invocation contract")
+    };
+}
+/// Typed call adapter for C inline function BTreeTupleSetPosting from nbtree.h:503
+///
+/// ```c
+/// static inline void
+/// BTreeTupleSetPosting(IndexTuple itup, uint16 nhtids, int postingoffset)
+/// {
+/// 	Assert(nhtids > 1);
+/// 	Assert((nhtids & BT_STATUS_OFFSET_MASK) == 0);
+/// 	Assert((size_t) postingoffset == MAXALIGN(postingoffset));
+/// 	Assert(postingoffset < INDEX_SIZE_MASK);
+/// 	Assert(!BTreeTupleIsPivot(itup));
+///
+/// 	itup->t_info |= INDEX_ALT_TID_MASK;
+/// 	ItemPointerSetOffsetNumber(&itup->t_tid, (nhtids | BT_IS_POSTING));
+/// 	ItemPointerSetBlockNumber(&itup->t_tid, postingoffset);
+/// }
+/// ```
+///
+///
+/// Calls the original function through its inspected C prototype. Each operand is evaluated once and converted using C parameter assignment rules. The result retains the function's original C type; `.get()` extracts its native storage, including `()` for a void result. Native calls retain the backend thread, PostgreSQL error, and caller safety contracts of the generated guarded binding.
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+#[macro_export]
+macro_rules! BTreeTupleSetPosting {
+    (@__pgrx_emit_check_safety; $itup:tt, $nhtids:tt, $postingoffset:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $itup);
+                $crate::__pgrx_c_operand!(@check_safety; $nhtids);
+                $crate::__pgrx_c_operand!(@check_safety; $postingoffset);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_BTreeTupleSetPosting!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
+    (@__pgrx_emit_public; $itup:tt, $nhtids:tt, $postingoffset:tt $(,)?) => {
+        $crate::__pgrx_c_macros::expression_result::finish(
+            $crate::BTreeTupleSetPosting!(@__pgrx_emit_value; $itup, $nhtids, $postingoffset)
+        )
+    };
+    (@__pgrx_emit_value; $itup:tt, $nhtids:tt, $postingoffset:tt $(,)?) => {
+        $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+            $crate::__pgrx_c_bindings::BTreeTupleSetPosting(
+                <
+                    $crate::__pgrx_c_macros::expression::CPointer<
+                        $crate::__pgrx_c_macros::expression::CRecord<
+                            $crate::__pgrx_c_bindings::IndexTupleData
+                        >,
+                        $crate::__pgrx_c_macros::expression::ReadWrite
+                    > as $crate::__pgrx_c_macros::expression::CType
+                >::into_storage(
+                    $crate::__pgrx_c_macros::expression::implicit::<
+                        $crate::__pgrx_c_macros::expression::CPointer<
+                            $crate::__pgrx_c_macros::expression::CRecord<
+                                $crate::__pgrx_c_bindings::IndexTupleData
+                            >,
+                            $crate::__pgrx_c_macros::expression::ReadWrite
+                        >,
+                        _
+                    >(
+                        $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                            $crate::__pgrx_c_operand!(@value [true]; $itup)
+                        )
+                    )
+                ),
+                <
+                    $crate::__pgrx_c_macros::CUnsignedShort as $crate::__pgrx_c_macros::expression::CType
+                >::into_storage(
+                    $crate::__pgrx_c_macros::expression::implicit::<
+                        $crate::__pgrx_c_macros::CUnsignedShort,
+                        _
+                    >(
+                        $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                            $crate::__pgrx_c_operand!(@value [true]; $nhtids)
+                        )
+                    )
+                ),
+                <$crate::__pgrx_c_macros::CInt as $crate::__pgrx_c_macros::expression::CType>::into_storage(
+                    $crate::__pgrx_c_macros::expression::implicit::<
+                        $crate::__pgrx_c_macros::CInt,
+                        _
+                    >(
+                        $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                            $crate::__pgrx_c_operand!(@value [true]; $postingoffset)
+                        )
+                    )
+                ),
+            )
+        )
+    };
+    (@__pgrx_c_value; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_BTreeTupleSetPosting!(@collect __pgrx_emit_value []; $($raw)*)
+    };
+    (@__pgrx_emit_place; $itup:tt, $nhtids:tt, $postingoffset:tt $(,)?) => {
+        compile_error!("C expression is not a place in this operation")
+    };
+    (@__pgrx_c_place; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_BTreeTupleSetPosting!(@collect __pgrx_emit_place []; $($raw)*)
+    };
+    (@__pgrx_emit_read_place; $itup:tt, $nhtids:tt, $postingoffset:tt $(,)?) => {
+        compile_error!("C expression is not a place in this operation")
+    };
+    (@__pgrx_c_read_place; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_BTreeTupleSetPosting!(@collect __pgrx_emit_read_place []; $($raw)*)
+    };
+    (@__pgrx_emit_size; $itup:tt, $nhtids:tt, $postingoffset:tt $(,)?) => {
+        $crate::__pgrx_c_macros::expression::size_of_value_type(
+            if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $itup);
+                        $crate::__pgrx_c_operand!(@check_safety; $nhtids);
+                        $crate::__pgrx_c_operand!(@check_safety; $postingoffset);
+                    }
+                }
+                Some(
+                    unsafe {
+                        $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                            $crate::__pgrx_c_bindings::BTreeTupleSetPosting(
+                                <
+                                    $crate::__pgrx_c_macros::expression::CPointer<
+                                        $crate::__pgrx_c_macros::expression::CRecord<
+                                            $crate::__pgrx_c_bindings::IndexTupleData
+                                        >,
+                                        $crate::__pgrx_c_macros::expression::ReadWrite
+                                    > as $crate::__pgrx_c_macros::expression::CType
+                                >::into_storage(
+                                    $crate::__pgrx_c_macros::expression::implicit::<
+                                        $crate::__pgrx_c_macros::expression::CPointer<
+                                            $crate::__pgrx_c_macros::expression::CRecord<
+                                                $crate::__pgrx_c_bindings::IndexTupleData
+                                            >,
+                                            $crate::__pgrx_c_macros::expression::ReadWrite
+                                        >,
+                                        _
+                                    >(
+                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                            true,
+                                            _
+                                        >($crate::__pgrx_c_operand!(@value [true]; $itup))
+                                    )
+                                ),
+                                <
+                                    $crate::__pgrx_c_macros::CUnsignedShort as $crate::__pgrx_c_macros::expression::CType
+                                >::into_storage(
+                                    $crate::__pgrx_c_macros::expression::implicit::<
+                                        $crate::__pgrx_c_macros::CUnsignedShort,
+                                        _
+                                    >(
+                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                            true,
+                                            _
+                                        >($crate::__pgrx_c_operand!(@value [true]; $nhtids))
+                                    )
+                                ),
+                                <
+                                    $crate::__pgrx_c_macros::CInt as $crate::__pgrx_c_macros::expression::CType
+                                >::into_storage(
+                                    $crate::__pgrx_c_macros::expression::implicit::<
+                                        $crate::__pgrx_c_macros::CInt,
+                                        _
+                                    >(
+                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                            true,
+                                            _
+                                        >($crate::__pgrx_c_operand!(@value [true]; $postingoffset))
+                                    )
+                                ),
+                            )
+                        )
+                    }
+                )
+            } else {
+                None
+            }
+        )
+    };
+    (@__pgrx_c_size; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_BTreeTupleSetPosting!(@collect __pgrx_emit_size []; $($raw)*)
+    };
+    (@__pgrx_emit_discard; $itup:tt, $nhtids:tt, $postingoffset:tt $(,)?) => {
+        {
+            let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                $crate::__pgrx_c_bindings::BTreeTupleSetPosting(
+                    <
+                        $crate::__pgrx_c_macros::expression::CPointer<
+                            $crate::__pgrx_c_macros::expression::CRecord<
+                                $crate::__pgrx_c_bindings::IndexTupleData
+                            >,
+                            $crate::__pgrx_c_macros::expression::ReadWrite
+                        > as $crate::__pgrx_c_macros::expression::CType
+                    >::into_storage(
+                        $crate::__pgrx_c_macros::expression::implicit::<
+                            $crate::__pgrx_c_macros::expression::CPointer<
+                                $crate::__pgrx_c_macros::expression::CRecord<
+                                    $crate::__pgrx_c_bindings::IndexTupleData
+                                >,
+                                $crate::__pgrx_c_macros::expression::ReadWrite
+                            >,
+                            _
+                        >(
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_operand!(@value [true]; $itup)
+                            )
+                        )
+                    ),
+                    <
+                        $crate::__pgrx_c_macros::CUnsignedShort as $crate::__pgrx_c_macros::expression::CType
+                    >::into_storage(
+                        $crate::__pgrx_c_macros::expression::implicit::<
+                            $crate::__pgrx_c_macros::CUnsignedShort,
+                            _
+                        >(
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_operand!(@value [true]; $nhtids)
+                            )
+                        )
+                    ),
+                    <$crate::__pgrx_c_macros::CInt as $crate::__pgrx_c_macros::expression::CType>::into_storage(
+                        $crate::__pgrx_c_macros::expression::implicit::<
+                            $crate::__pgrx_c_macros::CInt,
+                            _
+                        >(
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_operand!(@value [true]; $postingoffset)
+                            )
+                        )
+                    ),
+                )
+            );
+        }
+    };
+    (@__pgrx_c_discard; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_BTreeTupleSetPosting!(@collect __pgrx_emit_discard []; $($raw)*)
+    };
+    ($($raw:tt)*) => {
+        $crate::__pgrx_c_args_BTreeTupleSetPosting!(@collect __pgrx_emit_public []; $($raw)*)
+    };
+}
+
+#[cfg(not(all(
+    target_arch = "x86_64",
+    target_os = "linux",
+    target_pointer_width = "64",
+    target_endian = "little"
+)))]
+#[cfg(not(docsrs))]
+compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
+#[doc(hidden)]
+#[macro_export]
+macro_rules! __pgrx_c_args_BTreeTupleSetTopParent {
+    (@collect $mode:ident [$($done:tt)*]; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_BTreeTupleSetTopParent!(@p0 $mode [$($done)*]; $($raw)*)
+    };
+    (@classified [$next:ident $mode:ident [$($done:tt)*] [$($rest:tt)*]] $descriptor:tt) => {
+        $crate::__pgrx_c_args_BTreeTupleSetTopParent!(
+            @$next $mode [$($done)* $descriptor,];
+            $($rest)*
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_BTreeTupleSetTopParent!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+            $($rest)*
+        )
+    };
+    (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_BTreeTupleSetTopParent!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; - $($raw:tt)*) => {
+        $crate::__pgrx_c_args_BTreeTupleSetTopParent!(@negative0 $mode [$($done)*]; - $($raw)*)
+    };
+    (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
+        $crate::__pgrx_c_args_BTreeTupleSetTopParent!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BTreeTupleSetTopParent] [p1 $mode [$($done)*] [$($rest)*]] [
+                $head $(::$tail)* ! $group
+            ]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; ::$head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BTreeTupleSetTopParent] [p1 $mode [$($done)*] [$($rest)*]] [
+                ::$head $(::$tail)* ! $group
+            ]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; ($($inner:tt)*), $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BTreeTupleSetTopParent] [p1 $mode [$($done)*] [$($rest)*]] [
+                ($($inner)*)
+            ]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_BTreeTupleSetTopParent!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_BTreeTupleSetTopParent!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; - $argument:literal) => {
+        $crate::__pgrx_c_args_BTreeTupleSetTopParent!(
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
+    };
+    (@negative1 $mode:ident [$($done:tt)*]; $argument:expr) => {
+        $crate::__pgrx_c_args_BTreeTupleSetTopParent!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_BTreeTupleSetTopParent!(
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+            $($rest)*
+        )
+    };
+    (@negative1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_BTreeTupleSetTopParent!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; - $($raw:tt)*) => {
+        $crate::__pgrx_c_args_BTreeTupleSetTopParent!(@negative1 $mode [$($done)*]; - $($raw)*)
+    };
+    (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
+        $crate::__pgrx_c_args_BTreeTupleSetTopParent!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BTreeTupleSetTopParent] [p2 $mode [$($done)*] []] [
+                $head $(::$tail)* ! $group
+            ]
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; ::$head:ident $(::$tail:ident)* ! $group:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BTreeTupleSetTopParent] [p2 $mode [$($done)*] []] [
+                ::$head $(::$tail)* ! $group
+            ]
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; ($($inner:tt)*)) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BTreeTupleSetTopParent] [p2 $mode [$($done)*] []] [
+                ($($inner)*)
+            ]
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
+        $crate::__pgrx_c_args_BTreeTupleSetTopParent!(
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; $argument:expr) => {
+        $crate::__pgrx_c_args_BTreeTupleSetTopParent!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
+        $crate::__pgrx_c_args_BTreeTupleSetTopParent!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BTreeTupleSetTopParent] [p2 $mode [$($done)*] [$($rest)*]] [
+                $head $(::$tail)* ! $group
+            ]
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; ::$head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BTreeTupleSetTopParent] [p2 $mode [$($done)*] [$($rest)*]] [
+                ::$head $(::$tail)* ! $group
+            ]
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; ($($inner:tt)*), $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_BTreeTupleSetTopParent] [p2 $mode [$($done)*] [$($rest)*]] [
+                ($($inner)*)
+            ]
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_BTreeTupleSetTopParent!(
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_BTreeTupleSetTopParent!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p2 $mode:ident [$($done:tt)*];) => {
+        $crate::BTreeTupleSetTopParent!(@$mode; $($done)*)
+    };
+    ($($invalid:tt)*) => {
+        compile_error!("arguments do not satisfy this C macro's invocation contract")
+    };
+}
+/// Typed call adapter for C inline function BTreeTupleSetTopParent from nbtree.h:625
+///
+/// ```c
+/// static inline void
+/// BTreeTupleSetTopParent(IndexTuple leafhikey, BlockNumber blkno)
+/// {
+/// 	ItemPointerSetBlockNumber(&leafhikey->t_tid, blkno);
+/// 	BTreeTupleSetNAtts(leafhikey, 0, false);
+/// }
+/// ```
+///
+///
+/// Calls the original function through its inspected C prototype. Each operand is evaluated once and converted using C parameter assignment rules. The result retains the function's original C type; `.get()` extracts its native storage, including `()` for a void result. Native calls retain the backend thread, PostgreSQL error, and caller safety contracts of the generated guarded binding.
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+#[macro_export]
+macro_rules! BTreeTupleSetTopParent {
+    (@__pgrx_emit_check_safety; $leafhikey:tt, $blkno:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $leafhikey);
+                $crate::__pgrx_c_operand!(@check_safety; $blkno);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_BTreeTupleSetTopParent!(
+            @collect __pgrx_emit_check_safety [];
+            $($raw)*
+        )
+    };
+    (@__pgrx_emit_public; $leafhikey:tt, $blkno:tt $(,)?) => {
+        $crate::__pgrx_c_macros::expression_result::finish(
+            $crate::BTreeTupleSetTopParent!(@__pgrx_emit_value; $leafhikey, $blkno)
+        )
+    };
+    (@__pgrx_emit_value; $leafhikey:tt, $blkno:tt $(,)?) => {
+        $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+            $crate::__pgrx_c_bindings::BTreeTupleSetTopParent(
+                <
+                    $crate::__pgrx_c_macros::expression::CPointer<
+                        $crate::__pgrx_c_macros::expression::CRecord<
+                            $crate::__pgrx_c_bindings::IndexTupleData
+                        >,
+                        $crate::__pgrx_c_macros::expression::ReadWrite
+                    > as $crate::__pgrx_c_macros::expression::CType
+                >::into_storage(
+                    $crate::__pgrx_c_macros::expression::implicit::<
+                        $crate::__pgrx_c_macros::expression::CPointer<
+                            $crate::__pgrx_c_macros::expression::CRecord<
+                                $crate::__pgrx_c_bindings::IndexTupleData
+                            >,
+                            $crate::__pgrx_c_macros::expression::ReadWrite
+                        >,
+                        _
+                    >(
+                        $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                            $crate::__pgrx_c_operand!(@value [true]; $leafhikey)
+                        )
+                    )
+                ),
+                <
+                    $crate::__pgrx_c_macros::CUnsignedInt as $crate::__pgrx_c_macros::expression::CType
+                >::into_storage(
+                    $crate::__pgrx_c_macros::expression::implicit::<
+                        $crate::__pgrx_c_macros::CUnsignedInt,
+                        _
+                    >(
+                        $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                            $crate::__pgrx_c_operand!(@value [true]; $blkno)
+                        )
+                    )
+                ),
+            )
+        )
+    };
+    (@__pgrx_c_value; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_BTreeTupleSetTopParent!(@collect __pgrx_emit_value []; $($raw)*)
+    };
+    (@__pgrx_emit_place; $leafhikey:tt, $blkno:tt $(,)?) => {
+        compile_error!("C expression is not a place in this operation")
+    };
+    (@__pgrx_c_place; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_BTreeTupleSetTopParent!(@collect __pgrx_emit_place []; $($raw)*)
+    };
+    (@__pgrx_emit_read_place; $leafhikey:tt, $blkno:tt $(,)?) => {
+        compile_error!("C expression is not a place in this operation")
+    };
+    (@__pgrx_c_read_place; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_BTreeTupleSetTopParent!(@collect __pgrx_emit_read_place []; $($raw)*)
+    };
+    (@__pgrx_emit_size; $leafhikey:tt, $blkno:tt $(,)?) => {
+        $crate::__pgrx_c_macros::expression::size_of_value_type(
+            if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $leafhikey);
+                        $crate::__pgrx_c_operand!(@check_safety; $blkno);
+                    }
+                }
+                Some(
+                    unsafe {
+                        $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                            $crate::__pgrx_c_bindings::BTreeTupleSetTopParent(
+                                <
+                                    $crate::__pgrx_c_macros::expression::CPointer<
+                                        $crate::__pgrx_c_macros::expression::CRecord<
+                                            $crate::__pgrx_c_bindings::IndexTupleData
+                                        >,
+                                        $crate::__pgrx_c_macros::expression::ReadWrite
+                                    > as $crate::__pgrx_c_macros::expression::CType
+                                >::into_storage(
+                                    $crate::__pgrx_c_macros::expression::implicit::<
+                                        $crate::__pgrx_c_macros::expression::CPointer<
+                                            $crate::__pgrx_c_macros::expression::CRecord<
+                                                $crate::__pgrx_c_bindings::IndexTupleData
+                                            >,
+                                            $crate::__pgrx_c_macros::expression::ReadWrite
+                                        >,
+                                        _
+                                    >(
+                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                            true,
+                                            _
+                                        >($crate::__pgrx_c_operand!(@value [true]; $leafhikey))
+                                    )
+                                ),
+                                <
+                                    $crate::__pgrx_c_macros::CUnsignedInt as $crate::__pgrx_c_macros::expression::CType
+                                >::into_storage(
+                                    $crate::__pgrx_c_macros::expression::implicit::<
+                                        $crate::__pgrx_c_macros::CUnsignedInt,
+                                        _
+                                    >(
+                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                            true,
+                                            _
+                                        >($crate::__pgrx_c_operand!(@value [true]; $blkno))
+                                    )
+                                ),
+                            )
+                        )
+                    }
+                )
+            } else {
+                None
+            }
+        )
+    };
+    (@__pgrx_c_size; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_BTreeTupleSetTopParent!(@collect __pgrx_emit_size []; $($raw)*)
+    };
+    (@__pgrx_emit_discard; $leafhikey:tt, $blkno:tt $(,)?) => {
+        {
+            let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                $crate::__pgrx_c_bindings::BTreeTupleSetTopParent(
+                    <
+                        $crate::__pgrx_c_macros::expression::CPointer<
+                            $crate::__pgrx_c_macros::expression::CRecord<
+                                $crate::__pgrx_c_bindings::IndexTupleData
+                            >,
+                            $crate::__pgrx_c_macros::expression::ReadWrite
+                        > as $crate::__pgrx_c_macros::expression::CType
+                    >::into_storage(
+                        $crate::__pgrx_c_macros::expression::implicit::<
+                            $crate::__pgrx_c_macros::expression::CPointer<
+                                $crate::__pgrx_c_macros::expression::CRecord<
+                                    $crate::__pgrx_c_bindings::IndexTupleData
+                                >,
+                                $crate::__pgrx_c_macros::expression::ReadWrite
+                            >,
+                            _
+                        >(
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_operand!(@value [true]; $leafhikey)
+                            )
+                        )
+                    ),
+                    <
+                        $crate::__pgrx_c_macros::CUnsignedInt as $crate::__pgrx_c_macros::expression::CType
+                    >::into_storage(
+                        $crate::__pgrx_c_macros::expression::implicit::<
+                            $crate::__pgrx_c_macros::CUnsignedInt,
+                            _
+                        >(
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_operand!(@value [true]; $blkno)
+                            )
+                        )
+                    ),
+                )
+            );
+        }
+    };
+    (@__pgrx_c_discard; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_BTreeTupleSetTopParent!(@collect __pgrx_emit_discard []; $($raw)*)
+    };
+    ($($raw:tt)*) => {
+        $crate::__pgrx_c_args_BTreeTupleSetTopParent!(@collect __pgrx_emit_public []; $($raw)*)
+    };
+}
+
+#[cfg(not(all(
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -8587,20 +18060,24 @@ macro_rules! __pgrx_c_args_P_FIRSTDATAKEY {
         $crate::__pgrx_c_args_P_FIRSTDATAKEY!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_P_FIRSTDATAKEY!(@p1 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_P_FIRSTDATAKEY!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_P_FIRSTDATAKEY!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_P_FIRSTDATAKEY!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_P_FIRSTDATAKEY!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_P_FIRSTDATAKEY!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -8608,7 +18085,9 @@ macro_rules! __pgrx_c_args_P_FIRSTDATAKEY {
         $crate::__pgrx_c_args_P_FIRSTDATAKEY!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_P_FIRSTDATAKEY!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_P_FIRSTDATAKEY!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -8630,14 +18109,18 @@ macro_rules! __pgrx_c_args_P_FIRSTDATAKEY {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_P_FIRSTDATAKEY!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_P_FIRSTDATAKEY!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_P_FIRSTDATAKEY!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_P_FIRSTDATAKEY!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_P_FIRSTDATAKEY!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -8664,13 +18147,13 @@ macro_rules! __pgrx_c_args_P_FIRSTDATAKEY {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_P_FIRSTDATAKEY!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_P_FIRSTDATAKEY!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -8744,7 +18227,7 @@ macro_rules! P_FIRSTDATAKEY {
                                         $crate::__pgrx_c_macros::expression::null_constant(
                                             $crate::__pgrx_c_macros::CValue::<
                                                 $crate::__pgrx_c_macros::CInt
-                                            >::new($crate::P_NONE as i32)
+                                            >::new($crate::__pgrx_c_bindings::P_NONE as i32)
                                         )
                                     )
                                 )
@@ -8753,19 +18236,17 @@ macro_rules! P_FIRSTDATAKEY {
                     ) {
                         $crate::__pgrx_c_macros::Either::Left(
                             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                                /* PGRX: P_HIKEY remains expanded because no integer constant binding is available in the defining Rust crate. */
                                 $crate::__pgrx_c_macros::CValue::<
                                     $crate::__pgrx_c_macros::CUnsignedShort
-                                >::new(1u16)
+                                >::new($crate::__pgrx_c_bindings::P_HIKEY as u16)
                             )
                         )
                     } else {
                         $crate::__pgrx_c_macros::Either::Right(
                             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                                /* PGRX: P_FIRSTKEY remains expanded because no integer constant binding is available in the defining Rust crate. */
                                 $crate::__pgrx_c_macros::CValue::<
                                     $crate::__pgrx_c_macros::CUnsignedShort
-                                >::new(2u16)
+                                >::new($crate::__pgrx_c_bindings::P_FIRSTKEY as u16)
                             )
                         )
                     }
@@ -8841,7 +18322,9 @@ macro_rules! P_FIRSTDATAKEY {
                                                     $crate::__pgrx_c_macros::expression::null_constant(
                                                         $crate::__pgrx_c_macros::CValue::<
                                                             $crate::__pgrx_c_macros::CInt
-                                                        >::new($crate::P_NONE as i32)
+                                                        >::new(
+                                                            $crate::__pgrx_c_bindings::P_NONE as i32
+                                                        )
                                                     )
                                                 )
                                             )
@@ -8853,10 +18336,9 @@ macro_rules! P_FIRSTDATAKEY {
                                             true,
                                             _
                                         >(
-                                            /* PGRX: P_HIKEY remains expanded because no integer constant binding is available in the defining Rust crate. */
                                             $crate::__pgrx_c_macros::CValue::<
                                                 $crate::__pgrx_c_macros::CUnsignedShort
-                                            >::new(1u16)
+                                            >::new($crate::__pgrx_c_bindings::P_HIKEY as u16)
                                         )
                                     )
                                 } else {
@@ -8865,10 +18347,9 @@ macro_rules! P_FIRSTDATAKEY {
                                             true,
                                             _
                                         >(
-                                            /* PGRX: P_FIRSTKEY remains expanded because no integer constant binding is available in the defining Rust crate. */
                                             $crate::__pgrx_c_macros::CValue::<
                                                 $crate::__pgrx_c_macros::CUnsignedShort
-                                            >::new(2u16)
+                                            >::new($crate::__pgrx_c_bindings::P_FIRSTKEY as u16)
                                         )
                                     )
                                 }
@@ -8920,7 +18401,7 @@ macro_rules! P_FIRSTDATAKEY {
                                         $crate::__pgrx_c_macros::expression::null_constant(
                                             $crate::__pgrx_c_macros::CValue::<
                                                 $crate::__pgrx_c_macros::CInt
-                                            >::new($crate::P_NONE as i32)
+                                            >::new($crate::__pgrx_c_bindings::P_NONE as i32)
                                         )
                                     )
                                 )
@@ -8929,19 +18410,17 @@ macro_rules! P_FIRSTDATAKEY {
                     ) {
                         $crate::__pgrx_c_macros::Either::Left(
                             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                                /* PGRX: P_HIKEY remains expanded because no integer constant binding is available in the defining Rust crate. */
                                 $crate::__pgrx_c_macros::CValue::<
                                     $crate::__pgrx_c_macros::CUnsignedShort
-                                >::new(1u16)
+                                >::new($crate::__pgrx_c_bindings::P_HIKEY as u16)
                             )
                         )
                     } else {
                         $crate::__pgrx_c_macros::Either::Right(
                             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                                /* PGRX: P_FIRSTKEY remains expanded because no integer constant binding is available in the defining Rust crate. */
                                 $crate::__pgrx_c_macros::CValue::<
                                     $crate::__pgrx_c_macros::CUnsignedShort
-                                >::new(2u16)
+                                >::new($crate::__pgrx_c_bindings::P_FIRSTKEY as u16)
                             )
                         )
                     }
@@ -8958,8 +18437,8 @@ macro_rules! P_FIRSTDATAKEY {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -8986,20 +18465,24 @@ macro_rules! __pgrx_c_args_P_HAS_FULLXID {
         $crate::__pgrx_c_args_P_HAS_FULLXID!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_P_HAS_FULLXID!(@p1 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_P_HAS_FULLXID!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_P_HAS_FULLXID!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_P_HAS_FULLXID!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_P_HAS_FULLXID!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_P_HAS_FULLXID!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -9007,7 +18490,9 @@ macro_rules! __pgrx_c_args_P_HAS_FULLXID {
         $crate::__pgrx_c_args_P_HAS_FULLXID!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_P_HAS_FULLXID!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_P_HAS_FULLXID!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -9029,14 +18514,18 @@ macro_rules! __pgrx_c_args_P_HAS_FULLXID {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_P_HAS_FULLXID!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_P_HAS_FULLXID!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_P_HAS_FULLXID!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_P_HAS_FULLXID!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_P_HAS_FULLXID!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -9063,13 +18552,13 @@ macro_rules! __pgrx_c_args_P_HAS_FULLXID {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_P_HAS_FULLXID!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_P_HAS_FULLXID!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -9139,7 +18628,7 @@ macro_rules! P_HAS_FULLXID {
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                        $crate::BTP_HAS_FULLXID as i32
+                                        $crate::__pgrx_c_bindings::BTP_HAS_FULLXID as i32
                                     )
                                 )
                             )
@@ -9218,7 +18707,9 @@ macro_rules! P_HAS_FULLXID {
                                             >(
                                                 $crate::__pgrx_c_macros::CValue::<
                                                     $crate::__pgrx_c_macros::CInt
-                                                >::new($crate::BTP_HAS_FULLXID as i32)
+                                                >::new(
+                                                    $crate::__pgrx_c_bindings::BTP_HAS_FULLXID as i32
+                                                )
                                             )
                                         )
                                     )
@@ -9274,7 +18765,7 @@ macro_rules! P_HAS_FULLXID {
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                        $crate::BTP_HAS_FULLXID as i32
+                                        $crate::__pgrx_c_bindings::BTP_HAS_FULLXID as i32
                                     )
                                 )
                             )
@@ -9300,8 +18791,8 @@ macro_rules! P_HAS_FULLXID {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -9328,20 +18819,24 @@ macro_rules! __pgrx_c_args_P_HAS_GARBAGE {
         $crate::__pgrx_c_args_P_HAS_GARBAGE!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_P_HAS_GARBAGE!(@p1 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_P_HAS_GARBAGE!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_P_HAS_GARBAGE!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_P_HAS_GARBAGE!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_P_HAS_GARBAGE!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_P_HAS_GARBAGE!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -9349,7 +18844,9 @@ macro_rules! __pgrx_c_args_P_HAS_GARBAGE {
         $crate::__pgrx_c_args_P_HAS_GARBAGE!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_P_HAS_GARBAGE!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_P_HAS_GARBAGE!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -9371,14 +18868,18 @@ macro_rules! __pgrx_c_args_P_HAS_GARBAGE {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_P_HAS_GARBAGE!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_P_HAS_GARBAGE!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_P_HAS_GARBAGE!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_P_HAS_GARBAGE!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_P_HAS_GARBAGE!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -9405,13 +18906,13 @@ macro_rules! __pgrx_c_args_P_HAS_GARBAGE {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_P_HAS_GARBAGE!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_P_HAS_GARBAGE!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -9481,7 +18982,7 @@ macro_rules! P_HAS_GARBAGE {
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                        $crate::BTP_HAS_GARBAGE as i32
+                                        $crate::__pgrx_c_bindings::BTP_HAS_GARBAGE as i32
                                     )
                                 )
                             )
@@ -9560,7 +19061,9 @@ macro_rules! P_HAS_GARBAGE {
                                             >(
                                                 $crate::__pgrx_c_macros::CValue::<
                                                     $crate::__pgrx_c_macros::CInt
-                                                >::new($crate::BTP_HAS_GARBAGE as i32)
+                                                >::new(
+                                                    $crate::__pgrx_c_bindings::BTP_HAS_GARBAGE as i32
+                                                )
                                             )
                                         )
                                     )
@@ -9616,7 +19119,7 @@ macro_rules! P_HAS_GARBAGE {
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                        $crate::BTP_HAS_GARBAGE as i32
+                                        $crate::__pgrx_c_bindings::BTP_HAS_GARBAGE as i32
                                     )
                                 )
                             )
@@ -9642,8 +19145,8 @@ macro_rules! P_HAS_GARBAGE {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -9670,22 +19173,34 @@ macro_rules! __pgrx_c_args_P_IGNORE {
         $crate::__pgrx_c_args_P_IGNORE!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_P_IGNORE!(@p1 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_P_IGNORE!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_P_IGNORE!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_P_IGNORE!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_P_IGNORE!(@p1 $mode [$($done)* (@literal [- $argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_P_IGNORE!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+            $($rest)*
+        )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_P_IGNORE!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_P_IGNORE!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $($raw:tt)*) => {
         $crate::__pgrx_c_args_P_IGNORE!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_P_IGNORE!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_P_IGNORE!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -9707,13 +19222,20 @@ macro_rules! __pgrx_c_args_P_IGNORE {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_P_IGNORE!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_P_IGNORE!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_P_IGNORE!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_P_IGNORE!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
-        $crate::__pgrx_c_args_P_IGNORE!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_P_IGNORE!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
         $crate::__pgrx_c_classify!(
@@ -9735,10 +19257,16 @@ macro_rules! __pgrx_c_args_P_IGNORE {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_P_IGNORE!(@p1 $mode [$($done)* (@literal [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_P_IGNORE!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+            $($rest)*
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_P_IGNORE!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_P_IGNORE!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p1 $mode:ident [$($done:tt)*];) => {
         $crate::P_IGNORE!(@$mode; $($done)*)
@@ -9813,7 +19341,9 @@ macro_rules! P_IGNORE {
                                             >(
                                                 $crate::__pgrx_c_macros::CValue::<
                                                     $crate::__pgrx_c_macros::CInt
-                                                >::new($crate::BTP_DELETED as i32)
+                                                >::new(
+                                                    $crate::__pgrx_c_bindings::BTP_DELETED as i32
+                                                )
                                             ),
                                             $crate::__pgrx_c_macros::expression::profile_value::<
                                                 true,
@@ -9821,7 +19351,9 @@ macro_rules! P_IGNORE {
                                             >(
                                                 $crate::__pgrx_c_macros::CValue::<
                                                     $crate::__pgrx_c_macros::CInt
-                                                >::new($crate::BTP_HALF_DEAD as i32)
+                                                >::new(
+                                                    $crate::__pgrx_c_bindings::BTP_HALF_DEAD as i32
+                                                )
                                             )
                                         )
                                     )
@@ -9908,7 +19440,9 @@ macro_rules! P_IGNORE {
                                                         >(
                                                             $crate::__pgrx_c_macros::CValue::<
                                                                 $crate::__pgrx_c_macros::CInt
-                                                            >::new($crate::BTP_DELETED as i32)
+                                                            >::new(
+                                                                $crate::__pgrx_c_bindings::BTP_DELETED as i32
+                                                            )
                                                         ),
                                                         $crate::__pgrx_c_macros::expression::profile_value::<
                                                             true,
@@ -9916,7 +19450,9 @@ macro_rules! P_IGNORE {
                                                         >(
                                                             $crate::__pgrx_c_macros::CValue::<
                                                                 $crate::__pgrx_c_macros::CInt
-                                                            >::new($crate::BTP_HALF_DEAD as i32)
+                                                            >::new(
+                                                                $crate::__pgrx_c_bindings::BTP_HALF_DEAD as i32
+                                                            )
                                                         )
                                                     )
                                                 )
@@ -9982,7 +19518,9 @@ macro_rules! P_IGNORE {
                                             >(
                                                 $crate::__pgrx_c_macros::CValue::<
                                                     $crate::__pgrx_c_macros::CInt
-                                                >::new($crate::BTP_DELETED as i32)
+                                                >::new(
+                                                    $crate::__pgrx_c_bindings::BTP_DELETED as i32
+                                                )
                                             ),
                                             $crate::__pgrx_c_macros::expression::profile_value::<
                                                 true,
@@ -9990,7 +19528,9 @@ macro_rules! P_IGNORE {
                                             >(
                                                 $crate::__pgrx_c_macros::CValue::<
                                                     $crate::__pgrx_c_macros::CInt
-                                                >::new($crate::BTP_HALF_DEAD as i32)
+                                                >::new(
+                                                    $crate::__pgrx_c_bindings::BTP_HALF_DEAD as i32
+                                                )
                                             )
                                         )
                                     )
@@ -10018,8 +19558,8 @@ macro_rules! P_IGNORE {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -10046,20 +19586,24 @@ macro_rules! __pgrx_c_args_P_INCOMPLETE_SPLIT {
         $crate::__pgrx_c_args_P_INCOMPLETE_SPLIT!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_P_INCOMPLETE_SPLIT!(@p1 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_P_INCOMPLETE_SPLIT!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_P_INCOMPLETE_SPLIT!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_P_INCOMPLETE_SPLIT!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_P_INCOMPLETE_SPLIT!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_P_INCOMPLETE_SPLIT!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -10067,7 +19611,9 @@ macro_rules! __pgrx_c_args_P_INCOMPLETE_SPLIT {
         $crate::__pgrx_c_args_P_INCOMPLETE_SPLIT!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_P_INCOMPLETE_SPLIT!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_P_INCOMPLETE_SPLIT!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -10089,14 +19635,18 @@ macro_rules! __pgrx_c_args_P_INCOMPLETE_SPLIT {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_P_INCOMPLETE_SPLIT!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_P_INCOMPLETE_SPLIT!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_P_INCOMPLETE_SPLIT!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_P_INCOMPLETE_SPLIT!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_P_INCOMPLETE_SPLIT!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -10123,13 +19673,13 @@ macro_rules! __pgrx_c_args_P_INCOMPLETE_SPLIT {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_P_INCOMPLETE_SPLIT!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_P_INCOMPLETE_SPLIT!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -10199,7 +19749,7 @@ macro_rules! P_INCOMPLETE_SPLIT {
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                        $crate::BTP_INCOMPLETE_SPLIT as i32
+                                        $crate::__pgrx_c_bindings::BTP_INCOMPLETE_SPLIT as i32
                                     )
                                 )
                             )
@@ -10278,7 +19828,9 @@ macro_rules! P_INCOMPLETE_SPLIT {
                                             >(
                                                 $crate::__pgrx_c_macros::CValue::<
                                                     $crate::__pgrx_c_macros::CInt
-                                                >::new($crate::BTP_INCOMPLETE_SPLIT as i32)
+                                                >::new(
+                                                    $crate::__pgrx_c_bindings::BTP_INCOMPLETE_SPLIT as i32
+                                                )
                                             )
                                         )
                                     )
@@ -10334,7 +19886,7 @@ macro_rules! P_INCOMPLETE_SPLIT {
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                        $crate::BTP_INCOMPLETE_SPLIT as i32
+                                        $crate::__pgrx_c_bindings::BTP_INCOMPLETE_SPLIT as i32
                                     )
                                 )
                             )
@@ -10360,8 +19912,8 @@ macro_rules! P_INCOMPLETE_SPLIT {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -10388,25 +19940,34 @@ macro_rules! __pgrx_c_args_P_ISDELETED {
         $crate::__pgrx_c_args_P_ISDELETED!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_P_ISDELETED!(@p1 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_P_ISDELETED!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_P_ISDELETED!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_P_ISDELETED!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_P_ISDELETED!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_P_ISDELETED!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_P_ISDELETED!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $($raw:tt)*) => {
         $crate::__pgrx_c_args_P_ISDELETED!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_P_ISDELETED!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_P_ISDELETED!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -10428,13 +19989,20 @@ macro_rules! __pgrx_c_args_P_ISDELETED {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_P_ISDELETED!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_P_ISDELETED!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_P_ISDELETED!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_P_ISDELETED!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
-        $crate::__pgrx_c_args_P_ISDELETED!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_P_ISDELETED!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
         $crate::__pgrx_c_classify!(
@@ -10456,10 +20024,16 @@ macro_rules! __pgrx_c_args_P_ISDELETED {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_P_ISDELETED!(@p1 $mode [$($done)* (@literal [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_P_ISDELETED!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+            $($rest)*
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_P_ISDELETED!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_P_ISDELETED!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p1 $mode:ident [$($done:tt)*];) => {
         $crate::P_ISDELETED!(@$mode; $($done)*)
@@ -10527,7 +20101,7 @@ macro_rules! P_ISDELETED {
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                        $crate::BTP_DELETED as i32
+                                        $crate::__pgrx_c_bindings::BTP_DELETED as i32
                                     )
                                 )
                             )
@@ -10606,7 +20180,9 @@ macro_rules! P_ISDELETED {
                                             >(
                                                 $crate::__pgrx_c_macros::CValue::<
                                                     $crate::__pgrx_c_macros::CInt
-                                                >::new($crate::BTP_DELETED as i32)
+                                                >::new(
+                                                    $crate::__pgrx_c_bindings::BTP_DELETED as i32
+                                                )
                                             )
                                         )
                                     )
@@ -10662,7 +20238,7 @@ macro_rules! P_ISDELETED {
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                        $crate::BTP_DELETED as i32
+                                        $crate::__pgrx_c_bindings::BTP_DELETED as i32
                                     )
                                 )
                             )
@@ -10688,8 +20264,8 @@ macro_rules! P_ISDELETED {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -10716,25 +20292,34 @@ macro_rules! __pgrx_c_args_P_ISHALFDEAD {
         $crate::__pgrx_c_args_P_ISHALFDEAD!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_P_ISHALFDEAD!(@p1 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_P_ISHALFDEAD!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_P_ISHALFDEAD!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_P_ISHALFDEAD!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_P_ISHALFDEAD!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_P_ISHALFDEAD!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_P_ISHALFDEAD!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $($raw:tt)*) => {
         $crate::__pgrx_c_args_P_ISHALFDEAD!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_P_ISHALFDEAD!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_P_ISHALFDEAD!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -10756,13 +20341,20 @@ macro_rules! __pgrx_c_args_P_ISHALFDEAD {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_P_ISHALFDEAD!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_P_ISHALFDEAD!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_P_ISHALFDEAD!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_P_ISHALFDEAD!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
-        $crate::__pgrx_c_args_P_ISHALFDEAD!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_P_ISHALFDEAD!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
         $crate::__pgrx_c_classify!(
@@ -10785,12 +20377,15 @@ macro_rules! __pgrx_c_args_P_ISHALFDEAD {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_P_ISHALFDEAD!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_P_ISHALFDEAD!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_P_ISHALFDEAD!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p1 $mode:ident [$($done:tt)*];) => {
         $crate::P_ISHALFDEAD!(@$mode; $($done)*)
@@ -10858,7 +20453,7 @@ macro_rules! P_ISHALFDEAD {
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                        $crate::BTP_HALF_DEAD as i32
+                                        $crate::__pgrx_c_bindings::BTP_HALF_DEAD as i32
                                     )
                                 )
                             )
@@ -10937,7 +20532,9 @@ macro_rules! P_ISHALFDEAD {
                                             >(
                                                 $crate::__pgrx_c_macros::CValue::<
                                                     $crate::__pgrx_c_macros::CInt
-                                                >::new($crate::BTP_HALF_DEAD as i32)
+                                                >::new(
+                                                    $crate::__pgrx_c_bindings::BTP_HALF_DEAD as i32
+                                                )
                                             )
                                         )
                                     )
@@ -10993,7 +20590,7 @@ macro_rules! P_ISHALFDEAD {
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                        $crate::BTP_HALF_DEAD as i32
+                                        $crate::__pgrx_c_bindings::BTP_HALF_DEAD as i32
                                     )
                                 )
                             )
@@ -11019,8 +20616,8 @@ macro_rules! P_ISHALFDEAD {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -11047,22 +20644,34 @@ macro_rules! __pgrx_c_args_P_ISLEAF {
         $crate::__pgrx_c_args_P_ISLEAF!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_P_ISLEAF!(@p1 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_P_ISLEAF!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_P_ISLEAF!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_P_ISLEAF!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_P_ISLEAF!(@p1 $mode [$($done)* (@literal [- $argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_P_ISLEAF!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+            $($rest)*
+        )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_P_ISLEAF!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_P_ISLEAF!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $($raw:tt)*) => {
         $crate::__pgrx_c_args_P_ISLEAF!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_P_ISLEAF!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_P_ISLEAF!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -11084,13 +20693,20 @@ macro_rules! __pgrx_c_args_P_ISLEAF {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_P_ISLEAF!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_P_ISLEAF!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_P_ISLEAF!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_P_ISLEAF!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
-        $crate::__pgrx_c_args_P_ISLEAF!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_P_ISLEAF!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
         $crate::__pgrx_c_classify!(
@@ -11112,10 +20728,16 @@ macro_rules! __pgrx_c_args_P_ISLEAF {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_P_ISLEAF!(@p1 $mode [$($done)* (@literal [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_P_ISLEAF!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+            $($rest)*
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_P_ISLEAF!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_P_ISLEAF!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p1 $mode:ident [$($done:tt)*];) => {
         $crate::P_ISLEAF!(@$mode; $($done)*)
@@ -11183,7 +20805,7 @@ macro_rules! P_ISLEAF {
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                        $crate::BTP_LEAF as i32
+                                        $crate::__pgrx_c_bindings::BTP_LEAF as i32
                                     )
                                 )
                             )
@@ -11262,7 +20884,7 @@ macro_rules! P_ISLEAF {
                                             >(
                                                 $crate::__pgrx_c_macros::CValue::<
                                                     $crate::__pgrx_c_macros::CInt
-                                                >::new($crate::BTP_LEAF as i32)
+                                                >::new($crate::__pgrx_c_bindings::BTP_LEAF as i32)
                                             )
                                         )
                                     )
@@ -11318,7 +20940,7 @@ macro_rules! P_ISLEAF {
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                        $crate::BTP_LEAF as i32
+                                        $crate::__pgrx_c_bindings::BTP_LEAF as i32
                                     )
                                 )
                             )
@@ -11344,8 +20966,8 @@ macro_rules! P_ISLEAF {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -11372,22 +20994,34 @@ macro_rules! __pgrx_c_args_P_ISMETA {
         $crate::__pgrx_c_args_P_ISMETA!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_P_ISMETA!(@p1 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_P_ISMETA!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_P_ISMETA!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_P_ISMETA!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_P_ISMETA!(@p1 $mode [$($done)* (@literal [- $argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_P_ISMETA!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+            $($rest)*
+        )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_P_ISMETA!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_P_ISMETA!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $($raw:tt)*) => {
         $crate::__pgrx_c_args_P_ISMETA!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_P_ISMETA!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_P_ISMETA!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -11409,13 +21043,20 @@ macro_rules! __pgrx_c_args_P_ISMETA {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_P_ISMETA!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_P_ISMETA!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_P_ISMETA!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_P_ISMETA!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
-        $crate::__pgrx_c_args_P_ISMETA!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_P_ISMETA!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
         $crate::__pgrx_c_classify!(
@@ -11437,10 +21078,16 @@ macro_rules! __pgrx_c_args_P_ISMETA {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_P_ISMETA!(@p1 $mode [$($done)* (@literal [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_P_ISMETA!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+            $($rest)*
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_P_ISMETA!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_P_ISMETA!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p1 $mode:ident [$($done:tt)*];) => {
         $crate::P_ISMETA!(@$mode; $($done)*)
@@ -11508,7 +21155,7 @@ macro_rules! P_ISMETA {
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                        $crate::BTP_META as i32
+                                        $crate::__pgrx_c_bindings::BTP_META as i32
                                     )
                                 )
                             )
@@ -11587,7 +21234,7 @@ macro_rules! P_ISMETA {
                                             >(
                                                 $crate::__pgrx_c_macros::CValue::<
                                                     $crate::__pgrx_c_macros::CInt
-                                                >::new($crate::BTP_META as i32)
+                                                >::new($crate::__pgrx_c_bindings::BTP_META as i32)
                                             )
                                         )
                                     )
@@ -11643,7 +21290,7 @@ macro_rules! P_ISMETA {
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                        $crate::BTP_META as i32
+                                        $crate::__pgrx_c_bindings::BTP_META as i32
                                     )
                                 )
                             )
@@ -11669,8 +21316,8 @@ macro_rules! P_ISMETA {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -11697,22 +21344,34 @@ macro_rules! __pgrx_c_args_P_ISROOT {
         $crate::__pgrx_c_args_P_ISROOT!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_P_ISROOT!(@p1 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_P_ISROOT!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_P_ISROOT!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_P_ISROOT!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_P_ISROOT!(@p1 $mode [$($done)* (@literal [- $argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_P_ISROOT!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+            $($rest)*
+        )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_P_ISROOT!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_P_ISROOT!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $($raw:tt)*) => {
         $crate::__pgrx_c_args_P_ISROOT!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_P_ISROOT!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_P_ISROOT!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -11734,13 +21393,20 @@ macro_rules! __pgrx_c_args_P_ISROOT {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_P_ISROOT!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_P_ISROOT!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_P_ISROOT!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_P_ISROOT!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
-        $crate::__pgrx_c_args_P_ISROOT!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_P_ISROOT!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
         $crate::__pgrx_c_classify!(
@@ -11762,10 +21428,16 @@ macro_rules! __pgrx_c_args_P_ISROOT {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_P_ISROOT!(@p1 $mode [$($done)* (@literal [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_P_ISROOT!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+            $($rest)*
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_P_ISROOT!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_P_ISROOT!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p1 $mode:ident [$($done:tt)*];) => {
         $crate::P_ISROOT!(@$mode; $($done)*)
@@ -11833,7 +21505,7 @@ macro_rules! P_ISROOT {
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                        $crate::BTP_ROOT as i32
+                                        $crate::__pgrx_c_bindings::BTP_ROOT as i32
                                     )
                                 )
                             )
@@ -11912,7 +21584,7 @@ macro_rules! P_ISROOT {
                                             >(
                                                 $crate::__pgrx_c_macros::CValue::<
                                                     $crate::__pgrx_c_macros::CInt
-                                                >::new($crate::BTP_ROOT as i32)
+                                                >::new($crate::__pgrx_c_bindings::BTP_ROOT as i32)
                                             )
                                         )
                                     )
@@ -11968,7 +21640,7 @@ macro_rules! P_ISROOT {
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                        $crate::BTP_ROOT as i32
+                                        $crate::__pgrx_c_bindings::BTP_ROOT as i32
                                     )
                                 )
                             )
@@ -11994,8 +21666,8 @@ macro_rules! P_ISROOT {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -12022,25 +21694,34 @@ macro_rules! __pgrx_c_args_P_LEFTMOST {
         $crate::__pgrx_c_args_P_LEFTMOST!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_P_LEFTMOST!(@p1 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_P_LEFTMOST!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_P_LEFTMOST!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_P_LEFTMOST!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_P_LEFTMOST!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_P_LEFTMOST!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_P_LEFTMOST!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $($raw:tt)*) => {
         $crate::__pgrx_c_args_P_LEFTMOST!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_P_LEFTMOST!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_P_LEFTMOST!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -12062,13 +21743,20 @@ macro_rules! __pgrx_c_args_P_LEFTMOST {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_P_LEFTMOST!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_P_LEFTMOST!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_P_LEFTMOST!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_P_LEFTMOST!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
-        $crate::__pgrx_c_args_P_LEFTMOST!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_P_LEFTMOST!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
         $crate::__pgrx_c_classify!(
@@ -12090,10 +21778,16 @@ macro_rules! __pgrx_c_args_P_LEFTMOST {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_P_LEFTMOST!(@p1 $mode [$($done)* (@literal [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_P_LEFTMOST!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+            $($rest)*
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_P_LEFTMOST!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_P_LEFTMOST!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p1 $mode:ident [$($done:tt)*];) => {
         $crate::P_LEFTMOST!(@$mode; $($done)*)
@@ -12154,7 +21848,7 @@ macro_rules! P_LEFTMOST {
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::expression::null_constant(
                             $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                $crate::P_NONE as i32
+                                $crate::__pgrx_c_bindings::P_NONE as i32
                             )
                         )
                     )
@@ -12216,7 +21910,7 @@ macro_rules! P_LEFTMOST {
                                     $crate::__pgrx_c_macros::expression::null_constant(
                                         $crate::__pgrx_c_macros::CValue::<
                                             $crate::__pgrx_c_macros::CInt
-                                        >::new($crate::P_NONE as i32)
+                                        >::new($crate::__pgrx_c_bindings::P_NONE as i32)
                                     )
                                 )
                             )
@@ -12256,7 +21950,7 @@ macro_rules! P_LEFTMOST {
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::expression::null_constant(
                             $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                $crate::P_NONE as i32
+                                $crate::__pgrx_c_bindings::P_NONE as i32
                             )
                         )
                     )
@@ -12273,8 +21967,8 @@ macro_rules! P_LEFTMOST {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -12301,25 +21995,34 @@ macro_rules! __pgrx_c_args_P_RIGHTMOST {
         $crate::__pgrx_c_args_P_RIGHTMOST!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_P_RIGHTMOST!(@p1 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_P_RIGHTMOST!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_P_RIGHTMOST!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_P_RIGHTMOST!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_P_RIGHTMOST!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_P_RIGHTMOST!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_P_RIGHTMOST!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $($raw:tt)*) => {
         $crate::__pgrx_c_args_P_RIGHTMOST!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_P_RIGHTMOST!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_P_RIGHTMOST!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -12341,13 +22044,20 @@ macro_rules! __pgrx_c_args_P_RIGHTMOST {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_P_RIGHTMOST!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_P_RIGHTMOST!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_P_RIGHTMOST!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_P_RIGHTMOST!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
-        $crate::__pgrx_c_args_P_RIGHTMOST!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_P_RIGHTMOST!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
         $crate::__pgrx_c_classify!(
@@ -12369,10 +22079,16 @@ macro_rules! __pgrx_c_args_P_RIGHTMOST {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_P_RIGHTMOST!(@p1 $mode [$($done)* (@literal [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_P_RIGHTMOST!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+            $($rest)*
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_P_RIGHTMOST!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_P_RIGHTMOST!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p1 $mode:ident [$($done:tt)*];) => {
         $crate::P_RIGHTMOST!(@$mode; $($done)*)
@@ -12433,7 +22149,7 @@ macro_rules! P_RIGHTMOST {
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::expression::null_constant(
                             $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                $crate::P_NONE as i32
+                                $crate::__pgrx_c_bindings::P_NONE as i32
                             )
                         )
                     )
@@ -12495,7 +22211,7 @@ macro_rules! P_RIGHTMOST {
                                     $crate::__pgrx_c_macros::expression::null_constant(
                                         $crate::__pgrx_c_macros::CValue::<
                                             $crate::__pgrx_c_macros::CInt
-                                        >::new($crate::P_NONE as i32)
+                                        >::new($crate::__pgrx_c_bindings::P_NONE as i32)
                                     )
                                 )
                             )
@@ -12535,7 +22251,7 @@ macro_rules! P_RIGHTMOST {
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::expression::null_constant(
                             $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                $crate::P_NONE as i32
+                                $crate::__pgrx_c_bindings::P_NONE as i32
                             )
                         )
                     )
@@ -12552,13 +22268,36 @@ macro_rules! P_RIGHTMOST {
 }
 
 pub use BTCommuteStrategyNumber;
+pub use BTGetDeduplicateItems;
+pub use BTGetFillFactor;
+pub use BTGetTargetPageFreeSpace;
 pub use BTMaxItemSize;
 pub use BTMaxItemSizeNoHeapTid;
+pub use BTPageGetDeleteXid;
 pub use BTPageGetMeta;
 pub use BTPageGetOpaque;
+pub use BTPageIsRecyclable;
+pub use BTPageSetDeleted;
 pub use BTScanPosInvalidate;
+pub use BTScanPosIsPinned;
+pub use BTScanPosIsValid;
 pub use BTScanPosUnpin;
+pub use BTScanPosUnpinIfPinned;
+pub use BTreeTupleGetDownLink;
+pub use BTreeTupleGetHeapTID;
+pub use BTreeTupleGetMaxHeapTID;
 pub use BTreeTupleGetNAtts;
+pub use BTreeTupleGetNPosting;
+pub use BTreeTupleGetPosting;
+pub use BTreeTupleGetPostingN;
+pub use BTreeTupleGetPostingOffset;
+pub use BTreeTupleGetTopParent;
+pub use BTreeTupleIsPivot;
+pub use BTreeTupleIsPosting;
+pub use BTreeTupleSetDownLink;
+pub use BTreeTupleSetNAtts;
+pub use BTreeTupleSetPosting;
+pub use BTreeTupleSetTopParent;
 pub use P_FIRSTDATAKEY;
 pub use P_HAS_FULLXID;
 pub use P_HAS_GARBAGE;

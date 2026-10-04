@@ -5,8 +5,8 @@ This code is generated for documentation purposes, so that it is easy to referen
 // C macros from timestamp.h.
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -33,20 +33,24 @@ macro_rules! __pgrx_c_args_IS_VALID_DATE {
         $crate::__pgrx_c_args_IS_VALID_DATE!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_IS_VALID_DATE!(@p1 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_IS_VALID_DATE!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_IS_VALID_DATE!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_IS_VALID_DATE!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_IS_VALID_DATE!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_IS_VALID_DATE!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -54,7 +58,9 @@ macro_rules! __pgrx_c_args_IS_VALID_DATE {
         $crate::__pgrx_c_args_IS_VALID_DATE!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_IS_VALID_DATE!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_IS_VALID_DATE!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -76,14 +82,18 @@ macro_rules! __pgrx_c_args_IS_VALID_DATE {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_IS_VALID_DATE!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_IS_VALID_DATE!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_IS_VALID_DATE!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_IS_VALID_DATE!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_IS_VALID_DATE!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -110,13 +120,13 @@ macro_rules! __pgrx_c_args_IS_VALID_DATE {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_IS_VALID_DATE!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_IS_VALID_DATE!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -179,7 +189,9 @@ macro_rules! IS_VALID_DATE {
                                                 $crate::__pgrx_c_macros::expression::null_constant(
                                                     $crate::__pgrx_c_macros::CValue::<
                                                         $crate::__pgrx_c_macros::CInt
-                                                    >::new($crate::DATETIME_MIN_JULIAN as i32)
+                                                    >::new(
+                                                        $crate::__pgrx_c_bindings::DATETIME_MIN_JULIAN as i32
+                                                    )
                                                 )
                                             ),
                                             $crate::__pgrx_c_macros::expression::profile_value::<
@@ -188,7 +200,9 @@ macro_rules! IS_VALID_DATE {
                                             >(
                                                 $crate::__pgrx_c_macros::CValue::<
                                                     $crate::__pgrx_c_macros::CInt
-                                                >::new($crate::POSTGRES_EPOCH_JDATE as i32)
+                                                >::new(
+                                                    $crate::__pgrx_c_bindings::POSTGRES_EPOCH_JDATE as i32
+                                                )
                                             )
                                         )
                                     )
@@ -221,7 +235,9 @@ macro_rules! IS_VALID_DATE {
                                             >(
                                                 $crate::__pgrx_c_macros::CValue::<
                                                     $crate::__pgrx_c_macros::CInt
-                                                >::new($crate::DATE_END_JULIAN as i32)
+                                                >::new(
+                                                    $crate::__pgrx_c_bindings::DATE_END_JULIAN as i32
+                                                )
                                             ),
                                             $crate::__pgrx_c_macros::expression::profile_value::<
                                                 true,
@@ -229,7 +245,9 @@ macro_rules! IS_VALID_DATE {
                                             >(
                                                 $crate::__pgrx_c_macros::CValue::<
                                                     $crate::__pgrx_c_macros::CInt
-                                                >::new($crate::POSTGRES_EPOCH_JDATE as i32)
+                                                >::new(
+                                                    $crate::__pgrx_c_bindings::POSTGRES_EPOCH_JDATE as i32
+                                                )
                                             )
                                         )
                                     )
@@ -293,7 +311,7 @@ macro_rules! IS_VALID_DATE {
                                                                 $crate::__pgrx_c_macros::CValue::<
                                                                     $crate::__pgrx_c_macros::CInt
                                                                 >::new(
-                                                                    $crate::DATETIME_MIN_JULIAN as i32
+                                                                    $crate::__pgrx_c_bindings::DATETIME_MIN_JULIAN as i32
                                                                 )
                                                             )
                                                         ),
@@ -304,7 +322,7 @@ macro_rules! IS_VALID_DATE {
                                                             $crate::__pgrx_c_macros::CValue::<
                                                                 $crate::__pgrx_c_macros::CInt
                                                             >::new(
-                                                                $crate::POSTGRES_EPOCH_JDATE as i32
+                                                                $crate::__pgrx_c_bindings::POSTGRES_EPOCH_JDATE as i32
                                                             )
                                                         )
                                                     )
@@ -343,7 +361,9 @@ macro_rules! IS_VALID_DATE {
                                                         >(
                                                             $crate::__pgrx_c_macros::CValue::<
                                                                 $crate::__pgrx_c_macros::CInt
-                                                            >::new($crate::DATE_END_JULIAN as i32)
+                                                            >::new(
+                                                                $crate::__pgrx_c_bindings::DATE_END_JULIAN as i32
+                                                            )
                                                         ),
                                                         $crate::__pgrx_c_macros::expression::profile_value::<
                                                             true,
@@ -352,7 +372,7 @@ macro_rules! IS_VALID_DATE {
                                                             $crate::__pgrx_c_macros::CValue::<
                                                                 $crate::__pgrx_c_macros::CInt
                                                             >::new(
-                                                                $crate::POSTGRES_EPOCH_JDATE as i32
+                                                                $crate::__pgrx_c_bindings::POSTGRES_EPOCH_JDATE as i32
                                                             )
                                                         )
                                                     )
@@ -398,7 +418,9 @@ macro_rules! IS_VALID_DATE {
                                                 $crate::__pgrx_c_macros::expression::null_constant(
                                                     $crate::__pgrx_c_macros::CValue::<
                                                         $crate::__pgrx_c_macros::CInt
-                                                    >::new($crate::DATETIME_MIN_JULIAN as i32)
+                                                    >::new(
+                                                        $crate::__pgrx_c_bindings::DATETIME_MIN_JULIAN as i32
+                                                    )
                                                 )
                                             ),
                                             $crate::__pgrx_c_macros::expression::profile_value::<
@@ -407,7 +429,9 @@ macro_rules! IS_VALID_DATE {
                                             >(
                                                 $crate::__pgrx_c_macros::CValue::<
                                                     $crate::__pgrx_c_macros::CInt
-                                                >::new($crate::POSTGRES_EPOCH_JDATE as i32)
+                                                >::new(
+                                                    $crate::__pgrx_c_bindings::POSTGRES_EPOCH_JDATE as i32
+                                                )
                                             )
                                         )
                                     )
@@ -440,7 +464,9 @@ macro_rules! IS_VALID_DATE {
                                             >(
                                                 $crate::__pgrx_c_macros::CValue::<
                                                     $crate::__pgrx_c_macros::CInt
-                                                >::new($crate::DATE_END_JULIAN as i32)
+                                                >::new(
+                                                    $crate::__pgrx_c_bindings::DATE_END_JULIAN as i32
+                                                )
                                             ),
                                             $crate::__pgrx_c_macros::expression::profile_value::<
                                                 true,
@@ -448,7 +474,9 @@ macro_rules! IS_VALID_DATE {
                                             >(
                                                 $crate::__pgrx_c_macros::CValue::<
                                                     $crate::__pgrx_c_macros::CInt
-                                                >::new($crate::POSTGRES_EPOCH_JDATE as i32)
+                                                >::new(
+                                                    $crate::__pgrx_c_bindings::POSTGRES_EPOCH_JDATE as i32
+                                                )
                                             )
                                         )
                                     )
@@ -473,8 +501,8 @@ macro_rules! IS_VALID_DATE {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -502,13 +530,13 @@ macro_rules! __pgrx_c_args_IS_VALID_JULIAN {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_IS_VALID_JULIAN!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_IS_VALID_JULIAN!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -517,7 +545,7 @@ macro_rules! __pgrx_c_args_IS_VALID_JULIAN {
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_IS_VALID_JULIAN!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -544,25 +572,25 @@ macro_rules! __pgrx_c_args_IS_VALID_JULIAN {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_IS_VALID_JULIAN!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_IS_VALID_JULIAN!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_IS_VALID_JULIAN!(
-            @p2 $mode [$($done)* (@literal [- $argument]),];
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_IS_VALID_JULIAN!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -571,7 +599,7 @@ macro_rules! __pgrx_c_args_IS_VALID_JULIAN {
     };
     (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_IS_VALID_JULIAN!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -598,13 +626,13 @@ macro_rules! __pgrx_c_args_IS_VALID_JULIAN {
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_IS_VALID_JULIAN!(
-            @p2 $mode [$($done)* (@literal [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_IS_VALID_JULIAN!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -689,7 +717,9 @@ macro_rules! IS_VALID_JULIAN {
                                                 >(
                                                     $crate::__pgrx_c_macros::CValue::<
                                                         $crate::__pgrx_c_macros::CInt
-                                                    >::new($crate::JULIAN_MINYEAR as i32)
+                                                    >::new(
+                                                        $crate::__pgrx_c_bindings::JULIAN_MINYEAR as i32
+                                                    )
                                                 )
                                             )
                                         )
@@ -726,7 +756,7 @@ macro_rules! IS_VALID_JULIAN {
                                                                     $crate::__pgrx_c_macros::CValue::<
                                                                         $crate::__pgrx_c_macros::CInt
                                                                     >::new(
-                                                                        $crate::JULIAN_MINYEAR as i32
+                                                                        $crate::__pgrx_c_bindings::JULIAN_MINYEAR as i32
                                                                     )
                                                                 )
                                                             )
@@ -756,7 +786,7 @@ macro_rules! IS_VALID_JULIAN {
                                                                         $crate::__pgrx_c_macros::CValue::<
                                                                             $crate::__pgrx_c_macros::CInt
                                                                         >::new(
-                                                                            $crate::JULIAN_MINMONTH as i32
+                                                                            $crate::__pgrx_c_bindings::JULIAN_MINMONTH as i32
                                                                         )
                                                                     )
                                                                 )
@@ -800,7 +830,9 @@ macro_rules! IS_VALID_JULIAN {
                                                 >(
                                                     $crate::__pgrx_c_macros::CValue::<
                                                         $crate::__pgrx_c_macros::CInt
-                                                    >::new($crate::JULIAN_MAXYEAR as i32)
+                                                    >::new(
+                                                        $crate::__pgrx_c_bindings::JULIAN_MAXYEAR as i32
+                                                    )
                                                 )
                                             )
                                         )
@@ -837,7 +869,7 @@ macro_rules! IS_VALID_JULIAN {
                                                                     $crate::__pgrx_c_macros::CValue::<
                                                                         $crate::__pgrx_c_macros::CInt
                                                                     >::new(
-                                                                        $crate::JULIAN_MAXYEAR as i32
+                                                                        $crate::__pgrx_c_bindings::JULIAN_MAXYEAR as i32
                                                                     )
                                                                 )
                                                             )
@@ -867,7 +899,7 @@ macro_rules! IS_VALID_JULIAN {
                                                                         $crate::__pgrx_c_macros::CValue::<
                                                                             $crate::__pgrx_c_macros::CInt
                                                                         >::new(
-                                                                            $crate::JULIAN_MAXMONTH as i32
+                                                                            $crate::__pgrx_c_bindings::JULIAN_MAXMONTH as i32
                                                                         )
                                                                     )
                                                                 )
@@ -959,7 +991,7 @@ macro_rules! IS_VALID_JULIAN {
                                                                 $crate::__pgrx_c_macros::CValue::<
                                                                     $crate::__pgrx_c_macros::CInt
                                                                 >::new(
-                                                                    $crate::JULIAN_MINYEAR as i32
+                                                                    $crate::__pgrx_c_bindings::JULIAN_MINYEAR as i32
                                                                 )
                                                             )
                                                         )
@@ -999,7 +1031,7 @@ macro_rules! IS_VALID_JULIAN {
                                                                                 $crate::__pgrx_c_macros::CValue::<
                                                                                     $crate::__pgrx_c_macros::CInt
                                                                                 >::new(
-                                                                                    $crate::JULIAN_MINYEAR as i32
+                                                                                    $crate::__pgrx_c_bindings::JULIAN_MINYEAR as i32
                                                                                 )
                                                                             )
                                                                         )
@@ -1031,7 +1063,7 @@ macro_rules! IS_VALID_JULIAN {
                                                                                     $crate::__pgrx_c_macros::CValue::<
                                                                                         $crate::__pgrx_c_macros::CInt
                                                                                     >::new(
-                                                                                        $crate::JULIAN_MINMONTH as i32
+                                                                                        $crate::__pgrx_c_bindings::JULIAN_MINMONTH as i32
                                                                                     )
                                                                                 )
                                                                             )
@@ -1086,7 +1118,7 @@ macro_rules! IS_VALID_JULIAN {
                                                                 $crate::__pgrx_c_macros::CValue::<
                                                                     $crate::__pgrx_c_macros::CInt
                                                                 >::new(
-                                                                    $crate::JULIAN_MAXYEAR as i32
+                                                                    $crate::__pgrx_c_bindings::JULIAN_MAXYEAR as i32
                                                                 )
                                                             )
                                                         )
@@ -1126,7 +1158,7 @@ macro_rules! IS_VALID_JULIAN {
                                                                                 $crate::__pgrx_c_macros::CValue::<
                                                                                     $crate::__pgrx_c_macros::CInt
                                                                                 >::new(
-                                                                                    $crate::JULIAN_MAXYEAR as i32
+                                                                                    $crate::__pgrx_c_bindings::JULIAN_MAXYEAR as i32
                                                                                 )
                                                                             )
                                                                         )
@@ -1158,7 +1190,7 @@ macro_rules! IS_VALID_JULIAN {
                                                                                     $crate::__pgrx_c_macros::CValue::<
                                                                                         $crate::__pgrx_c_macros::CInt
                                                                                     >::new(
-                                                                                        $crate::JULIAN_MAXMONTH as i32
+                                                                                        $crate::__pgrx_c_bindings::JULIAN_MAXMONTH as i32
                                                                                     )
                                                                                 )
                                                                             )
@@ -1223,7 +1255,9 @@ macro_rules! IS_VALID_JULIAN {
                                                 >(
                                                     $crate::__pgrx_c_macros::CValue::<
                                                         $crate::__pgrx_c_macros::CInt
-                                                    >::new($crate::JULIAN_MINYEAR as i32)
+                                                    >::new(
+                                                        $crate::__pgrx_c_bindings::JULIAN_MINYEAR as i32
+                                                    )
                                                 )
                                             )
                                         )
@@ -1260,7 +1294,7 @@ macro_rules! IS_VALID_JULIAN {
                                                                     $crate::__pgrx_c_macros::CValue::<
                                                                         $crate::__pgrx_c_macros::CInt
                                                                     >::new(
-                                                                        $crate::JULIAN_MINYEAR as i32
+                                                                        $crate::__pgrx_c_bindings::JULIAN_MINYEAR as i32
                                                                     )
                                                                 )
                                                             )
@@ -1290,7 +1324,7 @@ macro_rules! IS_VALID_JULIAN {
                                                                         $crate::__pgrx_c_macros::CValue::<
                                                                             $crate::__pgrx_c_macros::CInt
                                                                         >::new(
-                                                                            $crate::JULIAN_MINMONTH as i32
+                                                                            $crate::__pgrx_c_bindings::JULIAN_MINMONTH as i32
                                                                         )
                                                                     )
                                                                 )
@@ -1334,7 +1368,9 @@ macro_rules! IS_VALID_JULIAN {
                                                 >(
                                                     $crate::__pgrx_c_macros::CValue::<
                                                         $crate::__pgrx_c_macros::CInt
-                                                    >::new($crate::JULIAN_MAXYEAR as i32)
+                                                    >::new(
+                                                        $crate::__pgrx_c_bindings::JULIAN_MAXYEAR as i32
+                                                    )
                                                 )
                                             )
                                         )
@@ -1371,7 +1407,7 @@ macro_rules! IS_VALID_JULIAN {
                                                                     $crate::__pgrx_c_macros::CValue::<
                                                                         $crate::__pgrx_c_macros::CInt
                                                                     >::new(
-                                                                        $crate::JULIAN_MAXYEAR as i32
+                                                                        $crate::__pgrx_c_bindings::JULIAN_MAXYEAR as i32
                                                                     )
                                                                 )
                                                             )
@@ -1401,7 +1437,7 @@ macro_rules! IS_VALID_JULIAN {
                                                                         $crate::__pgrx_c_macros::CValue::<
                                                                             $crate::__pgrx_c_macros::CInt
                                                                         >::new(
-                                                                            $crate::JULIAN_MAXMONTH as i32
+                                                                            $crate::__pgrx_c_bindings::JULIAN_MAXMONTH as i32
                                                                         )
                                                                     )
                                                                 )
@@ -1441,8 +1477,8 @@ macro_rules! IS_VALID_JULIAN {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -1469,20 +1505,24 @@ macro_rules! __pgrx_c_args_IS_VALID_TIMESTAMP {
         $crate::__pgrx_c_args_IS_VALID_TIMESTAMP!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_IS_VALID_TIMESTAMP!(@p1 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_IS_VALID_TIMESTAMP!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_IS_VALID_TIMESTAMP!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_IS_VALID_TIMESTAMP!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_IS_VALID_TIMESTAMP!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_IS_VALID_TIMESTAMP!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -1490,7 +1530,9 @@ macro_rules! __pgrx_c_args_IS_VALID_TIMESTAMP {
         $crate::__pgrx_c_args_IS_VALID_TIMESTAMP!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_IS_VALID_TIMESTAMP!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_IS_VALID_TIMESTAMP!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -1512,14 +1554,18 @@ macro_rules! __pgrx_c_args_IS_VALID_TIMESTAMP {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_IS_VALID_TIMESTAMP!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_IS_VALID_TIMESTAMP!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_IS_VALID_TIMESTAMP!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_IS_VALID_TIMESTAMP!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_IS_VALID_TIMESTAMP!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -1546,13 +1592,13 @@ macro_rules! __pgrx_c_args_IS_VALID_TIMESTAMP {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_IS_VALID_TIMESTAMP!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_IS_VALID_TIMESTAMP!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -1599,10 +1645,9 @@ macro_rules! IS_VALID_TIMESTAMP {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::le(
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                                    /* PGRX: MIN_TIMESTAMP remains expanded because no integer constant binding is available in the defining Rust crate. */
                                     $crate::__pgrx_c_macros::CValue::<
                                         $crate::__pgrx_c_macros::CLong
-                                    >::new(-211813488000000000i64)
+                                    >::new($crate::__pgrx_c_bindings::MIN_TIMESTAMP as i64)
                                 ),
                                 (
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -1620,10 +1665,9 @@ macro_rules! IS_VALID_TIMESTAMP {
                                     )
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                                    /* PGRX: END_TIMESTAMP remains expanded because no integer constant binding is available in the defining Rust crate. */
                                     $crate::__pgrx_c_macros::CValue::<
                                         $crate::__pgrx_c_macros::CLong
-                                    >::new(9223371331200000000i64)
+                                    >::new($crate::__pgrx_c_bindings::END_TIMESTAMP as i64)
                                 )
                             )
                         )
@@ -1671,10 +1715,11 @@ macro_rules! IS_VALID_TIMESTAMP {
                                                 true,
                                                 _
                                             >(
-                                                /* PGRX: MIN_TIMESTAMP remains expanded because no integer constant binding is available in the defining Rust crate. */
                                                 $crate::__pgrx_c_macros::CValue::<
                                                     $crate::__pgrx_c_macros::CLong
-                                                >::new(-211813488000000000i64)
+                                                >::new(
+                                                    $crate::__pgrx_c_bindings::MIN_TIMESTAMP as i64
+                                                )
                                             ),
                                             (
                                                 $crate::__pgrx_c_macros::expression::profile_value::<
@@ -1697,10 +1742,11 @@ macro_rules! IS_VALID_TIMESTAMP {
                                                 true,
                                                 _
                                             >(
-                                                /* PGRX: END_TIMESTAMP remains expanded because no integer constant binding is available in the defining Rust crate. */
                                                 $crate::__pgrx_c_macros::CValue::<
                                                     $crate::__pgrx_c_macros::CLong
-                                                >::new(9223371331200000000i64)
+                                                >::new(
+                                                    $crate::__pgrx_c_bindings::END_TIMESTAMP as i64
+                                                )
                                             )
                                         )
                                     )
@@ -1730,10 +1776,9 @@ macro_rules! IS_VALID_TIMESTAMP {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::le(
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                                    /* PGRX: MIN_TIMESTAMP remains expanded because no integer constant binding is available in the defining Rust crate. */
                                     $crate::__pgrx_c_macros::CValue::<
                                         $crate::__pgrx_c_macros::CLong
-                                    >::new(-211813488000000000i64)
+                                    >::new($crate::__pgrx_c_bindings::MIN_TIMESTAMP as i64)
                                 ),
                                 (
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -1751,10 +1796,9 @@ macro_rules! IS_VALID_TIMESTAMP {
                                     )
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                                    /* PGRX: END_TIMESTAMP remains expanded because no integer constant binding is available in the defining Rust crate. */
                                     $crate::__pgrx_c_macros::CValue::<
                                         $crate::__pgrx_c_macros::CLong
-                                    >::new(9223371331200000000i64)
+                                    >::new($crate::__pgrx_c_bindings::END_TIMESTAMP as i64)
                                 )
                             )
                         )
@@ -1776,8 +1820,8 @@ macro_rules! IS_VALID_TIMESTAMP {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -1808,21 +1852,23 @@ macro_rules! __pgrx_c_args_TIMESTAMP_IS_NOBEGIN {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
         $crate::__pgrx_c_args_TIMESTAMP_IS_NOBEGIN!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_TIMESTAMP_IS_NOBEGIN!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_TIMESTAMP_IS_NOBEGIN!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_TIMESTAMP_IS_NOBEGIN!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_TIMESTAMP_IS_NOBEGIN!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -1830,7 +1876,9 @@ macro_rules! __pgrx_c_args_TIMESTAMP_IS_NOBEGIN {
         $crate::__pgrx_c_args_TIMESTAMP_IS_NOBEGIN!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_TIMESTAMP_IS_NOBEGIN!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_TIMESTAMP_IS_NOBEGIN!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -1852,14 +1900,18 @@ macro_rules! __pgrx_c_args_TIMESTAMP_IS_NOBEGIN {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_TIMESTAMP_IS_NOBEGIN!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_TIMESTAMP_IS_NOBEGIN!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_TIMESTAMP_IS_NOBEGIN!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_TIMESTAMP_IS_NOBEGIN!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_TIMESTAMP_IS_NOBEGIN!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -1886,13 +1938,13 @@ macro_rules! __pgrx_c_args_TIMESTAMP_IS_NOBEGIN {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_TIMESTAMP_IS_NOBEGIN!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_TIMESTAMP_IS_NOBEGIN!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -1941,9 +1993,8 @@ macro_rules! TIMESTAMP_IS_NOBEGIN {
                         )
                     ),
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                        /* PGRX: DT_NOBEGIN remains expanded because no integer constant binding is available in the defining Rust crate. */
                         $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CLong>::new(
-                            -9223372036854775808i64
+                            $crate::__pgrx_c_bindings::DT_NOBEGIN as i64
                         )
                     )
                 )
@@ -1984,10 +2035,9 @@ macro_rules! TIMESTAMP_IS_NOBEGIN {
                                     )
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                                    /* PGRX: DT_NOBEGIN remains expanded because no integer constant binding is available in the defining Rust crate. */
                                     $crate::__pgrx_c_macros::CValue::<
                                         $crate::__pgrx_c_macros::CLong
-                                    >::new(-9223372036854775808i64)
+                                    >::new($crate::__pgrx_c_bindings::DT_NOBEGIN as i64)
                                 )
                             )
                         )
@@ -2012,9 +2062,8 @@ macro_rules! TIMESTAMP_IS_NOBEGIN {
                         )
                     ),
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                        /* PGRX: DT_NOBEGIN remains expanded because no integer constant binding is available in the defining Rust crate. */
                         $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CLong>::new(
-                            -9223372036854775808i64
+                            $crate::__pgrx_c_bindings::DT_NOBEGIN as i64
                         )
                     )
                 )
@@ -2030,8 +2079,8 @@ macro_rules! TIMESTAMP_IS_NOBEGIN {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -2058,20 +2107,24 @@ macro_rules! __pgrx_c_args_TIMESTAMP_IS_NOEND {
         $crate::__pgrx_c_args_TIMESTAMP_IS_NOEND!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_TIMESTAMP_IS_NOEND!(@p1 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_TIMESTAMP_IS_NOEND!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_TIMESTAMP_IS_NOEND!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_TIMESTAMP_IS_NOEND!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_TIMESTAMP_IS_NOEND!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_TIMESTAMP_IS_NOEND!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -2079,7 +2132,9 @@ macro_rules! __pgrx_c_args_TIMESTAMP_IS_NOEND {
         $crate::__pgrx_c_args_TIMESTAMP_IS_NOEND!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_TIMESTAMP_IS_NOEND!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_TIMESTAMP_IS_NOEND!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -2101,14 +2156,18 @@ macro_rules! __pgrx_c_args_TIMESTAMP_IS_NOEND {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_TIMESTAMP_IS_NOEND!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_TIMESTAMP_IS_NOEND!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_TIMESTAMP_IS_NOEND!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_TIMESTAMP_IS_NOEND!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_TIMESTAMP_IS_NOEND!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -2135,13 +2194,13 @@ macro_rules! __pgrx_c_args_TIMESTAMP_IS_NOEND {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_TIMESTAMP_IS_NOEND!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_TIMESTAMP_IS_NOEND!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -2190,9 +2249,8 @@ macro_rules! TIMESTAMP_IS_NOEND {
                         )
                     ),
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                        /* PGRX: DT_NOEND remains expanded because no integer constant binding is available in the defining Rust crate. */
                         $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CLong>::new(
-                            0x7FFFFFFFFFFFFFFFi64
+                            $crate::__pgrx_c_bindings::DT_NOEND as i64
                         )
                     )
                 )
@@ -2233,10 +2291,9 @@ macro_rules! TIMESTAMP_IS_NOEND {
                                     )
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                                    /* PGRX: DT_NOEND remains expanded because no integer constant binding is available in the defining Rust crate. */
                                     $crate::__pgrx_c_macros::CValue::<
                                         $crate::__pgrx_c_macros::CLong
-                                    >::new(0x7FFFFFFFFFFFFFFFi64)
+                                    >::new($crate::__pgrx_c_bindings::DT_NOEND as i64)
                                 )
                             )
                         )
@@ -2261,9 +2318,8 @@ macro_rules! TIMESTAMP_IS_NOEND {
                         )
                     ),
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                        /* PGRX: DT_NOEND remains expanded because no integer constant binding is available in the defining Rust crate. */
                         $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CLong>::new(
-                            0x7FFFFFFFFFFFFFFFi64
+                            $crate::__pgrx_c_bindings::DT_NOEND as i64
                         )
                     )
                 )
@@ -2279,8 +2335,8 @@ macro_rules! TIMESTAMP_IS_NOEND {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -2307,20 +2363,24 @@ macro_rules! __pgrx_c_args_TIMESTAMP_NOBEGIN {
         $crate::__pgrx_c_args_TIMESTAMP_NOBEGIN!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_TIMESTAMP_NOBEGIN!(@p1 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_TIMESTAMP_NOBEGIN!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_TIMESTAMP_NOBEGIN!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_TIMESTAMP_NOBEGIN!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_TIMESTAMP_NOBEGIN!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_TIMESTAMP_NOBEGIN!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -2328,7 +2388,9 @@ macro_rules! __pgrx_c_args_TIMESTAMP_NOBEGIN {
         $crate::__pgrx_c_args_TIMESTAMP_NOBEGIN!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_TIMESTAMP_NOBEGIN!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_TIMESTAMP_NOBEGIN!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -2350,14 +2412,18 @@ macro_rules! __pgrx_c_args_TIMESTAMP_NOBEGIN {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_TIMESTAMP_NOBEGIN!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_TIMESTAMP_NOBEGIN!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_TIMESTAMP_NOBEGIN!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_TIMESTAMP_NOBEGIN!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_TIMESTAMP_NOBEGIN!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -2384,13 +2450,13 @@ macro_rules! __pgrx_c_args_TIMESTAMP_NOBEGIN {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_TIMESTAMP_NOBEGIN!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_TIMESTAMP_NOBEGIN!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -2433,9 +2499,8 @@ macro_rules! TIMESTAMP_NOBEGIN {
                     $crate::__pgrx_c_macros::expression::assign(
                         ($crate::__pgrx_c_operand!(@place; $j)),
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                            /* PGRX: DT_NOBEGIN remains expanded because no integer constant binding is available in the defining Rust crate. */
                             $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CLong>::new(
-                                -9223372036854775808i64
+                                $crate::__pgrx_c_bindings::DT_NOBEGIN as i64
                             )
                         )
                     )
@@ -2458,8 +2523,8 @@ macro_rules! TIMESTAMP_NOBEGIN {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -2486,20 +2551,24 @@ macro_rules! __pgrx_c_args_TIMESTAMP_NOEND {
         $crate::__pgrx_c_args_TIMESTAMP_NOEND!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_TIMESTAMP_NOEND!(@p1 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_TIMESTAMP_NOEND!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_TIMESTAMP_NOEND!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_TIMESTAMP_NOEND!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_TIMESTAMP_NOEND!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_TIMESTAMP_NOEND!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -2507,7 +2576,9 @@ macro_rules! __pgrx_c_args_TIMESTAMP_NOEND {
         $crate::__pgrx_c_args_TIMESTAMP_NOEND!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_TIMESTAMP_NOEND!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_TIMESTAMP_NOEND!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -2529,14 +2600,18 @@ macro_rules! __pgrx_c_args_TIMESTAMP_NOEND {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_TIMESTAMP_NOEND!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_TIMESTAMP_NOEND!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_TIMESTAMP_NOEND!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_TIMESTAMP_NOEND!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_TIMESTAMP_NOEND!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -2563,13 +2638,13 @@ macro_rules! __pgrx_c_args_TIMESTAMP_NOEND {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_TIMESTAMP_NOEND!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_TIMESTAMP_NOEND!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -2612,9 +2687,8 @@ macro_rules! TIMESTAMP_NOEND {
                     $crate::__pgrx_c_macros::expression::assign(
                         ($crate::__pgrx_c_operand!(@place; $j)),
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                            /* PGRX: DT_NOEND remains expanded because no integer constant binding is available in the defining Rust crate. */
                             $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CLong>::new(
-                                0x7FFFFFFFFFFFFFFFi64
+                                $crate::__pgrx_c_bindings::DT_NOEND as i64
                             )
                         )
                     )
@@ -2637,8 +2711,8 @@ macro_rules! TIMESTAMP_NOEND {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -2669,21 +2743,23 @@ macro_rules! __pgrx_c_args_TIMESTAMP_NOT_FINITE {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
         $crate::__pgrx_c_args_TIMESTAMP_NOT_FINITE!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_TIMESTAMP_NOT_FINITE!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_TIMESTAMP_NOT_FINITE!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_TIMESTAMP_NOT_FINITE!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_TIMESTAMP_NOT_FINITE!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -2691,7 +2767,9 @@ macro_rules! __pgrx_c_args_TIMESTAMP_NOT_FINITE {
         $crate::__pgrx_c_args_TIMESTAMP_NOT_FINITE!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_TIMESTAMP_NOT_FINITE!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_TIMESTAMP_NOT_FINITE!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -2713,14 +2791,18 @@ macro_rules! __pgrx_c_args_TIMESTAMP_NOT_FINITE {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_TIMESTAMP_NOT_FINITE!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_TIMESTAMP_NOT_FINITE!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_TIMESTAMP_NOT_FINITE!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_TIMESTAMP_NOT_FINITE!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_TIMESTAMP_NOT_FINITE!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -2747,13 +2829,13 @@ macro_rules! __pgrx_c_args_TIMESTAMP_NOT_FINITE {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_TIMESTAMP_NOT_FINITE!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_TIMESTAMP_NOT_FINITE!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -2807,10 +2889,9 @@ macro_rules! TIMESTAMP_NOT_FINITE {
                                         >($crate::__pgrx_c_operand!(@value [true]; $j))
                                     ),
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                                        /* PGRX: DT_NOBEGIN remains expanded because no integer constant binding is available in the defining Rust crate. */
                                         $crate::__pgrx_c_macros::CValue::<
                                             $crate::__pgrx_c_macros::CLong
-                                        >::new(-9223372036854775808i64)
+                                        >::new($crate::__pgrx_c_bindings::DT_NOBEGIN as i64)
                                     )
                                 )
                             )
@@ -2826,10 +2907,9 @@ macro_rules! TIMESTAMP_NOT_FINITE {
                                         >($crate::__pgrx_c_operand!(@value [true]; $j))
                                     ),
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                                        /* PGRX: DT_NOEND remains expanded because no integer constant binding is available in the defining Rust crate. */
                                         $crate::__pgrx_c_macros::CValue::<
                                             $crate::__pgrx_c_macros::CLong
-                                        >::new(0x7FFFFFFFFFFFFFFFi64)
+                                        >::new($crate::__pgrx_c_bindings::DT_NOEND as i64)
                                     )
                                 )
                             )
@@ -2888,10 +2968,11 @@ macro_rules! TIMESTAMP_NOT_FINITE {
                                                     true,
                                                     _
                                                 >(
-                                                    /* PGRX: DT_NOBEGIN remains expanded because no integer constant binding is available in the defining Rust crate. */
                                                     $crate::__pgrx_c_macros::CValue::<
                                                         $crate::__pgrx_c_macros::CLong
-                                                    >::new(-9223372036854775808i64)
+                                                    >::new(
+                                                        $crate::__pgrx_c_bindings::DT_NOBEGIN as i64
+                                                    )
                                                 )
                                             )
                                         )
@@ -2913,10 +2994,11 @@ macro_rules! TIMESTAMP_NOT_FINITE {
                                                     true,
                                                     _
                                                 >(
-                                                    /* PGRX: DT_NOEND remains expanded because no integer constant binding is available in the defining Rust crate. */
                                                     $crate::__pgrx_c_macros::CValue::<
                                                         $crate::__pgrx_c_macros::CLong
-                                                    >::new(0x7FFFFFFFFFFFFFFFi64)
+                                                    >::new(
+                                                        $crate::__pgrx_c_bindings::DT_NOEND as i64
+                                                    )
                                                 )
                                             )
                                         )
@@ -2954,10 +3036,9 @@ macro_rules! TIMESTAMP_NOT_FINITE {
                                         >($crate::__pgrx_c_operand!(@value [true]; $j))
                                     ),
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                                        /* PGRX: DT_NOBEGIN remains expanded because no integer constant binding is available in the defining Rust crate. */
                                         $crate::__pgrx_c_macros::CValue::<
                                             $crate::__pgrx_c_macros::CLong
-                                        >::new(-9223372036854775808i64)
+                                        >::new($crate::__pgrx_c_bindings::DT_NOBEGIN as i64)
                                     )
                                 )
                             )
@@ -2973,10 +3054,9 @@ macro_rules! TIMESTAMP_NOT_FINITE {
                                         >($crate::__pgrx_c_operand!(@value [true]; $j))
                                     ),
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                                        /* PGRX: DT_NOEND remains expanded because no integer constant binding is available in the defining Rust crate. */
                                         $crate::__pgrx_c_macros::CValue::<
                                             $crate::__pgrx_c_macros::CLong
-                                        >::new(0x7FFFFFFFFFFFFFFFi64)
+                                        >::new($crate::__pgrx_c_bindings::DT_NOEND as i64)
                                     )
                                 )
                             )

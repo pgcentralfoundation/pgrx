@@ -50,6 +50,41 @@ fn fixture(name: &str) -> PathBuf {
     PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("tests/fixtures").join(name)
 }
 
+/// Repeated forward declarations cannot recharge or overwrite one original definition's source.
+#[test]
+fn repeated_inline_declarations_retain_definition_source_once_within_budget() {
+    let _lock = SCANNER_LOCK.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
+    let scanner = MacroScanner::new().expect("libclang must be available");
+    let directory = tempfile::tempdir().expect("own a temporary header directory");
+    let header = directory.path().join("repeated_inline.h");
+    let definition = format!(
+        "static inline int retained_inline(int value) {{ /*{}*/ return value; }}",
+        "x".repeat(60_000),
+    );
+    let following = "static inline int following_inline(int value) { return value + 1; }";
+    // This original header is only about 75 KiB. Copying its 60 KiB body for
+    // every declaration would exceed the 16 MiB retained-source budget and
+    // overwrite the first function's valid source before its final definition.
+    let declarations = "static inline int retained_inline(int value);\n".repeat(300);
+    std::fs::write(&header, format!("{declarations}{definition}\n{following}\n")).unwrap();
+    let mut arguments = oracle::native_arguments();
+    arguments.push("-std=c17".into());
+    let frontend = inspect(&scanner, &header, &arguments, None).unwrap();
+    for (name, expected) in
+        [("retained_inline", definition.as_str()), ("following_inline", following)]
+    {
+        let function = &frontend.declarations().function_signatures[name];
+        assert!(function.definition_available);
+        let original = function.definition.as_ref().expect("retain the compiler-proven definition");
+        assert_eq!(
+            original.source.as_deref(),
+            Some(expected),
+            "{name} must retain its original text"
+        );
+        assert_eq!(original.parameters, [Some("value".into())]);
+    }
+}
+
 /// Checks that protection codegen profiles preserve macro values and original arguments.
 #[test]
 fn protection_codegen_profiles_preserve_macro_values_and_original_arguments() {
@@ -240,6 +275,76 @@ fn final_environment_tracks_undefinition_redefinition_restoration_and_ambiguity(
     );
     drop(scanner);
     assert!(output.environment().active.contains_key("FRONT_RESTORED"));
+}
+
+/// Identical command-line replacement observations share one source-less context, while
+/// the final driver state still controls later undefinition and override values.
+#[test]
+fn repeated_command_line_definitions_preserve_final_values_without_physical_ownership() {
+    let _lock = SCANNER_LOCK.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
+    let scanner = MacroScanner::new().expect("libclang must be available");
+    let header = fixture("frontend_environment.h");
+    for (tail, expected) in
+        [(Vec::new(), 1000), (vec!["-UFLAG".to_owned(), "-DFLAG=2000".to_owned()], 2000)]
+    {
+        let mut arguments = oracle::native_arguments();
+        arguments.extend([
+            "-DFRONT_COMMAND_LINE(value)=((value)+FLAG)".into(),
+            "-DFRONT_IDENTICAL(value)=((value)+3)".into(),
+            "-DFLAG=1000".into(),
+            "-DFLAG=1000".into(),
+        ]);
+        arguments.extend(tail);
+        let frontend = inspect(&scanner, &header, &arguments, None)
+            .expect("inspect repeated command-line definitions");
+        let flag = &frontend.environment().active["FLAG"];
+        assert!(matches!(flag.provenance, ActiveProvenance::Resolved));
+        assert_eq!(flag.definition.kind, MacroKind::ObjectLike);
+        assert!(flag.definition.location.is_none());
+        assert!(flag.definition.provenance.is_none());
+        assert!(!flag.definition.main_file);
+        assert!(!flag.definition.builtin);
+        assert_eq!(
+            flag.definition.tokens.iter().map(|token| token.spelling.as_str()).collect::<Vec<_>>(),
+            ["FLAG", expected.to_string().as_str()]
+        );
+        let ActiveProvenance::Ambiguous(spans) =
+            &frontend.environment().active["FRONT_IDENTICAL"].provenance
+        else {
+            panic!("distinct physical definitions cannot lose their ambiguity");
+        };
+        assert_eq!(spans.len(), 2);
+        assert_eq!(spans.iter().map(|span| span.start_line).collect::<Vec<_>>(), [15, 17]);
+        // Keep the effective argv intact; deduplication belongs to provenance reconciliation.
+        assert_eq!(
+            frontend
+                .profile()
+                .arguments
+                .iter()
+                .filter(|argument| *argument == "-DFLAG=1000")
+                .count(),
+            2
+        );
+        let names = ["FRONT_COMMAND_PRESENT"];
+        let session = AnalysisSession::prepare(&scanner, &frontend, &names)
+            .expect("prepare the source-owned macro's command-line dependency");
+        let emission = emit(&session, names[0]);
+        assert!(
+            matches!(emission.status, EmissionStatus::Emitted { .. }),
+            "resolved source-less dependencies must retain typed lowering: {emission:?}"
+        );
+        let result = oracle::run_c(
+            &frontend.profile().compiler.executable,
+            &header,
+            &format!(
+                "_Static_assert(FLAG == {expected}, \"final command-line value\");\n_Static_assert(FRONT_COMMAND_PRESENT(10) == {}, \"source macro dependency\");\n",
+                expected + 10,
+            ),
+            &frontend.profile().arguments.iter().map(String::as_str).collect::<Vec<_>>(),
+            false,
+        );
+        assert!(result.is_empty());
+    }
 }
 
 /// Checks that inspection rejects arguments that change its language or write outputs.

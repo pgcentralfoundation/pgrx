@@ -166,6 +166,12 @@ fn match_node(
             ExpressionKind::IntegerLiteral { literal: right_literal },
         ) => left_literal == right_literal && same_concrete_type(pattern, left, candidate, right),
         (
+            ExpressionKind::StringLiteral { bytes: left_bytes },
+            ExpressionKind::StringLiteral { bytes: right_bytes },
+        ) => left_bytes == right_bytes,
+        (ExpressionKind::InvocationFile, ExpressionKind::InvocationFile)
+        | (ExpressionKind::InvocationLine, ExpressionKind::InvocationLine) => true,
+        (
             ExpressionKind::Identifier { name: left_name },
             ExpressionKind::Identifier { name: right_name },
         ) => {

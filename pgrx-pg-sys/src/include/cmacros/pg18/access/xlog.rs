@@ -5,8 +5,8 @@ This code is generated for documentation purposes, so that it is easy to referen
 // C macros from xlog.h.
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -80,13 +80,17 @@ macro_rules! XLogArchivingActive {
                                 $crate::__pgrx_c_macros::expression::load(
                                     $crate::__pgrx_c_macros::expression::place::<
                                         $crate::__pgrx_c_macros::CInt
-                                    >(::core::ptr::addr_of_mut!($crate::XLogArchiveMode))
+                                    >(
+                                        ::core::ptr::addr_of_mut!(
+                                            $crate::__pgrx_c_bindings::XLogArchiveMode
+                                        )
+                                    )
                                 )
                             ),
                             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                 $crate::__pgrx_c_macros::expression::null_constant(
                                     $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                        $crate::ArchiveMode::ARCHIVE_MODE_OFF as i32
+                                        $crate::__pgrx_c_bindings::ArchiveMode::ARCHIVE_MODE_OFF as i32
                                     )
                                 )
                             )
@@ -153,7 +157,7 @@ macro_rules! XLogArchivingActive {
                                                     $crate::__pgrx_c_macros::CInt
                                                 >(
                                                     ::core::ptr::addr_of_mut!(
-                                                        $crate::XLogArchiveMode
+                                                        $crate::__pgrx_c_bindings::XLogArchiveMode
                                                     )
                                                 )
                                             )
@@ -165,7 +169,9 @@ macro_rules! XLogArchivingActive {
                                             $crate::__pgrx_c_macros::expression::null_constant(
                                                 $crate::__pgrx_c_macros::CValue::<
                                                     $crate::__pgrx_c_macros::CInt
-                                                >::new($crate::ArchiveMode::ARCHIVE_MODE_OFF as i32)
+                                                >::new(
+                                                    $crate::__pgrx_c_bindings::ArchiveMode::ARCHIVE_MODE_OFF as i32
+                                                )
                                             )
                                         )
                                     )
@@ -210,13 +216,17 @@ macro_rules! XLogArchivingActive {
                                 $crate::__pgrx_c_macros::expression::load(
                                     $crate::__pgrx_c_macros::expression::place::<
                                         $crate::__pgrx_c_macros::CInt
-                                    >(::core::ptr::addr_of_mut!($crate::XLogArchiveMode))
+                                    >(
+                                        ::core::ptr::addr_of_mut!(
+                                            $crate::__pgrx_c_bindings::XLogArchiveMode
+                                        )
+                                    )
                                 )
                             ),
                             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                 $crate::__pgrx_c_macros::expression::null_constant(
                                     $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                        $crate::ArchiveMode::ARCHIVE_MODE_OFF as i32
+                                        $crate::__pgrx_c_bindings::ArchiveMode::ARCHIVE_MODE_OFF as i32
                                     )
                                 )
                             )
@@ -241,8 +251,8 @@ macro_rules! XLogArchivingActive {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -316,12 +326,16 @@ macro_rules! XLogArchivingAlways {
                                 $crate::__pgrx_c_macros::expression::load(
                                     $crate::__pgrx_c_macros::expression::place::<
                                         $crate::__pgrx_c_macros::CInt
-                                    >(::core::ptr::addr_of_mut!($crate::XLogArchiveMode))
+                                    >(
+                                        ::core::ptr::addr_of_mut!(
+                                            $crate::__pgrx_c_bindings::XLogArchiveMode
+                                        )
+                                    )
                                 )
                             ),
                             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                 $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                    $crate::ArchiveMode::ARCHIVE_MODE_ALWAYS as i32
+                                    $crate::__pgrx_c_bindings::ArchiveMode::ARCHIVE_MODE_ALWAYS as i32
                                 )
                             )
                         )
@@ -387,7 +401,7 @@ macro_rules! XLogArchivingAlways {
                                                     $crate::__pgrx_c_macros::CInt
                                                 >(
                                                     ::core::ptr::addr_of_mut!(
-                                                        $crate::XLogArchiveMode
+                                                        $crate::__pgrx_c_bindings::XLogArchiveMode
                                                     )
                                                 )
                                             )
@@ -398,7 +412,9 @@ macro_rules! XLogArchivingAlways {
                                         >(
                                             $crate::__pgrx_c_macros::CValue::<
                                                 $crate::__pgrx_c_macros::CInt
-                                            >::new($crate::ArchiveMode::ARCHIVE_MODE_ALWAYS as i32)
+                                            >::new(
+                                                $crate::__pgrx_c_bindings::ArchiveMode::ARCHIVE_MODE_ALWAYS as i32
+                                            )
                                         )
                                     )
                                 )
@@ -442,12 +458,16 @@ macro_rules! XLogArchivingAlways {
                                 $crate::__pgrx_c_macros::expression::load(
                                     $crate::__pgrx_c_macros::expression::place::<
                                         $crate::__pgrx_c_macros::CInt
-                                    >(::core::ptr::addr_of_mut!($crate::XLogArchiveMode))
+                                    >(
+                                        ::core::ptr::addr_of_mut!(
+                                            $crate::__pgrx_c_bindings::XLogArchiveMode
+                                        )
+                                    )
                                 )
                             ),
                             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                 $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                    $crate::ArchiveMode::ARCHIVE_MODE_ALWAYS as i32
+                                    $crate::__pgrx_c_bindings::ArchiveMode::ARCHIVE_MODE_ALWAYS as i32
                                 )
                             )
                         )
@@ -471,8 +491,8 @@ macro_rules! XLogArchivingAlways {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -526,14 +546,18 @@ macro_rules! XLogHintBitIsNeeded {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
                                 $crate::__pgrx_c_macros::CBool as $crate::__pgrx_c_macros::expression::CType
-                            >::from_storage($crate::DataChecksumsEnabled())
+                            >::from_storage($crate::__pgrx_c_bindings::DataChecksumsEnabled())
                         )
                     ) || $crate::__pgrx_c_macros::expression::truth(
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::load(
                                 $crate::__pgrx_c_macros::expression::place::<
                                     $crate::__pgrx_c_macros::CBool
-                                >(::core::ptr::addr_of_mut!($crate::wal_log_hints))
+                                >(
+                                    ::core::ptr::addr_of_mut!(
+                                        $crate::__pgrx_c_bindings::wal_log_hints
+                                    )
+                                )
                             )
                         )
                     ) {
@@ -574,14 +598,20 @@ macro_rules! XLogHintBitIsNeeded {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         <
                                             $crate::__pgrx_c_macros::CBool as $crate::__pgrx_c_macros::expression::CType
-                                        >::from_storage($crate::DataChecksumsEnabled())
+                                        >::from_storage(
+                                            $crate::__pgrx_c_bindings::DataChecksumsEnabled()
+                                        )
                                     )
                                 ) || $crate::__pgrx_c_macros::expression::truth(
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::expression::load(
                                             $crate::__pgrx_c_macros::expression::place::<
                                                 $crate::__pgrx_c_macros::CBool
-                                            >(::core::ptr::addr_of_mut!($crate::wal_log_hints))
+                                            >(
+                                                ::core::ptr::addr_of_mut!(
+                                                    $crate::__pgrx_c_bindings::wal_log_hints
+                                                )
+                                            )
                                         )
                                     )
                                 ) {
@@ -609,14 +639,18 @@ macro_rules! XLogHintBitIsNeeded {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
                                 $crate::__pgrx_c_macros::CBool as $crate::__pgrx_c_macros::expression::CType
-                            >::from_storage($crate::DataChecksumsEnabled())
+                            >::from_storage($crate::__pgrx_c_bindings::DataChecksumsEnabled())
                         )
                     ) || $crate::__pgrx_c_macros::expression::truth(
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::load(
                                 $crate::__pgrx_c_macros::expression::place::<
                                     $crate::__pgrx_c_macros::CBool
-                                >(::core::ptr::addr_of_mut!($crate::wal_log_hints))
+                                >(
+                                    ::core::ptr::addr_of_mut!(
+                                        $crate::__pgrx_c_bindings::wal_log_hints
+                                    )
+                                )
                             )
                         )
                     ) {
@@ -643,8 +677,8 @@ macro_rules! XLogHintBitIsNeeded {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -694,12 +728,12 @@ macro_rules! XLogIsNeeded {
                         $crate::__pgrx_c_macros::expression::load(
                             $crate::__pgrx_c_macros::expression::place::<
                                 $crate::__pgrx_c_macros::CInt
-                            >(::core::ptr::addr_of_mut!($crate::wal_level))
+                            >(::core::ptr::addr_of_mut!($crate::__pgrx_c_bindings::wal_level))
                         )
                     ),
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                            $crate::WalLevel::WAL_LEVEL_REPLICA as i32
+                            $crate::__pgrx_c_bindings::WalLevel::WAL_LEVEL_REPLICA as i32
                         )
                     )
                 )
@@ -735,12 +769,16 @@ macro_rules! XLogIsNeeded {
                                     $crate::__pgrx_c_macros::expression::load(
                                         $crate::__pgrx_c_macros::expression::place::<
                                             $crate::__pgrx_c_macros::CInt
-                                        >(::core::ptr::addr_of_mut!($crate::wal_level))
+                                        >(
+                                            ::core::ptr::addr_of_mut!(
+                                                $crate::__pgrx_c_bindings::wal_level
+                                            )
+                                        )
                                     )
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                        $crate::WalLevel::WAL_LEVEL_REPLICA as i32
+                                        $crate::__pgrx_c_bindings::WalLevel::WAL_LEVEL_REPLICA as i32
                                     )
                                 )
                             )
@@ -763,12 +801,12 @@ macro_rules! XLogIsNeeded {
                         $crate::__pgrx_c_macros::expression::load(
                             $crate::__pgrx_c_macros::expression::place::<
                                 $crate::__pgrx_c_macros::CInt
-                            >(::core::ptr::addr_of_mut!($crate::wal_level))
+                            >(::core::ptr::addr_of_mut!($crate::__pgrx_c_bindings::wal_level))
                         )
                     ),
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                            $crate::WalLevel::WAL_LEVEL_REPLICA as i32
+                            $crate::__pgrx_c_bindings::WalLevel::WAL_LEVEL_REPLICA as i32
                         )
                     )
                 )
@@ -790,8 +828,8 @@ macro_rules! XLogIsNeeded {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -841,12 +879,12 @@ macro_rules! XLogLogicalInfoActive {
                         $crate::__pgrx_c_macros::expression::load(
                             $crate::__pgrx_c_macros::expression::place::<
                                 $crate::__pgrx_c_macros::CInt
-                            >(::core::ptr::addr_of_mut!($crate::wal_level))
+                            >(::core::ptr::addr_of_mut!($crate::__pgrx_c_bindings::wal_level))
                         )
                     ),
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                            $crate::WalLevel::WAL_LEVEL_LOGICAL as i32
+                            $crate::__pgrx_c_bindings::WalLevel::WAL_LEVEL_LOGICAL as i32
                         )
                     )
                 )
@@ -882,12 +920,16 @@ macro_rules! XLogLogicalInfoActive {
                                     $crate::__pgrx_c_macros::expression::load(
                                         $crate::__pgrx_c_macros::expression::place::<
                                             $crate::__pgrx_c_macros::CInt
-                                        >(::core::ptr::addr_of_mut!($crate::wal_level))
+                                        >(
+                                            ::core::ptr::addr_of_mut!(
+                                                $crate::__pgrx_c_bindings::wal_level
+                                            )
+                                        )
                                     )
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                        $crate::WalLevel::WAL_LEVEL_LOGICAL as i32
+                                        $crate::__pgrx_c_bindings::WalLevel::WAL_LEVEL_LOGICAL as i32
                                     )
                                 )
                             )
@@ -910,12 +952,12 @@ macro_rules! XLogLogicalInfoActive {
                         $crate::__pgrx_c_macros::expression::load(
                             $crate::__pgrx_c_macros::expression::place::<
                                 $crate::__pgrx_c_macros::CInt
-                            >(::core::ptr::addr_of_mut!($crate::wal_level))
+                            >(::core::ptr::addr_of_mut!($crate::__pgrx_c_bindings::wal_level))
                         )
                     ),
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                            $crate::WalLevel::WAL_LEVEL_LOGICAL as i32
+                            $crate::__pgrx_c_bindings::WalLevel::WAL_LEVEL_LOGICAL as i32
                         )
                     )
                 )
@@ -937,8 +979,8 @@ macro_rules! XLogLogicalInfoActive {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -988,12 +1030,12 @@ macro_rules! XLogStandbyInfoActive {
                         $crate::__pgrx_c_macros::expression::load(
                             $crate::__pgrx_c_macros::expression::place::<
                                 $crate::__pgrx_c_macros::CInt
-                            >(::core::ptr::addr_of_mut!($crate::wal_level))
+                            >(::core::ptr::addr_of_mut!($crate::__pgrx_c_bindings::wal_level))
                         )
                     ),
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                            $crate::WalLevel::WAL_LEVEL_REPLICA as i32
+                            $crate::__pgrx_c_bindings::WalLevel::WAL_LEVEL_REPLICA as i32
                         )
                     )
                 )
@@ -1029,12 +1071,16 @@ macro_rules! XLogStandbyInfoActive {
                                     $crate::__pgrx_c_macros::expression::load(
                                         $crate::__pgrx_c_macros::expression::place::<
                                             $crate::__pgrx_c_macros::CInt
-                                        >(::core::ptr::addr_of_mut!($crate::wal_level))
+                                        >(
+                                            ::core::ptr::addr_of_mut!(
+                                                $crate::__pgrx_c_bindings::wal_level
+                                            )
+                                        )
                                     )
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                        $crate::WalLevel::WAL_LEVEL_REPLICA as i32
+                                        $crate::__pgrx_c_bindings::WalLevel::WAL_LEVEL_REPLICA as i32
                                     )
                                 )
                             )
@@ -1057,12 +1103,12 @@ macro_rules! XLogStandbyInfoActive {
                         $crate::__pgrx_c_macros::expression::load(
                             $crate::__pgrx_c_macros::expression::place::<
                                 $crate::__pgrx_c_macros::CInt
-                            >(::core::ptr::addr_of_mut!($crate::wal_level))
+                            >(::core::ptr::addr_of_mut!($crate::__pgrx_c_bindings::wal_level))
                         )
                     ),
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                            $crate::WalLevel::WAL_LEVEL_REPLICA as i32
+                            $crate::__pgrx_c_bindings::WalLevel::WAL_LEVEL_REPLICA as i32
                         )
                     )
                 )

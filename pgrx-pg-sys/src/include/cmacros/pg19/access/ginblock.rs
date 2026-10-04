@@ -5,8 +5,8 @@ This code is generated for documentation purposes, so that it is easy to referen
 // C macros from ginblock.h.
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -34,13 +34,13 @@ macro_rules! __pgrx_c_args_GinCategoryOffset {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinCategoryOffset!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinCategoryOffset!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -49,7 +49,7 @@ macro_rules! __pgrx_c_args_GinCategoryOffset {
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinCategoryOffset!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -76,31 +76,35 @@ macro_rules! __pgrx_c_args_GinCategoryOffset {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinCategoryOffset!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinCategoryOffset!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_GinCategoryOffset!(@p2 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_GinCategoryOffset!(
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative1 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_GinCategoryOffset!(@p2 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_GinCategoryOffset!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinCategoryOffset!(
-            @p2 $mode [$($done)* (@literal [- $argument]),];
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinCategoryOffset!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -108,7 +112,9 @@ macro_rules! __pgrx_c_args_GinCategoryOffset {
         $crate::__pgrx_c_args_GinCategoryOffset!(@negative1 $mode [$($done)*]; - $($raw)*)
     };
     (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_GinCategoryOffset!(@p2 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_GinCategoryOffset!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -130,14 +136,18 @@ macro_rules! __pgrx_c_args_GinCategoryOffset {
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_GinCategoryOffset!(@p2 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_GinCategoryOffset!(
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_GinCategoryOffset!(@p2 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_GinCategoryOffset!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinCategoryOffset!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -164,13 +174,13 @@ macro_rules! __pgrx_c_args_GinCategoryOffset {
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinCategoryOffset!(
-            @p2 $mode [$($done)* (@literal [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinCategoryOffset!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -224,7 +234,7 @@ macro_rules! GinCategoryOffset {
                                 usize
                             > as $crate::__pgrx_c_macros::expression::CType
                         >::from_storage(
-                            $crate::IndexInfoFindDataOffset(
+                            $crate::__pgrx_c_bindings::IndexInfoFindDataOffset(
                                 <
                                     $crate::__pgrx_c_macros::CUnsignedShort as $crate::__pgrx_c_macros::expression::CType
                                 >::into_storage(
@@ -361,7 +371,7 @@ macro_rules! GinCategoryOffset {
                                             usize
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::from_storage(
-                                        $crate::IndexInfoFindDataOffset(
+                                        $crate::__pgrx_c_bindings::IndexInfoFindDataOffset(
                                             <
                                                 $crate::__pgrx_c_macros::CUnsignedShort as $crate::__pgrx_c_macros::expression::CType
                                             >::into_storage(
@@ -481,7 +491,7 @@ macro_rules! GinCategoryOffset {
                                 usize
                             > as $crate::__pgrx_c_macros::expression::CType
                         >::from_storage(
-                            $crate::IndexInfoFindDataOffset(
+                            $crate::__pgrx_c_bindings::IndexInfoFindDataOffset(
                                 <
                                     $crate::__pgrx_c_macros::CUnsignedShort as $crate::__pgrx_c_macros::expression::CType
                                 >::into_storage(
@@ -588,8 +598,8 @@ macro_rules! GinCategoryOffset {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -620,23 +630,23 @@ macro_rules! __pgrx_c_args_GinDataLeafPageGetFreeSpace {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
         $crate::__pgrx_c_args_GinDataLeafPageGetFreeSpace!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_GinDataLeafPageGetFreeSpace!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinDataLeafPageGetFreeSpace!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinDataLeafPageGetFreeSpace!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -645,7 +655,7 @@ macro_rules! __pgrx_c_args_GinDataLeafPageGetFreeSpace {
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
         $crate::__pgrx_c_args_GinDataLeafPageGetFreeSpace!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
@@ -671,17 +681,17 @@ macro_rules! __pgrx_c_args_GinDataLeafPageGetFreeSpace {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_GinDataLeafPageGetFreeSpace!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_GinDataLeafPageGetFreeSpace!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinDataLeafPageGetFreeSpace!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -708,13 +718,13 @@ macro_rules! __pgrx_c_args_GinDataLeafPageGetFreeSpace {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinDataLeafPageGetFreeSpace!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinDataLeafPageGetFreeSpace!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -768,7 +778,7 @@ macro_rules! GinDataLeafPageGetFreeSpace {
                     usize
                 > as $crate::__pgrx_c_macros::expression::CType
             >::from_storage(
-                $crate::PageGetExactFreeSpace(
+                $crate::__pgrx_c_bindings::PageGetExactFreeSpace(
                     <
                         $crate::__pgrx_c_macros::expression::CPointer<
                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
@@ -833,7 +843,7 @@ macro_rules! GinDataLeafPageGetFreeSpace {
                                     usize
                                 > as $crate::__pgrx_c_macros::expression::CType
                             >::from_storage(
-                                $crate::PageGetExactFreeSpace(
+                                $crate::__pgrx_c_bindings::PageGetExactFreeSpace(
                                     <
                                         $crate::__pgrx_c_macros::expression::CPointer<
                                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
@@ -882,7 +892,7 @@ macro_rules! GinDataLeafPageGetFreeSpace {
                         usize
                     > as $crate::__pgrx_c_macros::expression::CType
                 >::from_storage(
-                    $crate::PageGetExactFreeSpace(
+                    $crate::__pgrx_c_bindings::PageGetExactFreeSpace(
                         <
                             $crate::__pgrx_c_macros::expression::CPointer<
                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
@@ -924,8 +934,8 @@ macro_rules! GinDataLeafPageGetFreeSpace {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -956,23 +966,23 @@ macro_rules! __pgrx_c_args_GinDataLeafPageGetPostingList {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
         $crate::__pgrx_c_args_GinDataLeafPageGetPostingList!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_GinDataLeafPageGetPostingList!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinDataLeafPageGetPostingList!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinDataLeafPageGetPostingList!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -984,7 +994,7 @@ macro_rules! __pgrx_c_args_GinDataLeafPageGetPostingList {
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
         $crate::__pgrx_c_args_GinDataLeafPageGetPostingList!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
@@ -1010,17 +1020,17 @@ macro_rules! __pgrx_c_args_GinDataLeafPageGetPostingList {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_GinDataLeafPageGetPostingList!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_GinDataLeafPageGetPostingList!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinDataLeafPageGetPostingList!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -1047,13 +1057,13 @@ macro_rules! __pgrx_c_args_GinDataLeafPageGetPostingList {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinDataLeafPageGetPostingList!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinDataLeafPageGetPostingList!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -1104,9 +1114,11 @@ macro_rules! GinDataLeafPageGetPostingList {
         /* PGRX: MAXALIGN remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */ /* PGRX: TYPEALIGN remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */
         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
             $crate::__pgrx_c_macros::expression::cast_as::<
-                *mut $crate::GinPostingList,
+                *mut $crate::__pgrx_c_bindings::GinPostingList,
                 $crate::__pgrx_c_macros::expression::CPointer<
-                    $crate::__pgrx_c_macros::expression::CRecord<$crate::GinPostingList>,
+                    $crate::__pgrx_c_macros::expression::CRecord<
+                        $crate::__pgrx_c_bindings::GinPostingList
+                    >,
                     $crate::__pgrx_c_macros::expression::ReadWrite
                 >,
                 _
@@ -1129,7 +1141,7 @@ macro_rules! GinDataLeafPageGetPostingList {
                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::from_storage(
-                                        $crate::PageGetContents(
+                                        $crate::__pgrx_c_bindings::PageGetContents(
                                             <
                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                     $crate::__pgrx_c_macros::expression::CIntegerStorage<
@@ -1193,7 +1205,7 @@ macro_rules! GinDataLeafPageGetPostingList {
                                                                         >(
                                                                             $crate::__pgrx_c_macros::expression::size_of::<
                                                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                    $crate::ItemPointerData
+                                                                                    $crate::__pgrx_c_bindings::ItemPointerData
                                                                                 >>()
                                                                         )
                                                                     )
@@ -1218,7 +1230,7 @@ macro_rules! GinDataLeafPageGetPostingList {
                                                                             $crate::__pgrx_c_macros::CValue::<
                                                                                 $crate::__pgrx_c_macros::CInt
                                                                             >::new(
-                                                                                $crate::MAXIMUM_ALIGNOF as i32
+                                                                                $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                             )
                                                                         )
                                                                     ),
@@ -1269,7 +1281,7 @@ macro_rules! GinDataLeafPageGetPostingList {
                                                                                     $crate::__pgrx_c_macros::CValue::<
                                                                                         $crate::__pgrx_c_macros::CInt
                                                                                     >::new(
-                                                                                        $crate::MAXIMUM_ALIGNOF as i32
+                                                                                        $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                                     )
                                                                                 )
                                                                             ),
@@ -1336,10 +1348,10 @@ macro_rules! GinDataLeafPageGetPostingList {
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::cast_as::<
-                                *mut $crate::GinPostingList,
+                                *mut $crate::__pgrx_c_bindings::GinPostingList,
                                 $crate::__pgrx_c_macros::expression::CPointer<
                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                        $crate::GinPostingList
+                                        $crate::__pgrx_c_bindings::GinPostingList
                                     >,
                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                 >,
@@ -1369,7 +1381,7 @@ macro_rules! GinDataLeafPageGetPostingList {
                                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                                         > as $crate::__pgrx_c_macros::expression::CType
                                                     >::from_storage(
-                                                        $crate::PageGetContents(
+                                                        $crate::__pgrx_c_bindings::PageGetContents(
                                                             <
                                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                                     $crate::__pgrx_c_macros::expression::CIntegerStorage<
@@ -1436,7 +1448,7 @@ macro_rules! GinDataLeafPageGetPostingList {
                                                                                         >(
                                                                                             $crate::__pgrx_c_macros::expression::size_of::<
                                                                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                    $crate::ItemPointerData
+                                                                                                    $crate::__pgrx_c_bindings::ItemPointerData
                                                                                                 >>()
                                                                                         )
                                                                                     )
@@ -1461,7 +1473,7 @@ macro_rules! GinDataLeafPageGetPostingList {
                                                                                             $crate::__pgrx_c_macros::CValue::<
                                                                                                 $crate::__pgrx_c_macros::CInt
                                                                                             >::new(
-                                                                                                $crate::MAXIMUM_ALIGNOF as i32
+                                                                                                $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                                             )
                                                                                         )
                                                                                     ),
@@ -1512,7 +1524,7 @@ macro_rules! GinDataLeafPageGetPostingList {
                                                                                                     $crate::__pgrx_c_macros::CValue::<
                                                                                                         $crate::__pgrx_c_macros::CInt
                                                                                                     >::new(
-                                                                                                        $crate::MAXIMUM_ALIGNOF as i32
+                                                                                                        $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                                                     )
                                                                                                 )
                                                                                             ),
@@ -1558,9 +1570,11 @@ macro_rules! GinDataLeafPageGetPostingList {
         {
             let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::cast_as::<
-                    *mut $crate::GinPostingList,
+                    *mut $crate::__pgrx_c_bindings::GinPostingList,
                     $crate::__pgrx_c_macros::expression::CPointer<
-                        $crate::__pgrx_c_macros::expression::CRecord<$crate::GinPostingList>,
+                        $crate::__pgrx_c_macros::expression::CRecord<
+                            $crate::__pgrx_c_bindings::GinPostingList
+                        >,
                         $crate::__pgrx_c_macros::expression::ReadWrite
                     >,
                     _
@@ -1583,7 +1597,7 @@ macro_rules! GinDataLeafPageGetPostingList {
                                                 $crate::__pgrx_c_macros::expression::ReadWrite
                                             > as $crate::__pgrx_c_macros::expression::CType
                                         >::from_storage(
-                                            $crate::PageGetContents(
+                                            $crate::__pgrx_c_bindings::PageGetContents(
                                                 <
                                                     $crate::__pgrx_c_macros::expression::CPointer<
                                                         $crate::__pgrx_c_macros::expression::CIntegerStorage<
@@ -1650,7 +1664,7 @@ macro_rules! GinDataLeafPageGetPostingList {
                                                                             >(
                                                                                 $crate::__pgrx_c_macros::expression::size_of::<
                                                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                        $crate::ItemPointerData
+                                                                                        $crate::__pgrx_c_bindings::ItemPointerData
                                                                                     >>()
                                                                             )
                                                                         )
@@ -1675,7 +1689,7 @@ macro_rules! GinDataLeafPageGetPostingList {
                                                                                 $crate::__pgrx_c_macros::CValue::<
                                                                                     $crate::__pgrx_c_macros::CInt
                                                                                 >::new(
-                                                                                    $crate::MAXIMUM_ALIGNOF as i32
+                                                                                    $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                                 )
                                                                             )
                                                                         ),
@@ -1726,7 +1740,7 @@ macro_rules! GinDataLeafPageGetPostingList {
                                                                                         $crate::__pgrx_c_macros::CValue::<
                                                                                             $crate::__pgrx_c_macros::CInt
                                                                                         >::new(
-                                                                                            $crate::MAXIMUM_ALIGNOF as i32
+                                                                                            $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                                         )
                                                                                     )
                                                                                 ),
@@ -1777,8 +1791,8 @@ macro_rules! GinDataLeafPageGetPostingList {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -1812,7 +1826,7 @@ macro_rules! __pgrx_c_args_GinDataLeafPageGetPostingListSize {
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_GinDataLeafPageGetPostingListSize!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
@@ -1820,7 +1834,7 @@ macro_rules! __pgrx_c_args_GinDataLeafPageGetPostingListSize {
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinDataLeafPageGetPostingListSize!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -1829,7 +1843,7 @@ macro_rules! __pgrx_c_args_GinDataLeafPageGetPostingListSize {
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
         $crate::__pgrx_c_args_GinDataLeafPageGetPostingListSize!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
@@ -1855,17 +1869,17 @@ macro_rules! __pgrx_c_args_GinDataLeafPageGetPostingListSize {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_GinDataLeafPageGetPostingListSize!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:tt) => {
         $crate::__pgrx_c_args_GinDataLeafPageGetPostingListSize!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinDataLeafPageGetPostingListSize!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -1892,13 +1906,13 @@ macro_rules! __pgrx_c_args_GinDataLeafPageGetPostingListSize {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinDataLeafPageGetPostingListSize!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:tt, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinDataLeafPageGetPostingListSize!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -1968,10 +1982,10 @@ macro_rules! GinDataLeafPageGetPostingListSize {
                                                     _
                                                 >(
                                                     $crate::__pgrx_c_macros::expression::cast_as::<
-                                                        $crate::PageHeader,
+                                                        $crate::__pgrx_c_bindings::PageHeader,
                                                         $crate::__pgrx_c_macros::expression::CPointer<
                                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                                $crate::PageHeaderData
+                                                                $crate::__pgrx_c_bindings::PageHeaderData
                                                             >,
                                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                                         >,
@@ -2024,7 +2038,7 @@ macro_rules! GinDataLeafPageGetPostingListSize {
                                                                         >(
                                                                             $crate::__pgrx_c_macros::expression::offset_of::<
                                                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                    $crate::PageHeaderData
+                                                                                    $crate::__pgrx_c_bindings::PageHeaderData
                                                                                 >,
                                                                                 $crate::__pgrx_c_field_marker!(
                                                                                     @path;
@@ -2055,7 +2069,7 @@ macro_rules! GinDataLeafPageGetPostingListSize {
                                                                         $crate::__pgrx_c_macros::CValue::<
                                                                             $crate::__pgrx_c_macros::CInt
                                                                         >::new(
-                                                                            $crate::MAXIMUM_ALIGNOF as i32
+                                                                            $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                         )
                                                                     )
                                                                 ),
@@ -2106,7 +2120,7 @@ macro_rules! GinDataLeafPageGetPostingListSize {
                                                                                 $crate::__pgrx_c_macros::CValue::<
                                                                                     $crate::__pgrx_c_macros::CInt
                                                                                 >::new(
-                                                                                    $crate::MAXIMUM_ALIGNOF as i32
+                                                                                    $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                                 )
                                                                             )
                                                                         ),
@@ -2158,7 +2172,7 @@ macro_rules! GinDataLeafPageGetPostingListSize {
                                                             >(
                                                                 $crate::__pgrx_c_macros::expression::size_of::<
                                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                                        $crate::ItemPointerData
+                                                                        $crate::__pgrx_c_bindings::ItemPointerData
                                                                     >>()
                                                             )
                                                         )
@@ -2183,7 +2197,7 @@ macro_rules! GinDataLeafPageGetPostingListSize {
                                                                 $crate::__pgrx_c_macros::CValue::<
                                                                     $crate::__pgrx_c_macros::CInt
                                                                 >::new(
-                                                                    $crate::MAXIMUM_ALIGNOF as i32
+                                                                    $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                 )
                                                             )
                                                         ),
@@ -2231,7 +2245,7 @@ macro_rules! GinDataLeafPageGetPostingListSize {
                                                                         $crate::__pgrx_c_macros::CValue::<
                                                                             $crate::__pgrx_c_macros::CInt
                                                                         >::new(
-                                                                            $crate::MAXIMUM_ALIGNOF as i32
+                                                                            $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                         )
                                                                     )
                                                                 ),
@@ -2322,10 +2336,10 @@ macro_rules! GinDataLeafPageGetPostingListSize {
                                                                 _
                                                             >(
                                                                 $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                    $crate::PageHeader,
+                                                                    $crate::__pgrx_c_bindings::PageHeader,
                                                                     $crate::__pgrx_c_macros::expression::CPointer<
                                                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                                                            $crate::PageHeaderData
+                                                                            $crate::__pgrx_c_bindings::PageHeaderData
                                                                         >,
                                                                         $crate::__pgrx_c_macros::expression::ReadWrite
                                                                     >,
@@ -2381,7 +2395,7 @@ macro_rules! GinDataLeafPageGetPostingListSize {
                                                                                     >(
                                                                                         $crate::__pgrx_c_macros::expression::offset_of::<
                                                                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                $crate::PageHeaderData
+                                                                                                $crate::__pgrx_c_bindings::PageHeaderData
                                                                                             >,
                                                                                             $crate::__pgrx_c_field_marker!(
                                                                                                 @path;
@@ -2412,7 +2426,7 @@ macro_rules! GinDataLeafPageGetPostingListSize {
                                                                                     $crate::__pgrx_c_macros::CValue::<
                                                                                         $crate::__pgrx_c_macros::CInt
                                                                                     >::new(
-                                                                                        $crate::MAXIMUM_ALIGNOF as i32
+                                                                                        $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                                     )
                                                                                 )
                                                                             ),
@@ -2463,7 +2477,7 @@ macro_rules! GinDataLeafPageGetPostingListSize {
                                                                                             $crate::__pgrx_c_macros::CValue::<
                                                                                                 $crate::__pgrx_c_macros::CInt
                                                                                             >::new(
-                                                                                                $crate::MAXIMUM_ALIGNOF as i32
+                                                                                                $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                                             )
                                                                                         )
                                                                                     ),
@@ -2518,7 +2532,7 @@ macro_rules! GinDataLeafPageGetPostingListSize {
                                                                         >(
                                                                             $crate::__pgrx_c_macros::expression::size_of::<
                                                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                    $crate::ItemPointerData
+                                                                                    $crate::__pgrx_c_bindings::ItemPointerData
                                                                                 >>()
                                                                         )
                                                                     )
@@ -2543,7 +2557,7 @@ macro_rules! GinDataLeafPageGetPostingListSize {
                                                                             $crate::__pgrx_c_macros::CValue::<
                                                                                 $crate::__pgrx_c_macros::CInt
                                                                             >::new(
-                                                                                $crate::MAXIMUM_ALIGNOF as i32
+                                                                                $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                             )
                                                                         )
                                                                     ),
@@ -2594,7 +2608,7 @@ macro_rules! GinDataLeafPageGetPostingListSize {
                                                                                     $crate::__pgrx_c_macros::CValue::<
                                                                                         $crate::__pgrx_c_macros::CInt
                                                                                     >::new(
-                                                                                        $crate::MAXIMUM_ALIGNOF as i32
+                                                                                        $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                                     )
                                                                                 )
                                                                             ),
@@ -2657,10 +2671,10 @@ macro_rules! GinDataLeafPageGetPostingListSize {
                                                     _
                                                 >(
                                                     $crate::__pgrx_c_macros::expression::cast_as::<
-                                                        $crate::PageHeader,
+                                                        $crate::__pgrx_c_bindings::PageHeader,
                                                         $crate::__pgrx_c_macros::expression::CPointer<
                                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                                $crate::PageHeaderData
+                                                                $crate::__pgrx_c_bindings::PageHeaderData
                                                             >,
                                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                                         >,
@@ -2713,7 +2727,7 @@ macro_rules! GinDataLeafPageGetPostingListSize {
                                                                         >(
                                                                             $crate::__pgrx_c_macros::expression::offset_of::<
                                                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                    $crate::PageHeaderData
+                                                                                    $crate::__pgrx_c_bindings::PageHeaderData
                                                                                 >,
                                                                                 $crate::__pgrx_c_field_marker!(
                                                                                     @path;
@@ -2744,7 +2758,7 @@ macro_rules! GinDataLeafPageGetPostingListSize {
                                                                         $crate::__pgrx_c_macros::CValue::<
                                                                             $crate::__pgrx_c_macros::CInt
                                                                         >::new(
-                                                                            $crate::MAXIMUM_ALIGNOF as i32
+                                                                            $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                         )
                                                                     )
                                                                 ),
@@ -2795,7 +2809,7 @@ macro_rules! GinDataLeafPageGetPostingListSize {
                                                                                 $crate::__pgrx_c_macros::CValue::<
                                                                                     $crate::__pgrx_c_macros::CInt
                                                                                 >::new(
-                                                                                    $crate::MAXIMUM_ALIGNOF as i32
+                                                                                    $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                                 )
                                                                             )
                                                                         ),
@@ -2847,7 +2861,7 @@ macro_rules! GinDataLeafPageGetPostingListSize {
                                                             >(
                                                                 $crate::__pgrx_c_macros::expression::size_of::<
                                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                                        $crate::ItemPointerData
+                                                                        $crate::__pgrx_c_bindings::ItemPointerData
                                                                     >>()
                                                             )
                                                         )
@@ -2872,7 +2886,7 @@ macro_rules! GinDataLeafPageGetPostingListSize {
                                                                 $crate::__pgrx_c_macros::CValue::<
                                                                     $crate::__pgrx_c_macros::CInt
                                                                 >::new(
-                                                                    $crate::MAXIMUM_ALIGNOF as i32
+                                                                    $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                 )
                                                             )
                                                         ),
@@ -2920,7 +2934,7 @@ macro_rules! GinDataLeafPageGetPostingListSize {
                                                                         $crate::__pgrx_c_macros::CValue::<
                                                                             $crate::__pgrx_c_macros::CInt
                                                                         >::new(
-                                                                            $crate::MAXIMUM_ALIGNOF as i32
+                                                                            $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                         )
                                                                     )
                                                                 ),
@@ -2962,8 +2976,8 @@ macro_rules! GinDataLeafPageGetPostingListSize {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -2996,14 +3010,16 @@ macro_rules! __pgrx_c_args_GinDataLeafPageIsEmpty {
         compile_error!("an ungrouped C parameter requires a parenthesized negative literal")
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_GinDataLeafPageIsEmpty!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_GinDataLeafPageIsEmpty!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         compile_error!("an ungrouped C parameter requires a parenthesized negative literal")
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinDataLeafPageIsEmpty!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -3011,7 +3027,9 @@ macro_rules! __pgrx_c_args_GinDataLeafPageIsEmpty {
         compile_error!("an ungrouped C parameter requires one token tree")
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_GinDataLeafPageIsEmpty!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_GinDataLeafPageIsEmpty!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -3036,15 +3054,17 @@ macro_rules! __pgrx_c_args_GinDataLeafPageIsEmpty {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_GinDataLeafPageIsEmpty!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:tt) => {
-        $crate::__pgrx_c_args_GinDataLeafPageIsEmpty!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_GinDataLeafPageIsEmpty!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinDataLeafPageIsEmpty!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -3071,13 +3091,13 @@ macro_rules! __pgrx_c_args_GinDataLeafPageIsEmpty {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinDataLeafPageIsEmpty!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:tt, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinDataLeafPageIsEmpty!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -3154,10 +3174,10 @@ macro_rules! GinDataLeafPageIsEmpty {
                                                                         _
                                                                     >(
                                                                         $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                            $crate::GinPageOpaque,
+                                                                            $crate::__pgrx_c_bindings::GinPageOpaque,
                                                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                    $crate::GinPageOpaqueData
+                                                                                    $crate::__pgrx_c_bindings::GinPageOpaqueData
                                                                                 >,
                                                                                 $crate::__pgrx_c_macros::expression::ReadWrite
                                                                             >,
@@ -3174,16 +3194,22 @@ macro_rules! GinDataLeafPageIsEmpty {
                                                                                                 true,
                                                                                                 _
                                                                                             >(
-                                                                                                $crate::__pgrx_c_generated::Inline_777d7ad23546580e873e0206a9a6e1cd(
+                                                                                                $crate::__pgrx_c_bindings::PageValidateSpecialPointer(
                                                                                                     <
                                                                                                         $crate::__pgrx_c_macros::expression::CPointer<
-                                                                                                            $crate::__pgrx_c_macros::CChar,
+                                                                                                            $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                                                                $crate::__pgrx_c_macros::CChar,
+                                                                                                                ::core::ffi::c_char
+                                                                                                            >,
                                                                                                             $crate::__pgrx_c_macros::expression::ReadOnly
                                                                                                         > as $crate::__pgrx_c_macros::expression::CType
                                                                                                     >::into_storage(
                                                                                                         $crate::__pgrx_c_macros::expression::implicit::<
                                                                                                             $crate::__pgrx_c_macros::expression::CPointer<
-                                                                                                                $crate::__pgrx_c_macros::CChar,
+                                                                                                                $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                                                                    $crate::__pgrx_c_macros::CChar,
+                                                                                                                    ::core::ffi::c_char
+                                                                                                                >,
                                                                                                                 $crate::__pgrx_c_macros::expression::ReadOnly
                                                                                                             >,
                                                                                                             _
@@ -3244,10 +3270,10 @@ macro_rules! GinDataLeafPageIsEmpty {
                                                                                                                             _
                                                                                                                         >(
                                                                                                                             $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                                                                                $crate::PageHeader,
+                                                                                                                                $crate::__pgrx_c_bindings::PageHeader,
                                                                                                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                                                                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                                                        $crate::PageHeaderData
+                                                                                                                                        $crate::__pgrx_c_bindings::PageHeaderData
                                                                                                                                     >,
                                                                                                                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                                                                                                                 >,
@@ -3292,7 +3318,9 @@ macro_rules! GinDataLeafPageIsEmpty {
                                                 >(
                                                     $crate::__pgrx_c_macros::CValue::<
                                                         $crate::__pgrx_c_macros::CInt
-                                                    >::new($crate::GIN_COMPRESSED as i32)
+                                                    >::new(
+                                                        $crate::__pgrx_c_bindings::GIN_COMPRESSED as i32
+                                                    )
                                                 )
                                             )
                                         )
@@ -3348,10 +3376,10 @@ macro_rules! GinDataLeafPageIsEmpty {
                                                                                     _
                                                                                 >(
                                                                                     $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                                        $crate::PageHeader,
+                                                                                        $crate::__pgrx_c_bindings::PageHeader,
                                                                                         $crate::__pgrx_c_macros::expression::CPointer<
                                                                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                $crate::PageHeaderData
+                                                                                                $crate::__pgrx_c_bindings::PageHeaderData
                                                                                             >,
                                                                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                                                                         >,
@@ -3409,7 +3437,7 @@ macro_rules! GinDataLeafPageIsEmpty {
                                                                                                         >(
                                                                                                             $crate::__pgrx_c_macros::expression::offset_of::<
                                                                                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                                    $crate::PageHeaderData
+                                                                                                                    $crate::__pgrx_c_bindings::PageHeaderData
                                                                                                                 >,
                                                                                                                 $crate::__pgrx_c_field_marker!(
                                                                                                                     @path;
@@ -3440,7 +3468,7 @@ macro_rules! GinDataLeafPageIsEmpty {
                                                                                                         $crate::__pgrx_c_macros::CValue::<
                                                                                                             $crate::__pgrx_c_macros::CInt
                                                                                                         >::new(
-                                                                                                            $crate::MAXIMUM_ALIGNOF as i32
+                                                                                                            $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                                                         )
                                                                                                     )
                                                                                                 ),
@@ -3493,7 +3521,7 @@ macro_rules! GinDataLeafPageIsEmpty {
                                                                                                                 $crate::__pgrx_c_macros::CValue::<
                                                                                                                     $crate::__pgrx_c_macros::CInt
                                                                                                                 >::new(
-                                                                                                                    $crate::MAXIMUM_ALIGNOF as i32
+                                                                                                                    $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                                                                 )
                                                                                                             )
                                                                                                         ),
@@ -3553,7 +3581,7 @@ macro_rules! GinDataLeafPageIsEmpty {
                                                                                             >(
                                                                                                 $crate::__pgrx_c_macros::expression::size_of::<
                                                                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                        $crate::ItemPointerData
+                                                                                                        $crate::__pgrx_c_bindings::ItemPointerData
                                                                                                     >>()
                                                                                             )
                                                                                         )
@@ -3578,7 +3606,7 @@ macro_rules! GinDataLeafPageIsEmpty {
                                                                                                 $crate::__pgrx_c_macros::CValue::<
                                                                                                     $crate::__pgrx_c_macros::CInt
                                                                                                 >::new(
-                                                                                                    $crate::MAXIMUM_ALIGNOF as i32
+                                                                                                    $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                                                 )
                                                                                             )
                                                                                         ),
@@ -3631,7 +3659,7 @@ macro_rules! GinDataLeafPageIsEmpty {
                                                                                                         $crate::__pgrx_c_macros::CValue::<
                                                                                                             $crate::__pgrx_c_macros::CInt
                                                                                                         >::new(
-                                                                                                            $crate::MAXIMUM_ALIGNOF as i32
+                                                                                                            $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                                                         )
                                                                                                     )
                                                                                                 ),
@@ -3695,10 +3723,10 @@ macro_rules! GinDataLeafPageIsEmpty {
                                                                 _
                                                             >(
                                                                 $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                    $crate::GinPageOpaque,
+                                                                    $crate::__pgrx_c_bindings::GinPageOpaque,
                                                                     $crate::__pgrx_c_macros::expression::CPointer<
                                                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                                                            $crate::GinPageOpaqueData
+                                                                            $crate::__pgrx_c_bindings::GinPageOpaqueData
                                                                         >,
                                                                         $crate::__pgrx_c_macros::expression::ReadWrite
                                                                     >,
@@ -3715,16 +3743,22 @@ macro_rules! GinDataLeafPageIsEmpty {
                                                                                         true,
                                                                                         _
                                                                                     >(
-                                                                                        $crate::__pgrx_c_generated::Inline_777d7ad23546580e873e0206a9a6e1cd(
+                                                                                        $crate::__pgrx_c_bindings::PageValidateSpecialPointer(
                                                                                             <
                                                                                                 $crate::__pgrx_c_macros::expression::CPointer<
-                                                                                                    $crate::__pgrx_c_macros::CChar,
+                                                                                                    $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                                                        $crate::__pgrx_c_macros::CChar,
+                                                                                                        ::core::ffi::c_char
+                                                                                                    >,
                                                                                                     $crate::__pgrx_c_macros::expression::ReadOnly
                                                                                                 > as $crate::__pgrx_c_macros::expression::CType
                                                                                             >::into_storage(
                                                                                                 $crate::__pgrx_c_macros::expression::implicit::<
                                                                                                     $crate::__pgrx_c_macros::expression::CPointer<
-                                                                                                        $crate::__pgrx_c_macros::CChar,
+                                                                                                        $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                                                            $crate::__pgrx_c_macros::CChar,
+                                                                                                            ::core::ffi::c_char
+                                                                                                        >,
                                                                                                         $crate::__pgrx_c_macros::expression::ReadOnly
                                                                                                     >,
                                                                                                     _
@@ -3785,10 +3819,10 @@ macro_rules! GinDataLeafPageIsEmpty {
                                                                                                                     _
                                                                                                                 >(
                                                                                                                     $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                                                                        $crate::PageHeader,
+                                                                                                                        $crate::__pgrx_c_bindings::PageHeader,
                                                                                                                         $crate::__pgrx_c_macros::expression::CPointer<
                                                                                                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                                                $crate::PageHeaderData
+                                                                                                                                $crate::__pgrx_c_bindings::PageHeaderData
                                                                                                                             >,
                                                                                                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                                                                                                         >,
@@ -3831,10 +3865,11 @@ macro_rules! GinDataLeafPageIsEmpty {
                                             true,
                                             _
                                         >(
-                                            /* PGRX: FirstOffsetNumber remains expanded because no integer constant binding is available in the defining Rust crate. */
                                             $crate::__pgrx_c_macros::CValue::<
                                                 $crate::__pgrx_c_macros::CUnsignedShort
-                                            >::new(1u16)
+                                            >::new(
+                                                $crate::__pgrx_c_bindings::FirstOffsetNumber as u16
+                                            )
                                         )
                                     )
                                 )
@@ -3903,10 +3938,10 @@ macro_rules! GinDataLeafPageIsEmpty {
                                                                                     _
                                                                                 >(
                                                                                     $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                                        $crate::GinPageOpaque,
+                                                                                        $crate::__pgrx_c_bindings::GinPageOpaque,
                                                                                         $crate::__pgrx_c_macros::expression::CPointer<
                                                                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                $crate::GinPageOpaqueData
+                                                                                                $crate::__pgrx_c_bindings::GinPageOpaqueData
                                                                                             >,
                                                                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                                                                         >,
@@ -3923,16 +3958,22 @@ macro_rules! GinDataLeafPageIsEmpty {
                                                                                                             true,
                                                                                                             _
                                                                                                         >(
-                                                                                                            $crate::__pgrx_c_generated::Inline_777d7ad23546580e873e0206a9a6e1cd(
+                                                                                                            $crate::__pgrx_c_bindings::PageValidateSpecialPointer(
                                                                                                                 <
                                                                                                                     $crate::__pgrx_c_macros::expression::CPointer<
-                                                                                                                        $crate::__pgrx_c_macros::CChar,
+                                                                                                                        $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                                                                            $crate::__pgrx_c_macros::CChar,
+                                                                                                                            ::core::ffi::c_char
+                                                                                                                        >,
                                                                                                                         $crate::__pgrx_c_macros::expression::ReadOnly
                                                                                                                     > as $crate::__pgrx_c_macros::expression::CType
                                                                                                                 >::into_storage(
                                                                                                                     $crate::__pgrx_c_macros::expression::implicit::<
                                                                                                                         $crate::__pgrx_c_macros::expression::CPointer<
-                                                                                                                            $crate::__pgrx_c_macros::CChar,
+                                                                                                                            $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                                                                                $crate::__pgrx_c_macros::CChar,
+                                                                                                                                ::core::ffi::c_char
+                                                                                                                            >,
                                                                                                                             $crate::__pgrx_c_macros::expression::ReadOnly
                                                                                                                         >,
                                                                                                                         _
@@ -3993,10 +4034,10 @@ macro_rules! GinDataLeafPageIsEmpty {
                                                                                                                                         _
                                                                                                                                     >(
                                                                                                                                         $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                                                                                            $crate::PageHeader,
+                                                                                                                                            $crate::__pgrx_c_bindings::PageHeader,
                                                                                                                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                                                                                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                                                                    $crate::PageHeaderData
+                                                                                                                                                    $crate::__pgrx_c_bindings::PageHeaderData
                                                                                                                                                 >,
                                                                                                                                                 $crate::__pgrx_c_macros::expression::ReadWrite
                                                                                                                                             >,
@@ -4042,7 +4083,7 @@ macro_rules! GinDataLeafPageIsEmpty {
                                                                 $crate::__pgrx_c_macros::CValue::<
                                                                     $crate::__pgrx_c_macros::CInt
                                                                 >::new(
-                                                                    $crate::GIN_COMPRESSED as i32
+                                                                    $crate::__pgrx_c_bindings::GIN_COMPRESSED as i32
                                                                 )
                                                             )
                                                         )
@@ -4105,10 +4146,10 @@ macro_rules! GinDataLeafPageIsEmpty {
                                                                                                 _
                                                                                             >(
                                                                                                 $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                                                    $crate::PageHeader,
+                                                                                                    $crate::__pgrx_c_bindings::PageHeader,
                                                                                                     $crate::__pgrx_c_macros::expression::CPointer<
                                                                                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                            $crate::PageHeaderData
+                                                                                                            $crate::__pgrx_c_bindings::PageHeaderData
                                                                                                         >,
                                                                                                         $crate::__pgrx_c_macros::expression::ReadWrite
                                                                                                     >,
@@ -4166,7 +4207,7 @@ macro_rules! GinDataLeafPageIsEmpty {
                                                                                                                     >(
                                                                                                                         $crate::__pgrx_c_macros::expression::offset_of::<
                                                                                                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                                                $crate::PageHeaderData
+                                                                                                                                $crate::__pgrx_c_bindings::PageHeaderData
                                                                                                                             >,
                                                                                                                             $crate::__pgrx_c_field_marker!(
                                                                                                                                 @path;
@@ -4197,7 +4238,7 @@ macro_rules! GinDataLeafPageIsEmpty {
                                                                                                                     $crate::__pgrx_c_macros::CValue::<
                                                                                                                         $crate::__pgrx_c_macros::CInt
                                                                                                                     >::new(
-                                                                                                                        $crate::MAXIMUM_ALIGNOF as i32
+                                                                                                                        $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                                                                     )
                                                                                                                 )
                                                                                                             ),
@@ -4250,7 +4291,7 @@ macro_rules! GinDataLeafPageIsEmpty {
                                                                                                                             $crate::__pgrx_c_macros::CValue::<
                                                                                                                                 $crate::__pgrx_c_macros::CInt
                                                                                                                             >::new(
-                                                                                                                                $crate::MAXIMUM_ALIGNOF as i32
+                                                                                                                                $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                                                                             )
                                                                                                                         )
                                                                                                                     ),
@@ -4310,7 +4351,7 @@ macro_rules! GinDataLeafPageIsEmpty {
                                                                                                         >(
                                                                                                             $crate::__pgrx_c_macros::expression::size_of::<
                                                                                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                                    $crate::ItemPointerData
+                                                                                                                    $crate::__pgrx_c_bindings::ItemPointerData
                                                                                                                 >>()
                                                                                                         )
                                                                                                     )
@@ -4335,7 +4376,7 @@ macro_rules! GinDataLeafPageIsEmpty {
                                                                                                             $crate::__pgrx_c_macros::CValue::<
                                                                                                                 $crate::__pgrx_c_macros::CInt
                                                                                                             >::new(
-                                                                                                                $crate::MAXIMUM_ALIGNOF as i32
+                                                                                                                $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                                                             )
                                                                                                         )
                                                                                                     ),
@@ -4388,7 +4429,7 @@ macro_rules! GinDataLeafPageIsEmpty {
                                                                                                                     $crate::__pgrx_c_macros::CValue::<
                                                                                                                         $crate::__pgrx_c_macros::CInt
                                                                                                                     >::new(
-                                                                                                                        $crate::MAXIMUM_ALIGNOF as i32
+                                                                                                                        $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                                                                     )
                                                                                                                 )
                                                                                                             ),
@@ -4455,10 +4496,10 @@ macro_rules! GinDataLeafPageIsEmpty {
                                                                             _
                                                                         >(
                                                                             $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                                $crate::GinPageOpaque,
+                                                                                $crate::__pgrx_c_bindings::GinPageOpaque,
                                                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                        $crate::GinPageOpaqueData
+                                                                                        $crate::__pgrx_c_bindings::GinPageOpaqueData
                                                                                     >,
                                                                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                                                                 >,
@@ -4475,16 +4516,22 @@ macro_rules! GinDataLeafPageIsEmpty {
                                                                                                     true,
                                                                                                     _
                                                                                                 >(
-                                                                                                    $crate::__pgrx_c_generated::Inline_777d7ad23546580e873e0206a9a6e1cd(
+                                                                                                    $crate::__pgrx_c_bindings::PageValidateSpecialPointer(
                                                                                                         <
                                                                                                             $crate::__pgrx_c_macros::expression::CPointer<
-                                                                                                                $crate::__pgrx_c_macros::CChar,
+                                                                                                                $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                                                                    $crate::__pgrx_c_macros::CChar,
+                                                                                                                    ::core::ffi::c_char
+                                                                                                                >,
                                                                                                                 $crate::__pgrx_c_macros::expression::ReadOnly
                                                                                                             > as $crate::__pgrx_c_macros::expression::CType
                                                                                                         >::into_storage(
                                                                                                             $crate::__pgrx_c_macros::expression::implicit::<
                                                                                                                 $crate::__pgrx_c_macros::expression::CPointer<
-                                                                                                                    $crate::__pgrx_c_macros::CChar,
+                                                                                                                    $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                                                                        $crate::__pgrx_c_macros::CChar,
+                                                                                                                        ::core::ffi::c_char
+                                                                                                                    >,
                                                                                                                     $crate::__pgrx_c_macros::expression::ReadOnly
                                                                                                                 >,
                                                                                                                 _
@@ -4545,10 +4592,10 @@ macro_rules! GinDataLeafPageIsEmpty {
                                                                                                                                 _
                                                                                                                             >(
                                                                                                                                 $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                                                                                    $crate::PageHeader,
+                                                                                                                                    $crate::__pgrx_c_bindings::PageHeader,
                                                                                                                                     $crate::__pgrx_c_macros::expression::CPointer<
                                                                                                                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                                                            $crate::PageHeaderData
+                                                                                                                                            $crate::__pgrx_c_bindings::PageHeaderData
                                                                                                                                         >,
                                                                                                                                         $crate::__pgrx_c_macros::expression::ReadWrite
                                                                                                                                     >,
@@ -4591,10 +4638,11 @@ macro_rules! GinDataLeafPageIsEmpty {
                                                         true,
                                                         _
                                                     >(
-                                                        /* PGRX: FirstOffsetNumber remains expanded because no integer constant binding is available in the defining Rust crate. */
                                                         $crate::__pgrx_c_macros::CValue::<
                                                             $crate::__pgrx_c_macros::CUnsignedShort
-                                                        >::new(1u16)
+                                                        >::new(
+                                                            $crate::__pgrx_c_bindings::FirstOffsetNumber as u16
+                                                        )
                                                     )
                                                 )
                                             )
@@ -4645,10 +4693,10 @@ macro_rules! GinDataLeafPageIsEmpty {
                                                                         _
                                                                     >(
                                                                         $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                            $crate::GinPageOpaque,
+                                                                            $crate::__pgrx_c_bindings::GinPageOpaque,
                                                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                    $crate::GinPageOpaqueData
+                                                                                    $crate::__pgrx_c_bindings::GinPageOpaqueData
                                                                                 >,
                                                                                 $crate::__pgrx_c_macros::expression::ReadWrite
                                                                             >,
@@ -4665,16 +4713,22 @@ macro_rules! GinDataLeafPageIsEmpty {
                                                                                                 true,
                                                                                                 _
                                                                                             >(
-                                                                                                $crate::__pgrx_c_generated::Inline_777d7ad23546580e873e0206a9a6e1cd(
+                                                                                                $crate::__pgrx_c_bindings::PageValidateSpecialPointer(
                                                                                                     <
                                                                                                         $crate::__pgrx_c_macros::expression::CPointer<
-                                                                                                            $crate::__pgrx_c_macros::CChar,
+                                                                                                            $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                                                                $crate::__pgrx_c_macros::CChar,
+                                                                                                                ::core::ffi::c_char
+                                                                                                            >,
                                                                                                             $crate::__pgrx_c_macros::expression::ReadOnly
                                                                                                         > as $crate::__pgrx_c_macros::expression::CType
                                                                                                     >::into_storage(
                                                                                                         $crate::__pgrx_c_macros::expression::implicit::<
                                                                                                             $crate::__pgrx_c_macros::expression::CPointer<
-                                                                                                                $crate::__pgrx_c_macros::CChar,
+                                                                                                                $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                                                                    $crate::__pgrx_c_macros::CChar,
+                                                                                                                    ::core::ffi::c_char
+                                                                                                                >,
                                                                                                                 $crate::__pgrx_c_macros::expression::ReadOnly
                                                                                                             >,
                                                                                                             _
@@ -4735,10 +4789,10 @@ macro_rules! GinDataLeafPageIsEmpty {
                                                                                                                             _
                                                                                                                         >(
                                                                                                                             $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                                                                                $crate::PageHeader,
+                                                                                                                                $crate::__pgrx_c_bindings::PageHeader,
                                                                                                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                                                                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                                                        $crate::PageHeaderData
+                                                                                                                                        $crate::__pgrx_c_bindings::PageHeaderData
                                                                                                                                     >,
                                                                                                                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                                                                                                                 >,
@@ -4783,7 +4837,9 @@ macro_rules! GinDataLeafPageIsEmpty {
                                                 >(
                                                     $crate::__pgrx_c_macros::CValue::<
                                                         $crate::__pgrx_c_macros::CInt
-                                                    >::new($crate::GIN_COMPRESSED as i32)
+                                                    >::new(
+                                                        $crate::__pgrx_c_bindings::GIN_COMPRESSED as i32
+                                                    )
                                                 )
                                             )
                                         )
@@ -4839,10 +4895,10 @@ macro_rules! GinDataLeafPageIsEmpty {
                                                                                     _
                                                                                 >(
                                                                                     $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                                        $crate::PageHeader,
+                                                                                        $crate::__pgrx_c_bindings::PageHeader,
                                                                                         $crate::__pgrx_c_macros::expression::CPointer<
                                                                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                $crate::PageHeaderData
+                                                                                                $crate::__pgrx_c_bindings::PageHeaderData
                                                                                             >,
                                                                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                                                                         >,
@@ -4900,7 +4956,7 @@ macro_rules! GinDataLeafPageIsEmpty {
                                                                                                         >(
                                                                                                             $crate::__pgrx_c_macros::expression::offset_of::<
                                                                                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                                    $crate::PageHeaderData
+                                                                                                                    $crate::__pgrx_c_bindings::PageHeaderData
                                                                                                                 >,
                                                                                                                 $crate::__pgrx_c_field_marker!(
                                                                                                                     @path;
@@ -4931,7 +4987,7 @@ macro_rules! GinDataLeafPageIsEmpty {
                                                                                                         $crate::__pgrx_c_macros::CValue::<
                                                                                                             $crate::__pgrx_c_macros::CInt
                                                                                                         >::new(
-                                                                                                            $crate::MAXIMUM_ALIGNOF as i32
+                                                                                                            $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                                                         )
                                                                                                     )
                                                                                                 ),
@@ -4984,7 +5040,7 @@ macro_rules! GinDataLeafPageIsEmpty {
                                                                                                                 $crate::__pgrx_c_macros::CValue::<
                                                                                                                     $crate::__pgrx_c_macros::CInt
                                                                                                                 >::new(
-                                                                                                                    $crate::MAXIMUM_ALIGNOF as i32
+                                                                                                                    $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                                                                 )
                                                                                                             )
                                                                                                         ),
@@ -5044,7 +5100,7 @@ macro_rules! GinDataLeafPageIsEmpty {
                                                                                             >(
                                                                                                 $crate::__pgrx_c_macros::expression::size_of::<
                                                                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                        $crate::ItemPointerData
+                                                                                                        $crate::__pgrx_c_bindings::ItemPointerData
                                                                                                     >>()
                                                                                             )
                                                                                         )
@@ -5069,7 +5125,7 @@ macro_rules! GinDataLeafPageIsEmpty {
                                                                                                 $crate::__pgrx_c_macros::CValue::<
                                                                                                     $crate::__pgrx_c_macros::CInt
                                                                                                 >::new(
-                                                                                                    $crate::MAXIMUM_ALIGNOF as i32
+                                                                                                    $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                                                 )
                                                                                             )
                                                                                         ),
@@ -5122,7 +5178,7 @@ macro_rules! GinDataLeafPageIsEmpty {
                                                                                                         $crate::__pgrx_c_macros::CValue::<
                                                                                                             $crate::__pgrx_c_macros::CInt
                                                                                                         >::new(
-                                                                                                            $crate::MAXIMUM_ALIGNOF as i32
+                                                                                                            $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                                                         )
                                                                                                     )
                                                                                                 ),
@@ -5186,10 +5242,10 @@ macro_rules! GinDataLeafPageIsEmpty {
                                                                 _
                                                             >(
                                                                 $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                    $crate::GinPageOpaque,
+                                                                    $crate::__pgrx_c_bindings::GinPageOpaque,
                                                                     $crate::__pgrx_c_macros::expression::CPointer<
                                                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                                                            $crate::GinPageOpaqueData
+                                                                            $crate::__pgrx_c_bindings::GinPageOpaqueData
                                                                         >,
                                                                         $crate::__pgrx_c_macros::expression::ReadWrite
                                                                     >,
@@ -5206,16 +5262,22 @@ macro_rules! GinDataLeafPageIsEmpty {
                                                                                         true,
                                                                                         _
                                                                                     >(
-                                                                                        $crate::__pgrx_c_generated::Inline_777d7ad23546580e873e0206a9a6e1cd(
+                                                                                        $crate::__pgrx_c_bindings::PageValidateSpecialPointer(
                                                                                             <
                                                                                                 $crate::__pgrx_c_macros::expression::CPointer<
-                                                                                                    $crate::__pgrx_c_macros::CChar,
+                                                                                                    $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                                                        $crate::__pgrx_c_macros::CChar,
+                                                                                                        ::core::ffi::c_char
+                                                                                                    >,
                                                                                                     $crate::__pgrx_c_macros::expression::ReadOnly
                                                                                                 > as $crate::__pgrx_c_macros::expression::CType
                                                                                             >::into_storage(
                                                                                                 $crate::__pgrx_c_macros::expression::implicit::<
                                                                                                     $crate::__pgrx_c_macros::expression::CPointer<
-                                                                                                        $crate::__pgrx_c_macros::CChar,
+                                                                                                        $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                                                            $crate::__pgrx_c_macros::CChar,
+                                                                                                            ::core::ffi::c_char
+                                                                                                        >,
                                                                                                         $crate::__pgrx_c_macros::expression::ReadOnly
                                                                                                     >,
                                                                                                     _
@@ -5276,10 +5338,10 @@ macro_rules! GinDataLeafPageIsEmpty {
                                                                                                                     _
                                                                                                                 >(
                                                                                                                     $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                                                                        $crate::PageHeader,
+                                                                                                                        $crate::__pgrx_c_bindings::PageHeader,
                                                                                                                         $crate::__pgrx_c_macros::expression::CPointer<
                                                                                                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                                                $crate::PageHeaderData
+                                                                                                                                $crate::__pgrx_c_bindings::PageHeaderData
                                                                                                                             >,
                                                                                                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                                                                                                         >,
@@ -5322,10 +5384,11 @@ macro_rules! GinDataLeafPageIsEmpty {
                                             true,
                                             _
                                         >(
-                                            /* PGRX: FirstOffsetNumber remains expanded because no integer constant binding is available in the defining Rust crate. */
                                             $crate::__pgrx_c_macros::CValue::<
                                                 $crate::__pgrx_c_macros::CUnsignedShort
-                                            >::new(1u16)
+                                            >::new(
+                                                $crate::__pgrx_c_bindings::FirstOffsetNumber as u16
+                                            )
                                         )
                                     )
                                 )
@@ -5345,8 +5408,8 @@ macro_rules! GinDataLeafPageIsEmpty {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -5373,20 +5436,24 @@ macro_rules! __pgrx_c_args_GinDataPageGetData {
         $crate::__pgrx_c_args_GinDataPageGetData!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_GinDataPageGetData!(@p1 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_GinDataPageGetData!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_GinDataPageGetData!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_GinDataPageGetData!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinDataPageGetData!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinDataPageGetData!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -5394,7 +5461,9 @@ macro_rules! __pgrx_c_args_GinDataPageGetData {
         $crate::__pgrx_c_args_GinDataPageGetData!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_GinDataPageGetData!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_GinDataPageGetData!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -5416,14 +5485,18 @@ macro_rules! __pgrx_c_args_GinDataPageGetData {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_GinDataPageGetData!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_GinDataPageGetData!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_GinDataPageGetData!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_GinDataPageGetData!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinDataPageGetData!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -5450,13 +5523,13 @@ macro_rules! __pgrx_c_args_GinDataPageGetData {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinDataPageGetData!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinDataPageGetData!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -5513,7 +5586,7 @@ macro_rules! GinDataPageGetData {
                                 $crate::__pgrx_c_macros::expression::ReadWrite
                             > as $crate::__pgrx_c_macros::expression::CType
                         >::from_storage(
-                            $crate::PageGetContents(
+                            $crate::__pgrx_c_bindings::PageGetContents(
                                 <
                                     $crate::__pgrx_c_macros::expression::CPointer<
                                         $crate::__pgrx_c_macros::expression::CIntegerStorage<
@@ -5569,7 +5642,7 @@ macro_rules! GinDataPageGetData {
                                                             >(
                                                                 $crate::__pgrx_c_macros::expression::size_of::<
                                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                                        $crate::ItemPointerData
+                                                                        $crate::__pgrx_c_bindings::ItemPointerData
                                                                     >>()
                                                             )
                                                         )
@@ -5594,7 +5667,7 @@ macro_rules! GinDataPageGetData {
                                                                 $crate::__pgrx_c_macros::CValue::<
                                                                     $crate::__pgrx_c_macros::CInt
                                                                 >::new(
-                                                                    $crate::MAXIMUM_ALIGNOF as i32
+                                                                    $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                 )
                                                             )
                                                         ),
@@ -5642,7 +5715,7 @@ macro_rules! GinDataPageGetData {
                                                                         $crate::__pgrx_c_macros::CValue::<
                                                                             $crate::__pgrx_c_macros::CInt
                                                                         >::new(
-                                                                            $crate::MAXIMUM_ALIGNOF as i32
+                                                                            $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                         )
                                                                     )
                                                                 ),
@@ -5711,7 +5784,7 @@ macro_rules! GinDataPageGetData {
                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::from_storage(
-                                        $crate::PageGetContents(
+                                        $crate::__pgrx_c_bindings::PageGetContents(
                                             <
                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                     $crate::__pgrx_c_macros::expression::CIntegerStorage<
@@ -5775,7 +5848,7 @@ macro_rules! GinDataPageGetData {
                                                                         >(
                                                                             $crate::__pgrx_c_macros::expression::size_of::<
                                                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                    $crate::ItemPointerData
+                                                                                    $crate::__pgrx_c_bindings::ItemPointerData
                                                                                 >>()
                                                                         )
                                                                     )
@@ -5800,7 +5873,7 @@ macro_rules! GinDataPageGetData {
                                                                             $crate::__pgrx_c_macros::CValue::<
                                                                                 $crate::__pgrx_c_macros::CInt
                                                                             >::new(
-                                                                                $crate::MAXIMUM_ALIGNOF as i32
+                                                                                $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                             )
                                                                         )
                                                                     ),
@@ -5851,7 +5924,7 @@ macro_rules! GinDataPageGetData {
                                                                                     $crate::__pgrx_c_macros::CValue::<
                                                                                         $crate::__pgrx_c_macros::CInt
                                                                                     >::new(
-                                                                                        $crate::MAXIMUM_ALIGNOF as i32
+                                                                                        $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                                     )
                                                                                 )
                                                                             ),
@@ -5901,7 +5974,7 @@ macro_rules! GinDataPageGetData {
                                 $crate::__pgrx_c_macros::expression::ReadWrite
                             > as $crate::__pgrx_c_macros::expression::CType
                         >::from_storage(
-                            $crate::PageGetContents(
+                            $crate::__pgrx_c_bindings::PageGetContents(
                                 <
                                     $crate::__pgrx_c_macros::expression::CPointer<
                                         $crate::__pgrx_c_macros::expression::CIntegerStorage<
@@ -5957,7 +6030,7 @@ macro_rules! GinDataPageGetData {
                                                             >(
                                                                 $crate::__pgrx_c_macros::expression::size_of::<
                                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                                        $crate::ItemPointerData
+                                                                        $crate::__pgrx_c_bindings::ItemPointerData
                                                                     >>()
                                                             )
                                                         )
@@ -5982,7 +6055,7 @@ macro_rules! GinDataPageGetData {
                                                                 $crate::__pgrx_c_macros::CValue::<
                                                                     $crate::__pgrx_c_macros::CInt
                                                                 >::new(
-                                                                    $crate::MAXIMUM_ALIGNOF as i32
+                                                                    $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                 )
                                                             )
                                                         ),
@@ -6030,7 +6103,7 @@ macro_rules! GinDataPageGetData {
                                                                         $crate::__pgrx_c_macros::CValue::<
                                                                             $crate::__pgrx_c_macros::CInt
                                                                         >::new(
-                                                                            $crate::MAXIMUM_ALIGNOF as i32
+                                                                            $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                         )
                                                                     )
                                                                 ),
@@ -6066,8 +6139,8 @@ macro_rules! GinDataPageGetData {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -6098,13 +6171,13 @@ macro_rules! __pgrx_c_args_GinDataPageGetPostingItem {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinDataPageGetPostingItem!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinDataPageGetPostingItem!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -6113,7 +6186,7 @@ macro_rules! __pgrx_c_args_GinDataPageGetPostingItem {
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinDataPageGetPostingItem!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -6140,35 +6213,35 @@ macro_rules! __pgrx_c_args_GinDataPageGetPostingItem {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinDataPageGetPostingItem!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinDataPageGetPostingItem!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $argument:literal) => {
         $crate::__pgrx_c_args_GinDataPageGetPostingItem!(
-            @p2 $mode [$($done)* (@literal [- $argument]),];
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
         )
     };
     (@negative1 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_GinDataPageGetPostingItem!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinDataPageGetPostingItem!(
-            @p2 $mode [$($done)* (@literal [- $argument]),];
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinDataPageGetPostingItem!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -6177,7 +6250,7 @@ macro_rules! __pgrx_c_args_GinDataPageGetPostingItem {
     };
     (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
         $crate::__pgrx_c_args_GinDataPageGetPostingItem!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
@@ -6203,17 +6276,17 @@ macro_rules! __pgrx_c_args_GinDataPageGetPostingItem {
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_GinDataPageGetPostingItem!(
-            @p2 $mode [$($done)* (@literal [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_GinDataPageGetPostingItem!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinDataPageGetPostingItem!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -6240,13 +6313,13 @@ macro_rules! __pgrx_c_args_GinDataPageGetPostingItem {
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinDataPageGetPostingItem!(
-            @p2 $mode [$($done)* (@literal [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinDataPageGetPostingItem!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -6297,9 +6370,11 @@ macro_rules! GinDataPageGetPostingItem {
         (
             $crate::__pgrx_c_macros::expression::profile_value::<false, _>(
                 $crate::__pgrx_c_macros::expression::cast_as::<
-                    *mut $crate::PostingItem,
+                    *mut $crate::__pgrx_c_bindings::PostingItem,
                     $crate::__pgrx_c_macros::expression::CPointer<
-                        $crate::__pgrx_c_macros::expression::CRecord<$crate::PostingItem>,
+                        $crate::__pgrx_c_macros::expression::CRecord<
+                            $crate::__pgrx_c_bindings::PostingItem
+                        >,
                         $crate::__pgrx_c_macros::expression::ReadWrite
                     >,
                     _
@@ -6331,7 +6406,7 @@ macro_rules! GinDataPageGetPostingItem {
                                                         $crate::__pgrx_c_macros::expression::ReadWrite
                                                     > as $crate::__pgrx_c_macros::expression::CType
                                                 >::from_storage(
-                                                    $crate::PageGetContents(
+                                                    $crate::__pgrx_c_bindings::PageGetContents(
                                                         <
                                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
@@ -6398,7 +6473,7 @@ macro_rules! GinDataPageGetPostingItem {
                                                                                     >(
                                                                                         $crate::__pgrx_c_macros::expression::size_of::<
                                                                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                $crate::ItemPointerData
+                                                                                                $crate::__pgrx_c_bindings::ItemPointerData
                                                                                             >>()
                                                                                     )
                                                                                 )
@@ -6423,7 +6498,7 @@ macro_rules! GinDataPageGetPostingItem {
                                                                                         $crate::__pgrx_c_macros::CValue::<
                                                                                             $crate::__pgrx_c_macros::CInt
                                                                                         >::new(
-                                                                                            $crate::MAXIMUM_ALIGNOF as i32
+                                                                                            $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                                         )
                                                                                     )
                                                                                 ),
@@ -6474,7 +6549,7 @@ macro_rules! GinDataPageGetPostingItem {
                                                                                                 $crate::__pgrx_c_macros::CValue::<
                                                                                                     $crate::__pgrx_c_macros::CInt
                                                                                                 >::new(
-                                                                                                    $crate::MAXIMUM_ALIGNOF as i32
+                                                                                                    $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                                                 )
                                                                                             )
                                                                                         ),
@@ -6546,7 +6621,7 @@ macro_rules! GinDataPageGetPostingItem {
                                         >(
                                             $crate::__pgrx_c_macros::expression::size_of::<
                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                    $crate::PostingItem
+                                                    $crate::__pgrx_c_bindings::PostingItem
                                                 >>()
                                         )
                                     )
@@ -6590,10 +6665,10 @@ macro_rules! GinDataPageGetPostingItem {
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<false, _>(
                             $crate::__pgrx_c_macros::expression::cast_as::<
-                                *mut $crate::PostingItem,
+                                *mut $crate::__pgrx_c_bindings::PostingItem,
                                 $crate::__pgrx_c_macros::expression::CPointer<
                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                        $crate::PostingItem
+                                        $crate::__pgrx_c_bindings::PostingItem
                                     >,
                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                 >,
@@ -6629,7 +6704,7 @@ macro_rules! GinDataPageGetPostingItem {
                                                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                                                 > as $crate::__pgrx_c_macros::expression::CType
                                                             >::from_storage(
-                                                                $crate::PageGetContents(
+                                                                $crate::__pgrx_c_bindings::PageGetContents(
                                                                     <
                                                                         $crate::__pgrx_c_macros::expression::CPointer<
                                                                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
@@ -6696,7 +6771,7 @@ macro_rules! GinDataPageGetPostingItem {
                                                                                                 >(
                                                                                                     $crate::__pgrx_c_macros::expression::size_of::<
                                                                                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                            $crate::ItemPointerData
+                                                                                                            $crate::__pgrx_c_bindings::ItemPointerData
                                                                                                         >>()
                                                                                                 )
                                                                                             )
@@ -6721,7 +6796,7 @@ macro_rules! GinDataPageGetPostingItem {
                                                                                                     $crate::__pgrx_c_macros::CValue::<
                                                                                                         $crate::__pgrx_c_macros::CInt
                                                                                                     >::new(
-                                                                                                        $crate::MAXIMUM_ALIGNOF as i32
+                                                                                                        $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                                                     )
                                                                                                 )
                                                                                             ),
@@ -6774,7 +6849,7 @@ macro_rules! GinDataPageGetPostingItem {
                                                                                                             $crate::__pgrx_c_macros::CValue::<
                                                                                                                 $crate::__pgrx_c_macros::CInt
                                                                                                             >::new(
-                                                                                                                $crate::MAXIMUM_ALIGNOF as i32
+                                                                                                                $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                                                             )
                                                                                                         )
                                                                                                     ),
@@ -6849,7 +6924,7 @@ macro_rules! GinDataPageGetPostingItem {
                                                     >(
                                                         $crate::__pgrx_c_macros::expression::size_of::<
                                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                                $crate::PostingItem
+                                                                $crate::__pgrx_c_bindings::PostingItem
                                                             >>()
                                                     )
                                                 )
@@ -6874,9 +6949,11 @@ macro_rules! GinDataPageGetPostingItem {
         {
             let _ = $crate::__pgrx_c_macros::expression::profile_value::<false, _>(
                 $crate::__pgrx_c_macros::expression::cast_as::<
-                    *mut $crate::PostingItem,
+                    *mut $crate::__pgrx_c_bindings::PostingItem,
                     $crate::__pgrx_c_macros::expression::CPointer<
-                        $crate::__pgrx_c_macros::expression::CRecord<$crate::PostingItem>,
+                        $crate::__pgrx_c_macros::expression::CRecord<
+                            $crate::__pgrx_c_bindings::PostingItem
+                        >,
                         $crate::__pgrx_c_macros::expression::ReadWrite
                     >,
                     _
@@ -6908,7 +6985,7 @@ macro_rules! GinDataPageGetPostingItem {
                                                         $crate::__pgrx_c_macros::expression::ReadWrite
                                                     > as $crate::__pgrx_c_macros::expression::CType
                                                 >::from_storage(
-                                                    $crate::PageGetContents(
+                                                    $crate::__pgrx_c_bindings::PageGetContents(
                                                         <
                                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
@@ -6975,7 +7052,7 @@ macro_rules! GinDataPageGetPostingItem {
                                                                                     >(
                                                                                         $crate::__pgrx_c_macros::expression::size_of::<
                                                                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                $crate::ItemPointerData
+                                                                                                $crate::__pgrx_c_bindings::ItemPointerData
                                                                                             >>()
                                                                                     )
                                                                                 )
@@ -7000,7 +7077,7 @@ macro_rules! GinDataPageGetPostingItem {
                                                                                         $crate::__pgrx_c_macros::CValue::<
                                                                                             $crate::__pgrx_c_macros::CInt
                                                                                         >::new(
-                                                                                            $crate::MAXIMUM_ALIGNOF as i32
+                                                                                            $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                                         )
                                                                                     )
                                                                                 ),
@@ -7051,7 +7128,7 @@ macro_rules! GinDataPageGetPostingItem {
                                                                                                 $crate::__pgrx_c_macros::CValue::<
                                                                                                     $crate::__pgrx_c_macros::CInt
                                                                                                 >::new(
-                                                                                                    $crate::MAXIMUM_ALIGNOF as i32
+                                                                                                    $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                                                 )
                                                                                             )
                                                                                         ),
@@ -7123,7 +7200,7 @@ macro_rules! GinDataPageGetPostingItem {
                                         >(
                                             $crate::__pgrx_c_macros::expression::size_of::<
                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                    $crate::PostingItem
+                                                    $crate::__pgrx_c_bindings::PostingItem
                                                 >>()
                                         )
                                     )
@@ -7144,8 +7221,8 @@ macro_rules! GinDataPageGetPostingItem {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -7176,23 +7253,23 @@ macro_rules! __pgrx_c_args_GinDataPageGetRightBound {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
         $crate::__pgrx_c_args_GinDataPageGetRightBound!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_GinDataPageGetRightBound!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinDataPageGetRightBound!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinDataPageGetRightBound!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -7201,7 +7278,7 @@ macro_rules! __pgrx_c_args_GinDataPageGetRightBound {
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
         $crate::__pgrx_c_args_GinDataPageGetRightBound!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
@@ -7227,17 +7304,17 @@ macro_rules! __pgrx_c_args_GinDataPageGetRightBound {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_GinDataPageGetRightBound!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_GinDataPageGetRightBound!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinDataPageGetRightBound!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -7264,13 +7341,13 @@ macro_rules! __pgrx_c_args_GinDataPageGetRightBound {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinDataPageGetRightBound!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinDataPageGetRightBound!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -7319,9 +7396,11 @@ macro_rules! GinDataPageGetRightBound {
         (
             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::cast_as::<
-                    $crate::ItemPointer,
+                    $crate::__pgrx_c_bindings::ItemPointer,
                     $crate::__pgrx_c_macros::expression::CPointer<
-                        $crate::__pgrx_c_macros::expression::CRecord<$crate::ItemPointerData>,
+                        $crate::__pgrx_c_macros::expression::CRecord<
+                            $crate::__pgrx_c_bindings::ItemPointerData
+                        >,
                         $crate::__pgrx_c_macros::expression::ReadWrite
                     >,
                     _
@@ -7336,7 +7415,7 @@ macro_rules! GinDataPageGetRightBound {
                                 $crate::__pgrx_c_macros::expression::ReadWrite
                             > as $crate::__pgrx_c_macros::expression::CType
                         >::from_storage(
-                            $crate::PageGetContents(
+                            $crate::__pgrx_c_bindings::PageGetContents(
                                 <
                                     $crate::__pgrx_c_macros::expression::CPointer<
                                         $crate::__pgrx_c_macros::expression::CIntegerStorage<
@@ -7399,10 +7478,10 @@ macro_rules! GinDataPageGetRightBound {
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::cast_as::<
-                                $crate::ItemPointer,
+                                $crate::__pgrx_c_bindings::ItemPointer,
                                 $crate::__pgrx_c_macros::expression::CPointer<
                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                        $crate::ItemPointerData
+                                        $crate::__pgrx_c_bindings::ItemPointerData
                                     >,
                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                 >,
@@ -7418,7 +7497,7 @@ macro_rules! GinDataPageGetRightBound {
                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::from_storage(
-                                        $crate::PageGetContents(
+                                        $crate::__pgrx_c_bindings::PageGetContents(
                                             <
                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                     $crate::__pgrx_c_macros::expression::CIntegerStorage<
@@ -7468,9 +7547,11 @@ macro_rules! GinDataPageGetRightBound {
         {
             let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::cast_as::<
-                    $crate::ItemPointer,
+                    $crate::__pgrx_c_bindings::ItemPointer,
                     $crate::__pgrx_c_macros::expression::CPointer<
-                        $crate::__pgrx_c_macros::expression::CRecord<$crate::ItemPointerData>,
+                        $crate::__pgrx_c_macros::expression::CRecord<
+                            $crate::__pgrx_c_bindings::ItemPointerData
+                        >,
                         $crate::__pgrx_c_macros::expression::ReadWrite
                     >,
                     _
@@ -7485,7 +7566,7 @@ macro_rules! GinDataPageGetRightBound {
                                 $crate::__pgrx_c_macros::expression::ReadWrite
                             > as $crate::__pgrx_c_macros::expression::CType
                         >::from_storage(
-                            $crate::PageGetContents(
+                            $crate::__pgrx_c_bindings::PageGetContents(
                                 <
                                     $crate::__pgrx_c_macros::expression::CPointer<
                                         $crate::__pgrx_c_macros::expression::CIntegerStorage<
@@ -7527,8 +7608,585 @@ macro_rules! GinDataPageGetRightBound {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
+    target_pointer_width = "64",
+    target_endian = "little"
+)))]
+#[cfg(not(docsrs))]
+compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
+#[doc(hidden)]
+#[macro_export]
+macro_rules! __pgrx_c_args_GinDataPageSetDataSize {
+    (@collect $mode:ident [$($done:tt)*]; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_GinDataPageSetDataSize!(@p0 $mode [$($done)*]; $($raw)*)
+    };
+    (@classified [$next:ident $mode:ident [$($done:tt)*] [$($rest:tt)*]] $descriptor:tt) => {
+        $crate::__pgrx_c_args_GinDataPageSetDataSize!(
+            @$next $mode [$($done)* $descriptor,];
+            $($rest)*
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
+        compile_error!("an ungrouped C parameter requires a parenthesized negative literal")
+    };
+    (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_GinDataPageSetDataSize!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; - $($raw:tt)*) => {
+        compile_error!("an ungrouped C parameter requires one token tree")
+    };
+    (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
+        $crate::__pgrx_c_args_GinDataPageSetDataSize!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_GinDataPageSetDataSize] [p1 $mode [$($done)*] [$($rest)*]] [
+                $head $(::$tail)* ! $group
+            ]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; ::$head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_GinDataPageSetDataSize] [p1 $mode [$($done)*] [$($rest)*]] [
+                ::$head $(::$tail)* ! $group
+            ]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; ($($inner:tt)*), $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_GinDataPageSetDataSize] [p1 $mode [$($done)*] [$($rest)*]] [
+                ($($inner)*)
+            ]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_GinDataPageSetDataSize!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $argument:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_GinDataPageSetDataSize!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; - $argument:literal) => {
+        $crate::__pgrx_c_args_GinDataPageSetDataSize!(
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
+    };
+    (@negative1 $mode:ident [$($done:tt)*]; $argument:expr) => {
+        $crate::__pgrx_c_args_GinDataPageSetDataSize!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_GinDataPageSetDataSize!(
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+            $($rest)*
+        )
+    };
+    (@negative1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_GinDataPageSetDataSize!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; - $($raw:tt)*) => {
+        $crate::__pgrx_c_args_GinDataPageSetDataSize!(@negative1 $mode [$($done)*]; - $($raw)*)
+    };
+    (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
+        $crate::__pgrx_c_args_GinDataPageSetDataSize!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_GinDataPageSetDataSize] [p2 $mode [$($done)*] []] [
+                $head $(::$tail)* ! $group
+            ]
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; ::$head:ident $(::$tail:ident)* ! $group:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_GinDataPageSetDataSize] [p2 $mode [$($done)*] []] [
+                ::$head $(::$tail)* ! $group
+            ]
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; ($($inner:tt)*)) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_GinDataPageSetDataSize] [p2 $mode [$($done)*] []] [
+                ($($inner)*)
+            ]
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
+        $crate::__pgrx_c_args_GinDataPageSetDataSize!(
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; $argument:expr) => {
+        $crate::__pgrx_c_args_GinDataPageSetDataSize!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
+        $crate::__pgrx_c_args_GinDataPageSetDataSize!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_GinDataPageSetDataSize] [p2 $mode [$($done)*] [$($rest)*]] [
+                $head $(::$tail)* ! $group
+            ]
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; ::$head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_GinDataPageSetDataSize] [p2 $mode [$($done)*] [$($rest)*]] [
+                ::$head $(::$tail)* ! $group
+            ]
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; ($($inner:tt)*), $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_GinDataPageSetDataSize] [p2 $mode [$($done)*] [$($rest)*]] [
+                ($($inner)*)
+            ]
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_GinDataPageSetDataSize!(
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_GinDataPageSetDataSize!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p2 $mode:ident [$($done:tt)*];) => {
+        $crate::GinDataPageSetDataSize!(@$mode; $($done)*)
+    };
+    ($($invalid:tt)*) => {
+        compile_error!("arguments do not satisfy this C macro's invocation contract")
+    };
+}
+/// C macro GinDataPageSetDataSize from ginblock.h:310
+///
+/// ```text
+/// #define GinDataPageSetDataSize( page , size ) { Assert ( size <= GinDataPageMaxDataSize ) ; ( ( PageHeader ) page ) -> pd_lower = ( size ) + MAXALIGN ( SizeOfPageHeaderData ) + MAXALIGN ( sizeof ( ItemPointerData ) ) ; }
+/// ```
+///
+///
+/// This macro executes C statements in order and yields no value. Local blocks retain their C scope. Pointer access and native calls keep their usual caller safety obligations.
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Checked signed arithmetic rejects overflow when the recorded C profile does not define wrapping; pointer arithmetic checks representable offsets and distances but still requires valid allocation bounds. Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+#[macro_export]
+macro_rules! GinDataPageSetDataSize {
+    (@__pgrx_emit_check_safety; $page:tt, $size:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $page);
+                $crate::__pgrx_c_operand!(@check_safety; $size);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_GinDataPageSetDataSize!(
+            @collect __pgrx_emit_check_safety [];
+            $($raw)*
+        )
+    };
+    (@__pgrx_emit_public; $page:tt, $size:tt $(,)?) => {
+        {
+            /* PGRX: GinDataPageMaxDataSize remains expanded because object macro is not a supported pure integer expression: constant probes cannot evaluate calls, variables, memory or mutation. */ /* PGRX: SizeOfPageHeaderData remains expanded because object macro is not a supported pure integer expression: constant probes cannot evaluate calls, variables, memory or mutation. */ /* PGRX: Assert remains expanded because preserving the complete statement body and its order has not been proved equivalent to C substitution. */ /* PGRX: MAXALIGN remains expanded because preserving the complete statement body and its order has not been proved equivalent to C substitution. */ /* PGRX: TYPEALIGN remains expanded because preserving the complete statement body and its order has not been proved equivalent to C substitution. */ /* PGRX: offsetof remains expanded because preserving the complete statement body and its order has not been proved equivalent to C substitution. */
+            {
+                let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    {
+                        {
+                            let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                /* PGRX: true remains expanded because no integer constant binding is available in the defining Rust crate. */
+                                $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
+                                    1i32
+                                )
+                            );
+                        }
+                    }
+                );
+            };
+            {
+                let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::assign(
+                        $crate::__pgrx_c_macros::expression::project::<
+                            $crate::__pgrx_c_generated::Field_pd_lower,
+                            _,
+                            _
+                        >(
+                            $crate::__pgrx_c_macros::expression::pointee(
+                                (
+                                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                        $crate::__pgrx_c_macros::expression::cast_as::<
+                                            $crate::__pgrx_c_bindings::PageHeader,
+                                            $crate::__pgrx_c_macros::expression::CPointer<
+                                                $crate::__pgrx_c_macros::expression::CRecord<
+                                                    $crate::__pgrx_c_bindings::PageHeaderData
+                                                >,
+                                                $crate::__pgrx_c_macros::expression::ReadWrite
+                                            >,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_macros::expression::profile_value::<
+                                                true,
+                                                _
+                                            >($crate::__pgrx_c_operand!(@value [true]; $page))
+                                        )
+                                    )
+                                )
+                            )
+                        ),
+                        $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                            $crate::__pgrx_c_macros::expression::add::<
+                                $crate::__pgrx_c_macros::Wrapping,
+                                _,
+                                _
+                            >(
+                                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                    $crate::__pgrx_c_macros::expression::add::<
+                                        $crate::__pgrx_c_macros::Wrapping,
+                                        _,
+                                        _
+                                    >(
+                                        (
+                                            $crate::__pgrx_c_macros::expression::profile_value::<
+                                                true,
+                                                _
+                                            >($crate::__pgrx_c_operand!(@value [true]; $size))
+                                        ),
+                                        (
+                                            $crate::__pgrx_c_macros::expression::profile_value::<
+                                                true,
+                                                _
+                                            >(
+                                                $crate::__pgrx_c_macros::expression::bitand(
+                                                    (
+                                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                                            true,
+                                                            _
+                                                        >(
+                                                            $crate::__pgrx_c_macros::expression::add::<
+                                                                $crate::__pgrx_c_macros::Wrapping,
+                                                                _,
+                                                                _
+                                                            >(
+                                                                $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                    true,
+                                                                    _
+                                                                >(
+                                                                    /* PGRX: uintptr_t remains expanded because the C type has no corresponding named Rust binding. */
+                                                                    $crate::__pgrx_c_macros::expression::cast::<
+                                                                        $crate::__pgrx_c_macros::CUnsignedLong,
+                                                                        _
+                                                                    >(
+                                                                        (
+                                                                            (
+                                                                                (
+                                                                                    $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                        true,
+                                                                                        _
+                                                                                    >(
+                                                                                        $crate::__pgrx_c_macros::expression::offset_of::<
+                                                                                            $crate::__pgrx_c_macros::expression::CRecord<
+                                                                                                $crate::__pgrx_c_bindings::PageHeaderData
+                                                                                            >,
+                                                                                            $crate::__pgrx_c_field_marker!(
+                                                                                                @path;
+                                                                                                pd_linp
+                                                                                            )
+                                                                                        >()
+                                                                                    )
+                                                                                )
+                                                                            )
+                                                                        )
+                                                                    )
+                                                                ),
+                                                                (
+                                                                    $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                        true,
+                                                                        _
+                                                                    >(
+                                                                        $crate::__pgrx_c_macros::expression::sub::<
+                                                                            $crate::__pgrx_c_macros::Wrapping,
+                                                                            _,
+                                                                            _
+                                                                        >(
+                                                                            (
+                                                                                $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                    true,
+                                                                                    _
+                                                                                >(
+                                                                                    $crate::__pgrx_c_macros::CValue::<
+                                                                                        $crate::__pgrx_c_macros::CInt
+                                                                                    >::new(
+                                                                                        $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
+                                                                                    )
+                                                                                )
+                                                                            ),
+                                                                            $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                true,
+                                                                                _
+                                                                            >(
+                                                                                $crate::__pgrx_c_macros::CValue::<
+                                                                                    $crate::__pgrx_c_macros::CInt
+                                                                                >::new(1i32)
+                                                                            )
+                                                                        )
+                                                                    )
+                                                                )
+                                                            )
+                                                        )
+                                                    ),
+                                                    $crate::__pgrx_c_macros::expression::profile_value::<
+                                                        true,
+                                                        _
+                                                    >(
+                                                        $crate::__pgrx_c_macros::expression::bitnot(
+                                                            (
+                                                                $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                    true,
+                                                                    _
+                                                                >(
+                                                                    /* PGRX: uintptr_t remains expanded because the C type has no corresponding named Rust binding. */
+                                                                    $crate::__pgrx_c_macros::expression::cast::<
+                                                                        $crate::__pgrx_c_macros::CUnsignedLong,
+                                                                        _
+                                                                    >(
+                                                                        (
+                                                                            $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                true,
+                                                                                _
+                                                                            >(
+                                                                                $crate::__pgrx_c_macros::expression::sub::<
+                                                                                    $crate::__pgrx_c_macros::Wrapping,
+                                                                                    _,
+                                                                                    _
+                                                                                >(
+                                                                                    (
+                                                                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                            true,
+                                                                                            _
+                                                                                        >(
+                                                                                            $crate::__pgrx_c_macros::CValue::<
+                                                                                                $crate::__pgrx_c_macros::CInt
+                                                                                            >::new(
+                                                                                                $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
+                                                                                            )
+                                                                                        )
+                                                                                    ),
+                                                                                    $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                        true,
+                                                                                        _
+                                                                                    >(
+                                                                                        $crate::__pgrx_c_macros::CValue::<
+                                                                                            $crate::__pgrx_c_macros::CInt
+                                                                                        >::new(1i32)
+                                                                                    )
+                                                                                )
+                                                                            )
+                                                                        )
+                                                                    )
+                                                                )
+                                                            )
+                                                        )
+                                                    )
+                                                )
+                                            )
+                                        )
+                                    )
+                                ),
+                                (
+                                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                        $crate::__pgrx_c_macros::expression::bitand(
+                                            (
+                                                $crate::__pgrx_c_macros::expression::profile_value::<
+                                                    true,
+                                                    _
+                                                >(
+                                                    $crate::__pgrx_c_macros::expression::add::<
+                                                        $crate::__pgrx_c_macros::Wrapping,
+                                                        _,
+                                                        _
+                                                    >(
+                                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                                            true,
+                                                            _
+                                                        >(
+                                                            /* PGRX: uintptr_t remains expanded because the C type has no corresponding named Rust binding. */
+                                                            $crate::__pgrx_c_macros::expression::cast::<
+                                                                $crate::__pgrx_c_macros::CUnsignedLong,
+                                                                _
+                                                            >(
+                                                                (
+                                                                    (
+                                                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                            true,
+                                                                            _
+                                                                        >(
+                                                                            $crate::__pgrx_c_macros::expression::size_of::<
+                                                                                $crate::__pgrx_c_macros::expression::CRecord<
+                                                                                    $crate::__pgrx_c_bindings::ItemPointerData
+                                                                                >>()
+                                                                        )
+                                                                    )
+                                                                )
+                                                            )
+                                                        ),
+                                                        (
+                                                            $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                true,
+                                                                _
+                                                            >(
+                                                                $crate::__pgrx_c_macros::expression::sub::<
+                                                                    $crate::__pgrx_c_macros::Wrapping,
+                                                                    _,
+                                                                    _
+                                                                >(
+                                                                    (
+                                                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                            true,
+                                                                            _
+                                                                        >(
+                                                                            $crate::__pgrx_c_macros::CValue::<
+                                                                                $crate::__pgrx_c_macros::CInt
+                                                                            >::new(
+                                                                                $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
+                                                                            )
+                                                                        )
+                                                                    ),
+                                                                    $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                        true,
+                                                                        _
+                                                                    >(
+                                                                        $crate::__pgrx_c_macros::CValue::<
+                                                                            $crate::__pgrx_c_macros::CInt
+                                                                        >::new(1i32)
+                                                                    )
+                                                                )
+                                                            )
+                                                        )
+                                                    )
+                                                )
+                                            ),
+                                            $crate::__pgrx_c_macros::expression::profile_value::<
+                                                true,
+                                                _
+                                            >(
+                                                $crate::__pgrx_c_macros::expression::bitnot(
+                                                    (
+                                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                                            true,
+                                                            _
+                                                        >(
+                                                            /* PGRX: uintptr_t remains expanded because the C type has no corresponding named Rust binding. */
+                                                            $crate::__pgrx_c_macros::expression::cast::<
+                                                                $crate::__pgrx_c_macros::CUnsignedLong,
+                                                                _
+                                                            >(
+                                                                (
+                                                                    $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                        true,
+                                                                        _
+                                                                    >(
+                                                                        $crate::__pgrx_c_macros::expression::sub::<
+                                                                            $crate::__pgrx_c_macros::Wrapping,
+                                                                            _,
+                                                                            _
+                                                                        >(
+                                                                            (
+                                                                                $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                    true,
+                                                                                    _
+                                                                                >(
+                                                                                    $crate::__pgrx_c_macros::CValue::<
+                                                                                        $crate::__pgrx_c_macros::CInt
+                                                                                    >::new(
+                                                                                        $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
+                                                                                    )
+                                                                                )
+                                                                            ),
+                                                                            $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                                true,
+                                                                                _
+                                                                            >(
+                                                                                $crate::__pgrx_c_macros::CValue::<
+                                                                                    $crate::__pgrx_c_macros::CInt
+                                                                                >::new(1i32)
+                                                                            )
+                                                                        )
+                                                                    )
+                                                                )
+                                                            )
+                                                        )
+                                                    )
+                                                )
+                                            )
+                                        )
+                                    )
+                                )
+                            )
+                        )
+                    )
+                );
+            };
+        }
+    };
+    (@__pgrx_emit_discard; $page:tt, $size:tt $(,)?) => {
+        $crate::GinDataPageSetDataSize!(@__pgrx_emit_public; $page, $size)
+    };
+    (@__pgrx_c_discard; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_GinDataPageSetDataSize!(@collect __pgrx_emit_discard []; $($raw)*)
+    };
+    (@$mode:ident; $($raw:tt)*) => {
+        compile_error!("a C statement body is not an expression operand")
+    };
+    ($($raw:tt)*) => {
+        $crate::__pgrx_c_args_GinDataPageSetDataSize!(@collect __pgrx_emit_public []; $($raw)*)
+    };
+}
+
+#[cfg(not(all(
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -7555,20 +8213,24 @@ macro_rules! __pgrx_c_args_GinGetDownlink {
         $crate::__pgrx_c_args_GinGetDownlink!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_GinGetDownlink!(@p1 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_GinGetDownlink!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_GinGetDownlink!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_GinGetDownlink!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinGetDownlink!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinGetDownlink!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -7576,7 +8238,9 @@ macro_rules! __pgrx_c_args_GinGetDownlink {
         $crate::__pgrx_c_args_GinGetDownlink!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_GinGetDownlink!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_GinGetDownlink!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -7598,14 +8262,18 @@ macro_rules! __pgrx_c_args_GinGetDownlink {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_GinGetDownlink!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_GinGetDownlink!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_GinGetDownlink!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_GinGetDownlink!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinGetDownlink!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -7632,13 +8300,13 @@ macro_rules! __pgrx_c_args_GinGetDownlink {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinGetDownlink!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinGetDownlink!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -7687,11 +8355,11 @@ macro_rules! GinGetDownlink {
                 <
                     $crate::__pgrx_c_macros::CUnsignedInt as $crate::__pgrx_c_macros::expression::CType
                 >::from_storage(
-                    $crate::ItemPointerGetBlockNumberNoCheck(
+                    $crate::__pgrx_c_bindings::ItemPointerGetBlockNumberNoCheck(
                         <
                             $crate::__pgrx_c_macros::expression::CPointer<
                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                    $crate::ItemPointerData
+                                    $crate::__pgrx_c_bindings::ItemPointerData
                                 >,
                                 $crate::__pgrx_c_macros::expression::ReadOnly
                             > as $crate::__pgrx_c_macros::expression::CType
@@ -7699,7 +8367,7 @@ macro_rules! GinGetDownlink {
                             $crate::__pgrx_c_macros::expression::implicit::<
                                 $crate::__pgrx_c_macros::expression::CPointer<
                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                        $crate::ItemPointerData
+                                        $crate::__pgrx_c_bindings::ItemPointerData
                                     >,
                                     $crate::__pgrx_c_macros::expression::ReadOnly
                                 >,
@@ -7765,11 +8433,11 @@ macro_rules! GinGetDownlink {
                             <
                                 $crate::__pgrx_c_macros::CUnsignedInt as $crate::__pgrx_c_macros::expression::CType
                             >::from_storage(
-                                $crate::ItemPointerGetBlockNumberNoCheck(
+                                $crate::__pgrx_c_bindings::ItemPointerGetBlockNumberNoCheck(
                                     <
                                         $crate::__pgrx_c_macros::expression::CPointer<
                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                $crate::ItemPointerData
+                                                $crate::__pgrx_c_bindings::ItemPointerData
                                             >,
                                             $crate::__pgrx_c_macros::expression::ReadOnly
                                         > as $crate::__pgrx_c_macros::expression::CType
@@ -7777,7 +8445,7 @@ macro_rules! GinGetDownlink {
                                         $crate::__pgrx_c_macros::expression::implicit::<
                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                    $crate::ItemPointerData
+                                                    $crate::__pgrx_c_bindings::ItemPointerData
                                                 >,
                                                 $crate::__pgrx_c_macros::expression::ReadOnly
                                             >,
@@ -7831,11 +8499,11 @@ macro_rules! GinGetDownlink {
                 <
                     $crate::__pgrx_c_macros::CUnsignedInt as $crate::__pgrx_c_macros::expression::CType
                 >::from_storage(
-                    $crate::ItemPointerGetBlockNumberNoCheck(
+                    $crate::__pgrx_c_bindings::ItemPointerGetBlockNumberNoCheck(
                         <
                             $crate::__pgrx_c_macros::expression::CPointer<
                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                    $crate::ItemPointerData
+                                    $crate::__pgrx_c_bindings::ItemPointerData
                                 >,
                                 $crate::__pgrx_c_macros::expression::ReadOnly
                             > as $crate::__pgrx_c_macros::expression::CType
@@ -7843,7 +8511,7 @@ macro_rules! GinGetDownlink {
                             $crate::__pgrx_c_macros::expression::implicit::<
                                 $crate::__pgrx_c_macros::expression::CPointer<
                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                        $crate::ItemPointerData
+                                        $crate::__pgrx_c_bindings::ItemPointerData
                                     >,
                                     $crate::__pgrx_c_macros::expression::ReadOnly
                                 >,
@@ -7888,8 +8556,8 @@ macro_rules! GinGetDownlink {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -7916,20 +8584,24 @@ macro_rules! __pgrx_c_args_GinGetNPosting {
         $crate::__pgrx_c_args_GinGetNPosting!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_GinGetNPosting!(@p1 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_GinGetNPosting!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_GinGetNPosting!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_GinGetNPosting!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinGetNPosting!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinGetNPosting!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -7937,7 +8609,9 @@ macro_rules! __pgrx_c_args_GinGetNPosting {
         $crate::__pgrx_c_args_GinGetNPosting!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_GinGetNPosting!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_GinGetNPosting!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -7959,14 +8633,18 @@ macro_rules! __pgrx_c_args_GinGetNPosting {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_GinGetNPosting!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_GinGetNPosting!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_GinGetNPosting!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_GinGetNPosting!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinGetNPosting!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -7993,13 +8671,13 @@ macro_rules! __pgrx_c_args_GinGetNPosting {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinGetNPosting!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinGetNPosting!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -8048,11 +8726,11 @@ macro_rules! GinGetNPosting {
                 <
                     $crate::__pgrx_c_macros::CUnsignedShort as $crate::__pgrx_c_macros::expression::CType
                 >::from_storage(
-                    $crate::ItemPointerGetOffsetNumberNoCheck(
+                    $crate::__pgrx_c_bindings::ItemPointerGetOffsetNumberNoCheck(
                         <
                             $crate::__pgrx_c_macros::expression::CPointer<
                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                    $crate::ItemPointerData
+                                    $crate::__pgrx_c_bindings::ItemPointerData
                                 >,
                                 $crate::__pgrx_c_macros::expression::ReadOnly
                             > as $crate::__pgrx_c_macros::expression::CType
@@ -8060,7 +8738,7 @@ macro_rules! GinGetNPosting {
                             $crate::__pgrx_c_macros::expression::implicit::<
                                 $crate::__pgrx_c_macros::expression::CPointer<
                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                        $crate::ItemPointerData
+                                        $crate::__pgrx_c_bindings::ItemPointerData
                                     >,
                                     $crate::__pgrx_c_macros::expression::ReadOnly
                                 >,
@@ -8126,11 +8804,11 @@ macro_rules! GinGetNPosting {
                             <
                                 $crate::__pgrx_c_macros::CUnsignedShort as $crate::__pgrx_c_macros::expression::CType
                             >::from_storage(
-                                $crate::ItemPointerGetOffsetNumberNoCheck(
+                                $crate::__pgrx_c_bindings::ItemPointerGetOffsetNumberNoCheck(
                                     <
                                         $crate::__pgrx_c_macros::expression::CPointer<
                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                $crate::ItemPointerData
+                                                $crate::__pgrx_c_bindings::ItemPointerData
                                             >,
                                             $crate::__pgrx_c_macros::expression::ReadOnly
                                         > as $crate::__pgrx_c_macros::expression::CType
@@ -8138,7 +8816,7 @@ macro_rules! GinGetNPosting {
                                         $crate::__pgrx_c_macros::expression::implicit::<
                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                    $crate::ItemPointerData
+                                                    $crate::__pgrx_c_bindings::ItemPointerData
                                                 >,
                                                 $crate::__pgrx_c_macros::expression::ReadOnly
                                             >,
@@ -8192,11 +8870,11 @@ macro_rules! GinGetNPosting {
                 <
                     $crate::__pgrx_c_macros::CUnsignedShort as $crate::__pgrx_c_macros::expression::CType
                 >::from_storage(
-                    $crate::ItemPointerGetOffsetNumberNoCheck(
+                    $crate::__pgrx_c_bindings::ItemPointerGetOffsetNumberNoCheck(
                         <
                             $crate::__pgrx_c_macros::expression::CPointer<
                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                    $crate::ItemPointerData
+                                    $crate::__pgrx_c_bindings::ItemPointerData
                                 >,
                                 $crate::__pgrx_c_macros::expression::ReadOnly
                             > as $crate::__pgrx_c_macros::expression::CType
@@ -8204,7 +8882,7 @@ macro_rules! GinGetNPosting {
                             $crate::__pgrx_c_macros::expression::implicit::<
                                 $crate::__pgrx_c_macros::expression::CPointer<
                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                        $crate::ItemPointerData
+                                        $crate::__pgrx_c_bindings::ItemPointerData
                                     >,
                                     $crate::__pgrx_c_macros::expression::ReadOnly
                                 >,
@@ -8249,8 +8927,8 @@ macro_rules! GinGetNPosting {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -8278,13 +8956,13 @@ macro_rules! __pgrx_c_args_GinGetNullCategory {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinGetNullCategory!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinGetNullCategory!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -8293,7 +8971,7 @@ macro_rules! __pgrx_c_args_GinGetNullCategory {
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinGetNullCategory!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -8320,31 +8998,35 @@ macro_rules! __pgrx_c_args_GinGetNullCategory {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinGetNullCategory!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinGetNullCategory!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_GinGetNullCategory!(@p2 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_GinGetNullCategory!(
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative1 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_GinGetNullCategory!(@p2 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_GinGetNullCategory!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinGetNullCategory!(
-            @p2 $mode [$($done)* (@literal [- $argument]),];
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinGetNullCategory!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -8352,7 +9034,9 @@ macro_rules! __pgrx_c_args_GinGetNullCategory {
         $crate::__pgrx_c_args_GinGetNullCategory!(@negative1 $mode [$($done)*]; - $($raw)*)
     };
     (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_GinGetNullCategory!(@p2 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_GinGetNullCategory!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -8374,14 +9058,18 @@ macro_rules! __pgrx_c_args_GinGetNullCategory {
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_GinGetNullCategory!(@p2 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_GinGetNullCategory!(
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_GinGetNullCategory!(@p2 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_GinGetNullCategory!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinGetNullCategory!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -8408,13 +9096,13 @@ macro_rules! __pgrx_c_args_GinGetNullCategory {
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinGetNullCategory!(
-            @p2 $mode [$($done)* (@literal [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinGetNullCategory!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -8465,7 +9153,7 @@ macro_rules! GinGetNullCategory {
                     (
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::cast_as::<
-                                *mut $crate::GinNullCategory,
+                                *mut $crate::__pgrx_c_bindings::GinNullCategory,
                                 $crate::__pgrx_c_macros::expression::CPointer<
                                     $crate::__pgrx_c_macros::CSignedChar,
                                     $crate::__pgrx_c_macros::expression::ReadWrite
@@ -8523,7 +9211,7 @@ macro_rules! GinGetNullCategory {
                                                                     usize
                                                                 > as $crate::__pgrx_c_macros::expression::CType
                                                             >::from_storage(
-                                                                $crate::IndexInfoFindDataOffset(
+                                                                $crate::__pgrx_c_bindings::IndexInfoFindDataOffset(
                                                                     <
                                                                         $crate::__pgrx_c_macros::CUnsignedShort as $crate::__pgrx_c_macros::expression::CType
                                                                     >::into_storage(
@@ -8650,7 +9338,7 @@ macro_rules! GinGetNullCategory {
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::expression::cast_as::<
-                            *mut $crate::GinNullCategory,
+                            *mut $crate::__pgrx_c_bindings::GinNullCategory,
                             $crate::__pgrx_c_macros::expression::CPointer<
                                 $crate::__pgrx_c_macros::CSignedChar,
                                 $crate::__pgrx_c_macros::expression::ReadWrite
@@ -8708,7 +9396,7 @@ macro_rules! GinGetNullCategory {
                                                                 usize
                                                             > as $crate::__pgrx_c_macros::expression::CType
                                                         >::from_storage(
-                                                            $crate::IndexInfoFindDataOffset(
+                                                            $crate::__pgrx_c_bindings::IndexInfoFindDataOffset(
                                                                 <
                                                                     $crate::__pgrx_c_macros::CUnsignedShort as $crate::__pgrx_c_macros::expression::CType
                                                                 >::into_storage(
@@ -8834,7 +9522,7 @@ macro_rules! GinGetNullCategory {
                 (
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::expression::cast_as::<
-                            *mut $crate::GinNullCategory,
+                            *mut $crate::__pgrx_c_bindings::GinNullCategory,
                             $crate::__pgrx_c_macros::expression::CPointer<
                                 $crate::__pgrx_c_macros::CSignedChar,
                                 $crate::__pgrx_c_macros::expression::ReadWrite
@@ -8892,7 +9580,7 @@ macro_rules! GinGetNullCategory {
                                                                 usize
                                                             > as $crate::__pgrx_c_macros::expression::CType
                                                         >::from_storage(
-                                                            $crate::IndexInfoFindDataOffset(
+                                                            $crate::__pgrx_c_bindings::IndexInfoFindDataOffset(
                                                                 <
                                                                     $crate::__pgrx_c_macros::CUnsignedShort as $crate::__pgrx_c_macros::expression::CType
                                                                 >::into_storage(
@@ -9027,7 +9715,7 @@ macro_rules! GinGetNullCategory {
                             (
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::cast_as::<
-                                        *mut $crate::GinNullCategory,
+                                        *mut $crate::__pgrx_c_bindings::GinNullCategory,
                                         $crate::__pgrx_c_macros::expression::CPointer<
                                             $crate::__pgrx_c_macros::CSignedChar,
                                             $crate::__pgrx_c_macros::expression::ReadWrite
@@ -9088,7 +9776,7 @@ macro_rules! GinGetNullCategory {
                                                                             usize
                                                                         > as $crate::__pgrx_c_macros::expression::CType
                                                                     >::from_storage(
-                                                                        $crate::IndexInfoFindDataOffset(
+                                                                        $crate::__pgrx_c_bindings::IndexInfoFindDataOffset(
                                                                             <
                                                                                 $crate::__pgrx_c_macros::CUnsignedShort as $crate::__pgrx_c_macros::expression::CType
                                                                             >::into_storage(
@@ -9222,7 +9910,7 @@ macro_rules! GinGetNullCategory {
                     (
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::cast_as::<
-                                *mut $crate::GinNullCategory,
+                                *mut $crate::__pgrx_c_bindings::GinNullCategory,
                                 $crate::__pgrx_c_macros::expression::CPointer<
                                     $crate::__pgrx_c_macros::CSignedChar,
                                     $crate::__pgrx_c_macros::expression::ReadWrite
@@ -9280,7 +9968,7 @@ macro_rules! GinGetNullCategory {
                                                                     usize
                                                                 > as $crate::__pgrx_c_macros::expression::CType
                                                             >::from_storage(
-                                                                $crate::IndexInfoFindDataOffset(
+                                                                $crate::__pgrx_c_bindings::IndexInfoFindDataOffset(
                                                                     <
                                                                         $crate::__pgrx_c_macros::CUnsignedShort as $crate::__pgrx_c_macros::expression::CType
                                                                     >::into_storage(
@@ -9406,8 +10094,8 @@ macro_rules! GinGetNullCategory {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -9434,20 +10122,24 @@ macro_rules! __pgrx_c_args_GinGetPosting {
         $crate::__pgrx_c_args_GinGetPosting!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_GinGetPosting!(@p1 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_GinGetPosting!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_GinGetPosting!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_GinGetPosting!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinGetPosting!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinGetPosting!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -9455,7 +10147,9 @@ macro_rules! __pgrx_c_args_GinGetPosting {
         $crate::__pgrx_c_args_GinGetPosting!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_GinGetPosting!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_GinGetPosting!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -9477,14 +10171,18 @@ macro_rules! __pgrx_c_args_GinGetPosting {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_GinGetPosting!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_GinGetPosting!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_GinGetPosting!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_GinGetPosting!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinGetPosting!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -9511,13 +10209,13 @@ macro_rules! __pgrx_c_args_GinGetPosting {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinGetPosting!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinGetPosting!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -9564,7 +10262,7 @@ macro_rules! GinGetPosting {
         (
             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::cast_as::<
-                    $crate::Pointer,
+                    $crate::__pgrx_c_bindings::Pointer,
                     $crate::__pgrx_c_macros::expression::CPointer<
                         $crate::__pgrx_c_macros::expression::CVoid,
                         $crate::__pgrx_c_macros::expression::ReadWrite
@@ -9605,11 +10303,11 @@ macro_rules! GinGetPosting {
                                                     <
                                                         $crate::__pgrx_c_macros::CUnsignedInt as $crate::__pgrx_c_macros::expression::CType
                                                     >::from_storage(
-                                                        $crate::ItemPointerGetBlockNumberNoCheck(
+                                                        $crate::__pgrx_c_bindings::ItemPointerGetBlockNumberNoCheck(
                                                             <
                                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                                        $crate::ItemPointerData
+                                                                        $crate::__pgrx_c_bindings::ItemPointerData
                                                                     >,
                                                                     $crate::__pgrx_c_macros::expression::ReadOnly
                                                                 > as $crate::__pgrx_c_macros::expression::CType
@@ -9617,7 +10315,7 @@ macro_rules! GinGetPosting {
                                                                 $crate::__pgrx_c_macros::expression::implicit::<
                                                                     $crate::__pgrx_c_macros::expression::CPointer<
                                                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                                                            $crate::ItemPointerData
+                                                                            $crate::__pgrx_c_bindings::ItemPointerData
                                                                         >,
                                                                         $crate::__pgrx_c_macros::expression::ReadOnly
                                                                     >,
@@ -9670,7 +10368,7 @@ macro_rules! GinGetPosting {
                                                             $crate::__pgrx_c_macros::CValue::<
                                                                 $crate::__pgrx_c_macros::CUnsignedInt
                                                             >::new(
-                                                                $crate::GIN_ITUP_COMPRESSED as u32
+                                                                $crate::__pgrx_c_bindings::GIN_ITUP_COMPRESSED as u32
                                                             )
                                                         )
                                                     )
@@ -9714,7 +10412,7 @@ macro_rules! GinGetPosting {
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::cast_as::<
-                                $crate::Pointer,
+                                $crate::__pgrx_c_bindings::Pointer,
                                 $crate::__pgrx_c_macros::expression::CPointer<
                                     $crate::__pgrx_c_macros::expression::CVoid,
                                     $crate::__pgrx_c_macros::expression::ReadWrite
@@ -9766,11 +10464,11 @@ macro_rules! GinGetPosting {
                                                                 <
                                                                     $crate::__pgrx_c_macros::CUnsignedInt as $crate::__pgrx_c_macros::expression::CType
                                                                 >::from_storage(
-                                                                    $crate::ItemPointerGetBlockNumberNoCheck(
+                                                                    $crate::__pgrx_c_bindings::ItemPointerGetBlockNumberNoCheck(
                                                                         <
                                                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                    $crate::ItemPointerData
+                                                                                    $crate::__pgrx_c_bindings::ItemPointerData
                                                                                 >,
                                                                                 $crate::__pgrx_c_macros::expression::ReadOnly
                                                                             > as $crate::__pgrx_c_macros::expression::CType
@@ -9778,7 +10476,7 @@ macro_rules! GinGetPosting {
                                                                             $crate::__pgrx_c_macros::expression::implicit::<
                                                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                        $crate::ItemPointerData
+                                                                                        $crate::__pgrx_c_bindings::ItemPointerData
                                                                                     >,
                                                                                     $crate::__pgrx_c_macros::expression::ReadOnly
                                                                                 >,
@@ -9831,7 +10529,7 @@ macro_rules! GinGetPosting {
                                                                         $crate::__pgrx_c_macros::CValue::<
                                                                             $crate::__pgrx_c_macros::CUnsignedInt
                                                                         >::new(
-                                                                            $crate::GIN_ITUP_COMPRESSED as u32
+                                                                            $crate::__pgrx_c_bindings::GIN_ITUP_COMPRESSED as u32
                                                                         )
                                                                     )
                                                                 )
@@ -9860,7 +10558,7 @@ macro_rules! GinGetPosting {
         {
             let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::cast_as::<
-                    $crate::Pointer,
+                    $crate::__pgrx_c_bindings::Pointer,
                     $crate::__pgrx_c_macros::expression::CPointer<
                         $crate::__pgrx_c_macros::expression::CVoid,
                         $crate::__pgrx_c_macros::expression::ReadWrite
@@ -9901,11 +10599,11 @@ macro_rules! GinGetPosting {
                                                     <
                                                         $crate::__pgrx_c_macros::CUnsignedInt as $crate::__pgrx_c_macros::expression::CType
                                                     >::from_storage(
-                                                        $crate::ItemPointerGetBlockNumberNoCheck(
+                                                        $crate::__pgrx_c_bindings::ItemPointerGetBlockNumberNoCheck(
                                                             <
                                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                                        $crate::ItemPointerData
+                                                                        $crate::__pgrx_c_bindings::ItemPointerData
                                                                     >,
                                                                     $crate::__pgrx_c_macros::expression::ReadOnly
                                                                 > as $crate::__pgrx_c_macros::expression::CType
@@ -9913,7 +10611,7 @@ macro_rules! GinGetPosting {
                                                                 $crate::__pgrx_c_macros::expression::implicit::<
                                                                     $crate::__pgrx_c_macros::expression::CPointer<
                                                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                                                            $crate::ItemPointerData
+                                                                            $crate::__pgrx_c_bindings::ItemPointerData
                                                                         >,
                                                                         $crate::__pgrx_c_macros::expression::ReadOnly
                                                                     >,
@@ -9966,7 +10664,7 @@ macro_rules! GinGetPosting {
                                                             $crate::__pgrx_c_macros::CValue::<
                                                                 $crate::__pgrx_c_macros::CUnsignedInt
                                                             >::new(
-                                                                $crate::GIN_ITUP_COMPRESSED as u32
+                                                                $crate::__pgrx_c_bindings::GIN_ITUP_COMPRESSED as u32
                                                             )
                                                         )
                                                     )
@@ -9991,8 +10689,8 @@ macro_rules! GinGetPosting {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -10019,20 +10717,24 @@ macro_rules! __pgrx_c_args_GinGetPostingOffset {
         $crate::__pgrx_c_args_GinGetPostingOffset!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_GinGetPostingOffset!(@p1 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_GinGetPostingOffset!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_GinGetPostingOffset!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_GinGetPostingOffset!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinGetPostingOffset!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinGetPostingOffset!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -10040,7 +10742,9 @@ macro_rules! __pgrx_c_args_GinGetPostingOffset {
         $crate::__pgrx_c_args_GinGetPostingOffset!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_GinGetPostingOffset!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_GinGetPostingOffset!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -10062,14 +10766,18 @@ macro_rules! __pgrx_c_args_GinGetPostingOffset {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_GinGetPostingOffset!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_GinGetPostingOffset!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_GinGetPostingOffset!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_GinGetPostingOffset!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinGetPostingOffset!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -10096,13 +10804,13 @@ macro_rules! __pgrx_c_args_GinGetPostingOffset {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinGetPostingOffset!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinGetPostingOffset!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -10154,11 +10862,11 @@ macro_rules! GinGetPostingOffset {
                             <
                                 $crate::__pgrx_c_macros::CUnsignedInt as $crate::__pgrx_c_macros::expression::CType
                             >::from_storage(
-                                $crate::ItemPointerGetBlockNumberNoCheck(
+                                $crate::__pgrx_c_bindings::ItemPointerGetBlockNumberNoCheck(
                                     <
                                         $crate::__pgrx_c_macros::expression::CPointer<
                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                $crate::ItemPointerData
+                                                $crate::__pgrx_c_bindings::ItemPointerData
                                             >,
                                             $crate::__pgrx_c_macros::expression::ReadOnly
                                         > as $crate::__pgrx_c_macros::expression::CType
@@ -10166,7 +10874,7 @@ macro_rules! GinGetPostingOffset {
                                         $crate::__pgrx_c_macros::expression::implicit::<
                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                    $crate::ItemPointerData
+                                                    $crate::__pgrx_c_bindings::ItemPointerData
                                                 >,
                                                 $crate::__pgrx_c_macros::expression::ReadOnly
                                             >,
@@ -10210,7 +10918,7 @@ macro_rules! GinGetPostingOffset {
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::CValue::<
                                         $crate::__pgrx_c_macros::CUnsignedInt
-                                    >::new($crate::GIN_ITUP_COMPRESSED as u32)
+                                    >::new($crate::__pgrx_c_bindings::GIN_ITUP_COMPRESSED as u32)
                                 )
                             )
                         )
@@ -10252,11 +10960,11 @@ macro_rules! GinGetPostingOffset {
                                         <
                                             $crate::__pgrx_c_macros::CUnsignedInt as $crate::__pgrx_c_macros::expression::CType
                                         >::from_storage(
-                                            $crate::ItemPointerGetBlockNumberNoCheck(
+                                            $crate::__pgrx_c_bindings::ItemPointerGetBlockNumberNoCheck(
                                                 <
                                                     $crate::__pgrx_c_macros::expression::CPointer<
                                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                                            $crate::ItemPointerData
+                                                            $crate::__pgrx_c_bindings::ItemPointerData
                                                         >,
                                                         $crate::__pgrx_c_macros::expression::ReadOnly
                                                     > as $crate::__pgrx_c_macros::expression::CType
@@ -10264,7 +10972,7 @@ macro_rules! GinGetPostingOffset {
                                                     $crate::__pgrx_c_macros::expression::implicit::<
                                                         $crate::__pgrx_c_macros::expression::CPointer<
                                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                                $crate::ItemPointerData
+                                                                $crate::__pgrx_c_bindings::ItemPointerData
                                                             >,
                                                             $crate::__pgrx_c_macros::expression::ReadOnly
                                                         >,
@@ -10311,7 +11019,9 @@ macro_rules! GinGetPostingOffset {
                                             >(
                                                 $crate::__pgrx_c_macros::CValue::<
                                                     $crate::__pgrx_c_macros::CUnsignedInt
-                                                >::new($crate::GIN_ITUP_COMPRESSED as u32)
+                                                >::new(
+                                                    $crate::__pgrx_c_bindings::GIN_ITUP_COMPRESSED as u32
+                                                )
                                             )
                                         )
                                     )
@@ -10338,11 +11048,11 @@ macro_rules! GinGetPostingOffset {
                             <
                                 $crate::__pgrx_c_macros::CUnsignedInt as $crate::__pgrx_c_macros::expression::CType
                             >::from_storage(
-                                $crate::ItemPointerGetBlockNumberNoCheck(
+                                $crate::__pgrx_c_bindings::ItemPointerGetBlockNumberNoCheck(
                                     <
                                         $crate::__pgrx_c_macros::expression::CPointer<
                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                $crate::ItemPointerData
+                                                $crate::__pgrx_c_bindings::ItemPointerData
                                             >,
                                             $crate::__pgrx_c_macros::expression::ReadOnly
                                         > as $crate::__pgrx_c_macros::expression::CType
@@ -10350,7 +11060,7 @@ macro_rules! GinGetPostingOffset {
                                         $crate::__pgrx_c_macros::expression::implicit::<
                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                    $crate::ItemPointerData
+                                                    $crate::__pgrx_c_bindings::ItemPointerData
                                                 >,
                                                 $crate::__pgrx_c_macros::expression::ReadOnly
                                             >,
@@ -10394,7 +11104,7 @@ macro_rules! GinGetPostingOffset {
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::CValue::<
                                         $crate::__pgrx_c_macros::CUnsignedInt
-                                    >::new($crate::GIN_ITUP_COMPRESSED as u32)
+                                    >::new($crate::__pgrx_c_bindings::GIN_ITUP_COMPRESSED as u32)
                                 )
                             )
                         )
@@ -10412,8 +11122,8 @@ macro_rules! GinGetPostingOffset {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -10440,20 +11150,24 @@ macro_rules! __pgrx_c_args_GinGetPostingTree {
         $crate::__pgrx_c_args_GinGetPostingTree!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_GinGetPostingTree!(@p1 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_GinGetPostingTree!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_GinGetPostingTree!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_GinGetPostingTree!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinGetPostingTree!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinGetPostingTree!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -10461,7 +11175,9 @@ macro_rules! __pgrx_c_args_GinGetPostingTree {
         $crate::__pgrx_c_args_GinGetPostingTree!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_GinGetPostingTree!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_GinGetPostingTree!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -10483,14 +11199,18 @@ macro_rules! __pgrx_c_args_GinGetPostingTree {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_GinGetPostingTree!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_GinGetPostingTree!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_GinGetPostingTree!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_GinGetPostingTree!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinGetPostingTree!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -10517,13 +11237,13 @@ macro_rules! __pgrx_c_args_GinGetPostingTree {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinGetPostingTree!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinGetPostingTree!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -10572,11 +11292,11 @@ macro_rules! GinGetPostingTree {
                 <
                     $crate::__pgrx_c_macros::CUnsignedInt as $crate::__pgrx_c_macros::expression::CType
                 >::from_storage(
-                    $crate::ItemPointerGetBlockNumberNoCheck(
+                    $crate::__pgrx_c_bindings::ItemPointerGetBlockNumberNoCheck(
                         <
                             $crate::__pgrx_c_macros::expression::CPointer<
                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                    $crate::ItemPointerData
+                                    $crate::__pgrx_c_bindings::ItemPointerData
                                 >,
                                 $crate::__pgrx_c_macros::expression::ReadOnly
                             > as $crate::__pgrx_c_macros::expression::CType
@@ -10584,7 +11304,7 @@ macro_rules! GinGetPostingTree {
                             $crate::__pgrx_c_macros::expression::implicit::<
                                 $crate::__pgrx_c_macros::expression::CPointer<
                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                        $crate::ItemPointerData
+                                        $crate::__pgrx_c_bindings::ItemPointerData
                                     >,
                                     $crate::__pgrx_c_macros::expression::ReadOnly
                                 >,
@@ -10650,11 +11370,11 @@ macro_rules! GinGetPostingTree {
                             <
                                 $crate::__pgrx_c_macros::CUnsignedInt as $crate::__pgrx_c_macros::expression::CType
                             >::from_storage(
-                                $crate::ItemPointerGetBlockNumberNoCheck(
+                                $crate::__pgrx_c_bindings::ItemPointerGetBlockNumberNoCheck(
                                     <
                                         $crate::__pgrx_c_macros::expression::CPointer<
                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                $crate::ItemPointerData
+                                                $crate::__pgrx_c_bindings::ItemPointerData
                                             >,
                                             $crate::__pgrx_c_macros::expression::ReadOnly
                                         > as $crate::__pgrx_c_macros::expression::CType
@@ -10662,7 +11382,7 @@ macro_rules! GinGetPostingTree {
                                         $crate::__pgrx_c_macros::expression::implicit::<
                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                    $crate::ItemPointerData
+                                                    $crate::__pgrx_c_bindings::ItemPointerData
                                                 >,
                                                 $crate::__pgrx_c_macros::expression::ReadOnly
                                             >,
@@ -10716,11 +11436,11 @@ macro_rules! GinGetPostingTree {
                 <
                     $crate::__pgrx_c_macros::CUnsignedInt as $crate::__pgrx_c_macros::expression::CType
                 >::from_storage(
-                    $crate::ItemPointerGetBlockNumberNoCheck(
+                    $crate::__pgrx_c_bindings::ItemPointerGetBlockNumberNoCheck(
                         <
                             $crate::__pgrx_c_macros::expression::CPointer<
                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                    $crate::ItemPointerData
+                                    $crate::__pgrx_c_bindings::ItemPointerData
                                 >,
                                 $crate::__pgrx_c_macros::expression::ReadOnly
                             > as $crate::__pgrx_c_macros::expression::CType
@@ -10728,7 +11448,7 @@ macro_rules! GinGetPostingTree {
                             $crate::__pgrx_c_macros::expression::implicit::<
                                 $crate::__pgrx_c_macros::expression::CPointer<
                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                        $crate::ItemPointerData
+                                        $crate::__pgrx_c_bindings::ItemPointerData
                                     >,
                                     $crate::__pgrx_c_macros::expression::ReadOnly
                                 >,
@@ -10773,8 +11493,8 @@ macro_rules! GinGetPostingTree {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -10801,20 +11521,24 @@ macro_rules! __pgrx_c_args_GinIsPostingTree {
         $crate::__pgrx_c_args_GinIsPostingTree!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_GinIsPostingTree!(@p1 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_GinIsPostingTree!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_GinIsPostingTree!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_GinIsPostingTree!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinIsPostingTree!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinIsPostingTree!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -10822,7 +11546,9 @@ macro_rules! __pgrx_c_args_GinIsPostingTree {
         $crate::__pgrx_c_args_GinIsPostingTree!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_GinIsPostingTree!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_GinIsPostingTree!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -10844,14 +11570,18 @@ macro_rules! __pgrx_c_args_GinIsPostingTree {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_GinIsPostingTree!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_GinIsPostingTree!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_GinIsPostingTree!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_GinIsPostingTree!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinIsPostingTree!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -10878,13 +11608,13 @@ macro_rules! __pgrx_c_args_GinIsPostingTree {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinIsPostingTree!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinIsPostingTree!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -10936,11 +11666,11 @@ macro_rules! GinIsPostingTree {
                             <
                                 $crate::__pgrx_c_macros::CUnsignedShort as $crate::__pgrx_c_macros::expression::CType
                             >::from_storage(
-                                $crate::ItemPointerGetOffsetNumberNoCheck(
+                                $crate::__pgrx_c_bindings::ItemPointerGetOffsetNumberNoCheck(
                                     <
                                         $crate::__pgrx_c_macros::expression::CPointer<
                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                $crate::ItemPointerData
+                                                $crate::__pgrx_c_bindings::ItemPointerData
                                             >,
                                             $crate::__pgrx_c_macros::expression::ReadOnly
                                         > as $crate::__pgrx_c_macros::expression::CType
@@ -10948,7 +11678,7 @@ macro_rules! GinIsPostingTree {
                                         $crate::__pgrx_c_macros::expression::implicit::<
                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                    $crate::ItemPointerData
+                                                    $crate::__pgrx_c_bindings::ItemPointerData
                                                 >,
                                                 $crate::__pgrx_c_macros::expression::ReadOnly
                                             >,
@@ -10987,9 +11717,8 @@ macro_rules! GinIsPostingTree {
                         )
                     ),
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                        /* PGRX: GIN_TREE_POSTING remains expanded because no integer constant binding is available in the defining Rust crate. */
                         $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CUnsignedShort>::new(
-                            65535u16
+                            $crate::__pgrx_c_bindings::GIN_TREE_POSTING as u16
                         )
                     )
                 )
@@ -11029,11 +11758,11 @@ macro_rules! GinIsPostingTree {
                                         <
                                             $crate::__pgrx_c_macros::CUnsignedShort as $crate::__pgrx_c_macros::expression::CType
                                         >::from_storage(
-                                            $crate::ItemPointerGetOffsetNumberNoCheck(
+                                            $crate::__pgrx_c_bindings::ItemPointerGetOffsetNumberNoCheck(
                                                 <
                                                     $crate::__pgrx_c_macros::expression::CPointer<
                                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                                            $crate::ItemPointerData
+                                                            $crate::__pgrx_c_bindings::ItemPointerData
                                                         >,
                                                         $crate::__pgrx_c_macros::expression::ReadOnly
                                                     > as $crate::__pgrx_c_macros::expression::CType
@@ -11041,7 +11770,7 @@ macro_rules! GinIsPostingTree {
                                                     $crate::__pgrx_c_macros::expression::implicit::<
                                                         $crate::__pgrx_c_macros::expression::CPointer<
                                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                                $crate::ItemPointerData
+                                                                $crate::__pgrx_c_bindings::ItemPointerData
                                                             >,
                                                             $crate::__pgrx_c_macros::expression::ReadOnly
                                                         >,
@@ -11080,10 +11809,9 @@ macro_rules! GinIsPostingTree {
                                     )
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                                    /* PGRX: GIN_TREE_POSTING remains expanded because no integer constant binding is available in the defining Rust crate. */
                                     $crate::__pgrx_c_macros::CValue::<
                                         $crate::__pgrx_c_macros::CUnsignedShort
-                                    >::new(65535u16)
+                                    >::new($crate::__pgrx_c_bindings::GIN_TREE_POSTING as u16)
                                 )
                             )
                         )
@@ -11107,11 +11835,11 @@ macro_rules! GinIsPostingTree {
                             <
                                 $crate::__pgrx_c_macros::CUnsignedShort as $crate::__pgrx_c_macros::expression::CType
                             >::from_storage(
-                                $crate::ItemPointerGetOffsetNumberNoCheck(
+                                $crate::__pgrx_c_bindings::ItemPointerGetOffsetNumberNoCheck(
                                     <
                                         $crate::__pgrx_c_macros::expression::CPointer<
                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                $crate::ItemPointerData
+                                                $crate::__pgrx_c_bindings::ItemPointerData
                                             >,
                                             $crate::__pgrx_c_macros::expression::ReadOnly
                                         > as $crate::__pgrx_c_macros::expression::CType
@@ -11119,7 +11847,7 @@ macro_rules! GinIsPostingTree {
                                         $crate::__pgrx_c_macros::expression::implicit::<
                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                    $crate::ItemPointerData
+                                                    $crate::__pgrx_c_bindings::ItemPointerData
                                                 >,
                                                 $crate::__pgrx_c_macros::expression::ReadOnly
                                             >,
@@ -11158,9 +11886,8 @@ macro_rules! GinIsPostingTree {
                         )
                     ),
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                        /* PGRX: GIN_TREE_POSTING remains expanded because no integer constant binding is available in the defining Rust crate. */
                         $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CUnsignedShort>::new(
-                            65535u16
+                            $crate::__pgrx_c_bindings::GIN_TREE_POSTING as u16
                         )
                     )
                 )
@@ -11176,8 +11903,8 @@ macro_rules! GinIsPostingTree {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -11208,23 +11935,23 @@ macro_rules! __pgrx_c_args_GinItemPointerGetBlockNumber {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
         $crate::__pgrx_c_args_GinItemPointerGetBlockNumber!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_GinItemPointerGetBlockNumber!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinItemPointerGetBlockNumber!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinItemPointerGetBlockNumber!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -11236,7 +11963,7 @@ macro_rules! __pgrx_c_args_GinItemPointerGetBlockNumber {
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
         $crate::__pgrx_c_args_GinItemPointerGetBlockNumber!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
@@ -11262,17 +11989,17 @@ macro_rules! __pgrx_c_args_GinItemPointerGetBlockNumber {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_GinItemPointerGetBlockNumber!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_GinItemPointerGetBlockNumber!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinItemPointerGetBlockNumber!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -11299,13 +12026,13 @@ macro_rules! __pgrx_c_args_GinItemPointerGetBlockNumber {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinItemPointerGetBlockNumber!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinItemPointerGetBlockNumber!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -11357,11 +12084,11 @@ macro_rules! GinItemPointerGetBlockNumber {
                 <
                     $crate::__pgrx_c_macros::CUnsignedInt as $crate::__pgrx_c_macros::expression::CType
                 >::from_storage(
-                    $crate::ItemPointerGetBlockNumberNoCheck(
+                    $crate::__pgrx_c_bindings::ItemPointerGetBlockNumberNoCheck(
                         <
                             $crate::__pgrx_c_macros::expression::CPointer<
                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                    $crate::ItemPointerData
+                                    $crate::__pgrx_c_bindings::ItemPointerData
                                 >,
                                 $crate::__pgrx_c_macros::expression::ReadOnly
                             > as $crate::__pgrx_c_macros::expression::CType
@@ -11369,7 +12096,7 @@ macro_rules! GinItemPointerGetBlockNumber {
                             $crate::__pgrx_c_macros::expression::implicit::<
                                 $crate::__pgrx_c_macros::expression::CPointer<
                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                        $crate::ItemPointerData
+                                        $crate::__pgrx_c_bindings::ItemPointerData
                                     >,
                                     $crate::__pgrx_c_macros::expression::ReadOnly
                                 >,
@@ -11418,11 +12145,11 @@ macro_rules! GinItemPointerGetBlockNumber {
                             <
                                 $crate::__pgrx_c_macros::CUnsignedInt as $crate::__pgrx_c_macros::expression::CType
                             >::from_storage(
-                                $crate::ItemPointerGetBlockNumberNoCheck(
+                                $crate::__pgrx_c_bindings::ItemPointerGetBlockNumberNoCheck(
                                     <
                                         $crate::__pgrx_c_macros::expression::CPointer<
                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                $crate::ItemPointerData
+                                                $crate::__pgrx_c_bindings::ItemPointerData
                                             >,
                                             $crate::__pgrx_c_macros::expression::ReadOnly
                                         > as $crate::__pgrx_c_macros::expression::CType
@@ -11430,7 +12157,7 @@ macro_rules! GinItemPointerGetBlockNumber {
                                         $crate::__pgrx_c_macros::expression::implicit::<
                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                    $crate::ItemPointerData
+                                                    $crate::__pgrx_c_bindings::ItemPointerData
                                                 >,
                                                 $crate::__pgrx_c_macros::expression::ReadOnly
                                             >,
@@ -11462,11 +12189,11 @@ macro_rules! GinItemPointerGetBlockNumber {
                 <
                     $crate::__pgrx_c_macros::CUnsignedInt as $crate::__pgrx_c_macros::expression::CType
                 >::from_storage(
-                    $crate::ItemPointerGetBlockNumberNoCheck(
+                    $crate::__pgrx_c_bindings::ItemPointerGetBlockNumberNoCheck(
                         <
                             $crate::__pgrx_c_macros::expression::CPointer<
                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                    $crate::ItemPointerData
+                                    $crate::__pgrx_c_bindings::ItemPointerData
                                 >,
                                 $crate::__pgrx_c_macros::expression::ReadOnly
                             > as $crate::__pgrx_c_macros::expression::CType
@@ -11474,7 +12201,7 @@ macro_rules! GinItemPointerGetBlockNumber {
                             $crate::__pgrx_c_macros::expression::implicit::<
                                 $crate::__pgrx_c_macros::expression::CPointer<
                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                        $crate::ItemPointerData
+                                        $crate::__pgrx_c_bindings::ItemPointerData
                                     >,
                                     $crate::__pgrx_c_macros::expression::ReadOnly
                                 >,
@@ -11505,8 +12232,8 @@ macro_rules! GinItemPointerGetBlockNumber {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -11537,23 +12264,23 @@ macro_rules! __pgrx_c_args_GinItemPointerGetOffsetNumber {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
         $crate::__pgrx_c_args_GinItemPointerGetOffsetNumber!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_GinItemPointerGetOffsetNumber!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinItemPointerGetOffsetNumber!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinItemPointerGetOffsetNumber!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -11565,7 +12292,7 @@ macro_rules! __pgrx_c_args_GinItemPointerGetOffsetNumber {
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
         $crate::__pgrx_c_args_GinItemPointerGetOffsetNumber!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
@@ -11591,17 +12318,17 @@ macro_rules! __pgrx_c_args_GinItemPointerGetOffsetNumber {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_GinItemPointerGetOffsetNumber!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_GinItemPointerGetOffsetNumber!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinItemPointerGetOffsetNumber!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -11628,13 +12355,13 @@ macro_rules! __pgrx_c_args_GinItemPointerGetOffsetNumber {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinItemPointerGetOffsetNumber!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinItemPointerGetOffsetNumber!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -11686,11 +12413,11 @@ macro_rules! GinItemPointerGetOffsetNumber {
                 <
                     $crate::__pgrx_c_macros::CUnsignedShort as $crate::__pgrx_c_macros::expression::CType
                 >::from_storage(
-                    $crate::ItemPointerGetOffsetNumberNoCheck(
+                    $crate::__pgrx_c_bindings::ItemPointerGetOffsetNumberNoCheck(
                         <
                             $crate::__pgrx_c_macros::expression::CPointer<
                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                    $crate::ItemPointerData
+                                    $crate::__pgrx_c_bindings::ItemPointerData
                                 >,
                                 $crate::__pgrx_c_macros::expression::ReadOnly
                             > as $crate::__pgrx_c_macros::expression::CType
@@ -11698,7 +12425,7 @@ macro_rules! GinItemPointerGetOffsetNumber {
                             $crate::__pgrx_c_macros::expression::implicit::<
                                 $crate::__pgrx_c_macros::expression::CPointer<
                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                        $crate::ItemPointerData
+                                        $crate::__pgrx_c_bindings::ItemPointerData
                                     >,
                                     $crate::__pgrx_c_macros::expression::ReadOnly
                                 >,
@@ -11753,11 +12480,11 @@ macro_rules! GinItemPointerGetOffsetNumber {
                             <
                                 $crate::__pgrx_c_macros::CUnsignedShort as $crate::__pgrx_c_macros::expression::CType
                             >::from_storage(
-                                $crate::ItemPointerGetOffsetNumberNoCheck(
+                                $crate::__pgrx_c_bindings::ItemPointerGetOffsetNumberNoCheck(
                                     <
                                         $crate::__pgrx_c_macros::expression::CPointer<
                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                $crate::ItemPointerData
+                                                $crate::__pgrx_c_bindings::ItemPointerData
                                             >,
                                             $crate::__pgrx_c_macros::expression::ReadOnly
                                         > as $crate::__pgrx_c_macros::expression::CType
@@ -11765,7 +12492,7 @@ macro_rules! GinItemPointerGetOffsetNumber {
                                         $crate::__pgrx_c_macros::expression::implicit::<
                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                    $crate::ItemPointerData
+                                                    $crate::__pgrx_c_bindings::ItemPointerData
                                                 >,
                                                 $crate::__pgrx_c_macros::expression::ReadOnly
                                             >,
@@ -11797,11 +12524,11 @@ macro_rules! GinItemPointerGetOffsetNumber {
                 <
                     $crate::__pgrx_c_macros::CUnsignedShort as $crate::__pgrx_c_macros::expression::CType
                 >::from_storage(
-                    $crate::ItemPointerGetOffsetNumberNoCheck(
+                    $crate::__pgrx_c_bindings::ItemPointerGetOffsetNumberNoCheck(
                         <
                             $crate::__pgrx_c_macros::expression::CPointer<
                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                    $crate::ItemPointerData
+                                    $crate::__pgrx_c_bindings::ItemPointerData
                                 >,
                                 $crate::__pgrx_c_macros::expression::ReadOnly
                             > as $crate::__pgrx_c_macros::expression::CType
@@ -11809,7 +12536,7 @@ macro_rules! GinItemPointerGetOffsetNumber {
                             $crate::__pgrx_c_macros::expression::implicit::<
                                 $crate::__pgrx_c_macros::expression::CPointer<
                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                        $crate::ItemPointerData
+                                        $crate::__pgrx_c_bindings::ItemPointerData
                                     >,
                                     $crate::__pgrx_c_macros::expression::ReadOnly
                                 >,
@@ -11840,8 +12567,8 @@ macro_rules! GinItemPointerGetOffsetNumber {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -11872,13 +12599,13 @@ macro_rules! __pgrx_c_args_GinItemPointerSetBlockNumber {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinItemPointerSetBlockNumber!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinItemPointerSetBlockNumber!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -11890,7 +12617,7 @@ macro_rules! __pgrx_c_args_GinItemPointerSetBlockNumber {
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinItemPointerSetBlockNumber!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -11917,35 +12644,35 @@ macro_rules! __pgrx_c_args_GinItemPointerSetBlockNumber {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinItemPointerSetBlockNumber!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinItemPointerSetBlockNumber!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $argument:literal) => {
         $crate::__pgrx_c_args_GinItemPointerSetBlockNumber!(
-            @p2 $mode [$($done)* (@literal [- $argument]),];
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
         )
     };
     (@negative1 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_GinItemPointerSetBlockNumber!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinItemPointerSetBlockNumber!(
-            @p2 $mode [$($done)* (@literal [- $argument]),];
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinItemPointerSetBlockNumber!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -11957,7 +12684,7 @@ macro_rules! __pgrx_c_args_GinItemPointerSetBlockNumber {
     };
     (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
         $crate::__pgrx_c_args_GinItemPointerSetBlockNumber!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
@@ -11983,17 +12710,17 @@ macro_rules! __pgrx_c_args_GinItemPointerSetBlockNumber {
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_GinItemPointerSetBlockNumber!(
-            @p2 $mode [$($done)* (@literal [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_GinItemPointerSetBlockNumber!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinItemPointerSetBlockNumber!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -12020,13 +12747,13 @@ macro_rules! __pgrx_c_args_GinItemPointerSetBlockNumber {
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinItemPointerSetBlockNumber!(
-            @p2 $mode [$($done)* (@literal [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinItemPointerSetBlockNumber!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -12076,17 +12803,19 @@ macro_rules! GinItemPointerSetBlockNumber {
         /* PGRX: GinItemPointerSetBlockNumber remains expanded because ItemPointerSetBlockNumber is not an active function-like macro. */
         (
             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                $crate::ItemPointerSetBlockNumber(
+                $crate::__pgrx_c_bindings::ItemPointerSetBlockNumber(
                     <
                         $crate::__pgrx_c_macros::expression::CPointer<
-                            $crate::__pgrx_c_macros::expression::CRecord<$crate::ItemPointerData>,
+                            $crate::__pgrx_c_macros::expression::CRecord<
+                                $crate::__pgrx_c_bindings::ItemPointerData
+                            >,
                             $crate::__pgrx_c_macros::expression::ReadWrite
                         > as $crate::__pgrx_c_macros::expression::CType
                     >::into_storage(
                         $crate::__pgrx_c_macros::expression::implicit::<
                             $crate::__pgrx_c_macros::expression::CPointer<
                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                    $crate::ItemPointerData
+                                    $crate::__pgrx_c_bindings::ItemPointerData
                                 >,
                                 $crate::__pgrx_c_macros::expression::ReadWrite
                             >,
@@ -12148,11 +12877,11 @@ macro_rules! GinItemPointerSetBlockNumber {
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                            $crate::ItemPointerSetBlockNumber(
+                            $crate::__pgrx_c_bindings::ItemPointerSetBlockNumber(
                                 <
                                     $crate::__pgrx_c_macros::expression::CPointer<
                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                            $crate::ItemPointerData
+                                            $crate::__pgrx_c_bindings::ItemPointerData
                                         >,
                                         $crate::__pgrx_c_macros::expression::ReadWrite
                                     > as $crate::__pgrx_c_macros::expression::CType
@@ -12160,7 +12889,7 @@ macro_rules! GinItemPointerSetBlockNumber {
                                     $crate::__pgrx_c_macros::expression::implicit::<
                                         $crate::__pgrx_c_macros::expression::CPointer<
                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                $crate::ItemPointerData
+                                                $crate::__pgrx_c_bindings::ItemPointerData
                                             >,
                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                         >,
@@ -12205,17 +12934,19 @@ macro_rules! GinItemPointerSetBlockNumber {
         /* PGRX: GinItemPointerSetBlockNumber remains expanded because ItemPointerSetBlockNumber is not an active function-like macro. */
         {
             let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                $crate::ItemPointerSetBlockNumber(
+                $crate::__pgrx_c_bindings::ItemPointerSetBlockNumber(
                     <
                         $crate::__pgrx_c_macros::expression::CPointer<
-                            $crate::__pgrx_c_macros::expression::CRecord<$crate::ItemPointerData>,
+                            $crate::__pgrx_c_macros::expression::CRecord<
+                                $crate::__pgrx_c_bindings::ItemPointerData
+                            >,
                             $crate::__pgrx_c_macros::expression::ReadWrite
                         > as $crate::__pgrx_c_macros::expression::CType
                     >::into_storage(
                         $crate::__pgrx_c_macros::expression::implicit::<
                             $crate::__pgrx_c_macros::expression::CPointer<
                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                    $crate::ItemPointerData
+                                    $crate::__pgrx_c_bindings::ItemPointerData
                                 >,
                                 $crate::__pgrx_c_macros::expression::ReadWrite
                             >,
@@ -12261,8 +12992,8 @@ macro_rules! GinItemPointerSetBlockNumber {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -12293,13 +13024,13 @@ macro_rules! __pgrx_c_args_GinItemPointerSetOffsetNumber {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinItemPointerSetOffsetNumber!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinItemPointerSetOffsetNumber!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -12311,7 +13042,7 @@ macro_rules! __pgrx_c_args_GinItemPointerSetOffsetNumber {
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinItemPointerSetOffsetNumber!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -12338,35 +13069,35 @@ macro_rules! __pgrx_c_args_GinItemPointerSetOffsetNumber {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinItemPointerSetOffsetNumber!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinItemPointerSetOffsetNumber!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $argument:literal) => {
         $crate::__pgrx_c_args_GinItemPointerSetOffsetNumber!(
-            @p2 $mode [$($done)* (@literal [- $argument]),];
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
         )
     };
     (@negative1 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_GinItemPointerSetOffsetNumber!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinItemPointerSetOffsetNumber!(
-            @p2 $mode [$($done)* (@literal [- $argument]),];
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinItemPointerSetOffsetNumber!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -12378,7 +13109,7 @@ macro_rules! __pgrx_c_args_GinItemPointerSetOffsetNumber {
     };
     (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
         $crate::__pgrx_c_args_GinItemPointerSetOffsetNumber!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
@@ -12404,17 +13135,17 @@ macro_rules! __pgrx_c_args_GinItemPointerSetOffsetNumber {
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_GinItemPointerSetOffsetNumber!(
-            @p2 $mode [$($done)* (@literal [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_GinItemPointerSetOffsetNumber!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinItemPointerSetOffsetNumber!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -12441,13 +13172,13 @@ macro_rules! __pgrx_c_args_GinItemPointerSetOffsetNumber {
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinItemPointerSetOffsetNumber!(
-            @p2 $mode [$($done)* (@literal [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinItemPointerSetOffsetNumber!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -12497,17 +13228,19 @@ macro_rules! GinItemPointerSetOffsetNumber {
         /* PGRX: GinItemPointerSetOffsetNumber remains expanded because ItemPointerSetOffsetNumber is not an active function-like macro. */
         (
             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                $crate::ItemPointerSetOffsetNumber(
+                $crate::__pgrx_c_bindings::ItemPointerSetOffsetNumber(
                     <
                         $crate::__pgrx_c_macros::expression::CPointer<
-                            $crate::__pgrx_c_macros::expression::CRecord<$crate::ItemPointerData>,
+                            $crate::__pgrx_c_macros::expression::CRecord<
+                                $crate::__pgrx_c_bindings::ItemPointerData
+                            >,
                             $crate::__pgrx_c_macros::expression::ReadWrite
                         > as $crate::__pgrx_c_macros::expression::CType
                     >::into_storage(
                         $crate::__pgrx_c_macros::expression::implicit::<
                             $crate::__pgrx_c_macros::expression::CPointer<
                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                    $crate::ItemPointerData
+                                    $crate::__pgrx_c_bindings::ItemPointerData
                                 >,
                                 $crate::__pgrx_c_macros::expression::ReadWrite
                             >,
@@ -12575,11 +13308,11 @@ macro_rules! GinItemPointerSetOffsetNumber {
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                            $crate::ItemPointerSetOffsetNumber(
+                            $crate::__pgrx_c_bindings::ItemPointerSetOffsetNumber(
                                 <
                                     $crate::__pgrx_c_macros::expression::CPointer<
                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                            $crate::ItemPointerData
+                                            $crate::__pgrx_c_bindings::ItemPointerData
                                         >,
                                         $crate::__pgrx_c_macros::expression::ReadWrite
                                     > as $crate::__pgrx_c_macros::expression::CType
@@ -12587,7 +13320,7 @@ macro_rules! GinItemPointerSetOffsetNumber {
                                     $crate::__pgrx_c_macros::expression::implicit::<
                                         $crate::__pgrx_c_macros::expression::CPointer<
                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                $crate::ItemPointerData
+                                                $crate::__pgrx_c_bindings::ItemPointerData
                                             >,
                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                         >,
@@ -12632,17 +13365,19 @@ macro_rules! GinItemPointerSetOffsetNumber {
         /* PGRX: GinItemPointerSetOffsetNumber remains expanded because ItemPointerSetOffsetNumber is not an active function-like macro. */
         {
             let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                $crate::ItemPointerSetOffsetNumber(
+                $crate::__pgrx_c_bindings::ItemPointerSetOffsetNumber(
                     <
                         $crate::__pgrx_c_macros::expression::CPointer<
-                            $crate::__pgrx_c_macros::expression::CRecord<$crate::ItemPointerData>,
+                            $crate::__pgrx_c_macros::expression::CRecord<
+                                $crate::__pgrx_c_bindings::ItemPointerData
+                            >,
                             $crate::__pgrx_c_macros::expression::ReadWrite
                         > as $crate::__pgrx_c_macros::expression::CType
                     >::into_storage(
                         $crate::__pgrx_c_macros::expression::implicit::<
                             $crate::__pgrx_c_macros::expression::CPointer<
                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                    $crate::ItemPointerData
+                                    $crate::__pgrx_c_bindings::ItemPointerData
                                 >,
                                 $crate::__pgrx_c_macros::expression::ReadWrite
                             >,
@@ -12688,8 +13423,8 @@ macro_rules! GinItemPointerSetOffsetNumber {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -12716,20 +13451,24 @@ macro_rules! __pgrx_c_args_GinItupIsCompressed {
         $crate::__pgrx_c_args_GinItupIsCompressed!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_GinItupIsCompressed!(@p1 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_GinItupIsCompressed!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_GinItupIsCompressed!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_GinItupIsCompressed!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinItupIsCompressed!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinItupIsCompressed!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -12737,7 +13476,9 @@ macro_rules! __pgrx_c_args_GinItupIsCompressed {
         $crate::__pgrx_c_args_GinItupIsCompressed!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_GinItupIsCompressed!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_GinItupIsCompressed!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -12759,14 +13500,18 @@ macro_rules! __pgrx_c_args_GinItupIsCompressed {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_GinItupIsCompressed!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_GinItupIsCompressed!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_GinItupIsCompressed!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_GinItupIsCompressed!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinItupIsCompressed!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -12793,13 +13538,13 @@ macro_rules! __pgrx_c_args_GinItupIsCompressed {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinItupIsCompressed!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinItupIsCompressed!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -12854,11 +13599,11 @@ macro_rules! GinItupIsCompressed {
                                         <
                                             $crate::__pgrx_c_macros::CUnsignedInt as $crate::__pgrx_c_macros::expression::CType
                                         >::from_storage(
-                                            $crate::ItemPointerGetBlockNumberNoCheck(
+                                            $crate::__pgrx_c_bindings::ItemPointerGetBlockNumberNoCheck(
                                                 <
                                                     $crate::__pgrx_c_macros::expression::CPointer<
                                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                                            $crate::ItemPointerData
+                                                            $crate::__pgrx_c_bindings::ItemPointerData
                                                         >,
                                                         $crate::__pgrx_c_macros::expression::ReadOnly
                                                     > as $crate::__pgrx_c_macros::expression::CType
@@ -12866,7 +13611,7 @@ macro_rules! GinItupIsCompressed {
                                                     $crate::__pgrx_c_macros::expression::implicit::<
                                                         $crate::__pgrx_c_macros::expression::CPointer<
                                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                                $crate::ItemPointerData
+                                                                $crate::__pgrx_c_bindings::ItemPointerData
                                                             >,
                                                             $crate::__pgrx_c_macros::expression::ReadOnly
                                                         >,
@@ -12907,7 +13652,7 @@ macro_rules! GinItupIsCompressed {
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::CValue::<
                                         $crate::__pgrx_c_macros::CUnsignedInt
-                                    >::new($crate::GIN_ITUP_COMPRESSED as u32)
+                                    >::new($crate::__pgrx_c_bindings::GIN_ITUP_COMPRESSED as u32)
                                 )
                             )
                         )
@@ -12962,11 +13707,11 @@ macro_rules! GinItupIsCompressed {
                                                     <
                                                         $crate::__pgrx_c_macros::CUnsignedInt as $crate::__pgrx_c_macros::expression::CType
                                                     >::from_storage(
-                                                        $crate::ItemPointerGetBlockNumberNoCheck(
+                                                        $crate::__pgrx_c_bindings::ItemPointerGetBlockNumberNoCheck(
                                                             <
                                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                                        $crate::ItemPointerData
+                                                                        $crate::__pgrx_c_bindings::ItemPointerData
                                                                     >,
                                                                     $crate::__pgrx_c_macros::expression::ReadOnly
                                                                 > as $crate::__pgrx_c_macros::expression::CType
@@ -12974,7 +13719,7 @@ macro_rules! GinItupIsCompressed {
                                                                 $crate::__pgrx_c_macros::expression::implicit::<
                                                                     $crate::__pgrx_c_macros::expression::CPointer<
                                                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                                                            $crate::ItemPointerData
+                                                                            $crate::__pgrx_c_bindings::ItemPointerData
                                                                         >,
                                                                         $crate::__pgrx_c_macros::expression::ReadOnly
                                                                     >,
@@ -13020,7 +13765,9 @@ macro_rules! GinItupIsCompressed {
                                             >(
                                                 $crate::__pgrx_c_macros::CValue::<
                                                     $crate::__pgrx_c_macros::CUnsignedInt
-                                                >::new($crate::GIN_ITUP_COMPRESSED as u32)
+                                                >::new(
+                                                    $crate::__pgrx_c_bindings::GIN_ITUP_COMPRESSED as u32
+                                                )
                                             )
                                         )
                                     )
@@ -13057,11 +13804,11 @@ macro_rules! GinItupIsCompressed {
                                         <
                                             $crate::__pgrx_c_macros::CUnsignedInt as $crate::__pgrx_c_macros::expression::CType
                                         >::from_storage(
-                                            $crate::ItemPointerGetBlockNumberNoCheck(
+                                            $crate::__pgrx_c_bindings::ItemPointerGetBlockNumberNoCheck(
                                                 <
                                                     $crate::__pgrx_c_macros::expression::CPointer<
                                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                                            $crate::ItemPointerData
+                                                            $crate::__pgrx_c_bindings::ItemPointerData
                                                         >,
                                                         $crate::__pgrx_c_macros::expression::ReadOnly
                                                     > as $crate::__pgrx_c_macros::expression::CType
@@ -13069,7 +13816,7 @@ macro_rules! GinItupIsCompressed {
                                                     $crate::__pgrx_c_macros::expression::implicit::<
                                                         $crate::__pgrx_c_macros::expression::CPointer<
                                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                                $crate::ItemPointerData
+                                                                $crate::__pgrx_c_bindings::ItemPointerData
                                                             >,
                                                             $crate::__pgrx_c_macros::expression::ReadOnly
                                                         >,
@@ -13110,7 +13857,7 @@ macro_rules! GinItupIsCompressed {
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::CValue::<
                                         $crate::__pgrx_c_macros::CUnsignedInt
-                                    >::new($crate::GIN_ITUP_COMPRESSED as u32)
+                                    >::new($crate::__pgrx_c_bindings::GIN_ITUP_COMPRESSED as u32)
                                 )
                             )
                         )
@@ -13135,8 +13882,8 @@ macro_rules! GinItupIsCompressed {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -13167,23 +13914,23 @@ macro_rules! __pgrx_c_args_GinNextPostingListSegment {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
         $crate::__pgrx_c_args_GinNextPostingListSegment!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_GinNextPostingListSegment!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinNextPostingListSegment!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinNextPostingListSegment!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -13192,7 +13939,7 @@ macro_rules! __pgrx_c_args_GinNextPostingListSegment {
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
         $crate::__pgrx_c_args_GinNextPostingListSegment!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
@@ -13218,17 +13965,17 @@ macro_rules! __pgrx_c_args_GinNextPostingListSegment {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_GinNextPostingListSegment!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_GinNextPostingListSegment!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinNextPostingListSegment!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -13255,13 +14002,13 @@ macro_rules! __pgrx_c_args_GinNextPostingListSegment {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinNextPostingListSegment!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinNextPostingListSegment!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -13311,9 +14058,11 @@ macro_rules! GinNextPostingListSegment {
         (
             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::cast_as::<
-                    *mut $crate::GinPostingList,
+                    *mut $crate::__pgrx_c_bindings::GinPostingList,
                     $crate::__pgrx_c_macros::expression::CPointer<
-                        $crate::__pgrx_c_macros::expression::CRecord<$crate::GinPostingList>,
+                        $crate::__pgrx_c_macros::expression::CRecord<
+                            $crate::__pgrx_c_bindings::GinPostingList
+                        >,
                         $crate::__pgrx_c_macros::expression::ReadWrite
                     >,
                     _
@@ -13356,7 +14105,7 @@ macro_rules! GinNextPostingListSegment {
                                             >(
                                                 $crate::__pgrx_c_macros::expression::offset_of::<
                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                        $crate::GinPostingList
+                                                        $crate::__pgrx_c_bindings::GinPostingList
                                                     >,
                                                     $crate::__pgrx_c_field_marker!(@path; bytes)
                                                 >()
@@ -13440,7 +14189,7 @@ macro_rules! GinNextPostingListSegment {
                                                                                         $crate::__pgrx_c_macros::CValue::<
                                                                                             $crate::__pgrx_c_macros::CInt
                                                                                         >::new(
-                                                                                            $crate::ALIGNOF_SHORT as i32
+                                                                                            $crate::__pgrx_c_bindings::ALIGNOF_SHORT as i32
                                                                                         )
                                                                                     )
                                                                                 ),
@@ -13491,7 +14240,7 @@ macro_rules! GinNextPostingListSegment {
                                                                                                 $crate::__pgrx_c_macros::CValue::<
                                                                                                     $crate::__pgrx_c_macros::CInt
                                                                                                 >::new(
-                                                                                                    $crate::ALIGNOF_SHORT as i32
+                                                                                                    $crate::__pgrx_c_bindings::ALIGNOF_SHORT as i32
                                                                                                 )
                                                                                             )
                                                                                         ),
@@ -13557,10 +14306,10 @@ macro_rules! GinNextPostingListSegment {
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::cast_as::<
-                                *mut $crate::GinPostingList,
+                                *mut $crate::__pgrx_c_bindings::GinPostingList,
                                 $crate::__pgrx_c_macros::expression::CPointer<
                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                        $crate::GinPostingList
+                                        $crate::__pgrx_c_bindings::GinPostingList
                                     >,
                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                 >,
@@ -13615,7 +14364,7 @@ macro_rules! GinNextPostingListSegment {
                                                         >(
                                                             $crate::__pgrx_c_macros::expression::offset_of::<
                                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                                    $crate::GinPostingList
+                                                                    $crate::__pgrx_c_bindings::GinPostingList
                                                                 >,
                                                                 $crate::__pgrx_c_field_marker!(
                                                                     @path;
@@ -13702,7 +14451,7 @@ macro_rules! GinNextPostingListSegment {
                                                                                                     $crate::__pgrx_c_macros::CValue::<
                                                                                                         $crate::__pgrx_c_macros::CInt
                                                                                                     >::new(
-                                                                                                        $crate::ALIGNOF_SHORT as i32
+                                                                                                        $crate::__pgrx_c_bindings::ALIGNOF_SHORT as i32
                                                                                                     )
                                                                                                 )
                                                                                             ),
@@ -13755,7 +14504,7 @@ macro_rules! GinNextPostingListSegment {
                                                                                                             $crate::__pgrx_c_macros::CValue::<
                                                                                                                 $crate::__pgrx_c_macros::CInt
                                                                                                             >::new(
-                                                                                                                $crate::ALIGNOF_SHORT as i32
+                                                                                                                $crate::__pgrx_c_bindings::ALIGNOF_SHORT as i32
                                                                                                             )
                                                                                                         )
                                                                                                     ),
@@ -13803,9 +14552,11 @@ macro_rules! GinNextPostingListSegment {
         {
             let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::cast_as::<
-                    *mut $crate::GinPostingList,
+                    *mut $crate::__pgrx_c_bindings::GinPostingList,
                     $crate::__pgrx_c_macros::expression::CPointer<
-                        $crate::__pgrx_c_macros::expression::CRecord<$crate::GinPostingList>,
+                        $crate::__pgrx_c_macros::expression::CRecord<
+                            $crate::__pgrx_c_bindings::GinPostingList
+                        >,
                         $crate::__pgrx_c_macros::expression::ReadWrite
                     >,
                     _
@@ -13848,7 +14599,7 @@ macro_rules! GinNextPostingListSegment {
                                             >(
                                                 $crate::__pgrx_c_macros::expression::offset_of::<
                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                        $crate::GinPostingList
+                                                        $crate::__pgrx_c_bindings::GinPostingList
                                                     >,
                                                     $crate::__pgrx_c_field_marker!(@path; bytes)
                                                 >()
@@ -13932,7 +14683,7 @@ macro_rules! GinNextPostingListSegment {
                                                                                         $crate::__pgrx_c_macros::CValue::<
                                                                                             $crate::__pgrx_c_macros::CInt
                                                                                         >::new(
-                                                                                            $crate::ALIGNOF_SHORT as i32
+                                                                                            $crate::__pgrx_c_bindings::ALIGNOF_SHORT as i32
                                                                                         )
                                                                                     )
                                                                                 ),
@@ -13983,7 +14734,7 @@ macro_rules! GinNextPostingListSegment {
                                                                                                 $crate::__pgrx_c_macros::CValue::<
                                                                                                     $crate::__pgrx_c_macros::CInt
                                                                                                 >::new(
-                                                                                                    $crate::ALIGNOF_SHORT as i32
+                                                                                                    $crate::__pgrx_c_bindings::ALIGNOF_SHORT as i32
                                                                                                 )
                                                                                             )
                                                                                         ),
@@ -14027,8 +14778,8 @@ macro_rules! GinNextPostingListSegment {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -14059,23 +14810,23 @@ macro_rules! __pgrx_c_args_GinNonLeafDataPageGetFreeSpace {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
         $crate::__pgrx_c_args_GinNonLeafDataPageGetFreeSpace!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_GinNonLeafDataPageGetFreeSpace!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinNonLeafDataPageGetFreeSpace!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinNonLeafDataPageGetFreeSpace!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -14087,7 +14838,7 @@ macro_rules! __pgrx_c_args_GinNonLeafDataPageGetFreeSpace {
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
         $crate::__pgrx_c_args_GinNonLeafDataPageGetFreeSpace!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
@@ -14113,17 +14864,17 @@ macro_rules! __pgrx_c_args_GinNonLeafDataPageGetFreeSpace {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_GinNonLeafDataPageGetFreeSpace!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_GinNonLeafDataPageGetFreeSpace!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinNonLeafDataPageGetFreeSpace!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -14150,13 +14901,13 @@ macro_rules! __pgrx_c_args_GinNonLeafDataPageGetFreeSpace {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinNonLeafDataPageGetFreeSpace!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinNonLeafDataPageGetFreeSpace!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -14234,7 +14985,7 @@ macro_rules! GinNonLeafDataPageGetFreeSpace {
                                                 >(
                                                     $crate::__pgrx_c_macros::CValue::<
                                                         $crate::__pgrx_c_macros::CInt
-                                                    >::new($crate::BLCKSZ as i32)
+                                                    >::new($crate::__pgrx_c_bindings::BLCKSZ as i32)
                                                 ),
                                                 (
                                                     $crate::__pgrx_c_macros::expression::profile_value::<
@@ -14270,7 +15021,7 @@ macro_rules! GinNonLeafDataPageGetFreeSpace {
                                                                                             >(
                                                                                                 $crate::__pgrx_c_macros::expression::offset_of::<
                                                                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                        $crate::PageHeaderData
+                                                                                                        $crate::__pgrx_c_bindings::PageHeaderData
                                                                                                     >,
                                                                                                     $crate::__pgrx_c_field_marker!(
                                                                                                         @path;
@@ -14301,7 +15052,7 @@ macro_rules! GinNonLeafDataPageGetFreeSpace {
                                                                                             $crate::__pgrx_c_macros::CValue::<
                                                                                                 $crate::__pgrx_c_macros::CInt
                                                                                             >::new(
-                                                                                                $crate::MAXIMUM_ALIGNOF as i32
+                                                                                                $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                                             )
                                                                                         )
                                                                                     ),
@@ -14352,7 +15103,7 @@ macro_rules! GinNonLeafDataPageGetFreeSpace {
                                                                                                     $crate::__pgrx_c_macros::CValue::<
                                                                                                         $crate::__pgrx_c_macros::CInt
                                                                                                     >::new(
-                                                                                                        $crate::MAXIMUM_ALIGNOF as i32
+                                                                                                        $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                                                     )
                                                                                                 )
                                                                                             ),
@@ -14412,7 +15163,7 @@ macro_rules! GinNonLeafDataPageGetFreeSpace {
                                                                                 >(
                                                                                     $crate::__pgrx_c_macros::expression::size_of::<
                                                                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                            $crate::ItemPointerData
+                                                                                            $crate::__pgrx_c_bindings::ItemPointerData
                                                                                         >>()
                                                                                 )
                                                                             )
@@ -14437,7 +15188,7 @@ macro_rules! GinNonLeafDataPageGetFreeSpace {
                                                                                     $crate::__pgrx_c_macros::CValue::<
                                                                                         $crate::__pgrx_c_macros::CInt
                                                                                     >::new(
-                                                                                        $crate::MAXIMUM_ALIGNOF as i32
+                                                                                        $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                                     )
                                                                                 )
                                                                             ),
@@ -14488,7 +15239,7 @@ macro_rules! GinNonLeafDataPageGetFreeSpace {
                                                                                             $crate::__pgrx_c_macros::CValue::<
                                                                                                 $crate::__pgrx_c_macros::CInt
                                                                                             >::new(
-                                                                                                $crate::MAXIMUM_ALIGNOF as i32
+                                                                                                $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                                             )
                                                                                         )
                                                                                     ),
@@ -14543,7 +15294,7 @@ macro_rules! GinNonLeafDataPageGetFreeSpace {
                                                                         >(
                                                                             $crate::__pgrx_c_macros::expression::size_of::<
                                                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                    $crate::GinPageOpaqueData
+                                                                                    $crate::__pgrx_c_bindings::GinPageOpaqueData
                                                                                 >>()
                                                                         )
                                                                     )
@@ -14568,7 +15319,7 @@ macro_rules! GinNonLeafDataPageGetFreeSpace {
                                                                             $crate::__pgrx_c_macros::CValue::<
                                                                                 $crate::__pgrx_c_macros::CInt
                                                                             >::new(
-                                                                                $crate::MAXIMUM_ALIGNOF as i32
+                                                                                $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                             )
                                                                         )
                                                                     ),
@@ -14619,7 +15370,7 @@ macro_rules! GinNonLeafDataPageGetFreeSpace {
                                                                                     $crate::__pgrx_c_macros::CValue::<
                                                                                         $crate::__pgrx_c_macros::CInt
                                                                                     >::new(
-                                                                                        $crate::MAXIMUM_ALIGNOF as i32
+                                                                                        $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                                     )
                                                                                 )
                                                                             ),
@@ -14665,10 +15416,10 @@ macro_rules! GinNonLeafDataPageGetFreeSpace {
                                                     _
                                                 >(
                                                     $crate::__pgrx_c_macros::expression::cast_as::<
-                                                        $crate::GinPageOpaque,
+                                                        $crate::__pgrx_c_bindings::GinPageOpaque,
                                                         $crate::__pgrx_c_macros::expression::CPointer<
                                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                                $crate::GinPageOpaqueData
+                                                                $crate::__pgrx_c_bindings::GinPageOpaqueData
                                                             >,
                                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                                         >,
@@ -14685,16 +15436,22 @@ macro_rules! GinNonLeafDataPageGetFreeSpace {
                                                                             false,
                                                                             _
                                                                         >(
-                                                                            $crate::__pgrx_c_generated::Inline_777d7ad23546580e873e0206a9a6e1cd(
+                                                                            $crate::__pgrx_c_bindings::PageValidateSpecialPointer(
                                                                                 <
                                                                                     $crate::__pgrx_c_macros::expression::CPointer<
-                                                                                        $crate::__pgrx_c_macros::CChar,
+                                                                                        $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                                            $crate::__pgrx_c_macros::CChar,
+                                                                                            ::core::ffi::c_char
+                                                                                        >,
                                                                                         $crate::__pgrx_c_macros::expression::ReadOnly
                                                                                     > as $crate::__pgrx_c_macros::expression::CType
                                                                                 >::into_storage(
                                                                                     $crate::__pgrx_c_macros::expression::implicit::<
                                                                                         $crate::__pgrx_c_macros::expression::CPointer<
-                                                                                            $crate::__pgrx_c_macros::CChar,
+                                                                                            $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                                                $crate::__pgrx_c_macros::CChar,
+                                                                                                ::core::ffi::c_char
+                                                                                            >,
                                                                                             $crate::__pgrx_c_macros::expression::ReadOnly
                                                                                         >,
                                                                                         _
@@ -14755,10 +15512,10 @@ macro_rules! GinNonLeafDataPageGetFreeSpace {
                                                                                                         _
                                                                                                     >(
                                                                                                         $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                                                            $crate::PageHeader,
+                                                                                                            $crate::__pgrx_c_bindings::PageHeader,
                                                                                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                                                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                                    $crate::PageHeaderData
+                                                                                                                    $crate::__pgrx_c_bindings::PageHeaderData
                                                                                                                 >,
                                                                                                                 $crate::__pgrx_c_macros::expression::ReadWrite
                                                                                                             >,
@@ -14800,7 +15557,7 @@ macro_rules! GinNonLeafDataPageGetFreeSpace {
                             $crate::__pgrx_c_macros::expression::profile_value::<false, _>(
                                 $crate::__pgrx_c_macros::expression::size_of::<
                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                        $crate::PostingItem
+                                        $crate::__pgrx_c_bindings::PostingItem
                                     >>()
                             )
                         )
@@ -14881,7 +15638,9 @@ macro_rules! GinNonLeafDataPageGetFreeSpace {
                                                             >(
                                                                 $crate::__pgrx_c_macros::CValue::<
                                                                     $crate::__pgrx_c_macros::CInt
-                                                                >::new($crate::BLCKSZ as i32)
+                                                                >::new(
+                                                                    $crate::__pgrx_c_bindings::BLCKSZ as i32
+                                                                )
                                                             ),
                                                             (
                                                                 $crate::__pgrx_c_macros::expression::profile_value::<
@@ -14917,7 +15676,7 @@ macro_rules! GinNonLeafDataPageGetFreeSpace {
                                                                                                         >(
                                                                                                             $crate::__pgrx_c_macros::expression::offset_of::<
                                                                                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                                    $crate::PageHeaderData
+                                                                                                                    $crate::__pgrx_c_bindings::PageHeaderData
                                                                                                                 >,
                                                                                                                 $crate::__pgrx_c_field_marker!(
                                                                                                                     @path;
@@ -14948,7 +15707,7 @@ macro_rules! GinNonLeafDataPageGetFreeSpace {
                                                                                                         $crate::__pgrx_c_macros::CValue::<
                                                                                                             $crate::__pgrx_c_macros::CInt
                                                                                                         >::new(
-                                                                                                            $crate::MAXIMUM_ALIGNOF as i32
+                                                                                                            $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                                                         )
                                                                                                     )
                                                                                                 ),
@@ -15001,7 +15760,7 @@ macro_rules! GinNonLeafDataPageGetFreeSpace {
                                                                                                                 $crate::__pgrx_c_macros::CValue::<
                                                                                                                     $crate::__pgrx_c_macros::CInt
                                                                                                                 >::new(
-                                                                                                                    $crate::MAXIMUM_ALIGNOF as i32
+                                                                                                                    $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                                                                 )
                                                                                                             )
                                                                                                         ),
@@ -15061,7 +15820,7 @@ macro_rules! GinNonLeafDataPageGetFreeSpace {
                                                                                             >(
                                                                                                 $crate::__pgrx_c_macros::expression::size_of::<
                                                                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                        $crate::ItemPointerData
+                                                                                                        $crate::__pgrx_c_bindings::ItemPointerData
                                                                                                     >>()
                                                                                             )
                                                                                         )
@@ -15086,7 +15845,7 @@ macro_rules! GinNonLeafDataPageGetFreeSpace {
                                                                                                 $crate::__pgrx_c_macros::CValue::<
                                                                                                     $crate::__pgrx_c_macros::CInt
                                                                                                 >::new(
-                                                                                                    $crate::MAXIMUM_ALIGNOF as i32
+                                                                                                    $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                                                 )
                                                                                             )
                                                                                         ),
@@ -15139,7 +15898,7 @@ macro_rules! GinNonLeafDataPageGetFreeSpace {
                                                                                                         $crate::__pgrx_c_macros::CValue::<
                                                                                                             $crate::__pgrx_c_macros::CInt
                                                                                                         >::new(
-                                                                                                            $crate::MAXIMUM_ALIGNOF as i32
+                                                                                                            $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                                                         )
                                                                                                     )
                                                                                                 ),
@@ -15199,7 +15958,7 @@ macro_rules! GinNonLeafDataPageGetFreeSpace {
                                                                                     >(
                                                                                         $crate::__pgrx_c_macros::expression::size_of::<
                                                                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                $crate::GinPageOpaqueData
+                                                                                                $crate::__pgrx_c_bindings::GinPageOpaqueData
                                                                                             >>()
                                                                                     )
                                                                                 )
@@ -15224,7 +15983,7 @@ macro_rules! GinNonLeafDataPageGetFreeSpace {
                                                                                         $crate::__pgrx_c_macros::CValue::<
                                                                                             $crate::__pgrx_c_macros::CInt
                                                                                         >::new(
-                                                                                            $crate::MAXIMUM_ALIGNOF as i32
+                                                                                            $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                                         )
                                                                                     )
                                                                                 ),
@@ -15275,7 +16034,7 @@ macro_rules! GinNonLeafDataPageGetFreeSpace {
                                                                                                 $crate::__pgrx_c_macros::CValue::<
                                                                                                     $crate::__pgrx_c_macros::CInt
                                                                                                 >::new(
-                                                                                                    $crate::MAXIMUM_ALIGNOF as i32
+                                                                                                    $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                                                 )
                                                                                             )
                                                                                         ),
@@ -15326,10 +16085,10 @@ macro_rules! GinNonLeafDataPageGetFreeSpace {
                                                                 _
                                                             >(
                                                                 $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                    $crate::GinPageOpaque,
+                                                                    $crate::__pgrx_c_bindings::GinPageOpaque,
                                                                     $crate::__pgrx_c_macros::expression::CPointer<
                                                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                                                            $crate::GinPageOpaqueData
+                                                                            $crate::__pgrx_c_bindings::GinPageOpaqueData
                                                                         >,
                                                                         $crate::__pgrx_c_macros::expression::ReadWrite
                                                                     >,
@@ -15346,16 +16105,22 @@ macro_rules! GinNonLeafDataPageGetFreeSpace {
                                                                                         false,
                                                                                         _
                                                                                     >(
-                                                                                        $crate::__pgrx_c_generated::Inline_777d7ad23546580e873e0206a9a6e1cd(
+                                                                                        $crate::__pgrx_c_bindings::PageValidateSpecialPointer(
                                                                                             <
                                                                                                 $crate::__pgrx_c_macros::expression::CPointer<
-                                                                                                    $crate::__pgrx_c_macros::CChar,
+                                                                                                    $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                                                        $crate::__pgrx_c_macros::CChar,
+                                                                                                        ::core::ffi::c_char
+                                                                                                    >,
                                                                                                     $crate::__pgrx_c_macros::expression::ReadOnly
                                                                                                 > as $crate::__pgrx_c_macros::expression::CType
                                                                                             >::into_storage(
                                                                                                 $crate::__pgrx_c_macros::expression::implicit::<
                                                                                                     $crate::__pgrx_c_macros::expression::CPointer<
-                                                                                                        $crate::__pgrx_c_macros::CChar,
+                                                                                                        $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                                                            $crate::__pgrx_c_macros::CChar,
+                                                                                                            ::core::ffi::c_char
+                                                                                                        >,
                                                                                                         $crate::__pgrx_c_macros::expression::ReadOnly
                                                                                                     >,
                                                                                                     _
@@ -15416,10 +16181,10 @@ macro_rules! GinNonLeafDataPageGetFreeSpace {
                                                                                                                     _
                                                                                                                 >(
                                                                                                                     $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                                                                        $crate::PageHeader,
+                                                                                                                        $crate::__pgrx_c_bindings::PageHeader,
                                                                                                                         $crate::__pgrx_c_macros::expression::CPointer<
                                                                                                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                                                $crate::PageHeaderData
+                                                                                                                                $crate::__pgrx_c_bindings::PageHeaderData
                                                                                                                             >,
                                                                                                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                                                                                                         >,
@@ -15464,7 +16229,7 @@ macro_rules! GinNonLeafDataPageGetFreeSpace {
                                         >(
                                             $crate::__pgrx_c_macros::expression::size_of::<
                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                    $crate::PostingItem
+                                                    $crate::__pgrx_c_bindings::PostingItem
                                                 >>()
                                         )
                                     )
@@ -15517,7 +16282,7 @@ macro_rules! GinNonLeafDataPageGetFreeSpace {
                                                 >(
                                                     $crate::__pgrx_c_macros::CValue::<
                                                         $crate::__pgrx_c_macros::CInt
-                                                    >::new($crate::BLCKSZ as i32)
+                                                    >::new($crate::__pgrx_c_bindings::BLCKSZ as i32)
                                                 ),
                                                 (
                                                     $crate::__pgrx_c_macros::expression::profile_value::<
@@ -15553,7 +16318,7 @@ macro_rules! GinNonLeafDataPageGetFreeSpace {
                                                                                             >(
                                                                                                 $crate::__pgrx_c_macros::expression::offset_of::<
                                                                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                        $crate::PageHeaderData
+                                                                                                        $crate::__pgrx_c_bindings::PageHeaderData
                                                                                                     >,
                                                                                                     $crate::__pgrx_c_field_marker!(
                                                                                                         @path;
@@ -15584,7 +16349,7 @@ macro_rules! GinNonLeafDataPageGetFreeSpace {
                                                                                             $crate::__pgrx_c_macros::CValue::<
                                                                                                 $crate::__pgrx_c_macros::CInt
                                                                                             >::new(
-                                                                                                $crate::MAXIMUM_ALIGNOF as i32
+                                                                                                $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                                             )
                                                                                         )
                                                                                     ),
@@ -15635,7 +16400,7 @@ macro_rules! GinNonLeafDataPageGetFreeSpace {
                                                                                                     $crate::__pgrx_c_macros::CValue::<
                                                                                                         $crate::__pgrx_c_macros::CInt
                                                                                                     >::new(
-                                                                                                        $crate::MAXIMUM_ALIGNOF as i32
+                                                                                                        $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                                                     )
                                                                                                 )
                                                                                             ),
@@ -15695,7 +16460,7 @@ macro_rules! GinNonLeafDataPageGetFreeSpace {
                                                                                 >(
                                                                                     $crate::__pgrx_c_macros::expression::size_of::<
                                                                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                            $crate::ItemPointerData
+                                                                                            $crate::__pgrx_c_bindings::ItemPointerData
                                                                                         >>()
                                                                                 )
                                                                             )
@@ -15720,7 +16485,7 @@ macro_rules! GinNonLeafDataPageGetFreeSpace {
                                                                                     $crate::__pgrx_c_macros::CValue::<
                                                                                         $crate::__pgrx_c_macros::CInt
                                                                                     >::new(
-                                                                                        $crate::MAXIMUM_ALIGNOF as i32
+                                                                                        $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                                     )
                                                                                 )
                                                                             ),
@@ -15771,7 +16536,7 @@ macro_rules! GinNonLeafDataPageGetFreeSpace {
                                                                                             $crate::__pgrx_c_macros::CValue::<
                                                                                                 $crate::__pgrx_c_macros::CInt
                                                                                             >::new(
-                                                                                                $crate::MAXIMUM_ALIGNOF as i32
+                                                                                                $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                                             )
                                                                                         )
                                                                                     ),
@@ -15826,7 +16591,7 @@ macro_rules! GinNonLeafDataPageGetFreeSpace {
                                                                         >(
                                                                             $crate::__pgrx_c_macros::expression::size_of::<
                                                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                    $crate::GinPageOpaqueData
+                                                                                    $crate::__pgrx_c_bindings::GinPageOpaqueData
                                                                                 >>()
                                                                         )
                                                                     )
@@ -15851,7 +16616,7 @@ macro_rules! GinNonLeafDataPageGetFreeSpace {
                                                                             $crate::__pgrx_c_macros::CValue::<
                                                                                 $crate::__pgrx_c_macros::CInt
                                                                             >::new(
-                                                                                $crate::MAXIMUM_ALIGNOF as i32
+                                                                                $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                             )
                                                                         )
                                                                     ),
@@ -15902,7 +16667,7 @@ macro_rules! GinNonLeafDataPageGetFreeSpace {
                                                                                     $crate::__pgrx_c_macros::CValue::<
                                                                                         $crate::__pgrx_c_macros::CInt
                                                                                     >::new(
-                                                                                        $crate::MAXIMUM_ALIGNOF as i32
+                                                                                        $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                                     )
                                                                                 )
                                                                             ),
@@ -15948,10 +16713,10 @@ macro_rules! GinNonLeafDataPageGetFreeSpace {
                                                     _
                                                 >(
                                                     $crate::__pgrx_c_macros::expression::cast_as::<
-                                                        $crate::GinPageOpaque,
+                                                        $crate::__pgrx_c_bindings::GinPageOpaque,
                                                         $crate::__pgrx_c_macros::expression::CPointer<
                                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                                $crate::GinPageOpaqueData
+                                                                $crate::__pgrx_c_bindings::GinPageOpaqueData
                                                             >,
                                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                                         >,
@@ -15968,16 +16733,22 @@ macro_rules! GinNonLeafDataPageGetFreeSpace {
                                                                             false,
                                                                             _
                                                                         >(
-                                                                            $crate::__pgrx_c_generated::Inline_777d7ad23546580e873e0206a9a6e1cd(
+                                                                            $crate::__pgrx_c_bindings::PageValidateSpecialPointer(
                                                                                 <
                                                                                     $crate::__pgrx_c_macros::expression::CPointer<
-                                                                                        $crate::__pgrx_c_macros::CChar,
+                                                                                        $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                                            $crate::__pgrx_c_macros::CChar,
+                                                                                            ::core::ffi::c_char
+                                                                                        >,
                                                                                         $crate::__pgrx_c_macros::expression::ReadOnly
                                                                                     > as $crate::__pgrx_c_macros::expression::CType
                                                                                 >::into_storage(
                                                                                     $crate::__pgrx_c_macros::expression::implicit::<
                                                                                         $crate::__pgrx_c_macros::expression::CPointer<
-                                                                                            $crate::__pgrx_c_macros::CChar,
+                                                                                            $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                                                $crate::__pgrx_c_macros::CChar,
+                                                                                                ::core::ffi::c_char
+                                                                                            >,
                                                                                             $crate::__pgrx_c_macros::expression::ReadOnly
                                                                                         >,
                                                                                         _
@@ -16038,10 +16809,10 @@ macro_rules! GinNonLeafDataPageGetFreeSpace {
                                                                                                         _
                                                                                                     >(
                                                                                                         $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                                                            $crate::PageHeader,
+                                                                                                            $crate::__pgrx_c_bindings::PageHeader,
                                                                                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                                                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                                    $crate::PageHeaderData
+                                                                                                                    $crate::__pgrx_c_bindings::PageHeaderData
                                                                                                                 >,
                                                                                                                 $crate::__pgrx_c_macros::expression::ReadWrite
                                                                                                             >,
@@ -16083,7 +16854,7 @@ macro_rules! GinNonLeafDataPageGetFreeSpace {
                             $crate::__pgrx_c_macros::expression::profile_value::<false, _>(
                                 $crate::__pgrx_c_macros::expression::size_of::<
                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                        $crate::PostingItem
+                                        $crate::__pgrx_c_bindings::PostingItem
                                     >>()
                             )
                         )
@@ -16107,8 +16878,8 @@ macro_rules! GinNonLeafDataPageGetFreeSpace {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -16135,20 +16906,24 @@ macro_rules! __pgrx_c_args_GinPageGetDeleteXid {
         $crate::__pgrx_c_args_GinPageGetDeleteXid!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_GinPageGetDeleteXid!(@p1 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_GinPageGetDeleteXid!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_GinPageGetDeleteXid!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_GinPageGetDeleteXid!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinPageGetDeleteXid!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinPageGetDeleteXid!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -16156,7 +16931,9 @@ macro_rules! __pgrx_c_args_GinPageGetDeleteXid {
         $crate::__pgrx_c_args_GinPageGetDeleteXid!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_GinPageGetDeleteXid!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_GinPageGetDeleteXid!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -16178,14 +16955,18 @@ macro_rules! __pgrx_c_args_GinPageGetDeleteXid {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_GinPageGetDeleteXid!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_GinPageGetDeleteXid!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_GinPageGetDeleteXid!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_GinPageGetDeleteXid!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinPageGetDeleteXid!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -16212,13 +16993,13 @@ macro_rules! __pgrx_c_args_GinPageGetDeleteXid {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinPageGetDeleteXid!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinPageGetDeleteXid!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -16273,10 +17054,10 @@ macro_rules! GinPageGetDeleteXid {
                             (
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::cast_as::<
-                                        $crate::PageHeader,
+                                        $crate::__pgrx_c_bindings::PageHeader,
                                         $crate::__pgrx_c_macros::expression::CPointer<
                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                $crate::PageHeaderData
+                                                $crate::__pgrx_c_bindings::PageHeaderData
                                             >,
                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                         >,
@@ -16311,10 +17092,10 @@ macro_rules! GinPageGetDeleteXid {
                     (
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::cast_as::<
-                                $crate::PageHeader,
+                                $crate::__pgrx_c_bindings::PageHeader,
                                 $crate::__pgrx_c_macros::expression::CPointer<
                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                        $crate::PageHeaderData
+                                        $crate::__pgrx_c_bindings::PageHeaderData
                                     >,
                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                 >,
@@ -16346,10 +17127,10 @@ macro_rules! GinPageGetDeleteXid {
                     (
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::cast_as::<
-                                $crate::PageHeader,
+                                $crate::__pgrx_c_bindings::PageHeader,
                                 $crate::__pgrx_c_macros::expression::CPointer<
                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                        $crate::PageHeaderData
+                                        $crate::__pgrx_c_bindings::PageHeaderData
                                     >,
                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                 >,
@@ -16389,10 +17170,10 @@ macro_rules! GinPageGetDeleteXid {
                                 (
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::expression::cast_as::<
-                                            $crate::PageHeader,
+                                            $crate::__pgrx_c_bindings::PageHeader,
                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                    $crate::PageHeaderData
+                                                    $crate::__pgrx_c_bindings::PageHeaderData
                                                 >,
                                                 $crate::__pgrx_c_macros::expression::ReadWrite
                                             >,
@@ -16432,10 +17213,10 @@ macro_rules! GinPageGetDeleteXid {
                             (
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::cast_as::<
-                                        $crate::PageHeader,
+                                        $crate::__pgrx_c_bindings::PageHeader,
                                         $crate::__pgrx_c_macros::expression::CPointer<
                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                $crate::PageHeaderData
+                                                $crate::__pgrx_c_bindings::PageHeaderData
                                             >,
                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                         >,
@@ -16465,8 +17246,8 @@ macro_rules! GinPageGetDeleteXid {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -16493,20 +17274,24 @@ macro_rules! __pgrx_c_args_GinPageGetMeta {
         $crate::__pgrx_c_args_GinPageGetMeta!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_GinPageGetMeta!(@p1 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_GinPageGetMeta!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_GinPageGetMeta!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_GinPageGetMeta!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinPageGetMeta!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinPageGetMeta!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -16514,7 +17299,9 @@ macro_rules! __pgrx_c_args_GinPageGetMeta {
         $crate::__pgrx_c_args_GinPageGetMeta!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_GinPageGetMeta!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_GinPageGetMeta!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -16536,14 +17323,18 @@ macro_rules! __pgrx_c_args_GinPageGetMeta {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_GinPageGetMeta!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_GinPageGetMeta!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_GinPageGetMeta!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_GinPageGetMeta!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinPageGetMeta!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -16570,13 +17361,13 @@ macro_rules! __pgrx_c_args_GinPageGetMeta {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinPageGetMeta!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinPageGetMeta!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -16622,9 +17413,11 @@ macro_rules! GinPageGetMeta {
         (
             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::cast_as::<
-                    *mut $crate::GinMetaPageData,
+                    *mut $crate::__pgrx_c_bindings::GinMetaPageData,
                     $crate::__pgrx_c_macros::expression::CPointer<
-                        $crate::__pgrx_c_macros::expression::CRecord<$crate::GinMetaPageData>,
+                        $crate::__pgrx_c_macros::expression::CRecord<
+                            $crate::__pgrx_c_bindings::GinMetaPageData
+                        >,
                         $crate::__pgrx_c_macros::expression::ReadWrite
                     >,
                     _
@@ -16639,7 +17432,7 @@ macro_rules! GinPageGetMeta {
                                 $crate::__pgrx_c_macros::expression::ReadWrite
                             > as $crate::__pgrx_c_macros::expression::CType
                         >::from_storage(
-                            $crate::PageGetContents(
+                            $crate::__pgrx_c_bindings::PageGetContents(
                                 <
                                     $crate::__pgrx_c_macros::expression::CPointer<
                                         $crate::__pgrx_c_macros::expression::CIntegerStorage<
@@ -16699,10 +17492,10 @@ macro_rules! GinPageGetMeta {
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::cast_as::<
-                                *mut $crate::GinMetaPageData,
+                                *mut $crate::__pgrx_c_bindings::GinMetaPageData,
                                 $crate::__pgrx_c_macros::expression::CPointer<
                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                        $crate::GinMetaPageData
+                                        $crate::__pgrx_c_bindings::GinMetaPageData
                                     >,
                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                 >,
@@ -16718,7 +17511,7 @@ macro_rules! GinPageGetMeta {
                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::from_storage(
-                                        $crate::PageGetContents(
+                                        $crate::__pgrx_c_bindings::PageGetContents(
                                             <
                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                     $crate::__pgrx_c_macros::expression::CIntegerStorage<
@@ -16763,9 +17556,11 @@ macro_rules! GinPageGetMeta {
         {
             let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::cast_as::<
-                    *mut $crate::GinMetaPageData,
+                    *mut $crate::__pgrx_c_bindings::GinMetaPageData,
                     $crate::__pgrx_c_macros::expression::CPointer<
-                        $crate::__pgrx_c_macros::expression::CRecord<$crate::GinMetaPageData>,
+                        $crate::__pgrx_c_macros::expression::CRecord<
+                            $crate::__pgrx_c_bindings::GinMetaPageData
+                        >,
                         $crate::__pgrx_c_macros::expression::ReadWrite
                     >,
                     _
@@ -16780,7 +17575,7 @@ macro_rules! GinPageGetMeta {
                                 $crate::__pgrx_c_macros::expression::ReadWrite
                             > as $crate::__pgrx_c_macros::expression::CType
                         >::from_storage(
-                            $crate::PageGetContents(
+                            $crate::__pgrx_c_bindings::PageGetContents(
                                 <
                                     $crate::__pgrx_c_macros::expression::CPointer<
                                         $crate::__pgrx_c_macros::expression::CIntegerStorage<
@@ -16822,8 +17617,8 @@ macro_rules! GinPageGetMeta {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -16850,20 +17645,24 @@ macro_rules! __pgrx_c_args_GinPageGetOpaque {
         $crate::__pgrx_c_args_GinPageGetOpaque!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_GinPageGetOpaque!(@p1 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_GinPageGetOpaque!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_GinPageGetOpaque!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_GinPageGetOpaque!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinPageGetOpaque!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinPageGetOpaque!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -16871,7 +17670,9 @@ macro_rules! __pgrx_c_args_GinPageGetOpaque {
         $crate::__pgrx_c_args_GinPageGetOpaque!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_GinPageGetOpaque!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_GinPageGetOpaque!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -16893,14 +17694,18 @@ macro_rules! __pgrx_c_args_GinPageGetOpaque {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_GinPageGetOpaque!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_GinPageGetOpaque!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_GinPageGetOpaque!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_GinPageGetOpaque!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinPageGetOpaque!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -16927,13 +17732,13 @@ macro_rules! __pgrx_c_args_GinPageGetOpaque {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinPageGetOpaque!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinPageGetOpaque!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -16980,9 +17785,11 @@ macro_rules! GinPageGetOpaque {
         (
             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::cast_as::<
-                    $crate::GinPageOpaque,
+                    $crate::__pgrx_c_bindings::GinPageOpaque,
                     $crate::__pgrx_c_macros::expression::CPointer<
-                        $crate::__pgrx_c_macros::expression::CRecord<$crate::GinPageOpaqueData>,
+                        $crate::__pgrx_c_macros::expression::CRecord<
+                            $crate::__pgrx_c_bindings::GinPageOpaqueData
+                        >,
                         $crate::__pgrx_c_macros::expression::ReadWrite
                     >,
                     _
@@ -16995,16 +17802,22 @@ macro_rules! GinPageGetOpaque {
                                         true,
                                         _
                                     >(
-                                        $crate::__pgrx_c_generated::Inline_777d7ad23546580e873e0206a9a6e1cd(
+                                        $crate::__pgrx_c_bindings::PageValidateSpecialPointer(
                                             <
                                                 $crate::__pgrx_c_macros::expression::CPointer<
-                                                    $crate::__pgrx_c_macros::CChar,
+                                                    $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                        $crate::__pgrx_c_macros::CChar,
+                                                        ::core::ffi::c_char
+                                                    >,
                                                     $crate::__pgrx_c_macros::expression::ReadOnly
                                                 > as $crate::__pgrx_c_macros::expression::CType
                                             >::into_storage(
                                                 $crate::__pgrx_c_macros::expression::implicit::<
                                                     $crate::__pgrx_c_macros::expression::CPointer<
-                                                        $crate::__pgrx_c_macros::CChar,
+                                                        $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                            $crate::__pgrx_c_macros::CChar,
+                                                            ::core::ffi::c_char
+                                                        >,
                                                         $crate::__pgrx_c_macros::expression::ReadOnly
                                                     >,
                                                     _
@@ -17053,10 +17866,10 @@ macro_rules! GinPageGetOpaque {
                                                                     _
                                                                 >(
                                                                     $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                        $crate::PageHeader,
+                                                                        $crate::__pgrx_c_bindings::PageHeader,
                                                                         $crate::__pgrx_c_macros::expression::CPointer<
                                                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                $crate::PageHeaderData
+                                                                                $crate::__pgrx_c_bindings::PageHeaderData
                                                                             >,
                                                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                                                         >,
@@ -17118,10 +17931,10 @@ macro_rules! GinPageGetOpaque {
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::cast_as::<
-                                $crate::GinPageOpaque,
+                                $crate::__pgrx_c_bindings::GinPageOpaque,
                                 $crate::__pgrx_c_macros::expression::CPointer<
                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                        $crate::GinPageOpaqueData
+                                        $crate::__pgrx_c_bindings::GinPageOpaqueData
                                     >,
                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                 >,
@@ -17135,16 +17948,22 @@ macro_rules! GinPageGetOpaque {
                                                     true,
                                                     _
                                                 >(
-                                                    $crate::__pgrx_c_generated::Inline_777d7ad23546580e873e0206a9a6e1cd(
+                                                    $crate::__pgrx_c_bindings::PageValidateSpecialPointer(
                                                         <
                                                             $crate::__pgrx_c_macros::expression::CPointer<
-                                                                $crate::__pgrx_c_macros::CChar,
+                                                                $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                    $crate::__pgrx_c_macros::CChar,
+                                                                    ::core::ffi::c_char
+                                                                >,
                                                                 $crate::__pgrx_c_macros::expression::ReadOnly
                                                             > as $crate::__pgrx_c_macros::expression::CType
                                                         >::into_storage(
                                                             $crate::__pgrx_c_macros::expression::implicit::<
                                                                 $crate::__pgrx_c_macros::expression::CPointer<
-                                                                    $crate::__pgrx_c_macros::CChar,
+                                                                    $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                        $crate::__pgrx_c_macros::CChar,
+                                                                        ::core::ffi::c_char
+                                                                    >,
                                                                     $crate::__pgrx_c_macros::expression::ReadOnly
                                                                 >,
                                                                 _
@@ -17201,10 +18020,10 @@ macro_rules! GinPageGetOpaque {
                                                                                 _
                                                                             >(
                                                                                 $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                                    $crate::PageHeader,
+                                                                                    $crate::__pgrx_c_bindings::PageHeader,
                                                                                     $crate::__pgrx_c_macros::expression::CPointer<
                                                                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                            $crate::PageHeaderData
+                                                                                            $crate::__pgrx_c_bindings::PageHeaderData
                                                                                         >,
                                                                                         $crate::__pgrx_c_macros::expression::ReadWrite
                                                                                     >,
@@ -17253,9 +18072,11 @@ macro_rules! GinPageGetOpaque {
         {
             let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::cast_as::<
-                    $crate::GinPageOpaque,
+                    $crate::__pgrx_c_bindings::GinPageOpaque,
                     $crate::__pgrx_c_macros::expression::CPointer<
-                        $crate::__pgrx_c_macros::expression::CRecord<$crate::GinPageOpaqueData>,
+                        $crate::__pgrx_c_macros::expression::CRecord<
+                            $crate::__pgrx_c_bindings::GinPageOpaqueData
+                        >,
                         $crate::__pgrx_c_macros::expression::ReadWrite
                     >,
                     _
@@ -17268,16 +18089,22 @@ macro_rules! GinPageGetOpaque {
                                         true,
                                         _
                                     >(
-                                        $crate::__pgrx_c_generated::Inline_777d7ad23546580e873e0206a9a6e1cd(
+                                        $crate::__pgrx_c_bindings::PageValidateSpecialPointer(
                                             <
                                                 $crate::__pgrx_c_macros::expression::CPointer<
-                                                    $crate::__pgrx_c_macros::CChar,
+                                                    $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                        $crate::__pgrx_c_macros::CChar,
+                                                        ::core::ffi::c_char
+                                                    >,
                                                     $crate::__pgrx_c_macros::expression::ReadOnly
                                                 > as $crate::__pgrx_c_macros::expression::CType
                                             >::into_storage(
                                                 $crate::__pgrx_c_macros::expression::implicit::<
                                                     $crate::__pgrx_c_macros::expression::CPointer<
-                                                        $crate::__pgrx_c_macros::CChar,
+                                                        $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                            $crate::__pgrx_c_macros::CChar,
+                                                            ::core::ffi::c_char
+                                                        >,
                                                         $crate::__pgrx_c_macros::expression::ReadOnly
                                                     >,
                                                     _
@@ -17326,10 +18153,10 @@ macro_rules! GinPageGetOpaque {
                                                                     _
                                                                 >(
                                                                     $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                        $crate::PageHeader,
+                                                                        $crate::__pgrx_c_bindings::PageHeader,
                                                                         $crate::__pgrx_c_macros::expression::CPointer<
                                                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                $crate::PageHeaderData
+                                                                                $crate::__pgrx_c_bindings::PageHeaderData
                                                                             >,
                                                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                                                         >,
@@ -17372,8 +18199,8 @@ macro_rules! GinPageGetOpaque {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -17400,20 +18227,24 @@ macro_rules! __pgrx_c_args_GinPageHasFullRow {
         $crate::__pgrx_c_args_GinPageHasFullRow!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_GinPageHasFullRow!(@p1 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_GinPageHasFullRow!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_GinPageHasFullRow!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_GinPageHasFullRow!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinPageHasFullRow!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinPageHasFullRow!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -17421,7 +18252,9 @@ macro_rules! __pgrx_c_args_GinPageHasFullRow {
         $crate::__pgrx_c_args_GinPageHasFullRow!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_GinPageHasFullRow!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_GinPageHasFullRow!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -17443,14 +18276,18 @@ macro_rules! __pgrx_c_args_GinPageHasFullRow {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_GinPageHasFullRow!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_GinPageHasFullRow!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_GinPageHasFullRow!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_GinPageHasFullRow!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinPageHasFullRow!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -17477,13 +18314,13 @@ macro_rules! __pgrx_c_args_GinPageHasFullRow {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinPageHasFullRow!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinPageHasFullRow!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -17547,10 +18384,10 @@ macro_rules! GinPageHasFullRow {
                                                         _
                                                     >(
                                                         $crate::__pgrx_c_macros::expression::cast_as::<
-                                                            $crate::GinPageOpaque,
+                                                            $crate::__pgrx_c_bindings::GinPageOpaque,
                                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                                    $crate::GinPageOpaqueData
+                                                                    $crate::__pgrx_c_bindings::GinPageOpaqueData
                                                                 >,
                                                                 $crate::__pgrx_c_macros::expression::ReadWrite
                                                             >,
@@ -17567,16 +18404,22 @@ macro_rules! GinPageHasFullRow {
                                                                                 true,
                                                                                 _
                                                                             >(
-                                                                                $crate::__pgrx_c_generated::Inline_777d7ad23546580e873e0206a9a6e1cd(
+                                                                                $crate::__pgrx_c_bindings::PageValidateSpecialPointer(
                                                                                     <
                                                                                         $crate::__pgrx_c_macros::expression::CPointer<
-                                                                                            $crate::__pgrx_c_macros::CChar,
+                                                                                            $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                                                $crate::__pgrx_c_macros::CChar,
+                                                                                                ::core::ffi::c_char
+                                                                                            >,
                                                                                             $crate::__pgrx_c_macros::expression::ReadOnly
                                                                                         > as $crate::__pgrx_c_macros::expression::CType
                                                                                     >::into_storage(
                                                                                         $crate::__pgrx_c_macros::expression::implicit::<
                                                                                             $crate::__pgrx_c_macros::expression::CPointer<
-                                                                                                $crate::__pgrx_c_macros::CChar,
+                                                                                                $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                                                    $crate::__pgrx_c_macros::CChar,
+                                                                                                    ::core::ffi::c_char
+                                                                                                >,
                                                                                                 $crate::__pgrx_c_macros::expression::ReadOnly
                                                                                             >,
                                                                                             _
@@ -17637,10 +18480,10 @@ macro_rules! GinPageHasFullRow {
                                                                                                             _
                                                                                                         >(
                                                                                                             $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                                                                $crate::PageHeader,
+                                                                                                                $crate::__pgrx_c_bindings::PageHeader,
                                                                                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                                                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                                        $crate::PageHeaderData
+                                                                                                                        $crate::__pgrx_c_bindings::PageHeaderData
                                                                                                                     >,
                                                                                                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                                                                                                 >,
@@ -17681,7 +18524,7 @@ macro_rules! GinPageHasFullRow {
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                        $crate::GIN_LIST_FULLROW as i32
+                                        $crate::__pgrx_c_bindings::GIN_LIST_FULLROW as i32
                                     )
                                 )
                             )
@@ -17746,10 +18589,10 @@ macro_rules! GinPageHasFullRow {
                                                                     _
                                                                 >(
                                                                     $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                        $crate::GinPageOpaque,
+                                                                        $crate::__pgrx_c_bindings::GinPageOpaque,
                                                                         $crate::__pgrx_c_macros::expression::CPointer<
                                                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                $crate::GinPageOpaqueData
+                                                                                $crate::__pgrx_c_bindings::GinPageOpaqueData
                                                                             >,
                                                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                                                         >,
@@ -17766,16 +18609,22 @@ macro_rules! GinPageHasFullRow {
                                                                                             true,
                                                                                             _
                                                                                         >(
-                                                                                            $crate::__pgrx_c_generated::Inline_777d7ad23546580e873e0206a9a6e1cd(
+                                                                                            $crate::__pgrx_c_bindings::PageValidateSpecialPointer(
                                                                                                 <
                                                                                                     $crate::__pgrx_c_macros::expression::CPointer<
-                                                                                                        $crate::__pgrx_c_macros::CChar,
+                                                                                                        $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                                                            $crate::__pgrx_c_macros::CChar,
+                                                                                                            ::core::ffi::c_char
+                                                                                                        >,
                                                                                                         $crate::__pgrx_c_macros::expression::ReadOnly
                                                                                                     > as $crate::__pgrx_c_macros::expression::CType
                                                                                                 >::into_storage(
                                                                                                     $crate::__pgrx_c_macros::expression::implicit::<
                                                                                                         $crate::__pgrx_c_macros::expression::CPointer<
-                                                                                                            $crate::__pgrx_c_macros::CChar,
+                                                                                                            $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                                                                $crate::__pgrx_c_macros::CChar,
+                                                                                                                ::core::ffi::c_char
+                                                                                                            >,
                                                                                                             $crate::__pgrx_c_macros::expression::ReadOnly
                                                                                                         >,
                                                                                                         _
@@ -17836,10 +18685,10 @@ macro_rules! GinPageHasFullRow {
                                                                                                                         _
                                                                                                                     >(
                                                                                                                         $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                                                                            $crate::PageHeader,
+                                                                                                                            $crate::__pgrx_c_bindings::PageHeader,
                                                                                                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                                                                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                                                    $crate::PageHeaderData
+                                                                                                                                    $crate::__pgrx_c_bindings::PageHeaderData
                                                                                                                                 >,
                                                                                                                                 $crate::__pgrx_c_macros::expression::ReadWrite
                                                                                                                             >,
@@ -17884,7 +18733,9 @@ macro_rules! GinPageHasFullRow {
                                             >(
                                                 $crate::__pgrx_c_macros::CValue::<
                                                     $crate::__pgrx_c_macros::CInt
-                                                >::new($crate::GIN_LIST_FULLROW as i32)
+                                                >::new(
+                                                    $crate::__pgrx_c_bindings::GIN_LIST_FULLROW as i32
+                                                )
                                             )
                                         )
                                     )
@@ -17930,10 +18781,10 @@ macro_rules! GinPageHasFullRow {
                                                         _
                                                     >(
                                                         $crate::__pgrx_c_macros::expression::cast_as::<
-                                                            $crate::GinPageOpaque,
+                                                            $crate::__pgrx_c_bindings::GinPageOpaque,
                                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                                    $crate::GinPageOpaqueData
+                                                                    $crate::__pgrx_c_bindings::GinPageOpaqueData
                                                                 >,
                                                                 $crate::__pgrx_c_macros::expression::ReadWrite
                                                             >,
@@ -17950,16 +18801,22 @@ macro_rules! GinPageHasFullRow {
                                                                                 true,
                                                                                 _
                                                                             >(
-                                                                                $crate::__pgrx_c_generated::Inline_777d7ad23546580e873e0206a9a6e1cd(
+                                                                                $crate::__pgrx_c_bindings::PageValidateSpecialPointer(
                                                                                     <
                                                                                         $crate::__pgrx_c_macros::expression::CPointer<
-                                                                                            $crate::__pgrx_c_macros::CChar,
+                                                                                            $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                                                $crate::__pgrx_c_macros::CChar,
+                                                                                                ::core::ffi::c_char
+                                                                                            >,
                                                                                             $crate::__pgrx_c_macros::expression::ReadOnly
                                                                                         > as $crate::__pgrx_c_macros::expression::CType
                                                                                     >::into_storage(
                                                                                         $crate::__pgrx_c_macros::expression::implicit::<
                                                                                             $crate::__pgrx_c_macros::expression::CPointer<
-                                                                                                $crate::__pgrx_c_macros::CChar,
+                                                                                                $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                                                    $crate::__pgrx_c_macros::CChar,
+                                                                                                    ::core::ffi::c_char
+                                                                                                >,
                                                                                                 $crate::__pgrx_c_macros::expression::ReadOnly
                                                                                             >,
                                                                                             _
@@ -18020,10 +18877,10 @@ macro_rules! GinPageHasFullRow {
                                                                                                             _
                                                                                                         >(
                                                                                                             $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                                                                $crate::PageHeader,
+                                                                                                                $crate::__pgrx_c_bindings::PageHeader,
                                                                                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                                                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                                        $crate::PageHeaderData
+                                                                                                                        $crate::__pgrx_c_bindings::PageHeaderData
                                                                                                                     >,
                                                                                                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                                                                                                 >,
@@ -18064,7 +18921,7 @@ macro_rules! GinPageHasFullRow {
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                        $crate::GIN_LIST_FULLROW as i32
+                                        $crate::__pgrx_c_bindings::GIN_LIST_FULLROW as i32
                                     )
                                 )
                             )
@@ -18090,8 +18947,8 @@ macro_rules! GinPageHasFullRow {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -18118,20 +18975,24 @@ macro_rules! __pgrx_c_args_GinPageIsCompressed {
         $crate::__pgrx_c_args_GinPageIsCompressed!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_GinPageIsCompressed!(@p1 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_GinPageIsCompressed!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_GinPageIsCompressed!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_GinPageIsCompressed!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinPageIsCompressed!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinPageIsCompressed!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -18139,7 +19000,9 @@ macro_rules! __pgrx_c_args_GinPageIsCompressed {
         $crate::__pgrx_c_args_GinPageIsCompressed!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_GinPageIsCompressed!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_GinPageIsCompressed!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -18161,14 +19024,18 @@ macro_rules! __pgrx_c_args_GinPageIsCompressed {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_GinPageIsCompressed!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_GinPageIsCompressed!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_GinPageIsCompressed!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_GinPageIsCompressed!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinPageIsCompressed!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -18195,13 +19062,13 @@ macro_rules! __pgrx_c_args_GinPageIsCompressed {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinPageIsCompressed!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinPageIsCompressed!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -18265,10 +19132,10 @@ macro_rules! GinPageIsCompressed {
                                                         _
                                                     >(
                                                         $crate::__pgrx_c_macros::expression::cast_as::<
-                                                            $crate::GinPageOpaque,
+                                                            $crate::__pgrx_c_bindings::GinPageOpaque,
                                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                                    $crate::GinPageOpaqueData
+                                                                    $crate::__pgrx_c_bindings::GinPageOpaqueData
                                                                 >,
                                                                 $crate::__pgrx_c_macros::expression::ReadWrite
                                                             >,
@@ -18285,16 +19152,22 @@ macro_rules! GinPageIsCompressed {
                                                                                 true,
                                                                                 _
                                                                             >(
-                                                                                $crate::__pgrx_c_generated::Inline_777d7ad23546580e873e0206a9a6e1cd(
+                                                                                $crate::__pgrx_c_bindings::PageValidateSpecialPointer(
                                                                                     <
                                                                                         $crate::__pgrx_c_macros::expression::CPointer<
-                                                                                            $crate::__pgrx_c_macros::CChar,
+                                                                                            $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                                                $crate::__pgrx_c_macros::CChar,
+                                                                                                ::core::ffi::c_char
+                                                                                            >,
                                                                                             $crate::__pgrx_c_macros::expression::ReadOnly
                                                                                         > as $crate::__pgrx_c_macros::expression::CType
                                                                                     >::into_storage(
                                                                                         $crate::__pgrx_c_macros::expression::implicit::<
                                                                                             $crate::__pgrx_c_macros::expression::CPointer<
-                                                                                                $crate::__pgrx_c_macros::CChar,
+                                                                                                $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                                                    $crate::__pgrx_c_macros::CChar,
+                                                                                                    ::core::ffi::c_char
+                                                                                                >,
                                                                                                 $crate::__pgrx_c_macros::expression::ReadOnly
                                                                                             >,
                                                                                             _
@@ -18355,10 +19228,10 @@ macro_rules! GinPageIsCompressed {
                                                                                                             _
                                                                                                         >(
                                                                                                             $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                                                                $crate::PageHeader,
+                                                                                                                $crate::__pgrx_c_bindings::PageHeader,
                                                                                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                                                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                                        $crate::PageHeaderData
+                                                                                                                        $crate::__pgrx_c_bindings::PageHeaderData
                                                                                                                     >,
                                                                                                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                                                                                                 >,
@@ -18399,7 +19272,7 @@ macro_rules! GinPageIsCompressed {
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                        $crate::GIN_COMPRESSED as i32
+                                        $crate::__pgrx_c_bindings::GIN_COMPRESSED as i32
                                     )
                                 )
                             )
@@ -18464,10 +19337,10 @@ macro_rules! GinPageIsCompressed {
                                                                     _
                                                                 >(
                                                                     $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                        $crate::GinPageOpaque,
+                                                                        $crate::__pgrx_c_bindings::GinPageOpaque,
                                                                         $crate::__pgrx_c_macros::expression::CPointer<
                                                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                $crate::GinPageOpaqueData
+                                                                                $crate::__pgrx_c_bindings::GinPageOpaqueData
                                                                             >,
                                                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                                                         >,
@@ -18484,16 +19357,22 @@ macro_rules! GinPageIsCompressed {
                                                                                             true,
                                                                                             _
                                                                                         >(
-                                                                                            $crate::__pgrx_c_generated::Inline_777d7ad23546580e873e0206a9a6e1cd(
+                                                                                            $crate::__pgrx_c_bindings::PageValidateSpecialPointer(
                                                                                                 <
                                                                                                     $crate::__pgrx_c_macros::expression::CPointer<
-                                                                                                        $crate::__pgrx_c_macros::CChar,
+                                                                                                        $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                                                            $crate::__pgrx_c_macros::CChar,
+                                                                                                            ::core::ffi::c_char
+                                                                                                        >,
                                                                                                         $crate::__pgrx_c_macros::expression::ReadOnly
                                                                                                     > as $crate::__pgrx_c_macros::expression::CType
                                                                                                 >::into_storage(
                                                                                                     $crate::__pgrx_c_macros::expression::implicit::<
                                                                                                         $crate::__pgrx_c_macros::expression::CPointer<
-                                                                                                            $crate::__pgrx_c_macros::CChar,
+                                                                                                            $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                                                                $crate::__pgrx_c_macros::CChar,
+                                                                                                                ::core::ffi::c_char
+                                                                                                            >,
                                                                                                             $crate::__pgrx_c_macros::expression::ReadOnly
                                                                                                         >,
                                                                                                         _
@@ -18554,10 +19433,10 @@ macro_rules! GinPageIsCompressed {
                                                                                                                         _
                                                                                                                     >(
                                                                                                                         $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                                                                            $crate::PageHeader,
+                                                                                                                            $crate::__pgrx_c_bindings::PageHeader,
                                                                                                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                                                                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                                                    $crate::PageHeaderData
+                                                                                                                                    $crate::__pgrx_c_bindings::PageHeaderData
                                                                                                                                 >,
                                                                                                                                 $crate::__pgrx_c_macros::expression::ReadWrite
                                                                                                                             >,
@@ -18602,7 +19481,9 @@ macro_rules! GinPageIsCompressed {
                                             >(
                                                 $crate::__pgrx_c_macros::CValue::<
                                                     $crate::__pgrx_c_macros::CInt
-                                                >::new($crate::GIN_COMPRESSED as i32)
+                                                >::new(
+                                                    $crate::__pgrx_c_bindings::GIN_COMPRESSED as i32
+                                                )
                                             )
                                         )
                                     )
@@ -18648,10 +19529,10 @@ macro_rules! GinPageIsCompressed {
                                                         _
                                                     >(
                                                         $crate::__pgrx_c_macros::expression::cast_as::<
-                                                            $crate::GinPageOpaque,
+                                                            $crate::__pgrx_c_bindings::GinPageOpaque,
                                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                                    $crate::GinPageOpaqueData
+                                                                    $crate::__pgrx_c_bindings::GinPageOpaqueData
                                                                 >,
                                                                 $crate::__pgrx_c_macros::expression::ReadWrite
                                                             >,
@@ -18668,16 +19549,22 @@ macro_rules! GinPageIsCompressed {
                                                                                 true,
                                                                                 _
                                                                             >(
-                                                                                $crate::__pgrx_c_generated::Inline_777d7ad23546580e873e0206a9a6e1cd(
+                                                                                $crate::__pgrx_c_bindings::PageValidateSpecialPointer(
                                                                                     <
                                                                                         $crate::__pgrx_c_macros::expression::CPointer<
-                                                                                            $crate::__pgrx_c_macros::CChar,
+                                                                                            $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                                                $crate::__pgrx_c_macros::CChar,
+                                                                                                ::core::ffi::c_char
+                                                                                            >,
                                                                                             $crate::__pgrx_c_macros::expression::ReadOnly
                                                                                         > as $crate::__pgrx_c_macros::expression::CType
                                                                                     >::into_storage(
                                                                                         $crate::__pgrx_c_macros::expression::implicit::<
                                                                                             $crate::__pgrx_c_macros::expression::CPointer<
-                                                                                                $crate::__pgrx_c_macros::CChar,
+                                                                                                $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                                                    $crate::__pgrx_c_macros::CChar,
+                                                                                                    ::core::ffi::c_char
+                                                                                                >,
                                                                                                 $crate::__pgrx_c_macros::expression::ReadOnly
                                                                                             >,
                                                                                             _
@@ -18738,10 +19625,10 @@ macro_rules! GinPageIsCompressed {
                                                                                                             _
                                                                                                         >(
                                                                                                             $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                                                                $crate::PageHeader,
+                                                                                                                $crate::__pgrx_c_bindings::PageHeader,
                                                                                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                                                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                                        $crate::PageHeaderData
+                                                                                                                        $crate::__pgrx_c_bindings::PageHeaderData
                                                                                                                     >,
                                                                                                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                                                                                                 >,
@@ -18782,7 +19669,7 @@ macro_rules! GinPageIsCompressed {
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                        $crate::GIN_COMPRESSED as i32
+                                        $crate::__pgrx_c_bindings::GIN_COMPRESSED as i32
                                     )
                                 )
                             )
@@ -18808,8 +19695,8 @@ macro_rules! GinPageIsCompressed {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -18836,20 +19723,24 @@ macro_rules! __pgrx_c_args_GinPageIsData {
         $crate::__pgrx_c_args_GinPageIsData!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_GinPageIsData!(@p1 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_GinPageIsData!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_GinPageIsData!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_GinPageIsData!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinPageIsData!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinPageIsData!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -18857,7 +19748,9 @@ macro_rules! __pgrx_c_args_GinPageIsData {
         $crate::__pgrx_c_args_GinPageIsData!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_GinPageIsData!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_GinPageIsData!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -18879,14 +19772,18 @@ macro_rules! __pgrx_c_args_GinPageIsData {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_GinPageIsData!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_GinPageIsData!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_GinPageIsData!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_GinPageIsData!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinPageIsData!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -18913,13 +19810,13 @@ macro_rules! __pgrx_c_args_GinPageIsData {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinPageIsData!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinPageIsData!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -18983,10 +19880,10 @@ macro_rules! GinPageIsData {
                                                         _
                                                     >(
                                                         $crate::__pgrx_c_macros::expression::cast_as::<
-                                                            $crate::GinPageOpaque,
+                                                            $crate::__pgrx_c_bindings::GinPageOpaque,
                                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                                    $crate::GinPageOpaqueData
+                                                                    $crate::__pgrx_c_bindings::GinPageOpaqueData
                                                                 >,
                                                                 $crate::__pgrx_c_macros::expression::ReadWrite
                                                             >,
@@ -19003,16 +19900,22 @@ macro_rules! GinPageIsData {
                                                                                 true,
                                                                                 _
                                                                             >(
-                                                                                $crate::__pgrx_c_generated::Inline_777d7ad23546580e873e0206a9a6e1cd(
+                                                                                $crate::__pgrx_c_bindings::PageValidateSpecialPointer(
                                                                                     <
                                                                                         $crate::__pgrx_c_macros::expression::CPointer<
-                                                                                            $crate::__pgrx_c_macros::CChar,
+                                                                                            $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                                                $crate::__pgrx_c_macros::CChar,
+                                                                                                ::core::ffi::c_char
+                                                                                            >,
                                                                                             $crate::__pgrx_c_macros::expression::ReadOnly
                                                                                         > as $crate::__pgrx_c_macros::expression::CType
                                                                                     >::into_storage(
                                                                                         $crate::__pgrx_c_macros::expression::implicit::<
                                                                                             $crate::__pgrx_c_macros::expression::CPointer<
-                                                                                                $crate::__pgrx_c_macros::CChar,
+                                                                                                $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                                                    $crate::__pgrx_c_macros::CChar,
+                                                                                                    ::core::ffi::c_char
+                                                                                                >,
                                                                                                 $crate::__pgrx_c_macros::expression::ReadOnly
                                                                                             >,
                                                                                             _
@@ -19073,10 +19976,10 @@ macro_rules! GinPageIsData {
                                                                                                             _
                                                                                                         >(
                                                                                                             $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                                                                $crate::PageHeader,
+                                                                                                                $crate::__pgrx_c_bindings::PageHeader,
                                                                                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                                                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                                        $crate::PageHeaderData
+                                                                                                                        $crate::__pgrx_c_bindings::PageHeaderData
                                                                                                                     >,
                                                                                                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                                                                                                 >,
@@ -19117,7 +20020,7 @@ macro_rules! GinPageIsData {
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                        $crate::GIN_DATA as i32
+                                        $crate::__pgrx_c_bindings::GIN_DATA as i32
                                     )
                                 )
                             )
@@ -19182,10 +20085,10 @@ macro_rules! GinPageIsData {
                                                                     _
                                                                 >(
                                                                     $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                        $crate::GinPageOpaque,
+                                                                        $crate::__pgrx_c_bindings::GinPageOpaque,
                                                                         $crate::__pgrx_c_macros::expression::CPointer<
                                                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                $crate::GinPageOpaqueData
+                                                                                $crate::__pgrx_c_bindings::GinPageOpaqueData
                                                                             >,
                                                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                                                         >,
@@ -19202,16 +20105,22 @@ macro_rules! GinPageIsData {
                                                                                             true,
                                                                                             _
                                                                                         >(
-                                                                                            $crate::__pgrx_c_generated::Inline_777d7ad23546580e873e0206a9a6e1cd(
+                                                                                            $crate::__pgrx_c_bindings::PageValidateSpecialPointer(
                                                                                                 <
                                                                                                     $crate::__pgrx_c_macros::expression::CPointer<
-                                                                                                        $crate::__pgrx_c_macros::CChar,
+                                                                                                        $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                                                            $crate::__pgrx_c_macros::CChar,
+                                                                                                            ::core::ffi::c_char
+                                                                                                        >,
                                                                                                         $crate::__pgrx_c_macros::expression::ReadOnly
                                                                                                     > as $crate::__pgrx_c_macros::expression::CType
                                                                                                 >::into_storage(
                                                                                                     $crate::__pgrx_c_macros::expression::implicit::<
                                                                                                         $crate::__pgrx_c_macros::expression::CPointer<
-                                                                                                            $crate::__pgrx_c_macros::CChar,
+                                                                                                            $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                                                                $crate::__pgrx_c_macros::CChar,
+                                                                                                                ::core::ffi::c_char
+                                                                                                            >,
                                                                                                             $crate::__pgrx_c_macros::expression::ReadOnly
                                                                                                         >,
                                                                                                         _
@@ -19272,10 +20181,10 @@ macro_rules! GinPageIsData {
                                                                                                                         _
                                                                                                                     >(
                                                                                                                         $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                                                                            $crate::PageHeader,
+                                                                                                                            $crate::__pgrx_c_bindings::PageHeader,
                                                                                                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                                                                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                                                    $crate::PageHeaderData
+                                                                                                                                    $crate::__pgrx_c_bindings::PageHeaderData
                                                                                                                                 >,
                                                                                                                                 $crate::__pgrx_c_macros::expression::ReadWrite
                                                                                                                             >,
@@ -19320,7 +20229,7 @@ macro_rules! GinPageIsData {
                                             >(
                                                 $crate::__pgrx_c_macros::CValue::<
                                                     $crate::__pgrx_c_macros::CInt
-                                                >::new($crate::GIN_DATA as i32)
+                                                >::new($crate::__pgrx_c_bindings::GIN_DATA as i32)
                                             )
                                         )
                                     )
@@ -19366,10 +20275,10 @@ macro_rules! GinPageIsData {
                                                         _
                                                     >(
                                                         $crate::__pgrx_c_macros::expression::cast_as::<
-                                                            $crate::GinPageOpaque,
+                                                            $crate::__pgrx_c_bindings::GinPageOpaque,
                                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                                    $crate::GinPageOpaqueData
+                                                                    $crate::__pgrx_c_bindings::GinPageOpaqueData
                                                                 >,
                                                                 $crate::__pgrx_c_macros::expression::ReadWrite
                                                             >,
@@ -19386,16 +20295,22 @@ macro_rules! GinPageIsData {
                                                                                 true,
                                                                                 _
                                                                             >(
-                                                                                $crate::__pgrx_c_generated::Inline_777d7ad23546580e873e0206a9a6e1cd(
+                                                                                $crate::__pgrx_c_bindings::PageValidateSpecialPointer(
                                                                                     <
                                                                                         $crate::__pgrx_c_macros::expression::CPointer<
-                                                                                            $crate::__pgrx_c_macros::CChar,
+                                                                                            $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                                                $crate::__pgrx_c_macros::CChar,
+                                                                                                ::core::ffi::c_char
+                                                                                            >,
                                                                                             $crate::__pgrx_c_macros::expression::ReadOnly
                                                                                         > as $crate::__pgrx_c_macros::expression::CType
                                                                                     >::into_storage(
                                                                                         $crate::__pgrx_c_macros::expression::implicit::<
                                                                                             $crate::__pgrx_c_macros::expression::CPointer<
-                                                                                                $crate::__pgrx_c_macros::CChar,
+                                                                                                $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                                                    $crate::__pgrx_c_macros::CChar,
+                                                                                                    ::core::ffi::c_char
+                                                                                                >,
                                                                                                 $crate::__pgrx_c_macros::expression::ReadOnly
                                                                                             >,
                                                                                             _
@@ -19456,10 +20371,10 @@ macro_rules! GinPageIsData {
                                                                                                             _
                                                                                                         >(
                                                                                                             $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                                                                $crate::PageHeader,
+                                                                                                                $crate::__pgrx_c_bindings::PageHeader,
                                                                                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                                                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                                        $crate::PageHeaderData
+                                                                                                                        $crate::__pgrx_c_bindings::PageHeaderData
                                                                                                                     >,
                                                                                                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                                                                                                 >,
@@ -19500,7 +20415,7 @@ macro_rules! GinPageIsData {
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                        $crate::GIN_DATA as i32
+                                        $crate::__pgrx_c_bindings::GIN_DATA as i32
                                     )
                                 )
                             )
@@ -19526,8 +20441,8 @@ macro_rules! GinPageIsData {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -19554,20 +20469,24 @@ macro_rules! __pgrx_c_args_GinPageIsDeleted {
         $crate::__pgrx_c_args_GinPageIsDeleted!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_GinPageIsDeleted!(@p1 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_GinPageIsDeleted!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_GinPageIsDeleted!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_GinPageIsDeleted!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinPageIsDeleted!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinPageIsDeleted!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -19575,7 +20494,9 @@ macro_rules! __pgrx_c_args_GinPageIsDeleted {
         $crate::__pgrx_c_args_GinPageIsDeleted!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_GinPageIsDeleted!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_GinPageIsDeleted!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -19597,14 +20518,18 @@ macro_rules! __pgrx_c_args_GinPageIsDeleted {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_GinPageIsDeleted!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_GinPageIsDeleted!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_GinPageIsDeleted!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_GinPageIsDeleted!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinPageIsDeleted!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -19631,13 +20556,13 @@ macro_rules! __pgrx_c_args_GinPageIsDeleted {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinPageIsDeleted!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinPageIsDeleted!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -19701,10 +20626,10 @@ macro_rules! GinPageIsDeleted {
                                                         _
                                                     >(
                                                         $crate::__pgrx_c_macros::expression::cast_as::<
-                                                            $crate::GinPageOpaque,
+                                                            $crate::__pgrx_c_bindings::GinPageOpaque,
                                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                                    $crate::GinPageOpaqueData
+                                                                    $crate::__pgrx_c_bindings::GinPageOpaqueData
                                                                 >,
                                                                 $crate::__pgrx_c_macros::expression::ReadWrite
                                                             >,
@@ -19721,16 +20646,22 @@ macro_rules! GinPageIsDeleted {
                                                                                 true,
                                                                                 _
                                                                             >(
-                                                                                $crate::__pgrx_c_generated::Inline_777d7ad23546580e873e0206a9a6e1cd(
+                                                                                $crate::__pgrx_c_bindings::PageValidateSpecialPointer(
                                                                                     <
                                                                                         $crate::__pgrx_c_macros::expression::CPointer<
-                                                                                            $crate::__pgrx_c_macros::CChar,
+                                                                                            $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                                                $crate::__pgrx_c_macros::CChar,
+                                                                                                ::core::ffi::c_char
+                                                                                            >,
                                                                                             $crate::__pgrx_c_macros::expression::ReadOnly
                                                                                         > as $crate::__pgrx_c_macros::expression::CType
                                                                                     >::into_storage(
                                                                                         $crate::__pgrx_c_macros::expression::implicit::<
                                                                                             $crate::__pgrx_c_macros::expression::CPointer<
-                                                                                                $crate::__pgrx_c_macros::CChar,
+                                                                                                $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                                                    $crate::__pgrx_c_macros::CChar,
+                                                                                                    ::core::ffi::c_char
+                                                                                                >,
                                                                                                 $crate::__pgrx_c_macros::expression::ReadOnly
                                                                                             >,
                                                                                             _
@@ -19791,10 +20722,10 @@ macro_rules! GinPageIsDeleted {
                                                                                                             _
                                                                                                         >(
                                                                                                             $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                                                                $crate::PageHeader,
+                                                                                                                $crate::__pgrx_c_bindings::PageHeader,
                                                                                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                                                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                                        $crate::PageHeaderData
+                                                                                                                        $crate::__pgrx_c_bindings::PageHeaderData
                                                                                                                     >,
                                                                                                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                                                                                                 >,
@@ -19835,7 +20766,7 @@ macro_rules! GinPageIsDeleted {
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                        $crate::GIN_DELETED as i32
+                                        $crate::__pgrx_c_bindings::GIN_DELETED as i32
                                     )
                                 )
                             )
@@ -19900,10 +20831,10 @@ macro_rules! GinPageIsDeleted {
                                                                     _
                                                                 >(
                                                                     $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                        $crate::GinPageOpaque,
+                                                                        $crate::__pgrx_c_bindings::GinPageOpaque,
                                                                         $crate::__pgrx_c_macros::expression::CPointer<
                                                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                $crate::GinPageOpaqueData
+                                                                                $crate::__pgrx_c_bindings::GinPageOpaqueData
                                                                             >,
                                                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                                                         >,
@@ -19920,16 +20851,22 @@ macro_rules! GinPageIsDeleted {
                                                                                             true,
                                                                                             _
                                                                                         >(
-                                                                                            $crate::__pgrx_c_generated::Inline_777d7ad23546580e873e0206a9a6e1cd(
+                                                                                            $crate::__pgrx_c_bindings::PageValidateSpecialPointer(
                                                                                                 <
                                                                                                     $crate::__pgrx_c_macros::expression::CPointer<
-                                                                                                        $crate::__pgrx_c_macros::CChar,
+                                                                                                        $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                                                            $crate::__pgrx_c_macros::CChar,
+                                                                                                            ::core::ffi::c_char
+                                                                                                        >,
                                                                                                         $crate::__pgrx_c_macros::expression::ReadOnly
                                                                                                     > as $crate::__pgrx_c_macros::expression::CType
                                                                                                 >::into_storage(
                                                                                                     $crate::__pgrx_c_macros::expression::implicit::<
                                                                                                         $crate::__pgrx_c_macros::expression::CPointer<
-                                                                                                            $crate::__pgrx_c_macros::CChar,
+                                                                                                            $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                                                                $crate::__pgrx_c_macros::CChar,
+                                                                                                                ::core::ffi::c_char
+                                                                                                            >,
                                                                                                             $crate::__pgrx_c_macros::expression::ReadOnly
                                                                                                         >,
                                                                                                         _
@@ -19990,10 +20927,10 @@ macro_rules! GinPageIsDeleted {
                                                                                                                         _
                                                                                                                     >(
                                                                                                                         $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                                                                            $crate::PageHeader,
+                                                                                                                            $crate::__pgrx_c_bindings::PageHeader,
                                                                                                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                                                                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                                                    $crate::PageHeaderData
+                                                                                                                                    $crate::__pgrx_c_bindings::PageHeaderData
                                                                                                                                 >,
                                                                                                                                 $crate::__pgrx_c_macros::expression::ReadWrite
                                                                                                                             >,
@@ -20038,7 +20975,9 @@ macro_rules! GinPageIsDeleted {
                                             >(
                                                 $crate::__pgrx_c_macros::CValue::<
                                                     $crate::__pgrx_c_macros::CInt
-                                                >::new($crate::GIN_DELETED as i32)
+                                                >::new(
+                                                    $crate::__pgrx_c_bindings::GIN_DELETED as i32
+                                                )
                                             )
                                         )
                                     )
@@ -20084,10 +21023,10 @@ macro_rules! GinPageIsDeleted {
                                                         _
                                                     >(
                                                         $crate::__pgrx_c_macros::expression::cast_as::<
-                                                            $crate::GinPageOpaque,
+                                                            $crate::__pgrx_c_bindings::GinPageOpaque,
                                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                                    $crate::GinPageOpaqueData
+                                                                    $crate::__pgrx_c_bindings::GinPageOpaqueData
                                                                 >,
                                                                 $crate::__pgrx_c_macros::expression::ReadWrite
                                                             >,
@@ -20104,16 +21043,22 @@ macro_rules! GinPageIsDeleted {
                                                                                 true,
                                                                                 _
                                                                             >(
-                                                                                $crate::__pgrx_c_generated::Inline_777d7ad23546580e873e0206a9a6e1cd(
+                                                                                $crate::__pgrx_c_bindings::PageValidateSpecialPointer(
                                                                                     <
                                                                                         $crate::__pgrx_c_macros::expression::CPointer<
-                                                                                            $crate::__pgrx_c_macros::CChar,
+                                                                                            $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                                                $crate::__pgrx_c_macros::CChar,
+                                                                                                ::core::ffi::c_char
+                                                                                            >,
                                                                                             $crate::__pgrx_c_macros::expression::ReadOnly
                                                                                         > as $crate::__pgrx_c_macros::expression::CType
                                                                                     >::into_storage(
                                                                                         $crate::__pgrx_c_macros::expression::implicit::<
                                                                                             $crate::__pgrx_c_macros::expression::CPointer<
-                                                                                                $crate::__pgrx_c_macros::CChar,
+                                                                                                $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                                                    $crate::__pgrx_c_macros::CChar,
+                                                                                                    ::core::ffi::c_char
+                                                                                                >,
                                                                                                 $crate::__pgrx_c_macros::expression::ReadOnly
                                                                                             >,
                                                                                             _
@@ -20174,10 +21119,10 @@ macro_rules! GinPageIsDeleted {
                                                                                                             _
                                                                                                         >(
                                                                                                             $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                                                                $crate::PageHeader,
+                                                                                                                $crate::__pgrx_c_bindings::PageHeader,
                                                                                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                                                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                                        $crate::PageHeaderData
+                                                                                                                        $crate::__pgrx_c_bindings::PageHeaderData
                                                                                                                     >,
                                                                                                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                                                                                                 >,
@@ -20218,7 +21163,7 @@ macro_rules! GinPageIsDeleted {
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                        $crate::GIN_DELETED as i32
+                                        $crate::__pgrx_c_bindings::GIN_DELETED as i32
                                     )
                                 )
                             )
@@ -20244,8 +21189,8 @@ macro_rules! GinPageIsDeleted {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -20276,23 +21221,23 @@ macro_rules! __pgrx_c_args_GinPageIsIncompleteSplit {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
         $crate::__pgrx_c_args_GinPageIsIncompleteSplit!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_GinPageIsIncompleteSplit!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinPageIsIncompleteSplit!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinPageIsIncompleteSplit!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -20301,7 +21246,7 @@ macro_rules! __pgrx_c_args_GinPageIsIncompleteSplit {
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
         $crate::__pgrx_c_args_GinPageIsIncompleteSplit!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
@@ -20327,17 +21272,17 @@ macro_rules! __pgrx_c_args_GinPageIsIncompleteSplit {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_GinPageIsIncompleteSplit!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_GinPageIsIncompleteSplit!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinPageIsIncompleteSplit!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -20364,13 +21309,13 @@ macro_rules! __pgrx_c_args_GinPageIsIncompleteSplit {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinPageIsIncompleteSplit!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinPageIsIncompleteSplit!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -20437,10 +21382,10 @@ macro_rules! GinPageIsIncompleteSplit {
                                                         _
                                                     >(
                                                         $crate::__pgrx_c_macros::expression::cast_as::<
-                                                            $crate::GinPageOpaque,
+                                                            $crate::__pgrx_c_bindings::GinPageOpaque,
                                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                                    $crate::GinPageOpaqueData
+                                                                    $crate::__pgrx_c_bindings::GinPageOpaqueData
                                                                 >,
                                                                 $crate::__pgrx_c_macros::expression::ReadWrite
                                                             >,
@@ -20457,16 +21402,22 @@ macro_rules! GinPageIsIncompleteSplit {
                                                                                 true,
                                                                                 _
                                                                             >(
-                                                                                $crate::__pgrx_c_generated::Inline_777d7ad23546580e873e0206a9a6e1cd(
+                                                                                $crate::__pgrx_c_bindings::PageValidateSpecialPointer(
                                                                                     <
                                                                                         $crate::__pgrx_c_macros::expression::CPointer<
-                                                                                            $crate::__pgrx_c_macros::CChar,
+                                                                                            $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                                                $crate::__pgrx_c_macros::CChar,
+                                                                                                ::core::ffi::c_char
+                                                                                            >,
                                                                                             $crate::__pgrx_c_macros::expression::ReadOnly
                                                                                         > as $crate::__pgrx_c_macros::expression::CType
                                                                                     >::into_storage(
                                                                                         $crate::__pgrx_c_macros::expression::implicit::<
                                                                                             $crate::__pgrx_c_macros::expression::CPointer<
-                                                                                                $crate::__pgrx_c_macros::CChar,
+                                                                                                $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                                                    $crate::__pgrx_c_macros::CChar,
+                                                                                                    ::core::ffi::c_char
+                                                                                                >,
                                                                                                 $crate::__pgrx_c_macros::expression::ReadOnly
                                                                                             >,
                                                                                             _
@@ -20527,10 +21478,10 @@ macro_rules! GinPageIsIncompleteSplit {
                                                                                                             _
                                                                                                         >(
                                                                                                             $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                                                                $crate::PageHeader,
+                                                                                                                $crate::__pgrx_c_bindings::PageHeader,
                                                                                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                                                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                                        $crate::PageHeaderData
+                                                                                                                        $crate::__pgrx_c_bindings::PageHeaderData
                                                                                                                     >,
                                                                                                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                                                                                                 >,
@@ -20571,7 +21522,7 @@ macro_rules! GinPageIsIncompleteSplit {
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                        $crate::GIN_INCOMPLETE_SPLIT as i32
+                                        $crate::__pgrx_c_bindings::GIN_INCOMPLETE_SPLIT as i32
                                     )
                                 )
                             )
@@ -20639,10 +21590,10 @@ macro_rules! GinPageIsIncompleteSplit {
                                                                     _
                                                                 >(
                                                                     $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                        $crate::GinPageOpaque,
+                                                                        $crate::__pgrx_c_bindings::GinPageOpaque,
                                                                         $crate::__pgrx_c_macros::expression::CPointer<
                                                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                $crate::GinPageOpaqueData
+                                                                                $crate::__pgrx_c_bindings::GinPageOpaqueData
                                                                             >,
                                                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                                                         >,
@@ -20659,16 +21610,22 @@ macro_rules! GinPageIsIncompleteSplit {
                                                                                             true,
                                                                                             _
                                                                                         >(
-                                                                                            $crate::__pgrx_c_generated::Inline_777d7ad23546580e873e0206a9a6e1cd(
+                                                                                            $crate::__pgrx_c_bindings::PageValidateSpecialPointer(
                                                                                                 <
                                                                                                     $crate::__pgrx_c_macros::expression::CPointer<
-                                                                                                        $crate::__pgrx_c_macros::CChar,
+                                                                                                        $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                                                            $crate::__pgrx_c_macros::CChar,
+                                                                                                            ::core::ffi::c_char
+                                                                                                        >,
                                                                                                         $crate::__pgrx_c_macros::expression::ReadOnly
                                                                                                     > as $crate::__pgrx_c_macros::expression::CType
                                                                                                 >::into_storage(
                                                                                                     $crate::__pgrx_c_macros::expression::implicit::<
                                                                                                         $crate::__pgrx_c_macros::expression::CPointer<
-                                                                                                            $crate::__pgrx_c_macros::CChar,
+                                                                                                            $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                                                                $crate::__pgrx_c_macros::CChar,
+                                                                                                                ::core::ffi::c_char
+                                                                                                            >,
                                                                                                             $crate::__pgrx_c_macros::expression::ReadOnly
                                                                                                         >,
                                                                                                         _
@@ -20729,10 +21686,10 @@ macro_rules! GinPageIsIncompleteSplit {
                                                                                                                         _
                                                                                                                     >(
                                                                                                                         $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                                                                            $crate::PageHeader,
+                                                                                                                            $crate::__pgrx_c_bindings::PageHeader,
                                                                                                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                                                                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                                                    $crate::PageHeaderData
+                                                                                                                                    $crate::__pgrx_c_bindings::PageHeaderData
                                                                                                                                 >,
                                                                                                                                 $crate::__pgrx_c_macros::expression::ReadWrite
                                                                                                                             >,
@@ -20777,7 +21734,9 @@ macro_rules! GinPageIsIncompleteSplit {
                                             >(
                                                 $crate::__pgrx_c_macros::CValue::<
                                                     $crate::__pgrx_c_macros::CInt
-                                                >::new($crate::GIN_INCOMPLETE_SPLIT as i32)
+                                                >::new(
+                                                    $crate::__pgrx_c_bindings::GIN_INCOMPLETE_SPLIT as i32
+                                                )
                                             )
                                         )
                                     )
@@ -20823,10 +21782,10 @@ macro_rules! GinPageIsIncompleteSplit {
                                                         _
                                                     >(
                                                         $crate::__pgrx_c_macros::expression::cast_as::<
-                                                            $crate::GinPageOpaque,
+                                                            $crate::__pgrx_c_bindings::GinPageOpaque,
                                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                                    $crate::GinPageOpaqueData
+                                                                    $crate::__pgrx_c_bindings::GinPageOpaqueData
                                                                 >,
                                                                 $crate::__pgrx_c_macros::expression::ReadWrite
                                                             >,
@@ -20843,16 +21802,22 @@ macro_rules! GinPageIsIncompleteSplit {
                                                                                 true,
                                                                                 _
                                                                             >(
-                                                                                $crate::__pgrx_c_generated::Inline_777d7ad23546580e873e0206a9a6e1cd(
+                                                                                $crate::__pgrx_c_bindings::PageValidateSpecialPointer(
                                                                                     <
                                                                                         $crate::__pgrx_c_macros::expression::CPointer<
-                                                                                            $crate::__pgrx_c_macros::CChar,
+                                                                                            $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                                                $crate::__pgrx_c_macros::CChar,
+                                                                                                ::core::ffi::c_char
+                                                                                            >,
                                                                                             $crate::__pgrx_c_macros::expression::ReadOnly
                                                                                         > as $crate::__pgrx_c_macros::expression::CType
                                                                                     >::into_storage(
                                                                                         $crate::__pgrx_c_macros::expression::implicit::<
                                                                                             $crate::__pgrx_c_macros::expression::CPointer<
-                                                                                                $crate::__pgrx_c_macros::CChar,
+                                                                                                $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                                                    $crate::__pgrx_c_macros::CChar,
+                                                                                                    ::core::ffi::c_char
+                                                                                                >,
                                                                                                 $crate::__pgrx_c_macros::expression::ReadOnly
                                                                                             >,
                                                                                             _
@@ -20913,10 +21878,10 @@ macro_rules! GinPageIsIncompleteSplit {
                                                                                                             _
                                                                                                         >(
                                                                                                             $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                                                                $crate::PageHeader,
+                                                                                                                $crate::__pgrx_c_bindings::PageHeader,
                                                                                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                                                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                                        $crate::PageHeaderData
+                                                                                                                        $crate::__pgrx_c_bindings::PageHeaderData
                                                                                                                     >,
                                                                                                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                                                                                                 >,
@@ -20957,7 +21922,7 @@ macro_rules! GinPageIsIncompleteSplit {
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                        $crate::GIN_INCOMPLETE_SPLIT as i32
+                                        $crate::__pgrx_c_bindings::GIN_INCOMPLETE_SPLIT as i32
                                     )
                                 )
                             )
@@ -20983,8 +21948,8 @@ macro_rules! GinPageIsIncompleteSplit {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -21011,20 +21976,24 @@ macro_rules! __pgrx_c_args_GinPageIsLeaf {
         $crate::__pgrx_c_args_GinPageIsLeaf!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_GinPageIsLeaf!(@p1 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_GinPageIsLeaf!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_GinPageIsLeaf!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_GinPageIsLeaf!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinPageIsLeaf!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinPageIsLeaf!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -21032,7 +22001,9 @@ macro_rules! __pgrx_c_args_GinPageIsLeaf {
         $crate::__pgrx_c_args_GinPageIsLeaf!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_GinPageIsLeaf!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_GinPageIsLeaf!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -21054,14 +22025,18 @@ macro_rules! __pgrx_c_args_GinPageIsLeaf {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_GinPageIsLeaf!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_GinPageIsLeaf!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_GinPageIsLeaf!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_GinPageIsLeaf!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinPageIsLeaf!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -21088,13 +22063,13 @@ macro_rules! __pgrx_c_args_GinPageIsLeaf {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinPageIsLeaf!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinPageIsLeaf!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -21158,10 +22133,10 @@ macro_rules! GinPageIsLeaf {
                                                         _
                                                     >(
                                                         $crate::__pgrx_c_macros::expression::cast_as::<
-                                                            $crate::GinPageOpaque,
+                                                            $crate::__pgrx_c_bindings::GinPageOpaque,
                                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                                    $crate::GinPageOpaqueData
+                                                                    $crate::__pgrx_c_bindings::GinPageOpaqueData
                                                                 >,
                                                                 $crate::__pgrx_c_macros::expression::ReadWrite
                                                             >,
@@ -21178,16 +22153,22 @@ macro_rules! GinPageIsLeaf {
                                                                                 true,
                                                                                 _
                                                                             >(
-                                                                                $crate::__pgrx_c_generated::Inline_777d7ad23546580e873e0206a9a6e1cd(
+                                                                                $crate::__pgrx_c_bindings::PageValidateSpecialPointer(
                                                                                     <
                                                                                         $crate::__pgrx_c_macros::expression::CPointer<
-                                                                                            $crate::__pgrx_c_macros::CChar,
+                                                                                            $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                                                $crate::__pgrx_c_macros::CChar,
+                                                                                                ::core::ffi::c_char
+                                                                                            >,
                                                                                             $crate::__pgrx_c_macros::expression::ReadOnly
                                                                                         > as $crate::__pgrx_c_macros::expression::CType
                                                                                     >::into_storage(
                                                                                         $crate::__pgrx_c_macros::expression::implicit::<
                                                                                             $crate::__pgrx_c_macros::expression::CPointer<
-                                                                                                $crate::__pgrx_c_macros::CChar,
+                                                                                                $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                                                    $crate::__pgrx_c_macros::CChar,
+                                                                                                    ::core::ffi::c_char
+                                                                                                >,
                                                                                                 $crate::__pgrx_c_macros::expression::ReadOnly
                                                                                             >,
                                                                                             _
@@ -21248,10 +22229,10 @@ macro_rules! GinPageIsLeaf {
                                                                                                             _
                                                                                                         >(
                                                                                                             $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                                                                $crate::PageHeader,
+                                                                                                                $crate::__pgrx_c_bindings::PageHeader,
                                                                                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                                                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                                        $crate::PageHeaderData
+                                                                                                                        $crate::__pgrx_c_bindings::PageHeaderData
                                                                                                                     >,
                                                                                                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                                                                                                 >,
@@ -21292,7 +22273,7 @@ macro_rules! GinPageIsLeaf {
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                        $crate::GIN_LEAF as i32
+                                        $crate::__pgrx_c_bindings::GIN_LEAF as i32
                                     )
                                 )
                             )
@@ -21357,10 +22338,10 @@ macro_rules! GinPageIsLeaf {
                                                                     _
                                                                 >(
                                                                     $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                        $crate::GinPageOpaque,
+                                                                        $crate::__pgrx_c_bindings::GinPageOpaque,
                                                                         $crate::__pgrx_c_macros::expression::CPointer<
                                                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                $crate::GinPageOpaqueData
+                                                                                $crate::__pgrx_c_bindings::GinPageOpaqueData
                                                                             >,
                                                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                                                         >,
@@ -21377,16 +22358,22 @@ macro_rules! GinPageIsLeaf {
                                                                                             true,
                                                                                             _
                                                                                         >(
-                                                                                            $crate::__pgrx_c_generated::Inline_777d7ad23546580e873e0206a9a6e1cd(
+                                                                                            $crate::__pgrx_c_bindings::PageValidateSpecialPointer(
                                                                                                 <
                                                                                                     $crate::__pgrx_c_macros::expression::CPointer<
-                                                                                                        $crate::__pgrx_c_macros::CChar,
+                                                                                                        $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                                                            $crate::__pgrx_c_macros::CChar,
+                                                                                                            ::core::ffi::c_char
+                                                                                                        >,
                                                                                                         $crate::__pgrx_c_macros::expression::ReadOnly
                                                                                                     > as $crate::__pgrx_c_macros::expression::CType
                                                                                                 >::into_storage(
                                                                                                     $crate::__pgrx_c_macros::expression::implicit::<
                                                                                                         $crate::__pgrx_c_macros::expression::CPointer<
-                                                                                                            $crate::__pgrx_c_macros::CChar,
+                                                                                                            $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                                                                $crate::__pgrx_c_macros::CChar,
+                                                                                                                ::core::ffi::c_char
+                                                                                                            >,
                                                                                                             $crate::__pgrx_c_macros::expression::ReadOnly
                                                                                                         >,
                                                                                                         _
@@ -21447,10 +22434,10 @@ macro_rules! GinPageIsLeaf {
                                                                                                                         _
                                                                                                                     >(
                                                                                                                         $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                                                                            $crate::PageHeader,
+                                                                                                                            $crate::__pgrx_c_bindings::PageHeader,
                                                                                                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                                                                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                                                    $crate::PageHeaderData
+                                                                                                                                    $crate::__pgrx_c_bindings::PageHeaderData
                                                                                                                                 >,
                                                                                                                                 $crate::__pgrx_c_macros::expression::ReadWrite
                                                                                                                             >,
@@ -21495,7 +22482,7 @@ macro_rules! GinPageIsLeaf {
                                             >(
                                                 $crate::__pgrx_c_macros::CValue::<
                                                     $crate::__pgrx_c_macros::CInt
-                                                >::new($crate::GIN_LEAF as i32)
+                                                >::new($crate::__pgrx_c_bindings::GIN_LEAF as i32)
                                             )
                                         )
                                     )
@@ -21541,10 +22528,10 @@ macro_rules! GinPageIsLeaf {
                                                         _
                                                     >(
                                                         $crate::__pgrx_c_macros::expression::cast_as::<
-                                                            $crate::GinPageOpaque,
+                                                            $crate::__pgrx_c_bindings::GinPageOpaque,
                                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                                    $crate::GinPageOpaqueData
+                                                                    $crate::__pgrx_c_bindings::GinPageOpaqueData
                                                                 >,
                                                                 $crate::__pgrx_c_macros::expression::ReadWrite
                                                             >,
@@ -21561,16 +22548,22 @@ macro_rules! GinPageIsLeaf {
                                                                                 true,
                                                                                 _
                                                                             >(
-                                                                                $crate::__pgrx_c_generated::Inline_777d7ad23546580e873e0206a9a6e1cd(
+                                                                                $crate::__pgrx_c_bindings::PageValidateSpecialPointer(
                                                                                     <
                                                                                         $crate::__pgrx_c_macros::expression::CPointer<
-                                                                                            $crate::__pgrx_c_macros::CChar,
+                                                                                            $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                                                $crate::__pgrx_c_macros::CChar,
+                                                                                                ::core::ffi::c_char
+                                                                                            >,
                                                                                             $crate::__pgrx_c_macros::expression::ReadOnly
                                                                                         > as $crate::__pgrx_c_macros::expression::CType
                                                                                     >::into_storage(
                                                                                         $crate::__pgrx_c_macros::expression::implicit::<
                                                                                             $crate::__pgrx_c_macros::expression::CPointer<
-                                                                                                $crate::__pgrx_c_macros::CChar,
+                                                                                                $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                                                    $crate::__pgrx_c_macros::CChar,
+                                                                                                    ::core::ffi::c_char
+                                                                                                >,
                                                                                                 $crate::__pgrx_c_macros::expression::ReadOnly
                                                                                             >,
                                                                                             _
@@ -21631,10 +22624,10 @@ macro_rules! GinPageIsLeaf {
                                                                                                             _
                                                                                                         >(
                                                                                                             $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                                                                $crate::PageHeader,
+                                                                                                                $crate::__pgrx_c_bindings::PageHeader,
                                                                                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                                                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                                        $crate::PageHeaderData
+                                                                                                                        $crate::__pgrx_c_bindings::PageHeaderData
                                                                                                                     >,
                                                                                                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                                                                                                 >,
@@ -21675,7 +22668,7 @@ macro_rules! GinPageIsLeaf {
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                        $crate::GIN_LEAF as i32
+                                        $crate::__pgrx_c_bindings::GIN_LEAF as i32
                                     )
                                 )
                             )
@@ -21701,8 +22694,8 @@ macro_rules! GinPageIsLeaf {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -21729,20 +22722,24 @@ macro_rules! __pgrx_c_args_GinPageIsList {
         $crate::__pgrx_c_args_GinPageIsList!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_GinPageIsList!(@p1 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_GinPageIsList!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_GinPageIsList!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_GinPageIsList!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinPageIsList!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinPageIsList!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -21750,7 +22747,9 @@ macro_rules! __pgrx_c_args_GinPageIsList {
         $crate::__pgrx_c_args_GinPageIsList!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_GinPageIsList!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_GinPageIsList!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -21772,14 +22771,18 @@ macro_rules! __pgrx_c_args_GinPageIsList {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_GinPageIsList!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_GinPageIsList!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_GinPageIsList!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_GinPageIsList!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinPageIsList!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -21806,13 +22809,13 @@ macro_rules! __pgrx_c_args_GinPageIsList {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinPageIsList!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinPageIsList!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -21876,10 +22879,10 @@ macro_rules! GinPageIsList {
                                                         _
                                                     >(
                                                         $crate::__pgrx_c_macros::expression::cast_as::<
-                                                            $crate::GinPageOpaque,
+                                                            $crate::__pgrx_c_bindings::GinPageOpaque,
                                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                                    $crate::GinPageOpaqueData
+                                                                    $crate::__pgrx_c_bindings::GinPageOpaqueData
                                                                 >,
                                                                 $crate::__pgrx_c_macros::expression::ReadWrite
                                                             >,
@@ -21896,16 +22899,22 @@ macro_rules! GinPageIsList {
                                                                                 true,
                                                                                 _
                                                                             >(
-                                                                                $crate::__pgrx_c_generated::Inline_777d7ad23546580e873e0206a9a6e1cd(
+                                                                                $crate::__pgrx_c_bindings::PageValidateSpecialPointer(
                                                                                     <
                                                                                         $crate::__pgrx_c_macros::expression::CPointer<
-                                                                                            $crate::__pgrx_c_macros::CChar,
+                                                                                            $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                                                $crate::__pgrx_c_macros::CChar,
+                                                                                                ::core::ffi::c_char
+                                                                                            >,
                                                                                             $crate::__pgrx_c_macros::expression::ReadOnly
                                                                                         > as $crate::__pgrx_c_macros::expression::CType
                                                                                     >::into_storage(
                                                                                         $crate::__pgrx_c_macros::expression::implicit::<
                                                                                             $crate::__pgrx_c_macros::expression::CPointer<
-                                                                                                $crate::__pgrx_c_macros::CChar,
+                                                                                                $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                                                    $crate::__pgrx_c_macros::CChar,
+                                                                                                    ::core::ffi::c_char
+                                                                                                >,
                                                                                                 $crate::__pgrx_c_macros::expression::ReadOnly
                                                                                             >,
                                                                                             _
@@ -21966,10 +22975,10 @@ macro_rules! GinPageIsList {
                                                                                                             _
                                                                                                         >(
                                                                                                             $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                                                                $crate::PageHeader,
+                                                                                                                $crate::__pgrx_c_bindings::PageHeader,
                                                                                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                                                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                                        $crate::PageHeaderData
+                                                                                                                        $crate::__pgrx_c_bindings::PageHeaderData
                                                                                                                     >,
                                                                                                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                                                                                                 >,
@@ -22010,7 +23019,7 @@ macro_rules! GinPageIsList {
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                        $crate::GIN_LIST as i32
+                                        $crate::__pgrx_c_bindings::GIN_LIST as i32
                                     )
                                 )
                             )
@@ -22075,10 +23084,10 @@ macro_rules! GinPageIsList {
                                                                     _
                                                                 >(
                                                                     $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                        $crate::GinPageOpaque,
+                                                                        $crate::__pgrx_c_bindings::GinPageOpaque,
                                                                         $crate::__pgrx_c_macros::expression::CPointer<
                                                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                $crate::GinPageOpaqueData
+                                                                                $crate::__pgrx_c_bindings::GinPageOpaqueData
                                                                             >,
                                                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                                                         >,
@@ -22095,16 +23104,22 @@ macro_rules! GinPageIsList {
                                                                                             true,
                                                                                             _
                                                                                         >(
-                                                                                            $crate::__pgrx_c_generated::Inline_777d7ad23546580e873e0206a9a6e1cd(
+                                                                                            $crate::__pgrx_c_bindings::PageValidateSpecialPointer(
                                                                                                 <
                                                                                                     $crate::__pgrx_c_macros::expression::CPointer<
-                                                                                                        $crate::__pgrx_c_macros::CChar,
+                                                                                                        $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                                                            $crate::__pgrx_c_macros::CChar,
+                                                                                                            ::core::ffi::c_char
+                                                                                                        >,
                                                                                                         $crate::__pgrx_c_macros::expression::ReadOnly
                                                                                                     > as $crate::__pgrx_c_macros::expression::CType
                                                                                                 >::into_storage(
                                                                                                     $crate::__pgrx_c_macros::expression::implicit::<
                                                                                                         $crate::__pgrx_c_macros::expression::CPointer<
-                                                                                                            $crate::__pgrx_c_macros::CChar,
+                                                                                                            $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                                                                $crate::__pgrx_c_macros::CChar,
+                                                                                                                ::core::ffi::c_char
+                                                                                                            >,
                                                                                                             $crate::__pgrx_c_macros::expression::ReadOnly
                                                                                                         >,
                                                                                                         _
@@ -22165,10 +23180,10 @@ macro_rules! GinPageIsList {
                                                                                                                         _
                                                                                                                     >(
                                                                                                                         $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                                                                            $crate::PageHeader,
+                                                                                                                            $crate::__pgrx_c_bindings::PageHeader,
                                                                                                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                                                                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                                                    $crate::PageHeaderData
+                                                                                                                                    $crate::__pgrx_c_bindings::PageHeaderData
                                                                                                                                 >,
                                                                                                                                 $crate::__pgrx_c_macros::expression::ReadWrite
                                                                                                                             >,
@@ -22213,7 +23228,7 @@ macro_rules! GinPageIsList {
                                             >(
                                                 $crate::__pgrx_c_macros::CValue::<
                                                     $crate::__pgrx_c_macros::CInt
-                                                >::new($crate::GIN_LIST as i32)
+                                                >::new($crate::__pgrx_c_bindings::GIN_LIST as i32)
                                             )
                                         )
                                     )
@@ -22259,10 +23274,10 @@ macro_rules! GinPageIsList {
                                                         _
                                                     >(
                                                         $crate::__pgrx_c_macros::expression::cast_as::<
-                                                            $crate::GinPageOpaque,
+                                                            $crate::__pgrx_c_bindings::GinPageOpaque,
                                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                                    $crate::GinPageOpaqueData
+                                                                    $crate::__pgrx_c_bindings::GinPageOpaqueData
                                                                 >,
                                                                 $crate::__pgrx_c_macros::expression::ReadWrite
                                                             >,
@@ -22279,16 +23294,22 @@ macro_rules! GinPageIsList {
                                                                                 true,
                                                                                 _
                                                                             >(
-                                                                                $crate::__pgrx_c_generated::Inline_777d7ad23546580e873e0206a9a6e1cd(
+                                                                                $crate::__pgrx_c_bindings::PageValidateSpecialPointer(
                                                                                     <
                                                                                         $crate::__pgrx_c_macros::expression::CPointer<
-                                                                                            $crate::__pgrx_c_macros::CChar,
+                                                                                            $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                                                $crate::__pgrx_c_macros::CChar,
+                                                                                                ::core::ffi::c_char
+                                                                                            >,
                                                                                             $crate::__pgrx_c_macros::expression::ReadOnly
                                                                                         > as $crate::__pgrx_c_macros::expression::CType
                                                                                     >::into_storage(
                                                                                         $crate::__pgrx_c_macros::expression::implicit::<
                                                                                             $crate::__pgrx_c_macros::expression::CPointer<
-                                                                                                $crate::__pgrx_c_macros::CChar,
+                                                                                                $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                                                    $crate::__pgrx_c_macros::CChar,
+                                                                                                    ::core::ffi::c_char
+                                                                                                >,
                                                                                                 $crate::__pgrx_c_macros::expression::ReadOnly
                                                                                             >,
                                                                                             _
@@ -22349,10 +23370,10 @@ macro_rules! GinPageIsList {
                                                                                                             _
                                                                                                         >(
                                                                                                             $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                                                                $crate::PageHeader,
+                                                                                                                $crate::__pgrx_c_bindings::PageHeader,
                                                                                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                                                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                                        $crate::PageHeaderData
+                                                                                                                        $crate::__pgrx_c_bindings::PageHeaderData
                                                                                                                     >,
                                                                                                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                                                                                                 >,
@@ -22393,7 +23414,7 @@ macro_rules! GinPageIsList {
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                        $crate::GIN_LIST as i32
+                                        $crate::__pgrx_c_bindings::GIN_LIST as i32
                                     )
                                 )
                             )
@@ -22419,8 +23440,8 @@ macro_rules! GinPageIsList {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -22447,20 +23468,24 @@ macro_rules! __pgrx_c_args_GinPageRightMost {
         $crate::__pgrx_c_args_GinPageRightMost!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_GinPageRightMost!(@p1 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_GinPageRightMost!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_GinPageRightMost!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_GinPageRightMost!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinPageRightMost!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinPageRightMost!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -22468,7 +23493,9 @@ macro_rules! __pgrx_c_args_GinPageRightMost {
         $crate::__pgrx_c_args_GinPageRightMost!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_GinPageRightMost!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_GinPageRightMost!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -22490,14 +23517,18 @@ macro_rules! __pgrx_c_args_GinPageRightMost {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_GinPageRightMost!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_GinPageRightMost!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_GinPageRightMost!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_GinPageRightMost!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinPageRightMost!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -22524,13 +23555,13 @@ macro_rules! __pgrx_c_args_GinPageRightMost {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinPageRightMost!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinPageRightMost!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -22591,10 +23622,10 @@ macro_rules! GinPageRightMost {
                                             _
                                         >(
                                             $crate::__pgrx_c_macros::expression::cast_as::<
-                                                $crate::GinPageOpaque,
+                                                $crate::__pgrx_c_bindings::GinPageOpaque,
                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                        $crate::GinPageOpaqueData
+                                                        $crate::__pgrx_c_bindings::GinPageOpaqueData
                                                     >,
                                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                                 >,
@@ -22611,16 +23642,22 @@ macro_rules! GinPageRightMost {
                                                                     true,
                                                                     _
                                                                 >(
-                                                                    $crate::__pgrx_c_generated::Inline_777d7ad23546580e873e0206a9a6e1cd(
+                                                                    $crate::__pgrx_c_bindings::PageValidateSpecialPointer(
                                                                         <
                                                                             $crate::__pgrx_c_macros::expression::CPointer<
-                                                                                $crate::__pgrx_c_macros::CChar,
+                                                                                $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                                    $crate::__pgrx_c_macros::CChar,
+                                                                                    ::core::ffi::c_char
+                                                                                >,
                                                                                 $crate::__pgrx_c_macros::expression::ReadOnly
                                                                             > as $crate::__pgrx_c_macros::expression::CType
                                                                         >::into_storage(
                                                                             $crate::__pgrx_c_macros::expression::implicit::<
                                                                                 $crate::__pgrx_c_macros::expression::CPointer<
-                                                                                    $crate::__pgrx_c_macros::CChar,
+                                                                                    $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                                        $crate::__pgrx_c_macros::CChar,
+                                                                                        ::core::ffi::c_char
+                                                                                    >,
                                                                                     $crate::__pgrx_c_macros::expression::ReadOnly
                                                                                 >,
                                                                                 _
@@ -22679,10 +23716,10 @@ macro_rules! GinPageRightMost {
                                                                                                 _
                                                                                             >(
                                                                                                 $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                                                    $crate::PageHeader,
+                                                                                                    $crate::__pgrx_c_bindings::PageHeader,
                                                                                                     $crate::__pgrx_c_macros::expression::CPointer<
                                                                                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                            $crate::PageHeaderData
+                                                                                                            $crate::__pgrx_c_bindings::PageHeaderData
                                                                                                         >,
                                                                                                         $crate::__pgrx_c_macros::expression::ReadWrite
                                                                                                     >,
@@ -22722,9 +23759,8 @@ macro_rules! GinPageRightMost {
                         )
                     ),
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                        /* PGRX: InvalidBlockNumber remains expanded because no integer constant binding is available in the defining Rust crate. */
                         $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CUnsignedInt>::new(
-                            4294967295u32
+                            $crate::__pgrx_c_bindings::InvalidBlockNumber as u32
                         )
                     )
                 )
@@ -22773,10 +23809,10 @@ macro_rules! GinPageRightMost {
                                                         _
                                                     >(
                                                         $crate::__pgrx_c_macros::expression::cast_as::<
-                                                            $crate::GinPageOpaque,
+                                                            $crate::__pgrx_c_bindings::GinPageOpaque,
                                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                                    $crate::GinPageOpaqueData
+                                                                    $crate::__pgrx_c_bindings::GinPageOpaqueData
                                                                 >,
                                                                 $crate::__pgrx_c_macros::expression::ReadWrite
                                                             >,
@@ -22793,16 +23829,22 @@ macro_rules! GinPageRightMost {
                                                                                 true,
                                                                                 _
                                                                             >(
-                                                                                $crate::__pgrx_c_generated::Inline_777d7ad23546580e873e0206a9a6e1cd(
+                                                                                $crate::__pgrx_c_bindings::PageValidateSpecialPointer(
                                                                                     <
                                                                                         $crate::__pgrx_c_macros::expression::CPointer<
-                                                                                            $crate::__pgrx_c_macros::CChar,
+                                                                                            $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                                                $crate::__pgrx_c_macros::CChar,
+                                                                                                ::core::ffi::c_char
+                                                                                            >,
                                                                                             $crate::__pgrx_c_macros::expression::ReadOnly
                                                                                         > as $crate::__pgrx_c_macros::expression::CType
                                                                                     >::into_storage(
                                                                                         $crate::__pgrx_c_macros::expression::implicit::<
                                                                                             $crate::__pgrx_c_macros::expression::CPointer<
-                                                                                                $crate::__pgrx_c_macros::CChar,
+                                                                                                $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                                                    $crate::__pgrx_c_macros::CChar,
+                                                                                                    ::core::ffi::c_char
+                                                                                                >,
                                                                                                 $crate::__pgrx_c_macros::expression::ReadOnly
                                                                                             >,
                                                                                             _
@@ -22863,10 +23905,10 @@ macro_rules! GinPageRightMost {
                                                                                                             _
                                                                                                         >(
                                                                                                             $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                                                                $crate::PageHeader,
+                                                                                                                $crate::__pgrx_c_bindings::PageHeader,
                                                                                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                                                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                                        $crate::PageHeaderData
+                                                                                                                        $crate::__pgrx_c_bindings::PageHeaderData
                                                                                                                     >,
                                                                                                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                                                                                                 >,
@@ -22906,10 +23948,9 @@ macro_rules! GinPageRightMost {
                                     )
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                                    /* PGRX: InvalidBlockNumber remains expanded because no integer constant binding is available in the defining Rust crate. */
                                     $crate::__pgrx_c_macros::CValue::<
                                         $crate::__pgrx_c_macros::CUnsignedInt
-                                    >::new(4294967295u32)
+                                    >::new($crate::__pgrx_c_bindings::InvalidBlockNumber as u32)
                                 )
                             )
                         )
@@ -22942,10 +23983,10 @@ macro_rules! GinPageRightMost {
                                             _
                                         >(
                                             $crate::__pgrx_c_macros::expression::cast_as::<
-                                                $crate::GinPageOpaque,
+                                                $crate::__pgrx_c_bindings::GinPageOpaque,
                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                        $crate::GinPageOpaqueData
+                                                        $crate::__pgrx_c_bindings::GinPageOpaqueData
                                                     >,
                                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                                 >,
@@ -22962,16 +24003,22 @@ macro_rules! GinPageRightMost {
                                                                     true,
                                                                     _
                                                                 >(
-                                                                    $crate::__pgrx_c_generated::Inline_777d7ad23546580e873e0206a9a6e1cd(
+                                                                    $crate::__pgrx_c_bindings::PageValidateSpecialPointer(
                                                                         <
                                                                             $crate::__pgrx_c_macros::expression::CPointer<
-                                                                                $crate::__pgrx_c_macros::CChar,
+                                                                                $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                                    $crate::__pgrx_c_macros::CChar,
+                                                                                    ::core::ffi::c_char
+                                                                                >,
                                                                                 $crate::__pgrx_c_macros::expression::ReadOnly
                                                                             > as $crate::__pgrx_c_macros::expression::CType
                                                                         >::into_storage(
                                                                             $crate::__pgrx_c_macros::expression::implicit::<
                                                                                 $crate::__pgrx_c_macros::expression::CPointer<
-                                                                                    $crate::__pgrx_c_macros::CChar,
+                                                                                    $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                                        $crate::__pgrx_c_macros::CChar,
+                                                                                        ::core::ffi::c_char
+                                                                                    >,
                                                                                     $crate::__pgrx_c_macros::expression::ReadOnly
                                                                                 >,
                                                                                 _
@@ -23030,10 +24077,10 @@ macro_rules! GinPageRightMost {
                                                                                                 _
                                                                                             >(
                                                                                                 $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                                                    $crate::PageHeader,
+                                                                                                    $crate::__pgrx_c_bindings::PageHeader,
                                                                                                     $crate::__pgrx_c_macros::expression::CPointer<
                                                                                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                            $crate::PageHeaderData
+                                                                                                            $crate::__pgrx_c_bindings::PageHeaderData
                                                                                                         >,
                                                                                                         $crate::__pgrx_c_macros::expression::ReadWrite
                                                                                                     >,
@@ -23073,9 +24120,8 @@ macro_rules! GinPageRightMost {
                         )
                     ),
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                        /* PGRX: InvalidBlockNumber remains expanded because no integer constant binding is available in the defining Rust crate. */
                         $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CUnsignedInt>::new(
-                            4294967295u32
+                            $crate::__pgrx_c_bindings::InvalidBlockNumber as u32
                         )
                     )
                 )
@@ -23091,8 +24137,8 @@ macro_rules! GinPageRightMost {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -23123,21 +24169,23 @@ macro_rules! __pgrx_c_args_GinPageSetCompressed {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
         $crate::__pgrx_c_args_GinPageSetCompressed!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_GinPageSetCompressed!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_GinPageSetCompressed!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinPageSetCompressed!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinPageSetCompressed!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -23145,7 +24193,9 @@ macro_rules! __pgrx_c_args_GinPageSetCompressed {
         $crate::__pgrx_c_args_GinPageSetCompressed!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_GinPageSetCompressed!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_GinPageSetCompressed!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -23167,14 +24217,18 @@ macro_rules! __pgrx_c_args_GinPageSetCompressed {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_GinPageSetCompressed!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_GinPageSetCompressed!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_GinPageSetCompressed!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_GinPageSetCompressed!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinPageSetCompressed!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -23201,13 +24255,13 @@ macro_rules! __pgrx_c_args_GinPageSetCompressed {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinPageSetCompressed!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinPageSetCompressed!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -23263,10 +24317,10 @@ macro_rules! GinPageSetCompressed {
                             (
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::cast_as::<
-                                        $crate::GinPageOpaque,
+                                        $crate::__pgrx_c_bindings::GinPageOpaque,
                                         $crate::__pgrx_c_macros::expression::CPointer<
                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                $crate::GinPageOpaqueData
+                                                $crate::__pgrx_c_bindings::GinPageOpaqueData
                                             >,
                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                         >,
@@ -23283,16 +24337,22 @@ macro_rules! GinPageSetCompressed {
                                                             true,
                                                             _
                                                         >(
-                                                            $crate::__pgrx_c_generated::Inline_777d7ad23546580e873e0206a9a6e1cd(
+                                                            $crate::__pgrx_c_bindings::PageValidateSpecialPointer(
                                                                 <
                                                                     $crate::__pgrx_c_macros::expression::CPointer<
-                                                                        $crate::__pgrx_c_macros::CChar,
+                                                                        $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                            $crate::__pgrx_c_macros::CChar,
+                                                                            ::core::ffi::c_char
+                                                                        >,
                                                                         $crate::__pgrx_c_macros::expression::ReadOnly
                                                                     > as $crate::__pgrx_c_macros::expression::CType
                                                                 >::into_storage(
                                                                     $crate::__pgrx_c_macros::expression::implicit::<
                                                                         $crate::__pgrx_c_macros::expression::CPointer<
-                                                                            $crate::__pgrx_c_macros::CChar,
+                                                                            $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                                $crate::__pgrx_c_macros::CChar,
+                                                                                ::core::ffi::c_char
+                                                                            >,
                                                                             $crate::__pgrx_c_macros::expression::ReadOnly
                                                                         >,
                                                                         _
@@ -23349,10 +24409,10 @@ macro_rules! GinPageSetCompressed {
                                                                                         _
                                                                                     >(
                                                                                         $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                                            $crate::PageHeader,
+                                                                                            $crate::__pgrx_c_bindings::PageHeader,
                                                                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                    $crate::PageHeaderData
+                                                                                                    $crate::__pgrx_c_bindings::PageHeaderData
                                                                                                 >,
                                                                                                 $crate::__pgrx_c_macros::expression::ReadWrite
                                                                                             >,
@@ -23391,7 +24451,7 @@ macro_rules! GinPageSetCompressed {
                     ),
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                            $crate::GIN_COMPRESSED as i32
+                            $crate::__pgrx_c_bindings::GIN_COMPRESSED as i32
                         )
                     ),
                     |__pgrx_old,
@@ -23440,10 +24500,10 @@ macro_rules! GinPageSetCompressed {
                                                 _
                                             >(
                                                 $crate::__pgrx_c_macros::expression::cast_as::<
-                                                    $crate::GinPageOpaque,
+                                                    $crate::__pgrx_c_bindings::GinPageOpaque,
                                                     $crate::__pgrx_c_macros::expression::CPointer<
                                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                                            $crate::GinPageOpaqueData
+                                                            $crate::__pgrx_c_bindings::GinPageOpaqueData
                                                         >,
                                                         $crate::__pgrx_c_macros::expression::ReadWrite
                                                     >,
@@ -23460,16 +24520,22 @@ macro_rules! GinPageSetCompressed {
                                                                         true,
                                                                         _
                                                                     >(
-                                                                        $crate::__pgrx_c_generated::Inline_777d7ad23546580e873e0206a9a6e1cd(
+                                                                        $crate::__pgrx_c_bindings::PageValidateSpecialPointer(
                                                                             <
                                                                                 $crate::__pgrx_c_macros::expression::CPointer<
-                                                                                    $crate::__pgrx_c_macros::CChar,
+                                                                                    $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                                        $crate::__pgrx_c_macros::CChar,
+                                                                                        ::core::ffi::c_char
+                                                                                    >,
                                                                                     $crate::__pgrx_c_macros::expression::ReadOnly
                                                                                 > as $crate::__pgrx_c_macros::expression::CType
                                                                             >::into_storage(
                                                                                 $crate::__pgrx_c_macros::expression::implicit::<
                                                                                     $crate::__pgrx_c_macros::expression::CPointer<
-                                                                                        $crate::__pgrx_c_macros::CChar,
+                                                                                        $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                                            $crate::__pgrx_c_macros::CChar,
+                                                                                            ::core::ffi::c_char
+                                                                                        >,
                                                                                         $crate::__pgrx_c_macros::expression::ReadOnly
                                                                                     >,
                                                                                     _
@@ -23530,10 +24596,10 @@ macro_rules! GinPageSetCompressed {
                                                                                                     _
                                                                                                 >(
                                                                                                     $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                                                        $crate::PageHeader,
+                                                                                                        $crate::__pgrx_c_bindings::PageHeader,
                                                                                                         $crate::__pgrx_c_macros::expression::CPointer<
                                                                                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                                $crate::PageHeaderData
+                                                                                                                $crate::__pgrx_c_bindings::PageHeaderData
                                                                                                             >,
                                                                                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                                                                                         >,
@@ -23572,7 +24638,7 @@ macro_rules! GinPageSetCompressed {
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                        $crate::GIN_COMPRESSED as i32
+                                        $crate::__pgrx_c_bindings::GIN_COMPRESSED as i32
                                     )
                                 ),
                                 |__pgrx_old,
@@ -23606,10 +24672,10 @@ macro_rules! GinPageSetCompressed {
                             (
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::cast_as::<
-                                        $crate::GinPageOpaque,
+                                        $crate::__pgrx_c_bindings::GinPageOpaque,
                                         $crate::__pgrx_c_macros::expression::CPointer<
                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                $crate::GinPageOpaqueData
+                                                $crate::__pgrx_c_bindings::GinPageOpaqueData
                                             >,
                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                         >,
@@ -23626,16 +24692,22 @@ macro_rules! GinPageSetCompressed {
                                                             true,
                                                             _
                                                         >(
-                                                            $crate::__pgrx_c_generated::Inline_777d7ad23546580e873e0206a9a6e1cd(
+                                                            $crate::__pgrx_c_bindings::PageValidateSpecialPointer(
                                                                 <
                                                                     $crate::__pgrx_c_macros::expression::CPointer<
-                                                                        $crate::__pgrx_c_macros::CChar,
+                                                                        $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                            $crate::__pgrx_c_macros::CChar,
+                                                                            ::core::ffi::c_char
+                                                                        >,
                                                                         $crate::__pgrx_c_macros::expression::ReadOnly
                                                                     > as $crate::__pgrx_c_macros::expression::CType
                                                                 >::into_storage(
                                                                     $crate::__pgrx_c_macros::expression::implicit::<
                                                                         $crate::__pgrx_c_macros::expression::CPointer<
-                                                                            $crate::__pgrx_c_macros::CChar,
+                                                                            $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                                $crate::__pgrx_c_macros::CChar,
+                                                                                ::core::ffi::c_char
+                                                                            >,
                                                                             $crate::__pgrx_c_macros::expression::ReadOnly
                                                                         >,
                                                                         _
@@ -23692,10 +24764,10 @@ macro_rules! GinPageSetCompressed {
                                                                                         _
                                                                                     >(
                                                                                         $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                                            $crate::PageHeader,
+                                                                                            $crate::__pgrx_c_bindings::PageHeader,
                                                                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                    $crate::PageHeaderData
+                                                                                                    $crate::__pgrx_c_bindings::PageHeaderData
                                                                                                 >,
                                                                                                 $crate::__pgrx_c_macros::expression::ReadWrite
                                                                                             >,
@@ -23734,7 +24806,7 @@ macro_rules! GinPageSetCompressed {
                     ),
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                            $crate::GIN_COMPRESSED as i32
+                            $crate::__pgrx_c_bindings::GIN_COMPRESSED as i32
                         )
                     ),
                     |__pgrx_old,
@@ -23752,8 +24824,8 @@ macro_rules! GinPageSetCompressed {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -23780,20 +24852,24 @@ macro_rules! __pgrx_c_args_GinPageSetData {
         $crate::__pgrx_c_args_GinPageSetData!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_GinPageSetData!(@p1 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_GinPageSetData!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_GinPageSetData!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_GinPageSetData!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinPageSetData!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinPageSetData!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -23801,7 +24877,9 @@ macro_rules! __pgrx_c_args_GinPageSetData {
         $crate::__pgrx_c_args_GinPageSetData!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_GinPageSetData!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_GinPageSetData!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -23823,14 +24901,18 @@ macro_rules! __pgrx_c_args_GinPageSetData {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_GinPageSetData!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_GinPageSetData!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_GinPageSetData!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_GinPageSetData!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinPageSetData!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -23857,13 +24939,13 @@ macro_rules! __pgrx_c_args_GinPageSetData {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinPageSetData!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinPageSetData!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -23919,10 +25001,10 @@ macro_rules! GinPageSetData {
                             (
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::cast_as::<
-                                        $crate::GinPageOpaque,
+                                        $crate::__pgrx_c_bindings::GinPageOpaque,
                                         $crate::__pgrx_c_macros::expression::CPointer<
                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                $crate::GinPageOpaqueData
+                                                $crate::__pgrx_c_bindings::GinPageOpaqueData
                                             >,
                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                         >,
@@ -23939,16 +25021,22 @@ macro_rules! GinPageSetData {
                                                             true,
                                                             _
                                                         >(
-                                                            $crate::__pgrx_c_generated::Inline_777d7ad23546580e873e0206a9a6e1cd(
+                                                            $crate::__pgrx_c_bindings::PageValidateSpecialPointer(
                                                                 <
                                                                     $crate::__pgrx_c_macros::expression::CPointer<
-                                                                        $crate::__pgrx_c_macros::CChar,
+                                                                        $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                            $crate::__pgrx_c_macros::CChar,
+                                                                            ::core::ffi::c_char
+                                                                        >,
                                                                         $crate::__pgrx_c_macros::expression::ReadOnly
                                                                     > as $crate::__pgrx_c_macros::expression::CType
                                                                 >::into_storage(
                                                                     $crate::__pgrx_c_macros::expression::implicit::<
                                                                         $crate::__pgrx_c_macros::expression::CPointer<
-                                                                            $crate::__pgrx_c_macros::CChar,
+                                                                            $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                                $crate::__pgrx_c_macros::CChar,
+                                                                                ::core::ffi::c_char
+                                                                            >,
                                                                             $crate::__pgrx_c_macros::expression::ReadOnly
                                                                         >,
                                                                         _
@@ -24005,10 +25093,10 @@ macro_rules! GinPageSetData {
                                                                                         _
                                                                                     >(
                                                                                         $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                                            $crate::PageHeader,
+                                                                                            $crate::__pgrx_c_bindings::PageHeader,
                                                                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                    $crate::PageHeaderData
+                                                                                                    $crate::__pgrx_c_bindings::PageHeaderData
                                                                                                 >,
                                                                                                 $crate::__pgrx_c_macros::expression::ReadWrite
                                                                                             >,
@@ -24047,7 +25135,7 @@ macro_rules! GinPageSetData {
                     ),
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                            $crate::GIN_DATA as i32
+                            $crate::__pgrx_c_bindings::GIN_DATA as i32
                         )
                     ),
                     |__pgrx_old,
@@ -24096,10 +25184,10 @@ macro_rules! GinPageSetData {
                                                 _
                                             >(
                                                 $crate::__pgrx_c_macros::expression::cast_as::<
-                                                    $crate::GinPageOpaque,
+                                                    $crate::__pgrx_c_bindings::GinPageOpaque,
                                                     $crate::__pgrx_c_macros::expression::CPointer<
                                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                                            $crate::GinPageOpaqueData
+                                                            $crate::__pgrx_c_bindings::GinPageOpaqueData
                                                         >,
                                                         $crate::__pgrx_c_macros::expression::ReadWrite
                                                     >,
@@ -24116,16 +25204,22 @@ macro_rules! GinPageSetData {
                                                                         true,
                                                                         _
                                                                     >(
-                                                                        $crate::__pgrx_c_generated::Inline_777d7ad23546580e873e0206a9a6e1cd(
+                                                                        $crate::__pgrx_c_bindings::PageValidateSpecialPointer(
                                                                             <
                                                                                 $crate::__pgrx_c_macros::expression::CPointer<
-                                                                                    $crate::__pgrx_c_macros::CChar,
+                                                                                    $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                                        $crate::__pgrx_c_macros::CChar,
+                                                                                        ::core::ffi::c_char
+                                                                                    >,
                                                                                     $crate::__pgrx_c_macros::expression::ReadOnly
                                                                                 > as $crate::__pgrx_c_macros::expression::CType
                                                                             >::into_storage(
                                                                                 $crate::__pgrx_c_macros::expression::implicit::<
                                                                                     $crate::__pgrx_c_macros::expression::CPointer<
-                                                                                        $crate::__pgrx_c_macros::CChar,
+                                                                                        $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                                            $crate::__pgrx_c_macros::CChar,
+                                                                                            ::core::ffi::c_char
+                                                                                        >,
                                                                                         $crate::__pgrx_c_macros::expression::ReadOnly
                                                                                     >,
                                                                                     _
@@ -24186,10 +25280,10 @@ macro_rules! GinPageSetData {
                                                                                                     _
                                                                                                 >(
                                                                                                     $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                                                        $crate::PageHeader,
+                                                                                                        $crate::__pgrx_c_bindings::PageHeader,
                                                                                                         $crate::__pgrx_c_macros::expression::CPointer<
                                                                                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                                $crate::PageHeaderData
+                                                                                                                $crate::__pgrx_c_bindings::PageHeaderData
                                                                                                             >,
                                                                                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                                                                                         >,
@@ -24228,7 +25322,7 @@ macro_rules! GinPageSetData {
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                        $crate::GIN_DATA as i32
+                                        $crate::__pgrx_c_bindings::GIN_DATA as i32
                                     )
                                 ),
                                 |__pgrx_old,
@@ -24262,10 +25356,10 @@ macro_rules! GinPageSetData {
                             (
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::cast_as::<
-                                        $crate::GinPageOpaque,
+                                        $crate::__pgrx_c_bindings::GinPageOpaque,
                                         $crate::__pgrx_c_macros::expression::CPointer<
                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                $crate::GinPageOpaqueData
+                                                $crate::__pgrx_c_bindings::GinPageOpaqueData
                                             >,
                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                         >,
@@ -24282,16 +25376,22 @@ macro_rules! GinPageSetData {
                                                             true,
                                                             _
                                                         >(
-                                                            $crate::__pgrx_c_generated::Inline_777d7ad23546580e873e0206a9a6e1cd(
+                                                            $crate::__pgrx_c_bindings::PageValidateSpecialPointer(
                                                                 <
                                                                     $crate::__pgrx_c_macros::expression::CPointer<
-                                                                        $crate::__pgrx_c_macros::CChar,
+                                                                        $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                            $crate::__pgrx_c_macros::CChar,
+                                                                            ::core::ffi::c_char
+                                                                        >,
                                                                         $crate::__pgrx_c_macros::expression::ReadOnly
                                                                     > as $crate::__pgrx_c_macros::expression::CType
                                                                 >::into_storage(
                                                                     $crate::__pgrx_c_macros::expression::implicit::<
                                                                         $crate::__pgrx_c_macros::expression::CPointer<
-                                                                            $crate::__pgrx_c_macros::CChar,
+                                                                            $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                                $crate::__pgrx_c_macros::CChar,
+                                                                                ::core::ffi::c_char
+                                                                            >,
                                                                             $crate::__pgrx_c_macros::expression::ReadOnly
                                                                         >,
                                                                         _
@@ -24348,10 +25448,10 @@ macro_rules! GinPageSetData {
                                                                                         _
                                                                                     >(
                                                                                         $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                                            $crate::PageHeader,
+                                                                                            $crate::__pgrx_c_bindings::PageHeader,
                                                                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                    $crate::PageHeaderData
+                                                                                                    $crate::__pgrx_c_bindings::PageHeaderData
                                                                                                 >,
                                                                                                 $crate::__pgrx_c_macros::expression::ReadWrite
                                                                                             >,
@@ -24390,7 +25490,7 @@ macro_rules! GinPageSetData {
                     ),
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                            $crate::GIN_DATA as i32
+                            $crate::__pgrx_c_bindings::GIN_DATA as i32
                         )
                     ),
                     |__pgrx_old,
@@ -24408,8 +25508,8 @@ macro_rules! GinPageSetData {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -24437,13 +25537,13 @@ macro_rules! __pgrx_c_args_GinPageSetDeleteXid {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinPageSetDeleteXid!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinPageSetDeleteXid!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -24452,7 +25552,7 @@ macro_rules! __pgrx_c_args_GinPageSetDeleteXid {
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinPageSetDeleteXid!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -24479,13 +25579,13 @@ macro_rules! __pgrx_c_args_GinPageSetDeleteXid {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinPageSetDeleteXid!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinPageSetDeleteXid!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -24493,14 +25593,16 @@ macro_rules! __pgrx_c_args_GinPageSetDeleteXid {
         compile_error!("an ungrouped C parameter requires a parenthesized negative literal")
     };
     (@negative1 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_GinPageSetDeleteXid!(@p2 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_GinPageSetDeleteXid!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         compile_error!("an ungrouped C parameter requires a parenthesized negative literal")
     };
     (@negative1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinPageSetDeleteXid!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -24508,7 +25610,9 @@ macro_rules! __pgrx_c_args_GinPageSetDeleteXid {
         compile_error!("an ungrouped C parameter requires one token tree")
     };
     (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_GinPageSetDeleteXid!(@p2 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_GinPageSetDeleteXid!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -24530,14 +25634,18 @@ macro_rules! __pgrx_c_args_GinPageSetDeleteXid {
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_GinPageSetDeleteXid!(@p2 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_GinPageSetDeleteXid!(
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:tt) => {
-        $crate::__pgrx_c_args_GinPageSetDeleteXid!(@p2 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_GinPageSetDeleteXid!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinPageSetDeleteXid!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -24564,13 +25672,13 @@ macro_rules! __pgrx_c_args_GinPageSetDeleteXid {
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinPageSetDeleteXid!(
-            @p2 $mode [$($done)* (@literal [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:tt, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinPageSetDeleteXid!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -24626,10 +25734,10 @@ macro_rules! GinPageSetDeleteXid {
                             (
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::cast_as::<
-                                        $crate::PageHeader,
+                                        $crate::__pgrx_c_bindings::PageHeader,
                                         $crate::__pgrx_c_macros::expression::CPointer<
                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                $crate::PageHeaderData
+                                                $crate::__pgrx_c_bindings::PageHeaderData
                                             >,
                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                         >,
@@ -24693,10 +25801,10 @@ macro_rules! GinPageSetDeleteXid {
                                                 _
                                             >(
                                                 $crate::__pgrx_c_macros::expression::cast_as::<
-                                                    $crate::PageHeader,
+                                                    $crate::__pgrx_c_bindings::PageHeader,
                                                     $crate::__pgrx_c_macros::expression::CPointer<
                                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                                            $crate::PageHeaderData
+                                                            $crate::__pgrx_c_bindings::PageHeaderData
                                                         >,
                                                         $crate::__pgrx_c_macros::expression::ReadWrite
                                                     >,
@@ -24746,10 +25854,10 @@ macro_rules! GinPageSetDeleteXid {
                             (
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::cast_as::<
-                                        $crate::PageHeader,
+                                        $crate::__pgrx_c_bindings::PageHeader,
                                         $crate::__pgrx_c_macros::expression::CPointer<
                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                $crate::PageHeaderData
+                                                $crate::__pgrx_c_bindings::PageHeaderData
                                             >,
                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                         >,
@@ -24782,8 +25890,8 @@ macro_rules! GinPageSetDeleteXid {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -24810,20 +25918,24 @@ macro_rules! __pgrx_c_args_GinPageSetDeleted {
         $crate::__pgrx_c_args_GinPageSetDeleted!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_GinPageSetDeleted!(@p1 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_GinPageSetDeleted!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_GinPageSetDeleted!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_GinPageSetDeleted!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinPageSetDeleted!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinPageSetDeleted!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -24831,7 +25943,9 @@ macro_rules! __pgrx_c_args_GinPageSetDeleted {
         $crate::__pgrx_c_args_GinPageSetDeleted!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_GinPageSetDeleted!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_GinPageSetDeleted!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -24853,14 +25967,18 @@ macro_rules! __pgrx_c_args_GinPageSetDeleted {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_GinPageSetDeleted!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_GinPageSetDeleted!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_GinPageSetDeleted!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_GinPageSetDeleted!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinPageSetDeleted!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -24887,13 +26005,13 @@ macro_rules! __pgrx_c_args_GinPageSetDeleted {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinPageSetDeleted!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinPageSetDeleted!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -24949,10 +26067,10 @@ macro_rules! GinPageSetDeleted {
                             (
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::cast_as::<
-                                        $crate::GinPageOpaque,
+                                        $crate::__pgrx_c_bindings::GinPageOpaque,
                                         $crate::__pgrx_c_macros::expression::CPointer<
                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                $crate::GinPageOpaqueData
+                                                $crate::__pgrx_c_bindings::GinPageOpaqueData
                                             >,
                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                         >,
@@ -24969,16 +26087,22 @@ macro_rules! GinPageSetDeleted {
                                                             true,
                                                             _
                                                         >(
-                                                            $crate::__pgrx_c_generated::Inline_777d7ad23546580e873e0206a9a6e1cd(
+                                                            $crate::__pgrx_c_bindings::PageValidateSpecialPointer(
                                                                 <
                                                                     $crate::__pgrx_c_macros::expression::CPointer<
-                                                                        $crate::__pgrx_c_macros::CChar,
+                                                                        $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                            $crate::__pgrx_c_macros::CChar,
+                                                                            ::core::ffi::c_char
+                                                                        >,
                                                                         $crate::__pgrx_c_macros::expression::ReadOnly
                                                                     > as $crate::__pgrx_c_macros::expression::CType
                                                                 >::into_storage(
                                                                     $crate::__pgrx_c_macros::expression::implicit::<
                                                                         $crate::__pgrx_c_macros::expression::CPointer<
-                                                                            $crate::__pgrx_c_macros::CChar,
+                                                                            $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                                $crate::__pgrx_c_macros::CChar,
+                                                                                ::core::ffi::c_char
+                                                                            >,
                                                                             $crate::__pgrx_c_macros::expression::ReadOnly
                                                                         >,
                                                                         _
@@ -25035,10 +26159,10 @@ macro_rules! GinPageSetDeleted {
                                                                                         _
                                                                                     >(
                                                                                         $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                                            $crate::PageHeader,
+                                                                                            $crate::__pgrx_c_bindings::PageHeader,
                                                                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                    $crate::PageHeaderData
+                                                                                                    $crate::__pgrx_c_bindings::PageHeaderData
                                                                                                 >,
                                                                                                 $crate::__pgrx_c_macros::expression::ReadWrite
                                                                                             >,
@@ -25077,7 +26201,7 @@ macro_rules! GinPageSetDeleted {
                     ),
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                            $crate::GIN_DELETED as i32
+                            $crate::__pgrx_c_bindings::GIN_DELETED as i32
                         )
                     ),
                     |__pgrx_old,
@@ -25126,10 +26250,10 @@ macro_rules! GinPageSetDeleted {
                                                 _
                                             >(
                                                 $crate::__pgrx_c_macros::expression::cast_as::<
-                                                    $crate::GinPageOpaque,
+                                                    $crate::__pgrx_c_bindings::GinPageOpaque,
                                                     $crate::__pgrx_c_macros::expression::CPointer<
                                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                                            $crate::GinPageOpaqueData
+                                                            $crate::__pgrx_c_bindings::GinPageOpaqueData
                                                         >,
                                                         $crate::__pgrx_c_macros::expression::ReadWrite
                                                     >,
@@ -25146,16 +26270,22 @@ macro_rules! GinPageSetDeleted {
                                                                         true,
                                                                         _
                                                                     >(
-                                                                        $crate::__pgrx_c_generated::Inline_777d7ad23546580e873e0206a9a6e1cd(
+                                                                        $crate::__pgrx_c_bindings::PageValidateSpecialPointer(
                                                                             <
                                                                                 $crate::__pgrx_c_macros::expression::CPointer<
-                                                                                    $crate::__pgrx_c_macros::CChar,
+                                                                                    $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                                        $crate::__pgrx_c_macros::CChar,
+                                                                                        ::core::ffi::c_char
+                                                                                    >,
                                                                                     $crate::__pgrx_c_macros::expression::ReadOnly
                                                                                 > as $crate::__pgrx_c_macros::expression::CType
                                                                             >::into_storage(
                                                                                 $crate::__pgrx_c_macros::expression::implicit::<
                                                                                     $crate::__pgrx_c_macros::expression::CPointer<
-                                                                                        $crate::__pgrx_c_macros::CChar,
+                                                                                        $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                                            $crate::__pgrx_c_macros::CChar,
+                                                                                            ::core::ffi::c_char
+                                                                                        >,
                                                                                         $crate::__pgrx_c_macros::expression::ReadOnly
                                                                                     >,
                                                                                     _
@@ -25216,10 +26346,10 @@ macro_rules! GinPageSetDeleted {
                                                                                                     _
                                                                                                 >(
                                                                                                     $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                                                        $crate::PageHeader,
+                                                                                                        $crate::__pgrx_c_bindings::PageHeader,
                                                                                                         $crate::__pgrx_c_macros::expression::CPointer<
                                                                                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                                $crate::PageHeaderData
+                                                                                                                $crate::__pgrx_c_bindings::PageHeaderData
                                                                                                             >,
                                                                                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                                                                                         >,
@@ -25258,7 +26388,7 @@ macro_rules! GinPageSetDeleted {
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                        $crate::GIN_DELETED as i32
+                                        $crate::__pgrx_c_bindings::GIN_DELETED as i32
                                     )
                                 ),
                                 |__pgrx_old,
@@ -25292,10 +26422,10 @@ macro_rules! GinPageSetDeleted {
                             (
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::cast_as::<
-                                        $crate::GinPageOpaque,
+                                        $crate::__pgrx_c_bindings::GinPageOpaque,
                                         $crate::__pgrx_c_macros::expression::CPointer<
                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                $crate::GinPageOpaqueData
+                                                $crate::__pgrx_c_bindings::GinPageOpaqueData
                                             >,
                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                         >,
@@ -25312,16 +26442,22 @@ macro_rules! GinPageSetDeleted {
                                                             true,
                                                             _
                                                         >(
-                                                            $crate::__pgrx_c_generated::Inline_777d7ad23546580e873e0206a9a6e1cd(
+                                                            $crate::__pgrx_c_bindings::PageValidateSpecialPointer(
                                                                 <
                                                                     $crate::__pgrx_c_macros::expression::CPointer<
-                                                                        $crate::__pgrx_c_macros::CChar,
+                                                                        $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                            $crate::__pgrx_c_macros::CChar,
+                                                                            ::core::ffi::c_char
+                                                                        >,
                                                                         $crate::__pgrx_c_macros::expression::ReadOnly
                                                                     > as $crate::__pgrx_c_macros::expression::CType
                                                                 >::into_storage(
                                                                     $crate::__pgrx_c_macros::expression::implicit::<
                                                                         $crate::__pgrx_c_macros::expression::CPointer<
-                                                                            $crate::__pgrx_c_macros::CChar,
+                                                                            $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                                $crate::__pgrx_c_macros::CChar,
+                                                                                ::core::ffi::c_char
+                                                                            >,
                                                                             $crate::__pgrx_c_macros::expression::ReadOnly
                                                                         >,
                                                                         _
@@ -25378,10 +26514,10 @@ macro_rules! GinPageSetDeleted {
                                                                                         _
                                                                                     >(
                                                                                         $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                                            $crate::PageHeader,
+                                                                                            $crate::__pgrx_c_bindings::PageHeader,
                                                                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                    $crate::PageHeaderData
+                                                                                                    $crate::__pgrx_c_bindings::PageHeaderData
                                                                                                 >,
                                                                                                 $crate::__pgrx_c_macros::expression::ReadWrite
                                                                                             >,
@@ -25420,7 +26556,7 @@ macro_rules! GinPageSetDeleted {
                     ),
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                            $crate::GIN_DELETED as i32
+                            $crate::__pgrx_c_bindings::GIN_DELETED as i32
                         )
                     ),
                     |__pgrx_old,
@@ -25438,8 +26574,8 @@ macro_rules! GinPageSetDeleted {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -25466,20 +26602,24 @@ macro_rules! __pgrx_c_args_GinPageSetFullRow {
         $crate::__pgrx_c_args_GinPageSetFullRow!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_GinPageSetFullRow!(@p1 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_GinPageSetFullRow!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_GinPageSetFullRow!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_GinPageSetFullRow!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinPageSetFullRow!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinPageSetFullRow!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -25487,7 +26627,9 @@ macro_rules! __pgrx_c_args_GinPageSetFullRow {
         $crate::__pgrx_c_args_GinPageSetFullRow!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_GinPageSetFullRow!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_GinPageSetFullRow!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -25509,14 +26651,18 @@ macro_rules! __pgrx_c_args_GinPageSetFullRow {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_GinPageSetFullRow!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_GinPageSetFullRow!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_GinPageSetFullRow!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_GinPageSetFullRow!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinPageSetFullRow!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -25543,13 +26689,13 @@ macro_rules! __pgrx_c_args_GinPageSetFullRow {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinPageSetFullRow!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinPageSetFullRow!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -25605,10 +26751,10 @@ macro_rules! GinPageSetFullRow {
                             (
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::cast_as::<
-                                        $crate::GinPageOpaque,
+                                        $crate::__pgrx_c_bindings::GinPageOpaque,
                                         $crate::__pgrx_c_macros::expression::CPointer<
                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                $crate::GinPageOpaqueData
+                                                $crate::__pgrx_c_bindings::GinPageOpaqueData
                                             >,
                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                         >,
@@ -25625,16 +26771,22 @@ macro_rules! GinPageSetFullRow {
                                                             true,
                                                             _
                                                         >(
-                                                            $crate::__pgrx_c_generated::Inline_777d7ad23546580e873e0206a9a6e1cd(
+                                                            $crate::__pgrx_c_bindings::PageValidateSpecialPointer(
                                                                 <
                                                                     $crate::__pgrx_c_macros::expression::CPointer<
-                                                                        $crate::__pgrx_c_macros::CChar,
+                                                                        $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                            $crate::__pgrx_c_macros::CChar,
+                                                                            ::core::ffi::c_char
+                                                                        >,
                                                                         $crate::__pgrx_c_macros::expression::ReadOnly
                                                                     > as $crate::__pgrx_c_macros::expression::CType
                                                                 >::into_storage(
                                                                     $crate::__pgrx_c_macros::expression::implicit::<
                                                                         $crate::__pgrx_c_macros::expression::CPointer<
-                                                                            $crate::__pgrx_c_macros::CChar,
+                                                                            $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                                $crate::__pgrx_c_macros::CChar,
+                                                                                ::core::ffi::c_char
+                                                                            >,
                                                                             $crate::__pgrx_c_macros::expression::ReadOnly
                                                                         >,
                                                                         _
@@ -25691,10 +26843,10 @@ macro_rules! GinPageSetFullRow {
                                                                                         _
                                                                                     >(
                                                                                         $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                                            $crate::PageHeader,
+                                                                                            $crate::__pgrx_c_bindings::PageHeader,
                                                                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                    $crate::PageHeaderData
+                                                                                                    $crate::__pgrx_c_bindings::PageHeaderData
                                                                                                 >,
                                                                                                 $crate::__pgrx_c_macros::expression::ReadWrite
                                                                                             >,
@@ -25733,7 +26885,7 @@ macro_rules! GinPageSetFullRow {
                     ),
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                            $crate::GIN_LIST_FULLROW as i32
+                            $crate::__pgrx_c_bindings::GIN_LIST_FULLROW as i32
                         )
                     ),
                     |__pgrx_old,
@@ -25782,10 +26934,10 @@ macro_rules! GinPageSetFullRow {
                                                 _
                                             >(
                                                 $crate::__pgrx_c_macros::expression::cast_as::<
-                                                    $crate::GinPageOpaque,
+                                                    $crate::__pgrx_c_bindings::GinPageOpaque,
                                                     $crate::__pgrx_c_macros::expression::CPointer<
                                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                                            $crate::GinPageOpaqueData
+                                                            $crate::__pgrx_c_bindings::GinPageOpaqueData
                                                         >,
                                                         $crate::__pgrx_c_macros::expression::ReadWrite
                                                     >,
@@ -25802,16 +26954,22 @@ macro_rules! GinPageSetFullRow {
                                                                         true,
                                                                         _
                                                                     >(
-                                                                        $crate::__pgrx_c_generated::Inline_777d7ad23546580e873e0206a9a6e1cd(
+                                                                        $crate::__pgrx_c_bindings::PageValidateSpecialPointer(
                                                                             <
                                                                                 $crate::__pgrx_c_macros::expression::CPointer<
-                                                                                    $crate::__pgrx_c_macros::CChar,
+                                                                                    $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                                        $crate::__pgrx_c_macros::CChar,
+                                                                                        ::core::ffi::c_char
+                                                                                    >,
                                                                                     $crate::__pgrx_c_macros::expression::ReadOnly
                                                                                 > as $crate::__pgrx_c_macros::expression::CType
                                                                             >::into_storage(
                                                                                 $crate::__pgrx_c_macros::expression::implicit::<
                                                                                     $crate::__pgrx_c_macros::expression::CPointer<
-                                                                                        $crate::__pgrx_c_macros::CChar,
+                                                                                        $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                                            $crate::__pgrx_c_macros::CChar,
+                                                                                            ::core::ffi::c_char
+                                                                                        >,
                                                                                         $crate::__pgrx_c_macros::expression::ReadOnly
                                                                                     >,
                                                                                     _
@@ -25872,10 +27030,10 @@ macro_rules! GinPageSetFullRow {
                                                                                                     _
                                                                                                 >(
                                                                                                     $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                                                        $crate::PageHeader,
+                                                                                                        $crate::__pgrx_c_bindings::PageHeader,
                                                                                                         $crate::__pgrx_c_macros::expression::CPointer<
                                                                                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                                $crate::PageHeaderData
+                                                                                                                $crate::__pgrx_c_bindings::PageHeaderData
                                                                                                             >,
                                                                                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                                                                                         >,
@@ -25914,7 +27072,7 @@ macro_rules! GinPageSetFullRow {
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                        $crate::GIN_LIST_FULLROW as i32
+                                        $crate::__pgrx_c_bindings::GIN_LIST_FULLROW as i32
                                     )
                                 ),
                                 |__pgrx_old,
@@ -25948,10 +27106,10 @@ macro_rules! GinPageSetFullRow {
                             (
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::cast_as::<
-                                        $crate::GinPageOpaque,
+                                        $crate::__pgrx_c_bindings::GinPageOpaque,
                                         $crate::__pgrx_c_macros::expression::CPointer<
                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                $crate::GinPageOpaqueData
+                                                $crate::__pgrx_c_bindings::GinPageOpaqueData
                                             >,
                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                         >,
@@ -25968,16 +27126,22 @@ macro_rules! GinPageSetFullRow {
                                                             true,
                                                             _
                                                         >(
-                                                            $crate::__pgrx_c_generated::Inline_777d7ad23546580e873e0206a9a6e1cd(
+                                                            $crate::__pgrx_c_bindings::PageValidateSpecialPointer(
                                                                 <
                                                                     $crate::__pgrx_c_macros::expression::CPointer<
-                                                                        $crate::__pgrx_c_macros::CChar,
+                                                                        $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                            $crate::__pgrx_c_macros::CChar,
+                                                                            ::core::ffi::c_char
+                                                                        >,
                                                                         $crate::__pgrx_c_macros::expression::ReadOnly
                                                                     > as $crate::__pgrx_c_macros::expression::CType
                                                                 >::into_storage(
                                                                     $crate::__pgrx_c_macros::expression::implicit::<
                                                                         $crate::__pgrx_c_macros::expression::CPointer<
-                                                                            $crate::__pgrx_c_macros::CChar,
+                                                                            $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                                $crate::__pgrx_c_macros::CChar,
+                                                                                ::core::ffi::c_char
+                                                                            >,
                                                                             $crate::__pgrx_c_macros::expression::ReadOnly
                                                                         >,
                                                                         _
@@ -26034,10 +27198,10 @@ macro_rules! GinPageSetFullRow {
                                                                                         _
                                                                                     >(
                                                                                         $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                                            $crate::PageHeader,
+                                                                                            $crate::__pgrx_c_bindings::PageHeader,
                                                                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                    $crate::PageHeaderData
+                                                                                                    $crate::__pgrx_c_bindings::PageHeaderData
                                                                                                 >,
                                                                                                 $crate::__pgrx_c_macros::expression::ReadWrite
                                                                                             >,
@@ -26076,7 +27240,7 @@ macro_rules! GinPageSetFullRow {
                     ),
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                            $crate::GIN_LIST_FULLROW as i32
+                            $crate::__pgrx_c_bindings::GIN_LIST_FULLROW as i32
                         )
                     ),
                     |__pgrx_old,
@@ -26094,8 +27258,8 @@ macro_rules! GinPageSetFullRow {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -26122,20 +27286,24 @@ macro_rules! __pgrx_c_args_GinPageSetLeaf {
         $crate::__pgrx_c_args_GinPageSetLeaf!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_GinPageSetLeaf!(@p1 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_GinPageSetLeaf!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_GinPageSetLeaf!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_GinPageSetLeaf!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinPageSetLeaf!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinPageSetLeaf!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -26143,7 +27311,9 @@ macro_rules! __pgrx_c_args_GinPageSetLeaf {
         $crate::__pgrx_c_args_GinPageSetLeaf!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_GinPageSetLeaf!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_GinPageSetLeaf!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -26165,14 +27335,18 @@ macro_rules! __pgrx_c_args_GinPageSetLeaf {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_GinPageSetLeaf!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_GinPageSetLeaf!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_GinPageSetLeaf!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_GinPageSetLeaf!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinPageSetLeaf!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -26199,13 +27373,13 @@ macro_rules! __pgrx_c_args_GinPageSetLeaf {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinPageSetLeaf!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinPageSetLeaf!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -26261,10 +27435,10 @@ macro_rules! GinPageSetLeaf {
                             (
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::cast_as::<
-                                        $crate::GinPageOpaque,
+                                        $crate::__pgrx_c_bindings::GinPageOpaque,
                                         $crate::__pgrx_c_macros::expression::CPointer<
                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                $crate::GinPageOpaqueData
+                                                $crate::__pgrx_c_bindings::GinPageOpaqueData
                                             >,
                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                         >,
@@ -26281,16 +27455,22 @@ macro_rules! GinPageSetLeaf {
                                                             true,
                                                             _
                                                         >(
-                                                            $crate::__pgrx_c_generated::Inline_777d7ad23546580e873e0206a9a6e1cd(
+                                                            $crate::__pgrx_c_bindings::PageValidateSpecialPointer(
                                                                 <
                                                                     $crate::__pgrx_c_macros::expression::CPointer<
-                                                                        $crate::__pgrx_c_macros::CChar,
+                                                                        $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                            $crate::__pgrx_c_macros::CChar,
+                                                                            ::core::ffi::c_char
+                                                                        >,
                                                                         $crate::__pgrx_c_macros::expression::ReadOnly
                                                                     > as $crate::__pgrx_c_macros::expression::CType
                                                                 >::into_storage(
                                                                     $crate::__pgrx_c_macros::expression::implicit::<
                                                                         $crate::__pgrx_c_macros::expression::CPointer<
-                                                                            $crate::__pgrx_c_macros::CChar,
+                                                                            $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                                $crate::__pgrx_c_macros::CChar,
+                                                                                ::core::ffi::c_char
+                                                                            >,
                                                                             $crate::__pgrx_c_macros::expression::ReadOnly
                                                                         >,
                                                                         _
@@ -26347,10 +27527,10 @@ macro_rules! GinPageSetLeaf {
                                                                                         _
                                                                                     >(
                                                                                         $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                                            $crate::PageHeader,
+                                                                                            $crate::__pgrx_c_bindings::PageHeader,
                                                                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                    $crate::PageHeaderData
+                                                                                                    $crate::__pgrx_c_bindings::PageHeaderData
                                                                                                 >,
                                                                                                 $crate::__pgrx_c_macros::expression::ReadWrite
                                                                                             >,
@@ -26389,7 +27569,7 @@ macro_rules! GinPageSetLeaf {
                     ),
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                            $crate::GIN_LEAF as i32
+                            $crate::__pgrx_c_bindings::GIN_LEAF as i32
                         )
                     ),
                     |__pgrx_old,
@@ -26438,10 +27618,10 @@ macro_rules! GinPageSetLeaf {
                                                 _
                                             >(
                                                 $crate::__pgrx_c_macros::expression::cast_as::<
-                                                    $crate::GinPageOpaque,
+                                                    $crate::__pgrx_c_bindings::GinPageOpaque,
                                                     $crate::__pgrx_c_macros::expression::CPointer<
                                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                                            $crate::GinPageOpaqueData
+                                                            $crate::__pgrx_c_bindings::GinPageOpaqueData
                                                         >,
                                                         $crate::__pgrx_c_macros::expression::ReadWrite
                                                     >,
@@ -26458,16 +27638,22 @@ macro_rules! GinPageSetLeaf {
                                                                         true,
                                                                         _
                                                                     >(
-                                                                        $crate::__pgrx_c_generated::Inline_777d7ad23546580e873e0206a9a6e1cd(
+                                                                        $crate::__pgrx_c_bindings::PageValidateSpecialPointer(
                                                                             <
                                                                                 $crate::__pgrx_c_macros::expression::CPointer<
-                                                                                    $crate::__pgrx_c_macros::CChar,
+                                                                                    $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                                        $crate::__pgrx_c_macros::CChar,
+                                                                                        ::core::ffi::c_char
+                                                                                    >,
                                                                                     $crate::__pgrx_c_macros::expression::ReadOnly
                                                                                 > as $crate::__pgrx_c_macros::expression::CType
                                                                             >::into_storage(
                                                                                 $crate::__pgrx_c_macros::expression::implicit::<
                                                                                     $crate::__pgrx_c_macros::expression::CPointer<
-                                                                                        $crate::__pgrx_c_macros::CChar,
+                                                                                        $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                                            $crate::__pgrx_c_macros::CChar,
+                                                                                            ::core::ffi::c_char
+                                                                                        >,
                                                                                         $crate::__pgrx_c_macros::expression::ReadOnly
                                                                                     >,
                                                                                     _
@@ -26528,10 +27714,10 @@ macro_rules! GinPageSetLeaf {
                                                                                                     _
                                                                                                 >(
                                                                                                     $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                                                        $crate::PageHeader,
+                                                                                                        $crate::__pgrx_c_bindings::PageHeader,
                                                                                                         $crate::__pgrx_c_macros::expression::CPointer<
                                                                                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                                $crate::PageHeaderData
+                                                                                                                $crate::__pgrx_c_bindings::PageHeaderData
                                                                                                             >,
                                                                                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                                                                                         >,
@@ -26570,7 +27756,7 @@ macro_rules! GinPageSetLeaf {
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                        $crate::GIN_LEAF as i32
+                                        $crate::__pgrx_c_bindings::GIN_LEAF as i32
                                     )
                                 ),
                                 |__pgrx_old,
@@ -26604,10 +27790,10 @@ macro_rules! GinPageSetLeaf {
                             (
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::cast_as::<
-                                        $crate::GinPageOpaque,
+                                        $crate::__pgrx_c_bindings::GinPageOpaque,
                                         $crate::__pgrx_c_macros::expression::CPointer<
                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                $crate::GinPageOpaqueData
+                                                $crate::__pgrx_c_bindings::GinPageOpaqueData
                                             >,
                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                         >,
@@ -26624,16 +27810,22 @@ macro_rules! GinPageSetLeaf {
                                                             true,
                                                             _
                                                         >(
-                                                            $crate::__pgrx_c_generated::Inline_777d7ad23546580e873e0206a9a6e1cd(
+                                                            $crate::__pgrx_c_bindings::PageValidateSpecialPointer(
                                                                 <
                                                                     $crate::__pgrx_c_macros::expression::CPointer<
-                                                                        $crate::__pgrx_c_macros::CChar,
+                                                                        $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                            $crate::__pgrx_c_macros::CChar,
+                                                                            ::core::ffi::c_char
+                                                                        >,
                                                                         $crate::__pgrx_c_macros::expression::ReadOnly
                                                                     > as $crate::__pgrx_c_macros::expression::CType
                                                                 >::into_storage(
                                                                     $crate::__pgrx_c_macros::expression::implicit::<
                                                                         $crate::__pgrx_c_macros::expression::CPointer<
-                                                                            $crate::__pgrx_c_macros::CChar,
+                                                                            $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                                $crate::__pgrx_c_macros::CChar,
+                                                                                ::core::ffi::c_char
+                                                                            >,
                                                                             $crate::__pgrx_c_macros::expression::ReadOnly
                                                                         >,
                                                                         _
@@ -26690,10 +27882,10 @@ macro_rules! GinPageSetLeaf {
                                                                                         _
                                                                                     >(
                                                                                         $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                                            $crate::PageHeader,
+                                                                                            $crate::__pgrx_c_bindings::PageHeader,
                                                                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                    $crate::PageHeaderData
+                                                                                                    $crate::__pgrx_c_bindings::PageHeaderData
                                                                                                 >,
                                                                                                 $crate::__pgrx_c_macros::expression::ReadWrite
                                                                                             >,
@@ -26732,7 +27924,7 @@ macro_rules! GinPageSetLeaf {
                     ),
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                            $crate::GIN_LEAF as i32
+                            $crate::__pgrx_c_bindings::GIN_LEAF as i32
                         )
                     ),
                     |__pgrx_old,
@@ -26750,8 +27942,8 @@ macro_rules! GinPageSetLeaf {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -26778,20 +27970,24 @@ macro_rules! __pgrx_c_args_GinPageSetList {
         $crate::__pgrx_c_args_GinPageSetList!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_GinPageSetList!(@p1 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_GinPageSetList!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_GinPageSetList!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_GinPageSetList!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinPageSetList!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinPageSetList!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -26799,7 +27995,9 @@ macro_rules! __pgrx_c_args_GinPageSetList {
         $crate::__pgrx_c_args_GinPageSetList!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_GinPageSetList!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_GinPageSetList!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -26821,14 +28019,18 @@ macro_rules! __pgrx_c_args_GinPageSetList {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_GinPageSetList!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_GinPageSetList!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_GinPageSetList!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_GinPageSetList!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinPageSetList!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -26855,13 +28057,13 @@ macro_rules! __pgrx_c_args_GinPageSetList {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinPageSetList!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinPageSetList!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -26917,10 +28119,10 @@ macro_rules! GinPageSetList {
                             (
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::cast_as::<
-                                        $crate::GinPageOpaque,
+                                        $crate::__pgrx_c_bindings::GinPageOpaque,
                                         $crate::__pgrx_c_macros::expression::CPointer<
                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                $crate::GinPageOpaqueData
+                                                $crate::__pgrx_c_bindings::GinPageOpaqueData
                                             >,
                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                         >,
@@ -26937,16 +28139,22 @@ macro_rules! GinPageSetList {
                                                             true,
                                                             _
                                                         >(
-                                                            $crate::__pgrx_c_generated::Inline_777d7ad23546580e873e0206a9a6e1cd(
+                                                            $crate::__pgrx_c_bindings::PageValidateSpecialPointer(
                                                                 <
                                                                     $crate::__pgrx_c_macros::expression::CPointer<
-                                                                        $crate::__pgrx_c_macros::CChar,
+                                                                        $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                            $crate::__pgrx_c_macros::CChar,
+                                                                            ::core::ffi::c_char
+                                                                        >,
                                                                         $crate::__pgrx_c_macros::expression::ReadOnly
                                                                     > as $crate::__pgrx_c_macros::expression::CType
                                                                 >::into_storage(
                                                                     $crate::__pgrx_c_macros::expression::implicit::<
                                                                         $crate::__pgrx_c_macros::expression::CPointer<
-                                                                            $crate::__pgrx_c_macros::CChar,
+                                                                            $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                                $crate::__pgrx_c_macros::CChar,
+                                                                                ::core::ffi::c_char
+                                                                            >,
                                                                             $crate::__pgrx_c_macros::expression::ReadOnly
                                                                         >,
                                                                         _
@@ -27003,10 +28211,10 @@ macro_rules! GinPageSetList {
                                                                                         _
                                                                                     >(
                                                                                         $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                                            $crate::PageHeader,
+                                                                                            $crate::__pgrx_c_bindings::PageHeader,
                                                                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                    $crate::PageHeaderData
+                                                                                                    $crate::__pgrx_c_bindings::PageHeaderData
                                                                                                 >,
                                                                                                 $crate::__pgrx_c_macros::expression::ReadWrite
                                                                                             >,
@@ -27045,7 +28253,7 @@ macro_rules! GinPageSetList {
                     ),
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                            $crate::GIN_LIST as i32
+                            $crate::__pgrx_c_bindings::GIN_LIST as i32
                         )
                     ),
                     |__pgrx_old,
@@ -27094,10 +28302,10 @@ macro_rules! GinPageSetList {
                                                 _
                                             >(
                                                 $crate::__pgrx_c_macros::expression::cast_as::<
-                                                    $crate::GinPageOpaque,
+                                                    $crate::__pgrx_c_bindings::GinPageOpaque,
                                                     $crate::__pgrx_c_macros::expression::CPointer<
                                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                                            $crate::GinPageOpaqueData
+                                                            $crate::__pgrx_c_bindings::GinPageOpaqueData
                                                         >,
                                                         $crate::__pgrx_c_macros::expression::ReadWrite
                                                     >,
@@ -27114,16 +28322,22 @@ macro_rules! GinPageSetList {
                                                                         true,
                                                                         _
                                                                     >(
-                                                                        $crate::__pgrx_c_generated::Inline_777d7ad23546580e873e0206a9a6e1cd(
+                                                                        $crate::__pgrx_c_bindings::PageValidateSpecialPointer(
                                                                             <
                                                                                 $crate::__pgrx_c_macros::expression::CPointer<
-                                                                                    $crate::__pgrx_c_macros::CChar,
+                                                                                    $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                                        $crate::__pgrx_c_macros::CChar,
+                                                                                        ::core::ffi::c_char
+                                                                                    >,
                                                                                     $crate::__pgrx_c_macros::expression::ReadOnly
                                                                                 > as $crate::__pgrx_c_macros::expression::CType
                                                                             >::into_storage(
                                                                                 $crate::__pgrx_c_macros::expression::implicit::<
                                                                                     $crate::__pgrx_c_macros::expression::CPointer<
-                                                                                        $crate::__pgrx_c_macros::CChar,
+                                                                                        $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                                            $crate::__pgrx_c_macros::CChar,
+                                                                                            ::core::ffi::c_char
+                                                                                        >,
                                                                                         $crate::__pgrx_c_macros::expression::ReadOnly
                                                                                     >,
                                                                                     _
@@ -27184,10 +28398,10 @@ macro_rules! GinPageSetList {
                                                                                                     _
                                                                                                 >(
                                                                                                     $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                                                        $crate::PageHeader,
+                                                                                                        $crate::__pgrx_c_bindings::PageHeader,
                                                                                                         $crate::__pgrx_c_macros::expression::CPointer<
                                                                                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                                $crate::PageHeaderData
+                                                                                                                $crate::__pgrx_c_bindings::PageHeaderData
                                                                                                             >,
                                                                                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                                                                                         >,
@@ -27226,7 +28440,7 @@ macro_rules! GinPageSetList {
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                        $crate::GIN_LIST as i32
+                                        $crate::__pgrx_c_bindings::GIN_LIST as i32
                                     )
                                 ),
                                 |__pgrx_old,
@@ -27260,10 +28474,10 @@ macro_rules! GinPageSetList {
                             (
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::cast_as::<
-                                        $crate::GinPageOpaque,
+                                        $crate::__pgrx_c_bindings::GinPageOpaque,
                                         $crate::__pgrx_c_macros::expression::CPointer<
                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                $crate::GinPageOpaqueData
+                                                $crate::__pgrx_c_bindings::GinPageOpaqueData
                                             >,
                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                         >,
@@ -27280,16 +28494,22 @@ macro_rules! GinPageSetList {
                                                             true,
                                                             _
                                                         >(
-                                                            $crate::__pgrx_c_generated::Inline_777d7ad23546580e873e0206a9a6e1cd(
+                                                            $crate::__pgrx_c_bindings::PageValidateSpecialPointer(
                                                                 <
                                                                     $crate::__pgrx_c_macros::expression::CPointer<
-                                                                        $crate::__pgrx_c_macros::CChar,
+                                                                        $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                            $crate::__pgrx_c_macros::CChar,
+                                                                            ::core::ffi::c_char
+                                                                        >,
                                                                         $crate::__pgrx_c_macros::expression::ReadOnly
                                                                     > as $crate::__pgrx_c_macros::expression::CType
                                                                 >::into_storage(
                                                                     $crate::__pgrx_c_macros::expression::implicit::<
                                                                         $crate::__pgrx_c_macros::expression::CPointer<
-                                                                            $crate::__pgrx_c_macros::CChar,
+                                                                            $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                                $crate::__pgrx_c_macros::CChar,
+                                                                                ::core::ffi::c_char
+                                                                            >,
                                                                             $crate::__pgrx_c_macros::expression::ReadOnly
                                                                         >,
                                                                         _
@@ -27346,10 +28566,10 @@ macro_rules! GinPageSetList {
                                                                                         _
                                                                                     >(
                                                                                         $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                                            $crate::PageHeader,
+                                                                                            $crate::__pgrx_c_bindings::PageHeader,
                                                                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                    $crate::PageHeaderData
+                                                                                                    $crate::__pgrx_c_bindings::PageHeaderData
                                                                                                 >,
                                                                                                 $crate::__pgrx_c_macros::expression::ReadWrite
                                                                                             >,
@@ -27388,7 +28608,7 @@ macro_rules! GinPageSetList {
                     ),
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                            $crate::GIN_LIST as i32
+                            $crate::__pgrx_c_bindings::GIN_LIST as i32
                         )
                     ),
                     |__pgrx_old,
@@ -27406,8 +28626,8 @@ macro_rules! GinPageSetList {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -27438,21 +28658,23 @@ macro_rules! __pgrx_c_args_GinPageSetNonDeleted {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
         $crate::__pgrx_c_args_GinPageSetNonDeleted!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_GinPageSetNonDeleted!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_GinPageSetNonDeleted!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinPageSetNonDeleted!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinPageSetNonDeleted!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -27460,7 +28682,9 @@ macro_rules! __pgrx_c_args_GinPageSetNonDeleted {
         $crate::__pgrx_c_args_GinPageSetNonDeleted!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_GinPageSetNonDeleted!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_GinPageSetNonDeleted!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -27482,14 +28706,18 @@ macro_rules! __pgrx_c_args_GinPageSetNonDeleted {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_GinPageSetNonDeleted!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_GinPageSetNonDeleted!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_GinPageSetNonDeleted!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_GinPageSetNonDeleted!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinPageSetNonDeleted!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -27516,13 +28744,13 @@ macro_rules! __pgrx_c_args_GinPageSetNonDeleted {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinPageSetNonDeleted!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinPageSetNonDeleted!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -27578,10 +28806,10 @@ macro_rules! GinPageSetNonDeleted {
                             (
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::cast_as::<
-                                        $crate::GinPageOpaque,
+                                        $crate::__pgrx_c_bindings::GinPageOpaque,
                                         $crate::__pgrx_c_macros::expression::CPointer<
                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                $crate::GinPageOpaqueData
+                                                $crate::__pgrx_c_bindings::GinPageOpaqueData
                                             >,
                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                         >,
@@ -27598,16 +28826,22 @@ macro_rules! GinPageSetNonDeleted {
                                                             true,
                                                             _
                                                         >(
-                                                            $crate::__pgrx_c_generated::Inline_777d7ad23546580e873e0206a9a6e1cd(
+                                                            $crate::__pgrx_c_bindings::PageValidateSpecialPointer(
                                                                 <
                                                                     $crate::__pgrx_c_macros::expression::CPointer<
-                                                                        $crate::__pgrx_c_macros::CChar,
+                                                                        $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                            $crate::__pgrx_c_macros::CChar,
+                                                                            ::core::ffi::c_char
+                                                                        >,
                                                                         $crate::__pgrx_c_macros::expression::ReadOnly
                                                                     > as $crate::__pgrx_c_macros::expression::CType
                                                                 >::into_storage(
                                                                     $crate::__pgrx_c_macros::expression::implicit::<
                                                                         $crate::__pgrx_c_macros::expression::CPointer<
-                                                                            $crate::__pgrx_c_macros::CChar,
+                                                                            $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                                $crate::__pgrx_c_macros::CChar,
+                                                                                ::core::ffi::c_char
+                                                                            >,
                                                                             $crate::__pgrx_c_macros::expression::ReadOnly
                                                                         >,
                                                                         _
@@ -27664,10 +28898,10 @@ macro_rules! GinPageSetNonDeleted {
                                                                                         _
                                                                                     >(
                                                                                         $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                                            $crate::PageHeader,
+                                                                                            $crate::__pgrx_c_bindings::PageHeader,
                                                                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                    $crate::PageHeaderData
+                                                                                                    $crate::__pgrx_c_bindings::PageHeaderData
                                                                                                 >,
                                                                                                 $crate::__pgrx_c_macros::expression::ReadWrite
                                                                                             >,
@@ -27708,7 +28942,7 @@ macro_rules! GinPageSetNonDeleted {
                         $crate::__pgrx_c_macros::expression::bitnot(
                             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                 $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                    $crate::GIN_DELETED as i32
+                                    $crate::__pgrx_c_bindings::GIN_DELETED as i32
                                 )
                             )
                         )
@@ -27759,10 +28993,10 @@ macro_rules! GinPageSetNonDeleted {
                                                 _
                                             >(
                                                 $crate::__pgrx_c_macros::expression::cast_as::<
-                                                    $crate::GinPageOpaque,
+                                                    $crate::__pgrx_c_bindings::GinPageOpaque,
                                                     $crate::__pgrx_c_macros::expression::CPointer<
                                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                                            $crate::GinPageOpaqueData
+                                                            $crate::__pgrx_c_bindings::GinPageOpaqueData
                                                         >,
                                                         $crate::__pgrx_c_macros::expression::ReadWrite
                                                     >,
@@ -27779,16 +29013,22 @@ macro_rules! GinPageSetNonDeleted {
                                                                         true,
                                                                         _
                                                                     >(
-                                                                        $crate::__pgrx_c_generated::Inline_777d7ad23546580e873e0206a9a6e1cd(
+                                                                        $crate::__pgrx_c_bindings::PageValidateSpecialPointer(
                                                                             <
                                                                                 $crate::__pgrx_c_macros::expression::CPointer<
-                                                                                    $crate::__pgrx_c_macros::CChar,
+                                                                                    $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                                        $crate::__pgrx_c_macros::CChar,
+                                                                                        ::core::ffi::c_char
+                                                                                    >,
                                                                                     $crate::__pgrx_c_macros::expression::ReadOnly
                                                                                 > as $crate::__pgrx_c_macros::expression::CType
                                                                             >::into_storage(
                                                                                 $crate::__pgrx_c_macros::expression::implicit::<
                                                                                     $crate::__pgrx_c_macros::expression::CPointer<
-                                                                                        $crate::__pgrx_c_macros::CChar,
+                                                                                        $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                                            $crate::__pgrx_c_macros::CChar,
+                                                                                            ::core::ffi::c_char
+                                                                                        >,
                                                                                         $crate::__pgrx_c_macros::expression::ReadOnly
                                                                                     >,
                                                                                     _
@@ -27849,10 +29089,10 @@ macro_rules! GinPageSetNonDeleted {
                                                                                                     _
                                                                                                 >(
                                                                                                     $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                                                        $crate::PageHeader,
+                                                                                                        $crate::__pgrx_c_bindings::PageHeader,
                                                                                                         $crate::__pgrx_c_macros::expression::CPointer<
                                                                                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                                $crate::PageHeaderData
+                                                                                                                $crate::__pgrx_c_bindings::PageHeaderData
                                                                                                             >,
                                                                                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                                                                                         >,
@@ -27897,7 +29137,7 @@ macro_rules! GinPageSetNonDeleted {
                                         >(
                                             $crate::__pgrx_c_macros::CValue::<
                                                 $crate::__pgrx_c_macros::CInt
-                                            >::new($crate::GIN_DELETED as i32)
+                                            >::new($crate::__pgrx_c_bindings::GIN_DELETED as i32)
                                         )
                                     )
                                 ),
@@ -27932,10 +29172,10 @@ macro_rules! GinPageSetNonDeleted {
                             (
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::cast_as::<
-                                        $crate::GinPageOpaque,
+                                        $crate::__pgrx_c_bindings::GinPageOpaque,
                                         $crate::__pgrx_c_macros::expression::CPointer<
                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                $crate::GinPageOpaqueData
+                                                $crate::__pgrx_c_bindings::GinPageOpaqueData
                                             >,
                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                         >,
@@ -27952,16 +29192,22 @@ macro_rules! GinPageSetNonDeleted {
                                                             true,
                                                             _
                                                         >(
-                                                            $crate::__pgrx_c_generated::Inline_777d7ad23546580e873e0206a9a6e1cd(
+                                                            $crate::__pgrx_c_bindings::PageValidateSpecialPointer(
                                                                 <
                                                                     $crate::__pgrx_c_macros::expression::CPointer<
-                                                                        $crate::__pgrx_c_macros::CChar,
+                                                                        $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                            $crate::__pgrx_c_macros::CChar,
+                                                                            ::core::ffi::c_char
+                                                                        >,
                                                                         $crate::__pgrx_c_macros::expression::ReadOnly
                                                                     > as $crate::__pgrx_c_macros::expression::CType
                                                                 >::into_storage(
                                                                     $crate::__pgrx_c_macros::expression::implicit::<
                                                                         $crate::__pgrx_c_macros::expression::CPointer<
-                                                                            $crate::__pgrx_c_macros::CChar,
+                                                                            $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                                $crate::__pgrx_c_macros::CChar,
+                                                                                ::core::ffi::c_char
+                                                                            >,
                                                                             $crate::__pgrx_c_macros::expression::ReadOnly
                                                                         >,
                                                                         _
@@ -28018,10 +29264,10 @@ macro_rules! GinPageSetNonDeleted {
                                                                                         _
                                                                                     >(
                                                                                         $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                                            $crate::PageHeader,
+                                                                                            $crate::__pgrx_c_bindings::PageHeader,
                                                                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                    $crate::PageHeaderData
+                                                                                                    $crate::__pgrx_c_bindings::PageHeaderData
                                                                                                 >,
                                                                                                 $crate::__pgrx_c_macros::expression::ReadWrite
                                                                                             >,
@@ -28062,7 +29308,7 @@ macro_rules! GinPageSetNonDeleted {
                         $crate::__pgrx_c_macros::expression::bitnot(
                             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                 $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                    $crate::GIN_DELETED as i32
+                                    $crate::__pgrx_c_bindings::GIN_DELETED as i32
                                 )
                             )
                         )
@@ -28082,8 +29328,8 @@ macro_rules! GinPageSetNonDeleted {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -28110,20 +29356,24 @@ macro_rules! __pgrx_c_args_GinPageSetNonLeaf {
         $crate::__pgrx_c_args_GinPageSetNonLeaf!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_GinPageSetNonLeaf!(@p1 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_GinPageSetNonLeaf!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_GinPageSetNonLeaf!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_GinPageSetNonLeaf!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinPageSetNonLeaf!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinPageSetNonLeaf!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -28131,7 +29381,9 @@ macro_rules! __pgrx_c_args_GinPageSetNonLeaf {
         $crate::__pgrx_c_args_GinPageSetNonLeaf!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_GinPageSetNonLeaf!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_GinPageSetNonLeaf!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -28153,14 +29405,18 @@ macro_rules! __pgrx_c_args_GinPageSetNonLeaf {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_GinPageSetNonLeaf!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_GinPageSetNonLeaf!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_GinPageSetNonLeaf!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_GinPageSetNonLeaf!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinPageSetNonLeaf!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -28187,13 +29443,13 @@ macro_rules! __pgrx_c_args_GinPageSetNonLeaf {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinPageSetNonLeaf!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinPageSetNonLeaf!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -28249,10 +29505,10 @@ macro_rules! GinPageSetNonLeaf {
                             (
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::cast_as::<
-                                        $crate::GinPageOpaque,
+                                        $crate::__pgrx_c_bindings::GinPageOpaque,
                                         $crate::__pgrx_c_macros::expression::CPointer<
                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                $crate::GinPageOpaqueData
+                                                $crate::__pgrx_c_bindings::GinPageOpaqueData
                                             >,
                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                         >,
@@ -28269,16 +29525,22 @@ macro_rules! GinPageSetNonLeaf {
                                                             true,
                                                             _
                                                         >(
-                                                            $crate::__pgrx_c_generated::Inline_777d7ad23546580e873e0206a9a6e1cd(
+                                                            $crate::__pgrx_c_bindings::PageValidateSpecialPointer(
                                                                 <
                                                                     $crate::__pgrx_c_macros::expression::CPointer<
-                                                                        $crate::__pgrx_c_macros::CChar,
+                                                                        $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                            $crate::__pgrx_c_macros::CChar,
+                                                                            ::core::ffi::c_char
+                                                                        >,
                                                                         $crate::__pgrx_c_macros::expression::ReadOnly
                                                                     > as $crate::__pgrx_c_macros::expression::CType
                                                                 >::into_storage(
                                                                     $crate::__pgrx_c_macros::expression::implicit::<
                                                                         $crate::__pgrx_c_macros::expression::CPointer<
-                                                                            $crate::__pgrx_c_macros::CChar,
+                                                                            $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                                $crate::__pgrx_c_macros::CChar,
+                                                                                ::core::ffi::c_char
+                                                                            >,
                                                                             $crate::__pgrx_c_macros::expression::ReadOnly
                                                                         >,
                                                                         _
@@ -28335,10 +29597,10 @@ macro_rules! GinPageSetNonLeaf {
                                                                                         _
                                                                                     >(
                                                                                         $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                                            $crate::PageHeader,
+                                                                                            $crate::__pgrx_c_bindings::PageHeader,
                                                                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                    $crate::PageHeaderData
+                                                                                                    $crate::__pgrx_c_bindings::PageHeaderData
                                                                                                 >,
                                                                                                 $crate::__pgrx_c_macros::expression::ReadWrite
                                                                                             >,
@@ -28379,7 +29641,7 @@ macro_rules! GinPageSetNonLeaf {
                         $crate::__pgrx_c_macros::expression::bitnot(
                             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                 $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                    $crate::GIN_LEAF as i32
+                                    $crate::__pgrx_c_bindings::GIN_LEAF as i32
                                 )
                             )
                         )
@@ -28430,10 +29692,10 @@ macro_rules! GinPageSetNonLeaf {
                                                 _
                                             >(
                                                 $crate::__pgrx_c_macros::expression::cast_as::<
-                                                    $crate::GinPageOpaque,
+                                                    $crate::__pgrx_c_bindings::GinPageOpaque,
                                                     $crate::__pgrx_c_macros::expression::CPointer<
                                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                                            $crate::GinPageOpaqueData
+                                                            $crate::__pgrx_c_bindings::GinPageOpaqueData
                                                         >,
                                                         $crate::__pgrx_c_macros::expression::ReadWrite
                                                     >,
@@ -28450,16 +29712,22 @@ macro_rules! GinPageSetNonLeaf {
                                                                         true,
                                                                         _
                                                                     >(
-                                                                        $crate::__pgrx_c_generated::Inline_777d7ad23546580e873e0206a9a6e1cd(
+                                                                        $crate::__pgrx_c_bindings::PageValidateSpecialPointer(
                                                                             <
                                                                                 $crate::__pgrx_c_macros::expression::CPointer<
-                                                                                    $crate::__pgrx_c_macros::CChar,
+                                                                                    $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                                        $crate::__pgrx_c_macros::CChar,
+                                                                                        ::core::ffi::c_char
+                                                                                    >,
                                                                                     $crate::__pgrx_c_macros::expression::ReadOnly
                                                                                 > as $crate::__pgrx_c_macros::expression::CType
                                                                             >::into_storage(
                                                                                 $crate::__pgrx_c_macros::expression::implicit::<
                                                                                     $crate::__pgrx_c_macros::expression::CPointer<
-                                                                                        $crate::__pgrx_c_macros::CChar,
+                                                                                        $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                                            $crate::__pgrx_c_macros::CChar,
+                                                                                            ::core::ffi::c_char
+                                                                                        >,
                                                                                         $crate::__pgrx_c_macros::expression::ReadOnly
                                                                                     >,
                                                                                     _
@@ -28520,10 +29788,10 @@ macro_rules! GinPageSetNonLeaf {
                                                                                                     _
                                                                                                 >(
                                                                                                     $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                                                        $crate::PageHeader,
+                                                                                                        $crate::__pgrx_c_bindings::PageHeader,
                                                                                                         $crate::__pgrx_c_macros::expression::CPointer<
                                                                                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                                $crate::PageHeaderData
+                                                                                                                $crate::__pgrx_c_bindings::PageHeaderData
                                                                                                             >,
                                                                                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                                                                                         >,
@@ -28568,7 +29836,7 @@ macro_rules! GinPageSetNonLeaf {
                                         >(
                                             $crate::__pgrx_c_macros::CValue::<
                                                 $crate::__pgrx_c_macros::CInt
-                                            >::new($crate::GIN_LEAF as i32)
+                                            >::new($crate::__pgrx_c_bindings::GIN_LEAF as i32)
                                         )
                                     )
                                 ),
@@ -28603,10 +29871,10 @@ macro_rules! GinPageSetNonLeaf {
                             (
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::cast_as::<
-                                        $crate::GinPageOpaque,
+                                        $crate::__pgrx_c_bindings::GinPageOpaque,
                                         $crate::__pgrx_c_macros::expression::CPointer<
                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                $crate::GinPageOpaqueData
+                                                $crate::__pgrx_c_bindings::GinPageOpaqueData
                                             >,
                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                         >,
@@ -28623,16 +29891,22 @@ macro_rules! GinPageSetNonLeaf {
                                                             true,
                                                             _
                                                         >(
-                                                            $crate::__pgrx_c_generated::Inline_777d7ad23546580e873e0206a9a6e1cd(
+                                                            $crate::__pgrx_c_bindings::PageValidateSpecialPointer(
                                                                 <
                                                                     $crate::__pgrx_c_macros::expression::CPointer<
-                                                                        $crate::__pgrx_c_macros::CChar,
+                                                                        $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                            $crate::__pgrx_c_macros::CChar,
+                                                                            ::core::ffi::c_char
+                                                                        >,
                                                                         $crate::__pgrx_c_macros::expression::ReadOnly
                                                                     > as $crate::__pgrx_c_macros::expression::CType
                                                                 >::into_storage(
                                                                     $crate::__pgrx_c_macros::expression::implicit::<
                                                                         $crate::__pgrx_c_macros::expression::CPointer<
-                                                                            $crate::__pgrx_c_macros::CChar,
+                                                                            $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                                $crate::__pgrx_c_macros::CChar,
+                                                                                ::core::ffi::c_char
+                                                                            >,
                                                                             $crate::__pgrx_c_macros::expression::ReadOnly
                                                                         >,
                                                                         _
@@ -28689,10 +29963,10 @@ macro_rules! GinPageSetNonLeaf {
                                                                                         _
                                                                                     >(
                                                                                         $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                                            $crate::PageHeader,
+                                                                                            $crate::__pgrx_c_bindings::PageHeader,
                                                                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                    $crate::PageHeaderData
+                                                                                                    $crate::__pgrx_c_bindings::PageHeaderData
                                                                                                 >,
                                                                                                 $crate::__pgrx_c_macros::expression::ReadWrite
                                                                                             >,
@@ -28733,7 +30007,7 @@ macro_rules! GinPageSetNonLeaf {
                         $crate::__pgrx_c_macros::expression::bitnot(
                             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                 $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                    $crate::GIN_LEAF as i32
+                                    $crate::__pgrx_c_bindings::GIN_LEAF as i32
                                 )
                             )
                         )
@@ -28753,8 +30027,8 @@ macro_rules! GinPageSetNonLeaf {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -28782,13 +30056,13 @@ macro_rules! __pgrx_c_args_GinSetDownlink {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinSetDownlink!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinSetDownlink!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -28797,7 +30071,7 @@ macro_rules! __pgrx_c_args_GinSetDownlink {
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinSetDownlink!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -28824,31 +30098,35 @@ macro_rules! __pgrx_c_args_GinSetDownlink {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinSetDownlink!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinSetDownlink!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_GinSetDownlink!(@p2 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_GinSetDownlink!(
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative1 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_GinSetDownlink!(@p2 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_GinSetDownlink!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinSetDownlink!(
-            @p2 $mode [$($done)* (@literal [- $argument]),];
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinSetDownlink!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -28856,7 +30134,9 @@ macro_rules! __pgrx_c_args_GinSetDownlink {
         $crate::__pgrx_c_args_GinSetDownlink!(@negative1 $mode [$($done)*]; - $($raw)*)
     };
     (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_GinSetDownlink!(@p2 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_GinSetDownlink!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -28878,14 +30158,18 @@ macro_rules! __pgrx_c_args_GinSetDownlink {
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_GinSetDownlink!(@p2 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_GinSetDownlink!(
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_GinSetDownlink!(@p2 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_GinSetDownlink!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinSetDownlink!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -28912,13 +30196,13 @@ macro_rules! __pgrx_c_args_GinSetDownlink {
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinSetDownlink!(
-            @p2 $mode [$($done)* (@literal [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinSetDownlink!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -28964,16 +30248,20 @@ macro_rules! GinSetDownlink {
     (@__pgrx_emit_value; $itup:tt, $blkno:tt $(,)?) => {
         /* PGRX: GinSetDownlink remains expanded because ItemPointerSet is not an active function-like macro. */
         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-            $crate::ItemPointerSet(
+            $crate::__pgrx_c_bindings::ItemPointerSet(
                 <
                     $crate::__pgrx_c_macros::expression::CPointer<
-                        $crate::__pgrx_c_macros::expression::CRecord<$crate::ItemPointerData>,
+                        $crate::__pgrx_c_macros::expression::CRecord<
+                            $crate::__pgrx_c_bindings::ItemPointerData
+                        >,
                         $crate::__pgrx_c_macros::expression::ReadWrite
                     > as $crate::__pgrx_c_macros::expression::CType
                 >::into_storage(
                     $crate::__pgrx_c_macros::expression::implicit::<
                         $crate::__pgrx_c_macros::expression::CPointer<
-                            $crate::__pgrx_c_macros::expression::CRecord<$crate::ItemPointerData>,
+                            $crate::__pgrx_c_macros::expression::CRecord<
+                                $crate::__pgrx_c_bindings::ItemPointerData
+                            >,
                             $crate::__pgrx_c_macros::expression::ReadWrite
                         >,
                         _
@@ -29019,10 +30307,9 @@ macro_rules! GinSetDownlink {
                     >(
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::null_constant(
-                                /* PGRX: InvalidOffsetNumber remains expanded because no integer constant binding is available in the defining Rust crate. */
                                 $crate::__pgrx_c_macros::CValue::<
                                     $crate::__pgrx_c_macros::CUnsignedShort
-                                >::new(0u16)
+                                >::new($crate::__pgrx_c_bindings::InvalidOffsetNumber as u16)
                             )
                         )
                     )
@@ -29058,11 +30345,11 @@ macro_rules! GinSetDownlink {
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                            $crate::ItemPointerSet(
+                            $crate::__pgrx_c_bindings::ItemPointerSet(
                                 <
                                     $crate::__pgrx_c_macros::expression::CPointer<
                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                            $crate::ItemPointerData
+                                            $crate::__pgrx_c_bindings::ItemPointerData
                                         >,
                                         $crate::__pgrx_c_macros::expression::ReadWrite
                                     > as $crate::__pgrx_c_macros::expression::CType
@@ -29070,7 +30357,7 @@ macro_rules! GinSetDownlink {
                                     $crate::__pgrx_c_macros::expression::implicit::<
                                         $crate::__pgrx_c_macros::expression::CPointer<
                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                $crate::ItemPointerData
+                                                $crate::__pgrx_c_bindings::ItemPointerData
                                             >,
                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                         >,
@@ -29129,10 +30416,11 @@ macro_rules! GinSetDownlink {
                                             _
                                         >(
                                             $crate::__pgrx_c_macros::expression::null_constant(
-                                                /* PGRX: InvalidOffsetNumber remains expanded because no integer constant binding is available in the defining Rust crate. */
                                                 $crate::__pgrx_c_macros::CValue::<
                                                     $crate::__pgrx_c_macros::CUnsignedShort
-                                                >::new(0u16)
+                                                >::new(
+                                                    $crate::__pgrx_c_bindings::InvalidOffsetNumber as u16
+                                                )
                                             )
                                         )
                                     )
@@ -29153,17 +30441,19 @@ macro_rules! GinSetDownlink {
         /* PGRX: GinSetDownlink remains expanded because ItemPointerSet is not an active function-like macro. */
         {
             let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                $crate::ItemPointerSet(
+                $crate::__pgrx_c_bindings::ItemPointerSet(
                     <
                         $crate::__pgrx_c_macros::expression::CPointer<
-                            $crate::__pgrx_c_macros::expression::CRecord<$crate::ItemPointerData>,
+                            $crate::__pgrx_c_macros::expression::CRecord<
+                                $crate::__pgrx_c_bindings::ItemPointerData
+                            >,
                             $crate::__pgrx_c_macros::expression::ReadWrite
                         > as $crate::__pgrx_c_macros::expression::CType
                     >::into_storage(
                         $crate::__pgrx_c_macros::expression::implicit::<
                             $crate::__pgrx_c_macros::expression::CPointer<
                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                    $crate::ItemPointerData
+                                    $crate::__pgrx_c_bindings::ItemPointerData
                                 >,
                                 $crate::__pgrx_c_macros::expression::ReadWrite
                             >,
@@ -29210,10 +30500,9 @@ macro_rules! GinSetDownlink {
                         >(
                             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                 $crate::__pgrx_c_macros::expression::null_constant(
-                                    /* PGRX: InvalidOffsetNumber remains expanded because no integer constant binding is available in the defining Rust crate. */
                                     $crate::__pgrx_c_macros::CValue::<
                                         $crate::__pgrx_c_macros::CUnsignedShort
-                                    >::new(0u16)
+                                    >::new($crate::__pgrx_c_bindings::InvalidOffsetNumber as u16)
                                 )
                             )
                         )
@@ -29231,8 +30520,8 @@ macro_rules! GinSetDownlink {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -29260,13 +30549,13 @@ macro_rules! __pgrx_c_args_GinSetNPosting {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinSetNPosting!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinSetNPosting!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -29275,7 +30564,7 @@ macro_rules! __pgrx_c_args_GinSetNPosting {
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinSetNPosting!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -29302,31 +30591,35 @@ macro_rules! __pgrx_c_args_GinSetNPosting {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinSetNPosting!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinSetNPosting!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_GinSetNPosting!(@p2 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_GinSetNPosting!(
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative1 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_GinSetNPosting!(@p2 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_GinSetNPosting!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinSetNPosting!(
-            @p2 $mode [$($done)* (@literal [- $argument]),];
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinSetNPosting!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -29334,7 +30627,9 @@ macro_rules! __pgrx_c_args_GinSetNPosting {
         $crate::__pgrx_c_args_GinSetNPosting!(@negative1 $mode [$($done)*]; - $($raw)*)
     };
     (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_GinSetNPosting!(@p2 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_GinSetNPosting!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -29356,14 +30651,18 @@ macro_rules! __pgrx_c_args_GinSetNPosting {
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_GinSetNPosting!(@p2 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_GinSetNPosting!(
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_GinSetNPosting!(@p2 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_GinSetNPosting!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinSetNPosting!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -29390,13 +30689,13 @@ macro_rules! __pgrx_c_args_GinSetNPosting {
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinSetNPosting!(
-            @p2 $mode [$($done)* (@literal [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinSetNPosting!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -29442,16 +30741,20 @@ macro_rules! GinSetNPosting {
     (@__pgrx_emit_value; $itup:tt, $n:tt $(,)?) => {
         /* PGRX: GinSetNPosting remains expanded because ItemPointerSetOffsetNumber is not an active function-like macro. */
         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-            $crate::ItemPointerSetOffsetNumber(
+            $crate::__pgrx_c_bindings::ItemPointerSetOffsetNumber(
                 <
                     $crate::__pgrx_c_macros::expression::CPointer<
-                        $crate::__pgrx_c_macros::expression::CRecord<$crate::ItemPointerData>,
+                        $crate::__pgrx_c_macros::expression::CRecord<
+                            $crate::__pgrx_c_bindings::ItemPointerData
+                        >,
                         $crate::__pgrx_c_macros::expression::ReadWrite
                     > as $crate::__pgrx_c_macros::expression::CType
                 >::into_storage(
                     $crate::__pgrx_c_macros::expression::implicit::<
                         $crate::__pgrx_c_macros::expression::CPointer<
-                            $crate::__pgrx_c_macros::expression::CRecord<$crate::ItemPointerData>,
+                            $crate::__pgrx_c_macros::expression::CRecord<
+                                $crate::__pgrx_c_bindings::ItemPointerData
+                            >,
                             $crate::__pgrx_c_macros::expression::ReadWrite
                         >,
                         _
@@ -29519,11 +30822,11 @@ macro_rules! GinSetNPosting {
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                            $crate::ItemPointerSetOffsetNumber(
+                            $crate::__pgrx_c_bindings::ItemPointerSetOffsetNumber(
                                 <
                                     $crate::__pgrx_c_macros::expression::CPointer<
                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                            $crate::ItemPointerData
+                                            $crate::__pgrx_c_bindings::ItemPointerData
                                         >,
                                         $crate::__pgrx_c_macros::expression::ReadWrite
                                     > as $crate::__pgrx_c_macros::expression::CType
@@ -29531,7 +30834,7 @@ macro_rules! GinSetNPosting {
                                     $crate::__pgrx_c_macros::expression::implicit::<
                                         $crate::__pgrx_c_macros::expression::CPointer<
                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                $crate::ItemPointerData
+                                                $crate::__pgrx_c_bindings::ItemPointerData
                                             >,
                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                         >,
@@ -29594,17 +30897,19 @@ macro_rules! GinSetNPosting {
         /* PGRX: GinSetNPosting remains expanded because ItemPointerSetOffsetNumber is not an active function-like macro. */
         {
             let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                $crate::ItemPointerSetOffsetNumber(
+                $crate::__pgrx_c_bindings::ItemPointerSetOffsetNumber(
                     <
                         $crate::__pgrx_c_macros::expression::CPointer<
-                            $crate::__pgrx_c_macros::expression::CRecord<$crate::ItemPointerData>,
+                            $crate::__pgrx_c_macros::expression::CRecord<
+                                $crate::__pgrx_c_bindings::ItemPointerData
+                            >,
                             $crate::__pgrx_c_macros::expression::ReadWrite
                         > as $crate::__pgrx_c_macros::expression::CType
                     >::into_storage(
                         $crate::__pgrx_c_macros::expression::implicit::<
                             $crate::__pgrx_c_macros::expression::CPointer<
                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                    $crate::ItemPointerData
+                                    $crate::__pgrx_c_bindings::ItemPointerData
                                 >,
                                 $crate::__pgrx_c_macros::expression::ReadWrite
                             >,
@@ -29655,8 +30960,8 @@ macro_rules! GinSetNPosting {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -29684,13 +30989,13 @@ macro_rules! __pgrx_c_args_GinSetNullCategory {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinSetNullCategory!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinSetNullCategory!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -29699,7 +31004,7 @@ macro_rules! __pgrx_c_args_GinSetNullCategory {
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinSetNullCategory!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -29726,25 +31031,25 @@ macro_rules! __pgrx_c_args_GinSetNullCategory {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinSetNullCategory!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinSetNullCategory!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinSetNullCategory!(
-            @p2 $mode [$($done)* (@literal [- $argument]),];
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinSetNullCategory!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -29753,7 +31058,7 @@ macro_rules! __pgrx_c_args_GinSetNullCategory {
     };
     (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinSetNullCategory!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -29780,31 +31085,35 @@ macro_rules! __pgrx_c_args_GinSetNullCategory {
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinSetNullCategory!(
-            @p2 $mode [$($done)* (@literal [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinSetNullCategory!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
     (@p2 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_GinSetNullCategory!(@p3 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_GinSetNullCategory!(
+            @p3 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative2 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_GinSetNullCategory!(@p3 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_GinSetNullCategory!(
+            @p3 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p2 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinSetNullCategory!(
-            @p3 $mode [$($done)* (@literal [- $argument]),];
+            @p3 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative2 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinSetNullCategory!(
-            @p3 $mode [$($done)* (@native [$argument]),];
+            @p3 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -29812,7 +31121,9 @@ macro_rules! __pgrx_c_args_GinSetNullCategory {
         $crate::__pgrx_c_args_GinSetNullCategory!(@negative2 $mode [$($done)*]; - $($raw)*)
     };
     (@p2 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_GinSetNullCategory!(@p3 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_GinSetNullCategory!(
+            @p3 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p2 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -29834,14 +31145,18 @@ macro_rules! __pgrx_c_args_GinSetNullCategory {
         )
     };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_GinSetNullCategory!(@p3 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_GinSetNullCategory!(
+            @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p2 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_GinSetNullCategory!(@p3 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_GinSetNullCategory!(
+            @p3 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p2 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinSetNullCategory!(
-            @p3 $mode [$($done)* (@native [$argument]),];
+            @p3 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -29868,13 +31183,13 @@ macro_rules! __pgrx_c_args_GinSetNullCategory {
     };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinSetNullCategory!(
-            @p3 $mode [$($done)* (@literal [$argument]),];
+            @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p2 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinSetNullCategory!(
-            @p3 $mode [$($done)* (@native [$argument]),];
+            @p3 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -29927,7 +31242,7 @@ macro_rules! GinSetNullCategory {
                         (
                             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                 $crate::__pgrx_c_macros::expression::cast_as::<
-                                    *mut $crate::GinNullCategory,
+                                    *mut $crate::__pgrx_c_bindings::GinNullCategory,
                                     $crate::__pgrx_c_macros::expression::CPointer<
                                         $crate::__pgrx_c_macros::CSignedChar,
                                         $crate::__pgrx_c_macros::expression::ReadWrite
@@ -29988,7 +31303,7 @@ macro_rules! GinSetNullCategory {
                                                                         usize
                                                                     > as $crate::__pgrx_c_macros::expression::CType
                                                                 >::from_storage(
-                                                                    $crate::IndexInfoFindDataOffset(
+                                                                    $crate::__pgrx_c_bindings::IndexInfoFindDataOffset(
                                                                         <
                                                                             $crate::__pgrx_c_macros::CUnsignedShort as $crate::__pgrx_c_macros::expression::CType
                                                                         >::into_storage(
@@ -30148,7 +31463,7 @@ macro_rules! GinSetNullCategory {
                                             _
                                         >(
                                             $crate::__pgrx_c_macros::expression::cast_as::<
-                                                *mut $crate::GinNullCategory,
+                                                *mut $crate::__pgrx_c_bindings::GinNullCategory,
                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                     $crate::__pgrx_c_macros::CSignedChar,
                                                     $crate::__pgrx_c_macros::expression::ReadWrite
@@ -30209,7 +31524,7 @@ macro_rules! GinSetNullCategory {
                                                                                     usize
                                                                                 > as $crate::__pgrx_c_macros::expression::CType
                                                                             >::from_storage(
-                                                                                $crate::IndexInfoFindDataOffset(
+                                                                                $crate::__pgrx_c_bindings::IndexInfoFindDataOffset(
                                                                                     <
                                                                                         $crate::__pgrx_c_macros::CUnsignedShort as $crate::__pgrx_c_macros::expression::CType
                                                                                     >::into_storage(
@@ -30351,7 +31666,7 @@ macro_rules! GinSetNullCategory {
                         (
                             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                 $crate::__pgrx_c_macros::expression::cast_as::<
-                                    *mut $crate::GinNullCategory,
+                                    *mut $crate::__pgrx_c_bindings::GinNullCategory,
                                     $crate::__pgrx_c_macros::expression::CPointer<
                                         $crate::__pgrx_c_macros::CSignedChar,
                                         $crate::__pgrx_c_macros::expression::ReadWrite
@@ -30412,7 +31727,7 @@ macro_rules! GinSetNullCategory {
                                                                         usize
                                                                     > as $crate::__pgrx_c_macros::expression::CType
                                                                 >::from_storage(
-                                                                    $crate::IndexInfoFindDataOffset(
+                                                                    $crate::__pgrx_c_bindings::IndexInfoFindDataOffset(
                                                                         <
                                                                             $crate::__pgrx_c_macros::CUnsignedShort as $crate::__pgrx_c_macros::expression::CType
                                                                         >::into_storage(
@@ -30544,8 +31859,8 @@ macro_rules! GinSetNullCategory {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -30573,13 +31888,13 @@ macro_rules! __pgrx_c_args_GinSetPostingOffset {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinSetPostingOffset!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinSetPostingOffset!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -30588,7 +31903,7 @@ macro_rules! __pgrx_c_args_GinSetPostingOffset {
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinSetPostingOffset!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -30615,31 +31930,35 @@ macro_rules! __pgrx_c_args_GinSetPostingOffset {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinSetPostingOffset!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinSetPostingOffset!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_GinSetPostingOffset!(@p2 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_GinSetPostingOffset!(
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative1 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_GinSetPostingOffset!(@p2 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_GinSetPostingOffset!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinSetPostingOffset!(
-            @p2 $mode [$($done)* (@literal [- $argument]),];
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinSetPostingOffset!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -30647,7 +31966,9 @@ macro_rules! __pgrx_c_args_GinSetPostingOffset {
         $crate::__pgrx_c_args_GinSetPostingOffset!(@negative1 $mode [$($done)*]; - $($raw)*)
     };
     (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_GinSetPostingOffset!(@p2 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_GinSetPostingOffset!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -30669,14 +31990,18 @@ macro_rules! __pgrx_c_args_GinSetPostingOffset {
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_GinSetPostingOffset!(@p2 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_GinSetPostingOffset!(
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_GinSetPostingOffset!(@p2 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_GinSetPostingOffset!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinSetPostingOffset!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -30703,13 +32028,13 @@ macro_rules! __pgrx_c_args_GinSetPostingOffset {
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinSetPostingOffset!(
-            @p2 $mode [$($done)* (@literal [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinSetPostingOffset!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -30755,16 +32080,20 @@ macro_rules! GinSetPostingOffset {
     (@__pgrx_emit_value; $itup:tt, $n:tt $(,)?) => {
         /* PGRX: GinSetPostingOffset remains expanded because ItemPointerSetBlockNumber is not an active function-like macro. */
         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-            $crate::ItemPointerSetBlockNumber(
+            $crate::__pgrx_c_bindings::ItemPointerSetBlockNumber(
                 <
                     $crate::__pgrx_c_macros::expression::CPointer<
-                        $crate::__pgrx_c_macros::expression::CRecord<$crate::ItemPointerData>,
+                        $crate::__pgrx_c_macros::expression::CRecord<
+                            $crate::__pgrx_c_bindings::ItemPointerData
+                        >,
                         $crate::__pgrx_c_macros::expression::ReadWrite
                     > as $crate::__pgrx_c_macros::expression::CType
                 >::into_storage(
                     $crate::__pgrx_c_macros::expression::implicit::<
                         $crate::__pgrx_c_macros::expression::CPointer<
-                            $crate::__pgrx_c_macros::expression::CRecord<$crate::ItemPointerData>,
+                            $crate::__pgrx_c_macros::expression::CRecord<
+                                $crate::__pgrx_c_bindings::ItemPointerData
+                            >,
                             $crate::__pgrx_c_macros::expression::ReadWrite
                         >,
                         _
@@ -30806,7 +32135,7 @@ macro_rules! GinSetPostingOffset {
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::CValue::<
                                         $crate::__pgrx_c_macros::CUnsignedInt
-                                    >::new($crate::GIN_ITUP_COMPRESSED as u32)
+                                    >::new($crate::__pgrx_c_bindings::GIN_ITUP_COMPRESSED as u32)
                                 )
                             )
                         )
@@ -30843,11 +32172,11 @@ macro_rules! GinSetPostingOffset {
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                            $crate::ItemPointerSetBlockNumber(
+                            $crate::__pgrx_c_bindings::ItemPointerSetBlockNumber(
                                 <
                                     $crate::__pgrx_c_macros::expression::CPointer<
                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                            $crate::ItemPointerData
+                                            $crate::__pgrx_c_bindings::ItemPointerData
                                         >,
                                         $crate::__pgrx_c_macros::expression::ReadWrite
                                     > as $crate::__pgrx_c_macros::expression::CType
@@ -30855,7 +32184,7 @@ macro_rules! GinSetPostingOffset {
                                     $crate::__pgrx_c_macros::expression::implicit::<
                                         $crate::__pgrx_c_macros::expression::CPointer<
                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                $crate::ItemPointerData
+                                                $crate::__pgrx_c_bindings::ItemPointerData
                                             >,
                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                         >,
@@ -30913,7 +32242,9 @@ macro_rules! GinSetPostingOffset {
                                                 >(
                                                     $crate::__pgrx_c_macros::CValue::<
                                                         $crate::__pgrx_c_macros::CUnsignedInt
-                                                    >::new($crate::GIN_ITUP_COMPRESSED as u32)
+                                                    >::new(
+                                                        $crate::__pgrx_c_bindings::GIN_ITUP_COMPRESSED as u32
+                                                    )
                                                 )
                                             )
                                         )
@@ -30935,17 +32266,19 @@ macro_rules! GinSetPostingOffset {
         /* PGRX: GinSetPostingOffset remains expanded because ItemPointerSetBlockNumber is not an active function-like macro. */
         {
             let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                $crate::ItemPointerSetBlockNumber(
+                $crate::__pgrx_c_bindings::ItemPointerSetBlockNumber(
                     <
                         $crate::__pgrx_c_macros::expression::CPointer<
-                            $crate::__pgrx_c_macros::expression::CRecord<$crate::ItemPointerData>,
+                            $crate::__pgrx_c_macros::expression::CRecord<
+                                $crate::__pgrx_c_bindings::ItemPointerData
+                            >,
                             $crate::__pgrx_c_macros::expression::ReadWrite
                         > as $crate::__pgrx_c_macros::expression::CType
                     >::into_storage(
                         $crate::__pgrx_c_macros::expression::implicit::<
                             $crate::__pgrx_c_macros::expression::CPointer<
                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                    $crate::ItemPointerData
+                                    $crate::__pgrx_c_bindings::ItemPointerData
                                 >,
                                 $crate::__pgrx_c_macros::expression::ReadWrite
                             >,
@@ -30989,7 +32322,9 @@ macro_rules! GinSetPostingOffset {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::CValue::<
                                             $crate::__pgrx_c_macros::CUnsignedInt
-                                        >::new($crate::GIN_ITUP_COMPRESSED as u32)
+                                        >::new(
+                                            $crate::__pgrx_c_bindings::GIN_ITUP_COMPRESSED as u32
+                                        )
                                     )
                                 )
                             )
@@ -31008,8 +32343,8 @@ macro_rules! GinSetPostingOffset {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -31037,13 +32372,13 @@ macro_rules! __pgrx_c_args_GinSetPostingTree {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinSetPostingTree!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinSetPostingTree!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -31052,7 +32387,7 @@ macro_rules! __pgrx_c_args_GinSetPostingTree {
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinSetPostingTree!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -31079,31 +32414,35 @@ macro_rules! __pgrx_c_args_GinSetPostingTree {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinSetPostingTree!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinSetPostingTree!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_GinSetPostingTree!(@p2 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_GinSetPostingTree!(
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative1 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_GinSetPostingTree!(@p2 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_GinSetPostingTree!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinSetPostingTree!(
-            @p2 $mode [$($done)* (@literal [- $argument]),];
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinSetPostingTree!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -31111,7 +32450,9 @@ macro_rules! __pgrx_c_args_GinSetPostingTree {
         $crate::__pgrx_c_args_GinSetPostingTree!(@negative1 $mode [$($done)*]; - $($raw)*)
     };
     (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_GinSetPostingTree!(@p2 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_GinSetPostingTree!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -31133,14 +32474,18 @@ macro_rules! __pgrx_c_args_GinSetPostingTree {
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_GinSetPostingTree!(@p2 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_GinSetPostingTree!(
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_GinSetPostingTree!(@p2 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_GinSetPostingTree!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinSetPostingTree!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -31167,13 +32512,13 @@ macro_rules! __pgrx_c_args_GinSetPostingTree {
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinSetPostingTree!(
-            @p2 $mode [$($done)* (@literal [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GinSetPostingTree!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -31223,11 +32568,11 @@ macro_rules! GinSetPostingTree {
                 {
                     {
                         let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                            $crate::ItemPointerSetOffsetNumber(
+                            $crate::__pgrx_c_bindings::ItemPointerSetOffsetNumber(
                                 <
                                     $crate::__pgrx_c_macros::expression::CPointer<
                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                            $crate::ItemPointerData
+                                            $crate::__pgrx_c_bindings::ItemPointerData
                                         >,
                                         $crate::__pgrx_c_macros::expression::ReadWrite
                                     > as $crate::__pgrx_c_macros::expression::CType
@@ -31235,7 +32580,7 @@ macro_rules! GinSetPostingTree {
                                     $crate::__pgrx_c_macros::expression::implicit::<
                                         $crate::__pgrx_c_macros::expression::CPointer<
                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                $crate::ItemPointerData
+                                                $crate::__pgrx_c_bindings::ItemPointerData
                                             >,
                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                         >,
@@ -31282,10 +32627,11 @@ macro_rules! GinSetPostingTree {
                                             true,
                                             _
                                         >(
-                                            /* PGRX: GIN_TREE_POSTING remains expanded because no integer constant binding is available in the defining Rust crate. */
                                             $crate::__pgrx_c_macros::CValue::<
                                                 $crate::__pgrx_c_macros::CUnsignedShort
-                                            >::new(65535u16)
+                                            >::new(
+                                                $crate::__pgrx_c_bindings::GIN_TREE_POSTING as u16
+                                            )
                                         )
                                     )
                                 ),
@@ -31293,11 +32639,11 @@ macro_rules! GinSetPostingTree {
                         );
                     };
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                        $crate::ItemPointerSetBlockNumber(
+                        $crate::__pgrx_c_bindings::ItemPointerSetBlockNumber(
                             <
                                 $crate::__pgrx_c_macros::expression::CPointer<
                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                        $crate::ItemPointerData
+                                        $crate::__pgrx_c_bindings::ItemPointerData
                                     >,
                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                 > as $crate::__pgrx_c_macros::expression::CType
@@ -31305,7 +32651,7 @@ macro_rules! GinSetPostingTree {
                                 $crate::__pgrx_c_macros::expression::implicit::<
                                     $crate::__pgrx_c_macros::expression::CPointer<
                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                            $crate::ItemPointerData
+                                            $crate::__pgrx_c_bindings::ItemPointerData
                                         >,
                                         $crate::__pgrx_c_macros::expression::ReadWrite
                                     >,
@@ -31388,11 +32734,11 @@ macro_rules! GinSetPostingTree {
                                         true,
                                         _
                                     >(
-                                        $crate::ItemPointerSetOffsetNumber(
+                                        $crate::__pgrx_c_bindings::ItemPointerSetOffsetNumber(
                                             <
                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                        $crate::ItemPointerData
+                                                        $crate::__pgrx_c_bindings::ItemPointerData
                                                     >,
                                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                                 > as $crate::__pgrx_c_macros::expression::CType
@@ -31400,7 +32746,7 @@ macro_rules! GinSetPostingTree {
                                                 $crate::__pgrx_c_macros::expression::implicit::<
                                                     $crate::__pgrx_c_macros::expression::CPointer<
                                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                                            $crate::ItemPointerData
+                                                            $crate::__pgrx_c_bindings::ItemPointerData
                                                         >,
                                                         $crate::__pgrx_c_macros::expression::ReadWrite
                                                     >,
@@ -31447,10 +32793,11 @@ macro_rules! GinSetPostingTree {
                                                         true,
                                                         _
                                                     >(
-                                                        /* PGRX: GIN_TREE_POSTING remains expanded because no integer constant binding is available in the defining Rust crate. */
                                                         $crate::__pgrx_c_macros::CValue::<
                                                             $crate::__pgrx_c_macros::CUnsignedShort
-                                                        >::new(65535u16)
+                                                        >::new(
+                                                            $crate::__pgrx_c_bindings::GIN_TREE_POSTING as u16
+                                                        )
                                                     )
                                                 )
                                             ),
@@ -31458,11 +32805,11 @@ macro_rules! GinSetPostingTree {
                                     );
                                 };
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                                    $crate::ItemPointerSetBlockNumber(
+                                    $crate::__pgrx_c_bindings::ItemPointerSetBlockNumber(
                                         <
                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                    $crate::ItemPointerData
+                                                    $crate::__pgrx_c_bindings::ItemPointerData
                                                 >,
                                                 $crate::__pgrx_c_macros::expression::ReadWrite
                                             > as $crate::__pgrx_c_macros::expression::CType
@@ -31470,7 +32817,7 @@ macro_rules! GinSetPostingTree {
                                             $crate::__pgrx_c_macros::expression::implicit::<
                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                        $crate::ItemPointerData
+                                                        $crate::__pgrx_c_bindings::ItemPointerData
                                                     >,
                                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                                 >,
@@ -31538,11 +32885,11 @@ macro_rules! GinSetPostingTree {
                 {
                     {
                         let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                            $crate::ItemPointerSetOffsetNumber(
+                            $crate::__pgrx_c_bindings::ItemPointerSetOffsetNumber(
                                 <
                                     $crate::__pgrx_c_macros::expression::CPointer<
                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                            $crate::ItemPointerData
+                                            $crate::__pgrx_c_bindings::ItemPointerData
                                         >,
                                         $crate::__pgrx_c_macros::expression::ReadWrite
                                     > as $crate::__pgrx_c_macros::expression::CType
@@ -31550,7 +32897,7 @@ macro_rules! GinSetPostingTree {
                                     $crate::__pgrx_c_macros::expression::implicit::<
                                         $crate::__pgrx_c_macros::expression::CPointer<
                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                $crate::ItemPointerData
+                                                $crate::__pgrx_c_bindings::ItemPointerData
                                             >,
                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                         >,
@@ -31597,10 +32944,11 @@ macro_rules! GinSetPostingTree {
                                             true,
                                             _
                                         >(
-                                            /* PGRX: GIN_TREE_POSTING remains expanded because no integer constant binding is available in the defining Rust crate. */
                                             $crate::__pgrx_c_macros::CValue::<
                                                 $crate::__pgrx_c_macros::CUnsignedShort
-                                            >::new(65535u16)
+                                            >::new(
+                                                $crate::__pgrx_c_bindings::GIN_TREE_POSTING as u16
+                                            )
                                         )
                                     )
                                 ),
@@ -31608,11 +32956,11 @@ macro_rules! GinSetPostingTree {
                         );
                     };
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                        $crate::ItemPointerSetBlockNumber(
+                        $crate::__pgrx_c_bindings::ItemPointerSetBlockNumber(
                             <
                                 $crate::__pgrx_c_macros::expression::CPointer<
                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                        $crate::ItemPointerData
+                                        $crate::__pgrx_c_bindings::ItemPointerData
                                     >,
                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                 > as $crate::__pgrx_c_macros::expression::CType
@@ -31620,7 +32968,7 @@ macro_rules! GinSetPostingTree {
                                 $crate::__pgrx_c_macros::expression::implicit::<
                                     $crate::__pgrx_c_macros::expression::CPointer<
                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                            $crate::ItemPointerData
+                                            $crate::__pgrx_c_bindings::ItemPointerData
                                         >,
                                         $crate::__pgrx_c_macros::expression::ReadWrite
                                     >,
@@ -31678,8 +33026,8 @@ macro_rules! GinSetPostingTree {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -31710,21 +33058,23 @@ macro_rules! __pgrx_c_args_ItemPointerIsLossyPage {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
         $crate::__pgrx_c_args_ItemPointerIsLossyPage!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_ItemPointerIsLossyPage!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_ItemPointerIsLossyPage!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_ItemPointerIsLossyPage!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_ItemPointerIsLossyPage!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -31732,7 +33082,9 @@ macro_rules! __pgrx_c_args_ItemPointerIsLossyPage {
         $crate::__pgrx_c_args_ItemPointerIsLossyPage!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_ItemPointerIsLossyPage!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_ItemPointerIsLossyPage!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -31757,15 +33109,17 @@ macro_rules! __pgrx_c_args_ItemPointerIsLossyPage {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_ItemPointerIsLossyPage!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_ItemPointerIsLossyPage!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_ItemPointerIsLossyPage!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_ItemPointerIsLossyPage!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -31792,13 +33146,13 @@ macro_rules! __pgrx_c_args_ItemPointerIsLossyPage {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_ItemPointerIsLossyPage!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_ItemPointerIsLossyPage!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -31856,11 +33210,11 @@ macro_rules! ItemPointerIsLossyPage {
                                         <
                                             $crate::__pgrx_c_macros::CUnsignedShort as $crate::__pgrx_c_macros::expression::CType
                                         >::from_storage(
-                                            $crate::ItemPointerGetOffsetNumberNoCheck(
+                                            $crate::__pgrx_c_bindings::ItemPointerGetOffsetNumberNoCheck(
                                                 <
                                                     $crate::__pgrx_c_macros::expression::CPointer<
                                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                                            $crate::ItemPointerData
+                                                            $crate::__pgrx_c_bindings::ItemPointerData
                                                         >,
                                                         $crate::__pgrx_c_macros::expression::ReadOnly
                                                     > as $crate::__pgrx_c_macros::expression::CType
@@ -31868,7 +33222,7 @@ macro_rules! ItemPointerIsLossyPage {
                                                     $crate::__pgrx_c_macros::expression::implicit::<
                                                         $crate::__pgrx_c_macros::expression::CPointer<
                                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                                $crate::ItemPointerData
+                                                                $crate::__pgrx_c_bindings::ItemPointerData
                                                             >,
                                                             $crate::__pgrx_c_macros::expression::ReadOnly
                                                         >,
@@ -31891,7 +33245,7 @@ macro_rules! ItemPointerIsLossyPage {
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::cast_as::<
-                                        $crate::OffsetNumber,
+                                        $crate::__pgrx_c_bindings::OffsetNumber,
                                         $crate::__pgrx_c_macros::CUnsignedShort,
                                         _
                                     >(
@@ -31915,11 +33269,11 @@ macro_rules! ItemPointerIsLossyPage {
                                         <
                                             $crate::__pgrx_c_macros::CUnsignedInt as $crate::__pgrx_c_macros::expression::CType
                                         >::from_storage(
-                                            $crate::ItemPointerGetBlockNumberNoCheck(
+                                            $crate::__pgrx_c_bindings::ItemPointerGetBlockNumberNoCheck(
                                                 <
                                                     $crate::__pgrx_c_macros::expression::CPointer<
                                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                                            $crate::ItemPointerData
+                                                            $crate::__pgrx_c_bindings::ItemPointerData
                                                         >,
                                                         $crate::__pgrx_c_macros::expression::ReadOnly
                                                     > as $crate::__pgrx_c_macros::expression::CType
@@ -31927,7 +33281,7 @@ macro_rules! ItemPointerIsLossyPage {
                                                     $crate::__pgrx_c_macros::expression::implicit::<
                                                         $crate::__pgrx_c_macros::expression::CPointer<
                                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                                $crate::ItemPointerData
+                                                                $crate::__pgrx_c_bindings::ItemPointerData
                                                             >,
                                                             $crate::__pgrx_c_macros::expression::ReadOnly
                                                         >,
@@ -31949,10 +33303,9 @@ macro_rules! ItemPointerIsLossyPage {
                                     )
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                                    /* PGRX: InvalidBlockNumber remains expanded because no integer constant binding is available in the defining Rust crate. */
                                     $crate::__pgrx_c_macros::CValue::<
                                         $crate::__pgrx_c_macros::CUnsignedInt
-                                    >::new(4294967295u32)
+                                    >::new($crate::__pgrx_c_bindings::InvalidBlockNumber as u32)
                                 )
                             )
                         )
@@ -32004,11 +33357,11 @@ macro_rules! ItemPointerIsLossyPage {
                                                     <
                                                         $crate::__pgrx_c_macros::CUnsignedShort as $crate::__pgrx_c_macros::expression::CType
                                                     >::from_storage(
-                                                        $crate::ItemPointerGetOffsetNumberNoCheck(
+                                                        $crate::__pgrx_c_bindings::ItemPointerGetOffsetNumberNoCheck(
                                                             <
                                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                                        $crate::ItemPointerData
+                                                                        $crate::__pgrx_c_bindings::ItemPointerData
                                                                     >,
                                                                     $crate::__pgrx_c_macros::expression::ReadOnly
                                                                 > as $crate::__pgrx_c_macros::expression::CType
@@ -32016,7 +33369,7 @@ macro_rules! ItemPointerIsLossyPage {
                                                                 $crate::__pgrx_c_macros::expression::implicit::<
                                                                     $crate::__pgrx_c_macros::expression::CPointer<
                                                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                                                            $crate::ItemPointerData
+                                                                            $crate::__pgrx_c_bindings::ItemPointerData
                                                                         >,
                                                                         $crate::__pgrx_c_macros::expression::ReadOnly
                                                                     >,
@@ -32042,7 +33395,7 @@ macro_rules! ItemPointerIsLossyPage {
                                                 _
                                             >(
                                                 $crate::__pgrx_c_macros::expression::cast_as::<
-                                                    $crate::OffsetNumber,
+                                                    $crate::__pgrx_c_bindings::OffsetNumber,
                                                     $crate::__pgrx_c_macros::CUnsignedShort,
                                                     _
                                                 >(
@@ -32069,11 +33422,11 @@ macro_rules! ItemPointerIsLossyPage {
                                                     <
                                                         $crate::__pgrx_c_macros::CUnsignedInt as $crate::__pgrx_c_macros::expression::CType
                                                     >::from_storage(
-                                                        $crate::ItemPointerGetBlockNumberNoCheck(
+                                                        $crate::__pgrx_c_bindings::ItemPointerGetBlockNumberNoCheck(
                                                             <
                                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                                        $crate::ItemPointerData
+                                                                        $crate::__pgrx_c_bindings::ItemPointerData
                                                                     >,
                                                                     $crate::__pgrx_c_macros::expression::ReadOnly
                                                                 > as $crate::__pgrx_c_macros::expression::CType
@@ -32081,7 +33434,7 @@ macro_rules! ItemPointerIsLossyPage {
                                                                 $crate::__pgrx_c_macros::expression::implicit::<
                                                                     $crate::__pgrx_c_macros::expression::CPointer<
                                                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                                                            $crate::ItemPointerData
+                                                                            $crate::__pgrx_c_bindings::ItemPointerData
                                                                         >,
                                                                         $crate::__pgrx_c_macros::expression::ReadOnly
                                                                     >,
@@ -32106,10 +33459,11 @@ macro_rules! ItemPointerIsLossyPage {
                                                 true,
                                                 _
                                             >(
-                                                /* PGRX: InvalidBlockNumber remains expanded because no integer constant binding is available in the defining Rust crate. */
                                                 $crate::__pgrx_c_macros::CValue::<
                                                     $crate::__pgrx_c_macros::CUnsignedInt
-                                                >::new(4294967295u32)
+                                                >::new(
+                                                    $crate::__pgrx_c_bindings::InvalidBlockNumber as u32
+                                                )
                                             )
                                         )
                                     )
@@ -32143,11 +33497,11 @@ macro_rules! ItemPointerIsLossyPage {
                                         <
                                             $crate::__pgrx_c_macros::CUnsignedShort as $crate::__pgrx_c_macros::expression::CType
                                         >::from_storage(
-                                            $crate::ItemPointerGetOffsetNumberNoCheck(
+                                            $crate::__pgrx_c_bindings::ItemPointerGetOffsetNumberNoCheck(
                                                 <
                                                     $crate::__pgrx_c_macros::expression::CPointer<
                                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                                            $crate::ItemPointerData
+                                                            $crate::__pgrx_c_bindings::ItemPointerData
                                                         >,
                                                         $crate::__pgrx_c_macros::expression::ReadOnly
                                                     > as $crate::__pgrx_c_macros::expression::CType
@@ -32155,7 +33509,7 @@ macro_rules! ItemPointerIsLossyPage {
                                                     $crate::__pgrx_c_macros::expression::implicit::<
                                                         $crate::__pgrx_c_macros::expression::CPointer<
                                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                                $crate::ItemPointerData
+                                                                $crate::__pgrx_c_bindings::ItemPointerData
                                                             >,
                                                             $crate::__pgrx_c_macros::expression::ReadOnly
                                                         >,
@@ -32178,7 +33532,7 @@ macro_rules! ItemPointerIsLossyPage {
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::cast_as::<
-                                        $crate::OffsetNumber,
+                                        $crate::__pgrx_c_bindings::OffsetNumber,
                                         $crate::__pgrx_c_macros::CUnsignedShort,
                                         _
                                     >(
@@ -32202,11 +33556,11 @@ macro_rules! ItemPointerIsLossyPage {
                                         <
                                             $crate::__pgrx_c_macros::CUnsignedInt as $crate::__pgrx_c_macros::expression::CType
                                         >::from_storage(
-                                            $crate::ItemPointerGetBlockNumberNoCheck(
+                                            $crate::__pgrx_c_bindings::ItemPointerGetBlockNumberNoCheck(
                                                 <
                                                     $crate::__pgrx_c_macros::expression::CPointer<
                                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                                            $crate::ItemPointerData
+                                                            $crate::__pgrx_c_bindings::ItemPointerData
                                                         >,
                                                         $crate::__pgrx_c_macros::expression::ReadOnly
                                                     > as $crate::__pgrx_c_macros::expression::CType
@@ -32214,7 +33568,7 @@ macro_rules! ItemPointerIsLossyPage {
                                                     $crate::__pgrx_c_macros::expression::implicit::<
                                                         $crate::__pgrx_c_macros::expression::CPointer<
                                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                                $crate::ItemPointerData
+                                                                $crate::__pgrx_c_bindings::ItemPointerData
                                                             >,
                                                             $crate::__pgrx_c_macros::expression::ReadOnly
                                                         >,
@@ -32236,10 +33590,9 @@ macro_rules! ItemPointerIsLossyPage {
                                     )
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                                    /* PGRX: InvalidBlockNumber remains expanded because no integer constant binding is available in the defining Rust crate. */
                                     $crate::__pgrx_c_macros::CValue::<
                                         $crate::__pgrx_c_macros::CUnsignedInt
-                                    >::new(4294967295u32)
+                                    >::new($crate::__pgrx_c_bindings::InvalidBlockNumber as u32)
                                 )
                             )
                         )
@@ -32261,8 +33614,8 @@ macro_rules! ItemPointerIsLossyPage {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -32289,20 +33642,24 @@ macro_rules! __pgrx_c_args_ItemPointerIsMin {
         $crate::__pgrx_c_args_ItemPointerIsMin!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_ItemPointerIsMin!(@p1 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_ItemPointerIsMin!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_ItemPointerIsMin!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_ItemPointerIsMin!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_ItemPointerIsMin!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_ItemPointerIsMin!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -32310,7 +33667,9 @@ macro_rules! __pgrx_c_args_ItemPointerIsMin {
         $crate::__pgrx_c_args_ItemPointerIsMin!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_ItemPointerIsMin!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_ItemPointerIsMin!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -32332,14 +33691,18 @@ macro_rules! __pgrx_c_args_ItemPointerIsMin {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_ItemPointerIsMin!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_ItemPointerIsMin!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_ItemPointerIsMin!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_ItemPointerIsMin!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_ItemPointerIsMin!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -32366,13 +33729,13 @@ macro_rules! __pgrx_c_args_ItemPointerIsMin {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_ItemPointerIsMin!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_ItemPointerIsMin!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -32427,11 +33790,11 @@ macro_rules! ItemPointerIsMin {
                                         <
                                             $crate::__pgrx_c_macros::CUnsignedShort as $crate::__pgrx_c_macros::expression::CType
                                         >::from_storage(
-                                            $crate::ItemPointerGetOffsetNumberNoCheck(
+                                            $crate::__pgrx_c_bindings::ItemPointerGetOffsetNumberNoCheck(
                                                 <
                                                     $crate::__pgrx_c_macros::expression::CPointer<
                                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                                            $crate::ItemPointerData
+                                                            $crate::__pgrx_c_bindings::ItemPointerData
                                                         >,
                                                         $crate::__pgrx_c_macros::expression::ReadOnly
                                                     > as $crate::__pgrx_c_macros::expression::CType
@@ -32439,7 +33802,7 @@ macro_rules! ItemPointerIsMin {
                                                     $crate::__pgrx_c_macros::expression::implicit::<
                                                         $crate::__pgrx_c_macros::expression::CPointer<
                                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                                $crate::ItemPointerData
+                                                                $crate::__pgrx_c_bindings::ItemPointerData
                                                             >,
                                                             $crate::__pgrx_c_macros::expression::ReadOnly
                                                         >,
@@ -32463,7 +33826,7 @@ macro_rules! ItemPointerIsMin {
                                 $crate::__pgrx_c_macros::expression::null_constant(
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::expression::cast_as::<
-                                            $crate::OffsetNumber,
+                                            $crate::__pgrx_c_bindings::OffsetNumber,
                                             $crate::__pgrx_c_macros::CUnsignedShort,
                                             _
                                         >(
@@ -32490,11 +33853,11 @@ macro_rules! ItemPointerIsMin {
                                         <
                                             $crate::__pgrx_c_macros::CUnsignedInt as $crate::__pgrx_c_macros::expression::CType
                                         >::from_storage(
-                                            $crate::ItemPointerGetBlockNumberNoCheck(
+                                            $crate::__pgrx_c_bindings::ItemPointerGetBlockNumberNoCheck(
                                                 <
                                                     $crate::__pgrx_c_macros::expression::CPointer<
                                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                                            $crate::ItemPointerData
+                                                            $crate::__pgrx_c_bindings::ItemPointerData
                                                         >,
                                                         $crate::__pgrx_c_macros::expression::ReadOnly
                                                     > as $crate::__pgrx_c_macros::expression::CType
@@ -32502,7 +33865,7 @@ macro_rules! ItemPointerIsMin {
                                                     $crate::__pgrx_c_macros::expression::implicit::<
                                                         $crate::__pgrx_c_macros::expression::CPointer<
                                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                                $crate::ItemPointerData
+                                                                $crate::__pgrx_c_bindings::ItemPointerData
                                                             >,
                                                             $crate::__pgrx_c_macros::expression::ReadOnly
                                                         >,
@@ -32526,7 +33889,7 @@ macro_rules! ItemPointerIsMin {
                                 $crate::__pgrx_c_macros::expression::null_constant(
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::expression::cast_as::<
-                                            $crate::BlockNumber,
+                                            $crate::__pgrx_c_bindings::BlockNumber,
                                             $crate::__pgrx_c_macros::CUnsignedInt,
                                             _
                                         >(
@@ -32593,11 +33956,11 @@ macro_rules! ItemPointerIsMin {
                                                     <
                                                         $crate::__pgrx_c_macros::CUnsignedShort as $crate::__pgrx_c_macros::expression::CType
                                                     >::from_storage(
-                                                        $crate::ItemPointerGetOffsetNumberNoCheck(
+                                                        $crate::__pgrx_c_bindings::ItemPointerGetOffsetNumberNoCheck(
                                                             <
                                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                                        $crate::ItemPointerData
+                                                                        $crate::__pgrx_c_bindings::ItemPointerData
                                                                     >,
                                                                     $crate::__pgrx_c_macros::expression::ReadOnly
                                                                 > as $crate::__pgrx_c_macros::expression::CType
@@ -32605,7 +33968,7 @@ macro_rules! ItemPointerIsMin {
                                                                 $crate::__pgrx_c_macros::expression::implicit::<
                                                                     $crate::__pgrx_c_macros::expression::CPointer<
                                                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                                                            $crate::ItemPointerData
+                                                                            $crate::__pgrx_c_bindings::ItemPointerData
                                                                         >,
                                                                         $crate::__pgrx_c_macros::expression::ReadOnly
                                                                     >,
@@ -32632,7 +33995,7 @@ macro_rules! ItemPointerIsMin {
                                                     _
                                                 >(
                                                     $crate::__pgrx_c_macros::expression::cast_as::<
-                                                        $crate::OffsetNumber,
+                                                        $crate::__pgrx_c_bindings::OffsetNumber,
                                                         $crate::__pgrx_c_macros::CUnsignedShort,
                                                         _
                                                     >(
@@ -32662,11 +34025,11 @@ macro_rules! ItemPointerIsMin {
                                                     <
                                                         $crate::__pgrx_c_macros::CUnsignedInt as $crate::__pgrx_c_macros::expression::CType
                                                     >::from_storage(
-                                                        $crate::ItemPointerGetBlockNumberNoCheck(
+                                                        $crate::__pgrx_c_bindings::ItemPointerGetBlockNumberNoCheck(
                                                             <
                                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                                        $crate::ItemPointerData
+                                                                        $crate::__pgrx_c_bindings::ItemPointerData
                                                                     >,
                                                                     $crate::__pgrx_c_macros::expression::ReadOnly
                                                                 > as $crate::__pgrx_c_macros::expression::CType
@@ -32674,7 +34037,7 @@ macro_rules! ItemPointerIsMin {
                                                                 $crate::__pgrx_c_macros::expression::implicit::<
                                                                     $crate::__pgrx_c_macros::expression::CPointer<
                                                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                                                            $crate::ItemPointerData
+                                                                            $crate::__pgrx_c_bindings::ItemPointerData
                                                                         >,
                                                                         $crate::__pgrx_c_macros::expression::ReadOnly
                                                                     >,
@@ -32701,7 +34064,7 @@ macro_rules! ItemPointerIsMin {
                                                     _
                                                 >(
                                                     $crate::__pgrx_c_macros::expression::cast_as::<
-                                                        $crate::BlockNumber,
+                                                        $crate::__pgrx_c_bindings::BlockNumber,
                                                         $crate::__pgrx_c_macros::CUnsignedInt,
                                                         _
                                                     >(
@@ -32750,11 +34113,11 @@ macro_rules! ItemPointerIsMin {
                                         <
                                             $crate::__pgrx_c_macros::CUnsignedShort as $crate::__pgrx_c_macros::expression::CType
                                         >::from_storage(
-                                            $crate::ItemPointerGetOffsetNumberNoCheck(
+                                            $crate::__pgrx_c_bindings::ItemPointerGetOffsetNumberNoCheck(
                                                 <
                                                     $crate::__pgrx_c_macros::expression::CPointer<
                                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                                            $crate::ItemPointerData
+                                                            $crate::__pgrx_c_bindings::ItemPointerData
                                                         >,
                                                         $crate::__pgrx_c_macros::expression::ReadOnly
                                                     > as $crate::__pgrx_c_macros::expression::CType
@@ -32762,7 +34125,7 @@ macro_rules! ItemPointerIsMin {
                                                     $crate::__pgrx_c_macros::expression::implicit::<
                                                         $crate::__pgrx_c_macros::expression::CPointer<
                                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                                $crate::ItemPointerData
+                                                                $crate::__pgrx_c_bindings::ItemPointerData
                                                             >,
                                                             $crate::__pgrx_c_macros::expression::ReadOnly
                                                         >,
@@ -32786,7 +34149,7 @@ macro_rules! ItemPointerIsMin {
                                 $crate::__pgrx_c_macros::expression::null_constant(
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::expression::cast_as::<
-                                            $crate::OffsetNumber,
+                                            $crate::__pgrx_c_bindings::OffsetNumber,
                                             $crate::__pgrx_c_macros::CUnsignedShort,
                                             _
                                         >(
@@ -32813,11 +34176,11 @@ macro_rules! ItemPointerIsMin {
                                         <
                                             $crate::__pgrx_c_macros::CUnsignedInt as $crate::__pgrx_c_macros::expression::CType
                                         >::from_storage(
-                                            $crate::ItemPointerGetBlockNumberNoCheck(
+                                            $crate::__pgrx_c_bindings::ItemPointerGetBlockNumberNoCheck(
                                                 <
                                                     $crate::__pgrx_c_macros::expression::CPointer<
                                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                                            $crate::ItemPointerData
+                                                            $crate::__pgrx_c_bindings::ItemPointerData
                                                         >,
                                                         $crate::__pgrx_c_macros::expression::ReadOnly
                                                     > as $crate::__pgrx_c_macros::expression::CType
@@ -32825,7 +34188,7 @@ macro_rules! ItemPointerIsMin {
                                                     $crate::__pgrx_c_macros::expression::implicit::<
                                                         $crate::__pgrx_c_macros::expression::CPointer<
                                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                                $crate::ItemPointerData
+                                                                $crate::__pgrx_c_bindings::ItemPointerData
                                                             >,
                                                             $crate::__pgrx_c_macros::expression::ReadOnly
                                                         >,
@@ -32849,7 +34212,7 @@ macro_rules! ItemPointerIsMin {
                                 $crate::__pgrx_c_macros::expression::null_constant(
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::expression::cast_as::<
-                                            $crate::BlockNumber,
+                                            $crate::__pgrx_c_bindings::BlockNumber,
                                             $crate::__pgrx_c_macros::CUnsignedInt,
                                             _
                                         >(
@@ -32886,8 +34249,8 @@ macro_rules! ItemPointerIsMin {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -32918,13 +34281,13 @@ macro_rules! __pgrx_c_args_ItemPointerSetLossyPage {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_ItemPointerSetLossyPage!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_ItemPointerSetLossyPage!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -32933,7 +34296,7 @@ macro_rules! __pgrx_c_args_ItemPointerSetLossyPage {
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_ItemPointerSetLossyPage!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -32960,35 +34323,35 @@ macro_rules! __pgrx_c_args_ItemPointerSetLossyPage {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_ItemPointerSetLossyPage!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_ItemPointerSetLossyPage!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $argument:literal) => {
         $crate::__pgrx_c_args_ItemPointerSetLossyPage!(
-            @p2 $mode [$($done)* (@literal [- $argument]),];
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
         )
     };
     (@negative1 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_ItemPointerSetLossyPage!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_ItemPointerSetLossyPage!(
-            @p2 $mode [$($done)* (@literal [- $argument]),];
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_ItemPointerSetLossyPage!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -32997,7 +34360,7 @@ macro_rules! __pgrx_c_args_ItemPointerSetLossyPage {
     };
     (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
         $crate::__pgrx_c_args_ItemPointerSetLossyPage!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
@@ -33023,17 +34386,17 @@ macro_rules! __pgrx_c_args_ItemPointerSetLossyPage {
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_ItemPointerSetLossyPage!(
-            @p2 $mode [$($done)* (@literal [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_ItemPointerSetLossyPage!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_ItemPointerSetLossyPage!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -33060,13 +34423,13 @@ macro_rules! __pgrx_c_args_ItemPointerSetLossyPage {
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_ItemPointerSetLossyPage!(
-            @p2 $mode [$($done)* (@literal [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_ItemPointerSetLossyPage!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -33115,16 +34478,20 @@ macro_rules! ItemPointerSetLossyPage {
     (@__pgrx_emit_value; $p:tt, $b:tt $(,)?) => {
         /* PGRX: ItemPointerSetLossyPage remains expanded because ItemPointerSet is not an active function-like macro. */
         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-            $crate::ItemPointerSet(
+            $crate::__pgrx_c_bindings::ItemPointerSet(
                 <
                     $crate::__pgrx_c_macros::expression::CPointer<
-                        $crate::__pgrx_c_macros::expression::CRecord<$crate::ItemPointerData>,
+                        $crate::__pgrx_c_macros::expression::CRecord<
+                            $crate::__pgrx_c_bindings::ItemPointerData
+                        >,
                         $crate::__pgrx_c_macros::expression::ReadWrite
                     > as $crate::__pgrx_c_macros::expression::CType
                 >::into_storage(
                     $crate::__pgrx_c_macros::expression::implicit::<
                         $crate::__pgrx_c_macros::expression::CPointer<
-                            $crate::__pgrx_c_macros::expression::CRecord<$crate::ItemPointerData>,
+                            $crate::__pgrx_c_macros::expression::CRecord<
+                                $crate::__pgrx_c_bindings::ItemPointerData
+                            >,
                             $crate::__pgrx_c_macros::expression::ReadWrite
                         >,
                         _
@@ -33159,7 +34526,7 @@ macro_rules! ItemPointerSetLossyPage {
                     >(
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::cast_as::<
-                                $crate::OffsetNumber,
+                                $crate::__pgrx_c_bindings::OffsetNumber,
                                 $crate::__pgrx_c_macros::CUnsignedShort,
                                 _
                             >(
@@ -33203,11 +34570,11 @@ macro_rules! ItemPointerSetLossyPage {
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                            $crate::ItemPointerSet(
+                            $crate::__pgrx_c_bindings::ItemPointerSet(
                                 <
                                     $crate::__pgrx_c_macros::expression::CPointer<
                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                            $crate::ItemPointerData
+                                            $crate::__pgrx_c_bindings::ItemPointerData
                                         >,
                                         $crate::__pgrx_c_macros::expression::ReadWrite
                                     > as $crate::__pgrx_c_macros::expression::CType
@@ -33215,7 +34582,7 @@ macro_rules! ItemPointerSetLossyPage {
                                     $crate::__pgrx_c_macros::expression::implicit::<
                                         $crate::__pgrx_c_macros::expression::CPointer<
                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                $crate::ItemPointerData
+                                                $crate::__pgrx_c_bindings::ItemPointerData
                                             >,
                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                         >,
@@ -33256,7 +34623,7 @@ macro_rules! ItemPointerSetLossyPage {
                                             _
                                         >(
                                             $crate::__pgrx_c_macros::expression::cast_as::<
-                                                $crate::OffsetNumber,
+                                                $crate::__pgrx_c_bindings::OffsetNumber,
                                                 $crate::__pgrx_c_macros::CUnsignedShort,
                                                 _
                                             >(
@@ -33288,17 +34655,19 @@ macro_rules! ItemPointerSetLossyPage {
         /* PGRX: ItemPointerSetLossyPage remains expanded because ItemPointerSet is not an active function-like macro. */
         {
             let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                $crate::ItemPointerSet(
+                $crate::__pgrx_c_bindings::ItemPointerSet(
                     <
                         $crate::__pgrx_c_macros::expression::CPointer<
-                            $crate::__pgrx_c_macros::expression::CRecord<$crate::ItemPointerData>,
+                            $crate::__pgrx_c_macros::expression::CRecord<
+                                $crate::__pgrx_c_bindings::ItemPointerData
+                            >,
                             $crate::__pgrx_c_macros::expression::ReadWrite
                         > as $crate::__pgrx_c_macros::expression::CType
                     >::into_storage(
                         $crate::__pgrx_c_macros::expression::implicit::<
                             $crate::__pgrx_c_macros::expression::CPointer<
                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                    $crate::ItemPointerData
+                                    $crate::__pgrx_c_bindings::ItemPointerData
                                 >,
                                 $crate::__pgrx_c_macros::expression::ReadWrite
                             >,
@@ -33334,7 +34703,7 @@ macro_rules! ItemPointerSetLossyPage {
                         >(
                             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                 $crate::__pgrx_c_macros::expression::cast_as::<
-                                    $crate::OffsetNumber,
+                                    $crate::__pgrx_c_bindings::OffsetNumber,
                                     $crate::__pgrx_c_macros::CUnsignedShort,
                                     _
                                 >(
@@ -33360,8 +34729,8 @@ macro_rules! ItemPointerSetLossyPage {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -33388,20 +34757,24 @@ macro_rules! __pgrx_c_args_ItemPointerSetMax {
         $crate::__pgrx_c_args_ItemPointerSetMax!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_ItemPointerSetMax!(@p1 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_ItemPointerSetMax!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_ItemPointerSetMax!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_ItemPointerSetMax!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_ItemPointerSetMax!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_ItemPointerSetMax!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -33409,7 +34782,9 @@ macro_rules! __pgrx_c_args_ItemPointerSetMax {
         $crate::__pgrx_c_args_ItemPointerSetMax!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_ItemPointerSetMax!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_ItemPointerSetMax!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -33431,14 +34806,18 @@ macro_rules! __pgrx_c_args_ItemPointerSetMax {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_ItemPointerSetMax!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_ItemPointerSetMax!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_ItemPointerSetMax!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_ItemPointerSetMax!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_ItemPointerSetMax!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -33465,13 +34844,13 @@ macro_rules! __pgrx_c_args_ItemPointerSetMax {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_ItemPointerSetMax!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_ItemPointerSetMax!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -33516,16 +34895,20 @@ macro_rules! ItemPointerSetMax {
     (@__pgrx_emit_value; $p:tt $(,)?) => {
         /* PGRX: ItemPointerSetMax remains expanded because ItemPointerSet is not an active function-like macro. */
         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-            $crate::ItemPointerSet(
+            $crate::__pgrx_c_bindings::ItemPointerSet(
                 <
                     $crate::__pgrx_c_macros::expression::CPointer<
-                        $crate::__pgrx_c_macros::expression::CRecord<$crate::ItemPointerData>,
+                        $crate::__pgrx_c_macros::expression::CRecord<
+                            $crate::__pgrx_c_bindings::ItemPointerData
+                        >,
                         $crate::__pgrx_c_macros::expression::ReadWrite
                     > as $crate::__pgrx_c_macros::expression::CType
                 >::into_storage(
                     $crate::__pgrx_c_macros::expression::implicit::<
                         $crate::__pgrx_c_macros::expression::CPointer<
-                            $crate::__pgrx_c_macros::expression::CRecord<$crate::ItemPointerData>,
+                            $crate::__pgrx_c_macros::expression::CRecord<
+                                $crate::__pgrx_c_bindings::ItemPointerData
+                            >,
                             $crate::__pgrx_c_macros::expression::ReadWrite
                         >,
                         _
@@ -33545,9 +34928,8 @@ macro_rules! ItemPointerSetMax {
                         _
                     >(
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                            /* PGRX: InvalidBlockNumber remains expanded because no integer constant binding is available in the defining Rust crate. */
                             $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CUnsignedInt>::new(
-                                4294967295u32
+                                $crate::__pgrx_c_bindings::InvalidBlockNumber as u32
                             )
                         )
                     )
@@ -33561,7 +34943,7 @@ macro_rules! ItemPointerSetMax {
                     >(
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::cast_as::<
-                                $crate::OffsetNumber,
+                                $crate::__pgrx_c_bindings::OffsetNumber,
                                 $crate::__pgrx_c_macros::CUnsignedShort,
                                 _
                             >(
@@ -33604,11 +34986,11 @@ macro_rules! ItemPointerSetMax {
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                            $crate::ItemPointerSet(
+                            $crate::__pgrx_c_bindings::ItemPointerSet(
                                 <
                                     $crate::__pgrx_c_macros::expression::CPointer<
                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                            $crate::ItemPointerData
+                                            $crate::__pgrx_c_bindings::ItemPointerData
                                         >,
                                         $crate::__pgrx_c_macros::expression::ReadWrite
                                     > as $crate::__pgrx_c_macros::expression::CType
@@ -33616,7 +34998,7 @@ macro_rules! ItemPointerSetMax {
                                     $crate::__pgrx_c_macros::expression::implicit::<
                                         $crate::__pgrx_c_macros::expression::CPointer<
                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                $crate::ItemPointerData
+                                                $crate::__pgrx_c_bindings::ItemPointerData
                                             >,
                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                         >,
@@ -33641,10 +35023,11 @@ macro_rules! ItemPointerSetMax {
                                             true,
                                             _
                                         >(
-                                            /* PGRX: InvalidBlockNumber remains expanded because no integer constant binding is available in the defining Rust crate. */
                                             $crate::__pgrx_c_macros::CValue::<
                                                 $crate::__pgrx_c_macros::CUnsignedInt
-                                            >::new(4294967295u32)
+                                            >::new(
+                                                $crate::__pgrx_c_bindings::InvalidBlockNumber as u32
+                                            )
                                         )
                                     )
                                 ),
@@ -33660,7 +35043,7 @@ macro_rules! ItemPointerSetMax {
                                             _
                                         >(
                                             $crate::__pgrx_c_macros::expression::cast_as::<
-                                                $crate::OffsetNumber,
+                                                $crate::__pgrx_c_bindings::OffsetNumber,
                                                 $crate::__pgrx_c_macros::CUnsignedShort,
                                                 _
                                             >(
@@ -33692,17 +35075,19 @@ macro_rules! ItemPointerSetMax {
         /* PGRX: ItemPointerSetMax remains expanded because ItemPointerSet is not an active function-like macro. */
         {
             let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                $crate::ItemPointerSet(
+                $crate::__pgrx_c_bindings::ItemPointerSet(
                     <
                         $crate::__pgrx_c_macros::expression::CPointer<
-                            $crate::__pgrx_c_macros::expression::CRecord<$crate::ItemPointerData>,
+                            $crate::__pgrx_c_macros::expression::CRecord<
+                                $crate::__pgrx_c_bindings::ItemPointerData
+                            >,
                             $crate::__pgrx_c_macros::expression::ReadWrite
                         > as $crate::__pgrx_c_macros::expression::CType
                     >::into_storage(
                         $crate::__pgrx_c_macros::expression::implicit::<
                             $crate::__pgrx_c_macros::expression::CPointer<
                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                    $crate::ItemPointerData
+                                    $crate::__pgrx_c_bindings::ItemPointerData
                                 >,
                                 $crate::__pgrx_c_macros::expression::ReadWrite
                             >,
@@ -33723,10 +35108,9 @@ macro_rules! ItemPointerSetMax {
                             _
                         >(
                             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                                /* PGRX: InvalidBlockNumber remains expanded because no integer constant binding is available in the defining Rust crate. */
                                 $crate::__pgrx_c_macros::CValue::<
                                     $crate::__pgrx_c_macros::CUnsignedInt
-                                >::new(4294967295u32)
+                                >::new($crate::__pgrx_c_bindings::InvalidBlockNumber as u32)
                             )
                         )
                     ),
@@ -33739,7 +35123,7 @@ macro_rules! ItemPointerSetMax {
                         >(
                             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                 $crate::__pgrx_c_macros::expression::cast_as::<
-                                    $crate::OffsetNumber,
+                                    $crate::__pgrx_c_bindings::OffsetNumber,
                                     $crate::__pgrx_c_macros::CUnsignedShort,
                                     _
                                 >(
@@ -33765,8 +35149,8 @@ macro_rules! ItemPointerSetMax {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -33793,20 +35177,24 @@ macro_rules! __pgrx_c_args_ItemPointerSetMin {
         $crate::__pgrx_c_args_ItemPointerSetMin!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_ItemPointerSetMin!(@p1 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_ItemPointerSetMin!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_ItemPointerSetMin!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_ItemPointerSetMin!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_ItemPointerSetMin!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_ItemPointerSetMin!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -33814,7 +35202,9 @@ macro_rules! __pgrx_c_args_ItemPointerSetMin {
         $crate::__pgrx_c_args_ItemPointerSetMin!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_ItemPointerSetMin!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_ItemPointerSetMin!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -33836,14 +35226,18 @@ macro_rules! __pgrx_c_args_ItemPointerSetMin {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_ItemPointerSetMin!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_ItemPointerSetMin!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_ItemPointerSetMin!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_ItemPointerSetMin!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_ItemPointerSetMin!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -33870,13 +35264,13 @@ macro_rules! __pgrx_c_args_ItemPointerSetMin {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_ItemPointerSetMin!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_ItemPointerSetMin!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -33921,16 +35315,20 @@ macro_rules! ItemPointerSetMin {
     (@__pgrx_emit_value; $p:tt $(,)?) => {
         /* PGRX: ItemPointerSetMin remains expanded because ItemPointerSet is not an active function-like macro. */
         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-            $crate::ItemPointerSet(
+            $crate::__pgrx_c_bindings::ItemPointerSet(
                 <
                     $crate::__pgrx_c_macros::expression::CPointer<
-                        $crate::__pgrx_c_macros::expression::CRecord<$crate::ItemPointerData>,
+                        $crate::__pgrx_c_macros::expression::CRecord<
+                            $crate::__pgrx_c_bindings::ItemPointerData
+                        >,
                         $crate::__pgrx_c_macros::expression::ReadWrite
                     > as $crate::__pgrx_c_macros::expression::CType
                 >::into_storage(
                     $crate::__pgrx_c_macros::expression::implicit::<
                         $crate::__pgrx_c_macros::expression::CPointer<
-                            $crate::__pgrx_c_macros::expression::CRecord<$crate::ItemPointerData>,
+                            $crate::__pgrx_c_macros::expression::CRecord<
+                                $crate::__pgrx_c_bindings::ItemPointerData
+                            >,
                             $crate::__pgrx_c_macros::expression::ReadWrite
                         >,
                         _
@@ -33952,7 +35350,7 @@ macro_rules! ItemPointerSetMin {
                         $crate::__pgrx_c_macros::expression::null_constant(
                             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                 $crate::__pgrx_c_macros::expression::cast_as::<
-                                    $crate::BlockNumber,
+                                    $crate::__pgrx_c_bindings::BlockNumber,
                                     $crate::__pgrx_c_macros::CUnsignedInt,
                                     _
                                 >(
@@ -33978,7 +35376,7 @@ macro_rules! ItemPointerSetMin {
                         $crate::__pgrx_c_macros::expression::null_constant(
                             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                 $crate::__pgrx_c_macros::expression::cast_as::<
-                                    $crate::OffsetNumber,
+                                    $crate::__pgrx_c_bindings::OffsetNumber,
                                     $crate::__pgrx_c_macros::CUnsignedShort,
                                     _
                                 >(
@@ -34024,11 +35422,11 @@ macro_rules! ItemPointerSetMin {
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                            $crate::ItemPointerSet(
+                            $crate::__pgrx_c_bindings::ItemPointerSet(
                                 <
                                     $crate::__pgrx_c_macros::expression::CPointer<
                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                            $crate::ItemPointerData
+                                            $crate::__pgrx_c_bindings::ItemPointerData
                                         >,
                                         $crate::__pgrx_c_macros::expression::ReadWrite
                                     > as $crate::__pgrx_c_macros::expression::CType
@@ -34036,7 +35434,7 @@ macro_rules! ItemPointerSetMin {
                                     $crate::__pgrx_c_macros::expression::implicit::<
                                         $crate::__pgrx_c_macros::expression::CPointer<
                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                $crate::ItemPointerData
+                                                $crate::__pgrx_c_bindings::ItemPointerData
                                             >,
                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                         >,
@@ -34063,7 +35461,7 @@ macro_rules! ItemPointerSetMin {
                                                 _
                                             >(
                                                 $crate::__pgrx_c_macros::expression::cast_as::<
-                                                    $crate::BlockNumber,
+                                                    $crate::__pgrx_c_bindings::BlockNumber,
                                                     $crate::__pgrx_c_macros::CUnsignedInt,
                                                     _
                                                 >(
@@ -34095,7 +35493,7 @@ macro_rules! ItemPointerSetMin {
                                                 _
                                             >(
                                                 $crate::__pgrx_c_macros::expression::cast_as::<
-                                                    $crate::OffsetNumber,
+                                                    $crate::__pgrx_c_bindings::OffsetNumber,
                                                     $crate::__pgrx_c_macros::CUnsignedShort,
                                                     _
                                                 >(
@@ -34130,17 +35528,19 @@ macro_rules! ItemPointerSetMin {
         /* PGRX: ItemPointerSetMin remains expanded because ItemPointerSet is not an active function-like macro. */
         {
             let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                $crate::ItemPointerSet(
+                $crate::__pgrx_c_bindings::ItemPointerSet(
                     <
                         $crate::__pgrx_c_macros::expression::CPointer<
-                            $crate::__pgrx_c_macros::expression::CRecord<$crate::ItemPointerData>,
+                            $crate::__pgrx_c_macros::expression::CRecord<
+                                $crate::__pgrx_c_bindings::ItemPointerData
+                            >,
                             $crate::__pgrx_c_macros::expression::ReadWrite
                         > as $crate::__pgrx_c_macros::expression::CType
                     >::into_storage(
                         $crate::__pgrx_c_macros::expression::implicit::<
                             $crate::__pgrx_c_macros::expression::CPointer<
                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                    $crate::ItemPointerData
+                                    $crate::__pgrx_c_bindings::ItemPointerData
                                 >,
                                 $crate::__pgrx_c_macros::expression::ReadWrite
                             >,
@@ -34163,7 +35563,7 @@ macro_rules! ItemPointerSetMin {
                             $crate::__pgrx_c_macros::expression::null_constant(
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::cast_as::<
-                                        $crate::BlockNumber,
+                                        $crate::__pgrx_c_bindings::BlockNumber,
                                         $crate::__pgrx_c_macros::CUnsignedInt,
                                         _
                                     >(
@@ -34192,7 +35592,7 @@ macro_rules! ItemPointerSetMin {
                             $crate::__pgrx_c_macros::expression::null_constant(
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::cast_as::<
-                                        $crate::OffsetNumber,
+                                        $crate::__pgrx_c_bindings::OffsetNumber,
                                         $crate::__pgrx_c_macros::CUnsignedShort,
                                         _
                                     >(
@@ -34224,8 +35624,8 @@ macro_rules! ItemPointerSetMin {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -34256,23 +35656,23 @@ macro_rules! __pgrx_c_args_PostingItemGetBlockNumber {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
         $crate::__pgrx_c_args_PostingItemGetBlockNumber!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_PostingItemGetBlockNumber!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_PostingItemGetBlockNumber!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_PostingItemGetBlockNumber!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -34281,7 +35681,7 @@ macro_rules! __pgrx_c_args_PostingItemGetBlockNumber {
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
         $crate::__pgrx_c_args_PostingItemGetBlockNumber!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
@@ -34307,17 +35707,17 @@ macro_rules! __pgrx_c_args_PostingItemGetBlockNumber {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_PostingItemGetBlockNumber!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_PostingItemGetBlockNumber!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_PostingItemGetBlockNumber!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -34344,13 +35744,13 @@ macro_rules! __pgrx_c_args_PostingItemGetBlockNumber {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_PostingItemGetBlockNumber!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_PostingItemGetBlockNumber!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -34399,16 +35799,20 @@ macro_rules! PostingItemGetBlockNumber {
         /* PGRX: PostingItemGetBlockNumber remains expanded because BlockIdGetBlockNumber is not an active function-like macro. */
         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
             <$crate::__pgrx_c_macros::CUnsignedInt as $crate::__pgrx_c_macros::expression::CType>::from_storage(
-                $crate::BlockIdGetBlockNumber(
+                $crate::__pgrx_c_bindings::BlockIdGetBlockNumber(
                     <
                         $crate::__pgrx_c_macros::expression::CPointer<
-                            $crate::__pgrx_c_macros::expression::CRecord<$crate::BlockIdData>,
+                            $crate::__pgrx_c_macros::expression::CRecord<
+                                $crate::__pgrx_c_bindings::BlockIdData
+                            >,
                             $crate::__pgrx_c_macros::expression::ReadOnly
                         > as $crate::__pgrx_c_macros::expression::CType
                     >::into_storage(
                         $crate::__pgrx_c_macros::expression::implicit::<
                             $crate::__pgrx_c_macros::expression::CPointer<
-                                $crate::__pgrx_c_macros::expression::CRecord<$crate::BlockIdData>,
+                                $crate::__pgrx_c_macros::expression::CRecord<
+                                    $crate::__pgrx_c_bindings::BlockIdData
+                                >,
                                 $crate::__pgrx_c_macros::expression::ReadOnly
                             >,
                             _
@@ -34475,11 +35879,11 @@ macro_rules! PostingItemGetBlockNumber {
                             <
                                 $crate::__pgrx_c_macros::CUnsignedInt as $crate::__pgrx_c_macros::expression::CType
                             >::from_storage(
-                                $crate::BlockIdGetBlockNumber(
+                                $crate::__pgrx_c_bindings::BlockIdGetBlockNumber(
                                     <
                                         $crate::__pgrx_c_macros::expression::CPointer<
                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                $crate::BlockIdData
+                                                $crate::__pgrx_c_bindings::BlockIdData
                                             >,
                                             $crate::__pgrx_c_macros::expression::ReadOnly
                                         > as $crate::__pgrx_c_macros::expression::CType
@@ -34487,7 +35891,7 @@ macro_rules! PostingItemGetBlockNumber {
                                         $crate::__pgrx_c_macros::expression::implicit::<
                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                    $crate::BlockIdData
+                                                    $crate::__pgrx_c_bindings::BlockIdData
                                                 >,
                                                 $crate::__pgrx_c_macros::expression::ReadOnly
                                             >,
@@ -34541,17 +35945,19 @@ macro_rules! PostingItemGetBlockNumber {
                 <
                     $crate::__pgrx_c_macros::CUnsignedInt as $crate::__pgrx_c_macros::expression::CType
                 >::from_storage(
-                    $crate::BlockIdGetBlockNumber(
+                    $crate::__pgrx_c_bindings::BlockIdGetBlockNumber(
                         <
                             $crate::__pgrx_c_macros::expression::CPointer<
-                                $crate::__pgrx_c_macros::expression::CRecord<$crate::BlockIdData>,
+                                $crate::__pgrx_c_macros::expression::CRecord<
+                                    $crate::__pgrx_c_bindings::BlockIdData
+                                >,
                                 $crate::__pgrx_c_macros::expression::ReadOnly
                             > as $crate::__pgrx_c_macros::expression::CType
                         >::into_storage(
                             $crate::__pgrx_c_macros::expression::implicit::<
                                 $crate::__pgrx_c_macros::expression::CPointer<
                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                        $crate::BlockIdData
+                                        $crate::__pgrx_c_bindings::BlockIdData
                                     >,
                                     $crate::__pgrx_c_macros::expression::ReadOnly
                                 >,
@@ -34596,8 +36002,8 @@ macro_rules! PostingItemGetBlockNumber {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -34628,13 +36034,13 @@ macro_rules! __pgrx_c_args_PostingItemSetBlockNumber {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_PostingItemSetBlockNumber!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_PostingItemSetBlockNumber!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -34643,7 +36049,7 @@ macro_rules! __pgrx_c_args_PostingItemSetBlockNumber {
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_PostingItemSetBlockNumber!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -34670,35 +36076,35 @@ macro_rules! __pgrx_c_args_PostingItemSetBlockNumber {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_PostingItemSetBlockNumber!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_PostingItemSetBlockNumber!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $argument:literal) => {
         $crate::__pgrx_c_args_PostingItemSetBlockNumber!(
-            @p2 $mode [$($done)* (@literal [- $argument]),];
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
         )
     };
     (@negative1 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_PostingItemSetBlockNumber!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_PostingItemSetBlockNumber!(
-            @p2 $mode [$($done)* (@literal [- $argument]),];
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_PostingItemSetBlockNumber!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -34707,7 +36113,7 @@ macro_rules! __pgrx_c_args_PostingItemSetBlockNumber {
     };
     (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
         $crate::__pgrx_c_args_PostingItemSetBlockNumber!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
@@ -34733,17 +36139,17 @@ macro_rules! __pgrx_c_args_PostingItemSetBlockNumber {
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_PostingItemSetBlockNumber!(
-            @p2 $mode [$($done)* (@literal [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_PostingItemSetBlockNumber!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_PostingItemSetBlockNumber!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -34770,13 +36176,13 @@ macro_rules! __pgrx_c_args_PostingItemSetBlockNumber {
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_PostingItemSetBlockNumber!(
-            @p2 $mode [$($done)* (@literal [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_PostingItemSetBlockNumber!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -34825,16 +36231,20 @@ macro_rules! PostingItemSetBlockNumber {
     (@__pgrx_emit_value; $pointer:tt, $blockNumber:tt $(,)?) => {
         /* PGRX: PostingItemSetBlockNumber remains expanded because BlockIdSet is not an active function-like macro. */
         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-            $crate::BlockIdSet(
+            $crate::__pgrx_c_bindings::BlockIdSet(
                 <
                     $crate::__pgrx_c_macros::expression::CPointer<
-                        $crate::__pgrx_c_macros::expression::CRecord<$crate::BlockIdData>,
+                        $crate::__pgrx_c_macros::expression::CRecord<
+                            $crate::__pgrx_c_bindings::BlockIdData
+                        >,
                         $crate::__pgrx_c_macros::expression::ReadWrite
                     > as $crate::__pgrx_c_macros::expression::CType
                 >::into_storage(
                     $crate::__pgrx_c_macros::expression::implicit::<
                         $crate::__pgrx_c_macros::expression::CPointer<
-                            $crate::__pgrx_c_macros::expression::CRecord<$crate::BlockIdData>,
+                            $crate::__pgrx_c_macros::expression::CRecord<
+                                $crate::__pgrx_c_bindings::BlockIdData
+                            >,
                             $crate::__pgrx_c_macros::expression::ReadWrite
                         >,
                         _
@@ -34914,11 +36324,11 @@ macro_rules! PostingItemSetBlockNumber {
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                            $crate::BlockIdSet(
+                            $crate::__pgrx_c_bindings::BlockIdSet(
                                 <
                                     $crate::__pgrx_c_macros::expression::CPointer<
                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                            $crate::BlockIdData
+                                            $crate::__pgrx_c_bindings::BlockIdData
                                         >,
                                         $crate::__pgrx_c_macros::expression::ReadWrite
                                     > as $crate::__pgrx_c_macros::expression::CType
@@ -34926,7 +36336,7 @@ macro_rules! PostingItemSetBlockNumber {
                                     $crate::__pgrx_c_macros::expression::implicit::<
                                         $crate::__pgrx_c_macros::expression::CPointer<
                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                $crate::BlockIdData
+                                                $crate::__pgrx_c_bindings::BlockIdData
                                             >,
                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                         >,
@@ -34998,16 +36408,20 @@ macro_rules! PostingItemSetBlockNumber {
         /* PGRX: PostingItemSetBlockNumber remains expanded because BlockIdSet is not an active function-like macro. */
         {
             let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                $crate::BlockIdSet(
+                $crate::__pgrx_c_bindings::BlockIdSet(
                     <
                         $crate::__pgrx_c_macros::expression::CPointer<
-                            $crate::__pgrx_c_macros::expression::CRecord<$crate::BlockIdData>,
+                            $crate::__pgrx_c_macros::expression::CRecord<
+                                $crate::__pgrx_c_bindings::BlockIdData
+                            >,
                             $crate::__pgrx_c_macros::expression::ReadWrite
                         > as $crate::__pgrx_c_macros::expression::CType
                     >::into_storage(
                         $crate::__pgrx_c_macros::expression::implicit::<
                             $crate::__pgrx_c_macros::expression::CPointer<
-                                $crate::__pgrx_c_macros::expression::CRecord<$crate::BlockIdData>,
+                                $crate::__pgrx_c_macros::expression::CRecord<
+                                    $crate::__pgrx_c_bindings::BlockIdData
+                                >,
                                 $crate::__pgrx_c_macros::expression::ReadWrite
                             >,
                             _
@@ -35066,8 +36480,8 @@ macro_rules! PostingItemSetBlockNumber {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -35098,21 +36512,23 @@ macro_rules! __pgrx_c_args_SizeOfGinPostingList {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
         $crate::__pgrx_c_args_SizeOfGinPostingList!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_SizeOfGinPostingList!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_SizeOfGinPostingList!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SizeOfGinPostingList!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SizeOfGinPostingList!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -35120,7 +36536,9 @@ macro_rules! __pgrx_c_args_SizeOfGinPostingList {
         $crate::__pgrx_c_args_SizeOfGinPostingList!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_SizeOfGinPostingList!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_SizeOfGinPostingList!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -35142,14 +36560,18 @@ macro_rules! __pgrx_c_args_SizeOfGinPostingList {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_SizeOfGinPostingList!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_SizeOfGinPostingList!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_SizeOfGinPostingList!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_SizeOfGinPostingList!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_SizeOfGinPostingList!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -35176,13 +36598,13 @@ macro_rules! __pgrx_c_args_SizeOfGinPostingList {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SizeOfGinPostingList!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SizeOfGinPostingList!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -35231,7 +36653,9 @@ macro_rules! SizeOfGinPostingList {
                 $crate::__pgrx_c_macros::expression::add::<$crate::__pgrx_c_macros::Wrapping, _, _>(
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::expression::offset_of::<
-                            $crate::__pgrx_c_macros::expression::CRecord<$crate::GinPostingList>,
+                            $crate::__pgrx_c_macros::expression::CRecord<
+                                $crate::__pgrx_c_bindings::GinPostingList
+                            >,
                             $crate::__pgrx_c_field_marker!(@path; bytes)
                         >()
                     ),
@@ -35305,7 +36729,9 @@ macro_rules! SizeOfGinPostingList {
                                                             >(
                                                                 $crate::__pgrx_c_macros::CValue::<
                                                                     $crate::__pgrx_c_macros::CInt
-                                                                >::new($crate::ALIGNOF_SHORT as i32)
+                                                                >::new(
+                                                                    $crate::__pgrx_c_bindings::ALIGNOF_SHORT as i32
+                                                                )
                                                             )
                                                         ),
                                                         $crate::__pgrx_c_macros::expression::profile_value::<
@@ -35352,7 +36778,7 @@ macro_rules! SizeOfGinPostingList {
                                                                         $crate::__pgrx_c_macros::CValue::<
                                                                             $crate::__pgrx_c_macros::CInt
                                                                         >::new(
-                                                                            $crate::ALIGNOF_SHORT as i32
+                                                                            $crate::__pgrx_c_bindings::ALIGNOF_SHORT as i32
                                                                         )
                                                                     )
                                                                 ),
@@ -35414,7 +36840,7 @@ macro_rules! SizeOfGinPostingList {
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::offset_of::<
                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                            $crate::GinPostingList
+                                            $crate::__pgrx_c_bindings::GinPostingList
                                         >,
                                         $crate::__pgrx_c_field_marker!(@path; bytes)
                                     >()
@@ -35493,7 +36919,7 @@ macro_rules! SizeOfGinPostingList {
                                                                             $crate::__pgrx_c_macros::CValue::<
                                                                                 $crate::__pgrx_c_macros::CInt
                                                                             >::new(
-                                                                                $crate::ALIGNOF_SHORT as i32
+                                                                                $crate::__pgrx_c_bindings::ALIGNOF_SHORT as i32
                                                                             )
                                                                         )
                                                                     ),
@@ -35544,7 +36970,7 @@ macro_rules! SizeOfGinPostingList {
                                                                                     $crate::__pgrx_c_macros::CValue::<
                                                                                         $crate::__pgrx_c_macros::CInt
                                                                                     >::new(
-                                                                                        $crate::ALIGNOF_SHORT as i32
+                                                                                        $crate::__pgrx_c_bindings::ALIGNOF_SHORT as i32
                                                                                     )
                                                                                 )
                                                                             ),
@@ -35586,7 +37012,9 @@ macro_rules! SizeOfGinPostingList {
                 $crate::__pgrx_c_macros::expression::add::<$crate::__pgrx_c_macros::Wrapping, _, _>(
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::expression::offset_of::<
-                            $crate::__pgrx_c_macros::expression::CRecord<$crate::GinPostingList>,
+                            $crate::__pgrx_c_macros::expression::CRecord<
+                                $crate::__pgrx_c_bindings::GinPostingList
+                            >,
                             $crate::__pgrx_c_field_marker!(@path; bytes)
                         >()
                     ),
@@ -35660,7 +37088,9 @@ macro_rules! SizeOfGinPostingList {
                                                             >(
                                                                 $crate::__pgrx_c_macros::CValue::<
                                                                     $crate::__pgrx_c_macros::CInt
-                                                                >::new($crate::ALIGNOF_SHORT as i32)
+                                                                >::new(
+                                                                    $crate::__pgrx_c_bindings::ALIGNOF_SHORT as i32
+                                                                )
                                                             )
                                                         ),
                                                         $crate::__pgrx_c_macros::expression::profile_value::<
@@ -35707,7 +37137,7 @@ macro_rules! SizeOfGinPostingList {
                                                                         $crate::__pgrx_c_macros::CValue::<
                                                                             $crate::__pgrx_c_macros::CInt
                                                                         >::new(
-                                                                            $crate::ALIGNOF_SHORT as i32
+                                                                            $crate::__pgrx_c_bindings::ALIGNOF_SHORT as i32
                                                                         )
                                                                     )
                                                                 ),
@@ -35750,6 +37180,7 @@ pub use GinDataLeafPageIsEmpty;
 pub use GinDataPageGetData;
 pub use GinDataPageGetPostingItem;
 pub use GinDataPageGetRightBound;
+pub use GinDataPageSetDataSize;
 pub use GinGetDownlink;
 pub use GinGetNPosting;
 pub use GinGetNullCategory;

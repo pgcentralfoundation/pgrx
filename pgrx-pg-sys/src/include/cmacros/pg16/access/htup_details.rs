@@ -5,8 +5,8 @@ This code is generated for documentation purposes, so that it is easy to referen
 // C macros from htup_details.h.
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -33,22 +33,34 @@ macro_rules! __pgrx_c_args_BITMAPLEN {
         $crate::__pgrx_c_args_BITMAPLEN!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_BITMAPLEN!(@p1 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_BITMAPLEN!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_BITMAPLEN!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_BITMAPLEN!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_BITMAPLEN!(@p1 $mode [$($done)* (@literal [- $argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_BITMAPLEN!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+            $($rest)*
+        )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_BITMAPLEN!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_BITMAPLEN!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $($raw:tt)*) => {
         $crate::__pgrx_c_args_BITMAPLEN!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_BITMAPLEN!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_BITMAPLEN!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -70,13 +82,20 @@ macro_rules! __pgrx_c_args_BITMAPLEN {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_BITMAPLEN!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_BITMAPLEN!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_BITMAPLEN!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_BITMAPLEN!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
-        $crate::__pgrx_c_args_BITMAPLEN!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_BITMAPLEN!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
         $crate::__pgrx_c_classify!(
@@ -98,10 +117,16 @@ macro_rules! __pgrx_c_args_BITMAPLEN {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_BITMAPLEN!(@p1 $mode [$($done)* (@literal [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_BITMAPLEN!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+            $($rest)*
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_BITMAPLEN!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_BITMAPLEN!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p1 $mode:ident [$($done:tt)*];) => {
         $crate::BITMAPLEN!(@$mode; $($done)*)
@@ -311,8 +336,8 @@ macro_rules! BITMAPLEN {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -339,22 +364,34 @@ macro_rules! __pgrx_c_args_GETSTRUCT {
         $crate::__pgrx_c_args_GETSTRUCT!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_GETSTRUCT!(@p1 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_GETSTRUCT!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_GETSTRUCT!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_GETSTRUCT!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_GETSTRUCT!(@p1 $mode [$($done)* (@literal [- $argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_GETSTRUCT!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+            $($rest)*
+        )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_GETSTRUCT!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_GETSTRUCT!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $($raw:tt)*) => {
         $crate::__pgrx_c_args_GETSTRUCT!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_GETSTRUCT!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_GETSTRUCT!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -376,13 +413,20 @@ macro_rules! __pgrx_c_args_GETSTRUCT {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_GETSTRUCT!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_GETSTRUCT!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_GETSTRUCT!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_GETSTRUCT!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
-        $crate::__pgrx_c_args_GETSTRUCT!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_GETSTRUCT!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
         $crate::__pgrx_c_classify!(
@@ -404,10 +448,16 @@ macro_rules! __pgrx_c_args_GETSTRUCT {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_GETSTRUCT!(@p1 $mode [$($done)* (@literal [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_GETSTRUCT!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+            $($rest)*
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_GETSTRUCT!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_GETSTRUCT!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p1 $mode:ident [$($done:tt)*];) => {
         $crate::GETSTRUCT!(@$mode; $($done)*)
@@ -731,8 +781,8 @@ macro_rules! GETSTRUCT {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -763,21 +813,23 @@ macro_rules! __pgrx_c_args_HEAP_LOCKED_UPGRADED {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
         $crate::__pgrx_c_args_HEAP_LOCKED_UPGRADED!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_HEAP_LOCKED_UPGRADED!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_HEAP_LOCKED_UPGRADED!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HEAP_LOCKED_UPGRADED!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HEAP_LOCKED_UPGRADED!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -785,7 +837,9 @@ macro_rules! __pgrx_c_args_HEAP_LOCKED_UPGRADED {
         $crate::__pgrx_c_args_HEAP_LOCKED_UPGRADED!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_HEAP_LOCKED_UPGRADED!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_HEAP_LOCKED_UPGRADED!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -807,14 +861,18 @@ macro_rules! __pgrx_c_args_HEAP_LOCKED_UPGRADED {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_HEAP_LOCKED_UPGRADED!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_HEAP_LOCKED_UPGRADED!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_HEAP_LOCKED_UPGRADED!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_HEAP_LOCKED_UPGRADED!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_HEAP_LOCKED_UPGRADED!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -841,13 +899,13 @@ macro_rules! __pgrx_c_args_HEAP_LOCKED_UPGRADED {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HEAP_LOCKED_UPGRADED!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HEAP_LOCKED_UPGRADED!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -919,7 +977,7 @@ macro_rules! HEAP_LOCKED_UPGRADED {
                                                             $crate::__pgrx_c_macros::CValue::<
                                                                 $crate::__pgrx_c_macros::CInt
                                                             >::new(
-                                                                $crate::HEAP_XMAX_IS_MULTI as i32
+                                                                $crate::__pgrx_c_bindings::HEAP_XMAX_IS_MULTI as i32
                                                             )
                                                         )
                                                     )
@@ -964,7 +1022,7 @@ macro_rules! HEAP_LOCKED_UPGRADED {
                                                             $crate::__pgrx_c_macros::CValue::<
                                                                 $crate::__pgrx_c_macros::CInt
                                                             >::new(
-                                                                $crate::HEAP_XMAX_LOCK_ONLY as i32
+                                                                $crate::__pgrx_c_bindings::HEAP_XMAX_LOCK_ONLY as i32
                                                             )
                                                         )
                                                     )
@@ -1023,7 +1081,7 @@ macro_rules! HEAP_LOCKED_UPGRADED {
                                                                 $crate::__pgrx_c_macros::CValue::<
                                                                     $crate::__pgrx_c_macros::CInt
                                                                 >::new(
-                                                                    $crate::HEAP_XMAX_EXCL_LOCK as i32
+                                                                    $crate::__pgrx_c_bindings::HEAP_XMAX_EXCL_LOCK as i32
                                                                 )
                                                             ),
                                                             $crate::__pgrx_c_macros::expression::profile_value::<
@@ -1033,7 +1091,7 @@ macro_rules! HEAP_LOCKED_UPGRADED {
                                                                 $crate::__pgrx_c_macros::CValue::<
                                                                     $crate::__pgrx_c_macros::CInt
                                                                 >::new(
-                                                                    $crate::HEAP_XMAX_KEYSHR_LOCK as i32
+                                                                    $crate::__pgrx_c_bindings::HEAP_XMAX_KEYSHR_LOCK as i32
                                                                 )
                                                             )
                                                         )
@@ -1123,7 +1181,7 @@ macro_rules! HEAP_LOCKED_UPGRADED {
                                                                         $crate::__pgrx_c_macros::CValue::<
                                                                             $crate::__pgrx_c_macros::CInt
                                                                         >::new(
-                                                                            $crate::HEAP_XMAX_IS_MULTI as i32
+                                                                            $crate::__pgrx_c_bindings::HEAP_XMAX_IS_MULTI as i32
                                                                         )
                                                                     )
                                                                 )
@@ -1171,7 +1229,7 @@ macro_rules! HEAP_LOCKED_UPGRADED {
                                                                         $crate::__pgrx_c_macros::CValue::<
                                                                             $crate::__pgrx_c_macros::CInt
                                                                         >::new(
-                                                                            $crate::HEAP_XMAX_LOCK_ONLY as i32
+                                                                            $crate::__pgrx_c_bindings::HEAP_XMAX_LOCK_ONLY as i32
                                                                         )
                                                                     )
                                                                 )
@@ -1233,7 +1291,7 @@ macro_rules! HEAP_LOCKED_UPGRADED {
                                                                             $crate::__pgrx_c_macros::CValue::<
                                                                                 $crate::__pgrx_c_macros::CInt
                                                                             >::new(
-                                                                                $crate::HEAP_XMAX_EXCL_LOCK as i32
+                                                                                $crate::__pgrx_c_bindings::HEAP_XMAX_EXCL_LOCK as i32
                                                                             )
                                                                         ),
                                                                         $crate::__pgrx_c_macros::expression::profile_value::<
@@ -1243,7 +1301,7 @@ macro_rules! HEAP_LOCKED_UPGRADED {
                                                                             $crate::__pgrx_c_macros::CValue::<
                                                                                 $crate::__pgrx_c_macros::CInt
                                                                             >::new(
-                                                                                $crate::HEAP_XMAX_KEYSHR_LOCK as i32
+                                                                                $crate::__pgrx_c_bindings::HEAP_XMAX_KEYSHR_LOCK as i32
                                                                             )
                                                                         )
                                                                     )
@@ -1316,7 +1374,7 @@ macro_rules! HEAP_LOCKED_UPGRADED {
                                                             $crate::__pgrx_c_macros::CValue::<
                                                                 $crate::__pgrx_c_macros::CInt
                                                             >::new(
-                                                                $crate::HEAP_XMAX_IS_MULTI as i32
+                                                                $crate::__pgrx_c_bindings::HEAP_XMAX_IS_MULTI as i32
                                                             )
                                                         )
                                                     )
@@ -1361,7 +1419,7 @@ macro_rules! HEAP_LOCKED_UPGRADED {
                                                             $crate::__pgrx_c_macros::CValue::<
                                                                 $crate::__pgrx_c_macros::CInt
                                                             >::new(
-                                                                $crate::HEAP_XMAX_LOCK_ONLY as i32
+                                                                $crate::__pgrx_c_bindings::HEAP_XMAX_LOCK_ONLY as i32
                                                             )
                                                         )
                                                     )
@@ -1420,7 +1478,7 @@ macro_rules! HEAP_LOCKED_UPGRADED {
                                                                 $crate::__pgrx_c_macros::CValue::<
                                                                     $crate::__pgrx_c_macros::CInt
                                                                 >::new(
-                                                                    $crate::HEAP_XMAX_EXCL_LOCK as i32
+                                                                    $crate::__pgrx_c_bindings::HEAP_XMAX_EXCL_LOCK as i32
                                                                 )
                                                             ),
                                                             $crate::__pgrx_c_macros::expression::profile_value::<
@@ -1430,7 +1488,7 @@ macro_rules! HEAP_LOCKED_UPGRADED {
                                                                 $crate::__pgrx_c_macros::CValue::<
                                                                     $crate::__pgrx_c_macros::CInt
                                                                 >::new(
-                                                                    $crate::HEAP_XMAX_KEYSHR_LOCK as i32
+                                                                    $crate::__pgrx_c_bindings::HEAP_XMAX_KEYSHR_LOCK as i32
                                                                 )
                                                             )
                                                         )
@@ -1467,8 +1525,8 @@ macro_rules! HEAP_LOCKED_UPGRADED {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -1499,23 +1557,23 @@ macro_rules! __pgrx_c_args_HEAP_XMAX_IS_EXCL_LOCKED {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
         $crate::__pgrx_c_args_HEAP_XMAX_IS_EXCL_LOCKED!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_HEAP_XMAX_IS_EXCL_LOCKED!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HEAP_XMAX_IS_EXCL_LOCKED!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HEAP_XMAX_IS_EXCL_LOCKED!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -1524,7 +1582,7 @@ macro_rules! __pgrx_c_args_HEAP_XMAX_IS_EXCL_LOCKED {
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
         $crate::__pgrx_c_args_HEAP_XMAX_IS_EXCL_LOCKED!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
@@ -1550,17 +1608,17 @@ macro_rules! __pgrx_c_args_HEAP_XMAX_IS_EXCL_LOCKED {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_HEAP_XMAX_IS_EXCL_LOCKED!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_HEAP_XMAX_IS_EXCL_LOCKED!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_HEAP_XMAX_IS_EXCL_LOCKED!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -1587,13 +1645,13 @@ macro_rules! __pgrx_c_args_HEAP_XMAX_IS_EXCL_LOCKED {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HEAP_XMAX_IS_EXCL_LOCKED!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HEAP_XMAX_IS_EXCL_LOCKED!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -1648,7 +1706,7 @@ macro_rules! HEAP_XMAX_IS_EXCL_LOCKED {
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                        $crate::HEAP_LOCK_MASK as i32
+                                        $crate::__pgrx_c_bindings::HEAP_LOCK_MASK as i32
                                     )
                                 )
                             )
@@ -1656,7 +1714,7 @@ macro_rules! HEAP_XMAX_IS_EXCL_LOCKED {
                     ),
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                            $crate::HEAP_XMAX_EXCL_LOCK as i32
+                            $crate::__pgrx_c_bindings::HEAP_XMAX_EXCL_LOCK as i32
                         )
                     )
                 )
@@ -1713,14 +1771,16 @@ macro_rules! HEAP_XMAX_IS_EXCL_LOCKED {
                                             >(
                                                 $crate::__pgrx_c_macros::CValue::<
                                                     $crate::__pgrx_c_macros::CInt
-                                                >::new($crate::HEAP_LOCK_MASK as i32)
+                                                >::new(
+                                                    $crate::__pgrx_c_bindings::HEAP_LOCK_MASK as i32
+                                                )
                                             )
                                         )
                                     )
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                        $crate::HEAP_XMAX_EXCL_LOCK as i32
+                                        $crate::__pgrx_c_bindings::HEAP_XMAX_EXCL_LOCK as i32
                                     )
                                 )
                             )
@@ -1749,7 +1809,7 @@ macro_rules! HEAP_XMAX_IS_EXCL_LOCKED {
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                        $crate::HEAP_LOCK_MASK as i32
+                                        $crate::__pgrx_c_bindings::HEAP_LOCK_MASK as i32
                                     )
                                 )
                             )
@@ -1757,7 +1817,7 @@ macro_rules! HEAP_XMAX_IS_EXCL_LOCKED {
                     ),
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                            $crate::HEAP_XMAX_EXCL_LOCK as i32
+                            $crate::__pgrx_c_bindings::HEAP_XMAX_EXCL_LOCK as i32
                         )
                     )
                 )
@@ -1773,8 +1833,8 @@ macro_rules! HEAP_XMAX_IS_EXCL_LOCKED {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -1805,23 +1865,23 @@ macro_rules! __pgrx_c_args_HEAP_XMAX_IS_KEYSHR_LOCKED {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
         $crate::__pgrx_c_args_HEAP_XMAX_IS_KEYSHR_LOCKED!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_HEAP_XMAX_IS_KEYSHR_LOCKED!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HEAP_XMAX_IS_KEYSHR_LOCKED!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HEAP_XMAX_IS_KEYSHR_LOCKED!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -1830,7 +1890,7 @@ macro_rules! __pgrx_c_args_HEAP_XMAX_IS_KEYSHR_LOCKED {
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
         $crate::__pgrx_c_args_HEAP_XMAX_IS_KEYSHR_LOCKED!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
@@ -1856,17 +1916,17 @@ macro_rules! __pgrx_c_args_HEAP_XMAX_IS_KEYSHR_LOCKED {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_HEAP_XMAX_IS_KEYSHR_LOCKED!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_HEAP_XMAX_IS_KEYSHR_LOCKED!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_HEAP_XMAX_IS_KEYSHR_LOCKED!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -1893,13 +1953,13 @@ macro_rules! __pgrx_c_args_HEAP_XMAX_IS_KEYSHR_LOCKED {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HEAP_XMAX_IS_KEYSHR_LOCKED!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HEAP_XMAX_IS_KEYSHR_LOCKED!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -1954,7 +2014,7 @@ macro_rules! HEAP_XMAX_IS_KEYSHR_LOCKED {
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                        $crate::HEAP_LOCK_MASK as i32
+                                        $crate::__pgrx_c_bindings::HEAP_LOCK_MASK as i32
                                     )
                                 )
                             )
@@ -1962,7 +2022,7 @@ macro_rules! HEAP_XMAX_IS_KEYSHR_LOCKED {
                     ),
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                            $crate::HEAP_XMAX_KEYSHR_LOCK as i32
+                            $crate::__pgrx_c_bindings::HEAP_XMAX_KEYSHR_LOCK as i32
                         )
                     )
                 )
@@ -2019,14 +2079,16 @@ macro_rules! HEAP_XMAX_IS_KEYSHR_LOCKED {
                                             >(
                                                 $crate::__pgrx_c_macros::CValue::<
                                                     $crate::__pgrx_c_macros::CInt
-                                                >::new($crate::HEAP_LOCK_MASK as i32)
+                                                >::new(
+                                                    $crate::__pgrx_c_bindings::HEAP_LOCK_MASK as i32
+                                                )
                                             )
                                         )
                                     )
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                        $crate::HEAP_XMAX_KEYSHR_LOCK as i32
+                                        $crate::__pgrx_c_bindings::HEAP_XMAX_KEYSHR_LOCK as i32
                                     )
                                 )
                             )
@@ -2055,7 +2117,7 @@ macro_rules! HEAP_XMAX_IS_KEYSHR_LOCKED {
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                        $crate::HEAP_LOCK_MASK as i32
+                                        $crate::__pgrx_c_bindings::HEAP_LOCK_MASK as i32
                                     )
                                 )
                             )
@@ -2063,7 +2125,7 @@ macro_rules! HEAP_XMAX_IS_KEYSHR_LOCKED {
                     ),
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                            $crate::HEAP_XMAX_KEYSHR_LOCK as i32
+                            $crate::__pgrx_c_bindings::HEAP_XMAX_KEYSHR_LOCK as i32
                         )
                     )
                 )
@@ -2079,8 +2141,8 @@ macro_rules! HEAP_XMAX_IS_KEYSHR_LOCKED {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -2111,23 +2173,23 @@ macro_rules! __pgrx_c_args_HEAP_XMAX_IS_LOCKED_ONLY {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
         $crate::__pgrx_c_args_HEAP_XMAX_IS_LOCKED_ONLY!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_HEAP_XMAX_IS_LOCKED_ONLY!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HEAP_XMAX_IS_LOCKED_ONLY!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HEAP_XMAX_IS_LOCKED_ONLY!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -2136,7 +2198,7 @@ macro_rules! __pgrx_c_args_HEAP_XMAX_IS_LOCKED_ONLY {
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
         $crate::__pgrx_c_args_HEAP_XMAX_IS_LOCKED_ONLY!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
@@ -2162,17 +2224,17 @@ macro_rules! __pgrx_c_args_HEAP_XMAX_IS_LOCKED_ONLY {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_HEAP_XMAX_IS_LOCKED_ONLY!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_HEAP_XMAX_IS_LOCKED_ONLY!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_HEAP_XMAX_IS_LOCKED_ONLY!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -2199,13 +2261,13 @@ macro_rules! __pgrx_c_args_HEAP_XMAX_IS_LOCKED_ONLY {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HEAP_XMAX_IS_LOCKED_ONLY!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HEAP_XMAX_IS_LOCKED_ONLY!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -2263,7 +2325,9 @@ macro_rules! HEAP_XMAX_IS_LOCKED_ONLY {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::CValue::<
                                             $crate::__pgrx_c_macros::CInt
-                                        >::new($crate::HEAP_XMAX_LOCK_ONLY as i32)
+                                        >::new(
+                                            $crate::__pgrx_c_bindings::HEAP_XMAX_LOCK_ONLY as i32
+                                        )
                                     )
                                 )
                             )
@@ -2302,7 +2366,7 @@ macro_rules! HEAP_XMAX_IS_LOCKED_ONLY {
                                                                 $crate::__pgrx_c_macros::CValue::<
                                                                     $crate::__pgrx_c_macros::CInt
                                                                 >::new(
-                                                                    $crate::HEAP_XMAX_IS_MULTI as i32
+                                                                    $crate::__pgrx_c_bindings::HEAP_XMAX_IS_MULTI as i32
                                                                 )
                                                             ),
                                                             $crate::__pgrx_c_macros::expression::profile_value::<
@@ -2312,7 +2376,7 @@ macro_rules! HEAP_XMAX_IS_LOCKED_ONLY {
                                                                 $crate::__pgrx_c_macros::CValue::<
                                                                     $crate::__pgrx_c_macros::CInt
                                                                 >::new(
-                                                                    $crate::HEAP_LOCK_MASK as i32
+                                                                    $crate::__pgrx_c_bindings::HEAP_LOCK_MASK as i32
                                                                 )
                                                             )
                                                         )
@@ -2324,7 +2388,9 @@ macro_rules! HEAP_XMAX_IS_LOCKED_ONLY {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::CValue::<
                                             $crate::__pgrx_c_macros::CInt
-                                        >::new($crate::HEAP_XMAX_EXCL_LOCK as i32)
+                                        >::new(
+                                            $crate::__pgrx_c_bindings::HEAP_XMAX_EXCL_LOCK as i32
+                                        )
                                     )
                                 )
                             )
@@ -2392,7 +2458,9 @@ macro_rules! HEAP_XMAX_IS_LOCKED_ONLY {
                                                 >(
                                                     $crate::__pgrx_c_macros::CValue::<
                                                         $crate::__pgrx_c_macros::CInt
-                                                    >::new($crate::HEAP_XMAX_LOCK_ONLY as i32)
+                                                    >::new(
+                                                        $crate::__pgrx_c_bindings::HEAP_XMAX_LOCK_ONLY as i32
+                                                    )
                                                 )
                                             )
                                         )
@@ -2434,7 +2502,7 @@ macro_rules! HEAP_XMAX_IS_LOCKED_ONLY {
                                                                             $crate::__pgrx_c_macros::CValue::<
                                                                                 $crate::__pgrx_c_macros::CInt
                                                                             >::new(
-                                                                                $crate::HEAP_XMAX_IS_MULTI as i32
+                                                                                $crate::__pgrx_c_bindings::HEAP_XMAX_IS_MULTI as i32
                                                                             )
                                                                         ),
                                                                         $crate::__pgrx_c_macros::expression::profile_value::<
@@ -2444,7 +2512,7 @@ macro_rules! HEAP_XMAX_IS_LOCKED_ONLY {
                                                                             $crate::__pgrx_c_macros::CValue::<
                                                                                 $crate::__pgrx_c_macros::CInt
                                                                             >::new(
-                                                                                $crate::HEAP_LOCK_MASK as i32
+                                                                                $crate::__pgrx_c_bindings::HEAP_LOCK_MASK as i32
                                                                             )
                                                                         )
                                                                     )
@@ -2459,7 +2527,9 @@ macro_rules! HEAP_XMAX_IS_LOCKED_ONLY {
                                                 >(
                                                     $crate::__pgrx_c_macros::CValue::<
                                                         $crate::__pgrx_c_macros::CInt
-                                                    >::new($crate::HEAP_XMAX_EXCL_LOCK as i32)
+                                                    >::new(
+                                                        $crate::__pgrx_c_bindings::HEAP_XMAX_EXCL_LOCK as i32
+                                                    )
                                                 )
                                             )
                                         )
@@ -2498,7 +2568,9 @@ macro_rules! HEAP_XMAX_IS_LOCKED_ONLY {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::CValue::<
                                             $crate::__pgrx_c_macros::CInt
-                                        >::new($crate::HEAP_XMAX_LOCK_ONLY as i32)
+                                        >::new(
+                                            $crate::__pgrx_c_bindings::HEAP_XMAX_LOCK_ONLY as i32
+                                        )
                                     )
                                 )
                             )
@@ -2537,7 +2609,7 @@ macro_rules! HEAP_XMAX_IS_LOCKED_ONLY {
                                                                 $crate::__pgrx_c_macros::CValue::<
                                                                     $crate::__pgrx_c_macros::CInt
                                                                 >::new(
-                                                                    $crate::HEAP_XMAX_IS_MULTI as i32
+                                                                    $crate::__pgrx_c_bindings::HEAP_XMAX_IS_MULTI as i32
                                                                 )
                                                             ),
                                                             $crate::__pgrx_c_macros::expression::profile_value::<
@@ -2547,7 +2619,7 @@ macro_rules! HEAP_XMAX_IS_LOCKED_ONLY {
                                                                 $crate::__pgrx_c_macros::CValue::<
                                                                     $crate::__pgrx_c_macros::CInt
                                                                 >::new(
-                                                                    $crate::HEAP_LOCK_MASK as i32
+                                                                    $crate::__pgrx_c_bindings::HEAP_LOCK_MASK as i32
                                                                 )
                                                             )
                                                         )
@@ -2559,7 +2631,9 @@ macro_rules! HEAP_XMAX_IS_LOCKED_ONLY {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::CValue::<
                                             $crate::__pgrx_c_macros::CInt
-                                        >::new($crate::HEAP_XMAX_EXCL_LOCK as i32)
+                                        >::new(
+                                            $crate::__pgrx_c_bindings::HEAP_XMAX_EXCL_LOCK as i32
+                                        )
                                     )
                                 )
                             )
@@ -2582,8 +2656,8 @@ macro_rules! HEAP_XMAX_IS_LOCKED_ONLY {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -2614,23 +2688,23 @@ macro_rules! __pgrx_c_args_HEAP_XMAX_IS_SHR_LOCKED {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
         $crate::__pgrx_c_args_HEAP_XMAX_IS_SHR_LOCKED!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_HEAP_XMAX_IS_SHR_LOCKED!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HEAP_XMAX_IS_SHR_LOCKED!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HEAP_XMAX_IS_SHR_LOCKED!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -2639,7 +2713,7 @@ macro_rules! __pgrx_c_args_HEAP_XMAX_IS_SHR_LOCKED {
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
         $crate::__pgrx_c_args_HEAP_XMAX_IS_SHR_LOCKED!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
@@ -2665,17 +2739,17 @@ macro_rules! __pgrx_c_args_HEAP_XMAX_IS_SHR_LOCKED {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_HEAP_XMAX_IS_SHR_LOCKED!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_HEAP_XMAX_IS_SHR_LOCKED!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_HEAP_XMAX_IS_SHR_LOCKED!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -2702,13 +2776,13 @@ macro_rules! __pgrx_c_args_HEAP_XMAX_IS_SHR_LOCKED {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HEAP_XMAX_IS_SHR_LOCKED!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HEAP_XMAX_IS_SHR_LOCKED!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -2763,7 +2837,7 @@ macro_rules! HEAP_XMAX_IS_SHR_LOCKED {
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                        $crate::HEAP_LOCK_MASK as i32
+                                        $crate::__pgrx_c_bindings::HEAP_LOCK_MASK as i32
                                     )
                                 )
                             )
@@ -2771,7 +2845,7 @@ macro_rules! HEAP_XMAX_IS_SHR_LOCKED {
                     ),
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                            $crate::HEAP_XMAX_SHR_LOCK as i32
+                            $crate::__pgrx_c_bindings::HEAP_XMAX_SHR_LOCK as i32
                         )
                     )
                 )
@@ -2825,14 +2899,16 @@ macro_rules! HEAP_XMAX_IS_SHR_LOCKED {
                                             >(
                                                 $crate::__pgrx_c_macros::CValue::<
                                                     $crate::__pgrx_c_macros::CInt
-                                                >::new($crate::HEAP_LOCK_MASK as i32)
+                                                >::new(
+                                                    $crate::__pgrx_c_bindings::HEAP_LOCK_MASK as i32
+                                                )
                                             )
                                         )
                                     )
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                        $crate::HEAP_XMAX_SHR_LOCK as i32
+                                        $crate::__pgrx_c_bindings::HEAP_XMAX_SHR_LOCK as i32
                                     )
                                 )
                             )
@@ -2861,7 +2937,7 @@ macro_rules! HEAP_XMAX_IS_SHR_LOCKED {
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                        $crate::HEAP_LOCK_MASK as i32
+                                        $crate::__pgrx_c_bindings::HEAP_LOCK_MASK as i32
                                     )
                                 )
                             )
@@ -2869,7 +2945,7 @@ macro_rules! HEAP_XMAX_IS_SHR_LOCKED {
                     ),
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                            $crate::HEAP_XMAX_SHR_LOCK as i32
+                            $crate::__pgrx_c_bindings::HEAP_XMAX_SHR_LOCK as i32
                         )
                     )
                 )
@@ -2885,8 +2961,8 @@ macro_rules! HEAP_XMAX_IS_SHR_LOCKED {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -2913,20 +2989,24 @@ macro_rules! __pgrx_c_args_HeapTupleAllFixed {
         $crate::__pgrx_c_args_HeapTupleAllFixed!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_HeapTupleAllFixed!(@p1 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_HeapTupleAllFixed!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_HeapTupleAllFixed!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_HeapTupleAllFixed!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleAllFixed!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleAllFixed!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -2934,7 +3014,9 @@ macro_rules! __pgrx_c_args_HeapTupleAllFixed {
         $crate::__pgrx_c_args_HeapTupleAllFixed!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_HeapTupleAllFixed!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_HeapTupleAllFixed!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -2956,14 +3038,18 @@ macro_rules! __pgrx_c_args_HeapTupleAllFixed {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_HeapTupleAllFixed!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_HeapTupleAllFixed!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_HeapTupleAllFixed!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_HeapTupleAllFixed!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleAllFixed!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -2990,13 +3076,13 @@ macro_rules! __pgrx_c_args_HeapTupleAllFixed {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleAllFixed!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleAllFixed!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -3081,7 +3167,7 @@ macro_rules! HeapTupleAllFixed {
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                        $crate::HEAP_HASVARWIDTH as i32
+                                        $crate::__pgrx_c_bindings::HEAP_HASVARWIDTH as i32
                                     )
                                 )
                             )
@@ -3170,7 +3256,9 @@ macro_rules! HeapTupleAllFixed {
                                             >(
                                                 $crate::__pgrx_c_macros::CValue::<
                                                     $crate::__pgrx_c_macros::CInt
-                                                >::new($crate::HEAP_HASVARWIDTH as i32)
+                                                >::new(
+                                                    $crate::__pgrx_c_bindings::HEAP_HASVARWIDTH as i32
+                                                )
                                             )
                                         )
                                     )
@@ -3234,7 +3322,7 @@ macro_rules! HeapTupleAllFixed {
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                        $crate::HEAP_HASVARWIDTH as i32
+                                        $crate::__pgrx_c_bindings::HEAP_HASVARWIDTH as i32
                                     )
                                 )
                             )
@@ -3253,8 +3341,8 @@ macro_rules! HeapTupleAllFixed {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -3285,21 +3373,23 @@ macro_rules! __pgrx_c_args_HeapTupleClearHeapOnly {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
         $crate::__pgrx_c_args_HeapTupleClearHeapOnly!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_HeapTupleClearHeapOnly!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_HeapTupleClearHeapOnly!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleClearHeapOnly!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleClearHeapOnly!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -3307,7 +3397,9 @@ macro_rules! __pgrx_c_args_HeapTupleClearHeapOnly {
         $crate::__pgrx_c_args_HeapTupleClearHeapOnly!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_HeapTupleClearHeapOnly!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_HeapTupleClearHeapOnly!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -3332,15 +3424,17 @@ macro_rules! __pgrx_c_args_HeapTupleClearHeapOnly {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_HeapTupleClearHeapOnly!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_HeapTupleClearHeapOnly!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_HeapTupleClearHeapOnly!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleClearHeapOnly!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -3367,13 +3461,13 @@ macro_rules! __pgrx_c_args_HeapTupleClearHeapOnly {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleClearHeapOnly!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleClearHeapOnly!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -3456,7 +3550,7 @@ macro_rules! HeapTupleClearHeapOnly {
                         $crate::__pgrx_c_macros::expression::bitnot(
                             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                 $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                    $crate::HEAP_ONLY_TUPLE as i32
+                                    $crate::__pgrx_c_bindings::HEAP_ONLY_TUPLE as i32
                                 )
                             )
                         )
@@ -3539,7 +3633,9 @@ macro_rules! HeapTupleClearHeapOnly {
                                         >(
                                             $crate::__pgrx_c_macros::CValue::<
                                                 $crate::__pgrx_c_macros::CInt
-                                            >::new($crate::HEAP_ONLY_TUPLE as i32)
+                                            >::new(
+                                                $crate::__pgrx_c_bindings::HEAP_ONLY_TUPLE as i32
+                                            )
                                         )
                                     )
                                 ),
@@ -3602,7 +3698,7 @@ macro_rules! HeapTupleClearHeapOnly {
                         $crate::__pgrx_c_macros::expression::bitnot(
                             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                 $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                    $crate::HEAP_ONLY_TUPLE as i32
+                                    $crate::__pgrx_c_bindings::HEAP_ONLY_TUPLE as i32
                                 )
                             )
                         )
@@ -3622,8 +3718,8 @@ macro_rules! HeapTupleClearHeapOnly {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -3654,23 +3750,23 @@ macro_rules! __pgrx_c_args_HeapTupleClearHotUpdated {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
         $crate::__pgrx_c_args_HeapTupleClearHotUpdated!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_HeapTupleClearHotUpdated!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleClearHotUpdated!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleClearHotUpdated!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -3679,7 +3775,7 @@ macro_rules! __pgrx_c_args_HeapTupleClearHotUpdated {
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
         $crate::__pgrx_c_args_HeapTupleClearHotUpdated!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
@@ -3705,17 +3801,17 @@ macro_rules! __pgrx_c_args_HeapTupleClearHotUpdated {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_HeapTupleClearHotUpdated!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_HeapTupleClearHotUpdated!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleClearHotUpdated!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -3742,13 +3838,13 @@ macro_rules! __pgrx_c_args_HeapTupleClearHotUpdated {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleClearHotUpdated!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleClearHotUpdated!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -3831,7 +3927,7 @@ macro_rules! HeapTupleClearHotUpdated {
                         $crate::__pgrx_c_macros::expression::bitnot(
                             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                 $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                    $crate::HEAP_HOT_UPDATED as i32
+                                    $crate::__pgrx_c_bindings::HEAP_HOT_UPDATED as i32
                                 )
                             )
                         )
@@ -3917,7 +4013,9 @@ macro_rules! HeapTupleClearHotUpdated {
                                         >(
                                             $crate::__pgrx_c_macros::CValue::<
                                                 $crate::__pgrx_c_macros::CInt
-                                            >::new($crate::HEAP_HOT_UPDATED as i32)
+                                            >::new(
+                                                $crate::__pgrx_c_bindings::HEAP_HOT_UPDATED as i32
+                                            )
                                         )
                                     )
                                 ),
@@ -3980,7 +4078,7 @@ macro_rules! HeapTupleClearHotUpdated {
                         $crate::__pgrx_c_macros::expression::bitnot(
                             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                 $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                    $crate::HEAP_HOT_UPDATED as i32
+                                    $crate::__pgrx_c_bindings::HEAP_HOT_UPDATED as i32
                                 )
                             )
                         )
@@ -4000,8 +4098,8 @@ macro_rules! HeapTupleClearHotUpdated {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -4032,21 +4130,23 @@ macro_rules! __pgrx_c_args_HeapTupleHasExternal {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
         $crate::__pgrx_c_args_HeapTupleHasExternal!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_HeapTupleHasExternal!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_HeapTupleHasExternal!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHasExternal!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHasExternal!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -4054,7 +4154,9 @@ macro_rules! __pgrx_c_args_HeapTupleHasExternal {
         $crate::__pgrx_c_args_HeapTupleHasExternal!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_HeapTupleHasExternal!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_HeapTupleHasExternal!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -4076,14 +4178,18 @@ macro_rules! __pgrx_c_args_HeapTupleHasExternal {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_HeapTupleHasExternal!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_HeapTupleHasExternal!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_HeapTupleHasExternal!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_HeapTupleHasExternal!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHasExternal!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -4110,13 +4216,13 @@ macro_rules! __pgrx_c_args_HeapTupleHasExternal {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHasExternal!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHasExternal!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -4201,7 +4307,7 @@ macro_rules! HeapTupleHasExternal {
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                        $crate::HEAP_HASEXTERNAL as i32
+                                        $crate::__pgrx_c_bindings::HEAP_HASEXTERNAL as i32
                                     )
                                 )
                             )
@@ -4297,7 +4403,9 @@ macro_rules! HeapTupleHasExternal {
                                             >(
                                                 $crate::__pgrx_c_macros::CValue::<
                                                     $crate::__pgrx_c_macros::CInt
-                                                >::new($crate::HEAP_HASEXTERNAL as i32)
+                                                >::new(
+                                                    $crate::__pgrx_c_bindings::HEAP_HASEXTERNAL as i32
+                                                )
                                             )
                                         )
                                     )
@@ -4368,7 +4476,7 @@ macro_rules! HeapTupleHasExternal {
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                        $crate::HEAP_HASEXTERNAL as i32
+                                        $crate::__pgrx_c_bindings::HEAP_HASEXTERNAL as i32
                                     )
                                 )
                             )
@@ -4394,8 +4502,8 @@ macro_rules! HeapTupleHasExternal {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -4422,20 +4530,24 @@ macro_rules! __pgrx_c_args_HeapTupleHasNulls {
         $crate::__pgrx_c_args_HeapTupleHasNulls!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_HeapTupleHasNulls!(@p1 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_HeapTupleHasNulls!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_HeapTupleHasNulls!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_HeapTupleHasNulls!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHasNulls!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHasNulls!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -4443,7 +4555,9 @@ macro_rules! __pgrx_c_args_HeapTupleHasNulls {
         $crate::__pgrx_c_args_HeapTupleHasNulls!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_HeapTupleHasNulls!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_HeapTupleHasNulls!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -4465,14 +4579,18 @@ macro_rules! __pgrx_c_args_HeapTupleHasNulls {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_HeapTupleHasNulls!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_HeapTupleHasNulls!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_HeapTupleHasNulls!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_HeapTupleHasNulls!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHasNulls!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -4499,13 +4617,13 @@ macro_rules! __pgrx_c_args_HeapTupleHasNulls {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHasNulls!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHasNulls!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -4590,7 +4708,7 @@ macro_rules! HeapTupleHasNulls {
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                        $crate::HEAP_HASNULL as i32
+                                        $crate::__pgrx_c_bindings::HEAP_HASNULL as i32
                                     )
                                 )
                             )
@@ -4686,7 +4804,9 @@ macro_rules! HeapTupleHasNulls {
                                             >(
                                                 $crate::__pgrx_c_macros::CValue::<
                                                     $crate::__pgrx_c_macros::CInt
-                                                >::new($crate::HEAP_HASNULL as i32)
+                                                >::new(
+                                                    $crate::__pgrx_c_bindings::HEAP_HASNULL as i32
+                                                )
                                             )
                                         )
                                     )
@@ -4757,7 +4877,7 @@ macro_rules! HeapTupleHasNulls {
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                        $crate::HEAP_HASNULL as i32
+                                        $crate::__pgrx_c_bindings::HEAP_HASNULL as i32
                                     )
                                 )
                             )
@@ -4783,8 +4903,8 @@ macro_rules! HeapTupleHasNulls {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -4815,21 +4935,23 @@ macro_rules! __pgrx_c_args_HeapTupleHasVarWidth {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
         $crate::__pgrx_c_args_HeapTupleHasVarWidth!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_HeapTupleHasVarWidth!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_HeapTupleHasVarWidth!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHasVarWidth!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHasVarWidth!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -4837,7 +4959,9 @@ macro_rules! __pgrx_c_args_HeapTupleHasVarWidth {
         $crate::__pgrx_c_args_HeapTupleHasVarWidth!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_HeapTupleHasVarWidth!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_HeapTupleHasVarWidth!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -4859,14 +4983,18 @@ macro_rules! __pgrx_c_args_HeapTupleHasVarWidth {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_HeapTupleHasVarWidth!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_HeapTupleHasVarWidth!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_HeapTupleHasVarWidth!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_HeapTupleHasVarWidth!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHasVarWidth!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -4893,13 +5021,13 @@ macro_rules! __pgrx_c_args_HeapTupleHasVarWidth {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHasVarWidth!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHasVarWidth!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -4984,7 +5112,7 @@ macro_rules! HeapTupleHasVarWidth {
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                        $crate::HEAP_HASVARWIDTH as i32
+                                        $crate::__pgrx_c_bindings::HEAP_HASVARWIDTH as i32
                                     )
                                 )
                             )
@@ -5080,7 +5208,9 @@ macro_rules! HeapTupleHasVarWidth {
                                             >(
                                                 $crate::__pgrx_c_macros::CValue::<
                                                     $crate::__pgrx_c_macros::CInt
-                                                >::new($crate::HEAP_HASVARWIDTH as i32)
+                                                >::new(
+                                                    $crate::__pgrx_c_bindings::HEAP_HASVARWIDTH as i32
+                                                )
                                             )
                                         )
                                     )
@@ -5151,7 +5281,7 @@ macro_rules! HeapTupleHasVarWidth {
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                        $crate::HEAP_HASVARWIDTH as i32
+                                        $crate::__pgrx_c_bindings::HEAP_HASVARWIDTH as i32
                                     )
                                 )
                             )
@@ -5177,8 +5307,8 @@ macro_rules! HeapTupleHasVarWidth {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -5209,23 +5339,23 @@ macro_rules! __pgrx_c_args_HeapTupleHeaderClearHeapOnly {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
         $crate::__pgrx_c_args_HeapTupleHeaderClearHeapOnly!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_HeapTupleHeaderClearHeapOnly!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderClearHeapOnly!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderClearHeapOnly!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -5237,7 +5367,7 @@ macro_rules! __pgrx_c_args_HeapTupleHeaderClearHeapOnly {
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
         $crate::__pgrx_c_args_HeapTupleHeaderClearHeapOnly!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
@@ -5263,17 +5393,17 @@ macro_rules! __pgrx_c_args_HeapTupleHeaderClearHeapOnly {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_HeapTupleHeaderClearHeapOnly!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_HeapTupleHeaderClearHeapOnly!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderClearHeapOnly!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -5300,13 +5430,13 @@ macro_rules! __pgrx_c_args_HeapTupleHeaderClearHeapOnly {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderClearHeapOnly!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderClearHeapOnly!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -5368,7 +5498,7 @@ macro_rules! HeapTupleHeaderClearHeapOnly {
                         $crate::__pgrx_c_macros::expression::bitnot(
                             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                 $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                    $crate::HEAP_ONLY_TUPLE as i32
+                                    $crate::__pgrx_c_bindings::HEAP_ONLY_TUPLE as i32
                                 )
                             )
                         )
@@ -5431,7 +5561,9 @@ macro_rules! HeapTupleHeaderClearHeapOnly {
                                         >(
                                             $crate::__pgrx_c_macros::CValue::<
                                                 $crate::__pgrx_c_macros::CInt
-                                            >::new($crate::HEAP_ONLY_TUPLE as i32)
+                                            >::new(
+                                                $crate::__pgrx_c_bindings::HEAP_ONLY_TUPLE as i32
+                                            )
                                         )
                                     )
                                 ),
@@ -5473,7 +5605,7 @@ macro_rules! HeapTupleHeaderClearHeapOnly {
                         $crate::__pgrx_c_macros::expression::bitnot(
                             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                 $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                    $crate::HEAP_ONLY_TUPLE as i32
+                                    $crate::__pgrx_c_bindings::HEAP_ONLY_TUPLE as i32
                                 )
                             )
                         )
@@ -5499,8 +5631,8 @@ macro_rules! HeapTupleHeaderClearHeapOnly {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -5531,23 +5663,23 @@ macro_rules! __pgrx_c_args_HeapTupleHeaderClearHotUpdated {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
         $crate::__pgrx_c_args_HeapTupleHeaderClearHotUpdated!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_HeapTupleHeaderClearHotUpdated!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderClearHotUpdated!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderClearHotUpdated!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -5559,7 +5691,7 @@ macro_rules! __pgrx_c_args_HeapTupleHeaderClearHotUpdated {
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
         $crate::__pgrx_c_args_HeapTupleHeaderClearHotUpdated!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
@@ -5585,17 +5717,17 @@ macro_rules! __pgrx_c_args_HeapTupleHeaderClearHotUpdated {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_HeapTupleHeaderClearHotUpdated!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_HeapTupleHeaderClearHotUpdated!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderClearHotUpdated!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -5622,13 +5754,13 @@ macro_rules! __pgrx_c_args_HeapTupleHeaderClearHotUpdated {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderClearHotUpdated!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderClearHotUpdated!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -5690,7 +5822,7 @@ macro_rules! HeapTupleHeaderClearHotUpdated {
                         $crate::__pgrx_c_macros::expression::bitnot(
                             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                 $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                    $crate::HEAP_HOT_UPDATED as i32
+                                    $crate::__pgrx_c_bindings::HEAP_HOT_UPDATED as i32
                                 )
                             )
                         )
@@ -5759,7 +5891,9 @@ macro_rules! HeapTupleHeaderClearHotUpdated {
                                         >(
                                             $crate::__pgrx_c_macros::CValue::<
                                                 $crate::__pgrx_c_macros::CInt
-                                            >::new($crate::HEAP_HOT_UPDATED as i32)
+                                            >::new(
+                                                $crate::__pgrx_c_bindings::HEAP_HOT_UPDATED as i32
+                                            )
                                         )
                                     )
                                 ),
@@ -5804,7 +5938,7 @@ macro_rules! HeapTupleHeaderClearHotUpdated {
                         $crate::__pgrx_c_macros::expression::bitnot(
                             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                 $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                    $crate::HEAP_HOT_UPDATED as i32
+                                    $crate::__pgrx_c_bindings::HEAP_HOT_UPDATED as i32
                                 )
                             )
                         )
@@ -5830,8 +5964,8 @@ macro_rules! HeapTupleHeaderClearHotUpdated {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -5862,23 +5996,23 @@ macro_rules! __pgrx_c_args_HeapTupleHeaderClearMatch {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
         $crate::__pgrx_c_args_HeapTupleHeaderClearMatch!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_HeapTupleHeaderClearMatch!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderClearMatch!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderClearMatch!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -5887,7 +6021,7 @@ macro_rules! __pgrx_c_args_HeapTupleHeaderClearMatch {
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
         $crate::__pgrx_c_args_HeapTupleHeaderClearMatch!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
@@ -5913,17 +6047,17 @@ macro_rules! __pgrx_c_args_HeapTupleHeaderClearMatch {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_HeapTupleHeaderClearMatch!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_HeapTupleHeaderClearMatch!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderClearMatch!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -5950,13 +6084,13 @@ macro_rules! __pgrx_c_args_HeapTupleHeaderClearMatch {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderClearMatch!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderClearMatch!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -6018,7 +6152,7 @@ macro_rules! HeapTupleHeaderClearMatch {
                         $crate::__pgrx_c_macros::expression::bitnot(
                             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                 $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                    $crate::HEAP_TUPLE_HAS_MATCH as i32
+                                    $crate::__pgrx_c_bindings::HEAP_TUPLE_HAS_MATCH as i32
                                 )
                             )
                         )
@@ -6081,7 +6215,9 @@ macro_rules! HeapTupleHeaderClearMatch {
                                         >(
                                             $crate::__pgrx_c_macros::CValue::<
                                                 $crate::__pgrx_c_macros::CInt
-                                            >::new($crate::HEAP_TUPLE_HAS_MATCH as i32)
+                                            >::new(
+                                                $crate::__pgrx_c_bindings::HEAP_TUPLE_HAS_MATCH as i32
+                                            )
                                         )
                                     )
                                 ),
@@ -6123,7 +6259,7 @@ macro_rules! HeapTupleHeaderClearMatch {
                         $crate::__pgrx_c_macros::expression::bitnot(
                             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                 $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                    $crate::HEAP_TUPLE_HAS_MATCH as i32
+                                    $crate::__pgrx_c_bindings::HEAP_TUPLE_HAS_MATCH as i32
                                 )
                             )
                         )
@@ -6143,8 +6279,8 @@ macro_rules! HeapTupleHeaderClearMatch {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -6175,23 +6311,23 @@ macro_rules! __pgrx_c_args_HeapTupleHeaderGetDatumLength {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
         $crate::__pgrx_c_args_HeapTupleHeaderGetDatumLength!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_HeapTupleHeaderGetDatumLength!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderGetDatumLength!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderGetDatumLength!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -6203,7 +6339,7 @@ macro_rules! __pgrx_c_args_HeapTupleHeaderGetDatumLength {
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
         $crate::__pgrx_c_args_HeapTupleHeaderGetDatumLength!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
@@ -6229,17 +6365,17 @@ macro_rules! __pgrx_c_args_HeapTupleHeaderGetDatumLength {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_HeapTupleHeaderGetDatumLength!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_HeapTupleHeaderGetDatumLength!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderGetDatumLength!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -6266,13 +6402,13 @@ macro_rules! __pgrx_c_args_HeapTupleHeaderGetDatumLength {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderGetDatumLength!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderGetDatumLength!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -6344,10 +6480,10 @@ macro_rules! HeapTupleHeaderGetDatumLength {
                                                             _
                                                         >(
                                                             $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                *mut $crate::varattrib_4b,
+                                                                *mut $crate::__pgrx_c_bindings::varattrib_4b,
                                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                                        $crate::varattrib_4b
+                                                                        $crate::__pgrx_c_bindings::varattrib_4b
                                                                     >,
                                                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                                                 >,
@@ -6451,10 +6587,10 @@ macro_rules! HeapTupleHeaderGetDatumLength {
                                                                         _
                                                                     >(
                                                                         $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                            *mut $crate::varattrib_4b,
+                                                                            *mut $crate::__pgrx_c_bindings::varattrib_4b,
                                                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                    $crate::varattrib_4b
+                                                                                    $crate::__pgrx_c_bindings::varattrib_4b
                                                                                 >,
                                                                                 $crate::__pgrx_c_macros::expression::ReadWrite
                                                                             >,
@@ -6536,10 +6672,10 @@ macro_rules! HeapTupleHeaderGetDatumLength {
                                                             _
                                                         >(
                                                             $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                *mut $crate::varattrib_4b,
+                                                                *mut $crate::__pgrx_c_bindings::varattrib_4b,
                                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                                        $crate::varattrib_4b
+                                                                        $crate::__pgrx_c_bindings::varattrib_4b
                                                                     >,
                                                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                                                 >,
@@ -6596,8 +6732,8 @@ macro_rules! HeapTupleHeaderGetDatumLength {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -6628,23 +6764,23 @@ macro_rules! __pgrx_c_args_HeapTupleHeaderGetNatts {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
         $crate::__pgrx_c_args_HeapTupleHeaderGetNatts!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_HeapTupleHeaderGetNatts!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderGetNatts!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderGetNatts!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -6653,7 +6789,7 @@ macro_rules! __pgrx_c_args_HeapTupleHeaderGetNatts {
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
         $crate::__pgrx_c_args_HeapTupleHeaderGetNatts!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
@@ -6679,17 +6815,17 @@ macro_rules! __pgrx_c_args_HeapTupleHeaderGetNatts {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_HeapTupleHeaderGetNatts!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_HeapTupleHeaderGetNatts!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderGetNatts!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -6716,13 +6852,13 @@ macro_rules! __pgrx_c_args_HeapTupleHeaderGetNatts {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderGetNatts!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderGetNatts!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -6787,7 +6923,7 @@ macro_rules! HeapTupleHeaderGetNatts {
                     ),
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                            $crate::HEAP_NATTS_MASK as i32
+                            $crate::__pgrx_c_bindings::HEAP_NATTS_MASK as i32
                         )
                     )
                 )
@@ -6846,7 +6982,7 @@ macro_rules! HeapTupleHeaderGetNatts {
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                        $crate::HEAP_NATTS_MASK as i32
+                                        $crate::__pgrx_c_bindings::HEAP_NATTS_MASK as i32
                                     )
                                 )
                             )
@@ -6885,7 +7021,7 @@ macro_rules! HeapTupleHeaderGetNatts {
                     ),
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                            $crate::HEAP_NATTS_MASK as i32
+                            $crate::__pgrx_c_bindings::HEAP_NATTS_MASK as i32
                         )
                     )
                 )
@@ -6901,8 +7037,8 @@ macro_rules! HeapTupleHeaderGetNatts {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -6933,23 +7069,23 @@ macro_rules! __pgrx_c_args_HeapTupleHeaderGetRawCommandId {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
         $crate::__pgrx_c_args_HeapTupleHeaderGetRawCommandId!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_HeapTupleHeaderGetRawCommandId!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderGetRawCommandId!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderGetRawCommandId!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -6961,7 +7097,7 @@ macro_rules! __pgrx_c_args_HeapTupleHeaderGetRawCommandId {
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
         $crate::__pgrx_c_args_HeapTupleHeaderGetRawCommandId!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
@@ -6987,17 +7123,17 @@ macro_rules! __pgrx_c_args_HeapTupleHeaderGetRawCommandId {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_HeapTupleHeaderGetRawCommandId!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_HeapTupleHeaderGetRawCommandId!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderGetRawCommandId!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -7024,13 +7160,13 @@ macro_rules! __pgrx_c_args_HeapTupleHeaderGetRawCommandId {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderGetRawCommandId!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderGetRawCommandId!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -7309,8 +7445,8 @@ macro_rules! HeapTupleHeaderGetRawCommandId {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -7341,23 +7477,23 @@ macro_rules! __pgrx_c_args_HeapTupleHeaderGetRawXmax {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
         $crate::__pgrx_c_args_HeapTupleHeaderGetRawXmax!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_HeapTupleHeaderGetRawXmax!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderGetRawXmax!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderGetRawXmax!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -7366,7 +7502,7 @@ macro_rules! __pgrx_c_args_HeapTupleHeaderGetRawXmax {
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
         $crate::__pgrx_c_args_HeapTupleHeaderGetRawXmax!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
@@ -7392,17 +7528,17 @@ macro_rules! __pgrx_c_args_HeapTupleHeaderGetRawXmax {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_HeapTupleHeaderGetRawXmax!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_HeapTupleHeaderGetRawXmax!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderGetRawXmax!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -7429,13 +7565,13 @@ macro_rules! __pgrx_c_args_HeapTupleHeaderGetRawXmax {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderGetRawXmax!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderGetRawXmax!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -7669,8 +7805,8 @@ macro_rules! HeapTupleHeaderGetRawXmax {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -7701,23 +7837,23 @@ macro_rules! __pgrx_c_args_HeapTupleHeaderGetRawXmin {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
         $crate::__pgrx_c_args_HeapTupleHeaderGetRawXmin!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_HeapTupleHeaderGetRawXmin!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderGetRawXmin!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderGetRawXmin!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -7726,7 +7862,7 @@ macro_rules! __pgrx_c_args_HeapTupleHeaderGetRawXmin {
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
         $crate::__pgrx_c_args_HeapTupleHeaderGetRawXmin!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
@@ -7752,17 +7888,17 @@ macro_rules! __pgrx_c_args_HeapTupleHeaderGetRawXmin {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_HeapTupleHeaderGetRawXmin!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_HeapTupleHeaderGetRawXmin!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderGetRawXmin!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -7789,13 +7925,13 @@ macro_rules! __pgrx_c_args_HeapTupleHeaderGetRawXmin {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderGetRawXmin!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderGetRawXmin!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -8029,8 +8165,480 @@ macro_rules! HeapTupleHeaderGetRawXmin {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
+    target_pointer_width = "64",
+    target_endian = "little"
+)))]
+#[cfg(not(docsrs))]
+compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
+#[doc(hidden)]
+#[macro_export]
+macro_rules! __pgrx_c_args_HeapTupleHeaderGetSpeculativeToken {
+    (@collect $mode:ident [$($done:tt)*]; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_HeapTupleHeaderGetSpeculativeToken!(@p0 $mode [$($done)*]; $($raw)*)
+    };
+    (@classified [$next:ident $mode:ident [$($done:tt)*] [$($rest:tt)*]] $descriptor:tt) => {
+        $crate::__pgrx_c_args_HeapTupleHeaderGetSpeculativeToken!(
+            @$next $mode [$($done)* $descriptor,];
+            $($rest)*
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
+        $crate::__pgrx_c_args_HeapTupleHeaderGetSpeculativeToken!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
+    };
+    (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
+        $crate::__pgrx_c_args_HeapTupleHeaderGetSpeculativeToken!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_HeapTupleHeaderGetSpeculativeToken!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+            $($rest)*
+        )
+    };
+    (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_HeapTupleHeaderGetSpeculativeToken!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; - $($raw:tt)*) => {
+        $crate::__pgrx_c_args_HeapTupleHeaderGetSpeculativeToken!(
+            @negative0 $mode [$($done)*];
+            - $($raw)*
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
+        $crate::__pgrx_c_args_HeapTupleHeaderGetSpeculativeToken!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_HeapTupleHeaderGetSpeculativeToken] [p1 $mode [$($done)*] []] [
+                $head $(::$tail)* ! $group
+            ]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; ::$head:ident $(::$tail:ident)* ! $group:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_HeapTupleHeaderGetSpeculativeToken] [p1 $mode [$($done)*] []] [
+                ::$head $(::$tail)* ! $group
+            ]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; ($($inner:tt)*)) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_HeapTupleHeaderGetSpeculativeToken] [p1 $mode [$($done)*] []] [
+                ($($inner)*)
+            ]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
+        $crate::__pgrx_c_args_HeapTupleHeaderGetSpeculativeToken!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
+        $crate::__pgrx_c_args_HeapTupleHeaderGetSpeculativeToken!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
+        $crate::__pgrx_c_args_HeapTupleHeaderGetSpeculativeToken!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_HeapTupleHeaderGetSpeculativeToken] [
+                p1 $mode [$($done)*] [$($rest)*]
+            ] [$head $(::$tail)* ! $group]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; ::$head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_HeapTupleHeaderGetSpeculativeToken] [
+                p1 $mode [$($done)*] [$($rest)*]
+            ] [::$head $(::$tail)* ! $group]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; ($($inner:tt)*), $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_HeapTupleHeaderGetSpeculativeToken] [
+                p1 $mode [$($done)*] [$($rest)*]
+            ] [($($inner)*)]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_HeapTupleHeaderGetSpeculativeToken!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_HeapTupleHeaderGetSpeculativeToken!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*];) => {
+        $crate::HeapTupleHeaderGetSpeculativeToken!(@$mode; $($done)*)
+    };
+    ($($invalid:tt)*) => {
+        compile_error!("arguments do not satisfy this C macro's invocation contract")
+    };
+}
+/// C macro HeapTupleHeaderGetSpeculativeToken from htup_details.h:438
+///
+/// ```text
+/// #define HeapTupleHeaderGetSpeculativeToken( tup ) ( AssertMacro ( HeapTupleHeaderIsSpeculative ( tup ) ) , ItemPointerGetBlockNumber ( & ( tup ) -> t_ctid ) )
+/// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+#[macro_export]
+macro_rules! HeapTupleHeaderGetSpeculativeToken {
+    (@__pgrx_emit_check_safety; $tup:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $tup);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_HeapTupleHeaderGetSpeculativeToken!(
+            @collect __pgrx_emit_check_safety [];
+            $($raw)*
+        )
+    };
+    (@__pgrx_emit_public; $tup:tt $(,)?) => {
+        $crate::__pgrx_c_macros::expression_result::finish(
+            $crate::HeapTupleHeaderGetSpeculativeToken!(@__pgrx_emit_value; $tup)
+        )
+    };
+    (@__pgrx_emit_value; $tup:tt $(,)?) => {
+        /* PGRX: AssertMacro remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */ /* PGRX: HeapTupleHeaderIsSpeculative remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */
+        (
+            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                {
+                    {
+                        let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                            {
+                                {
+                                    let _ = $crate::__pgrx_c_macros::expression::profile_value::<
+                                        true,
+                                        _
+                                    >(
+                                        /* PGRX: true remains expanded because no integer constant binding is available in the defining Rust crate. */
+                                        $crate::__pgrx_c_macros::CValue::<
+                                            $crate::__pgrx_c_macros::CInt
+                                        >::new(1i32)
+                                    );
+                                }
+                            }
+                        );
+                    };
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        <
+                            $crate::__pgrx_c_macros::CUnsignedInt as $crate::__pgrx_c_macros::expression::CType
+                        >::from_storage(
+                            $crate::__pgrx_c_bindings::ItemPointerGetBlockNumber(
+                                <
+                                    $crate::__pgrx_c_macros::expression::CPointer<
+                                        $crate::__pgrx_c_macros::expression::CRecord<
+                                            $crate::__pgrx_c_bindings::ItemPointerData
+                                        >,
+                                        $crate::__pgrx_c_macros::expression::ReadOnly
+                                    > as $crate::__pgrx_c_macros::expression::CType
+                                >::into_storage(
+                                    $crate::__pgrx_c_macros::expression::implicit::<
+                                        $crate::__pgrx_c_macros::expression::CPointer<
+                                            $crate::__pgrx_c_macros::expression::CRecord<
+                                                $crate::__pgrx_c_bindings::ItemPointerData
+                                            >,
+                                            $crate::__pgrx_c_macros::expression::ReadOnly
+                                        >,
+                                        _
+                                    >(
+                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                            true,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_macros::expression::address(
+                                                $crate::__pgrx_c_macros::expression::project::<
+                                                    $crate::__pgrx_c_generated::Field_t_ctid,
+                                                    _,
+                                                    _
+                                                >(
+                                                    $crate::__pgrx_c_macros::expression::pointee(
+                                                        (
+                                                            $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                true,
+                                                                _
+                                                            >(
+                                                                $crate::__pgrx_c_operand!(
+                                                                    @value [true];
+                                                                    $tup
+                                                                )
+                                                            )
+                                                        )
+                                                    )
+                                                )
+                                            )
+                                        )
+                                    )
+                                ),
+                            )
+                        )
+                    )
+                }
+            )
+        )
+    };
+    (@__pgrx_c_value; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_HeapTupleHeaderGetSpeculativeToken!(
+            @collect __pgrx_emit_value [];
+            $($raw)*
+        )
+    };
+    (@__pgrx_emit_place; $tup:tt $(,)?) => {
+        compile_error!("C expression is not a place in this operation")
+    };
+    (@__pgrx_c_place; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_HeapTupleHeaderGetSpeculativeToken!(
+            @collect __pgrx_emit_place [];
+            $($raw)*
+        )
+    };
+    (@__pgrx_emit_read_place; $tup:tt $(,)?) => {
+        compile_error!("C expression is not a place in this operation")
+    };
+    (@__pgrx_c_read_place; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_HeapTupleHeaderGetSpeculativeToken!(
+            @collect __pgrx_emit_read_place [];
+            $($raw)*
+        )
+    };
+    (@__pgrx_emit_size; $tup:tt $(,)?) => {
+        /* PGRX: AssertMacro remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */ /* PGRX: HeapTupleHeaderIsSpeculative remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */
+        $crate::__pgrx_c_macros::expression::size_of_value_type(
+            if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $tup);
+                    }
+                }
+                Some(
+                    unsafe {
+                        $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                            {
+                                {
+                                    let _ = $crate::__pgrx_c_macros::expression::profile_value::<
+                                        true,
+                                        _
+                                    >(
+                                        {
+                                            {
+                                                let _ = $crate::__pgrx_c_macros::expression::profile_value::<
+                                                    true,
+                                                    _
+                                                >(
+                                                    /* PGRX: true remains expanded because no integer constant binding is available in the defining Rust crate. */
+                                                    $crate::__pgrx_c_macros::CValue::<
+                                                        $crate::__pgrx_c_macros::CInt
+                                                    >::new(1i32)
+                                                );
+                                            }
+                                        }
+                                    );
+                                };
+                                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                    <
+                                        $crate::__pgrx_c_macros::CUnsignedInt as $crate::__pgrx_c_macros::expression::CType
+                                    >::from_storage(
+                                        $crate::__pgrx_c_bindings::ItemPointerGetBlockNumber(
+                                            <
+                                                $crate::__pgrx_c_macros::expression::CPointer<
+                                                    $crate::__pgrx_c_macros::expression::CRecord<
+                                                        $crate::__pgrx_c_bindings::ItemPointerData
+                                                    >,
+                                                    $crate::__pgrx_c_macros::expression::ReadOnly
+                                                > as $crate::__pgrx_c_macros::expression::CType
+                                            >::into_storage(
+                                                $crate::__pgrx_c_macros::expression::implicit::<
+                                                    $crate::__pgrx_c_macros::expression::CPointer<
+                                                        $crate::__pgrx_c_macros::expression::CRecord<
+                                                            $crate::__pgrx_c_bindings::ItemPointerData
+                                                        >,
+                                                        $crate::__pgrx_c_macros::expression::ReadOnly
+                                                    >,
+                                                    _
+                                                >(
+                                                    $crate::__pgrx_c_macros::expression::profile_value::<
+                                                        true,
+                                                        _
+                                                    >(
+                                                        $crate::__pgrx_c_macros::expression::address(
+                                                            $crate::__pgrx_c_macros::expression::project::<
+                                                                $crate::__pgrx_c_generated::Field_t_ctid,
+                                                                _,
+                                                                _
+                                                            >(
+                                                                $crate::__pgrx_c_macros::expression::pointee(
+                                                                    (
+                                                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                            true,
+                                                                            _
+                                                                        >(
+                                                                            $crate::__pgrx_c_operand!(
+                                                                                @value [true];
+                                                                                $tup
+                                                                            )
+                                                                        )
+                                                                    )
+                                                                )
+                                                            )
+                                                        )
+                                                    )
+                                                )
+                                            ),
+                                        )
+                                    )
+                                )
+                            }
+                        )
+                    }
+                )
+            } else {
+                None
+            }
+        )
+    };
+    (@__pgrx_c_size; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_HeapTupleHeaderGetSpeculativeToken!(
+            @collect __pgrx_emit_size [];
+            $($raw)*
+        )
+    };
+    (@__pgrx_emit_discard; $tup:tt $(,)?) => {
+        /* PGRX: AssertMacro remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */ /* PGRX: HeapTupleHeaderIsSpeculative remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */
+        {
+            let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                {
+                    {
+                        let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                            {
+                                {
+                                    let _ = $crate::__pgrx_c_macros::expression::profile_value::<
+                                        true,
+                                        _
+                                    >(
+                                        /* PGRX: true remains expanded because no integer constant binding is available in the defining Rust crate. */
+                                        $crate::__pgrx_c_macros::CValue::<
+                                            $crate::__pgrx_c_macros::CInt
+                                        >::new(1i32)
+                                    );
+                                }
+                            }
+                        );
+                    };
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        <
+                            $crate::__pgrx_c_macros::CUnsignedInt as $crate::__pgrx_c_macros::expression::CType
+                        >::from_storage(
+                            $crate::__pgrx_c_bindings::ItemPointerGetBlockNumber(
+                                <
+                                    $crate::__pgrx_c_macros::expression::CPointer<
+                                        $crate::__pgrx_c_macros::expression::CRecord<
+                                            $crate::__pgrx_c_bindings::ItemPointerData
+                                        >,
+                                        $crate::__pgrx_c_macros::expression::ReadOnly
+                                    > as $crate::__pgrx_c_macros::expression::CType
+                                >::into_storage(
+                                    $crate::__pgrx_c_macros::expression::implicit::<
+                                        $crate::__pgrx_c_macros::expression::CPointer<
+                                            $crate::__pgrx_c_macros::expression::CRecord<
+                                                $crate::__pgrx_c_bindings::ItemPointerData
+                                            >,
+                                            $crate::__pgrx_c_macros::expression::ReadOnly
+                                        >,
+                                        _
+                                    >(
+                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                            true,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_macros::expression::address(
+                                                $crate::__pgrx_c_macros::expression::project::<
+                                                    $crate::__pgrx_c_generated::Field_t_ctid,
+                                                    _,
+                                                    _
+                                                >(
+                                                    $crate::__pgrx_c_macros::expression::pointee(
+                                                        (
+                                                            $crate::__pgrx_c_macros::expression::profile_value::<
+                                                                true,
+                                                                _
+                                                            >(
+                                                                $crate::__pgrx_c_operand!(
+                                                                    @value [true];
+                                                                    $tup
+                                                                )
+                                                            )
+                                                        )
+                                                    )
+                                                )
+                                            )
+                                        )
+                                    )
+                                ),
+                            )
+                        )
+                    )
+                }
+            );
+        }
+    };
+    (@__pgrx_c_discard; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_HeapTupleHeaderGetSpeculativeToken!(
+            @collect __pgrx_emit_discard [];
+            $($raw)*
+        )
+    };
+    ($($raw:tt)*) => {
+        $crate::__pgrx_c_args_HeapTupleHeaderGetSpeculativeToken!(
+            @collect __pgrx_emit_public [];
+            $($raw)*
+        )
+    };
+}
+
+#[cfg(not(all(
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -8061,23 +8669,23 @@ macro_rules! __pgrx_c_args_HeapTupleHeaderGetTypMod {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
         $crate::__pgrx_c_args_HeapTupleHeaderGetTypMod!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_HeapTupleHeaderGetTypMod!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderGetTypMod!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderGetTypMod!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -8086,7 +8694,7 @@ macro_rules! __pgrx_c_args_HeapTupleHeaderGetTypMod {
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
         $crate::__pgrx_c_args_HeapTupleHeaderGetTypMod!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
@@ -8112,17 +8720,17 @@ macro_rules! __pgrx_c_args_HeapTupleHeaderGetTypMod {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_HeapTupleHeaderGetTypMod!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_HeapTupleHeaderGetTypMod!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderGetTypMod!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -8149,13 +8757,13 @@ macro_rules! __pgrx_c_args_HeapTupleHeaderGetTypMod {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderGetTypMod!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderGetTypMod!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -8389,8 +8997,8 @@ macro_rules! HeapTupleHeaderGetTypMod {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -8421,23 +9029,23 @@ macro_rules! __pgrx_c_args_HeapTupleHeaderGetTypeId {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
         $crate::__pgrx_c_args_HeapTupleHeaderGetTypeId!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_HeapTupleHeaderGetTypeId!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderGetTypeId!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderGetTypeId!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -8446,7 +9054,7 @@ macro_rules! __pgrx_c_args_HeapTupleHeaderGetTypeId {
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
         $crate::__pgrx_c_args_HeapTupleHeaderGetTypeId!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
@@ -8472,17 +9080,17 @@ macro_rules! __pgrx_c_args_HeapTupleHeaderGetTypeId {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_HeapTupleHeaderGetTypeId!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_HeapTupleHeaderGetTypeId!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderGetTypeId!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -8509,13 +9117,13 @@ macro_rules! __pgrx_c_args_HeapTupleHeaderGetTypeId {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderGetTypeId!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderGetTypeId!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -8749,8 +9357,8 @@ macro_rules! HeapTupleHeaderGetTypeId {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -8781,23 +9389,23 @@ macro_rules! __pgrx_c_args_HeapTupleHeaderGetUpdateXid {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
         $crate::__pgrx_c_args_HeapTupleHeaderGetUpdateXid!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_HeapTupleHeaderGetUpdateXid!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderGetUpdateXid!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderGetUpdateXid!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -8806,7 +9414,7 @@ macro_rules! __pgrx_c_args_HeapTupleHeaderGetUpdateXid {
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
         $crate::__pgrx_c_args_HeapTupleHeaderGetUpdateXid!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
@@ -8832,17 +9440,17 @@ macro_rules! __pgrx_c_args_HeapTupleHeaderGetUpdateXid {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_HeapTupleHeaderGetUpdateXid!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_HeapTupleHeaderGetUpdateXid!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderGetUpdateXid!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -8869,13 +9477,13 @@ macro_rules! __pgrx_c_args_HeapTupleHeaderGetUpdateXid {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderGetUpdateXid!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderGetUpdateXid!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -8984,7 +9592,7 @@ macro_rules! HeapTupleHeaderGetUpdateXid {
                                                                             $crate::__pgrx_c_macros::CValue::<
                                                                                 $crate::__pgrx_c_macros::CInt
                                                                             >::new(
-                                                                                $crate::HEAP_XMAX_INVALID as i32
+                                                                                $crate::__pgrx_c_bindings::HEAP_XMAX_INVALID as i32
                                                                             )
                                                                         )
                                                                     )
@@ -9034,7 +9642,7 @@ macro_rules! HeapTupleHeaderGetUpdateXid {
                                                                     $crate::__pgrx_c_macros::CValue::<
                                                                         $crate::__pgrx_c_macros::CInt
                                                                     >::new(
-                                                                        $crate::HEAP_XMAX_IS_MULTI as i32
+                                                                        $crate::__pgrx_c_bindings::HEAP_XMAX_IS_MULTI as i32
                                                                     )
                                                                 )
                                                             )
@@ -9094,7 +9702,7 @@ macro_rules! HeapTupleHeaderGetUpdateXid {
                                                                 $crate::__pgrx_c_macros::CValue::<
                                                                     $crate::__pgrx_c_macros::CInt
                                                                 >::new(
-                                                                    $crate::HEAP_XMAX_LOCK_ONLY as i32
+                                                                    $crate::__pgrx_c_bindings::HEAP_XMAX_LOCK_ONLY as i32
                                                                 )
                                                             )
                                                         )
@@ -9116,14 +9724,14 @@ macro_rules! HeapTupleHeaderGetUpdateXid {
                                 <
                                     $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                         $crate::__pgrx_c_macros::CUnsignedInt,
-                                        $crate::TransactionId
+                                        $crate::__pgrx_c_bindings::TransactionId
                                     > as $crate::__pgrx_c_macros::expression::CType
                                 >::from_storage(
-                                    $crate::HeapTupleGetUpdateXid(
+                                    $crate::__pgrx_c_bindings::HeapTupleGetUpdateXid(
                                         <
                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                    $crate::HeapTupleHeaderData
+                                                    $crate::__pgrx_c_bindings::HeapTupleHeaderData
                                                 >,
                                                 $crate::__pgrx_c_macros::expression::ReadWrite
                                             > as $crate::__pgrx_c_macros::expression::CType
@@ -9131,7 +9739,7 @@ macro_rules! HeapTupleHeaderGetUpdateXid {
                                             $crate::__pgrx_c_macros::expression::implicit::<
                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                        $crate::HeapTupleHeaderData
+                                                        $crate::__pgrx_c_bindings::HeapTupleHeaderData
                                                     >,
                                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                                 >,
@@ -9287,7 +9895,7 @@ macro_rules! HeapTupleHeaderGetUpdateXid {
                                                                                         $crate::__pgrx_c_macros::CValue::<
                                                                                             $crate::__pgrx_c_macros::CInt
                                                                                         >::new(
-                                                                                            $crate::HEAP_XMAX_INVALID as i32
+                                                                                            $crate::__pgrx_c_bindings::HEAP_XMAX_INVALID as i32
                                                                                         )
                                                                                     )
                                                                                 )
@@ -9337,7 +9945,7 @@ macro_rules! HeapTupleHeaderGetUpdateXid {
                                                                                 $crate::__pgrx_c_macros::CValue::<
                                                                                     $crate::__pgrx_c_macros::CInt
                                                                                 >::new(
-                                                                                    $crate::HEAP_XMAX_IS_MULTI as i32
+                                                                                    $crate::__pgrx_c_bindings::HEAP_XMAX_IS_MULTI as i32
                                                                                 )
                                                                             )
                                                                         )
@@ -9397,7 +10005,7 @@ macro_rules! HeapTupleHeaderGetUpdateXid {
                                                                             $crate::__pgrx_c_macros::CValue::<
                                                                                 $crate::__pgrx_c_macros::CInt
                                                                             >::new(
-                                                                                $crate::HEAP_XMAX_LOCK_ONLY as i32
+                                                                                $crate::__pgrx_c_bindings::HEAP_XMAX_LOCK_ONLY as i32
                                                                             )
                                                                         )
                                                                     )
@@ -9422,14 +10030,14 @@ macro_rules! HeapTupleHeaderGetUpdateXid {
                                             <
                                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                     $crate::__pgrx_c_macros::CUnsignedInt,
-                                                    $crate::TransactionId
+                                                    $crate::__pgrx_c_bindings::TransactionId
                                                 > as $crate::__pgrx_c_macros::expression::CType
                                             >::from_storage(
-                                                $crate::HeapTupleGetUpdateXid(
+                                                $crate::__pgrx_c_bindings::HeapTupleGetUpdateXid(
                                                     <
                                                         $crate::__pgrx_c_macros::expression::CPointer<
                                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                                $crate::HeapTupleHeaderData
+                                                                $crate::__pgrx_c_bindings::HeapTupleHeaderData
                                                             >,
                                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                                         > as $crate::__pgrx_c_macros::expression::CType
@@ -9437,7 +10045,7 @@ macro_rules! HeapTupleHeaderGetUpdateXid {
                                                         $crate::__pgrx_c_macros::expression::implicit::<
                                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                                    $crate::HeapTupleHeaderData
+                                                                    $crate::__pgrx_c_bindings::HeapTupleHeaderData
                                                                 >,
                                                                 $crate::__pgrx_c_macros::expression::ReadWrite
                                                             >,
@@ -9578,7 +10186,7 @@ macro_rules! HeapTupleHeaderGetUpdateXid {
                                                                             $crate::__pgrx_c_macros::CValue::<
                                                                                 $crate::__pgrx_c_macros::CInt
                                                                             >::new(
-                                                                                $crate::HEAP_XMAX_INVALID as i32
+                                                                                $crate::__pgrx_c_bindings::HEAP_XMAX_INVALID as i32
                                                                             )
                                                                         )
                                                                     )
@@ -9628,7 +10236,7 @@ macro_rules! HeapTupleHeaderGetUpdateXid {
                                                                     $crate::__pgrx_c_macros::CValue::<
                                                                         $crate::__pgrx_c_macros::CInt
                                                                     >::new(
-                                                                        $crate::HEAP_XMAX_IS_MULTI as i32
+                                                                        $crate::__pgrx_c_bindings::HEAP_XMAX_IS_MULTI as i32
                                                                     )
                                                                 )
                                                             )
@@ -9688,7 +10296,7 @@ macro_rules! HeapTupleHeaderGetUpdateXid {
                                                                 $crate::__pgrx_c_macros::CValue::<
                                                                     $crate::__pgrx_c_macros::CInt
                                                                 >::new(
-                                                                    $crate::HEAP_XMAX_LOCK_ONLY as i32
+                                                                    $crate::__pgrx_c_bindings::HEAP_XMAX_LOCK_ONLY as i32
                                                                 )
                                                             )
                                                         )
@@ -9710,14 +10318,14 @@ macro_rules! HeapTupleHeaderGetUpdateXid {
                                 <
                                     $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                         $crate::__pgrx_c_macros::CUnsignedInt,
-                                        $crate::TransactionId
+                                        $crate::__pgrx_c_bindings::TransactionId
                                     > as $crate::__pgrx_c_macros::expression::CType
                                 >::from_storage(
-                                    $crate::HeapTupleGetUpdateXid(
+                                    $crate::__pgrx_c_bindings::HeapTupleGetUpdateXid(
                                         <
                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                    $crate::HeapTupleHeaderData
+                                                    $crate::__pgrx_c_bindings::HeapTupleHeaderData
                                                 >,
                                                 $crate::__pgrx_c_macros::expression::ReadWrite
                                             > as $crate::__pgrx_c_macros::expression::CType
@@ -9725,7 +10333,7 @@ macro_rules! HeapTupleHeaderGetUpdateXid {
                                             $crate::__pgrx_c_macros::expression::implicit::<
                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                        $crate::HeapTupleHeaderData
+                                                        $crate::__pgrx_c_bindings::HeapTupleHeaderData
                                                     >,
                                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                                 >,
@@ -9798,8 +10406,8 @@ macro_rules! HeapTupleHeaderGetUpdateXid {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -9830,21 +10438,23 @@ macro_rules! __pgrx_c_args_HeapTupleHeaderGetXmin {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
         $crate::__pgrx_c_args_HeapTupleHeaderGetXmin!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_HeapTupleHeaderGetXmin!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_HeapTupleHeaderGetXmin!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderGetXmin!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderGetXmin!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -9852,7 +10462,9 @@ macro_rules! __pgrx_c_args_HeapTupleHeaderGetXmin {
         $crate::__pgrx_c_args_HeapTupleHeaderGetXmin!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_HeapTupleHeaderGetXmin!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_HeapTupleHeaderGetXmin!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -9877,15 +10489,17 @@ macro_rules! __pgrx_c_args_HeapTupleHeaderGetXmin {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_HeapTupleHeaderGetXmin!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_HeapTupleHeaderGetXmin!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_HeapTupleHeaderGetXmin!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderGetXmin!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -9912,13 +10526,13 @@ macro_rules! __pgrx_c_args_HeapTupleHeaderGetXmin {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderGetXmin!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderGetXmin!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -10007,7 +10621,9 @@ macro_rules! HeapTupleHeaderGetXmin {
                                                     >(
                                                         $crate::__pgrx_c_macros::CValue::<
                                                             $crate::__pgrx_c_macros::CInt
-                                                        >::new($crate::HEAP_XMIN_FROZEN as i32)
+                                                        >::new(
+                                                            $crate::__pgrx_c_bindings::HEAP_XMIN_FROZEN as i32
+                                                        )
                                                     )
                                                 )
                                             )
@@ -10016,7 +10632,7 @@ macro_rules! HeapTupleHeaderGetXmin {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::CValue::<
                                             $crate::__pgrx_c_macros::CInt
-                                        >::new($crate::HEAP_XMIN_FROZEN as i32)
+                                        >::new($crate::__pgrx_c_bindings::HEAP_XMIN_FROZEN as i32)
                                     )
                                 )
                             )
@@ -10024,10 +10640,9 @@ macro_rules! HeapTupleHeaderGetXmin {
                     ) {
                         $crate::__pgrx_c_macros::Either::Left(
                             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                                /* PGRX: FrozenTransactionId remains expanded because no integer constant binding is available in the defining Rust crate. */
                                 $crate::__pgrx_c_macros::CValue::<
                                     $crate::__pgrx_c_macros::CUnsignedInt
-                                >::new(2u32)
+                                >::new($crate::__pgrx_c_bindings::FrozenTransactionId as u32)
                             )
                         )
                     } else {
@@ -10152,7 +10767,7 @@ macro_rules! HeapTupleHeaderGetXmin {
                                                                     $crate::__pgrx_c_macros::CValue::<
                                                                         $crate::__pgrx_c_macros::CInt
                                                                     >::new(
-                                                                        $crate::HEAP_XMIN_FROZEN as i32
+                                                                        $crate::__pgrx_c_bindings::HEAP_XMIN_FROZEN as i32
                                                                     )
                                                                 )
                                                             )
@@ -10165,7 +10780,9 @@ macro_rules! HeapTupleHeaderGetXmin {
                                                 >(
                                                     $crate::__pgrx_c_macros::CValue::<
                                                         $crate::__pgrx_c_macros::CInt
-                                                    >::new($crate::HEAP_XMIN_FROZEN as i32)
+                                                    >::new(
+                                                        $crate::__pgrx_c_bindings::HEAP_XMIN_FROZEN as i32
+                                                    )
                                                 )
                                             )
                                         )
@@ -10176,10 +10793,11 @@ macro_rules! HeapTupleHeaderGetXmin {
                                             true,
                                             _
                                         >(
-                                            /* PGRX: FrozenTransactionId remains expanded because no integer constant binding is available in the defining Rust crate. */
                                             $crate::__pgrx_c_macros::CValue::<
                                                 $crate::__pgrx_c_macros::CUnsignedInt
-                                            >::new(2u32)
+                                            >::new(
+                                                $crate::__pgrx_c_bindings::FrozenTransactionId as u32
+                                            )
                                         )
                                     )
                                 } else {
@@ -10286,7 +10904,9 @@ macro_rules! HeapTupleHeaderGetXmin {
                                                     >(
                                                         $crate::__pgrx_c_macros::CValue::<
                                                             $crate::__pgrx_c_macros::CInt
-                                                        >::new($crate::HEAP_XMIN_FROZEN as i32)
+                                                        >::new(
+                                                            $crate::__pgrx_c_bindings::HEAP_XMIN_FROZEN as i32
+                                                        )
                                                     )
                                                 )
                                             )
@@ -10295,7 +10915,7 @@ macro_rules! HeapTupleHeaderGetXmin {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::CValue::<
                                             $crate::__pgrx_c_macros::CInt
-                                        >::new($crate::HEAP_XMIN_FROZEN as i32)
+                                        >::new($crate::__pgrx_c_bindings::HEAP_XMIN_FROZEN as i32)
                                     )
                                 )
                             )
@@ -10303,10 +10923,9 @@ macro_rules! HeapTupleHeaderGetXmin {
                     ) {
                         $crate::__pgrx_c_macros::Either::Left(
                             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                                /* PGRX: FrozenTransactionId remains expanded because no integer constant binding is available in the defining Rust crate. */
                                 $crate::__pgrx_c_macros::CValue::<
                                     $crate::__pgrx_c_macros::CUnsignedInt
-                                >::new(2u32)
+                                >::new($crate::__pgrx_c_bindings::FrozenTransactionId as u32)
                             )
                         )
                     } else {
@@ -10363,8 +10982,8 @@ macro_rules! HeapTupleHeaderGetXmin {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -10395,21 +11014,23 @@ macro_rules! __pgrx_c_args_HeapTupleHeaderGetXvac {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
         $crate::__pgrx_c_args_HeapTupleHeaderGetXvac!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_HeapTupleHeaderGetXvac!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_HeapTupleHeaderGetXvac!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderGetXvac!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderGetXvac!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -10417,7 +11038,9 @@ macro_rules! __pgrx_c_args_HeapTupleHeaderGetXvac {
         $crate::__pgrx_c_args_HeapTupleHeaderGetXvac!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_HeapTupleHeaderGetXvac!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_HeapTupleHeaderGetXvac!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -10442,15 +11065,17 @@ macro_rules! __pgrx_c_args_HeapTupleHeaderGetXvac {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_HeapTupleHeaderGetXvac!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_HeapTupleHeaderGetXvac!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_HeapTupleHeaderGetXvac!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderGetXvac!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -10477,13 +11102,13 @@ macro_rules! __pgrx_c_args_HeapTupleHeaderGetXvac {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderGetXvac!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderGetXvac!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -10558,7 +11183,7 @@ macro_rules! HeapTupleHeaderGetXvac {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::CValue::<
                                             $crate::__pgrx_c_macros::CInt
-                                        >::new($crate::HEAP_MOVED as i32)
+                                        >::new($crate::__pgrx_c_bindings::HEAP_MOVED as i32)
                                     )
                                 )
                             )
@@ -10611,10 +11236,9 @@ macro_rules! HeapTupleHeaderGetXvac {
                         $crate::__pgrx_c_macros::Either::Right(
                             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                 $crate::__pgrx_c_macros::expression::null_constant(
-                                    /* PGRX: InvalidTransactionId remains expanded because no integer constant binding is available in the defining Rust crate. */
                                     $crate::__pgrx_c_macros::CValue::<
                                         $crate::__pgrx_c_macros::CUnsignedInt
-                                    >::new(0u32)
+                                    >::new($crate::__pgrx_c_bindings::InvalidTransactionId as u32)
                                 )
                             )
                         )
@@ -10689,7 +11313,9 @@ macro_rules! HeapTupleHeaderGetXvac {
                                                 >(
                                                     $crate::__pgrx_c_macros::CValue::<
                                                         $crate::__pgrx_c_macros::CInt
-                                                    >::new($crate::HEAP_MOVED as i32)
+                                                    >::new(
+                                                        $crate::__pgrx_c_bindings::HEAP_MOVED as i32
+                                                    )
                                                 )
                                             )
                                         )
@@ -10748,10 +11374,11 @@ macro_rules! HeapTupleHeaderGetXvac {
                                             _
                                         >(
                                             $crate::__pgrx_c_macros::expression::null_constant(
-                                                /* PGRX: InvalidTransactionId remains expanded because no integer constant binding is available in the defining Rust crate. */
                                                 $crate::__pgrx_c_macros::CValue::<
                                                     $crate::__pgrx_c_macros::CUnsignedInt
-                                                >::new(0u32)
+                                                >::new(
+                                                    $crate::__pgrx_c_bindings::InvalidTransactionId as u32
+                                                )
                                             )
                                         )
                                     )
@@ -10802,7 +11429,7 @@ macro_rules! HeapTupleHeaderGetXvac {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::CValue::<
                                             $crate::__pgrx_c_macros::CInt
-                                        >::new($crate::HEAP_MOVED as i32)
+                                        >::new($crate::__pgrx_c_bindings::HEAP_MOVED as i32)
                                     )
                                 )
                             )
@@ -10855,10 +11482,9 @@ macro_rules! HeapTupleHeaderGetXvac {
                         $crate::__pgrx_c_macros::Either::Right(
                             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                 $crate::__pgrx_c_macros::expression::null_constant(
-                                    /* PGRX: InvalidTransactionId remains expanded because no integer constant binding is available in the defining Rust crate. */
                                     $crate::__pgrx_c_macros::CValue::<
                                         $crate::__pgrx_c_macros::CUnsignedInt
-                                    >::new(0u32)
+                                    >::new($crate::__pgrx_c_bindings::InvalidTransactionId as u32)
                                 )
                             )
                         )
@@ -10876,8 +11502,8 @@ macro_rules! HeapTupleHeaderGetXvac {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -10908,23 +11534,23 @@ macro_rules! __pgrx_c_args_HeapTupleHeaderHasExternal {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
         $crate::__pgrx_c_args_HeapTupleHeaderHasExternal!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_HeapTupleHeaderHasExternal!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderHasExternal!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderHasExternal!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -10933,7 +11559,7 @@ macro_rules! __pgrx_c_args_HeapTupleHeaderHasExternal {
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
         $crate::__pgrx_c_args_HeapTupleHeaderHasExternal!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
@@ -10959,17 +11585,17 @@ macro_rules! __pgrx_c_args_HeapTupleHeaderHasExternal {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_HeapTupleHeaderHasExternal!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_HeapTupleHeaderHasExternal!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderHasExternal!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -10996,13 +11622,13 @@ macro_rules! __pgrx_c_args_HeapTupleHeaderHasExternal {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderHasExternal!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderHasExternal!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -11075,7 +11701,7 @@ macro_rules! HeapTupleHeaderHasExternal {
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                        $crate::HEAP_HASEXTERNAL as i32
+                                        $crate::__pgrx_c_bindings::HEAP_HASEXTERNAL as i32
                                     )
                                 )
                             )
@@ -11157,7 +11783,9 @@ macro_rules! HeapTupleHeaderHasExternal {
                                             >(
                                                 $crate::__pgrx_c_macros::CValue::<
                                                     $crate::__pgrx_c_macros::CInt
-                                                >::new($crate::HEAP_HASEXTERNAL as i32)
+                                                >::new(
+                                                    $crate::__pgrx_c_bindings::HEAP_HASEXTERNAL as i32
+                                                )
                                             )
                                         )
                                     )
@@ -11213,7 +11841,7 @@ macro_rules! HeapTupleHeaderHasExternal {
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                        $crate::HEAP_HASEXTERNAL as i32
+                                        $crate::__pgrx_c_bindings::HEAP_HASEXTERNAL as i32
                                     )
                                 )
                             )
@@ -11239,8 +11867,8 @@ macro_rules! HeapTupleHeaderHasExternal {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -11271,23 +11899,23 @@ macro_rules! __pgrx_c_args_HeapTupleHeaderHasMatch {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
         $crate::__pgrx_c_args_HeapTupleHeaderHasMatch!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_HeapTupleHeaderHasMatch!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderHasMatch!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderHasMatch!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -11296,7 +11924,7 @@ macro_rules! __pgrx_c_args_HeapTupleHeaderHasMatch {
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
         $crate::__pgrx_c_args_HeapTupleHeaderHasMatch!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
@@ -11322,17 +11950,17 @@ macro_rules! __pgrx_c_args_HeapTupleHeaderHasMatch {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_HeapTupleHeaderHasMatch!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_HeapTupleHeaderHasMatch!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderHasMatch!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -11359,13 +11987,13 @@ macro_rules! __pgrx_c_args_HeapTupleHeaderHasMatch {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderHasMatch!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderHasMatch!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -11438,7 +12066,7 @@ macro_rules! HeapTupleHeaderHasMatch {
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                        $crate::HEAP_TUPLE_HAS_MATCH as i32
+                                        $crate::__pgrx_c_bindings::HEAP_TUPLE_HAS_MATCH as i32
                                     )
                                 )
                             )
@@ -11517,7 +12145,9 @@ macro_rules! HeapTupleHeaderHasMatch {
                                             >(
                                                 $crate::__pgrx_c_macros::CValue::<
                                                     $crate::__pgrx_c_macros::CInt
-                                                >::new($crate::HEAP_TUPLE_HAS_MATCH as i32)
+                                                >::new(
+                                                    $crate::__pgrx_c_bindings::HEAP_TUPLE_HAS_MATCH as i32
+                                                )
                                             )
                                         )
                                     )
@@ -11573,7 +12203,7 @@ macro_rules! HeapTupleHeaderHasMatch {
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                        $crate::HEAP_TUPLE_HAS_MATCH as i32
+                                        $crate::__pgrx_c_bindings::HEAP_TUPLE_HAS_MATCH as i32
                                     )
                                 )
                             )
@@ -11599,8 +12229,8 @@ macro_rules! HeapTupleHeaderHasMatch {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -11634,23 +12264,23 @@ macro_rules! __pgrx_c_args_HeapTupleHeaderIndicatesMovedPartitions {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
         $crate::__pgrx_c_args_HeapTupleHeaderIndicatesMovedPartitions!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_HeapTupleHeaderIndicatesMovedPartitions!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderIndicatesMovedPartitions!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderIndicatesMovedPartitions!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -11662,7 +12292,7 @@ macro_rules! __pgrx_c_args_HeapTupleHeaderIndicatesMovedPartitions {
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
         $crate::__pgrx_c_args_HeapTupleHeaderIndicatesMovedPartitions!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
@@ -11688,17 +12318,17 @@ macro_rules! __pgrx_c_args_HeapTupleHeaderIndicatesMovedPartitions {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_HeapTupleHeaderIndicatesMovedPartitions!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_HeapTupleHeaderIndicatesMovedPartitions!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderIndicatesMovedPartitions!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -11725,13 +12355,13 @@ macro_rules! __pgrx_c_args_HeapTupleHeaderIndicatesMovedPartitions {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderIndicatesMovedPartitions!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderIndicatesMovedPartitions!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -11780,17 +12410,19 @@ macro_rules! HeapTupleHeaderIndicatesMovedPartitions {
         /* PGRX: HeapTupleHeaderIndicatesMovedPartitions remains expanded because ItemPointerIndicatesMovedPartitions is not an active function-like macro. */
         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
             <$crate::__pgrx_c_macros::CBool as $crate::__pgrx_c_macros::expression::CType>::from_storage(
-                $crate::ItemPointerIndicatesMovedPartitions(
+                $crate::__pgrx_c_bindings::ItemPointerIndicatesMovedPartitions(
                     <
                         $crate::__pgrx_c_macros::expression::CPointer<
-                            $crate::__pgrx_c_macros::expression::CRecord<$crate::ItemPointerData>,
+                            $crate::__pgrx_c_macros::expression::CRecord<
+                                $crate::__pgrx_c_bindings::ItemPointerData
+                            >,
                             $crate::__pgrx_c_macros::expression::ReadOnly
                         > as $crate::__pgrx_c_macros::expression::CType
                     >::into_storage(
                         $crate::__pgrx_c_macros::expression::implicit::<
                             $crate::__pgrx_c_macros::expression::CPointer<
                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                    $crate::ItemPointerData
+                                    $crate::__pgrx_c_bindings::ItemPointerData
                                 >,
                                 $crate::__pgrx_c_macros::expression::ReadOnly
                             >,
@@ -11859,11 +12491,11 @@ macro_rules! HeapTupleHeaderIndicatesMovedPartitions {
                             <
                                 $crate::__pgrx_c_macros::CBool as $crate::__pgrx_c_macros::expression::CType
                             >::from_storage(
-                                $crate::ItemPointerIndicatesMovedPartitions(
+                                $crate::__pgrx_c_bindings::ItemPointerIndicatesMovedPartitions(
                                     <
                                         $crate::__pgrx_c_macros::expression::CPointer<
                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                $crate::ItemPointerData
+                                                $crate::__pgrx_c_bindings::ItemPointerData
                                             >,
                                             $crate::__pgrx_c_macros::expression::ReadOnly
                                         > as $crate::__pgrx_c_macros::expression::CType
@@ -11871,7 +12503,7 @@ macro_rules! HeapTupleHeaderIndicatesMovedPartitions {
                                         $crate::__pgrx_c_macros::expression::implicit::<
                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                    $crate::ItemPointerData
+                                                    $crate::__pgrx_c_bindings::ItemPointerData
                                                 >,
                                                 $crate::__pgrx_c_macros::expression::ReadOnly
                                             >,
@@ -11926,11 +12558,11 @@ macro_rules! HeapTupleHeaderIndicatesMovedPartitions {
         {
             let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 <$crate::__pgrx_c_macros::CBool as $crate::__pgrx_c_macros::expression::CType>::from_storage(
-                    $crate::ItemPointerIndicatesMovedPartitions(
+                    $crate::__pgrx_c_bindings::ItemPointerIndicatesMovedPartitions(
                         <
                             $crate::__pgrx_c_macros::expression::CPointer<
                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                    $crate::ItemPointerData
+                                    $crate::__pgrx_c_bindings::ItemPointerData
                                 >,
                                 $crate::__pgrx_c_macros::expression::ReadOnly
                             > as $crate::__pgrx_c_macros::expression::CType
@@ -11938,7 +12570,7 @@ macro_rules! HeapTupleHeaderIndicatesMovedPartitions {
                             $crate::__pgrx_c_macros::expression::implicit::<
                                 $crate::__pgrx_c_macros::expression::CPointer<
                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                        $crate::ItemPointerData
+                                        $crate::__pgrx_c_bindings::ItemPointerData
                                     >,
                                     $crate::__pgrx_c_macros::expression::ReadOnly
                                 >,
@@ -11989,8 +12621,8 @@ macro_rules! HeapTupleHeaderIndicatesMovedPartitions {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -12021,23 +12653,23 @@ macro_rules! __pgrx_c_args_HeapTupleHeaderIsHeapOnly {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
         $crate::__pgrx_c_args_HeapTupleHeaderIsHeapOnly!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_HeapTupleHeaderIsHeapOnly!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderIsHeapOnly!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderIsHeapOnly!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -12046,7 +12678,7 @@ macro_rules! __pgrx_c_args_HeapTupleHeaderIsHeapOnly {
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
         $crate::__pgrx_c_args_HeapTupleHeaderIsHeapOnly!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
@@ -12072,17 +12704,17 @@ macro_rules! __pgrx_c_args_HeapTupleHeaderIsHeapOnly {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_HeapTupleHeaderIsHeapOnly!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_HeapTupleHeaderIsHeapOnly!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderIsHeapOnly!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -12109,13 +12741,13 @@ macro_rules! __pgrx_c_args_HeapTupleHeaderIsHeapOnly {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderIsHeapOnly!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderIsHeapOnly!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -12188,7 +12820,7 @@ macro_rules! HeapTupleHeaderIsHeapOnly {
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                        $crate::HEAP_ONLY_TUPLE as i32
+                                        $crate::__pgrx_c_bindings::HEAP_ONLY_TUPLE as i32
                                     )
                                 )
                             )
@@ -12270,7 +12902,9 @@ macro_rules! HeapTupleHeaderIsHeapOnly {
                                             >(
                                                 $crate::__pgrx_c_macros::CValue::<
                                                     $crate::__pgrx_c_macros::CInt
-                                                >::new($crate::HEAP_ONLY_TUPLE as i32)
+                                                >::new(
+                                                    $crate::__pgrx_c_bindings::HEAP_ONLY_TUPLE as i32
+                                                )
                                             )
                                         )
                                     )
@@ -12326,7 +12960,7 @@ macro_rules! HeapTupleHeaderIsHeapOnly {
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                        $crate::HEAP_ONLY_TUPLE as i32
+                                        $crate::__pgrx_c_bindings::HEAP_ONLY_TUPLE as i32
                                     )
                                 )
                             )
@@ -12352,8 +12986,8 @@ macro_rules! HeapTupleHeaderIsHeapOnly {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -12384,23 +13018,23 @@ macro_rules! __pgrx_c_args_HeapTupleHeaderIsHotUpdated {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
         $crate::__pgrx_c_args_HeapTupleHeaderIsHotUpdated!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_HeapTupleHeaderIsHotUpdated!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderIsHotUpdated!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderIsHotUpdated!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -12409,7 +13043,7 @@ macro_rules! __pgrx_c_args_HeapTupleHeaderIsHotUpdated {
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
         $crate::__pgrx_c_args_HeapTupleHeaderIsHotUpdated!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
@@ -12435,17 +13069,17 @@ macro_rules! __pgrx_c_args_HeapTupleHeaderIsHotUpdated {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_HeapTupleHeaderIsHotUpdated!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_HeapTupleHeaderIsHotUpdated!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderIsHotUpdated!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -12472,13 +13106,13 @@ macro_rules! __pgrx_c_args_HeapTupleHeaderIsHotUpdated {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderIsHotUpdated!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderIsHotUpdated!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -12568,7 +13202,9 @@ macro_rules! HeapTupleHeaderIsHotUpdated {
                                                         >(
                                                             $crate::__pgrx_c_macros::CValue::<
                                                                 $crate::__pgrx_c_macros::CInt
-                                                            >::new($crate::HEAP_HOT_UPDATED as i32)
+                                                            >::new(
+                                                                $crate::__pgrx_c_bindings::HEAP_HOT_UPDATED as i32
+                                                            )
                                                         )
                                                     )
                                                 )
@@ -12626,7 +13262,9 @@ macro_rules! HeapTupleHeaderIsHotUpdated {
                                                         >(
                                                             $crate::__pgrx_c_macros::CValue::<
                                                                 $crate::__pgrx_c_macros::CInt
-                                                            >::new($crate::HEAP_XMAX_INVALID as i32)
+                                                            >::new(
+                                                                $crate::__pgrx_c_bindings::HEAP_XMAX_INVALID as i32
+                                                            )
                                                         )
                                                     )
                                                 )
@@ -12701,7 +13339,7 @@ macro_rules! HeapTupleHeaderIsHotUpdated {
                                                                         $crate::__pgrx_c_macros::CValue::<
                                                                             $crate::__pgrx_c_macros::CInt
                                                                         >::new(
-                                                                            $crate::HEAP_XMIN_COMMITTED as i32
+                                                                            $crate::__pgrx_c_bindings::HEAP_XMIN_COMMITTED as i32
                                                                         )
                                                                     ),
                                                                     $crate::__pgrx_c_macros::expression::profile_value::<
@@ -12711,7 +13349,7 @@ macro_rules! HeapTupleHeaderIsHotUpdated {
                                                                         $crate::__pgrx_c_macros::CValue::<
                                                                             $crate::__pgrx_c_macros::CInt
                                                                         >::new(
-                                                                            $crate::HEAP_XMIN_INVALID as i32
+                                                                            $crate::__pgrx_c_bindings::HEAP_XMIN_INVALID as i32
                                                                         )
                                                                     )
                                                                 )
@@ -12726,7 +13364,9 @@ macro_rules! HeapTupleHeaderIsHotUpdated {
                                             >(
                                                 $crate::__pgrx_c_macros::CValue::<
                                                     $crate::__pgrx_c_macros::CInt
-                                                >::new($crate::HEAP_XMIN_INVALID as i32)
+                                                >::new(
+                                                    $crate::__pgrx_c_bindings::HEAP_XMIN_INVALID as i32
+                                                )
                                             )
                                         )
                                     )
@@ -12825,7 +13465,7 @@ macro_rules! HeapTupleHeaderIsHotUpdated {
                                                                         $crate::__pgrx_c_macros::CValue::<
                                                                             $crate::__pgrx_c_macros::CInt
                                                                         >::new(
-                                                                            $crate::HEAP_HOT_UPDATED as i32
+                                                                            $crate::__pgrx_c_bindings::HEAP_HOT_UPDATED as i32
                                                                         )
                                                                     )
                                                                 )
@@ -12890,7 +13530,7 @@ macro_rules! HeapTupleHeaderIsHotUpdated {
                                                                         $crate::__pgrx_c_macros::CValue::<
                                                                             $crate::__pgrx_c_macros::CInt
                                                                         >::new(
-                                                                            $crate::HEAP_XMAX_INVALID as i32
+                                                                            $crate::__pgrx_c_bindings::HEAP_XMAX_INVALID as i32
                                                                         )
                                                                     )
                                                                 )
@@ -12971,7 +13611,7 @@ macro_rules! HeapTupleHeaderIsHotUpdated {
                                                                                     $crate::__pgrx_c_macros::CValue::<
                                                                                         $crate::__pgrx_c_macros::CInt
                                                                                     >::new(
-                                                                                        $crate::HEAP_XMIN_COMMITTED as i32
+                                                                                        $crate::__pgrx_c_bindings::HEAP_XMIN_COMMITTED as i32
                                                                                     )
                                                                                 ),
                                                                                 $crate::__pgrx_c_macros::expression::profile_value::<
@@ -12981,7 +13621,7 @@ macro_rules! HeapTupleHeaderIsHotUpdated {
                                                                                     $crate::__pgrx_c_macros::CValue::<
                                                                                         $crate::__pgrx_c_macros::CInt
                                                                                     >::new(
-                                                                                        $crate::HEAP_XMIN_INVALID as i32
+                                                                                        $crate::__pgrx_c_bindings::HEAP_XMIN_INVALID as i32
                                                                                     )
                                                                                 )
                                                                             )
@@ -12996,7 +13636,9 @@ macro_rules! HeapTupleHeaderIsHotUpdated {
                                                         >(
                                                             $crate::__pgrx_c_macros::CValue::<
                                                                 $crate::__pgrx_c_macros::CInt
-                                                            >::new($crate::HEAP_XMIN_INVALID as i32)
+                                                            >::new(
+                                                                $crate::__pgrx_c_bindings::HEAP_XMIN_INVALID as i32
+                                                            )
                                                         )
                                                     )
                                                 )
@@ -13069,7 +13711,9 @@ macro_rules! HeapTupleHeaderIsHotUpdated {
                                                         >(
                                                             $crate::__pgrx_c_macros::CValue::<
                                                                 $crate::__pgrx_c_macros::CInt
-                                                            >::new($crate::HEAP_HOT_UPDATED as i32)
+                                                            >::new(
+                                                                $crate::__pgrx_c_bindings::HEAP_HOT_UPDATED as i32
+                                                            )
                                                         )
                                                     )
                                                 )
@@ -13127,7 +13771,9 @@ macro_rules! HeapTupleHeaderIsHotUpdated {
                                                         >(
                                                             $crate::__pgrx_c_macros::CValue::<
                                                                 $crate::__pgrx_c_macros::CInt
-                                                            >::new($crate::HEAP_XMAX_INVALID as i32)
+                                                            >::new(
+                                                                $crate::__pgrx_c_bindings::HEAP_XMAX_INVALID as i32
+                                                            )
                                                         )
                                                     )
                                                 )
@@ -13202,7 +13848,7 @@ macro_rules! HeapTupleHeaderIsHotUpdated {
                                                                         $crate::__pgrx_c_macros::CValue::<
                                                                             $crate::__pgrx_c_macros::CInt
                                                                         >::new(
-                                                                            $crate::HEAP_XMIN_COMMITTED as i32
+                                                                            $crate::__pgrx_c_bindings::HEAP_XMIN_COMMITTED as i32
                                                                         )
                                                                     ),
                                                                     $crate::__pgrx_c_macros::expression::profile_value::<
@@ -13212,7 +13858,7 @@ macro_rules! HeapTupleHeaderIsHotUpdated {
                                                                         $crate::__pgrx_c_macros::CValue::<
                                                                             $crate::__pgrx_c_macros::CInt
                                                                         >::new(
-                                                                            $crate::HEAP_XMIN_INVALID as i32
+                                                                            $crate::__pgrx_c_bindings::HEAP_XMIN_INVALID as i32
                                                                         )
                                                                     )
                                                                 )
@@ -13227,7 +13873,9 @@ macro_rules! HeapTupleHeaderIsHotUpdated {
                                             >(
                                                 $crate::__pgrx_c_macros::CValue::<
                                                     $crate::__pgrx_c_macros::CInt
-                                                >::new($crate::HEAP_XMIN_INVALID as i32)
+                                                >::new(
+                                                    $crate::__pgrx_c_bindings::HEAP_XMIN_INVALID as i32
+                                                )
                                             )
                                         )
                                     )
@@ -13255,8 +13903,8 @@ macro_rules! HeapTupleHeaderIsHotUpdated {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -13287,23 +13935,23 @@ macro_rules! __pgrx_c_args_HeapTupleHeaderIsSpeculative {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
         $crate::__pgrx_c_args_HeapTupleHeaderIsSpeculative!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_HeapTupleHeaderIsSpeculative!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderIsSpeculative!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderIsSpeculative!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -13315,7 +13963,7 @@ macro_rules! __pgrx_c_args_HeapTupleHeaderIsSpeculative {
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
         $crate::__pgrx_c_args_HeapTupleHeaderIsSpeculative!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
@@ -13341,17 +13989,17 @@ macro_rules! __pgrx_c_args_HeapTupleHeaderIsSpeculative {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_HeapTupleHeaderIsSpeculative!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_HeapTupleHeaderIsSpeculative!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderIsSpeculative!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -13378,13 +14026,13 @@ macro_rules! __pgrx_c_args_HeapTupleHeaderIsSpeculative {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderIsSpeculative!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderIsSpeculative!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -13438,11 +14086,11 @@ macro_rules! HeapTupleHeaderIsSpeculative {
                             <
                                 $crate::__pgrx_c_macros::CUnsignedShort as $crate::__pgrx_c_macros::expression::CType
                             >::from_storage(
-                                $crate::ItemPointerGetOffsetNumberNoCheck(
+                                $crate::__pgrx_c_bindings::ItemPointerGetOffsetNumberNoCheck(
                                     <
                                         $crate::__pgrx_c_macros::expression::CPointer<
                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                $crate::ItemPointerData
+                                                $crate::__pgrx_c_bindings::ItemPointerData
                                             >,
                                             $crate::__pgrx_c_macros::expression::ReadOnly
                                         > as $crate::__pgrx_c_macros::expression::CType
@@ -13450,7 +14098,7 @@ macro_rules! HeapTupleHeaderIsSpeculative {
                                         $crate::__pgrx_c_macros::expression::implicit::<
                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                    $crate::ItemPointerData
+                                                    $crate::__pgrx_c_bindings::ItemPointerData
                                                 >,
                                                 $crate::__pgrx_c_macros::expression::ReadOnly
                                             >,
@@ -13489,7 +14137,7 @@ macro_rules! HeapTupleHeaderIsSpeculative {
                         ),
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                $crate::SpecTokenOffsetNumber as i32
+                                $crate::__pgrx_c_bindings::SpecTokenOffsetNumber as i32
                             )
                         )
                     )
@@ -13531,11 +14179,11 @@ macro_rules! HeapTupleHeaderIsSpeculative {
                                     <
                                         $crate::__pgrx_c_macros::CUnsignedShort as $crate::__pgrx_c_macros::expression::CType
                                     >::from_storage(
-                                        $crate::ItemPointerGetOffsetNumberNoCheck(
+                                        $crate::__pgrx_c_bindings::ItemPointerGetOffsetNumberNoCheck(
                                             <
                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                        $crate::ItemPointerData
+                                                        $crate::__pgrx_c_bindings::ItemPointerData
                                                     >,
                                                     $crate::__pgrx_c_macros::expression::ReadOnly
                                                 > as $crate::__pgrx_c_macros::expression::CType
@@ -13543,7 +14191,7 @@ macro_rules! HeapTupleHeaderIsSpeculative {
                                                 $crate::__pgrx_c_macros::expression::implicit::<
                                                     $crate::__pgrx_c_macros::expression::CPointer<
                                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                                            $crate::ItemPointerData
+                                                            $crate::__pgrx_c_bindings::ItemPointerData
                                                         >,
                                                         $crate::__pgrx_c_macros::expression::ReadOnly
                                                     >,
@@ -13582,7 +14230,7 @@ macro_rules! HeapTupleHeaderIsSpeculative {
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                        $crate::SpecTokenOffsetNumber as i32
+                                        $crate::__pgrx_c_bindings::SpecTokenOffsetNumber as i32
                                     )
                                 )
                             )
@@ -13605,11 +14253,11 @@ macro_rules! HeapTupleHeaderIsSpeculative {
                         <
                             $crate::__pgrx_c_macros::CUnsignedShort as $crate::__pgrx_c_macros::expression::CType
                         >::from_storage(
-                            $crate::ItemPointerGetOffsetNumberNoCheck(
+                            $crate::__pgrx_c_bindings::ItemPointerGetOffsetNumberNoCheck(
                                 <
                                     $crate::__pgrx_c_macros::expression::CPointer<
                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                            $crate::ItemPointerData
+                                            $crate::__pgrx_c_bindings::ItemPointerData
                                         >,
                                         $crate::__pgrx_c_macros::expression::ReadOnly
                                     > as $crate::__pgrx_c_macros::expression::CType
@@ -13617,7 +14265,7 @@ macro_rules! HeapTupleHeaderIsSpeculative {
                                     $crate::__pgrx_c_macros::expression::implicit::<
                                         $crate::__pgrx_c_macros::expression::CPointer<
                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                $crate::ItemPointerData
+                                                $crate::__pgrx_c_bindings::ItemPointerData
                                             >,
                                             $crate::__pgrx_c_macros::expression::ReadOnly
                                         >,
@@ -13656,7 +14304,7 @@ macro_rules! HeapTupleHeaderIsSpeculative {
                     ),
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                            $crate::SpecTokenOffsetNumber as i32
+                            $crate::__pgrx_c_bindings::SpecTokenOffsetNumber as i32
                         )
                     )
                 )
@@ -13678,8 +14326,769 @@ macro_rules! HeapTupleHeaderIsSpeculative {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
+    target_pointer_width = "64",
+    target_endian = "little"
+)))]
+#[cfg(not(docsrs))]
+compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
+#[doc(hidden)]
+#[macro_export]
+macro_rules! __pgrx_c_args_HeapTupleHeaderSetCmax {
+    (@collect $mode:ident [$($done:tt)*]; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_HeapTupleHeaderSetCmax!(@p0 $mode [$($done)*]; $($raw)*)
+    };
+    (@classified [$next:ident $mode:ident [$($done:tt)*] [$($rest:tt)*]] $descriptor:tt) => {
+        $crate::__pgrx_c_args_HeapTupleHeaderSetCmax!(
+            @$next $mode [$($done)* $descriptor,];
+            $($rest)*
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_HeapTupleHeaderSetCmax!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+            $($rest)*
+        )
+    };
+    (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_HeapTupleHeaderSetCmax!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; - $($raw:tt)*) => {
+        $crate::__pgrx_c_args_HeapTupleHeaderSetCmax!(@negative0 $mode [$($done)*]; - $($raw)*)
+    };
+    (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
+        $crate::__pgrx_c_args_HeapTupleHeaderSetCmax!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_HeapTupleHeaderSetCmax] [p1 $mode [$($done)*] [$($rest)*]] [
+                $head $(::$tail)* ! $group
+            ]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; ::$head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_HeapTupleHeaderSetCmax] [p1 $mode [$($done)*] [$($rest)*]] [
+                ::$head $(::$tail)* ! $group
+            ]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; ($($inner:tt)*), $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_HeapTupleHeaderSetCmax] [p1 $mode [$($done)*] [$($rest)*]] [
+                ($($inner)*)
+            ]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_HeapTupleHeaderSetCmax!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_HeapTupleHeaderSetCmax!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_HeapTupleHeaderSetCmax!(
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+            $($rest)*
+        )
+    };
+    (@negative1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_HeapTupleHeaderSetCmax!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; - $($raw:tt)*) => {
+        $crate::__pgrx_c_args_HeapTupleHeaderSetCmax!(@negative1 $mode [$($done)*]; - $($raw)*)
+    };
+    (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
+        $crate::__pgrx_c_args_HeapTupleHeaderSetCmax!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_HeapTupleHeaderSetCmax] [p2 $mode [$($done)*] [$($rest)*]] [
+                $head $(::$tail)* ! $group
+            ]
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; ::$head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_HeapTupleHeaderSetCmax] [p2 $mode [$($done)*] [$($rest)*]] [
+                ::$head $(::$tail)* ! $group
+            ]
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; ($($inner:tt)*), $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_HeapTupleHeaderSetCmax] [p2 $mode [$($done)*] [$($rest)*]] [
+                ($($inner)*)
+            ]
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_HeapTupleHeaderSetCmax!(
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_HeapTupleHeaderSetCmax!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p2 $mode:ident [$($done:tt)*]; - $argument:literal) => {
+        $crate::__pgrx_c_args_HeapTupleHeaderSetCmax!(
+            @p3 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
+    };
+    (@negative2 $mode:ident [$($done:tt)*]; $argument:expr) => {
+        $crate::__pgrx_c_args_HeapTupleHeaderSetCmax!(
+            @p3 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
+    };
+    (@p2 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_HeapTupleHeaderSetCmax!(
+            @p3 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+            $($rest)*
+        )
+    };
+    (@negative2 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_HeapTupleHeaderSetCmax!(
+            @p3 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p2 $mode:ident [$($done:tt)*]; - $($raw:tt)*) => {
+        $crate::__pgrx_c_args_HeapTupleHeaderSetCmax!(@negative2 $mode [$($done)*]; - $($raw)*)
+    };
+    (@p2 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
+        $crate::__pgrx_c_args_HeapTupleHeaderSetCmax!(
+            @p3 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
+    };
+    (@p2 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_HeapTupleHeaderSetCmax] [p3 $mode [$($done)*] []] [
+                $head $(::$tail)* ! $group
+            ]
+        )
+    };
+    (@p2 $mode:ident [$($done:tt)*]; ::$head:ident $(::$tail:ident)* ! $group:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_HeapTupleHeaderSetCmax] [p3 $mode [$($done)*] []] [
+                ::$head $(::$tail)* ! $group
+            ]
+        )
+    };
+    (@p2 $mode:ident [$($done:tt)*]; ($($inner:tt)*)) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_HeapTupleHeaderSetCmax] [p3 $mode [$($done)*] []] [
+                ($($inner)*)
+            ]
+        )
+    };
+    (@p2 $mode:ident [$($done:tt)*]; $argument:literal) => {
+        $crate::__pgrx_c_args_HeapTupleHeaderSetCmax!(
+            @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
+    };
+    (@p2 $mode:ident [$($done:tt)*]; $argument:expr) => {
+        $crate::__pgrx_c_args_HeapTupleHeaderSetCmax!(
+            @p3 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
+    };
+    (@p2 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
+        $crate::__pgrx_c_args_HeapTupleHeaderSetCmax!(
+            @p3 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p2 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_HeapTupleHeaderSetCmax] [p3 $mode [$($done)*] [$($rest)*]] [
+                $head $(::$tail)* ! $group
+            ]
+        )
+    };
+    (@p2 $mode:ident [$($done:tt)*]; ::$head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_HeapTupleHeaderSetCmax] [p3 $mode [$($done)*] [$($rest)*]] [
+                ::$head $(::$tail)* ! $group
+            ]
+        )
+    };
+    (@p2 $mode:ident [$($done:tt)*]; ($($inner:tt)*), $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_HeapTupleHeaderSetCmax] [p3 $mode [$($done)*] [$($rest)*]] [
+                ($($inner)*)
+            ]
+        )
+    };
+    (@p2 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_HeapTupleHeaderSetCmax!(
+            @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p2 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_HeapTupleHeaderSetCmax!(
+            @p3 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p3 $mode:ident [$($done:tt)*];) => {
+        $crate::HeapTupleHeaderSetCmax!(@$mode; $($done)*)
+    };
+    ($($invalid:tt)*) => {
+        compile_error!("arguments do not satisfy this C macro's invocation contract")
+    };
+}
+/// C macro HeapTupleHeaderSetCmax from htup_details.h:406
+///
+/// ```text
+/// #define HeapTupleHeaderSetCmax( tup , cid , iscombo ) do { Assert ( ! ( ( tup ) -> t_infomask & HEAP_MOVED ) ) ; ( tup ) -> t_choice . t_heap . t_field3 . t_cid = ( cid ) ; if ( iscombo ) ( tup ) -> t_infomask |= HEAP_COMBOCID ; else ( tup ) -> t_infomask &= ~ HEAP_COMBOCID ; } while ( 0 )
+/// ```
+///
+///
+/// This macro executes C statements in order and yields no value. Local blocks retain their C scope. Pointer access and native calls keep their usual caller safety obligations.
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+#[macro_export]
+macro_rules! HeapTupleHeaderSetCmax {
+    (@__pgrx_emit_check_safety; $tup:tt, $cid:tt, $iscombo:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $tup);
+                $crate::__pgrx_c_operand!(@check_safety; $cid);
+                $crate::__pgrx_c_operand!(@check_safety; $iscombo);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_HeapTupleHeaderSetCmax!(
+            @collect __pgrx_emit_check_safety [];
+            $($raw)*
+        )
+    };
+    (@__pgrx_emit_public; $tup:tt, $cid:tt, $iscombo:tt $(,)?) => {
+        {
+            /* PGRX: Assert remains expanded because preserving the complete statement body and its order has not been proved equivalent to C substitution. */
+            {
+                let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    {
+                        {
+                            let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                /* PGRX: true remains expanded because no integer constant binding is available in the defining Rust crate. */
+                                $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
+                                    1i32
+                                )
+                            );
+                        }
+                    }
+                );
+            };
+            {
+                let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::assign(
+                        $crate::__pgrx_c_macros::expression::project::<
+                            $crate::__pgrx_c_generated::Field_t_cid,
+                            _,
+                            _
+                        >(
+                            $crate::__pgrx_c_macros::expression::project::<
+                                $crate::__pgrx_c_generated::Field_t_field3,
+                                _,
+                                _
+                            >(
+                                $crate::__pgrx_c_macros::expression::project::<
+                                    $crate::__pgrx_c_generated::Field_t_heap,
+                                    _,
+                                    _
+                                >(
+                                    $crate::__pgrx_c_macros::expression::project::<
+                                        $crate::__pgrx_c_generated::Field_t_choice,
+                                        _,
+                                        _
+                                    >(
+                                        $crate::__pgrx_c_macros::expression::pointee(
+                                            (
+                                                $crate::__pgrx_c_macros::expression::profile_value::<
+                                                    true,
+                                                    _
+                                                >($crate::__pgrx_c_operand!(@value [true]; $tup))
+                                            )
+                                        )
+                                    )
+                                )
+                            )
+                        ),
+                        (
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_operand!(@value [true]; $cid)
+                            )
+                        )
+                    )
+                );
+            };
+            if $crate::__pgrx_c_macros::expression::truth(
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_operand!(@value [true]; $iscombo)
+                    )
+                )
+            ) {
+                {
+                    let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::modify(
+                            $crate::__pgrx_c_macros::expression::project::<
+                                $crate::__pgrx_c_generated::Field_t_infomask,
+                                _,
+                                _
+                            >(
+                                $crate::__pgrx_c_macros::expression::pointee(
+                                    (
+                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                            true,
+                                            _
+                                        >($crate::__pgrx_c_operand!(@value [true]; $tup))
+                                    )
+                                )
+                            ),
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
+                                    $crate::__pgrx_c_bindings::HEAP_COMBOCID as i32
+                                )
+                            ),
+                            |__pgrx_old,
+                            __pgrx_rhs| $crate::__pgrx_c_macros::expression::bitor(
+                                __pgrx_old,
+                                __pgrx_rhs
+                            )
+                        )
+                    );
+                };
+            } else {
+                {
+                    let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::modify(
+                            $crate::__pgrx_c_macros::expression::project::<
+                                $crate::__pgrx_c_generated::Field_t_infomask,
+                                _,
+                                _
+                            >(
+                                $crate::__pgrx_c_macros::expression::pointee(
+                                    (
+                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                            true,
+                                            _
+                                        >($crate::__pgrx_c_operand!(@value [true]; $tup))
+                                    )
+                                )
+                            ),
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_macros::expression::bitnot(
+                                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                        $crate::__pgrx_c_macros::CValue::<
+                                            $crate::__pgrx_c_macros::CInt
+                                        >::new($crate::__pgrx_c_bindings::HEAP_COMBOCID as i32)
+                                    )
+                                )
+                            ),
+                            |__pgrx_old,
+                            __pgrx_rhs| $crate::__pgrx_c_macros::expression::bitand(
+                                __pgrx_old,
+                                __pgrx_rhs
+                            )
+                        )
+                    );
+                };
+            }
+        }
+    };
+    (@__pgrx_emit_discard; $tup:tt, $cid:tt, $iscombo:tt $(,)?) => {
+        $crate::HeapTupleHeaderSetCmax!(@__pgrx_emit_public; $tup, $cid, $iscombo)
+    };
+    (@__pgrx_c_discard; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_HeapTupleHeaderSetCmax!(@collect __pgrx_emit_discard []; $($raw)*)
+    };
+    (@$mode:ident; $($raw:tt)*) => {
+        compile_error!("a C statement body is not an expression operand")
+    };
+    ($($raw:tt)*) => {
+        $crate::__pgrx_c_args_HeapTupleHeaderSetCmax!(@collect __pgrx_emit_public []; $($raw)*)
+    };
+}
+
+#[cfg(not(all(
+    target_arch = "x86_64",
+    target_os = "linux",
+    target_pointer_width = "64",
+    target_endian = "little"
+)))]
+#[cfg(not(docsrs))]
+compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
+#[doc(hidden)]
+#[macro_export]
+macro_rules! __pgrx_c_args_HeapTupleHeaderSetCmin {
+    (@collect $mode:ident [$($done:tt)*]; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_HeapTupleHeaderSetCmin!(@p0 $mode [$($done)*]; $($raw)*)
+    };
+    (@classified [$next:ident $mode:ident [$($done:tt)*] [$($rest:tt)*]] $descriptor:tt) => {
+        $crate::__pgrx_c_args_HeapTupleHeaderSetCmin!(
+            @$next $mode [$($done)* $descriptor,];
+            $($rest)*
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_HeapTupleHeaderSetCmin!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+            $($rest)*
+        )
+    };
+    (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_HeapTupleHeaderSetCmin!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; - $($raw:tt)*) => {
+        $crate::__pgrx_c_args_HeapTupleHeaderSetCmin!(@negative0 $mode [$($done)*]; - $($raw)*)
+    };
+    (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
+        $crate::__pgrx_c_args_HeapTupleHeaderSetCmin!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_HeapTupleHeaderSetCmin] [p1 $mode [$($done)*] [$($rest)*]] [
+                $head $(::$tail)* ! $group
+            ]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; ::$head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_HeapTupleHeaderSetCmin] [p1 $mode [$($done)*] [$($rest)*]] [
+                ::$head $(::$tail)* ! $group
+            ]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; ($($inner:tt)*), $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_HeapTupleHeaderSetCmin] [p1 $mode [$($done)*] [$($rest)*]] [
+                ($($inner)*)
+            ]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_HeapTupleHeaderSetCmin!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_HeapTupleHeaderSetCmin!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; - $argument:literal) => {
+        $crate::__pgrx_c_args_HeapTupleHeaderSetCmin!(
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
+    };
+    (@negative1 $mode:ident [$($done:tt)*]; $argument:expr) => {
+        $crate::__pgrx_c_args_HeapTupleHeaderSetCmin!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_HeapTupleHeaderSetCmin!(
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+            $($rest)*
+        )
+    };
+    (@negative1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_HeapTupleHeaderSetCmin!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; - $($raw:tt)*) => {
+        $crate::__pgrx_c_args_HeapTupleHeaderSetCmin!(@negative1 $mode [$($done)*]; - $($raw)*)
+    };
+    (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
+        $crate::__pgrx_c_args_HeapTupleHeaderSetCmin!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_HeapTupleHeaderSetCmin] [p2 $mode [$($done)*] []] [
+                $head $(::$tail)* ! $group
+            ]
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; ::$head:ident $(::$tail:ident)* ! $group:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_HeapTupleHeaderSetCmin] [p2 $mode [$($done)*] []] [
+                ::$head $(::$tail)* ! $group
+            ]
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; ($($inner:tt)*)) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_HeapTupleHeaderSetCmin] [p2 $mode [$($done)*] []] [
+                ($($inner)*)
+            ]
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
+        $crate::__pgrx_c_args_HeapTupleHeaderSetCmin!(
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; $argument:expr) => {
+        $crate::__pgrx_c_args_HeapTupleHeaderSetCmin!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
+        $crate::__pgrx_c_args_HeapTupleHeaderSetCmin!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_HeapTupleHeaderSetCmin] [p2 $mode [$($done)*] [$($rest)*]] [
+                $head $(::$tail)* ! $group
+            ]
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; ::$head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_HeapTupleHeaderSetCmin] [p2 $mode [$($done)*] [$($rest)*]] [
+                ::$head $(::$tail)* ! $group
+            ]
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; ($($inner:tt)*), $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_HeapTupleHeaderSetCmin] [p2 $mode [$($done)*] [$($rest)*]] [
+                ($($inner)*)
+            ]
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_HeapTupleHeaderSetCmin!(
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_HeapTupleHeaderSetCmin!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p2 $mode:ident [$($done:tt)*];) => {
+        $crate::HeapTupleHeaderSetCmin!(@$mode; $($done)*)
+    };
+    ($($invalid:tt)*) => {
+        compile_error!("arguments do not satisfy this C macro's invocation contract")
+    };
+}
+/// C macro HeapTupleHeaderSetCmin from htup_details.h:398
+///
+/// ```text
+/// #define HeapTupleHeaderSetCmin( tup , cid ) do { Assert ( ! ( ( tup ) -> t_infomask & HEAP_MOVED ) ) ; ( tup ) -> t_choice . t_heap . t_field3 . t_cid = ( cid ) ; ( tup ) -> t_infomask &= ~ HEAP_COMBOCID ; } while ( 0 )
+/// ```
+///
+///
+/// This macro executes C statements in order and yields no value. Local blocks retain their C scope. Pointer access and native calls keep their usual caller safety obligations.
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+#[macro_export]
+macro_rules! HeapTupleHeaderSetCmin {
+    (@__pgrx_emit_check_safety; $tup:tt, $cid:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $tup);
+                $crate::__pgrx_c_operand!(@check_safety; $cid);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_HeapTupleHeaderSetCmin!(
+            @collect __pgrx_emit_check_safety [];
+            $($raw)*
+        )
+    };
+    (@__pgrx_emit_public; $tup:tt, $cid:tt $(,)?) => {
+        {
+            /* PGRX: Assert remains expanded because preserving the complete statement body and its order has not been proved equivalent to C substitution. */
+            {
+                let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    {
+                        {
+                            let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                /* PGRX: true remains expanded because no integer constant binding is available in the defining Rust crate. */
+                                $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
+                                    1i32
+                                )
+                            );
+                        }
+                    }
+                );
+            };
+            {
+                let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::assign(
+                        $crate::__pgrx_c_macros::expression::project::<
+                            $crate::__pgrx_c_generated::Field_t_cid,
+                            _,
+                            _
+                        >(
+                            $crate::__pgrx_c_macros::expression::project::<
+                                $crate::__pgrx_c_generated::Field_t_field3,
+                                _,
+                                _
+                            >(
+                                $crate::__pgrx_c_macros::expression::project::<
+                                    $crate::__pgrx_c_generated::Field_t_heap,
+                                    _,
+                                    _
+                                >(
+                                    $crate::__pgrx_c_macros::expression::project::<
+                                        $crate::__pgrx_c_generated::Field_t_choice,
+                                        _,
+                                        _
+                                    >(
+                                        $crate::__pgrx_c_macros::expression::pointee(
+                                            (
+                                                $crate::__pgrx_c_macros::expression::profile_value::<
+                                                    true,
+                                                    _
+                                                >($crate::__pgrx_c_operand!(@value [true]; $tup))
+                                            )
+                                        )
+                                    )
+                                )
+                            )
+                        ),
+                        (
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_operand!(@value [true]; $cid)
+                            )
+                        )
+                    )
+                );
+            };
+            {
+                let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::modify(
+                        $crate::__pgrx_c_macros::expression::project::<
+                            $crate::__pgrx_c_generated::Field_t_infomask,
+                            _,
+                            _
+                        >(
+                            $crate::__pgrx_c_macros::expression::pointee(
+                                (
+                                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                        $crate::__pgrx_c_operand!(@value [true]; $tup)
+                                    )
+                                )
+                            )
+                        ),
+                        $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                            $crate::__pgrx_c_macros::expression::bitnot(
+                                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                    $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
+                                        $crate::__pgrx_c_bindings::HEAP_COMBOCID as i32
+                                    )
+                                )
+                            )
+                        ),
+                        |__pgrx_old,
+                        __pgrx_rhs| $crate::__pgrx_c_macros::expression::bitand(
+                            __pgrx_old,
+                            __pgrx_rhs
+                        )
+                    )
+                );
+            };
+        }
+    };
+    (@__pgrx_emit_discard; $tup:tt, $cid:tt $(,)?) => {
+        $crate::HeapTupleHeaderSetCmin!(@__pgrx_emit_public; $tup, $cid)
+    };
+    (@__pgrx_c_discard; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_HeapTupleHeaderSetCmin!(@collect __pgrx_emit_discard []; $($raw)*)
+    };
+    (@$mode:ident; $($raw:tt)*) => {
+        compile_error!("a C statement body is not an expression operand")
+    };
+    ($($raw:tt)*) => {
+        $crate::__pgrx_c_args_HeapTupleHeaderSetCmin!(@collect __pgrx_emit_public []; $($raw)*)
+    };
+}
+
+#[cfg(not(all(
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -13710,13 +15119,13 @@ macro_rules! __pgrx_c_args_HeapTupleHeaderSetDatumLength {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderSetDatumLength!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderSetDatumLength!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -13728,7 +15137,7 @@ macro_rules! __pgrx_c_args_HeapTupleHeaderSetDatumLength {
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderSetDatumLength!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -13755,35 +15164,35 @@ macro_rules! __pgrx_c_args_HeapTupleHeaderSetDatumLength {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderSetDatumLength!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderSetDatumLength!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $argument:literal) => {
         $crate::__pgrx_c_args_HeapTupleHeaderSetDatumLength!(
-            @p2 $mode [$($done)* (@literal [- $argument]),];
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
         )
     };
     (@negative1 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_HeapTupleHeaderSetDatumLength!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderSetDatumLength!(
-            @p2 $mode [$($done)* (@literal [- $argument]),];
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderSetDatumLength!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -13795,7 +15204,7 @@ macro_rules! __pgrx_c_args_HeapTupleHeaderSetDatumLength {
     };
     (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
         $crate::__pgrx_c_args_HeapTupleHeaderSetDatumLength!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
@@ -13821,17 +15230,17 @@ macro_rules! __pgrx_c_args_HeapTupleHeaderSetDatumLength {
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_HeapTupleHeaderSetDatumLength!(
-            @p2 $mode [$($done)* (@literal [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_HeapTupleHeaderSetDatumLength!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderSetDatumLength!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -13858,13 +15267,13 @@ macro_rules! __pgrx_c_args_HeapTupleHeaderSetDatumLength {
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderSetDatumLength!(
-            @p2 $mode [$($done)* (@literal [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderSetDatumLength!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -13929,10 +15338,10 @@ macro_rules! HeapTupleHeaderSetDatumLength {
                                 (
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::expression::cast_as::<
-                                            *mut $crate::varattrib_4b,
+                                            *mut $crate::__pgrx_c_bindings::varattrib_4b,
                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                    $crate::varattrib_4b
+                                                    $crate::__pgrx_c_bindings::varattrib_4b
                                                 >,
                                                 $crate::__pgrx_c_macros::expression::ReadWrite
                                             >,
@@ -13960,7 +15369,7 @@ macro_rules! HeapTupleHeaderSetDatumLength {
                                 (
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::expression::cast_as::<
-                                            $crate::uint32,
+                                            $crate::__pgrx_c_bindings::uint32,
                                             $crate::__pgrx_c_macros::CUnsignedInt,
                                             _
                                         >(
@@ -14040,10 +15449,10 @@ macro_rules! HeapTupleHeaderSetDatumLength {
                                                     _
                                                 >(
                                                     $crate::__pgrx_c_macros::expression::cast_as::<
-                                                        *mut $crate::varattrib_4b,
+                                                        *mut $crate::__pgrx_c_bindings::varattrib_4b,
                                                         $crate::__pgrx_c_macros::expression::CPointer<
                                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                                $crate::varattrib_4b
+                                                                $crate::__pgrx_c_bindings::varattrib_4b
                                                             >,
                                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                                         >,
@@ -14079,7 +15488,7 @@ macro_rules! HeapTupleHeaderSetDatumLength {
                                                     _
                                                 >(
                                                     $crate::__pgrx_c_macros::expression::cast_as::<
-                                                        $crate::uint32,
+                                                        $crate::__pgrx_c_bindings::uint32,
                                                         $crate::__pgrx_c_macros::CUnsignedInt,
                                                         _
                                                     >(
@@ -14139,10 +15548,10 @@ macro_rules! HeapTupleHeaderSetDatumLength {
                                 (
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::expression::cast_as::<
-                                            *mut $crate::varattrib_4b,
+                                            *mut $crate::__pgrx_c_bindings::varattrib_4b,
                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                    $crate::varattrib_4b
+                                                    $crate::__pgrx_c_bindings::varattrib_4b
                                                 >,
                                                 $crate::__pgrx_c_macros::expression::ReadWrite
                                             >,
@@ -14170,7 +15579,7 @@ macro_rules! HeapTupleHeaderSetDatumLength {
                                 (
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::expression::cast_as::<
-                                            $crate::uint32,
+                                            $crate::__pgrx_c_bindings::uint32,
                                             $crate::__pgrx_c_macros::CUnsignedInt,
                                             _
                                         >(
@@ -14210,8 +15619,8 @@ macro_rules! HeapTupleHeaderSetDatumLength {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -14242,23 +15651,23 @@ macro_rules! __pgrx_c_args_HeapTupleHeaderSetHeapOnly {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
         $crate::__pgrx_c_args_HeapTupleHeaderSetHeapOnly!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_HeapTupleHeaderSetHeapOnly!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderSetHeapOnly!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderSetHeapOnly!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -14267,7 +15676,7 @@ macro_rules! __pgrx_c_args_HeapTupleHeaderSetHeapOnly {
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
         $crate::__pgrx_c_args_HeapTupleHeaderSetHeapOnly!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
@@ -14293,17 +15702,17 @@ macro_rules! __pgrx_c_args_HeapTupleHeaderSetHeapOnly {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_HeapTupleHeaderSetHeapOnly!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_HeapTupleHeaderSetHeapOnly!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderSetHeapOnly!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -14330,13 +15739,13 @@ macro_rules! __pgrx_c_args_HeapTupleHeaderSetHeapOnly {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderSetHeapOnly!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderSetHeapOnly!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -14396,7 +15805,7 @@ macro_rules! HeapTupleHeaderSetHeapOnly {
                     ),
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                            $crate::HEAP_ONLY_TUPLE as i32
+                            $crate::__pgrx_c_bindings::HEAP_ONLY_TUPLE as i32
                         )
                     ),
                     |__pgrx_old,
@@ -14451,7 +15860,7 @@ macro_rules! HeapTupleHeaderSetHeapOnly {
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                        $crate::HEAP_ONLY_TUPLE as i32
+                                        $crate::__pgrx_c_bindings::HEAP_ONLY_TUPLE as i32
                                     )
                                 ),
                                 |__pgrx_old,
@@ -14490,7 +15899,7 @@ macro_rules! HeapTupleHeaderSetHeapOnly {
                     ),
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                            $crate::HEAP_ONLY_TUPLE as i32
+                            $crate::__pgrx_c_bindings::HEAP_ONLY_TUPLE as i32
                         )
                     ),
                     |__pgrx_old,
@@ -14508,8 +15917,8 @@ macro_rules! HeapTupleHeaderSetHeapOnly {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -14540,23 +15949,23 @@ macro_rules! __pgrx_c_args_HeapTupleHeaderSetHotUpdated {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
         $crate::__pgrx_c_args_HeapTupleHeaderSetHotUpdated!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_HeapTupleHeaderSetHotUpdated!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderSetHotUpdated!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderSetHotUpdated!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -14568,7 +15977,7 @@ macro_rules! __pgrx_c_args_HeapTupleHeaderSetHotUpdated {
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
         $crate::__pgrx_c_args_HeapTupleHeaderSetHotUpdated!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
@@ -14594,17 +16003,17 @@ macro_rules! __pgrx_c_args_HeapTupleHeaderSetHotUpdated {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_HeapTupleHeaderSetHotUpdated!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_HeapTupleHeaderSetHotUpdated!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderSetHotUpdated!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -14631,13 +16040,13 @@ macro_rules! __pgrx_c_args_HeapTupleHeaderSetHotUpdated {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderSetHotUpdated!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderSetHotUpdated!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -14697,7 +16106,7 @@ macro_rules! HeapTupleHeaderSetHotUpdated {
                     ),
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                            $crate::HEAP_HOT_UPDATED as i32
+                            $crate::__pgrx_c_bindings::HEAP_HOT_UPDATED as i32
                         )
                     ),
                     |__pgrx_old,
@@ -14752,7 +16161,7 @@ macro_rules! HeapTupleHeaderSetHotUpdated {
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                        $crate::HEAP_HOT_UPDATED as i32
+                                        $crate::__pgrx_c_bindings::HEAP_HOT_UPDATED as i32
                                     )
                                 ),
                                 |__pgrx_old,
@@ -14791,7 +16200,7 @@ macro_rules! HeapTupleHeaderSetHotUpdated {
                     ),
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                            $crate::HEAP_HOT_UPDATED as i32
+                            $crate::__pgrx_c_bindings::HEAP_HOT_UPDATED as i32
                         )
                     ),
                     |__pgrx_old,
@@ -14815,8 +16224,8 @@ macro_rules! HeapTupleHeaderSetHotUpdated {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -14847,23 +16256,23 @@ macro_rules! __pgrx_c_args_HeapTupleHeaderSetMatch {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
         $crate::__pgrx_c_args_HeapTupleHeaderSetMatch!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_HeapTupleHeaderSetMatch!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderSetMatch!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderSetMatch!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -14872,7 +16281,7 @@ macro_rules! __pgrx_c_args_HeapTupleHeaderSetMatch {
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
         $crate::__pgrx_c_args_HeapTupleHeaderSetMatch!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
@@ -14898,17 +16307,17 @@ macro_rules! __pgrx_c_args_HeapTupleHeaderSetMatch {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_HeapTupleHeaderSetMatch!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_HeapTupleHeaderSetMatch!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderSetMatch!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -14935,13 +16344,13 @@ macro_rules! __pgrx_c_args_HeapTupleHeaderSetMatch {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderSetMatch!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderSetMatch!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -15001,7 +16410,7 @@ macro_rules! HeapTupleHeaderSetMatch {
                     ),
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                            $crate::HEAP_TUPLE_HAS_MATCH as i32
+                            $crate::__pgrx_c_bindings::HEAP_TUPLE_HAS_MATCH as i32
                         )
                     ),
                     |__pgrx_old,
@@ -15053,7 +16462,7 @@ macro_rules! HeapTupleHeaderSetMatch {
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                        $crate::HEAP_TUPLE_HAS_MATCH as i32
+                                        $crate::__pgrx_c_bindings::HEAP_TUPLE_HAS_MATCH as i32
                                     )
                                 ),
                                 |__pgrx_old,
@@ -15092,7 +16501,7 @@ macro_rules! HeapTupleHeaderSetMatch {
                     ),
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                            $crate::HEAP_TUPLE_HAS_MATCH as i32
+                            $crate::__pgrx_c_bindings::HEAP_TUPLE_HAS_MATCH as i32
                         )
                     ),
                     |__pgrx_old,
@@ -15110,8 +16519,8 @@ macro_rules! HeapTupleHeaderSetMatch {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -15142,23 +16551,23 @@ macro_rules! __pgrx_c_args_HeapTupleHeaderSetMovedPartitions {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
         $crate::__pgrx_c_args_HeapTupleHeaderSetMovedPartitions!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_HeapTupleHeaderSetMovedPartitions!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderSetMovedPartitions!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderSetMovedPartitions!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -15170,7 +16579,7 @@ macro_rules! __pgrx_c_args_HeapTupleHeaderSetMovedPartitions {
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
         $crate::__pgrx_c_args_HeapTupleHeaderSetMovedPartitions!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
@@ -15196,17 +16605,17 @@ macro_rules! __pgrx_c_args_HeapTupleHeaderSetMovedPartitions {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_HeapTupleHeaderSetMovedPartitions!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_HeapTupleHeaderSetMovedPartitions!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderSetMovedPartitions!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -15233,13 +16642,13 @@ macro_rules! __pgrx_c_args_HeapTupleHeaderSetMovedPartitions {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderSetMovedPartitions!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderSetMovedPartitions!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -15287,16 +16696,20 @@ macro_rules! HeapTupleHeaderSetMovedPartitions {
     (@__pgrx_emit_value; $tup:tt $(,)?) => {
         /* PGRX: HeapTupleHeaderSetMovedPartitions remains expanded because ItemPointerSetMovedPartitions is not an active function-like macro. */
         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-            $crate::ItemPointerSetMovedPartitions(
+            $crate::__pgrx_c_bindings::ItemPointerSetMovedPartitions(
                 <
                     $crate::__pgrx_c_macros::expression::CPointer<
-                        $crate::__pgrx_c_macros::expression::CRecord<$crate::ItemPointerData>,
+                        $crate::__pgrx_c_macros::expression::CRecord<
+                            $crate::__pgrx_c_bindings::ItemPointerData
+                        >,
                         $crate::__pgrx_c_macros::expression::ReadWrite
                     > as $crate::__pgrx_c_macros::expression::CType
                 >::into_storage(
                     $crate::__pgrx_c_macros::expression::implicit::<
                         $crate::__pgrx_c_macros::expression::CPointer<
-                            $crate::__pgrx_c_macros::expression::CRecord<$crate::ItemPointerData>,
+                            $crate::__pgrx_c_macros::expression::CRecord<
+                                $crate::__pgrx_c_bindings::ItemPointerData
+                            >,
                             $crate::__pgrx_c_macros::expression::ReadWrite
                         >,
                         _
@@ -15360,11 +16773,11 @@ macro_rules! HeapTupleHeaderSetMovedPartitions {
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                            $crate::ItemPointerSetMovedPartitions(
+                            $crate::__pgrx_c_bindings::ItemPointerSetMovedPartitions(
                                 <
                                     $crate::__pgrx_c_macros::expression::CPointer<
                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                            $crate::ItemPointerData
+                                            $crate::__pgrx_c_bindings::ItemPointerData
                                         >,
                                         $crate::__pgrx_c_macros::expression::ReadWrite
                                     > as $crate::__pgrx_c_macros::expression::CType
@@ -15372,7 +16785,7 @@ macro_rules! HeapTupleHeaderSetMovedPartitions {
                                     $crate::__pgrx_c_macros::expression::implicit::<
                                         $crate::__pgrx_c_macros::expression::CPointer<
                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                $crate::ItemPointerData
+                                                $crate::__pgrx_c_bindings::ItemPointerData
                                             >,
                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                         >,
@@ -15425,17 +16838,19 @@ macro_rules! HeapTupleHeaderSetMovedPartitions {
         /* PGRX: HeapTupleHeaderSetMovedPartitions remains expanded because ItemPointerSetMovedPartitions is not an active function-like macro. */
         {
             let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                $crate::ItemPointerSetMovedPartitions(
+                $crate::__pgrx_c_bindings::ItemPointerSetMovedPartitions(
                     <
                         $crate::__pgrx_c_macros::expression::CPointer<
-                            $crate::__pgrx_c_macros::expression::CRecord<$crate::ItemPointerData>,
+                            $crate::__pgrx_c_macros::expression::CRecord<
+                                $crate::__pgrx_c_bindings::ItemPointerData
+                            >,
                             $crate::__pgrx_c_macros::expression::ReadWrite
                         > as $crate::__pgrx_c_macros::expression::CType
                     >::into_storage(
                         $crate::__pgrx_c_macros::expression::implicit::<
                             $crate::__pgrx_c_macros::expression::CPointer<
                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                    $crate::ItemPointerData
+                                    $crate::__pgrx_c_bindings::ItemPointerData
                                 >,
                                 $crate::__pgrx_c_macros::expression::ReadWrite
                             >,
@@ -15480,8 +16895,8 @@ macro_rules! HeapTupleHeaderSetMovedPartitions {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -15512,13 +16927,13 @@ macro_rules! __pgrx_c_args_HeapTupleHeaderSetNatts {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderSetNatts!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderSetNatts!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -15527,7 +16942,7 @@ macro_rules! __pgrx_c_args_HeapTupleHeaderSetNatts {
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderSetNatts!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -15554,35 +16969,35 @@ macro_rules! __pgrx_c_args_HeapTupleHeaderSetNatts {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderSetNatts!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderSetNatts!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $argument:literal) => {
         $crate::__pgrx_c_args_HeapTupleHeaderSetNatts!(
-            @p2 $mode [$($done)* (@literal [- $argument]),];
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
         )
     };
     (@negative1 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_HeapTupleHeaderSetNatts!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderSetNatts!(
-            @p2 $mode [$($done)* (@literal [- $argument]),];
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderSetNatts!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -15591,7 +17006,7 @@ macro_rules! __pgrx_c_args_HeapTupleHeaderSetNatts {
     };
     (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
         $crate::__pgrx_c_args_HeapTupleHeaderSetNatts!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
@@ -15617,17 +17032,17 @@ macro_rules! __pgrx_c_args_HeapTupleHeaderSetNatts {
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_HeapTupleHeaderSetNatts!(
-            @p2 $mode [$($done)* (@literal [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_HeapTupleHeaderSetNatts!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderSetNatts!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -15654,13 +17069,13 @@ macro_rules! __pgrx_c_args_HeapTupleHeaderSetNatts {
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderSetNatts!(
-            @p2 $mode [$($done)* (@literal [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderSetNatts!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -15761,7 +17176,9 @@ macro_rules! HeapTupleHeaderSetNatts {
                                                 >(
                                                     $crate::__pgrx_c_macros::CValue::<
                                                         $crate::__pgrx_c_macros::CInt
-                                                    >::new($crate::HEAP_NATTS_MASK as i32)
+                                                    >::new(
+                                                        $crate::__pgrx_c_bindings::HEAP_NATTS_MASK as i32
+                                                    )
                                                 )
                                             )
                                         )
@@ -15867,7 +17284,7 @@ macro_rules! HeapTupleHeaderSetNatts {
                                                                 $crate::__pgrx_c_macros::CValue::<
                                                                     $crate::__pgrx_c_macros::CInt
                                                                 >::new(
-                                                                    $crate::HEAP_NATTS_MASK as i32
+                                                                    $crate::__pgrx_c_bindings::HEAP_NATTS_MASK as i32
                                                                 )
                                                             )
                                                         )
@@ -15954,7 +17371,9 @@ macro_rules! HeapTupleHeaderSetNatts {
                                                 >(
                                                     $crate::__pgrx_c_macros::CValue::<
                                                         $crate::__pgrx_c_macros::CInt
-                                                    >::new($crate::HEAP_NATTS_MASK as i32)
+                                                    >::new(
+                                                        $crate::__pgrx_c_bindings::HEAP_NATTS_MASK as i32
+                                                    )
                                                 )
                                             )
                                         )
@@ -15981,8 +17400,8 @@ macro_rules! HeapTupleHeaderSetNatts {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -16013,13 +17432,13 @@ macro_rules! __pgrx_c_args_HeapTupleHeaderSetSpeculativeToken {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderSetSpeculativeToken!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderSetSpeculativeToken!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -16031,7 +17450,7 @@ macro_rules! __pgrx_c_args_HeapTupleHeaderSetSpeculativeToken {
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderSetSpeculativeToken!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -16058,35 +17477,35 @@ macro_rules! __pgrx_c_args_HeapTupleHeaderSetSpeculativeToken {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderSetSpeculativeToken!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderSetSpeculativeToken!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $argument:literal) => {
         $crate::__pgrx_c_args_HeapTupleHeaderSetSpeculativeToken!(
-            @p2 $mode [$($done)* (@literal [- $argument]),];
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
         )
     };
     (@negative1 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_HeapTupleHeaderSetSpeculativeToken!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderSetSpeculativeToken!(
-            @p2 $mode [$($done)* (@literal [- $argument]),];
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderSetSpeculativeToken!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -16098,7 +17517,7 @@ macro_rules! __pgrx_c_args_HeapTupleHeaderSetSpeculativeToken {
     };
     (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
         $crate::__pgrx_c_args_HeapTupleHeaderSetSpeculativeToken!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
@@ -16124,17 +17543,17 @@ macro_rules! __pgrx_c_args_HeapTupleHeaderSetSpeculativeToken {
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_HeapTupleHeaderSetSpeculativeToken!(
-            @p2 $mode [$($done)* (@literal [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_HeapTupleHeaderSetSpeculativeToken!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderSetSpeculativeToken!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -16161,13 +17580,13 @@ macro_rules! __pgrx_c_args_HeapTupleHeaderSetSpeculativeToken {
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderSetSpeculativeToken!(
-            @p2 $mode [$($done)* (@literal [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderSetSpeculativeToken!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -16217,17 +17636,19 @@ macro_rules! HeapTupleHeaderSetSpeculativeToken {
         /* PGRX: HeapTupleHeaderSetSpeculativeToken remains expanded because ItemPointerSet is not an active function-like macro. */
         (
             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                $crate::ItemPointerSet(
+                $crate::__pgrx_c_bindings::ItemPointerSet(
                     <
                         $crate::__pgrx_c_macros::expression::CPointer<
-                            $crate::__pgrx_c_macros::expression::CRecord<$crate::ItemPointerData>,
+                            $crate::__pgrx_c_macros::expression::CRecord<
+                                $crate::__pgrx_c_bindings::ItemPointerData
+                            >,
                             $crate::__pgrx_c_macros::expression::ReadWrite
                         > as $crate::__pgrx_c_macros::expression::CType
                     >::into_storage(
                         $crate::__pgrx_c_macros::expression::implicit::<
                             $crate::__pgrx_c_macros::expression::CPointer<
                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                    $crate::ItemPointerData
+                                    $crate::__pgrx_c_bindings::ItemPointerData
                                 >,
                                 $crate::__pgrx_c_macros::expression::ReadWrite
                             >,
@@ -16274,7 +17695,7 @@ macro_rules! HeapTupleHeaderSetSpeculativeToken {
                         >(
                             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                 $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                    $crate::SpecTokenOffsetNumber as i32
+                                    $crate::__pgrx_c_bindings::SpecTokenOffsetNumber as i32
                                 )
                             )
                         )
@@ -16320,11 +17741,11 @@ macro_rules! HeapTupleHeaderSetSpeculativeToken {
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                            $crate::ItemPointerSet(
+                            $crate::__pgrx_c_bindings::ItemPointerSet(
                                 <
                                     $crate::__pgrx_c_macros::expression::CPointer<
                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                            $crate::ItemPointerData
+                                            $crate::__pgrx_c_bindings::ItemPointerData
                                         >,
                                         $crate::__pgrx_c_macros::expression::ReadWrite
                                     > as $crate::__pgrx_c_macros::expression::CType
@@ -16332,7 +17753,7 @@ macro_rules! HeapTupleHeaderSetSpeculativeToken {
                                     $crate::__pgrx_c_macros::expression::implicit::<
                                         $crate::__pgrx_c_macros::expression::CPointer<
                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                $crate::ItemPointerData
+                                                $crate::__pgrx_c_bindings::ItemPointerData
                                             >,
                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                         >,
@@ -16392,7 +17813,9 @@ macro_rules! HeapTupleHeaderSetSpeculativeToken {
                                         >(
                                             $crate::__pgrx_c_macros::CValue::<
                                                 $crate::__pgrx_c_macros::CInt
-                                            >::new($crate::SpecTokenOffsetNumber as i32)
+                                            >::new(
+                                                $crate::__pgrx_c_bindings::SpecTokenOffsetNumber as i32
+                                            )
                                         )
                                     )
                                 ),
@@ -16415,17 +17838,19 @@ macro_rules! HeapTupleHeaderSetSpeculativeToken {
         /* PGRX: HeapTupleHeaderSetSpeculativeToken remains expanded because ItemPointerSet is not an active function-like macro. */
         {
             let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                $crate::ItemPointerSet(
+                $crate::__pgrx_c_bindings::ItemPointerSet(
                     <
                         $crate::__pgrx_c_macros::expression::CPointer<
-                            $crate::__pgrx_c_macros::expression::CRecord<$crate::ItemPointerData>,
+                            $crate::__pgrx_c_macros::expression::CRecord<
+                                $crate::__pgrx_c_bindings::ItemPointerData
+                            >,
                             $crate::__pgrx_c_macros::expression::ReadWrite
                         > as $crate::__pgrx_c_macros::expression::CType
                     >::into_storage(
                         $crate::__pgrx_c_macros::expression::implicit::<
                             $crate::__pgrx_c_macros::expression::CPointer<
                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                    $crate::ItemPointerData
+                                    $crate::__pgrx_c_bindings::ItemPointerData
                                 >,
                                 $crate::__pgrx_c_macros::expression::ReadWrite
                             >,
@@ -16472,7 +17897,7 @@ macro_rules! HeapTupleHeaderSetSpeculativeToken {
                         >(
                             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                 $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                    $crate::SpecTokenOffsetNumber as i32
+                                    $crate::__pgrx_c_bindings::SpecTokenOffsetNumber as i32
                                 )
                             )
                         )
@@ -16496,8 +17921,8 @@ macro_rules! HeapTupleHeaderSetSpeculativeToken {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -16528,13 +17953,13 @@ macro_rules! __pgrx_c_args_HeapTupleHeaderSetTypMod {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderSetTypMod!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderSetTypMod!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -16543,7 +17968,7 @@ macro_rules! __pgrx_c_args_HeapTupleHeaderSetTypMod {
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderSetTypMod!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -16570,35 +17995,35 @@ macro_rules! __pgrx_c_args_HeapTupleHeaderSetTypMod {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderSetTypMod!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderSetTypMod!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $argument:literal) => {
         $crate::__pgrx_c_args_HeapTupleHeaderSetTypMod!(
-            @p2 $mode [$($done)* (@literal [- $argument]),];
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
         )
     };
     (@negative1 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_HeapTupleHeaderSetTypMod!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderSetTypMod!(
-            @p2 $mode [$($done)* (@literal [- $argument]),];
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderSetTypMod!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -16607,7 +18032,7 @@ macro_rules! __pgrx_c_args_HeapTupleHeaderSetTypMod {
     };
     (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
         $crate::__pgrx_c_args_HeapTupleHeaderSetTypMod!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
@@ -16633,17 +18058,17 @@ macro_rules! __pgrx_c_args_HeapTupleHeaderSetTypMod {
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_HeapTupleHeaderSetTypMod!(
-            @p2 $mode [$($done)* (@literal [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_HeapTupleHeaderSetTypMod!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderSetTypMod!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -16670,13 +18095,13 @@ macro_rules! __pgrx_c_args_HeapTupleHeaderSetTypMod {
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderSetTypMod!(
-            @p2 $mode [$($done)* (@literal [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderSetTypMod!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -16884,8 +18309,8 @@ macro_rules! HeapTupleHeaderSetTypMod {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -16916,13 +18341,13 @@ macro_rules! __pgrx_c_args_HeapTupleHeaderSetTypeId {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderSetTypeId!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderSetTypeId!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -16931,7 +18356,7 @@ macro_rules! __pgrx_c_args_HeapTupleHeaderSetTypeId {
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderSetTypeId!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -16958,35 +18383,35 @@ macro_rules! __pgrx_c_args_HeapTupleHeaderSetTypeId {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderSetTypeId!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderSetTypeId!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $argument:literal) => {
         $crate::__pgrx_c_args_HeapTupleHeaderSetTypeId!(
-            @p2 $mode [$($done)* (@literal [- $argument]),];
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
         )
     };
     (@negative1 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_HeapTupleHeaderSetTypeId!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderSetTypeId!(
-            @p2 $mode [$($done)* (@literal [- $argument]),];
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderSetTypeId!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -16995,7 +18420,7 @@ macro_rules! __pgrx_c_args_HeapTupleHeaderSetTypeId {
     };
     (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
         $crate::__pgrx_c_args_HeapTupleHeaderSetTypeId!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
@@ -17021,17 +18446,17 @@ macro_rules! __pgrx_c_args_HeapTupleHeaderSetTypeId {
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_HeapTupleHeaderSetTypeId!(
-            @p2 $mode [$($done)* (@literal [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_HeapTupleHeaderSetTypeId!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderSetTypeId!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -17058,13 +18483,13 @@ macro_rules! __pgrx_c_args_HeapTupleHeaderSetTypeId {
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderSetTypeId!(
-            @p2 $mode [$($done)* (@literal [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderSetTypeId!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -17272,8 +18697,8 @@ macro_rules! HeapTupleHeaderSetTypeId {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -17304,13 +18729,13 @@ macro_rules! __pgrx_c_args_HeapTupleHeaderSetXmax {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderSetXmax!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderSetXmax!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -17319,7 +18744,7 @@ macro_rules! __pgrx_c_args_HeapTupleHeaderSetXmax {
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderSetXmax!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -17346,33 +18771,35 @@ macro_rules! __pgrx_c_args_HeapTupleHeaderSetXmax {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderSetXmax!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderSetXmax!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $argument:literal) => {
         $crate::__pgrx_c_args_HeapTupleHeaderSetXmax!(
-            @p2 $mode [$($done)* (@literal [- $argument]),];
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
         )
     };
     (@negative1 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_HeapTupleHeaderSetXmax!(@p2 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_HeapTupleHeaderSetXmax!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderSetXmax!(
-            @p2 $mode [$($done)* (@literal [- $argument]),];
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderSetXmax!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -17380,7 +18807,9 @@ macro_rules! __pgrx_c_args_HeapTupleHeaderSetXmax {
         $crate::__pgrx_c_args_HeapTupleHeaderSetXmax!(@negative1 $mode [$($done)*]; - $($raw)*)
     };
     (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_HeapTupleHeaderSetXmax!(@p2 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_HeapTupleHeaderSetXmax!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -17405,15 +18834,17 @@ macro_rules! __pgrx_c_args_HeapTupleHeaderSetXmax {
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_HeapTupleHeaderSetXmax!(
-            @p2 $mode [$($done)* (@literal [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_HeapTupleHeaderSetXmax!(@p2 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_HeapTupleHeaderSetXmax!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderSetXmax!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -17440,13 +18871,13 @@ macro_rules! __pgrx_c_args_HeapTupleHeaderSetXmax {
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderSetXmax!(
-            @p2 $mode [$($done)* (@literal [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderSetXmax!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -17651,8 +19082,8 @@ macro_rules! HeapTupleHeaderSetXmax {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -17683,13 +19114,13 @@ macro_rules! __pgrx_c_args_HeapTupleHeaderSetXmin {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderSetXmin!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderSetXmin!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -17698,7 +19129,7 @@ macro_rules! __pgrx_c_args_HeapTupleHeaderSetXmin {
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderSetXmin!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -17725,33 +19156,35 @@ macro_rules! __pgrx_c_args_HeapTupleHeaderSetXmin {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderSetXmin!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderSetXmin!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $argument:literal) => {
         $crate::__pgrx_c_args_HeapTupleHeaderSetXmin!(
-            @p2 $mode [$($done)* (@literal [- $argument]),];
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
         )
     };
     (@negative1 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_HeapTupleHeaderSetXmin!(@p2 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_HeapTupleHeaderSetXmin!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderSetXmin!(
-            @p2 $mode [$($done)* (@literal [- $argument]),];
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderSetXmin!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -17759,7 +19192,9 @@ macro_rules! __pgrx_c_args_HeapTupleHeaderSetXmin {
         $crate::__pgrx_c_args_HeapTupleHeaderSetXmin!(@negative1 $mode [$($done)*]; - $($raw)*)
     };
     (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_HeapTupleHeaderSetXmin!(@p2 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_HeapTupleHeaderSetXmin!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -17784,15 +19219,17 @@ macro_rules! __pgrx_c_args_HeapTupleHeaderSetXmin {
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_HeapTupleHeaderSetXmin!(
-            @p2 $mode [$($done)* (@literal [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_HeapTupleHeaderSetXmin!(@p2 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_HeapTupleHeaderSetXmin!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderSetXmin!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -17819,13 +19256,13 @@ macro_rules! __pgrx_c_args_HeapTupleHeaderSetXmin {
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderSetXmin!(
-            @p2 $mode [$($done)* (@literal [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderSetXmin!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -18030,8 +19467,1535 @@ macro_rules! HeapTupleHeaderSetXmin {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
+    target_pointer_width = "64",
+    target_endian = "little"
+)))]
+#[cfg(not(docsrs))]
+compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
+#[doc(hidden)]
+#[macro_export]
+macro_rules! __pgrx_c_args_HeapTupleHeaderSetXminCommitted {
+    (@collect $mode:ident [$($done:tt)*]; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_HeapTupleHeaderSetXminCommitted!(@p0 $mode [$($done)*]; $($raw)*)
+    };
+    (@classified [$next:ident $mode:ident [$($done:tt)*] [$($rest:tt)*]] $descriptor:tt) => {
+        $crate::__pgrx_c_args_HeapTupleHeaderSetXminCommitted!(
+            @$next $mode [$($done)* $descriptor,];
+            $($rest)*
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
+        $crate::__pgrx_c_args_HeapTupleHeaderSetXminCommitted!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
+    };
+    (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
+        $crate::__pgrx_c_args_HeapTupleHeaderSetXminCommitted!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_HeapTupleHeaderSetXminCommitted!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+            $($rest)*
+        )
+    };
+    (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_HeapTupleHeaderSetXminCommitted!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; - $($raw:tt)*) => {
+        $crate::__pgrx_c_args_HeapTupleHeaderSetXminCommitted!(
+            @negative0 $mode [$($done)*];
+            - $($raw)*
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
+        $crate::__pgrx_c_args_HeapTupleHeaderSetXminCommitted!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_HeapTupleHeaderSetXminCommitted] [p1 $mode [$($done)*] []] [
+                $head $(::$tail)* ! $group
+            ]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; ::$head:ident $(::$tail:ident)* ! $group:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_HeapTupleHeaderSetXminCommitted] [p1 $mode [$($done)*] []] [
+                ::$head $(::$tail)* ! $group
+            ]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; ($($inner:tt)*)) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_HeapTupleHeaderSetXminCommitted] [p1 $mode [$($done)*] []] [
+                ($($inner)*)
+            ]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
+        $crate::__pgrx_c_args_HeapTupleHeaderSetXminCommitted!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
+        $crate::__pgrx_c_args_HeapTupleHeaderSetXminCommitted!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
+        $crate::__pgrx_c_args_HeapTupleHeaderSetXminCommitted!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_HeapTupleHeaderSetXminCommitted] [
+                p1 $mode [$($done)*] [$($rest)*]
+            ] [$head $(::$tail)* ! $group]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; ::$head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_HeapTupleHeaderSetXminCommitted] [
+                p1 $mode [$($done)*] [$($rest)*]
+            ] [::$head $(::$tail)* ! $group]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; ($($inner:tt)*), $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_HeapTupleHeaderSetXminCommitted] [
+                p1 $mode [$($done)*] [$($rest)*]
+            ] [($($inner)*)]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_HeapTupleHeaderSetXminCommitted!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_HeapTupleHeaderSetXminCommitted!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*];) => {
+        $crate::HeapTupleHeaderSetXminCommitted!(@$mode; $($done)*)
+    };
+    ($($invalid:tt)*) => {
+        compile_error!("arguments do not satisfy this C macro's invocation contract")
+    };
+}
+/// C macro HeapTupleHeaderSetXminCommitted from htup_details.h:341
+///
+/// ```text
+/// #define HeapTupleHeaderSetXminCommitted( tup ) ( AssertMacro ( ! HeapTupleHeaderXminInvalid ( tup ) ) , ( ( tup ) -> t_infomask |= HEAP_XMIN_COMMITTED ) )
+/// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+#[macro_export]
+macro_rules! HeapTupleHeaderSetXminCommitted {
+    (@__pgrx_emit_check_safety; $tup:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $tup);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_HeapTupleHeaderSetXminCommitted!(
+            @collect __pgrx_emit_check_safety [];
+            $($raw)*
+        )
+    };
+    (@__pgrx_emit_public; $tup:tt $(,)?) => {
+        $crate::__pgrx_c_macros::expression_result::finish(
+            $crate::HeapTupleHeaderSetXminCommitted!(@__pgrx_emit_value; $tup)
+        )
+    };
+    (@__pgrx_emit_value; $tup:tt $(,)?) => {
+        /* PGRX: AssertMacro remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */ /* PGRX: HeapTupleHeaderXminInvalid remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */
+        (
+            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                {
+                    {
+                        let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                            {
+                                {
+                                    let _ = $crate::__pgrx_c_macros::expression::profile_value::<
+                                        true,
+                                        _
+                                    >(
+                                        /* PGRX: true remains expanded because no integer constant binding is available in the defining Rust crate. */
+                                        $crate::__pgrx_c_macros::CValue::<
+                                            $crate::__pgrx_c_macros::CInt
+                                        >::new(1i32)
+                                    );
+                                }
+                            }
+                        );
+                    };
+                    (
+                        $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                            $crate::__pgrx_c_macros::expression::modify(
+                                $crate::__pgrx_c_macros::expression::project::<
+                                    $crate::__pgrx_c_generated::Field_t_infomask,
+                                    _,
+                                    _
+                                >(
+                                    $crate::__pgrx_c_macros::expression::pointee(
+                                        (
+                                            $crate::__pgrx_c_macros::expression::profile_value::<
+                                                true,
+                                                _
+                                            >($crate::__pgrx_c_operand!(@value [true]; $tup))
+                                        )
+                                    )
+                                ),
+                                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                    $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
+                                        $crate::__pgrx_c_bindings::HEAP_XMIN_COMMITTED as i32
+                                    )
+                                ),
+                                |__pgrx_old,
+                                __pgrx_rhs| $crate::__pgrx_c_macros::expression::bitor(
+                                    __pgrx_old,
+                                    __pgrx_rhs
+                                )
+                            )
+                        )
+                    )
+                }
+            )
+        )
+    };
+    (@__pgrx_c_value; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_HeapTupleHeaderSetXminCommitted!(
+            @collect __pgrx_emit_value [];
+            $($raw)*
+        )
+    };
+    (@__pgrx_emit_place; $tup:tt $(,)?) => {
+        compile_error!("C expression is not a place in this operation")
+    };
+    (@__pgrx_c_place; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_HeapTupleHeaderSetXminCommitted!(
+            @collect __pgrx_emit_place [];
+            $($raw)*
+        )
+    };
+    (@__pgrx_emit_read_place; $tup:tt $(,)?) => {
+        compile_error!("C expression is not a place in this operation")
+    };
+    (@__pgrx_c_read_place; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_HeapTupleHeaderSetXminCommitted!(
+            @collect __pgrx_emit_read_place [];
+            $($raw)*
+        )
+    };
+    (@__pgrx_emit_size; $tup:tt $(,)?) => {
+        /* PGRX: AssertMacro remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */ /* PGRX: HeapTupleHeaderXminInvalid remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */
+        $crate::__pgrx_c_macros::expression::size_of_value_type(
+            if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $tup);
+                    }
+                }
+                Some(
+                    unsafe {
+                        $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                            {
+                                {
+                                    let _ = $crate::__pgrx_c_macros::expression::profile_value::<
+                                        true,
+                                        _
+                                    >(
+                                        {
+                                            {
+                                                let _ = $crate::__pgrx_c_macros::expression::profile_value::<
+                                                    true,
+                                                    _
+                                                >(
+                                                    /* PGRX: true remains expanded because no integer constant binding is available in the defining Rust crate. */
+                                                    $crate::__pgrx_c_macros::CValue::<
+                                                        $crate::__pgrx_c_macros::CInt
+                                                    >::new(1i32)
+                                                );
+                                            }
+                                        }
+                                    );
+                                };
+                                (
+                                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                        $crate::__pgrx_c_macros::expression::modify(
+                                            $crate::__pgrx_c_macros::expression::project::<
+                                                $crate::__pgrx_c_generated::Field_t_infomask,
+                                                _,
+                                                _
+                                            >(
+                                                $crate::__pgrx_c_macros::expression::pointee(
+                                                    (
+                                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                                            true,
+                                                            _
+                                                        >(
+                                                            $crate::__pgrx_c_operand!(
+                                                                @value [true];
+                                                                $tup
+                                                            )
+                                                        )
+                                                    )
+                                                )
+                                            ),
+                                            $crate::__pgrx_c_macros::expression::profile_value::<
+                                                true,
+                                                _
+                                            >(
+                                                $crate::__pgrx_c_macros::CValue::<
+                                                    $crate::__pgrx_c_macros::CInt
+                                                >::new(
+                                                    $crate::__pgrx_c_bindings::HEAP_XMIN_COMMITTED as i32
+                                                )
+                                            ),
+                                            |__pgrx_old,
+                                            __pgrx_rhs| $crate::__pgrx_c_macros::expression::bitor(
+                                                __pgrx_old,
+                                                __pgrx_rhs
+                                            )
+                                        )
+                                    )
+                                )
+                            }
+                        )
+                    }
+                )
+            } else {
+                None
+            }
+        )
+    };
+    (@__pgrx_c_size; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_HeapTupleHeaderSetXminCommitted!(
+            @collect __pgrx_emit_size [];
+            $($raw)*
+        )
+    };
+    (@__pgrx_emit_discard; $tup:tt $(,)?) => {
+        /* PGRX: AssertMacro remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */ /* PGRX: HeapTupleHeaderXminInvalid remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */
+        {
+            let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                {
+                    {
+                        let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                            {
+                                {
+                                    let _ = $crate::__pgrx_c_macros::expression::profile_value::<
+                                        true,
+                                        _
+                                    >(
+                                        /* PGRX: true remains expanded because no integer constant binding is available in the defining Rust crate. */
+                                        $crate::__pgrx_c_macros::CValue::<
+                                            $crate::__pgrx_c_macros::CInt
+                                        >::new(1i32)
+                                    );
+                                }
+                            }
+                        );
+                    };
+                    (
+                        $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                            $crate::__pgrx_c_macros::expression::modify(
+                                $crate::__pgrx_c_macros::expression::project::<
+                                    $crate::__pgrx_c_generated::Field_t_infomask,
+                                    _,
+                                    _
+                                >(
+                                    $crate::__pgrx_c_macros::expression::pointee(
+                                        (
+                                            $crate::__pgrx_c_macros::expression::profile_value::<
+                                                true,
+                                                _
+                                            >($crate::__pgrx_c_operand!(@value [true]; $tup))
+                                        )
+                                    )
+                                ),
+                                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                    $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
+                                        $crate::__pgrx_c_bindings::HEAP_XMIN_COMMITTED as i32
+                                    )
+                                ),
+                                |__pgrx_old,
+                                __pgrx_rhs| $crate::__pgrx_c_macros::expression::bitor(
+                                    __pgrx_old,
+                                    __pgrx_rhs
+                                )
+                            )
+                        )
+                    )
+                }
+            );
+        }
+    };
+    (@__pgrx_c_discard; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_HeapTupleHeaderSetXminCommitted!(
+            @collect __pgrx_emit_discard [];
+            $($raw)*
+        )
+    };
+    ($($raw:tt)*) => {
+        $crate::__pgrx_c_args_HeapTupleHeaderSetXminCommitted!(
+            @collect __pgrx_emit_public [];
+            $($raw)*
+        )
+    };
+}
+
+#[cfg(not(all(
+    target_arch = "x86_64",
+    target_os = "linux",
+    target_pointer_width = "64",
+    target_endian = "little"
+)))]
+#[cfg(not(docsrs))]
+compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
+#[doc(hidden)]
+#[macro_export]
+macro_rules! __pgrx_c_args_HeapTupleHeaderSetXminFrozen {
+    (@collect $mode:ident [$($done:tt)*]; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_HeapTupleHeaderSetXminFrozen!(@p0 $mode [$($done)*]; $($raw)*)
+    };
+    (@classified [$next:ident $mode:ident [$($done:tt)*] [$($rest:tt)*]] $descriptor:tt) => {
+        $crate::__pgrx_c_args_HeapTupleHeaderSetXminFrozen!(
+            @$next $mode [$($done)* $descriptor,];
+            $($rest)*
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
+        $crate::__pgrx_c_args_HeapTupleHeaderSetXminFrozen!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
+    };
+    (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
+        $crate::__pgrx_c_args_HeapTupleHeaderSetXminFrozen!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_HeapTupleHeaderSetXminFrozen!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+            $($rest)*
+        )
+    };
+    (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_HeapTupleHeaderSetXminFrozen!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; - $($raw:tt)*) => {
+        $crate::__pgrx_c_args_HeapTupleHeaderSetXminFrozen!(
+            @negative0 $mode [$($done)*];
+            - $($raw)*
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
+        $crate::__pgrx_c_args_HeapTupleHeaderSetXminFrozen!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_HeapTupleHeaderSetXminFrozen] [p1 $mode [$($done)*] []] [
+                $head $(::$tail)* ! $group
+            ]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; ::$head:ident $(::$tail:ident)* ! $group:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_HeapTupleHeaderSetXminFrozen] [p1 $mode [$($done)*] []] [
+                ::$head $(::$tail)* ! $group
+            ]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; ($($inner:tt)*)) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_HeapTupleHeaderSetXminFrozen] [p1 $mode [$($done)*] []] [
+                ($($inner)*)
+            ]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
+        $crate::__pgrx_c_args_HeapTupleHeaderSetXminFrozen!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
+        $crate::__pgrx_c_args_HeapTupleHeaderSetXminFrozen!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
+        $crate::__pgrx_c_args_HeapTupleHeaderSetXminFrozen!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_HeapTupleHeaderSetXminFrozen] [
+                p1 $mode [$($done)*] [$($rest)*]
+            ] [$head $(::$tail)* ! $group]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; ::$head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_HeapTupleHeaderSetXminFrozen] [
+                p1 $mode [$($done)*] [$($rest)*]
+            ] [::$head $(::$tail)* ! $group]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; ($($inner:tt)*), $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_HeapTupleHeaderSetXminFrozen] [
+                p1 $mode [$($done)*] [$($rest)*]
+            ] [($($inner)*)]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_HeapTupleHeaderSetXminFrozen!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_HeapTupleHeaderSetXminFrozen!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*];) => {
+        $crate::HeapTupleHeaderSetXminFrozen!(@$mode; $($done)*)
+    };
+    ($($invalid:tt)*) => {
+        compile_error!("arguments do not satisfy this C macro's invocation contract")
+    };
+}
+/// C macro HeapTupleHeaderSetXminFrozen from htup_details.h:353
+///
+/// ```text
+/// #define HeapTupleHeaderSetXminFrozen( tup ) ( AssertMacro ( ! HeapTupleHeaderXminInvalid ( tup ) ) , ( ( tup ) -> t_infomask |= HEAP_XMIN_FROZEN ) )
+/// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+#[macro_export]
+macro_rules! HeapTupleHeaderSetXminFrozen {
+    (@__pgrx_emit_check_safety; $tup:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $tup);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_HeapTupleHeaderSetXminFrozen!(
+            @collect __pgrx_emit_check_safety [];
+            $($raw)*
+        )
+    };
+    (@__pgrx_emit_public; $tup:tt $(,)?) => {
+        $crate::__pgrx_c_macros::expression_result::finish(
+            $crate::HeapTupleHeaderSetXminFrozen!(@__pgrx_emit_value; $tup)
+        )
+    };
+    (@__pgrx_emit_value; $tup:tt $(,)?) => {
+        /* PGRX: AssertMacro remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */ /* PGRX: HeapTupleHeaderXminInvalid remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */
+        (
+            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                {
+                    {
+                        let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                            {
+                                {
+                                    let _ = $crate::__pgrx_c_macros::expression::profile_value::<
+                                        true,
+                                        _
+                                    >(
+                                        /* PGRX: true remains expanded because no integer constant binding is available in the defining Rust crate. */
+                                        $crate::__pgrx_c_macros::CValue::<
+                                            $crate::__pgrx_c_macros::CInt
+                                        >::new(1i32)
+                                    );
+                                }
+                            }
+                        );
+                    };
+                    (
+                        $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                            $crate::__pgrx_c_macros::expression::modify(
+                                $crate::__pgrx_c_macros::expression::project::<
+                                    $crate::__pgrx_c_generated::Field_t_infomask,
+                                    _,
+                                    _
+                                >(
+                                    $crate::__pgrx_c_macros::expression::pointee(
+                                        (
+                                            $crate::__pgrx_c_macros::expression::profile_value::<
+                                                true,
+                                                _
+                                            >($crate::__pgrx_c_operand!(@value [true]; $tup))
+                                        )
+                                    )
+                                ),
+                                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                    $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
+                                        $crate::__pgrx_c_bindings::HEAP_XMIN_FROZEN as i32
+                                    )
+                                ),
+                                |__pgrx_old,
+                                __pgrx_rhs| $crate::__pgrx_c_macros::expression::bitor(
+                                    __pgrx_old,
+                                    __pgrx_rhs
+                                )
+                            )
+                        )
+                    )
+                }
+            )
+        )
+    };
+    (@__pgrx_c_value; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_HeapTupleHeaderSetXminFrozen!(@collect __pgrx_emit_value []; $($raw)*)
+    };
+    (@__pgrx_emit_place; $tup:tt $(,)?) => {
+        compile_error!("C expression is not a place in this operation")
+    };
+    (@__pgrx_c_place; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_HeapTupleHeaderSetXminFrozen!(@collect __pgrx_emit_place []; $($raw)*)
+    };
+    (@__pgrx_emit_read_place; $tup:tt $(,)?) => {
+        compile_error!("C expression is not a place in this operation")
+    };
+    (@__pgrx_c_read_place; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_HeapTupleHeaderSetXminFrozen!(
+            @collect __pgrx_emit_read_place [];
+            $($raw)*
+        )
+    };
+    (@__pgrx_emit_size; $tup:tt $(,)?) => {
+        /* PGRX: AssertMacro remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */ /* PGRX: HeapTupleHeaderXminInvalid remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */
+        $crate::__pgrx_c_macros::expression::size_of_value_type(
+            if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $tup);
+                    }
+                }
+                Some(
+                    unsafe {
+                        $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                            {
+                                {
+                                    let _ = $crate::__pgrx_c_macros::expression::profile_value::<
+                                        true,
+                                        _
+                                    >(
+                                        {
+                                            {
+                                                let _ = $crate::__pgrx_c_macros::expression::profile_value::<
+                                                    true,
+                                                    _
+                                                >(
+                                                    /* PGRX: true remains expanded because no integer constant binding is available in the defining Rust crate. */
+                                                    $crate::__pgrx_c_macros::CValue::<
+                                                        $crate::__pgrx_c_macros::CInt
+                                                    >::new(1i32)
+                                                );
+                                            }
+                                        }
+                                    );
+                                };
+                                (
+                                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                        $crate::__pgrx_c_macros::expression::modify(
+                                            $crate::__pgrx_c_macros::expression::project::<
+                                                $crate::__pgrx_c_generated::Field_t_infomask,
+                                                _,
+                                                _
+                                            >(
+                                                $crate::__pgrx_c_macros::expression::pointee(
+                                                    (
+                                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                                            true,
+                                                            _
+                                                        >(
+                                                            $crate::__pgrx_c_operand!(
+                                                                @value [true];
+                                                                $tup
+                                                            )
+                                                        )
+                                                    )
+                                                )
+                                            ),
+                                            $crate::__pgrx_c_macros::expression::profile_value::<
+                                                true,
+                                                _
+                                            >(
+                                                $crate::__pgrx_c_macros::CValue::<
+                                                    $crate::__pgrx_c_macros::CInt
+                                                >::new(
+                                                    $crate::__pgrx_c_bindings::HEAP_XMIN_FROZEN as i32
+                                                )
+                                            ),
+                                            |__pgrx_old,
+                                            __pgrx_rhs| $crate::__pgrx_c_macros::expression::bitor(
+                                                __pgrx_old,
+                                                __pgrx_rhs
+                                            )
+                                        )
+                                    )
+                                )
+                            }
+                        )
+                    }
+                )
+            } else {
+                None
+            }
+        )
+    };
+    (@__pgrx_c_size; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_HeapTupleHeaderSetXminFrozen!(@collect __pgrx_emit_size []; $($raw)*)
+    };
+    (@__pgrx_emit_discard; $tup:tt $(,)?) => {
+        /* PGRX: AssertMacro remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */ /* PGRX: HeapTupleHeaderXminInvalid remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */
+        {
+            let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                {
+                    {
+                        let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                            {
+                                {
+                                    let _ = $crate::__pgrx_c_macros::expression::profile_value::<
+                                        true,
+                                        _
+                                    >(
+                                        /* PGRX: true remains expanded because no integer constant binding is available in the defining Rust crate. */
+                                        $crate::__pgrx_c_macros::CValue::<
+                                            $crate::__pgrx_c_macros::CInt
+                                        >::new(1i32)
+                                    );
+                                }
+                            }
+                        );
+                    };
+                    (
+                        $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                            $crate::__pgrx_c_macros::expression::modify(
+                                $crate::__pgrx_c_macros::expression::project::<
+                                    $crate::__pgrx_c_generated::Field_t_infomask,
+                                    _,
+                                    _
+                                >(
+                                    $crate::__pgrx_c_macros::expression::pointee(
+                                        (
+                                            $crate::__pgrx_c_macros::expression::profile_value::<
+                                                true,
+                                                _
+                                            >($crate::__pgrx_c_operand!(@value [true]; $tup))
+                                        )
+                                    )
+                                ),
+                                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                    $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
+                                        $crate::__pgrx_c_bindings::HEAP_XMIN_FROZEN as i32
+                                    )
+                                ),
+                                |__pgrx_old,
+                                __pgrx_rhs| $crate::__pgrx_c_macros::expression::bitor(
+                                    __pgrx_old,
+                                    __pgrx_rhs
+                                )
+                            )
+                        )
+                    )
+                }
+            );
+        }
+    };
+    (@__pgrx_c_discard; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_HeapTupleHeaderSetXminFrozen!(
+            @collect __pgrx_emit_discard [];
+            $($raw)*
+        )
+    };
+    ($($raw:tt)*) => {
+        $crate::__pgrx_c_args_HeapTupleHeaderSetXminFrozen!(
+            @collect __pgrx_emit_public [];
+            $($raw)*
+        )
+    };
+}
+
+#[cfg(not(all(
+    target_arch = "x86_64",
+    target_os = "linux",
+    target_pointer_width = "64",
+    target_endian = "little"
+)))]
+#[cfg(not(docsrs))]
+compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
+#[doc(hidden)]
+#[macro_export]
+macro_rules! __pgrx_c_args_HeapTupleHeaderSetXminInvalid {
+    (@collect $mode:ident [$($done:tt)*]; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_HeapTupleHeaderSetXminInvalid!(@p0 $mode [$($done)*]; $($raw)*)
+    };
+    (@classified [$next:ident $mode:ident [$($done:tt)*] [$($rest:tt)*]] $descriptor:tt) => {
+        $crate::__pgrx_c_args_HeapTupleHeaderSetXminInvalid!(
+            @$next $mode [$($done)* $descriptor,];
+            $($rest)*
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
+        $crate::__pgrx_c_args_HeapTupleHeaderSetXminInvalid!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
+    };
+    (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
+        $crate::__pgrx_c_args_HeapTupleHeaderSetXminInvalid!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_HeapTupleHeaderSetXminInvalid!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+            $($rest)*
+        )
+    };
+    (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_HeapTupleHeaderSetXminInvalid!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; - $($raw:tt)*) => {
+        $crate::__pgrx_c_args_HeapTupleHeaderSetXminInvalid!(
+            @negative0 $mode [$($done)*];
+            - $($raw)*
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
+        $crate::__pgrx_c_args_HeapTupleHeaderSetXminInvalid!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_HeapTupleHeaderSetXminInvalid] [p1 $mode [$($done)*] []] [
+                $head $(::$tail)* ! $group
+            ]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; ::$head:ident $(::$tail:ident)* ! $group:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_HeapTupleHeaderSetXminInvalid] [p1 $mode [$($done)*] []] [
+                ::$head $(::$tail)* ! $group
+            ]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; ($($inner:tt)*)) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_HeapTupleHeaderSetXminInvalid] [p1 $mode [$($done)*] []] [
+                ($($inner)*)
+            ]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
+        $crate::__pgrx_c_args_HeapTupleHeaderSetXminInvalid!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
+        $crate::__pgrx_c_args_HeapTupleHeaderSetXminInvalid!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
+        $crate::__pgrx_c_args_HeapTupleHeaderSetXminInvalid!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_HeapTupleHeaderSetXminInvalid] [
+                p1 $mode [$($done)*] [$($rest)*]
+            ] [$head $(::$tail)* ! $group]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; ::$head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_HeapTupleHeaderSetXminInvalid] [
+                p1 $mode [$($done)*] [$($rest)*]
+            ] [::$head $(::$tail)* ! $group]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; ($($inner:tt)*), $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_HeapTupleHeaderSetXminInvalid] [
+                p1 $mode [$($done)*] [$($rest)*]
+            ] [($($inner)*)]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_HeapTupleHeaderSetXminInvalid!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_HeapTupleHeaderSetXminInvalid!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*];) => {
+        $crate::HeapTupleHeaderSetXminInvalid!(@$mode; $($done)*)
+    };
+    ($($invalid:tt)*) => {
+        compile_error!("arguments do not satisfy this C macro's invocation contract")
+    };
+}
+/// C macro HeapTupleHeaderSetXminInvalid from htup_details.h:347
+///
+/// ```text
+/// #define HeapTupleHeaderSetXminInvalid( tup ) ( AssertMacro ( ! HeapTupleHeaderXminCommitted ( tup ) ) , ( ( tup ) -> t_infomask |= HEAP_XMIN_INVALID ) )
+/// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+#[macro_export]
+macro_rules! HeapTupleHeaderSetXminInvalid {
+    (@__pgrx_emit_check_safety; $tup:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $tup);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_HeapTupleHeaderSetXminInvalid!(
+            @collect __pgrx_emit_check_safety [];
+            $($raw)*
+        )
+    };
+    (@__pgrx_emit_public; $tup:tt $(,)?) => {
+        $crate::__pgrx_c_macros::expression_result::finish(
+            $crate::HeapTupleHeaderSetXminInvalid!(@__pgrx_emit_value; $tup)
+        )
+    };
+    (@__pgrx_emit_value; $tup:tt $(,)?) => {
+        /* PGRX: AssertMacro remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */ /* PGRX: HeapTupleHeaderXminCommitted remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */
+        (
+            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                {
+                    {
+                        let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                            {
+                                {
+                                    let _ = $crate::__pgrx_c_macros::expression::profile_value::<
+                                        true,
+                                        _
+                                    >(
+                                        /* PGRX: true remains expanded because no integer constant binding is available in the defining Rust crate. */
+                                        $crate::__pgrx_c_macros::CValue::<
+                                            $crate::__pgrx_c_macros::CInt
+                                        >::new(1i32)
+                                    );
+                                }
+                            }
+                        );
+                    };
+                    (
+                        $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                            $crate::__pgrx_c_macros::expression::modify(
+                                $crate::__pgrx_c_macros::expression::project::<
+                                    $crate::__pgrx_c_generated::Field_t_infomask,
+                                    _,
+                                    _
+                                >(
+                                    $crate::__pgrx_c_macros::expression::pointee(
+                                        (
+                                            $crate::__pgrx_c_macros::expression::profile_value::<
+                                                true,
+                                                _
+                                            >($crate::__pgrx_c_operand!(@value [true]; $tup))
+                                        )
+                                    )
+                                ),
+                                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                    $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
+                                        $crate::__pgrx_c_bindings::HEAP_XMIN_INVALID as i32
+                                    )
+                                ),
+                                |__pgrx_old,
+                                __pgrx_rhs| $crate::__pgrx_c_macros::expression::bitor(
+                                    __pgrx_old,
+                                    __pgrx_rhs
+                                )
+                            )
+                        )
+                    )
+                }
+            )
+        )
+    };
+    (@__pgrx_c_value; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_HeapTupleHeaderSetXminInvalid!(
+            @collect __pgrx_emit_value [];
+            $($raw)*
+        )
+    };
+    (@__pgrx_emit_place; $tup:tt $(,)?) => {
+        compile_error!("C expression is not a place in this operation")
+    };
+    (@__pgrx_c_place; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_HeapTupleHeaderSetXminInvalid!(
+            @collect __pgrx_emit_place [];
+            $($raw)*
+        )
+    };
+    (@__pgrx_emit_read_place; $tup:tt $(,)?) => {
+        compile_error!("C expression is not a place in this operation")
+    };
+    (@__pgrx_c_read_place; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_HeapTupleHeaderSetXminInvalid!(
+            @collect __pgrx_emit_read_place [];
+            $($raw)*
+        )
+    };
+    (@__pgrx_emit_size; $tup:tt $(,)?) => {
+        /* PGRX: AssertMacro remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */ /* PGRX: HeapTupleHeaderXminCommitted remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */
+        $crate::__pgrx_c_macros::expression::size_of_value_type(
+            if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $tup);
+                    }
+                }
+                Some(
+                    unsafe {
+                        $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                            {
+                                {
+                                    let _ = $crate::__pgrx_c_macros::expression::profile_value::<
+                                        true,
+                                        _
+                                    >(
+                                        {
+                                            {
+                                                let _ = $crate::__pgrx_c_macros::expression::profile_value::<
+                                                    true,
+                                                    _
+                                                >(
+                                                    /* PGRX: true remains expanded because no integer constant binding is available in the defining Rust crate. */
+                                                    $crate::__pgrx_c_macros::CValue::<
+                                                        $crate::__pgrx_c_macros::CInt
+                                                    >::new(1i32)
+                                                );
+                                            }
+                                        }
+                                    );
+                                };
+                                (
+                                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                        $crate::__pgrx_c_macros::expression::modify(
+                                            $crate::__pgrx_c_macros::expression::project::<
+                                                $crate::__pgrx_c_generated::Field_t_infomask,
+                                                _,
+                                                _
+                                            >(
+                                                $crate::__pgrx_c_macros::expression::pointee(
+                                                    (
+                                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                                            true,
+                                                            _
+                                                        >(
+                                                            $crate::__pgrx_c_operand!(
+                                                                @value [true];
+                                                                $tup
+                                                            )
+                                                        )
+                                                    )
+                                                )
+                                            ),
+                                            $crate::__pgrx_c_macros::expression::profile_value::<
+                                                true,
+                                                _
+                                            >(
+                                                $crate::__pgrx_c_macros::CValue::<
+                                                    $crate::__pgrx_c_macros::CInt
+                                                >::new(
+                                                    $crate::__pgrx_c_bindings::HEAP_XMIN_INVALID as i32
+                                                )
+                                            ),
+                                            |__pgrx_old,
+                                            __pgrx_rhs| $crate::__pgrx_c_macros::expression::bitor(
+                                                __pgrx_old,
+                                                __pgrx_rhs
+                                            )
+                                        )
+                                    )
+                                )
+                            }
+                        )
+                    }
+                )
+            } else {
+                None
+            }
+        )
+    };
+    (@__pgrx_c_size; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_HeapTupleHeaderSetXminInvalid!(@collect __pgrx_emit_size []; $($raw)*)
+    };
+    (@__pgrx_emit_discard; $tup:tt $(,)?) => {
+        /* PGRX: AssertMacro remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */ /* PGRX: HeapTupleHeaderXminCommitted remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */
+        {
+            let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                {
+                    {
+                        let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                            {
+                                {
+                                    let _ = $crate::__pgrx_c_macros::expression::profile_value::<
+                                        true,
+                                        _
+                                    >(
+                                        /* PGRX: true remains expanded because no integer constant binding is available in the defining Rust crate. */
+                                        $crate::__pgrx_c_macros::CValue::<
+                                            $crate::__pgrx_c_macros::CInt
+                                        >::new(1i32)
+                                    );
+                                }
+                            }
+                        );
+                    };
+                    (
+                        $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                            $crate::__pgrx_c_macros::expression::modify(
+                                $crate::__pgrx_c_macros::expression::project::<
+                                    $crate::__pgrx_c_generated::Field_t_infomask,
+                                    _,
+                                    _
+                                >(
+                                    $crate::__pgrx_c_macros::expression::pointee(
+                                        (
+                                            $crate::__pgrx_c_macros::expression::profile_value::<
+                                                true,
+                                                _
+                                            >($crate::__pgrx_c_operand!(@value [true]; $tup))
+                                        )
+                                    )
+                                ),
+                                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                    $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
+                                        $crate::__pgrx_c_bindings::HEAP_XMIN_INVALID as i32
+                                    )
+                                ),
+                                |__pgrx_old,
+                                __pgrx_rhs| $crate::__pgrx_c_macros::expression::bitor(
+                                    __pgrx_old,
+                                    __pgrx_rhs
+                                )
+                            )
+                        )
+                    )
+                }
+            );
+        }
+    };
+    (@__pgrx_c_discard; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_HeapTupleHeaderSetXminInvalid!(
+            @collect __pgrx_emit_discard [];
+            $($raw)*
+        )
+    };
+    ($($raw:tt)*) => {
+        $crate::__pgrx_c_args_HeapTupleHeaderSetXminInvalid!(
+            @collect __pgrx_emit_public [];
+            $($raw)*
+        )
+    };
+}
+
+#[cfg(not(all(
+    target_arch = "x86_64",
+    target_os = "linux",
+    target_pointer_width = "64",
+    target_endian = "little"
+)))]
+#[cfg(not(docsrs))]
+compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
+#[doc(hidden)]
+#[macro_export]
+macro_rules! __pgrx_c_args_HeapTupleHeaderSetXvac {
+    (@collect $mode:ident [$($done:tt)*]; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_HeapTupleHeaderSetXvac!(@p0 $mode [$($done)*]; $($raw)*)
+    };
+    (@classified [$next:ident $mode:ident [$($done:tt)*] [$($rest:tt)*]] $descriptor:tt) => {
+        $crate::__pgrx_c_args_HeapTupleHeaderSetXvac!(
+            @$next $mode [$($done)* $descriptor,];
+            $($rest)*
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_HeapTupleHeaderSetXvac!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+            $($rest)*
+        )
+    };
+    (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_HeapTupleHeaderSetXvac!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; - $($raw:tt)*) => {
+        $crate::__pgrx_c_args_HeapTupleHeaderSetXvac!(@negative0 $mode [$($done)*]; - $($raw)*)
+    };
+    (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
+        $crate::__pgrx_c_args_HeapTupleHeaderSetXvac!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_HeapTupleHeaderSetXvac] [p1 $mode [$($done)*] [$($rest)*]] [
+                $head $(::$tail)* ! $group
+            ]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; ::$head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_HeapTupleHeaderSetXvac] [p1 $mode [$($done)*] [$($rest)*]] [
+                ::$head $(::$tail)* ! $group
+            ]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; ($($inner:tt)*), $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_HeapTupleHeaderSetXvac] [p1 $mode [$($done)*] [$($rest)*]] [
+                ($($inner)*)
+            ]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_HeapTupleHeaderSetXvac!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_HeapTupleHeaderSetXvac!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; - $argument:literal) => {
+        $crate::__pgrx_c_args_HeapTupleHeaderSetXvac!(
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
+    };
+    (@negative1 $mode:ident [$($done:tt)*]; $argument:expr) => {
+        $crate::__pgrx_c_args_HeapTupleHeaderSetXvac!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_HeapTupleHeaderSetXvac!(
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+            $($rest)*
+        )
+    };
+    (@negative1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_HeapTupleHeaderSetXvac!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; - $($raw:tt)*) => {
+        $crate::__pgrx_c_args_HeapTupleHeaderSetXvac!(@negative1 $mode [$($done)*]; - $($raw)*)
+    };
+    (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
+        $crate::__pgrx_c_args_HeapTupleHeaderSetXvac!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_HeapTupleHeaderSetXvac] [p2 $mode [$($done)*] []] [
+                $head $(::$tail)* ! $group
+            ]
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; ::$head:ident $(::$tail:ident)* ! $group:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_HeapTupleHeaderSetXvac] [p2 $mode [$($done)*] []] [
+                ::$head $(::$tail)* ! $group
+            ]
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; ($($inner:tt)*)) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_HeapTupleHeaderSetXvac] [p2 $mode [$($done)*] []] [
+                ($($inner)*)
+            ]
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
+        $crate::__pgrx_c_args_HeapTupleHeaderSetXvac!(
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; $argument:expr) => {
+        $crate::__pgrx_c_args_HeapTupleHeaderSetXvac!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
+        $crate::__pgrx_c_args_HeapTupleHeaderSetXvac!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_HeapTupleHeaderSetXvac] [p2 $mode [$($done)*] [$($rest)*]] [
+                $head $(::$tail)* ! $group
+            ]
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; ::$head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_HeapTupleHeaderSetXvac] [p2 $mode [$($done)*] [$($rest)*]] [
+                ::$head $(::$tail)* ! $group
+            ]
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; ($($inner:tt)*), $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_HeapTupleHeaderSetXvac] [p2 $mode [$($done)*] [$($rest)*]] [
+                ($($inner)*)
+            ]
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_HeapTupleHeaderSetXvac!(
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_HeapTupleHeaderSetXvac!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p2 $mode:ident [$($done:tt)*];) => {
+        $crate::HeapTupleHeaderSetXvac!(@$mode; $($done)*)
+    };
+    ($($invalid:tt)*) => {
+        compile_error!("arguments do not satisfy this C macro's invocation contract")
+    };
+}
+/// C macro HeapTupleHeaderSetXvac from htup_details.h:424
+///
+/// ```text
+/// #define HeapTupleHeaderSetXvac( tup , xid ) do { Assert ( ( tup ) -> t_infomask & HEAP_MOVED ) ; ( tup ) -> t_choice . t_heap . t_field3 . t_xvac = ( xid ) ; } while ( 0 )
+/// ```
+///
+///
+/// This macro executes C statements in order and yields no value. Local blocks retain their C scope. Pointer access and native calls keep their usual caller safety obligations.
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+#[macro_export]
+macro_rules! HeapTupleHeaderSetXvac {
+    (@__pgrx_emit_check_safety; $tup:tt, $xid:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $tup);
+                $crate::__pgrx_c_operand!(@check_safety; $xid);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_HeapTupleHeaderSetXvac!(
+            @collect __pgrx_emit_check_safety [];
+            $($raw)*
+        )
+    };
+    (@__pgrx_emit_public; $tup:tt, $xid:tt $(,)?) => {
+        {
+            /* PGRX: Assert remains expanded because preserving the complete statement body and its order has not been proved equivalent to C substitution. */
+            {
+                let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    {
+                        {
+                            let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                /* PGRX: true remains expanded because no integer constant binding is available in the defining Rust crate. */
+                                $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
+                                    1i32
+                                )
+                            );
+                        }
+                    }
+                );
+            };
+            {
+                let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::assign(
+                        $crate::__pgrx_c_macros::expression::project::<
+                            $crate::__pgrx_c_generated::Field_t_xvac,
+                            _,
+                            _
+                        >(
+                            $crate::__pgrx_c_macros::expression::project::<
+                                $crate::__pgrx_c_generated::Field_t_field3,
+                                _,
+                                _
+                            >(
+                                $crate::__pgrx_c_macros::expression::project::<
+                                    $crate::__pgrx_c_generated::Field_t_heap,
+                                    _,
+                                    _
+                                >(
+                                    $crate::__pgrx_c_macros::expression::project::<
+                                        $crate::__pgrx_c_generated::Field_t_choice,
+                                        _,
+                                        _
+                                    >(
+                                        $crate::__pgrx_c_macros::expression::pointee(
+                                            (
+                                                $crate::__pgrx_c_macros::expression::profile_value::<
+                                                    true,
+                                                    _
+                                                >($crate::__pgrx_c_operand!(@value [true]; $tup))
+                                            )
+                                        )
+                                    )
+                                )
+                            )
+                        ),
+                        (
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_operand!(@value [true]; $xid)
+                            )
+                        )
+                    )
+                );
+            };
+        }
+    };
+    (@__pgrx_emit_discard; $tup:tt, $xid:tt $(,)?) => {
+        $crate::HeapTupleHeaderSetXvac!(@__pgrx_emit_public; $tup, $xid)
+    };
+    (@__pgrx_c_discard; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_HeapTupleHeaderSetXvac!(@collect __pgrx_emit_discard []; $($raw)*)
+    };
+    (@$mode:ident; $($raw:tt)*) => {
+        compile_error!("a C statement body is not an expression operand")
+    };
+    ($($raw:tt)*) => {
+        $crate::__pgrx_c_args_HeapTupleHeaderSetXvac!(@collect __pgrx_emit_public []; $($raw)*)
+    };
+}
+
+#[cfg(not(all(
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -18062,23 +21026,23 @@ macro_rules! __pgrx_c_args_HeapTupleHeaderXminCommitted {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
         $crate::__pgrx_c_args_HeapTupleHeaderXminCommitted!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_HeapTupleHeaderXminCommitted!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderXminCommitted!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderXminCommitted!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -18090,7 +21054,7 @@ macro_rules! __pgrx_c_args_HeapTupleHeaderXminCommitted {
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
         $crate::__pgrx_c_args_HeapTupleHeaderXminCommitted!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
@@ -18116,17 +21080,17 @@ macro_rules! __pgrx_c_args_HeapTupleHeaderXminCommitted {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_HeapTupleHeaderXminCommitted!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_HeapTupleHeaderXminCommitted!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderXminCommitted!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -18153,13 +21117,13 @@ macro_rules! __pgrx_c_args_HeapTupleHeaderXminCommitted {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderXminCommitted!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderXminCommitted!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -18232,7 +21196,7 @@ macro_rules! HeapTupleHeaderXminCommitted {
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                        $crate::HEAP_XMIN_COMMITTED as i32
+                                        $crate::__pgrx_c_bindings::HEAP_XMIN_COMMITTED as i32
                                     )
                                 )
                             )
@@ -18314,7 +21278,9 @@ macro_rules! HeapTupleHeaderXminCommitted {
                                             >(
                                                 $crate::__pgrx_c_macros::CValue::<
                                                     $crate::__pgrx_c_macros::CInt
-                                                >::new($crate::HEAP_XMIN_COMMITTED as i32)
+                                                >::new(
+                                                    $crate::__pgrx_c_bindings::HEAP_XMIN_COMMITTED as i32
+                                                )
                                             )
                                         )
                                     )
@@ -18370,7 +21336,7 @@ macro_rules! HeapTupleHeaderXminCommitted {
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                        $crate::HEAP_XMIN_COMMITTED as i32
+                                        $crate::__pgrx_c_bindings::HEAP_XMIN_COMMITTED as i32
                                     )
                                 )
                             )
@@ -18402,8 +21368,8 @@ macro_rules! HeapTupleHeaderXminCommitted {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -18434,23 +21400,23 @@ macro_rules! __pgrx_c_args_HeapTupleHeaderXminFrozen {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
         $crate::__pgrx_c_args_HeapTupleHeaderXminFrozen!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_HeapTupleHeaderXminFrozen!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderXminFrozen!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderXminFrozen!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -18459,7 +21425,7 @@ macro_rules! __pgrx_c_args_HeapTupleHeaderXminFrozen {
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
         $crate::__pgrx_c_args_HeapTupleHeaderXminFrozen!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
@@ -18485,17 +21451,17 @@ macro_rules! __pgrx_c_args_HeapTupleHeaderXminFrozen {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_HeapTupleHeaderXminFrozen!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_HeapTupleHeaderXminFrozen!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderXminFrozen!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -18522,13 +21488,13 @@ macro_rules! __pgrx_c_args_HeapTupleHeaderXminFrozen {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderXminFrozen!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderXminFrozen!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -18603,7 +21569,7 @@ macro_rules! HeapTupleHeaderXminFrozen {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::CValue::<
                                             $crate::__pgrx_c_macros::CInt
-                                        >::new($crate::HEAP_XMIN_FROZEN as i32)
+                                        >::new($crate::__pgrx_c_bindings::HEAP_XMIN_FROZEN as i32)
                                     )
                                 )
                             )
@@ -18611,7 +21577,7 @@ macro_rules! HeapTupleHeaderXminFrozen {
                     ),
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                            $crate::HEAP_XMIN_FROZEN as i32
+                            $crate::__pgrx_c_bindings::HEAP_XMIN_FROZEN as i32
                         )
                     )
                 )
@@ -18684,7 +21650,9 @@ macro_rules! HeapTupleHeaderXminFrozen {
                                                 >(
                                                     $crate::__pgrx_c_macros::CValue::<
                                                         $crate::__pgrx_c_macros::CInt
-                                                    >::new($crate::HEAP_XMIN_FROZEN as i32)
+                                                    >::new(
+                                                        $crate::__pgrx_c_bindings::HEAP_XMIN_FROZEN as i32
+                                                    )
                                                 )
                                             )
                                         )
@@ -18692,7 +21660,7 @@ macro_rules! HeapTupleHeaderXminFrozen {
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                        $crate::HEAP_XMIN_FROZEN as i32
+                                        $crate::__pgrx_c_bindings::HEAP_XMIN_FROZEN as i32
                                     )
                                 )
                             )
@@ -18741,7 +21709,7 @@ macro_rules! HeapTupleHeaderXminFrozen {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::CValue::<
                                             $crate::__pgrx_c_macros::CInt
-                                        >::new($crate::HEAP_XMIN_FROZEN as i32)
+                                        >::new($crate::__pgrx_c_bindings::HEAP_XMIN_FROZEN as i32)
                                     )
                                 )
                             )
@@ -18749,7 +21717,7 @@ macro_rules! HeapTupleHeaderXminFrozen {
                     ),
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                            $crate::HEAP_XMIN_FROZEN as i32
+                            $crate::__pgrx_c_bindings::HEAP_XMIN_FROZEN as i32
                         )
                     )
                 )
@@ -18765,8 +21733,8 @@ macro_rules! HeapTupleHeaderXminFrozen {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -18797,23 +21765,23 @@ macro_rules! __pgrx_c_args_HeapTupleHeaderXminInvalid {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
         $crate::__pgrx_c_args_HeapTupleHeaderXminInvalid!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_HeapTupleHeaderXminInvalid!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderXminInvalid!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderXminInvalid!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -18822,7 +21790,7 @@ macro_rules! __pgrx_c_args_HeapTupleHeaderXminInvalid {
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
         $crate::__pgrx_c_args_HeapTupleHeaderXminInvalid!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
@@ -18848,17 +21816,17 @@ macro_rules! __pgrx_c_args_HeapTupleHeaderXminInvalid {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_HeapTupleHeaderXminInvalid!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_HeapTupleHeaderXminInvalid!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderXminInvalid!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -18885,13 +21853,13 @@ macro_rules! __pgrx_c_args_HeapTupleHeaderXminInvalid {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderXminInvalid!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleHeaderXminInvalid!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -18971,7 +21939,9 @@ macro_rules! HeapTupleHeaderXminInvalid {
                                             >(
                                                 $crate::__pgrx_c_macros::CValue::<
                                                     $crate::__pgrx_c_macros::CInt
-                                                >::new($crate::HEAP_XMIN_COMMITTED as i32)
+                                                >::new(
+                                                    $crate::__pgrx_c_bindings::HEAP_XMIN_COMMITTED as i32
+                                                )
                                             ),
                                             $crate::__pgrx_c_macros::expression::profile_value::<
                                                 true,
@@ -18979,7 +21949,9 @@ macro_rules! HeapTupleHeaderXminInvalid {
                                             >(
                                                 $crate::__pgrx_c_macros::CValue::<
                                                     $crate::__pgrx_c_macros::CInt
-                                                >::new($crate::HEAP_XMIN_INVALID as i32)
+                                                >::new(
+                                                    $crate::__pgrx_c_bindings::HEAP_XMIN_INVALID as i32
+                                                )
                                             )
                                         )
                                     )
@@ -18989,7 +21961,7 @@ macro_rules! HeapTupleHeaderXminInvalid {
                     ),
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                            $crate::HEAP_XMIN_INVALID as i32
+                            $crate::__pgrx_c_bindings::HEAP_XMIN_INVALID as i32
                         )
                     )
                 )
@@ -19068,7 +22040,7 @@ macro_rules! HeapTupleHeaderXminInvalid {
                                                             $crate::__pgrx_c_macros::CValue::<
                                                                 $crate::__pgrx_c_macros::CInt
                                                             >::new(
-                                                                $crate::HEAP_XMIN_COMMITTED as i32
+                                                                $crate::__pgrx_c_bindings::HEAP_XMIN_COMMITTED as i32
                                                             )
                                                         ),
                                                         $crate::__pgrx_c_macros::expression::profile_value::<
@@ -19077,7 +22049,9 @@ macro_rules! HeapTupleHeaderXminInvalid {
                                                         >(
                                                             $crate::__pgrx_c_macros::CValue::<
                                                                 $crate::__pgrx_c_macros::CInt
-                                                            >::new($crate::HEAP_XMIN_INVALID as i32)
+                                                            >::new(
+                                                                $crate::__pgrx_c_bindings::HEAP_XMIN_INVALID as i32
+                                                            )
                                                         )
                                                     )
                                                 )
@@ -19087,7 +22061,7 @@ macro_rules! HeapTupleHeaderXminInvalid {
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                        $crate::HEAP_XMIN_INVALID as i32
+                                        $crate::__pgrx_c_bindings::HEAP_XMIN_INVALID as i32
                                     )
                                 )
                             )
@@ -19141,7 +22115,9 @@ macro_rules! HeapTupleHeaderXminInvalid {
                                             >(
                                                 $crate::__pgrx_c_macros::CValue::<
                                                     $crate::__pgrx_c_macros::CInt
-                                                >::new($crate::HEAP_XMIN_COMMITTED as i32)
+                                                >::new(
+                                                    $crate::__pgrx_c_bindings::HEAP_XMIN_COMMITTED as i32
+                                                )
                                             ),
                                             $crate::__pgrx_c_macros::expression::profile_value::<
                                                 true,
@@ -19149,7 +22125,9 @@ macro_rules! HeapTupleHeaderXminInvalid {
                                             >(
                                                 $crate::__pgrx_c_macros::CValue::<
                                                     $crate::__pgrx_c_macros::CInt
-                                                >::new($crate::HEAP_XMIN_INVALID as i32)
+                                                >::new(
+                                                    $crate::__pgrx_c_bindings::HEAP_XMIN_INVALID as i32
+                                                )
                                             )
                                         )
                                     )
@@ -19159,7 +22137,7 @@ macro_rules! HeapTupleHeaderXminInvalid {
                     ),
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                            $crate::HEAP_XMIN_INVALID as i32
+                            $crate::__pgrx_c_bindings::HEAP_XMIN_INVALID as i32
                         )
                     )
                 )
@@ -19175,8 +22153,8 @@ macro_rules! HeapTupleHeaderXminInvalid {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -19203,20 +22181,24 @@ macro_rules! __pgrx_c_args_HeapTupleIsHeapOnly {
         $crate::__pgrx_c_args_HeapTupleIsHeapOnly!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_HeapTupleIsHeapOnly!(@p1 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_HeapTupleIsHeapOnly!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_HeapTupleIsHeapOnly!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_HeapTupleIsHeapOnly!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleIsHeapOnly!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleIsHeapOnly!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -19224,7 +22206,9 @@ macro_rules! __pgrx_c_args_HeapTupleIsHeapOnly {
         $crate::__pgrx_c_args_HeapTupleIsHeapOnly!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_HeapTupleIsHeapOnly!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_HeapTupleIsHeapOnly!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -19246,14 +22230,18 @@ macro_rules! __pgrx_c_args_HeapTupleIsHeapOnly {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_HeapTupleIsHeapOnly!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_HeapTupleIsHeapOnly!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_HeapTupleIsHeapOnly!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_HeapTupleIsHeapOnly!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleIsHeapOnly!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -19280,13 +22268,13 @@ macro_rules! __pgrx_c_args_HeapTupleIsHeapOnly {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleIsHeapOnly!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleIsHeapOnly!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -19374,7 +22362,7 @@ macro_rules! HeapTupleIsHeapOnly {
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                        $crate::HEAP_ONLY_TUPLE as i32
+                                        $crate::__pgrx_c_bindings::HEAP_ONLY_TUPLE as i32
                                     )
                                 )
                             )
@@ -19473,7 +22461,9 @@ macro_rules! HeapTupleIsHeapOnly {
                                             >(
                                                 $crate::__pgrx_c_macros::CValue::<
                                                     $crate::__pgrx_c_macros::CInt
-                                                >::new($crate::HEAP_ONLY_TUPLE as i32)
+                                                >::new(
+                                                    $crate::__pgrx_c_bindings::HEAP_ONLY_TUPLE as i32
+                                                )
                                             )
                                         )
                                     )
@@ -19547,7 +22537,7 @@ macro_rules! HeapTupleIsHeapOnly {
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                        $crate::HEAP_ONLY_TUPLE as i32
+                                        $crate::__pgrx_c_bindings::HEAP_ONLY_TUPLE as i32
                                     )
                                 )
                             )
@@ -19573,8 +22563,8 @@ macro_rules! HeapTupleIsHeapOnly {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -19605,21 +22595,23 @@ macro_rules! __pgrx_c_args_HeapTupleIsHotUpdated {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
         $crate::__pgrx_c_args_HeapTupleIsHotUpdated!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_HeapTupleIsHotUpdated!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_HeapTupleIsHotUpdated!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleIsHotUpdated!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleIsHotUpdated!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -19627,7 +22619,9 @@ macro_rules! __pgrx_c_args_HeapTupleIsHotUpdated {
         $crate::__pgrx_c_args_HeapTupleIsHotUpdated!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_HeapTupleIsHotUpdated!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_HeapTupleIsHotUpdated!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -19649,14 +22643,18 @@ macro_rules! __pgrx_c_args_HeapTupleIsHotUpdated {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_HeapTupleIsHotUpdated!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_HeapTupleIsHotUpdated!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_HeapTupleIsHotUpdated!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_HeapTupleIsHotUpdated!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleIsHotUpdated!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -19683,13 +22681,13 @@ macro_rules! __pgrx_c_args_HeapTupleIsHotUpdated {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleIsHotUpdated!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleIsHotUpdated!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -19795,7 +22793,9 @@ macro_rules! HeapTupleIsHotUpdated {
                                                         >(
                                                             $crate::__pgrx_c_macros::CValue::<
                                                                 $crate::__pgrx_c_macros::CInt
-                                                            >::new($crate::HEAP_HOT_UPDATED as i32)
+                                                            >::new(
+                                                                $crate::__pgrx_c_bindings::HEAP_HOT_UPDATED as i32
+                                                            )
                                                         )
                                                     )
                                                 )
@@ -19872,7 +22872,9 @@ macro_rules! HeapTupleIsHotUpdated {
                                                         >(
                                                             $crate::__pgrx_c_macros::CValue::<
                                                                 $crate::__pgrx_c_macros::CInt
-                                                            >::new($crate::HEAP_XMAX_INVALID as i32)
+                                                            >::new(
+                                                                $crate::__pgrx_c_bindings::HEAP_XMAX_INVALID as i32
+                                                            )
                                                         )
                                                     )
                                                 )
@@ -19966,7 +22968,7 @@ macro_rules! HeapTupleIsHotUpdated {
                                                                         $crate::__pgrx_c_macros::CValue::<
                                                                             $crate::__pgrx_c_macros::CInt
                                                                         >::new(
-                                                                            $crate::HEAP_XMIN_COMMITTED as i32
+                                                                            $crate::__pgrx_c_bindings::HEAP_XMIN_COMMITTED as i32
                                                                         )
                                                                     ),
                                                                     $crate::__pgrx_c_macros::expression::profile_value::<
@@ -19976,7 +22978,7 @@ macro_rules! HeapTupleIsHotUpdated {
                                                                         $crate::__pgrx_c_macros::CValue::<
                                                                             $crate::__pgrx_c_macros::CInt
                                                                         >::new(
-                                                                            $crate::HEAP_XMIN_INVALID as i32
+                                                                            $crate::__pgrx_c_bindings::HEAP_XMIN_INVALID as i32
                                                                         )
                                                                     )
                                                                 )
@@ -19991,7 +22993,9 @@ macro_rules! HeapTupleIsHotUpdated {
                                             >(
                                                 $crate::__pgrx_c_macros::CValue::<
                                                     $crate::__pgrx_c_macros::CInt
-                                                >::new($crate::HEAP_XMIN_INVALID as i32)
+                                                >::new(
+                                                    $crate::__pgrx_c_bindings::HEAP_XMIN_INVALID as i32
+                                                )
                                             )
                                         )
                                     )
@@ -20104,7 +23108,7 @@ macro_rules! HeapTupleIsHotUpdated {
                                                                         $crate::__pgrx_c_macros::CValue::<
                                                                             $crate::__pgrx_c_macros::CInt
                                                                         >::new(
-                                                                            $crate::HEAP_HOT_UPDATED as i32
+                                                                            $crate::__pgrx_c_bindings::HEAP_HOT_UPDATED as i32
                                                                         )
                                                                     )
                                                                 )
@@ -20186,7 +23190,7 @@ macro_rules! HeapTupleIsHotUpdated {
                                                                         $crate::__pgrx_c_macros::CValue::<
                                                                             $crate::__pgrx_c_macros::CInt
                                                                         >::new(
-                                                                            $crate::HEAP_XMAX_INVALID as i32
+                                                                            $crate::__pgrx_c_bindings::HEAP_XMAX_INVALID as i32
                                                                         )
                                                                     )
                                                                 )
@@ -20284,7 +23288,7 @@ macro_rules! HeapTupleIsHotUpdated {
                                                                                     $crate::__pgrx_c_macros::CValue::<
                                                                                         $crate::__pgrx_c_macros::CInt
                                                                                     >::new(
-                                                                                        $crate::HEAP_XMIN_COMMITTED as i32
+                                                                                        $crate::__pgrx_c_bindings::HEAP_XMIN_COMMITTED as i32
                                                                                     )
                                                                                 ),
                                                                                 $crate::__pgrx_c_macros::expression::profile_value::<
@@ -20294,7 +23298,7 @@ macro_rules! HeapTupleIsHotUpdated {
                                                                                     $crate::__pgrx_c_macros::CValue::<
                                                                                         $crate::__pgrx_c_macros::CInt
                                                                                     >::new(
-                                                                                        $crate::HEAP_XMIN_INVALID as i32
+                                                                                        $crate::__pgrx_c_bindings::HEAP_XMIN_INVALID as i32
                                                                                     )
                                                                                 )
                                                                             )
@@ -20309,7 +23313,9 @@ macro_rules! HeapTupleIsHotUpdated {
                                                         >(
                                                             $crate::__pgrx_c_macros::CValue::<
                                                                 $crate::__pgrx_c_macros::CInt
-                                                            >::new($crate::HEAP_XMIN_INVALID as i32)
+                                                            >::new(
+                                                                $crate::__pgrx_c_bindings::HEAP_XMIN_INVALID as i32
+                                                            )
                                                         )
                                                     )
                                                 )
@@ -20401,7 +23407,9 @@ macro_rules! HeapTupleIsHotUpdated {
                                                         >(
                                                             $crate::__pgrx_c_macros::CValue::<
                                                                 $crate::__pgrx_c_macros::CInt
-                                                            >::new($crate::HEAP_HOT_UPDATED as i32)
+                                                            >::new(
+                                                                $crate::__pgrx_c_bindings::HEAP_HOT_UPDATED as i32
+                                                            )
                                                         )
                                                     )
                                                 )
@@ -20478,7 +23486,9 @@ macro_rules! HeapTupleIsHotUpdated {
                                                         >(
                                                             $crate::__pgrx_c_macros::CValue::<
                                                                 $crate::__pgrx_c_macros::CInt
-                                                            >::new($crate::HEAP_XMAX_INVALID as i32)
+                                                            >::new(
+                                                                $crate::__pgrx_c_bindings::HEAP_XMAX_INVALID as i32
+                                                            )
                                                         )
                                                     )
                                                 )
@@ -20572,7 +23582,7 @@ macro_rules! HeapTupleIsHotUpdated {
                                                                         $crate::__pgrx_c_macros::CValue::<
                                                                             $crate::__pgrx_c_macros::CInt
                                                                         >::new(
-                                                                            $crate::HEAP_XMIN_COMMITTED as i32
+                                                                            $crate::__pgrx_c_bindings::HEAP_XMIN_COMMITTED as i32
                                                                         )
                                                                     ),
                                                                     $crate::__pgrx_c_macros::expression::profile_value::<
@@ -20582,7 +23592,7 @@ macro_rules! HeapTupleIsHotUpdated {
                                                                         $crate::__pgrx_c_macros::CValue::<
                                                                             $crate::__pgrx_c_macros::CInt
                                                                         >::new(
-                                                                            $crate::HEAP_XMIN_INVALID as i32
+                                                                            $crate::__pgrx_c_bindings::HEAP_XMIN_INVALID as i32
                                                                         )
                                                                     )
                                                                 )
@@ -20597,7 +23607,9 @@ macro_rules! HeapTupleIsHotUpdated {
                                             >(
                                                 $crate::__pgrx_c_macros::CValue::<
                                                     $crate::__pgrx_c_macros::CInt
-                                                >::new($crate::HEAP_XMIN_INVALID as i32)
+                                                >::new(
+                                                    $crate::__pgrx_c_bindings::HEAP_XMIN_INVALID as i32
+                                                )
                                             )
                                         )
                                     )
@@ -20622,8 +23634,8 @@ macro_rules! HeapTupleIsHotUpdated {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -20650,20 +23662,24 @@ macro_rules! __pgrx_c_args_HeapTupleNoNulls {
         $crate::__pgrx_c_args_HeapTupleNoNulls!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_HeapTupleNoNulls!(@p1 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_HeapTupleNoNulls!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_HeapTupleNoNulls!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_HeapTupleNoNulls!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleNoNulls!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleNoNulls!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -20671,7 +23687,9 @@ macro_rules! __pgrx_c_args_HeapTupleNoNulls {
         $crate::__pgrx_c_args_HeapTupleNoNulls!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_HeapTupleNoNulls!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_HeapTupleNoNulls!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -20693,14 +23711,18 @@ macro_rules! __pgrx_c_args_HeapTupleNoNulls {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_HeapTupleNoNulls!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_HeapTupleNoNulls!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_HeapTupleNoNulls!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_HeapTupleNoNulls!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleNoNulls!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -20727,13 +23749,13 @@ macro_rules! __pgrx_c_args_HeapTupleNoNulls {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleNoNulls!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleNoNulls!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -20818,7 +23840,7 @@ macro_rules! HeapTupleNoNulls {
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                        $crate::HEAP_HASNULL as i32
+                                        $crate::__pgrx_c_bindings::HEAP_HASNULL as i32
                                     )
                                 )
                             )
@@ -20907,7 +23929,9 @@ macro_rules! HeapTupleNoNulls {
                                             >(
                                                 $crate::__pgrx_c_macros::CValue::<
                                                     $crate::__pgrx_c_macros::CInt
-                                                >::new($crate::HEAP_HASNULL as i32)
+                                                >::new(
+                                                    $crate::__pgrx_c_bindings::HEAP_HASNULL as i32
+                                                )
                                             )
                                         )
                                     )
@@ -20971,7 +23995,7 @@ macro_rules! HeapTupleNoNulls {
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                        $crate::HEAP_HASNULL as i32
+                                        $crate::__pgrx_c_bindings::HEAP_HASNULL as i32
                                     )
                                 )
                             )
@@ -20990,8 +24014,8 @@ macro_rules! HeapTupleNoNulls {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -21022,21 +24046,23 @@ macro_rules! __pgrx_c_args_HeapTupleSetHeapOnly {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
         $crate::__pgrx_c_args_HeapTupleSetHeapOnly!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_HeapTupleSetHeapOnly!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_HeapTupleSetHeapOnly!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleSetHeapOnly!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleSetHeapOnly!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -21044,7 +24070,9 @@ macro_rules! __pgrx_c_args_HeapTupleSetHeapOnly {
         $crate::__pgrx_c_args_HeapTupleSetHeapOnly!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_HeapTupleSetHeapOnly!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_HeapTupleSetHeapOnly!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -21066,14 +24094,18 @@ macro_rules! __pgrx_c_args_HeapTupleSetHeapOnly {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_HeapTupleSetHeapOnly!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_HeapTupleSetHeapOnly!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_HeapTupleSetHeapOnly!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_HeapTupleSetHeapOnly!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleSetHeapOnly!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -21100,13 +24132,13 @@ macro_rules! __pgrx_c_args_HeapTupleSetHeapOnly {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleSetHeapOnly!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleSetHeapOnly!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -21184,7 +24216,7 @@ macro_rules! HeapTupleSetHeapOnly {
                     ),
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                            $crate::HEAP_ONLY_TUPLE as i32
+                            $crate::__pgrx_c_bindings::HEAP_ONLY_TUPLE as i32
                         )
                     ),
                     |__pgrx_old,
@@ -21259,7 +24291,7 @@ macro_rules! HeapTupleSetHeapOnly {
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                        $crate::HEAP_ONLY_TUPLE as i32
+                                        $crate::__pgrx_c_bindings::HEAP_ONLY_TUPLE as i32
                                     )
                                 ),
                                 |__pgrx_old,
@@ -21319,7 +24351,7 @@ macro_rules! HeapTupleSetHeapOnly {
                     ),
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                            $crate::HEAP_ONLY_TUPLE as i32
+                            $crate::__pgrx_c_bindings::HEAP_ONLY_TUPLE as i32
                         )
                     ),
                     |__pgrx_old,
@@ -21337,8 +24369,8 @@ macro_rules! HeapTupleSetHeapOnly {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -21369,21 +24401,23 @@ macro_rules! __pgrx_c_args_HeapTupleSetHotUpdated {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
         $crate::__pgrx_c_args_HeapTupleSetHotUpdated!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_HeapTupleSetHotUpdated!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_HeapTupleSetHotUpdated!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleSetHotUpdated!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleSetHotUpdated!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -21391,7 +24425,9 @@ macro_rules! __pgrx_c_args_HeapTupleSetHotUpdated {
         $crate::__pgrx_c_args_HeapTupleSetHotUpdated!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_HeapTupleSetHotUpdated!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_HeapTupleSetHotUpdated!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -21416,15 +24452,17 @@ macro_rules! __pgrx_c_args_HeapTupleSetHotUpdated {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_HeapTupleSetHotUpdated!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_HeapTupleSetHotUpdated!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_HeapTupleSetHotUpdated!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleSetHotUpdated!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -21451,13 +24489,13 @@ macro_rules! __pgrx_c_args_HeapTupleSetHotUpdated {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleSetHotUpdated!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleSetHotUpdated!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -21538,7 +24576,7 @@ macro_rules! HeapTupleSetHotUpdated {
                     ),
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                            $crate::HEAP_HOT_UPDATED as i32
+                            $crate::__pgrx_c_bindings::HEAP_HOT_UPDATED as i32
                         )
                     ),
                     |__pgrx_old,
@@ -21613,7 +24651,7 @@ macro_rules! HeapTupleSetHotUpdated {
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                        $crate::HEAP_HOT_UPDATED as i32
+                                        $crate::__pgrx_c_bindings::HEAP_HOT_UPDATED as i32
                                     )
                                 ),
                                 |__pgrx_old,
@@ -21673,7 +24711,7 @@ macro_rules! HeapTupleSetHotUpdated {
                     ),
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                            $crate::HEAP_HOT_UPDATED as i32
+                            $crate::__pgrx_c_bindings::HEAP_HOT_UPDATED as i32
                         )
                     ),
                     |__pgrx_old,
@@ -21687,6 +24725,1309 @@ macro_rules! HeapTupleSetHotUpdated {
     };
     ($($raw:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleSetHotUpdated!(@collect __pgrx_emit_public []; $($raw)*)
+    };
+}
+
+#[cfg(not(all(
+    target_arch = "x86_64",
+    target_os = "linux",
+    target_pointer_width = "64",
+    target_endian = "little"
+)))]
+#[cfg(not(docsrs))]
+compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
+#[doc(hidden)]
+#[macro_export]
+macro_rules! __pgrx_c_args_fastgetattr {
+    (@collect $mode:ident [$($done:tt)*]; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_fastgetattr!(@p0 $mode [$($done)*]; $($raw)*)
+    };
+    (@classified [$next:ident $mode:ident [$($done:tt)*] [$($rest:tt)*]] $descriptor:tt) => {
+        $crate::__pgrx_c_args_fastgetattr!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
+    };
+    (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_fastgetattr!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+            $($rest)*
+        )
+    };
+    (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_fastgetattr!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; - $($raw:tt)*) => {
+        $crate::__pgrx_c_args_fastgetattr!(@negative0 $mode [$($done)*]; - $($raw)*)
+    };
+    (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
+        $crate::__pgrx_c_args_fastgetattr!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_fastgetattr] [p1 $mode [$($done)*] [$($rest)*]] [
+                $head $(::$tail)* ! $group
+            ]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; ::$head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_fastgetattr] [p1 $mode [$($done)*] [$($rest)*]] [
+                ::$head $(::$tail)* ! $group
+            ]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; ($($inner:tt)*), $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_fastgetattr] [p1 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_fastgetattr!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_fastgetattr!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_fastgetattr!(
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+            $($rest)*
+        )
+    };
+    (@negative1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_fastgetattr!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; - $($raw:tt)*) => {
+        $crate::__pgrx_c_args_fastgetattr!(@negative1 $mode [$($done)*]; - $($raw)*)
+    };
+    (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
+        $crate::__pgrx_c_args_fastgetattr!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_fastgetattr] [p2 $mode [$($done)*] [$($rest)*]] [
+                $head $(::$tail)* ! $group
+            ]
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; ::$head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_fastgetattr] [p2 $mode [$($done)*] [$($rest)*]] [
+                ::$head $(::$tail)* ! $group
+            ]
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; ($($inner:tt)*), $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_fastgetattr] [p2 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_fastgetattr!(
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_fastgetattr!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p2 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_fastgetattr!(
+            @p3 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+            $($rest)*
+        )
+    };
+    (@negative2 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_fastgetattr!(
+            @p3 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p2 $mode:ident [$($done:tt)*]; - $($raw:tt)*) => {
+        $crate::__pgrx_c_args_fastgetattr!(@negative2 $mode [$($done)*]; - $($raw)*)
+    };
+    (@p2 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
+        $crate::__pgrx_c_args_fastgetattr!(
+            @p3 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p2 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_fastgetattr] [p3 $mode [$($done)*] [$($rest)*]] [
+                $head $(::$tail)* ! $group
+            ]
+        )
+    };
+    (@p2 $mode:ident [$($done:tt)*]; ::$head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_fastgetattr] [p3 $mode [$($done)*] [$($rest)*]] [
+                ::$head $(::$tail)* ! $group
+            ]
+        )
+    };
+    (@p2 $mode:ident [$($done:tt)*]; ($($inner:tt)*), $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_fastgetattr] [p3 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
+        )
+    };
+    (@p2 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_fastgetattr!(
+            @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p2 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_fastgetattr!(
+            @p3 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p3 $mode:ident [$($done:tt)*]; - $argument:literal) => {
+        $crate::__pgrx_c_args_fastgetattr!(
+            @p4 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
+    };
+    (@negative3 $mode:ident [$($done:tt)*]; $argument:expr) => {
+        $crate::__pgrx_c_args_fastgetattr!(
+            @p4 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
+    };
+    (@p3 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_fastgetattr!(
+            @p4 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+            $($rest)*
+        )
+    };
+    (@negative3 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_fastgetattr!(
+            @p4 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p3 $mode:ident [$($done:tt)*]; - $($raw:tt)*) => {
+        $crate::__pgrx_c_args_fastgetattr!(@negative3 $mode [$($done)*]; - $($raw)*)
+    };
+    (@p3 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
+        $crate::__pgrx_c_args_fastgetattr!(
+            @p4 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
+    };
+    (@p3 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_fastgetattr] [p4 $mode [$($done)*] []] [
+                $head $(::$tail)* ! $group
+            ]
+        )
+    };
+    (@p3 $mode:ident [$($done:tt)*]; ::$head:ident $(::$tail:ident)* ! $group:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_fastgetattr] [p4 $mode [$($done)*] []] [
+                ::$head $(::$tail)* ! $group
+            ]
+        )
+    };
+    (@p3 $mode:ident [$($done:tt)*]; ($($inner:tt)*)) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_fastgetattr] [p4 $mode [$($done)*] []] [($($inner)*)]
+        )
+    };
+    (@p3 $mode:ident [$($done:tt)*]; $argument:literal) => {
+        $crate::__pgrx_c_args_fastgetattr!(
+            @p4 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
+    };
+    (@p3 $mode:ident [$($done:tt)*]; $argument:expr) => {
+        $crate::__pgrx_c_args_fastgetattr!(
+            @p4 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
+    };
+    (@p3 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
+        $crate::__pgrx_c_args_fastgetattr!(
+            @p4 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p3 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_fastgetattr] [p4 $mode [$($done)*] [$($rest)*]] [
+                $head $(::$tail)* ! $group
+            ]
+        )
+    };
+    (@p3 $mode:ident [$($done:tt)*]; ::$head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_fastgetattr] [p4 $mode [$($done)*] [$($rest)*]] [
+                ::$head $(::$tail)* ! $group
+            ]
+        )
+    };
+    (@p3 $mode:ident [$($done:tt)*]; ($($inner:tt)*), $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_fastgetattr] [p4 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
+        )
+    };
+    (@p3 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_fastgetattr!(
+            @p4 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p3 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_fastgetattr!(
+            @p4 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p4 $mode:ident [$($done:tt)*];) => {
+        $crate::fastgetattr!(@$mode; $($done)*)
+    };
+    ($($invalid:tt)*) => {
+        compile_error!("arguments do not satisfy this C macro's invocation contract")
+    };
+}
+/// Typed call adapter for C inline function fastgetattr from htup_details.h:753
+///
+/// ```c
+/// static inline Datum
+/// fastgetattr(HeapTuple tup, int attnum, TupleDesc tupleDesc, bool *isnull)
+/// {
+/// 	Assert(attnum > 0);
+///
+/// 	*isnull = false;
+/// 	if (HeapTupleNoNulls(tup))
+/// 	{
+/// 		Form_pg_attribute att;
+///
+/// 		att = TupleDescAttr(tupleDesc, attnum - 1);
+/// 		if (att->attcacheoff >= 0)
+/// 			return fetchatt(att, (char *) tup->t_data + tup->t_data->t_hoff +
+/// 							att->attcacheoff);
+/// 		else
+/// 			return nocachegetattr(tup, attnum, tupleDesc);
+/// 	}
+/// 	else
+/// 	{
+/// 		if (att_isnull(attnum - 1, tup->t_data->t_bits))
+/// 		{
+/// 			*isnull = true;
+/// 			return (Datum) NULL;
+/// 		}
+/// 		else
+/// 			return nocachegetattr(tup, attnum, tupleDesc);
+/// 	}
+/// }
+/// ```
+///
+///
+/// Calls the original function through its inspected C prototype. Each operand is evaluated once and converted using C parameter assignment rules. The result retains the function's original C type; `.get()` extracts its native storage, including `()` for a void result. Native calls retain the backend thread, PostgreSQL error, and caller safety contracts of the generated guarded binding.
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+#[macro_export]
+macro_rules! fastgetattr {
+    (@__pgrx_emit_check_safety; $tup:tt, $attnum:tt, $tupleDesc:tt, $isnull:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $tup);
+                $crate::__pgrx_c_operand!(@check_safety; $attnum);
+                $crate::__pgrx_c_operand!(@check_safety; $tupleDesc);
+                $crate::__pgrx_c_operand!(@check_safety; $isnull);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_fastgetattr!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
+    (@__pgrx_emit_public; $tup:tt, $attnum:tt, $tupleDesc:tt, $isnull:tt $(,)?) => {
+        $crate::__pgrx_c_macros::expression_result::finish(
+            $crate::fastgetattr!(@__pgrx_emit_value; $tup, $attnum, $tupleDesc, $isnull)
+        )
+    };
+    (@__pgrx_emit_value; $tup:tt, $attnum:tt, $tupleDesc:tt, $isnull:tt $(,)?) => {
+        $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+            <
+                $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                    $crate::__pgrx_c_macros::CUnsignedLong,
+                    $crate::__pgrx_c_bindings::Datum
+                > as $crate::__pgrx_c_macros::expression::CType
+            >::from_storage(
+                $crate::__pgrx_c_bindings::fastgetattr(
+                    <
+                        $crate::__pgrx_c_macros::expression::CPointer<
+                            $crate::__pgrx_c_macros::expression::CRecord<
+                                $crate::__pgrx_c_bindings::HeapTupleData
+                            >,
+                            $crate::__pgrx_c_macros::expression::ReadWrite
+                        > as $crate::__pgrx_c_macros::expression::CType
+                    >::into_storage(
+                        $crate::__pgrx_c_macros::expression::implicit::<
+                            $crate::__pgrx_c_macros::expression::CPointer<
+                                $crate::__pgrx_c_macros::expression::CRecord<
+                                    $crate::__pgrx_c_bindings::HeapTupleData
+                                >,
+                                $crate::__pgrx_c_macros::expression::ReadWrite
+                            >,
+                            _
+                        >(
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_operand!(@value [true]; $tup)
+                            )
+                        )
+                    ),
+                    <$crate::__pgrx_c_macros::CInt as $crate::__pgrx_c_macros::expression::CType>::into_storage(
+                        $crate::__pgrx_c_macros::expression::implicit::<
+                            $crate::__pgrx_c_macros::CInt,
+                            _
+                        >(
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_operand!(@value [true]; $attnum)
+                            )
+                        )
+                    ),
+                    <
+                        $crate::__pgrx_c_macros::expression::CPointer<
+                            $crate::__pgrx_c_macros::expression::CRecord<
+                                $crate::__pgrx_c_bindings::TupleDescData
+                            >,
+                            $crate::__pgrx_c_macros::expression::ReadWrite
+                        > as $crate::__pgrx_c_macros::expression::CType
+                    >::into_storage(
+                        $crate::__pgrx_c_macros::expression::implicit::<
+                            $crate::__pgrx_c_macros::expression::CPointer<
+                                $crate::__pgrx_c_macros::expression::CRecord<
+                                    $crate::__pgrx_c_bindings::TupleDescData
+                                >,
+                                $crate::__pgrx_c_macros::expression::ReadWrite
+                            >,
+                            _
+                        >(
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_operand!(@value [true]; $tupleDesc)
+                            )
+                        )
+                    ),
+                    <
+                        $crate::__pgrx_c_macros::expression::CPointer<
+                            $crate::__pgrx_c_macros::CBool,
+                            $crate::__pgrx_c_macros::expression::ReadWrite
+                        > as $crate::__pgrx_c_macros::expression::CType
+                    >::into_storage(
+                        $crate::__pgrx_c_macros::expression::implicit::<
+                            $crate::__pgrx_c_macros::expression::CPointer<
+                                $crate::__pgrx_c_macros::CBool,
+                                $crate::__pgrx_c_macros::expression::ReadWrite
+                            >,
+                            _
+                        >(
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_operand!(@value [true]; $isnull)
+                            )
+                        )
+                    ),
+                )
+            )
+        )
+    };
+    (@__pgrx_c_value; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_fastgetattr!(@collect __pgrx_emit_value []; $($raw)*)
+    };
+    (@__pgrx_emit_place; $tup:tt, $attnum:tt, $tupleDesc:tt, $isnull:tt $(,)?) => {
+        compile_error!("C expression is not a place in this operation")
+    };
+    (@__pgrx_c_place; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_fastgetattr!(@collect __pgrx_emit_place []; $($raw)*)
+    };
+    (@__pgrx_emit_read_place; $tup:tt, $attnum:tt, $tupleDesc:tt, $isnull:tt $(,)?) => {
+        compile_error!("C expression is not a place in this operation")
+    };
+    (@__pgrx_c_read_place; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_fastgetattr!(@collect __pgrx_emit_read_place []; $($raw)*)
+    };
+    (@__pgrx_emit_size; $tup:tt, $attnum:tt, $tupleDesc:tt, $isnull:tt $(,)?) => {
+        $crate::__pgrx_c_macros::expression::size_of_value_type(
+            if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $tup);
+                        $crate::__pgrx_c_operand!(@check_safety; $attnum);
+                        $crate::__pgrx_c_operand!(@check_safety; $tupleDesc);
+                        $crate::__pgrx_c_operand!(@check_safety; $isnull);
+                    }
+                }
+                Some(
+                    unsafe {
+                        $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                            <
+                                $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                    $crate::__pgrx_c_macros::CUnsignedLong,
+                                    $crate::__pgrx_c_bindings::Datum
+                                > as $crate::__pgrx_c_macros::expression::CType
+                            >::from_storage(
+                                $crate::__pgrx_c_bindings::fastgetattr(
+                                    <
+                                        $crate::__pgrx_c_macros::expression::CPointer<
+                                            $crate::__pgrx_c_macros::expression::CRecord<
+                                                $crate::__pgrx_c_bindings::HeapTupleData
+                                            >,
+                                            $crate::__pgrx_c_macros::expression::ReadWrite
+                                        > as $crate::__pgrx_c_macros::expression::CType
+                                    >::into_storage(
+                                        $crate::__pgrx_c_macros::expression::implicit::<
+                                            $crate::__pgrx_c_macros::expression::CPointer<
+                                                $crate::__pgrx_c_macros::expression::CRecord<
+                                                    $crate::__pgrx_c_bindings::HeapTupleData
+                                                >,
+                                                $crate::__pgrx_c_macros::expression::ReadWrite
+                                            >,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_macros::expression::profile_value::<
+                                                true,
+                                                _
+                                            >($crate::__pgrx_c_operand!(@value [true]; $tup))
+                                        )
+                                    ),
+                                    <
+                                        $crate::__pgrx_c_macros::CInt as $crate::__pgrx_c_macros::expression::CType
+                                    >::into_storage(
+                                        $crate::__pgrx_c_macros::expression::implicit::<
+                                            $crate::__pgrx_c_macros::CInt,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_macros::expression::profile_value::<
+                                                true,
+                                                _
+                                            >($crate::__pgrx_c_operand!(@value [true]; $attnum))
+                                        )
+                                    ),
+                                    <
+                                        $crate::__pgrx_c_macros::expression::CPointer<
+                                            $crate::__pgrx_c_macros::expression::CRecord<
+                                                $crate::__pgrx_c_bindings::TupleDescData
+                                            >,
+                                            $crate::__pgrx_c_macros::expression::ReadWrite
+                                        > as $crate::__pgrx_c_macros::expression::CType
+                                    >::into_storage(
+                                        $crate::__pgrx_c_macros::expression::implicit::<
+                                            $crate::__pgrx_c_macros::expression::CPointer<
+                                                $crate::__pgrx_c_macros::expression::CRecord<
+                                                    $crate::__pgrx_c_bindings::TupleDescData
+                                                >,
+                                                $crate::__pgrx_c_macros::expression::ReadWrite
+                                            >,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_macros::expression::profile_value::<
+                                                true,
+                                                _
+                                            >($crate::__pgrx_c_operand!(@value [true]; $tupleDesc))
+                                        )
+                                    ),
+                                    <
+                                        $crate::__pgrx_c_macros::expression::CPointer<
+                                            $crate::__pgrx_c_macros::CBool,
+                                            $crate::__pgrx_c_macros::expression::ReadWrite
+                                        > as $crate::__pgrx_c_macros::expression::CType
+                                    >::into_storage(
+                                        $crate::__pgrx_c_macros::expression::implicit::<
+                                            $crate::__pgrx_c_macros::expression::CPointer<
+                                                $crate::__pgrx_c_macros::CBool,
+                                                $crate::__pgrx_c_macros::expression::ReadWrite
+                                            >,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_macros::expression::profile_value::<
+                                                true,
+                                                _
+                                            >($crate::__pgrx_c_operand!(@value [true]; $isnull))
+                                        )
+                                    ),
+                                )
+                            )
+                        )
+                    }
+                )
+            } else {
+                None
+            }
+        )
+    };
+    (@__pgrx_c_size; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_fastgetattr!(@collect __pgrx_emit_size []; $($raw)*)
+    };
+    (@__pgrx_emit_discard; $tup:tt, $attnum:tt, $tupleDesc:tt, $isnull:tt $(,)?) => {
+        {
+            let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                <
+                    $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                        $crate::__pgrx_c_macros::CUnsignedLong,
+                        $crate::__pgrx_c_bindings::Datum
+                    > as $crate::__pgrx_c_macros::expression::CType
+                >::from_storage(
+                    $crate::__pgrx_c_bindings::fastgetattr(
+                        <
+                            $crate::__pgrx_c_macros::expression::CPointer<
+                                $crate::__pgrx_c_macros::expression::CRecord<
+                                    $crate::__pgrx_c_bindings::HeapTupleData
+                                >,
+                                $crate::__pgrx_c_macros::expression::ReadWrite
+                            > as $crate::__pgrx_c_macros::expression::CType
+                        >::into_storage(
+                            $crate::__pgrx_c_macros::expression::implicit::<
+                                $crate::__pgrx_c_macros::expression::CPointer<
+                                    $crate::__pgrx_c_macros::expression::CRecord<
+                                        $crate::__pgrx_c_bindings::HeapTupleData
+                                    >,
+                                    $crate::__pgrx_c_macros::expression::ReadWrite
+                                >,
+                                _
+                            >(
+                                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                    $crate::__pgrx_c_operand!(@value [true]; $tup)
+                                )
+                            )
+                        ),
+                        <
+                            $crate::__pgrx_c_macros::CInt as $crate::__pgrx_c_macros::expression::CType
+                        >::into_storage(
+                            $crate::__pgrx_c_macros::expression::implicit::<
+                                $crate::__pgrx_c_macros::CInt,
+                                _
+                            >(
+                                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                    $crate::__pgrx_c_operand!(@value [true]; $attnum)
+                                )
+                            )
+                        ),
+                        <
+                            $crate::__pgrx_c_macros::expression::CPointer<
+                                $crate::__pgrx_c_macros::expression::CRecord<
+                                    $crate::__pgrx_c_bindings::TupleDescData
+                                >,
+                                $crate::__pgrx_c_macros::expression::ReadWrite
+                            > as $crate::__pgrx_c_macros::expression::CType
+                        >::into_storage(
+                            $crate::__pgrx_c_macros::expression::implicit::<
+                                $crate::__pgrx_c_macros::expression::CPointer<
+                                    $crate::__pgrx_c_macros::expression::CRecord<
+                                        $crate::__pgrx_c_bindings::TupleDescData
+                                    >,
+                                    $crate::__pgrx_c_macros::expression::ReadWrite
+                                >,
+                                _
+                            >(
+                                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                    $crate::__pgrx_c_operand!(@value [true]; $tupleDesc)
+                                )
+                            )
+                        ),
+                        <
+                            $crate::__pgrx_c_macros::expression::CPointer<
+                                $crate::__pgrx_c_macros::CBool,
+                                $crate::__pgrx_c_macros::expression::ReadWrite
+                            > as $crate::__pgrx_c_macros::expression::CType
+                        >::into_storage(
+                            $crate::__pgrx_c_macros::expression::implicit::<
+                                $crate::__pgrx_c_macros::expression::CPointer<
+                                    $crate::__pgrx_c_macros::CBool,
+                                    $crate::__pgrx_c_macros::expression::ReadWrite
+                                >,
+                                _
+                            >(
+                                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                    $crate::__pgrx_c_operand!(@value [true]; $isnull)
+                                )
+                            )
+                        ),
+                    )
+                )
+            );
+        }
+    };
+    (@__pgrx_c_discard; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_fastgetattr!(@collect __pgrx_emit_discard []; $($raw)*)
+    };
+    ($($raw:tt)*) => {
+        $crate::__pgrx_c_args_fastgetattr!(@collect __pgrx_emit_public []; $($raw)*)
+    };
+}
+
+#[cfg(not(all(
+    target_arch = "x86_64",
+    target_os = "linux",
+    target_pointer_width = "64",
+    target_endian = "little"
+)))]
+#[cfg(not(docsrs))]
+compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
+#[doc(hidden)]
+#[macro_export]
+macro_rules! __pgrx_c_args_heap_getattr {
+    (@collect $mode:ident [$($done:tt)*]; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_heap_getattr!(@p0 $mode [$($done)*]; $($raw)*)
+    };
+    (@classified [$next:ident $mode:ident [$($done:tt)*] [$($rest:tt)*]] $descriptor:tt) => {
+        $crate::__pgrx_c_args_heap_getattr!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
+    };
+    (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_heap_getattr!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+            $($rest)*
+        )
+    };
+    (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_heap_getattr!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; - $($raw:tt)*) => {
+        $crate::__pgrx_c_args_heap_getattr!(@negative0 $mode [$($done)*]; - $($raw)*)
+    };
+    (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
+        $crate::__pgrx_c_args_heap_getattr!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_heap_getattr] [p1 $mode [$($done)*] [$($rest)*]] [
+                $head $(::$tail)* ! $group
+            ]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; ::$head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_heap_getattr] [p1 $mode [$($done)*] [$($rest)*]] [
+                ::$head $(::$tail)* ! $group
+            ]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; ($($inner:tt)*), $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_heap_getattr] [p1 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_heap_getattr!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_heap_getattr!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_heap_getattr!(
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+            $($rest)*
+        )
+    };
+    (@negative1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_heap_getattr!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; - $($raw:tt)*) => {
+        $crate::__pgrx_c_args_heap_getattr!(@negative1 $mode [$($done)*]; - $($raw)*)
+    };
+    (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
+        $crate::__pgrx_c_args_heap_getattr!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_heap_getattr] [p2 $mode [$($done)*] [$($rest)*]] [
+                $head $(::$tail)* ! $group
+            ]
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; ::$head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_heap_getattr] [p2 $mode [$($done)*] [$($rest)*]] [
+                ::$head $(::$tail)* ! $group
+            ]
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; ($($inner:tt)*), $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_heap_getattr] [p2 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_heap_getattr!(
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_heap_getattr!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p2 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_heap_getattr!(
+            @p3 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+            $($rest)*
+        )
+    };
+    (@negative2 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_heap_getattr!(
+            @p3 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p2 $mode:ident [$($done:tt)*]; - $($raw:tt)*) => {
+        $crate::__pgrx_c_args_heap_getattr!(@negative2 $mode [$($done)*]; - $($raw)*)
+    };
+    (@p2 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
+        $crate::__pgrx_c_args_heap_getattr!(
+            @p3 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p2 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_heap_getattr] [p3 $mode [$($done)*] [$($rest)*]] [
+                $head $(::$tail)* ! $group
+            ]
+        )
+    };
+    (@p2 $mode:ident [$($done:tt)*]; ::$head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_heap_getattr] [p3 $mode [$($done)*] [$($rest)*]] [
+                ::$head $(::$tail)* ! $group
+            ]
+        )
+    };
+    (@p2 $mode:ident [$($done:tt)*]; ($($inner:tt)*), $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_heap_getattr] [p3 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
+        )
+    };
+    (@p2 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_heap_getattr!(
+            @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p2 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_heap_getattr!(
+            @p3 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p3 $mode:ident [$($done:tt)*]; - $argument:literal) => {
+        $crate::__pgrx_c_args_heap_getattr!(
+            @p4 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
+    };
+    (@negative3 $mode:ident [$($done:tt)*]; $argument:expr) => {
+        $crate::__pgrx_c_args_heap_getattr!(
+            @p4 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
+    };
+    (@p3 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_heap_getattr!(
+            @p4 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+            $($rest)*
+        )
+    };
+    (@negative3 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_heap_getattr!(
+            @p4 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p3 $mode:ident [$($done:tt)*]; - $($raw:tt)*) => {
+        $crate::__pgrx_c_args_heap_getattr!(@negative3 $mode [$($done)*]; - $($raw)*)
+    };
+    (@p3 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
+        $crate::__pgrx_c_args_heap_getattr!(
+            @p4 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
+    };
+    (@p3 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_heap_getattr] [p4 $mode [$($done)*] []] [
+                $head $(::$tail)* ! $group
+            ]
+        )
+    };
+    (@p3 $mode:ident [$($done:tt)*]; ::$head:ident $(::$tail:ident)* ! $group:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_heap_getattr] [p4 $mode [$($done)*] []] [
+                ::$head $(::$tail)* ! $group
+            ]
+        )
+    };
+    (@p3 $mode:ident [$($done:tt)*]; ($($inner:tt)*)) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_heap_getattr] [p4 $mode [$($done)*] []] [($($inner)*)]
+        )
+    };
+    (@p3 $mode:ident [$($done:tt)*]; $argument:literal) => {
+        $crate::__pgrx_c_args_heap_getattr!(
+            @p4 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
+    };
+    (@p3 $mode:ident [$($done:tt)*]; $argument:expr) => {
+        $crate::__pgrx_c_args_heap_getattr!(
+            @p4 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
+    };
+    (@p3 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
+        $crate::__pgrx_c_args_heap_getattr!(
+            @p4 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p3 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_heap_getattr] [p4 $mode [$($done)*] [$($rest)*]] [
+                $head $(::$tail)* ! $group
+            ]
+        )
+    };
+    (@p3 $mode:ident [$($done:tt)*]; ::$head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_heap_getattr] [p4 $mode [$($done)*] [$($rest)*]] [
+                ::$head $(::$tail)* ! $group
+            ]
+        )
+    };
+    (@p3 $mode:ident [$($done:tt)*]; ($($inner:tt)*), $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_heap_getattr] [p4 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
+        )
+    };
+    (@p3 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_heap_getattr!(
+            @p4 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p3 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_heap_getattr!(
+            @p4 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p4 $mode:ident [$($done:tt)*];) => {
+        $crate::heap_getattr!(@$mode; $($done)*)
+    };
+    ($($invalid:tt)*) => {
+        compile_error!("arguments do not satisfy this C macro's invocation contract")
+    };
+}
+/// Typed call adapter for C inline function heap_getattr from htup_details.h:796
+///
+/// ```c
+/// static inline Datum
+/// heap_getattr(HeapTuple tup, int attnum, TupleDesc tupleDesc, bool *isnull)
+/// {
+/// 	if (attnum > 0)
+/// 	{
+/// 		if (attnum > (int) HeapTupleHeaderGetNatts(tup->t_data))
+/// 			return getmissingattr(tupleDesc, attnum, isnull);
+/// 		else
+/// 			return fastgetattr(tup, attnum, tupleDesc, isnull);
+/// 	}
+/// 	else
+/// 		return heap_getsysattr(tup, attnum, tupleDesc, isnull);
+/// }
+/// ```
+///
+///
+/// Calls the original function through its inspected C prototype. Each operand is evaluated once and converted using C parameter assignment rules. The result retains the function's original C type; `.get()` extracts its native storage, including `()` for a void result. Native calls retain the backend thread, PostgreSQL error, and caller safety contracts of the generated guarded binding.
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+#[macro_export]
+macro_rules! heap_getattr {
+    (@__pgrx_emit_check_safety; $tup:tt, $attnum:tt, $tupleDesc:tt, $isnull:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $tup);
+                $crate::__pgrx_c_operand!(@check_safety; $attnum);
+                $crate::__pgrx_c_operand!(@check_safety; $tupleDesc);
+                $crate::__pgrx_c_operand!(@check_safety; $isnull);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_heap_getattr!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
+    (@__pgrx_emit_public; $tup:tt, $attnum:tt, $tupleDesc:tt, $isnull:tt $(,)?) => {
+        $crate::__pgrx_c_macros::expression_result::finish(
+            $crate::heap_getattr!(@__pgrx_emit_value; $tup, $attnum, $tupleDesc, $isnull)
+        )
+    };
+    (@__pgrx_emit_value; $tup:tt, $attnum:tt, $tupleDesc:tt, $isnull:tt $(,)?) => {
+        $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+            <
+                $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                    $crate::__pgrx_c_macros::CUnsignedLong,
+                    $crate::__pgrx_c_bindings::Datum
+                > as $crate::__pgrx_c_macros::expression::CType
+            >::from_storage(
+                $crate::__pgrx_c_bindings::heap_getattr(
+                    <
+                        $crate::__pgrx_c_macros::expression::CPointer<
+                            $crate::__pgrx_c_macros::expression::CRecord<
+                                $crate::__pgrx_c_bindings::HeapTupleData
+                            >,
+                            $crate::__pgrx_c_macros::expression::ReadWrite
+                        > as $crate::__pgrx_c_macros::expression::CType
+                    >::into_storage(
+                        $crate::__pgrx_c_macros::expression::implicit::<
+                            $crate::__pgrx_c_macros::expression::CPointer<
+                                $crate::__pgrx_c_macros::expression::CRecord<
+                                    $crate::__pgrx_c_bindings::HeapTupleData
+                                >,
+                                $crate::__pgrx_c_macros::expression::ReadWrite
+                            >,
+                            _
+                        >(
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_operand!(@value [true]; $tup)
+                            )
+                        )
+                    ),
+                    <$crate::__pgrx_c_macros::CInt as $crate::__pgrx_c_macros::expression::CType>::into_storage(
+                        $crate::__pgrx_c_macros::expression::implicit::<
+                            $crate::__pgrx_c_macros::CInt,
+                            _
+                        >(
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_operand!(@value [true]; $attnum)
+                            )
+                        )
+                    ),
+                    <
+                        $crate::__pgrx_c_macros::expression::CPointer<
+                            $crate::__pgrx_c_macros::expression::CRecord<
+                                $crate::__pgrx_c_bindings::TupleDescData
+                            >,
+                            $crate::__pgrx_c_macros::expression::ReadWrite
+                        > as $crate::__pgrx_c_macros::expression::CType
+                    >::into_storage(
+                        $crate::__pgrx_c_macros::expression::implicit::<
+                            $crate::__pgrx_c_macros::expression::CPointer<
+                                $crate::__pgrx_c_macros::expression::CRecord<
+                                    $crate::__pgrx_c_bindings::TupleDescData
+                                >,
+                                $crate::__pgrx_c_macros::expression::ReadWrite
+                            >,
+                            _
+                        >(
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_operand!(@value [true]; $tupleDesc)
+                            )
+                        )
+                    ),
+                    <
+                        $crate::__pgrx_c_macros::expression::CPointer<
+                            $crate::__pgrx_c_macros::CBool,
+                            $crate::__pgrx_c_macros::expression::ReadWrite
+                        > as $crate::__pgrx_c_macros::expression::CType
+                    >::into_storage(
+                        $crate::__pgrx_c_macros::expression::implicit::<
+                            $crate::__pgrx_c_macros::expression::CPointer<
+                                $crate::__pgrx_c_macros::CBool,
+                                $crate::__pgrx_c_macros::expression::ReadWrite
+                            >,
+                            _
+                        >(
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_operand!(@value [true]; $isnull)
+                            )
+                        )
+                    ),
+                )
+            )
+        )
+    };
+    (@__pgrx_c_value; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_heap_getattr!(@collect __pgrx_emit_value []; $($raw)*)
+    };
+    (@__pgrx_emit_place; $tup:tt, $attnum:tt, $tupleDesc:tt, $isnull:tt $(,)?) => {
+        compile_error!("C expression is not a place in this operation")
+    };
+    (@__pgrx_c_place; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_heap_getattr!(@collect __pgrx_emit_place []; $($raw)*)
+    };
+    (@__pgrx_emit_read_place; $tup:tt, $attnum:tt, $tupleDesc:tt, $isnull:tt $(,)?) => {
+        compile_error!("C expression is not a place in this operation")
+    };
+    (@__pgrx_c_read_place; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_heap_getattr!(@collect __pgrx_emit_read_place []; $($raw)*)
+    };
+    (@__pgrx_emit_size; $tup:tt, $attnum:tt, $tupleDesc:tt, $isnull:tt $(,)?) => {
+        $crate::__pgrx_c_macros::expression::size_of_value_type(
+            if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $tup);
+                        $crate::__pgrx_c_operand!(@check_safety; $attnum);
+                        $crate::__pgrx_c_operand!(@check_safety; $tupleDesc);
+                        $crate::__pgrx_c_operand!(@check_safety; $isnull);
+                    }
+                }
+                Some(
+                    unsafe {
+                        $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                            <
+                                $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                    $crate::__pgrx_c_macros::CUnsignedLong,
+                                    $crate::__pgrx_c_bindings::Datum
+                                > as $crate::__pgrx_c_macros::expression::CType
+                            >::from_storage(
+                                $crate::__pgrx_c_bindings::heap_getattr(
+                                    <
+                                        $crate::__pgrx_c_macros::expression::CPointer<
+                                            $crate::__pgrx_c_macros::expression::CRecord<
+                                                $crate::__pgrx_c_bindings::HeapTupleData
+                                            >,
+                                            $crate::__pgrx_c_macros::expression::ReadWrite
+                                        > as $crate::__pgrx_c_macros::expression::CType
+                                    >::into_storage(
+                                        $crate::__pgrx_c_macros::expression::implicit::<
+                                            $crate::__pgrx_c_macros::expression::CPointer<
+                                                $crate::__pgrx_c_macros::expression::CRecord<
+                                                    $crate::__pgrx_c_bindings::HeapTupleData
+                                                >,
+                                                $crate::__pgrx_c_macros::expression::ReadWrite
+                                            >,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_macros::expression::profile_value::<
+                                                true,
+                                                _
+                                            >($crate::__pgrx_c_operand!(@value [true]; $tup))
+                                        )
+                                    ),
+                                    <
+                                        $crate::__pgrx_c_macros::CInt as $crate::__pgrx_c_macros::expression::CType
+                                    >::into_storage(
+                                        $crate::__pgrx_c_macros::expression::implicit::<
+                                            $crate::__pgrx_c_macros::CInt,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_macros::expression::profile_value::<
+                                                true,
+                                                _
+                                            >($crate::__pgrx_c_operand!(@value [true]; $attnum))
+                                        )
+                                    ),
+                                    <
+                                        $crate::__pgrx_c_macros::expression::CPointer<
+                                            $crate::__pgrx_c_macros::expression::CRecord<
+                                                $crate::__pgrx_c_bindings::TupleDescData
+                                            >,
+                                            $crate::__pgrx_c_macros::expression::ReadWrite
+                                        > as $crate::__pgrx_c_macros::expression::CType
+                                    >::into_storage(
+                                        $crate::__pgrx_c_macros::expression::implicit::<
+                                            $crate::__pgrx_c_macros::expression::CPointer<
+                                                $crate::__pgrx_c_macros::expression::CRecord<
+                                                    $crate::__pgrx_c_bindings::TupleDescData
+                                                >,
+                                                $crate::__pgrx_c_macros::expression::ReadWrite
+                                            >,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_macros::expression::profile_value::<
+                                                true,
+                                                _
+                                            >($crate::__pgrx_c_operand!(@value [true]; $tupleDesc))
+                                        )
+                                    ),
+                                    <
+                                        $crate::__pgrx_c_macros::expression::CPointer<
+                                            $crate::__pgrx_c_macros::CBool,
+                                            $crate::__pgrx_c_macros::expression::ReadWrite
+                                        > as $crate::__pgrx_c_macros::expression::CType
+                                    >::into_storage(
+                                        $crate::__pgrx_c_macros::expression::implicit::<
+                                            $crate::__pgrx_c_macros::expression::CPointer<
+                                                $crate::__pgrx_c_macros::CBool,
+                                                $crate::__pgrx_c_macros::expression::ReadWrite
+                                            >,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_macros::expression::profile_value::<
+                                                true,
+                                                _
+                                            >($crate::__pgrx_c_operand!(@value [true]; $isnull))
+                                        )
+                                    ),
+                                )
+                            )
+                        )
+                    }
+                )
+            } else {
+                None
+            }
+        )
+    };
+    (@__pgrx_c_size; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_heap_getattr!(@collect __pgrx_emit_size []; $($raw)*)
+    };
+    (@__pgrx_emit_discard; $tup:tt, $attnum:tt, $tupleDesc:tt, $isnull:tt $(,)?) => {
+        {
+            let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                <
+                    $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                        $crate::__pgrx_c_macros::CUnsignedLong,
+                        $crate::__pgrx_c_bindings::Datum
+                    > as $crate::__pgrx_c_macros::expression::CType
+                >::from_storage(
+                    $crate::__pgrx_c_bindings::heap_getattr(
+                        <
+                            $crate::__pgrx_c_macros::expression::CPointer<
+                                $crate::__pgrx_c_macros::expression::CRecord<
+                                    $crate::__pgrx_c_bindings::HeapTupleData
+                                >,
+                                $crate::__pgrx_c_macros::expression::ReadWrite
+                            > as $crate::__pgrx_c_macros::expression::CType
+                        >::into_storage(
+                            $crate::__pgrx_c_macros::expression::implicit::<
+                                $crate::__pgrx_c_macros::expression::CPointer<
+                                    $crate::__pgrx_c_macros::expression::CRecord<
+                                        $crate::__pgrx_c_bindings::HeapTupleData
+                                    >,
+                                    $crate::__pgrx_c_macros::expression::ReadWrite
+                                >,
+                                _
+                            >(
+                                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                    $crate::__pgrx_c_operand!(@value [true]; $tup)
+                                )
+                            )
+                        ),
+                        <
+                            $crate::__pgrx_c_macros::CInt as $crate::__pgrx_c_macros::expression::CType
+                        >::into_storage(
+                            $crate::__pgrx_c_macros::expression::implicit::<
+                                $crate::__pgrx_c_macros::CInt,
+                                _
+                            >(
+                                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                    $crate::__pgrx_c_operand!(@value [true]; $attnum)
+                                )
+                            )
+                        ),
+                        <
+                            $crate::__pgrx_c_macros::expression::CPointer<
+                                $crate::__pgrx_c_macros::expression::CRecord<
+                                    $crate::__pgrx_c_bindings::TupleDescData
+                                >,
+                                $crate::__pgrx_c_macros::expression::ReadWrite
+                            > as $crate::__pgrx_c_macros::expression::CType
+                        >::into_storage(
+                            $crate::__pgrx_c_macros::expression::implicit::<
+                                $crate::__pgrx_c_macros::expression::CPointer<
+                                    $crate::__pgrx_c_macros::expression::CRecord<
+                                        $crate::__pgrx_c_bindings::TupleDescData
+                                    >,
+                                    $crate::__pgrx_c_macros::expression::ReadWrite
+                                >,
+                                _
+                            >(
+                                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                    $crate::__pgrx_c_operand!(@value [true]; $tupleDesc)
+                                )
+                            )
+                        ),
+                        <
+                            $crate::__pgrx_c_macros::expression::CPointer<
+                                $crate::__pgrx_c_macros::CBool,
+                                $crate::__pgrx_c_macros::expression::ReadWrite
+                            > as $crate::__pgrx_c_macros::expression::CType
+                        >::into_storage(
+                            $crate::__pgrx_c_macros::expression::implicit::<
+                                $crate::__pgrx_c_macros::expression::CPointer<
+                                    $crate::__pgrx_c_macros::CBool,
+                                    $crate::__pgrx_c_macros::expression::ReadWrite
+                                >,
+                                _
+                            >(
+                                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                    $crate::__pgrx_c_operand!(@value [true]; $isnull)
+                                )
+                            )
+                        ),
+                    )
+                )
+            );
+        }
+    };
+    (@__pgrx_c_discard; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_heap_getattr!(@collect __pgrx_emit_discard []; $($raw)*)
+    };
+    ($($raw:tt)*) => {
+        $crate::__pgrx_c_args_heap_getattr!(@collect __pgrx_emit_public []; $($raw)*)
     };
 }
 
@@ -21711,6 +26052,7 @@ pub use HeapTupleHeaderGetNatts;
 pub use HeapTupleHeaderGetRawCommandId;
 pub use HeapTupleHeaderGetRawXmax;
 pub use HeapTupleHeaderGetRawXmin;
+pub use HeapTupleHeaderGetSpeculativeToken;
 pub use HeapTupleHeaderGetTypMod;
 pub use HeapTupleHeaderGetTypeId;
 pub use HeapTupleHeaderGetUpdateXid;
@@ -21722,6 +26064,8 @@ pub use HeapTupleHeaderIndicatesMovedPartitions;
 pub use HeapTupleHeaderIsHeapOnly;
 pub use HeapTupleHeaderIsHotUpdated;
 pub use HeapTupleHeaderIsSpeculative;
+pub use HeapTupleHeaderSetCmax;
+pub use HeapTupleHeaderSetCmin;
 pub use HeapTupleHeaderSetDatumLength;
 pub use HeapTupleHeaderSetHeapOnly;
 pub use HeapTupleHeaderSetHotUpdated;
@@ -21733,6 +26077,10 @@ pub use HeapTupleHeaderSetTypMod;
 pub use HeapTupleHeaderSetTypeId;
 pub use HeapTupleHeaderSetXmax;
 pub use HeapTupleHeaderSetXmin;
+pub use HeapTupleHeaderSetXminCommitted;
+pub use HeapTupleHeaderSetXminFrozen;
+pub use HeapTupleHeaderSetXminInvalid;
+pub use HeapTupleHeaderSetXvac;
 pub use HeapTupleHeaderXminCommitted;
 pub use HeapTupleHeaderXminFrozen;
 pub use HeapTupleHeaderXminInvalid;
@@ -21741,3 +26089,5 @@ pub use HeapTupleIsHotUpdated;
 pub use HeapTupleNoNulls;
 pub use HeapTupleSetHeapOnly;
 pub use HeapTupleSetHotUpdated;
+pub use fastgetattr;
+pub use heap_getattr;

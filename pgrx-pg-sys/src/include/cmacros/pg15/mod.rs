@@ -31,6 +31,10 @@ pub use datatype::*;
 mod executor;
 #[allow(unused_imports)]
 pub use executor::*;
+#[path = "foreign/mod.rs"]
+mod foreign;
+#[allow(unused_imports)]
+pub use foreign::*;
 #[path = "lib/mod.rs"]
 mod lib;
 #[allow(unused_imports)]
@@ -79,6 +83,10 @@ pub use replication::*;
 mod storage;
 #[allow(unused_imports)]
 pub use storage::*;
+#[path = "tcop/mod.rs"]
+mod tcop;
+#[allow(unused_imports)]
+pub use tcop::*;
 #[path = "tsearch/mod.rs"]
 mod tsearch;
 #[allow(unused_imports)]

@@ -5,8 +5,8 @@ This code is generated for documentation purposes, so that it is easy to referen
 // C macros from parallel.h.
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -56,7 +56,11 @@ macro_rules! IsParallelWorker {
                         $crate::__pgrx_c_macros::expression::load(
                             $crate::__pgrx_c_macros::expression::place::<
                                 $crate::__pgrx_c_macros::CInt
-                            >(::core::ptr::addr_of_mut!($crate::ParallelWorkerNumber))
+                            >(
+                                ::core::ptr::addr_of_mut!(
+                                    $crate::__pgrx_c_bindings::ParallelWorkerNumber
+                                )
+                            )
                         )
                     ),
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -99,7 +103,11 @@ macro_rules! IsParallelWorker {
                                     $crate::__pgrx_c_macros::expression::load(
                                         $crate::__pgrx_c_macros::expression::place::<
                                             $crate::__pgrx_c_macros::CInt
-                                        >(::core::ptr::addr_of_mut!($crate::ParallelWorkerNumber))
+                                        >(
+                                            ::core::ptr::addr_of_mut!(
+                                                $crate::__pgrx_c_bindings::ParallelWorkerNumber
+                                            )
+                                        )
                                     )
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -129,7 +137,11 @@ macro_rules! IsParallelWorker {
                         $crate::__pgrx_c_macros::expression::load(
                             $crate::__pgrx_c_macros::expression::place::<
                                 $crate::__pgrx_c_macros::CInt
-                            >(::core::ptr::addr_of_mut!($crate::ParallelWorkerNumber))
+                            >(
+                                ::core::ptr::addr_of_mut!(
+                                    $crate::__pgrx_c_bindings::ParallelWorkerNumber
+                                )
+                            )
                         )
                     ),
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(

@@ -22,3 +22,7 @@ pub use walreceiver::*;
 mod walsender;
 #[allow(unused_imports)]
 pub use walsender::*;
+#[path = "worker_internal.rs"]
+mod worker_internal;
+#[allow(unused_imports)]
+pub use worker_internal::*;

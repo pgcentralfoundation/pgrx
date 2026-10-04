@@ -1302,6 +1302,32 @@ pub fn place<M: CType>(address: *mut M::Storage) -> Place<M> {
 pub fn const_place<M: CType>(address: *const M::Storage) -> Place<M, ReadOnly> {
     Place::new(address, Access { volatile: M::VOLATILE, unaligned: false })
 }
+/// Retain a generated narrow string's static array extent and read-only storage.
+///
+/// The generator supplies the complete C char array, including its final zero.
+/// C string literal writes are undefined, so this place never grants mutation.
+/// Inspected plain-char signedness changes values read from high bytes, not their stored bits.
+pub fn string_literal<const N: usize>(
+    bytes: &'static [u8; N],
+) -> Place<CArray<super::CChar, N>, ReadOnly> {
+    // Both inspected plain-char representations admit every byte pattern with byte
+    // alignment. This cast retains the static allocation without reading it.
+    const_place(core::ptr::from_ref(bytes).cast())
+}
+/// Copy Rust's invocation filename bytes into static, zero-terminated C array storage.
+///
+/// Generated code calls this in a const initializer with the exact concat! length.
+pub const fn invocation_file_bytes<const N: usize>(filename: &str) -> [u8; N] {
+    assert!(filename.len() == N, "invocation filename array extent mismatch");
+    let bytes = filename.as_bytes();
+    let mut result = [0; N];
+    let mut index = 0;
+    while index < N {
+        result[index] = bytes[index];
+        index += 1;
+    }
+    result
+}
 /// Resolve a binding storage type to its registered C marker for mutable lvalue lowering.
 pub fn native_place<T: NativeType>(address: *mut T) -> Place<T::Marker> {
     place(address)
@@ -3443,6 +3469,31 @@ mod tests {
     use std::path::PathBuf;
     use std::sync::atomic::{AtomicU64, Ordering};
 
+    /// Retain literal bytes while reading each high byte through inspected plain-char storage.
+    #[test]
+    fn string_array_preserves_every_native_char_byte() {
+        /// Fully initialized static byte allocation with one final C string terminator.
+        static BYTES: [u8; 257] = {
+            let mut bytes = [0; 257];
+            let mut index = 0;
+            while index < 256 {
+                bytes[index] = index as u8;
+                index += 1;
+            }
+            bytes
+        };
+        let place = string_literal(&BYTES);
+        let chars = decay(place).get();
+        for (index, byte) in BYTES.iter().enumerate() {
+            // SAFETY: This index lies within BYTES' live static allocation;
+            // inspected plain char has byte alignment and admits every initialized
+            // byte. No mutation or conflicting access occurs through this read.
+            let character = unsafe { chars.add(index).read() };
+            assert_eq!(character as u8, *byte);
+            assert_eq!(i32::from(character), i32::from(*byte as super::super::CCharRepr));
+        }
+    }
+
     /// Provide a record with independently initialized fields to test address-only projection and raw aggregate copies.
     #[repr(C)]
     struct Partial {
@@ -3832,7 +3883,24 @@ mod tests {
         let third = add::<Undefined, _, _>(read_only, input(2_i32));
         // SAFETY: The third element is initialized in this live array allocation.
         assert_eq!(unsafe { load(pointee(third)) }.get(), 41);
-        assert_eq!(sub::<Undefined, _, _>(third, read_only).get(), 2);
+        let distance: CValue<super::super::CPtrDiff> = sub::<Undefined, _, _>(third, read_only);
+        assert_eq!(distance.get(), 2);
+    }
+
+    /// Preserve all pointer bits and the inspected size result rank without reading addressed storage.
+    #[cfg(target_pointer_width = "64")]
+    #[test]
+    fn pointer_and_size_carriers_keep_all_64_bits() {
+        let address = 0x1234_5678_9abc_def0_usize;
+        let pointer = Pointer::<CInt>::new(core::ptr::with_exposed_provenance_mut(address));
+        let encoded: CValue<super::super::CSize> = cast::<super::super::CSize, _>(pointer);
+        assert_eq!(encoded.get(), address as u64);
+        let restored: Pointer<CInt> = cast::<CPointer<CInt>, _>(encoded);
+        assert_eq!(restored.get().addr(), address);
+        let size: CValue<super::super::CSize> = size_of::<CInt>();
+        let alignment: CValue<super::super::CSize> = align_of::<CInt>();
+        assert_eq!(size.get(), 4);
+        assert_eq!(alignment.get(), core::mem::align_of::<i32>() as u64);
     }
 
     /// Preserve all pointer bits through target-size integer casts, including LLP64 high bits.

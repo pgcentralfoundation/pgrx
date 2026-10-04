@@ -5,8 +5,8 @@ This code is generated for documentation purposes, so that it is easy to referen
 // C macros from rangetypes.h.
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -33,20 +33,24 @@ macro_rules! __pgrx_c_args_DatumGetRangeTypeP {
         $crate::__pgrx_c_args_DatumGetRangeTypeP!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_DatumGetRangeTypeP!(@p1 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_DatumGetRangeTypeP!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_DatumGetRangeTypeP!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_DatumGetRangeTypeP!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_DatumGetRangeTypeP!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_DatumGetRangeTypeP!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -54,7 +58,9 @@ macro_rules! __pgrx_c_args_DatumGetRangeTypeP {
         $crate::__pgrx_c_args_DatumGetRangeTypeP!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_DatumGetRangeTypeP!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_DatumGetRangeTypeP!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -76,14 +82,18 @@ macro_rules! __pgrx_c_args_DatumGetRangeTypeP {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_DatumGetRangeTypeP!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_DatumGetRangeTypeP!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_DatumGetRangeTypeP!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_DatumGetRangeTypeP!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_DatumGetRangeTypeP!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -110,13 +120,13 @@ macro_rules! __pgrx_c_args_DatumGetRangeTypeP {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_DatumGetRangeTypeP!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_DatumGetRangeTypeP!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -163,9 +173,11 @@ macro_rules! DatumGetRangeTypeP {
         (
             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::cast_as::<
-                    *mut $crate::RangeType,
+                    *mut $crate::__pgrx_c_bindings::RangeType,
                     $crate::__pgrx_c_macros::expression::CPointer<
-                        $crate::__pgrx_c_macros::expression::CRecord<$crate::RangeType>,
+                        $crate::__pgrx_c_macros::expression::CRecord<
+                            $crate::__pgrx_c_bindings::RangeType
+                        >,
                         $crate::__pgrx_c_macros::expression::ReadWrite
                     >,
                     _
@@ -173,15 +185,17 @@ macro_rules! DatumGetRangeTypeP {
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         <
                             $crate::__pgrx_c_macros::expression::CPointer<
-                                $crate::__pgrx_c_macros::expression::CRecord<$crate::varlena>,
+                                $crate::__pgrx_c_macros::expression::CRecord<
+                                    $crate::__pgrx_c_bindings::varlena
+                                >,
                                 $crate::__pgrx_c_macros::expression::ReadWrite
                             > as $crate::__pgrx_c_macros::expression::CType
                         >::from_storage(
-                            $crate::pg_detoast_datum(
+                            $crate::__pgrx_c_bindings::pg_detoast_datum(
                                 <
                                     $crate::__pgrx_c_macros::expression::CPointer<
                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                            $crate::varlena
+                                            $crate::__pgrx_c_bindings::varlena
                                         >,
                                         $crate::__pgrx_c_macros::expression::ReadWrite
                                     > as $crate::__pgrx_c_macros::expression::CType
@@ -189,7 +203,7 @@ macro_rules! DatumGetRangeTypeP {
                                     $crate::__pgrx_c_macros::expression::implicit::<
                                         $crate::__pgrx_c_macros::expression::CPointer<
                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                $crate::varlena
+                                                $crate::__pgrx_c_bindings::varlena
                                             >,
                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                         >,
@@ -200,10 +214,10 @@ macro_rules! DatumGetRangeTypeP {
                                             _
                                         >(
                                             $crate::__pgrx_c_macros::expression::cast_as::<
-                                                *mut $crate::varlena,
+                                                *mut $crate::__pgrx_c_bindings::varlena,
                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                        $crate::varlena
+                                                        $crate::__pgrx_c_bindings::varlena
                                                     >,
                                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                                 >,
@@ -215,7 +229,7 @@ macro_rules! DatumGetRangeTypeP {
                                                         _
                                                     >(
                                                         $crate::__pgrx_c_macros::expression::cast_as::<
-                                                            $crate::Pointer,
+                                                            $crate::__pgrx_c_bindings::Pointer,
                                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                                     $crate::__pgrx_c_macros::CChar,
@@ -278,9 +292,11 @@ macro_rules! DatumGetRangeTypeP {
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::cast_as::<
-                                *mut $crate::RangeType,
+                                *mut $crate::__pgrx_c_bindings::RangeType,
                                 $crate::__pgrx_c_macros::expression::CPointer<
-                                    $crate::__pgrx_c_macros::expression::CRecord<$crate::RangeType>,
+                                    $crate::__pgrx_c_macros::expression::CRecord<
+                                        $crate::__pgrx_c_bindings::RangeType
+                                    >,
                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                 >,
                                 _
@@ -289,16 +305,16 @@ macro_rules! DatumGetRangeTypeP {
                                     <
                                         $crate::__pgrx_c_macros::expression::CPointer<
                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                $crate::varlena
+                                                $crate::__pgrx_c_bindings::varlena
                                             >,
                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::from_storage(
-                                        $crate::pg_detoast_datum(
+                                        $crate::__pgrx_c_bindings::pg_detoast_datum(
                                             <
                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                        $crate::varlena
+                                                        $crate::__pgrx_c_bindings::varlena
                                                     >,
                                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                                 > as $crate::__pgrx_c_macros::expression::CType
@@ -306,7 +322,7 @@ macro_rules! DatumGetRangeTypeP {
                                                 $crate::__pgrx_c_macros::expression::implicit::<
                                                     $crate::__pgrx_c_macros::expression::CPointer<
                                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                                            $crate::varlena
+                                                            $crate::__pgrx_c_bindings::varlena
                                                         >,
                                                         $crate::__pgrx_c_macros::expression::ReadWrite
                                                     >,
@@ -317,10 +333,10 @@ macro_rules! DatumGetRangeTypeP {
                                                         _
                                                     >(
                                                         $crate::__pgrx_c_macros::expression::cast_as::<
-                                                            *mut $crate::varlena,
+                                                            *mut $crate::__pgrx_c_bindings::varlena,
                                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                                    $crate::varlena
+                                                                    $crate::__pgrx_c_bindings::varlena
                                                                 >,
                                                                 $crate::__pgrx_c_macros::expression::ReadWrite
                                                             >,
@@ -332,7 +348,7 @@ macro_rules! DatumGetRangeTypeP {
                                                                     _
                                                                 >(
                                                                     $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                        $crate::Pointer,
+                                                                        $crate::__pgrx_c_bindings::Pointer,
                                                                         $crate::__pgrx_c_macros::expression::CPointer<
                                                                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                                                 $crate::__pgrx_c_macros::CChar,
@@ -380,9 +396,11 @@ macro_rules! DatumGetRangeTypeP {
         {
             let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::cast_as::<
-                    *mut $crate::RangeType,
+                    *mut $crate::__pgrx_c_bindings::RangeType,
                     $crate::__pgrx_c_macros::expression::CPointer<
-                        $crate::__pgrx_c_macros::expression::CRecord<$crate::RangeType>,
+                        $crate::__pgrx_c_macros::expression::CRecord<
+                            $crate::__pgrx_c_bindings::RangeType
+                        >,
                         $crate::__pgrx_c_macros::expression::ReadWrite
                     >,
                     _
@@ -390,15 +408,17 @@ macro_rules! DatumGetRangeTypeP {
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         <
                             $crate::__pgrx_c_macros::expression::CPointer<
-                                $crate::__pgrx_c_macros::expression::CRecord<$crate::varlena>,
+                                $crate::__pgrx_c_macros::expression::CRecord<
+                                    $crate::__pgrx_c_bindings::varlena
+                                >,
                                 $crate::__pgrx_c_macros::expression::ReadWrite
                             > as $crate::__pgrx_c_macros::expression::CType
                         >::from_storage(
-                            $crate::pg_detoast_datum(
+                            $crate::__pgrx_c_bindings::pg_detoast_datum(
                                 <
                                     $crate::__pgrx_c_macros::expression::CPointer<
                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                            $crate::varlena
+                                            $crate::__pgrx_c_bindings::varlena
                                         >,
                                         $crate::__pgrx_c_macros::expression::ReadWrite
                                     > as $crate::__pgrx_c_macros::expression::CType
@@ -406,7 +426,7 @@ macro_rules! DatumGetRangeTypeP {
                                     $crate::__pgrx_c_macros::expression::implicit::<
                                         $crate::__pgrx_c_macros::expression::CPointer<
                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                $crate::varlena
+                                                $crate::__pgrx_c_bindings::varlena
                                             >,
                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                         >,
@@ -417,10 +437,10 @@ macro_rules! DatumGetRangeTypeP {
                                             _
                                         >(
                                             $crate::__pgrx_c_macros::expression::cast_as::<
-                                                *mut $crate::varlena,
+                                                *mut $crate::__pgrx_c_bindings::varlena,
                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                        $crate::varlena
+                                                        $crate::__pgrx_c_bindings::varlena
                                                     >,
                                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                                 >,
@@ -432,7 +452,7 @@ macro_rules! DatumGetRangeTypeP {
                                                         _
                                                     >(
                                                         $crate::__pgrx_c_macros::expression::cast_as::<
-                                                            $crate::Pointer,
+                                                            $crate::__pgrx_c_bindings::Pointer,
                                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                                     $crate::__pgrx_c_macros::CChar,
@@ -476,8 +496,8 @@ macro_rules! DatumGetRangeTypeP {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -508,21 +528,23 @@ macro_rules! __pgrx_c_args_DatumGetRangeTypePCopy {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
         $crate::__pgrx_c_args_DatumGetRangeTypePCopy!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_DatumGetRangeTypePCopy!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_DatumGetRangeTypePCopy!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_DatumGetRangeTypePCopy!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_DatumGetRangeTypePCopy!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -530,7 +552,9 @@ macro_rules! __pgrx_c_args_DatumGetRangeTypePCopy {
         $crate::__pgrx_c_args_DatumGetRangeTypePCopy!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_DatumGetRangeTypePCopy!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_DatumGetRangeTypePCopy!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -555,15 +579,17 @@ macro_rules! __pgrx_c_args_DatumGetRangeTypePCopy {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_DatumGetRangeTypePCopy!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_DatumGetRangeTypePCopy!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_DatumGetRangeTypePCopy!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_DatumGetRangeTypePCopy!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -590,13 +616,13 @@ macro_rules! __pgrx_c_args_DatumGetRangeTypePCopy {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_DatumGetRangeTypePCopy!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_DatumGetRangeTypePCopy!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -646,9 +672,11 @@ macro_rules! DatumGetRangeTypePCopy {
         (
             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::cast_as::<
-                    *mut $crate::RangeType,
+                    *mut $crate::__pgrx_c_bindings::RangeType,
                     $crate::__pgrx_c_macros::expression::CPointer<
-                        $crate::__pgrx_c_macros::expression::CRecord<$crate::RangeType>,
+                        $crate::__pgrx_c_macros::expression::CRecord<
+                            $crate::__pgrx_c_bindings::RangeType
+                        >,
                         $crate::__pgrx_c_macros::expression::ReadWrite
                     >,
                     _
@@ -656,15 +684,17 @@ macro_rules! DatumGetRangeTypePCopy {
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         <
                             $crate::__pgrx_c_macros::expression::CPointer<
-                                $crate::__pgrx_c_macros::expression::CRecord<$crate::varlena>,
+                                $crate::__pgrx_c_macros::expression::CRecord<
+                                    $crate::__pgrx_c_bindings::varlena
+                                >,
                                 $crate::__pgrx_c_macros::expression::ReadWrite
                             > as $crate::__pgrx_c_macros::expression::CType
                         >::from_storage(
-                            $crate::pg_detoast_datum_copy(
+                            $crate::__pgrx_c_bindings::pg_detoast_datum_copy(
                                 <
                                     $crate::__pgrx_c_macros::expression::CPointer<
                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                            $crate::varlena
+                                            $crate::__pgrx_c_bindings::varlena
                                         >,
                                         $crate::__pgrx_c_macros::expression::ReadWrite
                                     > as $crate::__pgrx_c_macros::expression::CType
@@ -672,7 +702,7 @@ macro_rules! DatumGetRangeTypePCopy {
                                     $crate::__pgrx_c_macros::expression::implicit::<
                                         $crate::__pgrx_c_macros::expression::CPointer<
                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                $crate::varlena
+                                                $crate::__pgrx_c_bindings::varlena
                                             >,
                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                         >,
@@ -683,10 +713,10 @@ macro_rules! DatumGetRangeTypePCopy {
                                             _
                                         >(
                                             $crate::__pgrx_c_macros::expression::cast_as::<
-                                                *mut $crate::varlena,
+                                                *mut $crate::__pgrx_c_bindings::varlena,
                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                        $crate::varlena
+                                                        $crate::__pgrx_c_bindings::varlena
                                                     >,
                                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                                 >,
@@ -698,7 +728,7 @@ macro_rules! DatumGetRangeTypePCopy {
                                                         _
                                                     >(
                                                         $crate::__pgrx_c_macros::expression::cast_as::<
-                                                            $crate::Pointer,
+                                                            $crate::__pgrx_c_bindings::Pointer,
                                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                                     $crate::__pgrx_c_macros::CChar,
@@ -761,9 +791,11 @@ macro_rules! DatumGetRangeTypePCopy {
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::cast_as::<
-                                *mut $crate::RangeType,
+                                *mut $crate::__pgrx_c_bindings::RangeType,
                                 $crate::__pgrx_c_macros::expression::CPointer<
-                                    $crate::__pgrx_c_macros::expression::CRecord<$crate::RangeType>,
+                                    $crate::__pgrx_c_macros::expression::CRecord<
+                                        $crate::__pgrx_c_bindings::RangeType
+                                    >,
                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                 >,
                                 _
@@ -772,16 +804,16 @@ macro_rules! DatumGetRangeTypePCopy {
                                     <
                                         $crate::__pgrx_c_macros::expression::CPointer<
                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                $crate::varlena
+                                                $crate::__pgrx_c_bindings::varlena
                                             >,
                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::from_storage(
-                                        $crate::pg_detoast_datum_copy(
+                                        $crate::__pgrx_c_bindings::pg_detoast_datum_copy(
                                             <
                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                        $crate::varlena
+                                                        $crate::__pgrx_c_bindings::varlena
                                                     >,
                                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                                 > as $crate::__pgrx_c_macros::expression::CType
@@ -789,7 +821,7 @@ macro_rules! DatumGetRangeTypePCopy {
                                                 $crate::__pgrx_c_macros::expression::implicit::<
                                                     $crate::__pgrx_c_macros::expression::CPointer<
                                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                                            $crate::varlena
+                                                            $crate::__pgrx_c_bindings::varlena
                                                         >,
                                                         $crate::__pgrx_c_macros::expression::ReadWrite
                                                     >,
@@ -800,10 +832,10 @@ macro_rules! DatumGetRangeTypePCopy {
                                                         _
                                                     >(
                                                         $crate::__pgrx_c_macros::expression::cast_as::<
-                                                            *mut $crate::varlena,
+                                                            *mut $crate::__pgrx_c_bindings::varlena,
                                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                                    $crate::varlena
+                                                                    $crate::__pgrx_c_bindings::varlena
                                                                 >,
                                                                 $crate::__pgrx_c_macros::expression::ReadWrite
                                                             >,
@@ -815,7 +847,7 @@ macro_rules! DatumGetRangeTypePCopy {
                                                                     _
                                                                 >(
                                                                     $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                        $crate::Pointer,
+                                                                        $crate::__pgrx_c_bindings::Pointer,
                                                                         $crate::__pgrx_c_macros::expression::CPointer<
                                                                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                                                 $crate::__pgrx_c_macros::CChar,
@@ -863,9 +895,11 @@ macro_rules! DatumGetRangeTypePCopy {
         {
             let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::cast_as::<
-                    *mut $crate::RangeType,
+                    *mut $crate::__pgrx_c_bindings::RangeType,
                     $crate::__pgrx_c_macros::expression::CPointer<
-                        $crate::__pgrx_c_macros::expression::CRecord<$crate::RangeType>,
+                        $crate::__pgrx_c_macros::expression::CRecord<
+                            $crate::__pgrx_c_bindings::RangeType
+                        >,
                         $crate::__pgrx_c_macros::expression::ReadWrite
                     >,
                     _
@@ -873,15 +907,17 @@ macro_rules! DatumGetRangeTypePCopy {
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         <
                             $crate::__pgrx_c_macros::expression::CPointer<
-                                $crate::__pgrx_c_macros::expression::CRecord<$crate::varlena>,
+                                $crate::__pgrx_c_macros::expression::CRecord<
+                                    $crate::__pgrx_c_bindings::varlena
+                                >,
                                 $crate::__pgrx_c_macros::expression::ReadWrite
                             > as $crate::__pgrx_c_macros::expression::CType
                         >::from_storage(
-                            $crate::pg_detoast_datum_copy(
+                            $crate::__pgrx_c_bindings::pg_detoast_datum_copy(
                                 <
                                     $crate::__pgrx_c_macros::expression::CPointer<
                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                            $crate::varlena
+                                            $crate::__pgrx_c_bindings::varlena
                                         >,
                                         $crate::__pgrx_c_macros::expression::ReadWrite
                                     > as $crate::__pgrx_c_macros::expression::CType
@@ -889,7 +925,7 @@ macro_rules! DatumGetRangeTypePCopy {
                                     $crate::__pgrx_c_macros::expression::implicit::<
                                         $crate::__pgrx_c_macros::expression::CPointer<
                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                $crate::varlena
+                                                $crate::__pgrx_c_bindings::varlena
                                             >,
                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                         >,
@@ -900,10 +936,10 @@ macro_rules! DatumGetRangeTypePCopy {
                                             _
                                         >(
                                             $crate::__pgrx_c_macros::expression::cast_as::<
-                                                *mut $crate::varlena,
+                                                *mut $crate::__pgrx_c_bindings::varlena,
                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                        $crate::varlena
+                                                        $crate::__pgrx_c_bindings::varlena
                                                     >,
                                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                                 >,
@@ -915,7 +951,7 @@ macro_rules! DatumGetRangeTypePCopy {
                                                         _
                                                     >(
                                                         $crate::__pgrx_c_macros::expression::cast_as::<
-                                                            $crate::Pointer,
+                                                            $crate::__pgrx_c_bindings::Pointer,
                                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                                     $crate::__pgrx_c_macros::CChar,
@@ -959,8 +995,8 @@ macro_rules! DatumGetRangeTypePCopy {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -991,7 +1027,7 @@ macro_rules! __pgrx_c_args_PG_GETARG_RANGE_P {
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_PG_GETARG_RANGE_P!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -1000,7 +1036,7 @@ macro_rules! __pgrx_c_args_PG_GETARG_RANGE_P {
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_PG_GETARG_RANGE_P!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -1027,31 +1063,35 @@ macro_rules! __pgrx_c_args_PG_GETARG_RANGE_P {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_PG_GETARG_RANGE_P!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:tt, $($rest:tt)*) => {
         $crate::__pgrx_c_args_PG_GETARG_RANGE_P!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_PG_GETARG_RANGE_P!(@p2 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_PG_GETARG_RANGE_P!(
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative1 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_PG_GETARG_RANGE_P!(@p2 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_PG_GETARG_RANGE_P!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_PG_GETARG_RANGE_P!(
-            @p2 $mode [$($done)* (@literal [- $argument]),];
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_PG_GETARG_RANGE_P!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -1059,7 +1099,9 @@ macro_rules! __pgrx_c_args_PG_GETARG_RANGE_P {
         $crate::__pgrx_c_args_PG_GETARG_RANGE_P!(@negative1 $mode [$($done)*]; - $($raw)*)
     };
     (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_PG_GETARG_RANGE_P!(@p2 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_PG_GETARG_RANGE_P!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -1081,14 +1123,18 @@ macro_rules! __pgrx_c_args_PG_GETARG_RANGE_P {
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_PG_GETARG_RANGE_P!(@p2 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_PG_GETARG_RANGE_P!(
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_PG_GETARG_RANGE_P!(@p2 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_PG_GETARG_RANGE_P!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_PG_GETARG_RANGE_P!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -1115,13 +1161,13 @@ macro_rules! __pgrx_c_args_PG_GETARG_RANGE_P {
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_PG_GETARG_RANGE_P!(
-            @p2 $mode [$($done)* (@literal [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_PG_GETARG_RANGE_P!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -1171,9 +1217,11 @@ macro_rules! PG_GETARG_RANGE_P {
         (
             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::cast_as::<
-                    *mut $crate::RangeType,
+                    *mut $crate::__pgrx_c_bindings::RangeType,
                     $crate::__pgrx_c_macros::expression::CPointer<
-                        $crate::__pgrx_c_macros::expression::CRecord<$crate::RangeType>,
+                        $crate::__pgrx_c_macros::expression::CRecord<
+                            $crate::__pgrx_c_bindings::RangeType
+                        >,
                         $crate::__pgrx_c_macros::expression::ReadWrite
                     >,
                     _
@@ -1181,15 +1229,17 @@ macro_rules! PG_GETARG_RANGE_P {
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         <
                             $crate::__pgrx_c_macros::expression::CPointer<
-                                $crate::__pgrx_c_macros::expression::CRecord<$crate::varlena>,
+                                $crate::__pgrx_c_macros::expression::CRecord<
+                                    $crate::__pgrx_c_bindings::varlena
+                                >,
                                 $crate::__pgrx_c_macros::expression::ReadWrite
                             > as $crate::__pgrx_c_macros::expression::CType
                         >::from_storage(
-                            $crate::pg_detoast_datum(
+                            $crate::__pgrx_c_bindings::pg_detoast_datum(
                                 <
                                     $crate::__pgrx_c_macros::expression::CPointer<
                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                            $crate::varlena
+                                            $crate::__pgrx_c_bindings::varlena
                                         >,
                                         $crate::__pgrx_c_macros::expression::ReadWrite
                                     > as $crate::__pgrx_c_macros::expression::CType
@@ -1197,7 +1247,7 @@ macro_rules! PG_GETARG_RANGE_P {
                                     $crate::__pgrx_c_macros::expression::implicit::<
                                         $crate::__pgrx_c_macros::expression::CPointer<
                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                $crate::varlena
+                                                $crate::__pgrx_c_bindings::varlena
                                             >,
                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                         >,
@@ -1208,10 +1258,10 @@ macro_rules! PG_GETARG_RANGE_P {
                                             _
                                         >(
                                             $crate::__pgrx_c_macros::expression::cast_as::<
-                                                *mut $crate::varlena,
+                                                *mut $crate::__pgrx_c_bindings::varlena,
                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                        $crate::varlena
+                                                        $crate::__pgrx_c_bindings::varlena
                                                     >,
                                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                                 >,
@@ -1223,7 +1273,7 @@ macro_rules! PG_GETARG_RANGE_P {
                                                         _
                                                     >(
                                                         $crate::__pgrx_c_macros::expression::cast_as::<
-                                                            $crate::Pointer,
+                                                            $crate::__pgrx_c_bindings::Pointer,
                                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                                     $crate::__pgrx_c_macros::CChar,
@@ -1332,9 +1382,11 @@ macro_rules! PG_GETARG_RANGE_P {
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::cast_as::<
-                                *mut $crate::RangeType,
+                                *mut $crate::__pgrx_c_bindings::RangeType,
                                 $crate::__pgrx_c_macros::expression::CPointer<
-                                    $crate::__pgrx_c_macros::expression::CRecord<$crate::RangeType>,
+                                    $crate::__pgrx_c_macros::expression::CRecord<
+                                        $crate::__pgrx_c_bindings::RangeType
+                                    >,
                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                 >,
                                 _
@@ -1343,16 +1395,16 @@ macro_rules! PG_GETARG_RANGE_P {
                                     <
                                         $crate::__pgrx_c_macros::expression::CPointer<
                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                $crate::varlena
+                                                $crate::__pgrx_c_bindings::varlena
                                             >,
                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::from_storage(
-                                        $crate::pg_detoast_datum(
+                                        $crate::__pgrx_c_bindings::pg_detoast_datum(
                                             <
                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                        $crate::varlena
+                                                        $crate::__pgrx_c_bindings::varlena
                                                     >,
                                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                                 > as $crate::__pgrx_c_macros::expression::CType
@@ -1360,7 +1412,7 @@ macro_rules! PG_GETARG_RANGE_P {
                                                 $crate::__pgrx_c_macros::expression::implicit::<
                                                     $crate::__pgrx_c_macros::expression::CPointer<
                                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                                            $crate::varlena
+                                                            $crate::__pgrx_c_bindings::varlena
                                                         >,
                                                         $crate::__pgrx_c_macros::expression::ReadWrite
                                                     >,
@@ -1371,10 +1423,10 @@ macro_rules! PG_GETARG_RANGE_P {
                                                         _
                                                     >(
                                                         $crate::__pgrx_c_macros::expression::cast_as::<
-                                                            *mut $crate::varlena,
+                                                            *mut $crate::__pgrx_c_bindings::varlena,
                                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                                    $crate::varlena
+                                                                    $crate::__pgrx_c_bindings::varlena
                                                                 >,
                                                                 $crate::__pgrx_c_macros::expression::ReadWrite
                                                             >,
@@ -1386,7 +1438,7 @@ macro_rules! PG_GETARG_RANGE_P {
                                                                     _
                                                                 >(
                                                                     $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                        $crate::Pointer,
+                                                                        $crate::__pgrx_c_bindings::Pointer,
                                                                         $crate::__pgrx_c_macros::expression::CPointer<
                                                                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                                                 $crate::__pgrx_c_macros::CChar,
@@ -1479,9 +1531,11 @@ macro_rules! PG_GETARG_RANGE_P {
         {
             let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::cast_as::<
-                    *mut $crate::RangeType,
+                    *mut $crate::__pgrx_c_bindings::RangeType,
                     $crate::__pgrx_c_macros::expression::CPointer<
-                        $crate::__pgrx_c_macros::expression::CRecord<$crate::RangeType>,
+                        $crate::__pgrx_c_macros::expression::CRecord<
+                            $crate::__pgrx_c_bindings::RangeType
+                        >,
                         $crate::__pgrx_c_macros::expression::ReadWrite
                     >,
                     _
@@ -1489,15 +1543,17 @@ macro_rules! PG_GETARG_RANGE_P {
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         <
                             $crate::__pgrx_c_macros::expression::CPointer<
-                                $crate::__pgrx_c_macros::expression::CRecord<$crate::varlena>,
+                                $crate::__pgrx_c_macros::expression::CRecord<
+                                    $crate::__pgrx_c_bindings::varlena
+                                >,
                                 $crate::__pgrx_c_macros::expression::ReadWrite
                             > as $crate::__pgrx_c_macros::expression::CType
                         >::from_storage(
-                            $crate::pg_detoast_datum(
+                            $crate::__pgrx_c_bindings::pg_detoast_datum(
                                 <
                                     $crate::__pgrx_c_macros::expression::CPointer<
                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                            $crate::varlena
+                                            $crate::__pgrx_c_bindings::varlena
                                         >,
                                         $crate::__pgrx_c_macros::expression::ReadWrite
                                     > as $crate::__pgrx_c_macros::expression::CType
@@ -1505,7 +1561,7 @@ macro_rules! PG_GETARG_RANGE_P {
                                     $crate::__pgrx_c_macros::expression::implicit::<
                                         $crate::__pgrx_c_macros::expression::CPointer<
                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                $crate::varlena
+                                                $crate::__pgrx_c_bindings::varlena
                                             >,
                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                         >,
@@ -1516,10 +1572,10 @@ macro_rules! PG_GETARG_RANGE_P {
                                             _
                                         >(
                                             $crate::__pgrx_c_macros::expression::cast_as::<
-                                                *mut $crate::varlena,
+                                                *mut $crate::__pgrx_c_bindings::varlena,
                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                        $crate::varlena
+                                                        $crate::__pgrx_c_bindings::varlena
                                                     >,
                                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                                 >,
@@ -1531,7 +1587,7 @@ macro_rules! PG_GETARG_RANGE_P {
                                                         _
                                                     >(
                                                         $crate::__pgrx_c_macros::expression::cast_as::<
-                                                            $crate::Pointer,
+                                                            $crate::__pgrx_c_bindings::Pointer,
                                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                                     $crate::__pgrx_c_macros::CChar,
@@ -1620,8 +1676,8 @@ macro_rules! PG_GETARG_RANGE_P {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -1655,7 +1711,7 @@ macro_rules! __pgrx_c_args_PG_GETARG_RANGE_P_COPY {
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_PG_GETARG_RANGE_P_COPY!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -1664,7 +1720,7 @@ macro_rules! __pgrx_c_args_PG_GETARG_RANGE_P_COPY {
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_PG_GETARG_RANGE_P_COPY!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -1691,33 +1747,35 @@ macro_rules! __pgrx_c_args_PG_GETARG_RANGE_P_COPY {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_PG_GETARG_RANGE_P_COPY!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:tt, $($rest:tt)*) => {
         $crate::__pgrx_c_args_PG_GETARG_RANGE_P_COPY!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $argument:literal) => {
         $crate::__pgrx_c_args_PG_GETARG_RANGE_P_COPY!(
-            @p2 $mode [$($done)* (@literal [- $argument]),];
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
         )
     };
     (@negative1 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_PG_GETARG_RANGE_P_COPY!(@p2 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_PG_GETARG_RANGE_P_COPY!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_PG_GETARG_RANGE_P_COPY!(
-            @p2 $mode [$($done)* (@literal [- $argument]),];
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_PG_GETARG_RANGE_P_COPY!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -1725,7 +1783,9 @@ macro_rules! __pgrx_c_args_PG_GETARG_RANGE_P_COPY {
         $crate::__pgrx_c_args_PG_GETARG_RANGE_P_COPY!(@negative1 $mode [$($done)*]; - $($raw)*)
     };
     (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_PG_GETARG_RANGE_P_COPY!(@p2 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_PG_GETARG_RANGE_P_COPY!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -1750,15 +1810,17 @@ macro_rules! __pgrx_c_args_PG_GETARG_RANGE_P_COPY {
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_PG_GETARG_RANGE_P_COPY!(
-            @p2 $mode [$($done)* (@literal [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_PG_GETARG_RANGE_P_COPY!(@p2 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_PG_GETARG_RANGE_P_COPY!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_PG_GETARG_RANGE_P_COPY!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -1785,13 +1847,13 @@ macro_rules! __pgrx_c_args_PG_GETARG_RANGE_P_COPY {
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_PG_GETARG_RANGE_P_COPY!(
-            @p2 $mode [$($done)* (@literal [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_PG_GETARG_RANGE_P_COPY!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -1844,9 +1906,11 @@ macro_rules! PG_GETARG_RANGE_P_COPY {
         (
             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::cast_as::<
-                    *mut $crate::RangeType,
+                    *mut $crate::__pgrx_c_bindings::RangeType,
                     $crate::__pgrx_c_macros::expression::CPointer<
-                        $crate::__pgrx_c_macros::expression::CRecord<$crate::RangeType>,
+                        $crate::__pgrx_c_macros::expression::CRecord<
+                            $crate::__pgrx_c_bindings::RangeType
+                        >,
                         $crate::__pgrx_c_macros::expression::ReadWrite
                     >,
                     _
@@ -1854,15 +1918,17 @@ macro_rules! PG_GETARG_RANGE_P_COPY {
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         <
                             $crate::__pgrx_c_macros::expression::CPointer<
-                                $crate::__pgrx_c_macros::expression::CRecord<$crate::varlena>,
+                                $crate::__pgrx_c_macros::expression::CRecord<
+                                    $crate::__pgrx_c_bindings::varlena
+                                >,
                                 $crate::__pgrx_c_macros::expression::ReadWrite
                             > as $crate::__pgrx_c_macros::expression::CType
                         >::from_storage(
-                            $crate::pg_detoast_datum_copy(
+                            $crate::__pgrx_c_bindings::pg_detoast_datum_copy(
                                 <
                                     $crate::__pgrx_c_macros::expression::CPointer<
                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                            $crate::varlena
+                                            $crate::__pgrx_c_bindings::varlena
                                         >,
                                         $crate::__pgrx_c_macros::expression::ReadWrite
                                     > as $crate::__pgrx_c_macros::expression::CType
@@ -1870,7 +1936,7 @@ macro_rules! PG_GETARG_RANGE_P_COPY {
                                     $crate::__pgrx_c_macros::expression::implicit::<
                                         $crate::__pgrx_c_macros::expression::CPointer<
                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                $crate::varlena
+                                                $crate::__pgrx_c_bindings::varlena
                                             >,
                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                         >,
@@ -1881,10 +1947,10 @@ macro_rules! PG_GETARG_RANGE_P_COPY {
                                             _
                                         >(
                                             $crate::__pgrx_c_macros::expression::cast_as::<
-                                                *mut $crate::varlena,
+                                                *mut $crate::__pgrx_c_bindings::varlena,
                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                        $crate::varlena
+                                                        $crate::__pgrx_c_bindings::varlena
                                                     >,
                                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                                 >,
@@ -1896,7 +1962,7 @@ macro_rules! PG_GETARG_RANGE_P_COPY {
                                                         _
                                                     >(
                                                         $crate::__pgrx_c_macros::expression::cast_as::<
-                                                            $crate::Pointer,
+                                                            $crate::__pgrx_c_bindings::Pointer,
                                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                                     $crate::__pgrx_c_macros::CChar,
@@ -2005,9 +2071,11 @@ macro_rules! PG_GETARG_RANGE_P_COPY {
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::cast_as::<
-                                *mut $crate::RangeType,
+                                *mut $crate::__pgrx_c_bindings::RangeType,
                                 $crate::__pgrx_c_macros::expression::CPointer<
-                                    $crate::__pgrx_c_macros::expression::CRecord<$crate::RangeType>,
+                                    $crate::__pgrx_c_macros::expression::CRecord<
+                                        $crate::__pgrx_c_bindings::RangeType
+                                    >,
                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                 >,
                                 _
@@ -2016,16 +2084,16 @@ macro_rules! PG_GETARG_RANGE_P_COPY {
                                     <
                                         $crate::__pgrx_c_macros::expression::CPointer<
                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                $crate::varlena
+                                                $crate::__pgrx_c_bindings::varlena
                                             >,
                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::from_storage(
-                                        $crate::pg_detoast_datum_copy(
+                                        $crate::__pgrx_c_bindings::pg_detoast_datum_copy(
                                             <
                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                        $crate::varlena
+                                                        $crate::__pgrx_c_bindings::varlena
                                                     >,
                                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                                 > as $crate::__pgrx_c_macros::expression::CType
@@ -2033,7 +2101,7 @@ macro_rules! PG_GETARG_RANGE_P_COPY {
                                                 $crate::__pgrx_c_macros::expression::implicit::<
                                                     $crate::__pgrx_c_macros::expression::CPointer<
                                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                                            $crate::varlena
+                                                            $crate::__pgrx_c_bindings::varlena
                                                         >,
                                                         $crate::__pgrx_c_macros::expression::ReadWrite
                                                     >,
@@ -2044,10 +2112,10 @@ macro_rules! PG_GETARG_RANGE_P_COPY {
                                                         _
                                                     >(
                                                         $crate::__pgrx_c_macros::expression::cast_as::<
-                                                            *mut $crate::varlena,
+                                                            *mut $crate::__pgrx_c_bindings::varlena,
                                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                                    $crate::varlena
+                                                                    $crate::__pgrx_c_bindings::varlena
                                                                 >,
                                                                 $crate::__pgrx_c_macros::expression::ReadWrite
                                                             >,
@@ -2059,7 +2127,7 @@ macro_rules! PG_GETARG_RANGE_P_COPY {
                                                                     _
                                                                 >(
                                                                     $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                        $crate::Pointer,
+                                                                        $crate::__pgrx_c_bindings::Pointer,
                                                                         $crate::__pgrx_c_macros::expression::CPointer<
                                                                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                                                 $crate::__pgrx_c_macros::CChar,
@@ -2152,9 +2220,11 @@ macro_rules! PG_GETARG_RANGE_P_COPY {
         {
             let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::cast_as::<
-                    *mut $crate::RangeType,
+                    *mut $crate::__pgrx_c_bindings::RangeType,
                     $crate::__pgrx_c_macros::expression::CPointer<
-                        $crate::__pgrx_c_macros::expression::CRecord<$crate::RangeType>,
+                        $crate::__pgrx_c_macros::expression::CRecord<
+                            $crate::__pgrx_c_bindings::RangeType
+                        >,
                         $crate::__pgrx_c_macros::expression::ReadWrite
                     >,
                     _
@@ -2162,15 +2232,17 @@ macro_rules! PG_GETARG_RANGE_P_COPY {
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         <
                             $crate::__pgrx_c_macros::expression::CPointer<
-                                $crate::__pgrx_c_macros::expression::CRecord<$crate::varlena>,
+                                $crate::__pgrx_c_macros::expression::CRecord<
+                                    $crate::__pgrx_c_bindings::varlena
+                                >,
                                 $crate::__pgrx_c_macros::expression::ReadWrite
                             > as $crate::__pgrx_c_macros::expression::CType
                         >::from_storage(
-                            $crate::pg_detoast_datum_copy(
+                            $crate::__pgrx_c_bindings::pg_detoast_datum_copy(
                                 <
                                     $crate::__pgrx_c_macros::expression::CPointer<
                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                            $crate::varlena
+                                            $crate::__pgrx_c_bindings::varlena
                                         >,
                                         $crate::__pgrx_c_macros::expression::ReadWrite
                                     > as $crate::__pgrx_c_macros::expression::CType
@@ -2178,7 +2250,7 @@ macro_rules! PG_GETARG_RANGE_P_COPY {
                                     $crate::__pgrx_c_macros::expression::implicit::<
                                         $crate::__pgrx_c_macros::expression::CPointer<
                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                $crate::varlena
+                                                $crate::__pgrx_c_bindings::varlena
                                             >,
                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                         >,
@@ -2189,10 +2261,10 @@ macro_rules! PG_GETARG_RANGE_P_COPY {
                                             _
                                         >(
                                             $crate::__pgrx_c_macros::expression::cast_as::<
-                                                *mut $crate::varlena,
+                                                *mut $crate::__pgrx_c_bindings::varlena,
                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                        $crate::varlena
+                                                        $crate::__pgrx_c_bindings::varlena
                                                     >,
                                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                                 >,
@@ -2204,7 +2276,7 @@ macro_rules! PG_GETARG_RANGE_P_COPY {
                                                         _
                                                     >(
                                                         $crate::__pgrx_c_macros::expression::cast_as::<
-                                                            $crate::Pointer,
+                                                            $crate::__pgrx_c_bindings::Pointer,
                                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                                     $crate::__pgrx_c_macros::CChar,
@@ -2293,8 +2365,8 @@ macro_rules! PG_GETARG_RANGE_P_COPY {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -2321,20 +2393,24 @@ macro_rules! __pgrx_c_args_PG_RETURN_RANGE_P {
         $crate::__pgrx_c_args_PG_RETURN_RANGE_P!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_PG_RETURN_RANGE_P!(@p1 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_PG_RETURN_RANGE_P!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_PG_RETURN_RANGE_P!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_PG_RETURN_RANGE_P!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_PG_RETURN_RANGE_P!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_PG_RETURN_RANGE_P!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -2342,7 +2418,9 @@ macro_rules! __pgrx_c_args_PG_RETURN_RANGE_P {
         $crate::__pgrx_c_args_PG_RETURN_RANGE_P!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_PG_RETURN_RANGE_P!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_PG_RETURN_RANGE_P!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -2364,14 +2442,18 @@ macro_rules! __pgrx_c_args_PG_RETURN_RANGE_P {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_PG_RETURN_RANGE_P!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_PG_RETURN_RANGE_P!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_PG_RETURN_RANGE_P!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_PG_RETURN_RANGE_P!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_PG_RETURN_RANGE_P!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -2398,13 +2480,13 @@ macro_rules! __pgrx_c_args_PG_RETURN_RANGE_P {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_PG_RETURN_RANGE_P!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_PG_RETURN_RANGE_P!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -2511,8 +2593,8 @@ macro_rules! PG_RETURN_RANGE_P {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -2539,20 +2621,24 @@ macro_rules! __pgrx_c_args_RANGE_HAS_LBOUND {
         $crate::__pgrx_c_args_RANGE_HAS_LBOUND!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_RANGE_HAS_LBOUND!(@p1 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_RANGE_HAS_LBOUND!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_RANGE_HAS_LBOUND!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_RANGE_HAS_LBOUND!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_RANGE_HAS_LBOUND!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_RANGE_HAS_LBOUND!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -2560,7 +2646,9 @@ macro_rules! __pgrx_c_args_RANGE_HAS_LBOUND {
         $crate::__pgrx_c_args_RANGE_HAS_LBOUND!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_RANGE_HAS_LBOUND!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_RANGE_HAS_LBOUND!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -2582,14 +2670,18 @@ macro_rules! __pgrx_c_args_RANGE_HAS_LBOUND {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_RANGE_HAS_LBOUND!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_RANGE_HAS_LBOUND!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_RANGE_HAS_LBOUND!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_RANGE_HAS_LBOUND!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_RANGE_HAS_LBOUND!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -2616,13 +2708,13 @@ macro_rules! __pgrx_c_args_RANGE_HAS_LBOUND {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_RANGE_HAS_LBOUND!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_RANGE_HAS_LBOUND!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -2686,7 +2778,9 @@ macro_rules! RANGE_HAS_LBOUND {
                                                     >(
                                                         $crate::__pgrx_c_macros::CValue::<
                                                             $crate::__pgrx_c_macros::CInt
-                                                        >::new($crate::RANGE_EMPTY as i32)
+                                                        >::new(
+                                                            $crate::__pgrx_c_bindings::RANGE_EMPTY as i32
+                                                        )
                                                     ),
                                                     $crate::__pgrx_c_macros::expression::profile_value::<
                                                         true,
@@ -2694,7 +2788,9 @@ macro_rules! RANGE_HAS_LBOUND {
                                                     >(
                                                         $crate::__pgrx_c_macros::CValue::<
                                                             $crate::__pgrx_c_macros::CInt
-                                                        >::new($crate::RANGE_LB_NULL as i32)
+                                                        >::new(
+                                                            $crate::__pgrx_c_bindings::RANGE_LB_NULL as i32
+                                                        )
                                                     )
                                                 )
                                             ),
@@ -2704,7 +2800,9 @@ macro_rules! RANGE_HAS_LBOUND {
                                             >(
                                                 $crate::__pgrx_c_macros::CValue::<
                                                     $crate::__pgrx_c_macros::CInt
-                                                >::new($crate::RANGE_LB_INF as i32)
+                                                >::new(
+                                                    $crate::__pgrx_c_bindings::RANGE_LB_INF as i32
+                                                )
                                             )
                                         )
                                     )
@@ -2770,7 +2868,7 @@ macro_rules! RANGE_HAS_LBOUND {
                                                                     $crate::__pgrx_c_macros::CValue::<
                                                                         $crate::__pgrx_c_macros::CInt
                                                                     >::new(
-                                                                        $crate::RANGE_EMPTY as i32
+                                                                        $crate::__pgrx_c_bindings::RANGE_EMPTY as i32
                                                                     )
                                                                 ),
                                                                 $crate::__pgrx_c_macros::expression::profile_value::<
@@ -2780,7 +2878,7 @@ macro_rules! RANGE_HAS_LBOUND {
                                                                     $crate::__pgrx_c_macros::CValue::<
                                                                         $crate::__pgrx_c_macros::CInt
                                                                     >::new(
-                                                                        $crate::RANGE_LB_NULL as i32
+                                                                        $crate::__pgrx_c_bindings::RANGE_LB_NULL as i32
                                                                     )
                                                                 )
                                                             )
@@ -2791,7 +2889,9 @@ macro_rules! RANGE_HAS_LBOUND {
                                                         >(
                                                             $crate::__pgrx_c_macros::CValue::<
                                                                 $crate::__pgrx_c_macros::CInt
-                                                            >::new($crate::RANGE_LB_INF as i32)
+                                                            >::new(
+                                                                $crate::__pgrx_c_bindings::RANGE_LB_INF as i32
+                                                            )
                                                         )
                                                     )
                                                 )
@@ -2837,7 +2937,9 @@ macro_rules! RANGE_HAS_LBOUND {
                                                     >(
                                                         $crate::__pgrx_c_macros::CValue::<
                                                             $crate::__pgrx_c_macros::CInt
-                                                        >::new($crate::RANGE_EMPTY as i32)
+                                                        >::new(
+                                                            $crate::__pgrx_c_bindings::RANGE_EMPTY as i32
+                                                        )
                                                     ),
                                                     $crate::__pgrx_c_macros::expression::profile_value::<
                                                         true,
@@ -2845,7 +2947,9 @@ macro_rules! RANGE_HAS_LBOUND {
                                                     >(
                                                         $crate::__pgrx_c_macros::CValue::<
                                                             $crate::__pgrx_c_macros::CInt
-                                                        >::new($crate::RANGE_LB_NULL as i32)
+                                                        >::new(
+                                                            $crate::__pgrx_c_bindings::RANGE_LB_NULL as i32
+                                                        )
                                                     )
                                                 )
                                             ),
@@ -2855,7 +2959,9 @@ macro_rules! RANGE_HAS_LBOUND {
                                             >(
                                                 $crate::__pgrx_c_macros::CValue::<
                                                     $crate::__pgrx_c_macros::CInt
-                                                >::new($crate::RANGE_LB_INF as i32)
+                                                >::new(
+                                                    $crate::__pgrx_c_bindings::RANGE_LB_INF as i32
+                                                )
                                             )
                                         )
                                     )
@@ -2876,8 +2982,8 @@ macro_rules! RANGE_HAS_LBOUND {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -2904,20 +3010,24 @@ macro_rules! __pgrx_c_args_RANGE_HAS_UBOUND {
         $crate::__pgrx_c_args_RANGE_HAS_UBOUND!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_RANGE_HAS_UBOUND!(@p1 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_RANGE_HAS_UBOUND!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_RANGE_HAS_UBOUND!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_RANGE_HAS_UBOUND!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_RANGE_HAS_UBOUND!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_RANGE_HAS_UBOUND!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -2925,7 +3035,9 @@ macro_rules! __pgrx_c_args_RANGE_HAS_UBOUND {
         $crate::__pgrx_c_args_RANGE_HAS_UBOUND!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_RANGE_HAS_UBOUND!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_RANGE_HAS_UBOUND!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -2947,14 +3059,18 @@ macro_rules! __pgrx_c_args_RANGE_HAS_UBOUND {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_RANGE_HAS_UBOUND!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_RANGE_HAS_UBOUND!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_RANGE_HAS_UBOUND!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_RANGE_HAS_UBOUND!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_RANGE_HAS_UBOUND!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -2981,13 +3097,13 @@ macro_rules! __pgrx_c_args_RANGE_HAS_UBOUND {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_RANGE_HAS_UBOUND!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_RANGE_HAS_UBOUND!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -3051,7 +3167,9 @@ macro_rules! RANGE_HAS_UBOUND {
                                                     >(
                                                         $crate::__pgrx_c_macros::CValue::<
                                                             $crate::__pgrx_c_macros::CInt
-                                                        >::new($crate::RANGE_EMPTY as i32)
+                                                        >::new(
+                                                            $crate::__pgrx_c_bindings::RANGE_EMPTY as i32
+                                                        )
                                                     ),
                                                     $crate::__pgrx_c_macros::expression::profile_value::<
                                                         true,
@@ -3059,7 +3177,9 @@ macro_rules! RANGE_HAS_UBOUND {
                                                     >(
                                                         $crate::__pgrx_c_macros::CValue::<
                                                             $crate::__pgrx_c_macros::CInt
-                                                        >::new($crate::RANGE_UB_NULL as i32)
+                                                        >::new(
+                                                            $crate::__pgrx_c_bindings::RANGE_UB_NULL as i32
+                                                        )
                                                     )
                                                 )
                                             ),
@@ -3069,7 +3189,9 @@ macro_rules! RANGE_HAS_UBOUND {
                                             >(
                                                 $crate::__pgrx_c_macros::CValue::<
                                                     $crate::__pgrx_c_macros::CInt
-                                                >::new($crate::RANGE_UB_INF as i32)
+                                                >::new(
+                                                    $crate::__pgrx_c_bindings::RANGE_UB_INF as i32
+                                                )
                                             )
                                         )
                                     )
@@ -3135,7 +3257,7 @@ macro_rules! RANGE_HAS_UBOUND {
                                                                     $crate::__pgrx_c_macros::CValue::<
                                                                         $crate::__pgrx_c_macros::CInt
                                                                     >::new(
-                                                                        $crate::RANGE_EMPTY as i32
+                                                                        $crate::__pgrx_c_bindings::RANGE_EMPTY as i32
                                                                     )
                                                                 ),
                                                                 $crate::__pgrx_c_macros::expression::profile_value::<
@@ -3145,7 +3267,7 @@ macro_rules! RANGE_HAS_UBOUND {
                                                                     $crate::__pgrx_c_macros::CValue::<
                                                                         $crate::__pgrx_c_macros::CInt
                                                                     >::new(
-                                                                        $crate::RANGE_UB_NULL as i32
+                                                                        $crate::__pgrx_c_bindings::RANGE_UB_NULL as i32
                                                                     )
                                                                 )
                                                             )
@@ -3156,7 +3278,9 @@ macro_rules! RANGE_HAS_UBOUND {
                                                         >(
                                                             $crate::__pgrx_c_macros::CValue::<
                                                                 $crate::__pgrx_c_macros::CInt
-                                                            >::new($crate::RANGE_UB_INF as i32)
+                                                            >::new(
+                                                                $crate::__pgrx_c_bindings::RANGE_UB_INF as i32
+                                                            )
                                                         )
                                                     )
                                                 )
@@ -3202,7 +3326,9 @@ macro_rules! RANGE_HAS_UBOUND {
                                                     >(
                                                         $crate::__pgrx_c_macros::CValue::<
                                                             $crate::__pgrx_c_macros::CInt
-                                                        >::new($crate::RANGE_EMPTY as i32)
+                                                        >::new(
+                                                            $crate::__pgrx_c_bindings::RANGE_EMPTY as i32
+                                                        )
                                                     ),
                                                     $crate::__pgrx_c_macros::expression::profile_value::<
                                                         true,
@@ -3210,7 +3336,9 @@ macro_rules! RANGE_HAS_UBOUND {
                                                     >(
                                                         $crate::__pgrx_c_macros::CValue::<
                                                             $crate::__pgrx_c_macros::CInt
-                                                        >::new($crate::RANGE_UB_NULL as i32)
+                                                        >::new(
+                                                            $crate::__pgrx_c_bindings::RANGE_UB_NULL as i32
+                                                        )
                                                     )
                                                 )
                                             ),
@@ -3220,7 +3348,9 @@ macro_rules! RANGE_HAS_UBOUND {
                                             >(
                                                 $crate::__pgrx_c_macros::CValue::<
                                                     $crate::__pgrx_c_macros::CInt
-                                                >::new($crate::RANGE_UB_INF as i32)
+                                                >::new(
+                                                    $crate::__pgrx_c_bindings::RANGE_UB_INF as i32
+                                                )
                                             )
                                         )
                                     )
@@ -3241,8 +3371,8 @@ macro_rules! RANGE_HAS_UBOUND {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -3269,25 +3399,34 @@ macro_rules! __pgrx_c_args_RangeIsEmpty {
         $crate::__pgrx_c_args_RangeIsEmpty!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_RangeIsEmpty!(@p1 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_RangeIsEmpty!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_RangeIsEmpty!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_RangeIsEmpty!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_RangeIsEmpty!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_RangeIsEmpty!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_RangeIsEmpty!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $($raw:tt)*) => {
         $crate::__pgrx_c_args_RangeIsEmpty!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_RangeIsEmpty!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_RangeIsEmpty!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -3309,13 +3448,20 @@ macro_rules! __pgrx_c_args_RangeIsEmpty {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_RangeIsEmpty!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_RangeIsEmpty!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_RangeIsEmpty!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_RangeIsEmpty!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
-        $crate::__pgrx_c_args_RangeIsEmpty!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_RangeIsEmpty!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
         $crate::__pgrx_c_classify!(
@@ -3338,12 +3484,15 @@ macro_rules! __pgrx_c_args_RangeIsEmpty {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_RangeIsEmpty!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_RangeIsEmpty!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_RangeIsEmpty!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p1 $mode:ident [$($done:tt)*];) => {
         $crate::RangeIsEmpty!(@$mode; $($done)*)
@@ -3394,11 +3543,11 @@ macro_rules! RangeIsEmpty {
                                     <
                                         $crate::__pgrx_c_macros::CChar as $crate::__pgrx_c_macros::expression::CType
                                     >::from_storage(
-                                        $crate::__pgrx_c_generated::Inline_855cc3592e20e67c1dca9edb1e4c07c3(
+                                        $crate::__pgrx_c_generated::Inline_090e7ec43e443e69d5ce6f4d6f31d885(
                                             <
                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                        $crate::RangeType
+                                                        $crate::__pgrx_c_bindings::RangeType
                                                     >,
                                                     $crate::__pgrx_c_macros::expression::ReadOnly
                                                 > as $crate::__pgrx_c_macros::expression::CType
@@ -3406,7 +3555,7 @@ macro_rules! RangeIsEmpty {
                                                 $crate::__pgrx_c_macros::expression::implicit::<
                                                     $crate::__pgrx_c_macros::expression::CPointer<
                                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                                            $crate::RangeType
+                                                            $crate::__pgrx_c_bindings::RangeType
                                                         >,
                                                         $crate::__pgrx_c_macros::expression::ReadOnly
                                                     >,
@@ -3423,7 +3572,7 @@ macro_rules! RangeIsEmpty {
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                        $crate::RANGE_EMPTY as i32
+                                        $crate::__pgrx_c_bindings::RANGE_EMPTY as i32
                                     )
                                 )
                             )
@@ -3477,11 +3626,11 @@ macro_rules! RangeIsEmpty {
                                                 <
                                                     $crate::__pgrx_c_macros::CChar as $crate::__pgrx_c_macros::expression::CType
                                                 >::from_storage(
-                                                    $crate::__pgrx_c_generated::Inline_855cc3592e20e67c1dca9edb1e4c07c3(
+                                                    $crate::__pgrx_c_generated::Inline_090e7ec43e443e69d5ce6f4d6f31d885(
                                                         <
                                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                                    $crate::RangeType
+                                                                    $crate::__pgrx_c_bindings::RangeType
                                                                 >,
                                                                 $crate::__pgrx_c_macros::expression::ReadOnly
                                                             > as $crate::__pgrx_c_macros::expression::CType
@@ -3489,7 +3638,7 @@ macro_rules! RangeIsEmpty {
                                                             $crate::__pgrx_c_macros::expression::implicit::<
                                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                                        $crate::RangeType
+                                                                        $crate::__pgrx_c_bindings::RangeType
                                                                     >,
                                                                     $crate::__pgrx_c_macros::expression::ReadOnly
                                                                 >,
@@ -3515,7 +3664,9 @@ macro_rules! RangeIsEmpty {
                                             >(
                                                 $crate::__pgrx_c_macros::CValue::<
                                                     $crate::__pgrx_c_macros::CInt
-                                                >::new($crate::RANGE_EMPTY as i32)
+                                                >::new(
+                                                    $crate::__pgrx_c_bindings::RANGE_EMPTY as i32
+                                                )
                                             )
                                         )
                                     )
@@ -3550,11 +3701,11 @@ macro_rules! RangeIsEmpty {
                                     <
                                         $crate::__pgrx_c_macros::CChar as $crate::__pgrx_c_macros::expression::CType
                                     >::from_storage(
-                                        $crate::__pgrx_c_generated::Inline_855cc3592e20e67c1dca9edb1e4c07c3(
+                                        $crate::__pgrx_c_generated::Inline_090e7ec43e443e69d5ce6f4d6f31d885(
                                             <
                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                        $crate::RangeType
+                                                        $crate::__pgrx_c_bindings::RangeType
                                                     >,
                                                     $crate::__pgrx_c_macros::expression::ReadOnly
                                                 > as $crate::__pgrx_c_macros::expression::CType
@@ -3562,7 +3713,7 @@ macro_rules! RangeIsEmpty {
                                                 $crate::__pgrx_c_macros::expression::implicit::<
                                                     $crate::__pgrx_c_macros::expression::CPointer<
                                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                                            $crate::RangeType
+                                                            $crate::__pgrx_c_bindings::RangeType
                                                         >,
                                                         $crate::__pgrx_c_macros::expression::ReadOnly
                                                     >,
@@ -3579,7 +3730,7 @@ macro_rules! RangeIsEmpty {
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                        $crate::RANGE_EMPTY as i32
+                                        $crate::__pgrx_c_bindings::RANGE_EMPTY as i32
                                     )
                                 )
                             )
@@ -3605,8 +3756,8 @@ macro_rules! RangeIsEmpty {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -3637,21 +3788,23 @@ macro_rules! __pgrx_c_args_RangeIsOrContainsEmpty {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
         $crate::__pgrx_c_args_RangeIsOrContainsEmpty!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_RangeIsOrContainsEmpty!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_RangeIsOrContainsEmpty!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_RangeIsOrContainsEmpty!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_RangeIsOrContainsEmpty!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -3659,7 +3812,9 @@ macro_rules! __pgrx_c_args_RangeIsOrContainsEmpty {
         $crate::__pgrx_c_args_RangeIsOrContainsEmpty!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_RangeIsOrContainsEmpty!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_RangeIsOrContainsEmpty!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -3684,15 +3839,17 @@ macro_rules! __pgrx_c_args_RangeIsOrContainsEmpty {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_RangeIsOrContainsEmpty!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_RangeIsOrContainsEmpty!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_RangeIsOrContainsEmpty!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_RangeIsOrContainsEmpty!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -3719,13 +3876,13 @@ macro_rules! __pgrx_c_args_RangeIsOrContainsEmpty {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_RangeIsOrContainsEmpty!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_RangeIsOrContainsEmpty!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -3781,11 +3938,11 @@ macro_rules! RangeIsOrContainsEmpty {
                                     <
                                         $crate::__pgrx_c_macros::CChar as $crate::__pgrx_c_macros::expression::CType
                                     >::from_storage(
-                                        $crate::__pgrx_c_generated::Inline_855cc3592e20e67c1dca9edb1e4c07c3(
+                                        $crate::__pgrx_c_generated::Inline_090e7ec43e443e69d5ce6f4d6f31d885(
                                             <
                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                        $crate::RangeType
+                                                        $crate::__pgrx_c_bindings::RangeType
                                                     >,
                                                     $crate::__pgrx_c_macros::expression::ReadOnly
                                                 > as $crate::__pgrx_c_macros::expression::CType
@@ -3793,7 +3950,7 @@ macro_rules! RangeIsOrContainsEmpty {
                                                 $crate::__pgrx_c_macros::expression::implicit::<
                                                     $crate::__pgrx_c_macros::expression::CPointer<
                                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                                            $crate::RangeType
+                                                            $crate::__pgrx_c_bindings::RangeType
                                                         >,
                                                         $crate::__pgrx_c_macros::expression::ReadOnly
                                                     >,
@@ -3817,7 +3974,9 @@ macro_rules! RangeIsOrContainsEmpty {
                                             >(
                                                 $crate::__pgrx_c_macros::CValue::<
                                                     $crate::__pgrx_c_macros::CInt
-                                                >::new($crate::RANGE_EMPTY as i32)
+                                                >::new(
+                                                    $crate::__pgrx_c_bindings::RANGE_EMPTY as i32
+                                                )
                                             ),
                                             $crate::__pgrx_c_macros::expression::profile_value::<
                                                 true,
@@ -3825,7 +3984,9 @@ macro_rules! RangeIsOrContainsEmpty {
                                             >(
                                                 $crate::__pgrx_c_macros::CValue::<
                                                     $crate::__pgrx_c_macros::CInt
-                                                >::new($crate::RANGE_CONTAIN_EMPTY as i32)
+                                                >::new(
+                                                    $crate::__pgrx_c_bindings::RANGE_CONTAIN_EMPTY as i32
+                                                )
                                             )
                                         )
                                     )
@@ -3881,11 +4042,11 @@ macro_rules! RangeIsOrContainsEmpty {
                                                 <
                                                     $crate::__pgrx_c_macros::CChar as $crate::__pgrx_c_macros::expression::CType
                                                 >::from_storage(
-                                                    $crate::__pgrx_c_generated::Inline_855cc3592e20e67c1dca9edb1e4c07c3(
+                                                    $crate::__pgrx_c_generated::Inline_090e7ec43e443e69d5ce6f4d6f31d885(
                                                         <
                                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                                    $crate::RangeType
+                                                                    $crate::__pgrx_c_bindings::RangeType
                                                                 >,
                                                                 $crate::__pgrx_c_macros::expression::ReadOnly
                                                             > as $crate::__pgrx_c_macros::expression::CType
@@ -3893,7 +4054,7 @@ macro_rules! RangeIsOrContainsEmpty {
                                                             $crate::__pgrx_c_macros::expression::implicit::<
                                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                                        $crate::RangeType
+                                                                        $crate::__pgrx_c_bindings::RangeType
                                                                     >,
                                                                     $crate::__pgrx_c_macros::expression::ReadOnly
                                                                 >,
@@ -3925,7 +4086,9 @@ macro_rules! RangeIsOrContainsEmpty {
                                                         >(
                                                             $crate::__pgrx_c_macros::CValue::<
                                                                 $crate::__pgrx_c_macros::CInt
-                                                            >::new($crate::RANGE_EMPTY as i32)
+                                                            >::new(
+                                                                $crate::__pgrx_c_bindings::RANGE_EMPTY as i32
+                                                            )
                                                         ),
                                                         $crate::__pgrx_c_macros::expression::profile_value::<
                                                             true,
@@ -3934,7 +4097,7 @@ macro_rules! RangeIsOrContainsEmpty {
                                                             $crate::__pgrx_c_macros::CValue::<
                                                                 $crate::__pgrx_c_macros::CInt
                                                             >::new(
-                                                                $crate::RANGE_CONTAIN_EMPTY as i32
+                                                                $crate::__pgrx_c_bindings::RANGE_CONTAIN_EMPTY as i32
                                                             )
                                                         )
                                                     )
@@ -3973,11 +4136,11 @@ macro_rules! RangeIsOrContainsEmpty {
                                     <
                                         $crate::__pgrx_c_macros::CChar as $crate::__pgrx_c_macros::expression::CType
                                     >::from_storage(
-                                        $crate::__pgrx_c_generated::Inline_855cc3592e20e67c1dca9edb1e4c07c3(
+                                        $crate::__pgrx_c_generated::Inline_090e7ec43e443e69d5ce6f4d6f31d885(
                                             <
                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                        $crate::RangeType
+                                                        $crate::__pgrx_c_bindings::RangeType
                                                     >,
                                                     $crate::__pgrx_c_macros::expression::ReadOnly
                                                 > as $crate::__pgrx_c_macros::expression::CType
@@ -3985,7 +4148,7 @@ macro_rules! RangeIsOrContainsEmpty {
                                                 $crate::__pgrx_c_macros::expression::implicit::<
                                                     $crate::__pgrx_c_macros::expression::CPointer<
                                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                                            $crate::RangeType
+                                                            $crate::__pgrx_c_bindings::RangeType
                                                         >,
                                                         $crate::__pgrx_c_macros::expression::ReadOnly
                                                     >,
@@ -4009,7 +4172,9 @@ macro_rules! RangeIsOrContainsEmpty {
                                             >(
                                                 $crate::__pgrx_c_macros::CValue::<
                                                     $crate::__pgrx_c_macros::CInt
-                                                >::new($crate::RANGE_EMPTY as i32)
+                                                >::new(
+                                                    $crate::__pgrx_c_bindings::RANGE_EMPTY as i32
+                                                )
                                             ),
                                             $crate::__pgrx_c_macros::expression::profile_value::<
                                                 true,
@@ -4017,7 +4182,9 @@ macro_rules! RangeIsOrContainsEmpty {
                                             >(
                                                 $crate::__pgrx_c_macros::CValue::<
                                                     $crate::__pgrx_c_macros::CInt
-                                                >::new($crate::RANGE_CONTAIN_EMPTY as i32)
+                                                >::new(
+                                                    $crate::__pgrx_c_bindings::RANGE_CONTAIN_EMPTY as i32
+                                                )
                                             )
                                         )
                                     )
@@ -4045,8 +4212,8 @@ macro_rules! RangeIsOrContainsEmpty {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -4073,20 +4240,24 @@ macro_rules! __pgrx_c_args_RangeTypeGetOid {
         $crate::__pgrx_c_args_RangeTypeGetOid!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_RangeTypeGetOid!(@p1 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_RangeTypeGetOid!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_RangeTypeGetOid!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_RangeTypeGetOid!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_RangeTypeGetOid!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_RangeTypeGetOid!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -4094,7 +4265,9 @@ macro_rules! __pgrx_c_args_RangeTypeGetOid {
         $crate::__pgrx_c_args_RangeTypeGetOid!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_RangeTypeGetOid!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_RangeTypeGetOid!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -4116,14 +4289,18 @@ macro_rules! __pgrx_c_args_RangeTypeGetOid {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_RangeTypeGetOid!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_RangeTypeGetOid!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_RangeTypeGetOid!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_RangeTypeGetOid!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_RangeTypeGetOid!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -4150,13 +4327,13 @@ macro_rules! __pgrx_c_args_RangeTypeGetOid {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_RangeTypeGetOid!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_RangeTypeGetOid!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -4321,8 +4498,8 @@ macro_rules! RangeTypeGetOid {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -4349,20 +4526,24 @@ macro_rules! __pgrx_c_args_RangeTypePGetDatum {
         $crate::__pgrx_c_args_RangeTypePGetDatum!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_RangeTypePGetDatum!(@p1 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_RangeTypePGetDatum!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_RangeTypePGetDatum!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_RangeTypePGetDatum!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_RangeTypePGetDatum!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_RangeTypePGetDatum!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -4370,7 +4551,9 @@ macro_rules! __pgrx_c_args_RangeTypePGetDatum {
         $crate::__pgrx_c_args_RangeTypePGetDatum!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_RangeTypePGetDatum!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_RangeTypePGetDatum!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -4392,14 +4575,18 @@ macro_rules! __pgrx_c_args_RangeTypePGetDatum {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_RangeTypePGetDatum!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_RangeTypePGetDatum!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_RangeTypePGetDatum!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_RangeTypePGetDatum!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_RangeTypePGetDatum!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -4426,13 +4613,13 @@ macro_rules! __pgrx_c_args_RangeTypePGetDatum {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_RangeTypePGetDatum!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_RangeTypePGetDatum!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };

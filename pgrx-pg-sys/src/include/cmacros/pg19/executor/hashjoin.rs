@@ -5,8 +5,8 @@ This code is generated for documentation purposes, so that it is easy to referen
 // C macros from hashjoin.h.
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -37,23 +37,23 @@ macro_rules! __pgrx_c_args_EstimateParallelHashJoinBatch {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
         $crate::__pgrx_c_args_EstimateParallelHashJoinBatch!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_EstimateParallelHashJoinBatch!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_EstimateParallelHashJoinBatch!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_EstimateParallelHashJoinBatch!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -65,7 +65,7 @@ macro_rules! __pgrx_c_args_EstimateParallelHashJoinBatch {
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
         $crate::__pgrx_c_args_EstimateParallelHashJoinBatch!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
@@ -91,17 +91,17 @@ macro_rules! __pgrx_c_args_EstimateParallelHashJoinBatch {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_EstimateParallelHashJoinBatch!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_EstimateParallelHashJoinBatch!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_EstimateParallelHashJoinBatch!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -128,13 +128,13 @@ macro_rules! __pgrx_c_args_EstimateParallelHashJoinBatch {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_EstimateParallelHashJoinBatch!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_EstimateParallelHashJoinBatch!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -211,7 +211,7 @@ macro_rules! EstimateParallelHashJoinBatch {
                                                             >(
                                                                 $crate::__pgrx_c_macros::expression::size_of::<
                                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                                        $crate::ParallelHashJoinBatch
+                                                                        $crate::__pgrx_c_bindings::ParallelHashJoinBatch
                                                                     >>()
                                                             )
                                                         )
@@ -236,7 +236,7 @@ macro_rules! EstimateParallelHashJoinBatch {
                                                                 $crate::__pgrx_c_macros::CValue::<
                                                                     $crate::__pgrx_c_macros::CInt
                                                                 >::new(
-                                                                    $crate::MAXIMUM_ALIGNOF as i32
+                                                                    $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                 )
                                                             )
                                                         ),
@@ -284,7 +284,7 @@ macro_rules! EstimateParallelHashJoinBatch {
                                                                         $crate::__pgrx_c_macros::CValue::<
                                                                             $crate::__pgrx_c_macros::CInt
                                                                         >::new(
-                                                                            $crate::MAXIMUM_ALIGNOF as i32
+                                                                            $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                         )
                                                                     )
                                                                 ),
@@ -347,7 +347,7 @@ macro_rules! EstimateParallelHashJoinBatch {
                                                                                 usize
                                                                             > as $crate::__pgrx_c_macros::expression::CType
                                                                         >::from_storage(
-                                                                            $crate::sts_estimate(
+                                                                            $crate::__pgrx_c_bindings::sts_estimate(
                                                                                 <
                                                                                     $crate::__pgrx_c_macros::CInt as $crate::__pgrx_c_macros::expression::CType
                                                                                 >::into_storage(
@@ -425,7 +425,7 @@ macro_rules! EstimateParallelHashJoinBatch {
                                                                         $crate::__pgrx_c_macros::CValue::<
                                                                             $crate::__pgrx_c_macros::CInt
                                                                         >::new(
-                                                                            $crate::MAXIMUM_ALIGNOF as i32
+                                                                            $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                         )
                                                                     )
                                                                 ),
@@ -476,7 +476,7 @@ macro_rules! EstimateParallelHashJoinBatch {
                                                                                 $crate::__pgrx_c_macros::CValue::<
                                                                                     $crate::__pgrx_c_macros::CInt
                                                                                 >::new(
-                                                                                    $crate::MAXIMUM_ALIGNOF as i32
+                                                                                    $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                                 )
                                                                             )
                                                                         ),
@@ -581,7 +581,7 @@ macro_rules! EstimateParallelHashJoinBatch {
                                                                         >(
                                                                             $crate::__pgrx_c_macros::expression::size_of::<
                                                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                    $crate::ParallelHashJoinBatch
+                                                                                    $crate::__pgrx_c_bindings::ParallelHashJoinBatch
                                                                                 >>()
                                                                         )
                                                                     )
@@ -606,7 +606,7 @@ macro_rules! EstimateParallelHashJoinBatch {
                                                                             $crate::__pgrx_c_macros::CValue::<
                                                                                 $crate::__pgrx_c_macros::CInt
                                                                             >::new(
-                                                                                $crate::MAXIMUM_ALIGNOF as i32
+                                                                                $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                             )
                                                                         )
                                                                     ),
@@ -657,7 +657,7 @@ macro_rules! EstimateParallelHashJoinBatch {
                                                                                     $crate::__pgrx_c_macros::CValue::<
                                                                                         $crate::__pgrx_c_macros::CInt
                                                                                     >::new(
-                                                                                        $crate::MAXIMUM_ALIGNOF as i32
+                                                                                        $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                                     )
                                                                                 )
                                                                             ),
@@ -723,7 +723,7 @@ macro_rules! EstimateParallelHashJoinBatch {
                                                                                             usize
                                                                                         > as $crate::__pgrx_c_macros::expression::CType
                                                                                     >::from_storage(
-                                                                                        $crate::sts_estimate(
+                                                                                        $crate::__pgrx_c_bindings::sts_estimate(
                                                                                             <
                                                                                                 $crate::__pgrx_c_macros::CInt as $crate::__pgrx_c_macros::expression::CType
                                                                                             >::into_storage(
@@ -801,7 +801,7 @@ macro_rules! EstimateParallelHashJoinBatch {
                                                                                     $crate::__pgrx_c_macros::CValue::<
                                                                                         $crate::__pgrx_c_macros::CInt
                                                                                     >::new(
-                                                                                        $crate::MAXIMUM_ALIGNOF as i32
+                                                                                        $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                                     )
                                                                                 )
                                                                             ),
@@ -852,7 +852,7 @@ macro_rules! EstimateParallelHashJoinBatch {
                                                                                             $crate::__pgrx_c_macros::CValue::<
                                                                                                 $crate::__pgrx_c_macros::CInt
                                                                                             >::new(
-                                                                                                $crate::MAXIMUM_ALIGNOF as i32
+                                                                                                $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                                             )
                                                                                         )
                                                                                     ),
@@ -929,7 +929,7 @@ macro_rules! EstimateParallelHashJoinBatch {
                                                             >(
                                                                 $crate::__pgrx_c_macros::expression::size_of::<
                                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                                        $crate::ParallelHashJoinBatch
+                                                                        $crate::__pgrx_c_bindings::ParallelHashJoinBatch
                                                                     >>()
                                                             )
                                                         )
@@ -954,7 +954,7 @@ macro_rules! EstimateParallelHashJoinBatch {
                                                                 $crate::__pgrx_c_macros::CValue::<
                                                                     $crate::__pgrx_c_macros::CInt
                                                                 >::new(
-                                                                    $crate::MAXIMUM_ALIGNOF as i32
+                                                                    $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                 )
                                                             )
                                                         ),
@@ -1002,7 +1002,7 @@ macro_rules! EstimateParallelHashJoinBatch {
                                                                         $crate::__pgrx_c_macros::CValue::<
                                                                             $crate::__pgrx_c_macros::CInt
                                                                         >::new(
-                                                                            $crate::MAXIMUM_ALIGNOF as i32
+                                                                            $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                         )
                                                                     )
                                                                 ),
@@ -1065,7 +1065,7 @@ macro_rules! EstimateParallelHashJoinBatch {
                                                                                 usize
                                                                             > as $crate::__pgrx_c_macros::expression::CType
                                                                         >::from_storage(
-                                                                            $crate::sts_estimate(
+                                                                            $crate::__pgrx_c_bindings::sts_estimate(
                                                                                 <
                                                                                     $crate::__pgrx_c_macros::CInt as $crate::__pgrx_c_macros::expression::CType
                                                                                 >::into_storage(
@@ -1143,7 +1143,7 @@ macro_rules! EstimateParallelHashJoinBatch {
                                                                         $crate::__pgrx_c_macros::CValue::<
                                                                             $crate::__pgrx_c_macros::CInt
                                                                         >::new(
-                                                                            $crate::MAXIMUM_ALIGNOF as i32
+                                                                            $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                         )
                                                                     )
                                                                 ),
@@ -1194,7 +1194,7 @@ macro_rules! EstimateParallelHashJoinBatch {
                                                                                 $crate::__pgrx_c_macros::CValue::<
                                                                                     $crate::__pgrx_c_macros::CInt
                                                                                 >::new(
-                                                                                    $crate::MAXIMUM_ALIGNOF as i32
+                                                                                    $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                                 )
                                                                             )
                                                                         ),
@@ -1243,8 +1243,8 @@ macro_rules! EstimateParallelHashJoinBatch {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -1271,20 +1271,24 @@ macro_rules! __pgrx_c_args_HASH_CHUNK_DATA {
         $crate::__pgrx_c_args_HASH_CHUNK_DATA!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_HASH_CHUNK_DATA!(@p1 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_HASH_CHUNK_DATA!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_HASH_CHUNK_DATA!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_HASH_CHUNK_DATA!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HASH_CHUNK_DATA!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HASH_CHUNK_DATA!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -1292,7 +1296,9 @@ macro_rules! __pgrx_c_args_HASH_CHUNK_DATA {
         $crate::__pgrx_c_args_HASH_CHUNK_DATA!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_HASH_CHUNK_DATA!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_HASH_CHUNK_DATA!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -1314,14 +1320,18 @@ macro_rules! __pgrx_c_args_HASH_CHUNK_DATA {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_HASH_CHUNK_DATA!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_HASH_CHUNK_DATA!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_HASH_CHUNK_DATA!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_HASH_CHUNK_DATA!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_HASH_CHUNK_DATA!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -1348,13 +1358,13 @@ macro_rules! __pgrx_c_args_HASH_CHUNK_DATA {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HASH_CHUNK_DATA!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HASH_CHUNK_DATA!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -1445,7 +1455,7 @@ macro_rules! HASH_CHUNK_DATA {
                                                             >(
                                                                 $crate::__pgrx_c_macros::expression::size_of::<
                                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                                        $crate::HashMemoryChunkData
+                                                                        $crate::__pgrx_c_bindings::HashMemoryChunkData
                                                                     >>()
                                                             )
                                                         )
@@ -1470,7 +1480,7 @@ macro_rules! HASH_CHUNK_DATA {
                                                                 $crate::__pgrx_c_macros::CValue::<
                                                                     $crate::__pgrx_c_macros::CInt
                                                                 >::new(
-                                                                    $crate::MAXIMUM_ALIGNOF as i32
+                                                                    $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                 )
                                                             )
                                                         ),
@@ -1518,7 +1528,7 @@ macro_rules! HASH_CHUNK_DATA {
                                                                         $crate::__pgrx_c_macros::CValue::<
                                                                             $crate::__pgrx_c_macros::CInt
                                                                         >::new(
-                                                                            $crate::MAXIMUM_ALIGNOF as i32
+                                                                            $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                         )
                                                                     )
                                                                 ),
@@ -1625,7 +1635,7 @@ macro_rules! HASH_CHUNK_DATA {
                                                                         >(
                                                                             $crate::__pgrx_c_macros::expression::size_of::<
                                                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                    $crate::HashMemoryChunkData
+                                                                                    $crate::__pgrx_c_bindings::HashMemoryChunkData
                                                                                 >>()
                                                                         )
                                                                     )
@@ -1650,7 +1660,7 @@ macro_rules! HASH_CHUNK_DATA {
                                                                             $crate::__pgrx_c_macros::CValue::<
                                                                                 $crate::__pgrx_c_macros::CInt
                                                                             >::new(
-                                                                                $crate::MAXIMUM_ALIGNOF as i32
+                                                                                $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                             )
                                                                         )
                                                                     ),
@@ -1701,7 +1711,7 @@ macro_rules! HASH_CHUNK_DATA {
                                                                                     $crate::__pgrx_c_macros::CValue::<
                                                                                         $crate::__pgrx_c_macros::CInt
                                                                                     >::new(
-                                                                                        $crate::MAXIMUM_ALIGNOF as i32
+                                                                                        $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                                     )
                                                                                 )
                                                                             ),
@@ -1785,7 +1795,7 @@ macro_rules! HASH_CHUNK_DATA {
                                                             >(
                                                                 $crate::__pgrx_c_macros::expression::size_of::<
                                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                                        $crate::HashMemoryChunkData
+                                                                        $crate::__pgrx_c_bindings::HashMemoryChunkData
                                                                     >>()
                                                             )
                                                         )
@@ -1810,7 +1820,7 @@ macro_rules! HASH_CHUNK_DATA {
                                                                 $crate::__pgrx_c_macros::CValue::<
                                                                     $crate::__pgrx_c_macros::CInt
                                                                 >::new(
-                                                                    $crate::MAXIMUM_ALIGNOF as i32
+                                                                    $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                 )
                                                             )
                                                         ),
@@ -1858,7 +1868,7 @@ macro_rules! HASH_CHUNK_DATA {
                                                                         $crate::__pgrx_c_macros::CValue::<
                                                                             $crate::__pgrx_c_macros::CInt
                                                                         >::new(
-                                                                            $crate::MAXIMUM_ALIGNOF as i32
+                                                                            $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                         )
                                                                     )
                                                                 ),
@@ -1894,8 +1904,8 @@ macro_rules! HASH_CHUNK_DATA {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -1922,20 +1932,24 @@ macro_rules! __pgrx_c_args_HJTUPLE_MINTUPLE {
         $crate::__pgrx_c_args_HJTUPLE_MINTUPLE!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_HJTUPLE_MINTUPLE!(@p1 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_HJTUPLE_MINTUPLE!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_HJTUPLE_MINTUPLE!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_HJTUPLE_MINTUPLE!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HJTUPLE_MINTUPLE!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HJTUPLE_MINTUPLE!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -1943,7 +1957,9 @@ macro_rules! __pgrx_c_args_HJTUPLE_MINTUPLE {
         $crate::__pgrx_c_args_HJTUPLE_MINTUPLE!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_HJTUPLE_MINTUPLE!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_HJTUPLE_MINTUPLE!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -1965,14 +1981,18 @@ macro_rules! __pgrx_c_args_HJTUPLE_MINTUPLE {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_HJTUPLE_MINTUPLE!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_HJTUPLE_MINTUPLE!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_HJTUPLE_MINTUPLE!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_HJTUPLE_MINTUPLE!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_HJTUPLE_MINTUPLE!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -1999,13 +2019,13 @@ macro_rules! __pgrx_c_args_HJTUPLE_MINTUPLE {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HJTUPLE_MINTUPLE!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HJTUPLE_MINTUPLE!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -2052,9 +2072,11 @@ macro_rules! HJTUPLE_MINTUPLE {
         (
             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::cast_as::<
-                    $crate::MinimalTuple,
+                    $crate::__pgrx_c_bindings::MinimalTuple,
                     $crate::__pgrx_c_macros::expression::CPointer<
-                        $crate::__pgrx_c_macros::expression::CRecord<$crate::MinimalTupleData>,
+                        $crate::__pgrx_c_macros::expression::CRecord<
+                            $crate::__pgrx_c_bindings::MinimalTupleData
+                        >,
                         $crate::__pgrx_c_macros::expression::ReadWrite
                     >,
                     _
@@ -2112,7 +2134,7 @@ macro_rules! HJTUPLE_MINTUPLE {
                                                                         >(
                                                                             $crate::__pgrx_c_macros::expression::size_of::<
                                                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                    $crate::HashJoinTupleData
+                                                                                    $crate::__pgrx_c_bindings::HashJoinTupleData
                                                                                 >>()
                                                                         )
                                                                     )
@@ -2137,7 +2159,7 @@ macro_rules! HJTUPLE_MINTUPLE {
                                                                             $crate::__pgrx_c_macros::CValue::<
                                                                                 $crate::__pgrx_c_macros::CInt
                                                                             >::new(
-                                                                                $crate::MAXIMUM_ALIGNOF as i32
+                                                                                $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                             )
                                                                         )
                                                                     ),
@@ -2188,7 +2210,7 @@ macro_rules! HJTUPLE_MINTUPLE {
                                                                                     $crate::__pgrx_c_macros::CValue::<
                                                                                         $crate::__pgrx_c_macros::CInt
                                                                                     >::new(
-                                                                                        $crate::MAXIMUM_ALIGNOF as i32
+                                                                                        $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                                     )
                                                                                 )
                                                                             ),
@@ -2246,10 +2268,10 @@ macro_rules! HJTUPLE_MINTUPLE {
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::cast_as::<
-                                $crate::MinimalTuple,
+                                $crate::__pgrx_c_bindings::MinimalTuple,
                                 $crate::__pgrx_c_macros::expression::CPointer<
                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                        $crate::MinimalTupleData
+                                        $crate::__pgrx_c_bindings::MinimalTupleData
                                     >,
                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                 >,
@@ -2319,7 +2341,7 @@ macro_rules! HJTUPLE_MINTUPLE {
                                                                                     >(
                                                                                         $crate::__pgrx_c_macros::expression::size_of::<
                                                                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                $crate::HashJoinTupleData
+                                                                                                $crate::__pgrx_c_bindings::HashJoinTupleData
                                                                                             >>()
                                                                                     )
                                                                                 )
@@ -2344,7 +2366,7 @@ macro_rules! HJTUPLE_MINTUPLE {
                                                                                         $crate::__pgrx_c_macros::CValue::<
                                                                                             $crate::__pgrx_c_macros::CInt
                                                                                         >::new(
-                                                                                            $crate::MAXIMUM_ALIGNOF as i32
+                                                                                            $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                                         )
                                                                                     )
                                                                                 ),
@@ -2395,7 +2417,7 @@ macro_rules! HJTUPLE_MINTUPLE {
                                                                                                 $crate::__pgrx_c_macros::CValue::<
                                                                                                     $crate::__pgrx_c_macros::CInt
                                                                                                 >::new(
-                                                                                                    $crate::MAXIMUM_ALIGNOF as i32
+                                                                                                    $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                                                 )
                                                                                             )
                                                                                         ),
@@ -2440,9 +2462,11 @@ macro_rules! HJTUPLE_MINTUPLE {
         {
             let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::cast_as::<
-                    $crate::MinimalTuple,
+                    $crate::__pgrx_c_bindings::MinimalTuple,
                     $crate::__pgrx_c_macros::expression::CPointer<
-                        $crate::__pgrx_c_macros::expression::CRecord<$crate::MinimalTupleData>,
+                        $crate::__pgrx_c_macros::expression::CRecord<
+                            $crate::__pgrx_c_bindings::MinimalTupleData
+                        >,
                         $crate::__pgrx_c_macros::expression::ReadWrite
                     >,
                     _
@@ -2500,7 +2524,7 @@ macro_rules! HJTUPLE_MINTUPLE {
                                                                         >(
                                                                             $crate::__pgrx_c_macros::expression::size_of::<
                                                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                    $crate::HashJoinTupleData
+                                                                                    $crate::__pgrx_c_bindings::HashJoinTupleData
                                                                                 >>()
                                                                         )
                                                                     )
@@ -2525,7 +2549,7 @@ macro_rules! HJTUPLE_MINTUPLE {
                                                                             $crate::__pgrx_c_macros::CValue::<
                                                                                 $crate::__pgrx_c_macros::CInt
                                                                             >::new(
-                                                                                $crate::MAXIMUM_ALIGNOF as i32
+                                                                                $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                             )
                                                                         )
                                                                     ),
@@ -2576,7 +2600,7 @@ macro_rules! HJTUPLE_MINTUPLE {
                                                                                     $crate::__pgrx_c_macros::CValue::<
                                                                                         $crate::__pgrx_c_macros::CInt
                                                                                     >::new(
-                                                                                        $crate::MAXIMUM_ALIGNOF as i32
+                                                                                        $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                                     )
                                                                                 )
                                                                             ),
@@ -2615,8 +2639,8 @@ macro_rules! HJTUPLE_MINTUPLE {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -2647,13 +2671,13 @@ macro_rules! __pgrx_c_args_NthParallelHashJoinBatch {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_NthParallelHashJoinBatch!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_NthParallelHashJoinBatch!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -2662,7 +2686,7 @@ macro_rules! __pgrx_c_args_NthParallelHashJoinBatch {
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_NthParallelHashJoinBatch!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -2689,25 +2713,25 @@ macro_rules! __pgrx_c_args_NthParallelHashJoinBatch {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_NthParallelHashJoinBatch!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_NthParallelHashJoinBatch!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_NthParallelHashJoinBatch!(
-            @p2 $mode [$($done)* (@literal [- $argument]),];
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_NthParallelHashJoinBatch!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -2716,7 +2740,7 @@ macro_rules! __pgrx_c_args_NthParallelHashJoinBatch {
     };
     (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_NthParallelHashJoinBatch!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -2743,35 +2767,35 @@ macro_rules! __pgrx_c_args_NthParallelHashJoinBatch {
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_NthParallelHashJoinBatch!(
-            @p2 $mode [$($done)* (@literal [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_NthParallelHashJoinBatch!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
     (@p2 $mode:ident [$($done:tt)*]; - $argument:literal) => {
         $crate::__pgrx_c_args_NthParallelHashJoinBatch!(
-            @p3 $mode [$($done)* (@literal [- $argument]),];
+            @p3 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
         )
     };
     (@negative2 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_NthParallelHashJoinBatch!(
-            @p3 $mode [$($done)* (@native [$argument]),];
+            @p3 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p2 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_NthParallelHashJoinBatch!(
-            @p3 $mode [$($done)* (@literal [- $argument]),];
+            @p3 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative2 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_NthParallelHashJoinBatch!(
-            @p3 $mode [$($done)* (@native [$argument]),];
+            @p3 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -2780,7 +2804,7 @@ macro_rules! __pgrx_c_args_NthParallelHashJoinBatch {
     };
     (@p2 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
         $crate::__pgrx_c_args_NthParallelHashJoinBatch!(
-            @p3 $mode [$($done)* (@native [$argument]),];
+            @p3 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p2 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
@@ -2806,17 +2830,17 @@ macro_rules! __pgrx_c_args_NthParallelHashJoinBatch {
     };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_NthParallelHashJoinBatch!(
-            @p3 $mode [$($done)* (@literal [$argument]),];
+            @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
         )
     };
     (@p2 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_NthParallelHashJoinBatch!(
-            @p3 $mode [$($done)* (@native [$argument]),];
+            @p3 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p2 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_NthParallelHashJoinBatch!(
-            @p3 $mode [$($done)* (@native [$argument]),];
+            @p3 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -2843,13 +2867,13 @@ macro_rules! __pgrx_c_args_NthParallelHashJoinBatch {
     };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_NthParallelHashJoinBatch!(
-            @p3 $mode [$($done)* (@literal [$argument]),];
+            @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p2 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_NthParallelHashJoinBatch!(
-            @p3 $mode [$($done)* (@native [$argument]),];
+            @p3 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -2903,9 +2927,11 @@ macro_rules! NthParallelHashJoinBatch {
         (
             $crate::__pgrx_c_macros::expression::profile_value::<false, _>(
                 $crate::__pgrx_c_macros::expression::cast_as::<
-                    *mut $crate::ParallelHashJoinBatch,
+                    *mut $crate::__pgrx_c_bindings::ParallelHashJoinBatch,
                     $crate::__pgrx_c_macros::expression::CPointer<
-                        $crate::__pgrx_c_macros::expression::CRecord<$crate::ParallelHashJoinBatch>,
+                        $crate::__pgrx_c_macros::expression::CRecord<
+                            $crate::__pgrx_c_bindings::ParallelHashJoinBatch
+                        >,
                         $crate::__pgrx_c_macros::expression::ReadWrite
                     >,
                     _
@@ -2982,7 +3008,7 @@ macro_rules! NthParallelHashJoinBatch {
                                                                                             >(
                                                                                                 $crate::__pgrx_c_macros::expression::size_of::<
                                                                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                        $crate::ParallelHashJoinBatch
+                                                                                                        $crate::__pgrx_c_bindings::ParallelHashJoinBatch
                                                                                                     >>()
                                                                                             )
                                                                                         )
@@ -3007,7 +3033,7 @@ macro_rules! NthParallelHashJoinBatch {
                                                                                                 $crate::__pgrx_c_macros::CValue::<
                                                                                                     $crate::__pgrx_c_macros::CInt
                                                                                                 >::new(
-                                                                                                    $crate::MAXIMUM_ALIGNOF as i32
+                                                                                                    $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                                                 )
                                                                                             )
                                                                                         ),
@@ -3060,7 +3086,7 @@ macro_rules! NthParallelHashJoinBatch {
                                                                                                         $crate::__pgrx_c_macros::CValue::<
                                                                                                             $crate::__pgrx_c_macros::CInt
                                                                                                         >::new(
-                                                                                                            $crate::MAXIMUM_ALIGNOF as i32
+                                                                                                            $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                                                         )
                                                                                                     )
                                                                                                 ),
@@ -3131,7 +3157,7 @@ macro_rules! NthParallelHashJoinBatch {
                                                                                                                 usize
                                                                                                             > as $crate::__pgrx_c_macros::expression::CType
                                                                                                         >::from_storage(
-                                                                                                            $crate::sts_estimate(
+                                                                                                            $crate::__pgrx_c_bindings::sts_estimate(
                                                                                                                 <
                                                                                                                     $crate::__pgrx_c_macros::CInt as $crate::__pgrx_c_macros::expression::CType
                                                                                                                 >::into_storage(
@@ -3209,7 +3235,7 @@ macro_rules! NthParallelHashJoinBatch {
                                                                                                         $crate::__pgrx_c_macros::CValue::<
                                                                                                             $crate::__pgrx_c_macros::CInt
                                                                                                         >::new(
-                                                                                                            $crate::MAXIMUM_ALIGNOF as i32
+                                                                                                            $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                                                         )
                                                                                                     )
                                                                                                 ),
@@ -3262,7 +3288,7 @@ macro_rules! NthParallelHashJoinBatch {
                                                                                                                 $crate::__pgrx_c_macros::CValue::<
                                                                                                                     $crate::__pgrx_c_macros::CInt
                                                                                                                 >::new(
-                                                                                                                    $crate::MAXIMUM_ALIGNOF as i32
+                                                                                                                    $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                                                                 )
                                                                                                             )
                                                                                                         ),
@@ -3348,10 +3374,10 @@ macro_rules! NthParallelHashJoinBatch {
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<false, _>(
                             $crate::__pgrx_c_macros::expression::cast_as::<
-                                *mut $crate::ParallelHashJoinBatch,
+                                *mut $crate::__pgrx_c_bindings::ParallelHashJoinBatch,
                                 $crate::__pgrx_c_macros::expression::CPointer<
                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                        $crate::ParallelHashJoinBatch
+                                        $crate::__pgrx_c_bindings::ParallelHashJoinBatch
                                     >,
                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                 >,
@@ -3440,7 +3466,7 @@ macro_rules! NthParallelHashJoinBatch {
                                                                                                         >(
                                                                                                             $crate::__pgrx_c_macros::expression::size_of::<
                                                                                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                                    $crate::ParallelHashJoinBatch
+                                                                                                                    $crate::__pgrx_c_bindings::ParallelHashJoinBatch
                                                                                                                 >>()
                                                                                                         )
                                                                                                     )
@@ -3465,7 +3491,7 @@ macro_rules! NthParallelHashJoinBatch {
                                                                                                             $crate::__pgrx_c_macros::CValue::<
                                                                                                                 $crate::__pgrx_c_macros::CInt
                                                                                                             >::new(
-                                                                                                                $crate::MAXIMUM_ALIGNOF as i32
+                                                                                                                $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                                                             )
                                                                                                         )
                                                                                                     ),
@@ -3518,7 +3544,7 @@ macro_rules! NthParallelHashJoinBatch {
                                                                                                                     $crate::__pgrx_c_macros::CValue::<
                                                                                                                         $crate::__pgrx_c_macros::CInt
                                                                                                                     >::new(
-                                                                                                                        $crate::MAXIMUM_ALIGNOF as i32
+                                                                                                                        $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                                                                     )
                                                                                                                 )
                                                                                                             ),
@@ -3589,7 +3615,7 @@ macro_rules! NthParallelHashJoinBatch {
                                                                                                                             usize
                                                                                                                         > as $crate::__pgrx_c_macros::expression::CType
                                                                                                                     >::from_storage(
-                                                                                                                        $crate::sts_estimate(
+                                                                                                                        $crate::__pgrx_c_bindings::sts_estimate(
                                                                                                                             <
                                                                                                                                 $crate::__pgrx_c_macros::CInt as $crate::__pgrx_c_macros::expression::CType
                                                                                                                             >::into_storage(
@@ -3667,7 +3693,7 @@ macro_rules! NthParallelHashJoinBatch {
                                                                                                                     $crate::__pgrx_c_macros::CValue::<
                                                                                                                         $crate::__pgrx_c_macros::CInt
                                                                                                                     >::new(
-                                                                                                                        $crate::MAXIMUM_ALIGNOF as i32
+                                                                                                                        $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                                                                     )
                                                                                                                 )
                                                                                                             ),
@@ -3720,7 +3746,7 @@ macro_rules! NthParallelHashJoinBatch {
                                                                                                                             $crate::__pgrx_c_macros::CValue::<
                                                                                                                                 $crate::__pgrx_c_macros::CInt
                                                                                                                             >::new(
-                                                                                                                                $crate::MAXIMUM_ALIGNOF as i32
+                                                                                                                                $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                                                                             )
                                                                                                                         )
                                                                                                                     ),
@@ -3791,9 +3817,11 @@ macro_rules! NthParallelHashJoinBatch {
         {
             let _ = $crate::__pgrx_c_macros::expression::profile_value::<false, _>(
                 $crate::__pgrx_c_macros::expression::cast_as::<
-                    *mut $crate::ParallelHashJoinBatch,
+                    *mut $crate::__pgrx_c_bindings::ParallelHashJoinBatch,
                     $crate::__pgrx_c_macros::expression::CPointer<
-                        $crate::__pgrx_c_macros::expression::CRecord<$crate::ParallelHashJoinBatch>,
+                        $crate::__pgrx_c_macros::expression::CRecord<
+                            $crate::__pgrx_c_bindings::ParallelHashJoinBatch
+                        >,
                         $crate::__pgrx_c_macros::expression::ReadWrite
                     >,
                     _
@@ -3870,7 +3898,7 @@ macro_rules! NthParallelHashJoinBatch {
                                                                                             >(
                                                                                                 $crate::__pgrx_c_macros::expression::size_of::<
                                                                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                        $crate::ParallelHashJoinBatch
+                                                                                                        $crate::__pgrx_c_bindings::ParallelHashJoinBatch
                                                                                                     >>()
                                                                                             )
                                                                                         )
@@ -3895,7 +3923,7 @@ macro_rules! NthParallelHashJoinBatch {
                                                                                                 $crate::__pgrx_c_macros::CValue::<
                                                                                                     $crate::__pgrx_c_macros::CInt
                                                                                                 >::new(
-                                                                                                    $crate::MAXIMUM_ALIGNOF as i32
+                                                                                                    $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                                                 )
                                                                                             )
                                                                                         ),
@@ -3948,7 +3976,7 @@ macro_rules! NthParallelHashJoinBatch {
                                                                                                         $crate::__pgrx_c_macros::CValue::<
                                                                                                             $crate::__pgrx_c_macros::CInt
                                                                                                         >::new(
-                                                                                                            $crate::MAXIMUM_ALIGNOF as i32
+                                                                                                            $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                                                         )
                                                                                                     )
                                                                                                 ),
@@ -4019,7 +4047,7 @@ macro_rules! NthParallelHashJoinBatch {
                                                                                                                 usize
                                                                                                             > as $crate::__pgrx_c_macros::expression::CType
                                                                                                         >::from_storage(
-                                                                                                            $crate::sts_estimate(
+                                                                                                            $crate::__pgrx_c_bindings::sts_estimate(
                                                                                                                 <
                                                                                                                     $crate::__pgrx_c_macros::CInt as $crate::__pgrx_c_macros::expression::CType
                                                                                                                 >::into_storage(
@@ -4097,7 +4125,7 @@ macro_rules! NthParallelHashJoinBatch {
                                                                                                         $crate::__pgrx_c_macros::CValue::<
                                                                                                             $crate::__pgrx_c_macros::CInt
                                                                                                         >::new(
-                                                                                                            $crate::MAXIMUM_ALIGNOF as i32
+                                                                                                            $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                                                         )
                                                                                                     )
                                                                                                 ),
@@ -4150,7 +4178,7 @@ macro_rules! NthParallelHashJoinBatch {
                                                                                                                 $crate::__pgrx_c_macros::CValue::<
                                                                                                                     $crate::__pgrx_c_macros::CInt
                                                                                                                 >::new(
-                                                                                                                    $crate::MAXIMUM_ALIGNOF as i32
+                                                                                                                    $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                                                                 )
                                                                                                             )
                                                                                                         ),
@@ -4212,8 +4240,8 @@ macro_rules! NthParallelHashJoinBatch {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -4244,21 +4272,23 @@ macro_rules! __pgrx_c_args_PHJ_GROW_BATCHES_PHASE {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
         $crate::__pgrx_c_args_PHJ_GROW_BATCHES_PHASE!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_PHJ_GROW_BATCHES_PHASE!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_PHJ_GROW_BATCHES_PHASE!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_PHJ_GROW_BATCHES_PHASE!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_PHJ_GROW_BATCHES_PHASE!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -4266,7 +4296,9 @@ macro_rules! __pgrx_c_args_PHJ_GROW_BATCHES_PHASE {
         $crate::__pgrx_c_args_PHJ_GROW_BATCHES_PHASE!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_PHJ_GROW_BATCHES_PHASE!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_PHJ_GROW_BATCHES_PHASE!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -4291,15 +4323,17 @@ macro_rules! __pgrx_c_args_PHJ_GROW_BATCHES_PHASE {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_PHJ_GROW_BATCHES_PHASE!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_PHJ_GROW_BATCHES_PHASE!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_PHJ_GROW_BATCHES_PHASE!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_PHJ_GROW_BATCHES_PHASE!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -4326,13 +4360,13 @@ macro_rules! __pgrx_c_args_PHJ_GROW_BATCHES_PHASE {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_PHJ_GROW_BATCHES_PHASE!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_PHJ_GROW_BATCHES_PHASE!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -4467,8 +4501,8 @@ macro_rules! PHJ_GROW_BATCHES_PHASE {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -4499,21 +4533,23 @@ macro_rules! __pgrx_c_args_PHJ_GROW_BUCKETS_PHASE {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
         $crate::__pgrx_c_args_PHJ_GROW_BUCKETS_PHASE!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_PHJ_GROW_BUCKETS_PHASE!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_PHJ_GROW_BUCKETS_PHASE!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_PHJ_GROW_BUCKETS_PHASE!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_PHJ_GROW_BUCKETS_PHASE!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -4521,7 +4557,9 @@ macro_rules! __pgrx_c_args_PHJ_GROW_BUCKETS_PHASE {
         $crate::__pgrx_c_args_PHJ_GROW_BUCKETS_PHASE!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_PHJ_GROW_BUCKETS_PHASE!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_PHJ_GROW_BUCKETS_PHASE!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -4546,15 +4584,17 @@ macro_rules! __pgrx_c_args_PHJ_GROW_BUCKETS_PHASE {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_PHJ_GROW_BUCKETS_PHASE!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_PHJ_GROW_BUCKETS_PHASE!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_PHJ_GROW_BUCKETS_PHASE!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_PHJ_GROW_BUCKETS_PHASE!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -4581,13 +4621,13 @@ macro_rules! __pgrx_c_args_PHJ_GROW_BUCKETS_PHASE {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_PHJ_GROW_BUCKETS_PHASE!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_PHJ_GROW_BUCKETS_PHASE!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -4722,8 +4762,8 @@ macro_rules! PHJ_GROW_BUCKETS_PHASE {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -4754,23 +4794,23 @@ macro_rules! __pgrx_c_args_ParallelHashJoinBatchInner {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
         $crate::__pgrx_c_args_ParallelHashJoinBatchInner!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_ParallelHashJoinBatchInner!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_ParallelHashJoinBatchInner!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_ParallelHashJoinBatchInner!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -4779,7 +4819,7 @@ macro_rules! __pgrx_c_args_ParallelHashJoinBatchInner {
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
         $crate::__pgrx_c_args_ParallelHashJoinBatchInner!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
@@ -4805,17 +4845,17 @@ macro_rules! __pgrx_c_args_ParallelHashJoinBatchInner {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_ParallelHashJoinBatchInner!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_ParallelHashJoinBatchInner!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_ParallelHashJoinBatchInner!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -4842,13 +4882,13 @@ macro_rules! __pgrx_c_args_ParallelHashJoinBatchInner {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_ParallelHashJoinBatchInner!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_ParallelHashJoinBatchInner!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -4898,9 +4938,11 @@ macro_rules! ParallelHashJoinBatchInner {
         (
             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::cast_as::<
-                    *mut $crate::SharedTuplestore,
+                    *mut $crate::__pgrx_c_bindings::SharedTuplestore,
                     $crate::__pgrx_c_macros::expression::CPointer<
-                        $crate::__pgrx_c_macros::expression::COpaque<$crate::SharedTuplestore>,
+                        $crate::__pgrx_c_macros::expression::COpaque<
+                            $crate::__pgrx_c_bindings::SharedTuplestore
+                        >,
                         $crate::__pgrx_c_macros::expression::ReadWrite
                     >,
                     _
@@ -4958,7 +5000,7 @@ macro_rules! ParallelHashJoinBatchInner {
                                                                         >(
                                                                             $crate::__pgrx_c_macros::expression::size_of::<
                                                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                    $crate::ParallelHashJoinBatch
+                                                                                    $crate::__pgrx_c_bindings::ParallelHashJoinBatch
                                                                                 >>()
                                                                         )
                                                                     )
@@ -4983,7 +5025,7 @@ macro_rules! ParallelHashJoinBatchInner {
                                                                             $crate::__pgrx_c_macros::CValue::<
                                                                                 $crate::__pgrx_c_macros::CInt
                                                                             >::new(
-                                                                                $crate::MAXIMUM_ALIGNOF as i32
+                                                                                $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                             )
                                                                         )
                                                                     ),
@@ -5034,7 +5076,7 @@ macro_rules! ParallelHashJoinBatchInner {
                                                                                     $crate::__pgrx_c_macros::CValue::<
                                                                                         $crate::__pgrx_c_macros::CInt
                                                                                     >::new(
-                                                                                        $crate::MAXIMUM_ALIGNOF as i32
+                                                                                        $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                                     )
                                                                                 )
                                                                             ),
@@ -5095,10 +5137,10 @@ macro_rules! ParallelHashJoinBatchInner {
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::cast_as::<
-                                *mut $crate::SharedTuplestore,
+                                *mut $crate::__pgrx_c_bindings::SharedTuplestore,
                                 $crate::__pgrx_c_macros::expression::CPointer<
                                     $crate::__pgrx_c_macros::expression::COpaque<
-                                        $crate::SharedTuplestore
+                                        $crate::__pgrx_c_bindings::SharedTuplestore
                                     >,
                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                 >,
@@ -5168,7 +5210,7 @@ macro_rules! ParallelHashJoinBatchInner {
                                                                                     >(
                                                                                         $crate::__pgrx_c_macros::expression::size_of::<
                                                                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                $crate::ParallelHashJoinBatch
+                                                                                                $crate::__pgrx_c_bindings::ParallelHashJoinBatch
                                                                                             >>()
                                                                                     )
                                                                                 )
@@ -5193,7 +5235,7 @@ macro_rules! ParallelHashJoinBatchInner {
                                                                                         $crate::__pgrx_c_macros::CValue::<
                                                                                             $crate::__pgrx_c_macros::CInt
                                                                                         >::new(
-                                                                                            $crate::MAXIMUM_ALIGNOF as i32
+                                                                                            $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                                         )
                                                                                     )
                                                                                 ),
@@ -5244,7 +5286,7 @@ macro_rules! ParallelHashJoinBatchInner {
                                                                                                 $crate::__pgrx_c_macros::CValue::<
                                                                                                     $crate::__pgrx_c_macros::CInt
                                                                                                 >::new(
-                                                                                                    $crate::MAXIMUM_ALIGNOF as i32
+                                                                                                    $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                                                 )
                                                                                             )
                                                                                         ),
@@ -5289,9 +5331,11 @@ macro_rules! ParallelHashJoinBatchInner {
         {
             let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::cast_as::<
-                    *mut $crate::SharedTuplestore,
+                    *mut $crate::__pgrx_c_bindings::SharedTuplestore,
                     $crate::__pgrx_c_macros::expression::CPointer<
-                        $crate::__pgrx_c_macros::expression::COpaque<$crate::SharedTuplestore>,
+                        $crate::__pgrx_c_macros::expression::COpaque<
+                            $crate::__pgrx_c_bindings::SharedTuplestore
+                        >,
                         $crate::__pgrx_c_macros::expression::ReadWrite
                     >,
                     _
@@ -5349,7 +5393,7 @@ macro_rules! ParallelHashJoinBatchInner {
                                                                         >(
                                                                             $crate::__pgrx_c_macros::expression::size_of::<
                                                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                    $crate::ParallelHashJoinBatch
+                                                                                    $crate::__pgrx_c_bindings::ParallelHashJoinBatch
                                                                                 >>()
                                                                         )
                                                                     )
@@ -5374,7 +5418,7 @@ macro_rules! ParallelHashJoinBatchInner {
                                                                             $crate::__pgrx_c_macros::CValue::<
                                                                                 $crate::__pgrx_c_macros::CInt
                                                                             >::new(
-                                                                                $crate::MAXIMUM_ALIGNOF as i32
+                                                                                $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                             )
                                                                         )
                                                                     ),
@@ -5425,7 +5469,7 @@ macro_rules! ParallelHashJoinBatchInner {
                                                                                     $crate::__pgrx_c_macros::CValue::<
                                                                                         $crate::__pgrx_c_macros::CInt
                                                                                     >::new(
-                                                                                        $crate::MAXIMUM_ALIGNOF as i32
+                                                                                        $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                                     )
                                                                                 )
                                                                             ),
@@ -5464,8 +5508,8 @@ macro_rules! ParallelHashJoinBatchInner {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -5496,13 +5540,13 @@ macro_rules! __pgrx_c_args_ParallelHashJoinBatchOuter {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_ParallelHashJoinBatchOuter!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_ParallelHashJoinBatchOuter!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -5511,7 +5555,7 @@ macro_rules! __pgrx_c_args_ParallelHashJoinBatchOuter {
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_ParallelHashJoinBatchOuter!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -5538,35 +5582,35 @@ macro_rules! __pgrx_c_args_ParallelHashJoinBatchOuter {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_ParallelHashJoinBatchOuter!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_ParallelHashJoinBatchOuter!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $argument:literal) => {
         $crate::__pgrx_c_args_ParallelHashJoinBatchOuter!(
-            @p2 $mode [$($done)* (@literal [- $argument]),];
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
         )
     };
     (@negative1 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_ParallelHashJoinBatchOuter!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_ParallelHashJoinBatchOuter!(
-            @p2 $mode [$($done)* (@literal [- $argument]),];
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_ParallelHashJoinBatchOuter!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -5575,7 +5619,7 @@ macro_rules! __pgrx_c_args_ParallelHashJoinBatchOuter {
     };
     (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
         $crate::__pgrx_c_args_ParallelHashJoinBatchOuter!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
@@ -5601,17 +5645,17 @@ macro_rules! __pgrx_c_args_ParallelHashJoinBatchOuter {
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_ParallelHashJoinBatchOuter!(
-            @p2 $mode [$($done)* (@literal [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_ParallelHashJoinBatchOuter!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_ParallelHashJoinBatchOuter!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -5638,13 +5682,13 @@ macro_rules! __pgrx_c_args_ParallelHashJoinBatchOuter {
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_ParallelHashJoinBatchOuter!(
-            @p2 $mode [$($done)* (@literal [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_ParallelHashJoinBatchOuter!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -5695,9 +5739,11 @@ macro_rules! ParallelHashJoinBatchOuter {
         (
             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::cast_as::<
-                    *mut $crate::SharedTuplestore,
+                    *mut $crate::__pgrx_c_bindings::SharedTuplestore,
                     $crate::__pgrx_c_macros::expression::CPointer<
-                        $crate::__pgrx_c_macros::expression::COpaque<$crate::SharedTuplestore>,
+                        $crate::__pgrx_c_macros::expression::COpaque<
+                            $crate::__pgrx_c_bindings::SharedTuplestore
+                        >,
                         $crate::__pgrx_c_macros::expression::ReadWrite
                     >,
                     _
@@ -5723,10 +5769,10 @@ macro_rules! ParallelHashJoinBatchOuter {
                                                 _
                                             >(
                                                 $crate::__pgrx_c_macros::expression::cast_as::<
-                                                    *mut $crate::SharedTuplestore,
+                                                    *mut $crate::__pgrx_c_bindings::SharedTuplestore,
                                                     $crate::__pgrx_c_macros::expression::CPointer<
                                                         $crate::__pgrx_c_macros::expression::COpaque<
-                                                            $crate::SharedTuplestore
+                                                            $crate::__pgrx_c_bindings::SharedTuplestore
                                                         >,
                                                         $crate::__pgrx_c_macros::expression::ReadWrite
                                                     >,
@@ -5799,7 +5845,7 @@ macro_rules! ParallelHashJoinBatchOuter {
                                                                                                         >(
                                                                                                             $crate::__pgrx_c_macros::expression::size_of::<
                                                                                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                                    $crate::ParallelHashJoinBatch
+                                                                                                                    $crate::__pgrx_c_bindings::ParallelHashJoinBatch
                                                                                                                 >>()
                                                                                                         )
                                                                                                     )
@@ -5824,7 +5870,7 @@ macro_rules! ParallelHashJoinBatchOuter {
                                                                                                             $crate::__pgrx_c_macros::CValue::<
                                                                                                                 $crate::__pgrx_c_macros::CInt
                                                                                                             >::new(
-                                                                                                                $crate::MAXIMUM_ALIGNOF as i32
+                                                                                                                $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                                                             )
                                                                                                         )
                                                                                                     ),
@@ -5877,7 +5923,7 @@ macro_rules! ParallelHashJoinBatchOuter {
                                                                                                                     $crate::__pgrx_c_macros::CValue::<
                                                                                                                         $crate::__pgrx_c_macros::CInt
                                                                                                                     >::new(
-                                                                                                                        $crate::MAXIMUM_ALIGNOF as i32
+                                                                                                                        $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                                                                     )
                                                                                                                 )
                                                                                                             ),
@@ -5944,7 +5990,7 @@ macro_rules! ParallelHashJoinBatchOuter {
                                                                                     usize
                                                                                 > as $crate::__pgrx_c_macros::expression::CType
                                                                             >::from_storage(
-                                                                                $crate::sts_estimate(
+                                                                                $crate::__pgrx_c_bindings::sts_estimate(
                                                                                     <
                                                                                         $crate::__pgrx_c_macros::CInt as $crate::__pgrx_c_macros::expression::CType
                                                                                     >::into_storage(
@@ -5990,7 +6036,7 @@ macro_rules! ParallelHashJoinBatchOuter {
                                                                             $crate::__pgrx_c_macros::CValue::<
                                                                                 $crate::__pgrx_c_macros::CInt
                                                                             >::new(
-                                                                                $crate::MAXIMUM_ALIGNOF as i32
+                                                                                $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                             )
                                                                         )
                                                                     ),
@@ -6041,7 +6087,7 @@ macro_rules! ParallelHashJoinBatchOuter {
                                                                                     $crate::__pgrx_c_macros::CValue::<
                                                                                         $crate::__pgrx_c_macros::CInt
                                                                                     >::new(
-                                                                                        $crate::MAXIMUM_ALIGNOF as i32
+                                                                                        $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                                     )
                                                                                 )
                                                                             ),
@@ -6103,10 +6149,10 @@ macro_rules! ParallelHashJoinBatchOuter {
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::cast_as::<
-                                *mut $crate::SharedTuplestore,
+                                *mut $crate::__pgrx_c_bindings::SharedTuplestore,
                                 $crate::__pgrx_c_macros::expression::CPointer<
                                     $crate::__pgrx_c_macros::expression::COpaque<
-                                        $crate::SharedTuplestore
+                                        $crate::__pgrx_c_bindings::SharedTuplestore
                                     >,
                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                 >,
@@ -6136,10 +6182,10 @@ macro_rules! ParallelHashJoinBatchOuter {
                                                             _
                                                         >(
                                                             $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                *mut $crate::SharedTuplestore,
+                                                                *mut $crate::__pgrx_c_bindings::SharedTuplestore,
                                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                                     $crate::__pgrx_c_macros::expression::COpaque<
-                                                                        $crate::SharedTuplestore
+                                                                        $crate::__pgrx_c_bindings::SharedTuplestore
                                                                     >,
                                                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                                                 >,
@@ -6214,7 +6260,7 @@ macro_rules! ParallelHashJoinBatchOuter {
                                                                                                                     >(
                                                                                                                         $crate::__pgrx_c_macros::expression::size_of::<
                                                                                                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                                                $crate::ParallelHashJoinBatch
+                                                                                                                                $crate::__pgrx_c_bindings::ParallelHashJoinBatch
                                                                                                                             >>()
                                                                                                                     )
                                                                                                                 )
@@ -6239,7 +6285,7 @@ macro_rules! ParallelHashJoinBatchOuter {
                                                                                                                         $crate::__pgrx_c_macros::CValue::<
                                                                                                                             $crate::__pgrx_c_macros::CInt
                                                                                                                         >::new(
-                                                                                                                            $crate::MAXIMUM_ALIGNOF as i32
+                                                                                                                            $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                                                                         )
                                                                                                                     )
                                                                                                                 ),
@@ -6292,7 +6338,7 @@ macro_rules! ParallelHashJoinBatchOuter {
                                                                                                                                 $crate::__pgrx_c_macros::CValue::<
                                                                                                                                     $crate::__pgrx_c_macros::CInt
                                                                                                                                 >::new(
-                                                                                                                                    $crate::MAXIMUM_ALIGNOF as i32
+                                                                                                                                    $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                                                                                 )
                                                                                                                             )
                                                                                                                         ),
@@ -6362,7 +6408,7 @@ macro_rules! ParallelHashJoinBatchOuter {
                                                                                                 usize
                                                                                             > as $crate::__pgrx_c_macros::expression::CType
                                                                                         >::from_storage(
-                                                                                            $crate::sts_estimate(
+                                                                                            $crate::__pgrx_c_bindings::sts_estimate(
                                                                                                 <
                                                                                                     $crate::__pgrx_c_macros::CInt as $crate::__pgrx_c_macros::expression::CType
                                                                                                 >::into_storage(
@@ -6408,7 +6454,7 @@ macro_rules! ParallelHashJoinBatchOuter {
                                                                                         $crate::__pgrx_c_macros::CValue::<
                                                                                             $crate::__pgrx_c_macros::CInt
                                                                                         >::new(
-                                                                                            $crate::MAXIMUM_ALIGNOF as i32
+                                                                                            $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                                         )
                                                                                     )
                                                                                 ),
@@ -6459,7 +6505,7 @@ macro_rules! ParallelHashJoinBatchOuter {
                                                                                                 $crate::__pgrx_c_macros::CValue::<
                                                                                                     $crate::__pgrx_c_macros::CInt
                                                                                                 >::new(
-                                                                                                    $crate::MAXIMUM_ALIGNOF as i32
+                                                                                                    $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                                                 )
                                                                                             )
                                                                                         ),
@@ -6504,9 +6550,11 @@ macro_rules! ParallelHashJoinBatchOuter {
         {
             let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::cast_as::<
-                    *mut $crate::SharedTuplestore,
+                    *mut $crate::__pgrx_c_bindings::SharedTuplestore,
                     $crate::__pgrx_c_macros::expression::CPointer<
-                        $crate::__pgrx_c_macros::expression::COpaque<$crate::SharedTuplestore>,
+                        $crate::__pgrx_c_macros::expression::COpaque<
+                            $crate::__pgrx_c_bindings::SharedTuplestore
+                        >,
                         $crate::__pgrx_c_macros::expression::ReadWrite
                     >,
                     _
@@ -6532,10 +6580,10 @@ macro_rules! ParallelHashJoinBatchOuter {
                                                 _
                                             >(
                                                 $crate::__pgrx_c_macros::expression::cast_as::<
-                                                    *mut $crate::SharedTuplestore,
+                                                    *mut $crate::__pgrx_c_bindings::SharedTuplestore,
                                                     $crate::__pgrx_c_macros::expression::CPointer<
                                                         $crate::__pgrx_c_macros::expression::COpaque<
-                                                            $crate::SharedTuplestore
+                                                            $crate::__pgrx_c_bindings::SharedTuplestore
                                                         >,
                                                         $crate::__pgrx_c_macros::expression::ReadWrite
                                                     >,
@@ -6608,7 +6656,7 @@ macro_rules! ParallelHashJoinBatchOuter {
                                                                                                         >(
                                                                                                             $crate::__pgrx_c_macros::expression::size_of::<
                                                                                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                                    $crate::ParallelHashJoinBatch
+                                                                                                                    $crate::__pgrx_c_bindings::ParallelHashJoinBatch
                                                                                                                 >>()
                                                                                                         )
                                                                                                     )
@@ -6633,7 +6681,7 @@ macro_rules! ParallelHashJoinBatchOuter {
                                                                                                             $crate::__pgrx_c_macros::CValue::<
                                                                                                                 $crate::__pgrx_c_macros::CInt
                                                                                                             >::new(
-                                                                                                                $crate::MAXIMUM_ALIGNOF as i32
+                                                                                                                $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                                                             )
                                                                                                         )
                                                                                                     ),
@@ -6686,7 +6734,7 @@ macro_rules! ParallelHashJoinBatchOuter {
                                                                                                                     $crate::__pgrx_c_macros::CValue::<
                                                                                                                         $crate::__pgrx_c_macros::CInt
                                                                                                                     >::new(
-                                                                                                                        $crate::MAXIMUM_ALIGNOF as i32
+                                                                                                                        $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                                                                     )
                                                                                                                 )
                                                                                                             ),
@@ -6753,7 +6801,7 @@ macro_rules! ParallelHashJoinBatchOuter {
                                                                                     usize
                                                                                 > as $crate::__pgrx_c_macros::expression::CType
                                                                             >::from_storage(
-                                                                                $crate::sts_estimate(
+                                                                                $crate::__pgrx_c_bindings::sts_estimate(
                                                                                     <
                                                                                         $crate::__pgrx_c_macros::CInt as $crate::__pgrx_c_macros::expression::CType
                                                                                     >::into_storage(
@@ -6799,7 +6847,7 @@ macro_rules! ParallelHashJoinBatchOuter {
                                                                             $crate::__pgrx_c_macros::CValue::<
                                                                                 $crate::__pgrx_c_macros::CInt
                                                                             >::new(
-                                                                                $crate::MAXIMUM_ALIGNOF as i32
+                                                                                $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                             )
                                                                         )
                                                                     ),
@@ -6850,7 +6898,7 @@ macro_rules! ParallelHashJoinBatchOuter {
                                                                                     $crate::__pgrx_c_macros::CValue::<
                                                                                         $crate::__pgrx_c_macros::CInt
                                                                                     >::new(
-                                                                                        $crate::MAXIMUM_ALIGNOF as i32
+                                                                                        $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                                     )
                                                                                 )
                                                                             ),

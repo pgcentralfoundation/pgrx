@@ -5,8 +5,8 @@ This code is generated for documentation purposes, so that it is easy to referen
 // C macros from xact.h.
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -56,12 +56,12 @@ macro_rules! IsolationIsSerializable {
                         $crate::__pgrx_c_macros::expression::load(
                             $crate::__pgrx_c_macros::expression::place::<
                                 $crate::__pgrx_c_macros::CInt
-                            >(::core::ptr::addr_of_mut!($crate::XactIsoLevel))
+                            >(::core::ptr::addr_of_mut!($crate::__pgrx_c_bindings::XactIsoLevel))
                         )
                     ),
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                            $crate::XACT_SERIALIZABLE as i32
+                            $crate::__pgrx_c_bindings::XACT_SERIALIZABLE as i32
                         )
                     )
                 )
@@ -97,12 +97,16 @@ macro_rules! IsolationIsSerializable {
                                     $crate::__pgrx_c_macros::expression::load(
                                         $crate::__pgrx_c_macros::expression::place::<
                                             $crate::__pgrx_c_macros::CInt
-                                        >(::core::ptr::addr_of_mut!($crate::XactIsoLevel))
+                                        >(
+                                            ::core::ptr::addr_of_mut!(
+                                                $crate::__pgrx_c_bindings::XactIsoLevel
+                                            )
+                                        )
                                     )
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                        $crate::XACT_SERIALIZABLE as i32
+                                        $crate::__pgrx_c_bindings::XACT_SERIALIZABLE as i32
                                     )
                                 )
                             )
@@ -125,12 +129,12 @@ macro_rules! IsolationIsSerializable {
                         $crate::__pgrx_c_macros::expression::load(
                             $crate::__pgrx_c_macros::expression::place::<
                                 $crate::__pgrx_c_macros::CInt
-                            >(::core::ptr::addr_of_mut!($crate::XactIsoLevel))
+                            >(::core::ptr::addr_of_mut!($crate::__pgrx_c_bindings::XactIsoLevel))
                         )
                     ),
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                            $crate::XACT_SERIALIZABLE as i32
+                            $crate::__pgrx_c_bindings::XACT_SERIALIZABLE as i32
                         )
                     )
                 )
@@ -152,8 +156,8 @@ macro_rules! IsolationIsSerializable {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -203,12 +207,12 @@ macro_rules! IsolationUsesXactSnapshot {
                         $crate::__pgrx_c_macros::expression::load(
                             $crate::__pgrx_c_macros::expression::place::<
                                 $crate::__pgrx_c_macros::CInt
-                            >(::core::ptr::addr_of_mut!($crate::XactIsoLevel))
+                            >(::core::ptr::addr_of_mut!($crate::__pgrx_c_bindings::XactIsoLevel))
                         )
                     ),
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                            $crate::XACT_REPEATABLE_READ as i32
+                            $crate::__pgrx_c_bindings::XACT_REPEATABLE_READ as i32
                         )
                     )
                 )
@@ -244,12 +248,16 @@ macro_rules! IsolationUsesXactSnapshot {
                                     $crate::__pgrx_c_macros::expression::load(
                                         $crate::__pgrx_c_macros::expression::place::<
                                             $crate::__pgrx_c_macros::CInt
-                                        >(::core::ptr::addr_of_mut!($crate::XactIsoLevel))
+                                        >(
+                                            ::core::ptr::addr_of_mut!(
+                                                $crate::__pgrx_c_bindings::XactIsoLevel
+                                            )
+                                        )
                                     )
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                        $crate::XACT_REPEATABLE_READ as i32
+                                        $crate::__pgrx_c_bindings::XACT_REPEATABLE_READ as i32
                                     )
                                 )
                             )
@@ -272,12 +280,12 @@ macro_rules! IsolationUsesXactSnapshot {
                         $crate::__pgrx_c_macros::expression::load(
                             $crate::__pgrx_c_macros::expression::place::<
                                 $crate::__pgrx_c_macros::CInt
-                            >(::core::ptr::addr_of_mut!($crate::XactIsoLevel))
+                            >(::core::ptr::addr_of_mut!($crate::__pgrx_c_bindings::XactIsoLevel))
                         )
                     ),
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                            $crate::XACT_REPEATABLE_READ as i32
+                            $crate::__pgrx_c_bindings::XACT_REPEATABLE_READ as i32
                         )
                     )
                 )
@@ -299,8 +307,8 @@ macro_rules! IsolationUsesXactSnapshot {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -334,7 +342,7 @@ macro_rules! __pgrx_c_args_XactCompletionApplyFeedback {
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_XactCompletionApplyFeedback!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
@@ -342,7 +350,7 @@ macro_rules! __pgrx_c_args_XactCompletionApplyFeedback {
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_XactCompletionApplyFeedback!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -351,7 +359,7 @@ macro_rules! __pgrx_c_args_XactCompletionApplyFeedback {
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
         $crate::__pgrx_c_args_XactCompletionApplyFeedback!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
@@ -377,17 +385,17 @@ macro_rules! __pgrx_c_args_XactCompletionApplyFeedback {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_XactCompletionApplyFeedback!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:tt) => {
         $crate::__pgrx_c_args_XactCompletionApplyFeedback!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_XactCompletionApplyFeedback!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -414,13 +422,13 @@ macro_rules! __pgrx_c_args_XactCompletionApplyFeedback {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_XactCompletionApplyFeedback!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:tt, $($rest:tt)*) => {
         $crate::__pgrx_c_args_XactCompletionApplyFeedback!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -474,7 +482,9 @@ macro_rules! XactCompletionApplyFeedback {
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::CValue::<
                                         $crate::__pgrx_c_macros::CUnsignedInt
-                                    >::new($crate::XACT_COMPLETION_APPLY_FEEDBACK as u32)
+                                    >::new(
+                                        $crate::__pgrx_c_bindings::XACT_COMPLETION_APPLY_FEEDBACK as u32
+                                    )
                                 )
                             )
                         )
@@ -534,7 +544,7 @@ macro_rules! XactCompletionApplyFeedback {
                                                 $crate::__pgrx_c_macros::CValue::<
                                                     $crate::__pgrx_c_macros::CUnsignedInt
                                                 >::new(
-                                                    $crate::XACT_COMPLETION_APPLY_FEEDBACK as u32
+                                                    $crate::__pgrx_c_bindings::XACT_COMPLETION_APPLY_FEEDBACK as u32
                                                 )
                                             )
                                         )
@@ -572,7 +582,9 @@ macro_rules! XactCompletionApplyFeedback {
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::CValue::<
                                         $crate::__pgrx_c_macros::CUnsignedInt
-                                    >::new($crate::XACT_COMPLETION_APPLY_FEEDBACK as u32)
+                                    >::new(
+                                        $crate::__pgrx_c_bindings::XACT_COMPLETION_APPLY_FEEDBACK as u32
+                                    )
                                 )
                             )
                         )
@@ -600,8 +612,8 @@ macro_rules! XactCompletionApplyFeedback {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -635,7 +647,7 @@ macro_rules! __pgrx_c_args_XactCompletionForceSyncCommit {
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_XactCompletionForceSyncCommit!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
@@ -643,7 +655,7 @@ macro_rules! __pgrx_c_args_XactCompletionForceSyncCommit {
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_XactCompletionForceSyncCommit!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -652,7 +664,7 @@ macro_rules! __pgrx_c_args_XactCompletionForceSyncCommit {
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
         $crate::__pgrx_c_args_XactCompletionForceSyncCommit!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
@@ -678,17 +690,17 @@ macro_rules! __pgrx_c_args_XactCompletionForceSyncCommit {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_XactCompletionForceSyncCommit!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:tt) => {
         $crate::__pgrx_c_args_XactCompletionForceSyncCommit!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_XactCompletionForceSyncCommit!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -715,13 +727,13 @@ macro_rules! __pgrx_c_args_XactCompletionForceSyncCommit {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_XactCompletionForceSyncCommit!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:tt, $($rest:tt)*) => {
         $crate::__pgrx_c_args_XactCompletionForceSyncCommit!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -775,7 +787,9 @@ macro_rules! XactCompletionForceSyncCommit {
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::CValue::<
                                         $crate::__pgrx_c_macros::CUnsignedInt
-                                    >::new($crate::XACT_COMPLETION_FORCE_SYNC_COMMIT as u32)
+                                    >::new(
+                                        $crate::__pgrx_c_bindings::XACT_COMPLETION_FORCE_SYNC_COMMIT as u32
+                                    )
                                 )
                             )
                         )
@@ -841,7 +855,7 @@ macro_rules! XactCompletionForceSyncCommit {
                                                 $crate::__pgrx_c_macros::CValue::<
                                                     $crate::__pgrx_c_macros::CUnsignedInt
                                                 >::new(
-                                                    $crate::XACT_COMPLETION_FORCE_SYNC_COMMIT as u32
+                                                    $crate::__pgrx_c_bindings::XACT_COMPLETION_FORCE_SYNC_COMMIT as u32
                                                 )
                                             )
                                         )
@@ -879,7 +893,9 @@ macro_rules! XactCompletionForceSyncCommit {
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::CValue::<
                                         $crate::__pgrx_c_macros::CUnsignedInt
-                                    >::new($crate::XACT_COMPLETION_FORCE_SYNC_COMMIT as u32)
+                                    >::new(
+                                        $crate::__pgrx_c_bindings::XACT_COMPLETION_FORCE_SYNC_COMMIT as u32
+                                    )
                                 )
                             )
                         )
@@ -910,8 +926,8 @@ macro_rules! XactCompletionForceSyncCommit {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -945,7 +961,7 @@ macro_rules! __pgrx_c_args_XactCompletionRelcacheInitFileInval {
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_XactCompletionRelcacheInitFileInval!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
@@ -953,7 +969,7 @@ macro_rules! __pgrx_c_args_XactCompletionRelcacheInitFileInval {
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_XactCompletionRelcacheInitFileInval!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -962,7 +978,7 @@ macro_rules! __pgrx_c_args_XactCompletionRelcacheInitFileInval {
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
         $crate::__pgrx_c_args_XactCompletionRelcacheInitFileInval!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
@@ -988,17 +1004,17 @@ macro_rules! __pgrx_c_args_XactCompletionRelcacheInitFileInval {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_XactCompletionRelcacheInitFileInval!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:tt) => {
         $crate::__pgrx_c_args_XactCompletionRelcacheInitFileInval!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_XactCompletionRelcacheInitFileInval!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -1025,13 +1041,13 @@ macro_rules! __pgrx_c_args_XactCompletionRelcacheInitFileInval {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_XactCompletionRelcacheInitFileInval!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:tt, $($rest:tt)*) => {
         $crate::__pgrx_c_args_XactCompletionRelcacheInitFileInval!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -1085,7 +1101,9 @@ macro_rules! XactCompletionRelcacheInitFileInval {
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::CValue::<
                                         $crate::__pgrx_c_macros::CUnsignedInt
-                                    >::new($crate::XACT_COMPLETION_UPDATE_RELCACHE_FILE as u32)
+                                    >::new(
+                                        $crate::__pgrx_c_bindings::XACT_COMPLETION_UPDATE_RELCACHE_FILE as u32
+                                    )
                                 )
                             )
                         )
@@ -1151,7 +1169,7 @@ macro_rules! XactCompletionRelcacheInitFileInval {
                                                 $crate::__pgrx_c_macros::CValue::<
                                                     $crate::__pgrx_c_macros::CUnsignedInt
                                                 >::new(
-                                                    $crate::XACT_COMPLETION_UPDATE_RELCACHE_FILE as u32
+                                                    $crate::__pgrx_c_bindings::XACT_COMPLETION_UPDATE_RELCACHE_FILE as u32
                                                 )
                                             )
                                         )
@@ -1192,7 +1210,9 @@ macro_rules! XactCompletionRelcacheInitFileInval {
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::CValue::<
                                         $crate::__pgrx_c_macros::CUnsignedInt
-                                    >::new($crate::XACT_COMPLETION_UPDATE_RELCACHE_FILE as u32)
+                                    >::new(
+                                        $crate::__pgrx_c_bindings::XACT_COMPLETION_UPDATE_RELCACHE_FILE as u32
+                                    )
                                 )
                             )
                         )

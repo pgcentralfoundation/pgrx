@@ -52,7 +52,7 @@ const OUTPUT_LIMIT: u64 = 16 * 1024 * 1024;
 const COMPILER_TIMEOUT: Duration = Duration::from_secs(60);
 /// Compiler flags that consume a separate value and must be parsed without confusing it with another
 /// input.
-const VALUE_OPTIONS: &[&str] = &[
+pub(crate) const VALUE_OPTIONS: &[&str] = &[
     "-I",
     "-isystem",
     "-iquote",
@@ -185,8 +185,9 @@ pub(crate) struct CompilerOutput {
 
 /// Inspect original headers under one verified compiler and libclang environment.
 ///
-/// Clang's final macro dump supplies active definitions. Physical definitions from
-/// libclang supply provenance; identical historical definitions remain ambiguous.
+/// Clang's final macro dump supplies active definitions. Libclang supplies physical
+/// origins and compiler/command-line context. Repeated observations of the same
+/// origin are deduplicated; distinct matching physical definitions remain ambiguous.
 pub fn inspect(
     scanner: &MacroScanner,
     header: &Path,
@@ -205,7 +206,7 @@ pub(crate) fn inspect_with_compiler_hint(
     preferred_compiler: Option<&Path>,
     configured_compiler: Option<&Path>,
 ) -> Result<FrontendOutput, FrontendError> {
-    let arguments = normalize_arguments(arguments)?;
+    let arguments = prepare_arguments(arguments)?;
     validate_arguments(&arguments)?;
     let requested_header = input_path(header)?;
     // The supplied spelling determines quoted-include lookup, including through
@@ -297,13 +298,14 @@ pub(crate) fn inspect_with_compiler_hint(
         inventory,
         dependencies: macro_dependencies,
     };
-    for name in definitions::prove(scanner, &frontend)? {
-        frontend
+    for (name, definition) in definitions::prove(scanner, &frontend)? {
+        let info = frontend
             .declarations
             .function_signatures
             .get_mut(&name)
-            .expect("definition proof refers to a catalogued declaration")
-            .definition_available = true;
+            .expect("definition proof refers to a catalogued declaration");
+        info.definition_available = true;
+        info.definition = definition;
     }
     frontend.declarations.bitfields = bitfields::probe(scanner, &frontend)?;
     let builtins = builtins::prove(scanner, &frontend)?;
@@ -631,16 +633,19 @@ fn signature(definition: &MacroDefinition) -> (bool, Vec<&str>) {
     )
 }
 
-/// Attach physical provenance to the final active definitions, retaining ambiguity when multiple
-/// source definitions match.
+/// Reconcile final replacement signatures with physical or source-less discovery origins.
+/// Distinct matching header origins remain ambiguous; repeated compiler/command-line
+/// observations do not invent competing physical ownership.
 fn join_active(live: Vec<MacroDefinition>, inventory: &MacroInventory) -> MacroEnvironment {
     let mut history = HashMap::<_, (Vec<_>, HashSet<_>)>::new();
     for definition in &inventory.macros {
         let (definitions, locations) = history.entry(signature(definition)).or_default();
-        // Re-including an unguarded header can record one physical definition
-        // several times. Only distinct physical definitions make provenance ambiguous.
-        if let Some(location) = &definition.location
-            && !locations.insert((&location.file, location.offset))
+        // One exact replacement signature can be observed repeatedly through an unguarded
+        // header or identical command-line definitions. A source-less observation has one
+        // context identity, distinct from every physical (file, offset) definition. The final
+        // driver dump selects the signature; collapsing None never assigns it a header origin.
+        if !locations
+            .insert(definition.location.as_ref().map(|location| (&location.file, location.offset)))
         {
             continue;
         }
@@ -1779,7 +1784,25 @@ fn semantic_options(
                     | "-fno-common"
                     | "-fcommon"
                     | "-ffunction-sections"
+                    | "-fno-function-sections"
                     | "-fdata-sections"
+                    | "-fno-inline"
+                    | "-finline-functions"
+                    | "-finline-hint-functions"
+                    | "-fbuiltin"
+                    | "-fno-builtin"
+                    // Explicit runtime markers are lowered before PostgreSQL
+                    // inspection. Other callers may use a newer driver directly.
+                    | "-fms-runtime-lib=dll"
+                    | "-fms-runtime-lib=dll_dbg"
+                    | "-fms-runtime-lib=static"
+                    | "-fms-runtime-lib=static_dbg"
+                    // The closed forwarded CL /MT option concerns C++ standard
+                    // library LTO visibility; this pipeline only admits C.
+                    | "-flto-visibility-public-std"
+                    // Writable string literals remain refused: CArray assumes
+                    // string-literal storage cannot legally be mutated.
+                    | "-fno-writable-strings"
                     | "-fno-asynchronous-unwind-tables"
                     | "-fasynchronous-unwind-tables"
                     | "-fno-unwind-tables"
@@ -2141,7 +2164,7 @@ pub(crate) fn run_compiler(
 /// Fresh staged outputs are checked before publication; publication errors can
 /// leave the object updated without replacing the archive.
 /// Preprocess with the original flags before compiling the fixed token stream
-/// as position-independent machine code. This preserves header branches that
+/// as target-native machine code. This preserves header branches that
 /// depend on PIC/PIE predefines even when native backend flags differ from the
 /// inspected mode, and prevents forced includes from running a second time.
 /// Backend output flags keep the archive independent of Clang's LLVM version
@@ -2187,7 +2210,8 @@ pub fn compile_native_support(
     let staged_object = object_stage
         .path()
         .join(object.file_name().expect("native output identity validated its filename"));
-    let staged_archive = archive_stage.path().join("support.a");
+    let msvc = profile.target.uses_msvc_abi();
+    let staged_archive = archive_stage.path().join(if msvc { "support.lib" } else { "support.a" });
     // Keep the input beside the fixed archive name, separate from the object
     // staging directory whose filename is chosen by the caller.
     let staged_source = archive_stage.path().join("support.i");
@@ -2196,6 +2220,30 @@ pub fn compile_native_support(
     let expanded = run_compiler(&profile.compiler.executable, &preprocessing)?;
     std::fs::write(&staged_source, expanded.stdout)
         .map_err(|source| FrontendError::NativeIo { path: staged_source.clone(), source })?;
+    let args = native_object_arguments(profile, &staged_source, &staged_object)?;
+    run_compiler(&profile.compiler.executable, &args)?;
+    require_native_artifact(&staged_object, "object")?;
+    let (archiver, archive_arguments) = native_archive_command(
+        &profile.compiler.executable,
+        crate::model::is_windows_triple(&profile.target.triple),
+        &staged_object,
+        &staged_archive,
+    )?;
+    run_compiler(&archiver, &archive_arguments)?;
+    require_native_artifact(&staged_archive, "archive")?;
+    std::fs::rename(&staged_object, object)
+        .map_err(|source| FrontendError::NativeIo { path: object.into(), source })?;
+    std::fs::rename(&staged_archive, archive)
+        .map_err(|source| FrontendError::NativeIo { path: archive.into(), source })?;
+    Ok(())
+}
+
+/// Preserve inspected preprocessing while selecting regular native code for the target ABI.
+fn native_object_arguments(
+    profile: &CompilationProfile,
+    source: &Path,
+    object: &Path,
+) -> Result<Vec<String>, FrontendError> {
     let mut args = profile.arguments.clone();
     args.extend([
         "-x".into(),
@@ -2209,30 +2257,43 @@ pub fn compile_native_support(
         // PostgreSQL's coverage runtime is not linked into Rust extensions.
         "-fno-profile-arcs".into(),
         "-fno-test-coverage".into(),
+        // Generated native helpers belong to this extension's inspected
+        // profile. ELF interposition must not substitute another extension's
+        // layouts or access routines; preprocessing has already frozen C input.
+        "-fvisibility=hidden".into(),
         "-ffunction-sections".into(),
         "-fdata-sections".into(),
-        path(&staged_source)?,
+        path_string(source)?.to_owned(),
         "-o".into(),
-        path(&staged_object)?,
+        path_string(object)?.to_owned(),
     ]);
-    let windows_target = profile
-        .target
-        .triple
-        .split('-')
-        .any(|part| matches!(part, "windows" | "win32" | "mingw32"));
-    if !windows_target {
+    // Every Windows target uses COFF, including MinGW and versioned MSVC triples.
+    if !crate::model::is_windows_triple(&profile.target.triple) {
         args.push("-fPIC".into());
     }
-    run_compiler(&profile.compiler.executable, &args)?;
-    require_native_artifact(&staged_object, "object")?;
-    let adjacent = profile
-        .compiler
-        .executable
-        .with_file_name(format!("llvm-ar{}", std::env::consts::EXE_SUFFIX));
-    let librarian = profile
-        .compiler
-        .executable
-        .with_file_name(format!("llvm-lib{}", std::env::consts::EXE_SUFFIX));
+    // MSVC's deprecated POSIX names (for example mkdir) resolve through oldnames.
+    // Clang's GNU driver omits this default when no CRT mode was recorded; add
+    // only the compatibility library after preprocessing, without choosing a
+    // CRT or changing its predefines. Explicit CRT lowering already adds it.
+    if profile.target.uses_msvc_abi()
+        && !args.windows(2).any(|pair| pair == ["-Xclang", "--dependent-lib=oldnames"])
+    {
+        args.extend(["-Xclang".into(), "--dependent-lib=oldnames".into()]);
+    }
+    Ok(args)
+}
+
+/// Prefer adjacent LLVM archive tools and preserve the target's COFF format on every Windows ABI.
+/// Without an adjacent Windows librarian, LLVM-ar's explicit COFF mode remains available;
+/// Unix archives may use the system ar when no adjacent LLVM tool exists.
+fn native_archive_command(
+    compiler: &Path,
+    windows_target: bool,
+    object: &Path,
+    archive: &Path,
+) -> Result<(PathBuf, Vec<String>), FrontendError> {
+    let adjacent = compiler.with_file_name(format!("llvm-ar{}", std::env::consts::EXE_SUFFIX));
+    let librarian = compiler.with_file_name(format!("llvm-lib{}", std::env::consts::EXE_SUFFIX));
     let archiver = if windows_target && librarian.is_file() {
         librarian
     } else if adjacent.is_file() {
@@ -2242,23 +2303,18 @@ pub fn compile_native_support(
     } else {
         PathBuf::from("ar")
     };
-    let archive_args =
-        if windows_target && archiver.file_stem().is_some_and(|name| name == "llvm-lib") {
-            vec![format!("/OUT:{}", path(&staged_archive)?), path(&staged_object)?]
-        } else {
-            let mut args = vec!["crs".into(), path(&staged_archive)?, path(&staged_object)?];
-            if windows_target {
-                args.insert(0, "--format=coff".into());
-            }
-            args
-        };
-    run_compiler(&archiver, &archive_args)?;
-    require_native_artifact(&staged_archive, "archive")?;
-    std::fs::rename(&staged_object, object)
-        .map_err(|source| FrontendError::NativeIo { path: object.into(), source })?;
-    std::fs::rename(&staged_archive, archive)
-        .map_err(|source| FrontendError::NativeIo { path: archive.into(), source })?;
-    Ok(())
+    let arguments = if windows_target && archiver.file_stem().is_some_and(|name| name == "llvm-lib")
+    {
+        vec![format!("/OUT:{}", path_string(archive)?), path_string(object)?.to_owned()]
+    } else {
+        let mut args =
+            vec!["crs".into(), path_string(archive)?.to_owned(), path_string(object)?.to_owned()];
+        if windows_target {
+            args.insert(0, "--format=coff".into());
+        }
+        args
+    };
+    Ok((archiver, arguments))
 }
 
 /// Resolve output identities, including absent filenames, to reject source/object/archive aliasing.
@@ -2438,6 +2494,31 @@ pub(crate) fn validate_driver_configuration(verbose: &str) -> Result<(), Fronten
     Ok(())
 }
 
+/// Normalize protected option operands first, then fold CRT selectors across the complete argv.
+/// Explicit target options override the native target environment; other option operands cannot
+/// masquerade as a target or runtime selector. Compiler witnesses establish the final ABI later.
+pub(crate) fn prepare_arguments(arguments: &[String]) -> Result<Vec<String>, FrontendError> {
+    let normalized = normalize_arguments(arguments)?;
+    let mut msvc = cfg!(target_env = "msvc");
+    let mut arguments = normalized.iter();
+    while let Some(argument) = arguments.next() {
+        if matches!(argument.as_str(), "-target" | "--target") {
+            if let Some(triple) = arguments.next() {
+                msvc = crate::model::is_msvc_triple(triple);
+            }
+        } else if VALUE_OPTIONS.contains(&argument.as_str())
+            || matches!(argument.as_str(), "-x" | "-Xclang" | "-Xpreprocessor" | "-mllvm")
+        {
+            let _operand = arguments.next();
+        } else if let Some(triple) =
+            argument.strip_prefix("--target=").or_else(|| argument.strip_prefix("-target="))
+        {
+            msvc = crate::model::is_msvc_triple(triple);
+        }
+    }
+    crate::lower_msvc_runtime_flags(&normalized, msvc)
+}
+
 /// Normalize the narrowly supported preprocessor forwarding forms used by packaged PostgreSQL.
 /// Every forwarded definition still passes the protected target-fact checks; other preprocessor
 /// actions remain refused rather than silently changing the inspected inputs.
@@ -2450,7 +2531,9 @@ fn normalize_arguments(arguments: &[String]) -> Result<Vec<String>, FrontendErro
     let mut arguments = arguments.iter();
     while let Some(argument) = arguments.next() {
         // Option operands are paths or definitions, not independent switches.
-        if VALUE_OPTIONS.contains(&argument.as_str()) {
+        if VALUE_OPTIONS.contains(&argument.as_str())
+            || matches!(argument.as_str(), "-x" | "-Xclang" | "-Xpreprocessor" | "-mllvm")
+        {
             normalized.push(argument.clone());
             if let Some(value) = arguments.next() {
                 normalized.push(value.clone());
@@ -2539,6 +2622,24 @@ fn validate_arguments(arguments: &[String]) -> Result<(), FrontendError> {
                     ));
                 }
             }
+        }
+        if argument == "-Xclang" {
+            if arguments.next().is_some_and(|value| {
+                matches!(
+                    value.as_str(),
+                    "--dependent-lib=msvcrt"
+                        | "--dependent-lib=msvcrtd"
+                        | "--dependent-lib=libcmt"
+                        | "--dependent-lib=libcmtd"
+                        | "--dependent-lib=oldnames"
+                        | "-flto-visibility-public-std"
+                )
+            }) {
+                continue;
+            }
+            return Err(FrontendError::Arguments(
+                "only verified MSVC CRT cc1 options may be forwarded with -Xclang".into(),
+            ));
         }
         if VALUE_OPTIONS.contains(&argument.as_str()) {
             match arguments.next() {
@@ -2721,6 +2822,50 @@ mod tests {
         );
     }
 
+    /// Raw CL runtime controls fold after base normalization, preserving forwarded user overrides
+    /// and cross-GCC option operands even when their spelling resembles another target or selector.
+    #[test]
+    fn normalized_runtime_controls_preserve_cross_driver_operands() {
+        let raw = [
+            "--target",
+            "x86_64-pc-windows-msvc19.20.0",
+            "/MDd",
+            "/MT",
+            "-Wp,-U_DLL,-D_DEBUG=7",
+            "-ccc-gcc-name",
+            "-fms-runtime-lib=dll",
+            "--gcc-triple",
+            "--target=aarch64-unknown-linux-gnu",
+        ]
+        .map(str::to_owned);
+        let prepared = prepare_arguments(&raw).unwrap();
+        validate_arguments(&prepared).unwrap();
+        assert!(prepared.contains(&"--dependent-lib=libcmt".into()));
+        assert!(!prepared.contains(&"--dependent-lib=msvcrt".into()));
+        assert!(prepared.windows(2).any(|pair| pair == ["-ccc-gcc-name", "-fms-runtime-lib=dll"]));
+        assert!(
+            prepared
+                .windows(2)
+                .any(|pair| pair == ["--gcc-triple", "--target=aarch64-unknown-linux-gnu"])
+        );
+        assert!(
+            prepared.iter().position(|arg| arg == "-U_DLL").unwrap()
+                > prepared.iter().position(|arg| arg == "-D_MT").unwrap()
+        );
+        assert!(prepared.iter().any(|arg| arg == "-D_DEBUG=7"));
+        assert_eq!(prepare_arguments(&prepared).unwrap(), prepared);
+        let overridden = [
+            "--target=x86_64-pc-windows-msvc",
+            "-fms-runtime-lib=dll",
+            "--target=aarch64-unknown-linux-gnu",
+        ]
+        .map(str::to_owned);
+        assert_eq!(prepare_arguments(&overridden).unwrap(), overridden);
+        let opaque = ["--target=x86_64-pc-windows-msvc", "-Xclang", "/MD"].map(str::to_owned);
+        assert_eq!(normalize_arguments(&opaque).unwrap(), opaque);
+        assert!(validate_arguments(&opaque).is_err());
+    }
+
     /// Header-name tokens reject delimiters and line breaks instead of applying C string escaping.
     #[test]
     fn header_paths_are_checked_as_header_name_tokens() {
@@ -2739,6 +2884,178 @@ mod tests {
         } else {
             assert_eq!(c_header_path(Path::new(r"back\slash.h")).unwrap(), r"back\slash.h");
         }
+    }
+
+    /// Compile a real versioned-MSVC COFF object and exercise production archive selection.
+    /// No Windows SDK, Windows linker or llvm-lib installation is needed on a Unix host.
+    #[test]
+    fn versioned_msvc_native_objects_use_coff_archive_conventions() {
+        let _lock = crate::SCANNER_LOCK.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
+        let directory = tempfile::tempdir().unwrap();
+        let header = directory.path().join("native.h");
+        let source = directory.path().join("native.i");
+        let object = directory.path().join("native.obj");
+        let archive = directory.path().join("native.lib");
+        std::fs::write(&header, "int native_probe(void);\n").unwrap();
+        std::fs::write(&source, "int native_probe(void) { return 42; }\n").unwrap();
+        let scanner = MacroScanner::new().unwrap();
+        let frontend =
+            inspect(&scanner, &header, &["--target=x86_64-pc-windows-msvc19.20.0".into()], None)
+                .unwrap();
+        let profile = frontend.profile();
+        assert!(profile.target.triple.ends_with("-windows-msvc19.20.0"));
+        assert!(profile.target.uses_msvc_abi());
+        let arguments = native_object_arguments(profile, &source, &object).unwrap();
+        assert!(!arguments.iter().any(|argument| argument == "-fPIC"));
+        run_compiler(&profile.compiler.executable, &arguments).unwrap();
+        let bytes = std::fs::read(&object).unwrap();
+        assert_eq!(&bytes[..2], &[0x64, 0x86], "native support must contain AMD64 COFF");
+        let directives = |bytes: &[u8]| {
+            let sections = u16::from_le_bytes(bytes[2..4].try_into().unwrap()) as usize;
+            let optional = u16::from_le_bytes(bytes[16..18].try_into().unwrap()) as usize;
+            let section = bytes[20 + optional..20 + optional + sections * 40]
+                .chunks_exact(40)
+                .find(|section| &section[..8] == b".drectve")
+                .expect("MSVC native objects retain POSIX compatibility linker directives");
+            let length = u32::from_le_bytes(section[16..20].try_into().unwrap()) as usize;
+            let offset = u32::from_le_bytes(section[20..24].try_into().unwrap()) as usize;
+            std::str::from_utf8(bytes.get(offset..offset + length).unwrap())
+                .unwrap()
+                .split_whitespace()
+                .map(|directive| directive.trim_matches('"').to_owned())
+                .collect::<Vec<_>>()
+        };
+        assert_eq!(
+            directives(&bytes),
+            ["/DEFAULTLIB:oldnames.lib"],
+            "unrecorded CRT flags must not invent a CRT library"
+        );
+        let original_arguments = profile.arguments.clone();
+        let mut explicit = profile.clone();
+        explicit.arguments.extend(
+            crate::lower_msvc_runtime_flags(&["-fms-runtime-lib=dll".into()], true).unwrap(),
+        );
+        let explicit_arguments = native_object_arguments(&explicit, &source, &object).unwrap();
+        assert_eq!(
+            explicit_arguments
+                .windows(2)
+                .filter(|pair| *pair == ["-Xclang", "--dependent-lib=oldnames"])
+                .count(),
+            1,
+            "an explicit runtime's compatibility library is not duplicated"
+        );
+        run_compiler(&profile.compiler.executable, &explicit_arguments).unwrap();
+        assert_eq!(
+            directives(&std::fs::read(&object).unwrap()),
+            ["/DEFAULTLIB:msvcrt.lib", "/DEFAULTLIB:oldnames.lib"]
+        );
+        assert_eq!(profile.arguments, original_arguments, "native linkage preserves inspection");
+
+        for (triple, msvc) in [
+            ("x86_64-pc-windows-msvc", true),
+            ("aarch64-pc-windows-msvc19.33.0", true),
+            ("x86_64-pc-windows-msvc-preview", false),
+            ("x86_64-pc-windows-msvc19.33.0-extra", false),
+            ("x86_64-pc-windows-gnu", false),
+            ("x86_64-unknown-linux-gnu", false),
+            ("aarch64-apple-darwin", false),
+        ] {
+            let mut target = profile.target.clone();
+            target.triple = triple.into();
+            assert_eq!(target.uses_msvc_abi(), msvc, "{triple}");
+        }
+        let bin = directory.path().join("bin");
+        std::fs::create_dir(&bin).unwrap();
+        let compiler = bin.join(if cfg!(windows) { "clang.exe" } else { "clang" });
+        let ar = format!("llvm-ar{}", std::env::consts::EXE_SUFFIX);
+        let lib = format!("llvm-lib{}", std::env::consts::EXE_SUFFIX);
+        let (selected, arguments) =
+            native_archive_command(&compiler, true, &object, &archive).unwrap();
+        assert_eq!(selected, PathBuf::from(&ar), "missing COFF archiver never falls back to ar");
+        assert_eq!(
+            arguments,
+            ["--format=coff", "crs", archive.to_str().unwrap(), object.to_str().unwrap()]
+        );
+        let llvm_ar = bin.join(ar);
+        std::fs::write(&llvm_ar, "owned test marker; never executed").unwrap();
+        let (selected, arguments) =
+            native_archive_command(&compiler, true, &object, &archive).unwrap();
+        assert_eq!(selected, llvm_ar);
+        assert_eq!(arguments[0], "--format=coff");
+        let adjacent = bin.join(lib);
+        std::fs::write(&adjacent, "owned test marker; never executed").unwrap();
+        let (selected, arguments) =
+            native_archive_command(&compiler, true, &object, &archive).unwrap();
+        assert_eq!(selected, adjacent);
+        assert_eq!(
+            arguments,
+            [format!("/OUT:{}", archive.to_str().unwrap()), object.to_str().unwrap().into()]
+        );
+        let (selected, arguments) =
+            native_archive_command(&compiler, false, &object, &archive).unwrap();
+        assert_eq!(selected, llvm_ar);
+        assert_eq!(arguments, ["crs", archive.to_str().unwrap(), object.to_str().unwrap()]);
+        let missing = directory.path().join("without-tools/clang");
+        assert_eq!(
+            native_archive_command(&missing, false, &object, &archive).unwrap().0,
+            PathBuf::from("ar")
+        );
+        for triple in ["x86_64-pc-windows-gnu", "i686-w64-mingw32", "aarch64-pc-win32"] {
+            let mut windows = profile.clone();
+            windows.target.triple = triple.into();
+            assert!(crate::model::is_windows_triple(triple));
+            assert!(
+                !native_object_arguments(&windows, &source, &object)
+                    .unwrap()
+                    .contains(&"-fPIC".into()),
+                "{triple}"
+            );
+            assert!(
+                !native_object_arguments(&windows, &source, &object)
+                    .unwrap()
+                    .contains(&"--dependent-lib=oldnames".into()),
+                "{triple} is outside the verified MSVC ABI"
+            );
+        }
+        let mut unix = profile.clone();
+        unix.target.triple = "x86_64-unknown-linux-gnu".into();
+        assert!(
+            native_object_arguments(&unix, &source, &object).unwrap().contains(&"-fPIC".into())
+        );
+        assert!(
+            !native_object_arguments(&unix, &source, &object)
+                .unwrap()
+                .contains(&"--dependent-lib=oldnames".into())
+        );
+        for flag in ["-fno-profile-arcs", "-fno-test-coverage", "-fvisibility=hidden"] {
+            assert!(
+                native_object_arguments(profile, &source, &object).unwrap().contains(&flag.into())
+            );
+        }
+    }
+
+    /// Permit only the closed cc1 CRT options; arbitrary forwarding remains refused.
+    #[test]
+    fn runtime_cc1_forwarding_is_closed() {
+        for mode in ["dll", "dll_dbg", "static", "static_dbg"] {
+            let lowered = crate::lower_msvc_runtime_flags(
+                &[format!("-fms-runtime-lib={mode}"), "-U_DEBUG".into()],
+                true,
+            )
+            .unwrap();
+            validate_arguments(&lowered).unwrap();
+            let (_, unsupported) = semantic_options(&lowered, "clang -cc1\n").unwrap();
+            assert!(unsupported.is_empty(), "{lowered:?}");
+        }
+        for operand in [
+            "--dependent-lib=arbitrary",
+            "-D_DEBUG",
+            "-fpack-struct=1",
+            "--dependent-lib=oldnames\0",
+        ] {
+            assert!(validate_arguments(&["-Xclang".into(), operand.into()]).is_err(), "{operand}");
+        }
+        assert!(validate_arguments(&["-Xclang".into()]).is_err());
     }
 
     /// Preserve native drive, UNC, and ordinary backslash spellings in Clang dependencies.

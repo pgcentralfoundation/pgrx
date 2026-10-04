@@ -2,6 +2,10 @@
 
 This code is generated for documentation purposes, so that it is easy to reference on docs.rs. C macros and their support code are regenerated for your build of pgrx, and your Postgres configuration may differ.
 */
+#[path = "execScan.rs"]
+mod execScan;
+#[allow(unused_imports)]
+pub use execScan::*;
 #[path = "execdebug.rs"]
 mod execdebug;
 #[allow(unused_imports)]

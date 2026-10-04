@@ -5,8 +5,8 @@ This code is generated for documentation purposes, so that it is easy to referen
 // C macros from bitmapset.h.
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -33,25 +33,34 @@ macro_rules! __pgrx_c_args_bms_is_empty {
         $crate::__pgrx_c_args_bms_is_empty!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_bms_is_empty!(@p1 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_bms_is_empty!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_bms_is_empty!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_bms_is_empty!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_bms_is_empty!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_bms_is_empty!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_bms_is_empty!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $($raw:tt)*) => {
         $crate::__pgrx_c_args_bms_is_empty!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_bms_is_empty!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_bms_is_empty!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -73,13 +82,20 @@ macro_rules! __pgrx_c_args_bms_is_empty {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_bms_is_empty!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_bms_is_empty!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_bms_is_empty!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_bms_is_empty!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
-        $crate::__pgrx_c_args_bms_is_empty!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_bms_is_empty!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
         $crate::__pgrx_c_classify!(
@@ -102,12 +118,15 @@ macro_rules! __pgrx_c_args_bms_is_empty {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_bms_is_empty!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_bms_is_empty!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_bms_is_empty!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p1 $mode:ident [$($done:tt)*];) => {
         $crate::bms_is_empty!(@$mode; $($done)*)
@@ -295,8 +314,8 @@ macro_rules! bms_is_empty {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -327,21 +346,23 @@ macro_rules! __pgrx_c_args_bmw_leftmost_one_pos {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
         $crate::__pgrx_c_args_bmw_leftmost_one_pos!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_bmw_leftmost_one_pos!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_bmw_leftmost_one_pos!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_bmw_leftmost_one_pos!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_bmw_leftmost_one_pos!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -349,7 +370,9 @@ macro_rules! __pgrx_c_args_bmw_leftmost_one_pos {
         $crate::__pgrx_c_args_bmw_leftmost_one_pos!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_bmw_leftmost_one_pos!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_bmw_leftmost_one_pos!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -371,14 +394,18 @@ macro_rules! __pgrx_c_args_bmw_leftmost_one_pos {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_bmw_leftmost_one_pos!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_bmw_leftmost_one_pos!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_bmw_leftmost_one_pos!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_bmw_leftmost_one_pos!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_bmw_leftmost_one_pos!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -405,13 +432,13 @@ macro_rules! __pgrx_c_args_bmw_leftmost_one_pos {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_bmw_leftmost_one_pos!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_bmw_leftmost_one_pos!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -457,12 +484,12 @@ macro_rules! bmw_leftmost_one_pos {
         /* PGRX: bmw_leftmost_one_pos remains expanded because pg_leftmost_one_pos64 is not an active function-like macro. */
         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
             <$crate::__pgrx_c_macros::CInt as $crate::__pgrx_c_macros::expression::CType>::from_storage(
-                $crate::pg_leftmost_one_pos64(
+                $crate::__pgrx_c_bindings::pg_leftmost_one_pos64(
                     <
-                        $crate::__pgrx_c_macros::CUnsignedLongLong as $crate::__pgrx_c_macros::expression::CType
+                        $crate::__pgrx_c_macros::CUnsignedLong as $crate::__pgrx_c_macros::expression::CType
                     >::into_storage(
                         $crate::__pgrx_c_macros::expression::implicit::<
-                            $crate::__pgrx_c_macros::CUnsignedLongLong,
+                            $crate::__pgrx_c_macros::CUnsignedLong,
                             _
                         >(
                             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -504,12 +531,12 @@ macro_rules! bmw_leftmost_one_pos {
                             <
                                 $crate::__pgrx_c_macros::CInt as $crate::__pgrx_c_macros::expression::CType
                             >::from_storage(
-                                $crate::pg_leftmost_one_pos64(
+                                $crate::__pgrx_c_bindings::pg_leftmost_one_pos64(
                                     <
-                                        $crate::__pgrx_c_macros::CUnsignedLongLong as $crate::__pgrx_c_macros::expression::CType
+                                        $crate::__pgrx_c_macros::CUnsignedLong as $crate::__pgrx_c_macros::expression::CType
                                     >::into_storage(
                                         $crate::__pgrx_c_macros::expression::implicit::<
-                                            $crate::__pgrx_c_macros::CUnsignedLongLong,
+                                            $crate::__pgrx_c_macros::CUnsignedLong,
                                             _
                                         >(
                                             $crate::__pgrx_c_macros::expression::profile_value::<
@@ -536,12 +563,12 @@ macro_rules! bmw_leftmost_one_pos {
         {
             let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 <$crate::__pgrx_c_macros::CInt as $crate::__pgrx_c_macros::expression::CType>::from_storage(
-                    $crate::pg_leftmost_one_pos64(
+                    $crate::__pgrx_c_bindings::pg_leftmost_one_pos64(
                         <
-                            $crate::__pgrx_c_macros::CUnsignedLongLong as $crate::__pgrx_c_macros::expression::CType
+                            $crate::__pgrx_c_macros::CUnsignedLong as $crate::__pgrx_c_macros::expression::CType
                         >::into_storage(
                             $crate::__pgrx_c_macros::expression::implicit::<
-                                $crate::__pgrx_c_macros::CUnsignedLongLong,
+                                $crate::__pgrx_c_macros::CUnsignedLong,
                                 _
                             >(
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -563,8 +590,8 @@ macro_rules! bmw_leftmost_one_pos {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -591,25 +618,34 @@ macro_rules! __pgrx_c_args_bmw_popcount {
         $crate::__pgrx_c_args_bmw_popcount!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_bmw_popcount!(@p1 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_bmw_popcount!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_bmw_popcount!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_bmw_popcount!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_bmw_popcount!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_bmw_popcount!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_bmw_popcount!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $($raw:tt)*) => {
         $crate::__pgrx_c_args_bmw_popcount!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_bmw_popcount!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_bmw_popcount!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -631,13 +667,20 @@ macro_rules! __pgrx_c_args_bmw_popcount {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_bmw_popcount!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_bmw_popcount!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_bmw_popcount!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_bmw_popcount!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
-        $crate::__pgrx_c_args_bmw_popcount!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_bmw_popcount!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
         $crate::__pgrx_c_classify!(
@@ -660,12 +703,15 @@ macro_rules! __pgrx_c_args_bmw_popcount {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_bmw_popcount!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_bmw_popcount!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_bmw_popcount!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p1 $mode:ident [$($done:tt)*];) => {
         $crate::bmw_popcount!(@$mode; $($done)*)
@@ -708,19 +754,18 @@ macro_rules! bmw_popcount {
     (@__pgrx_emit_value; $w:tt $(,)?) => {
         /* PGRX: bmw_popcount remains expanded because pg_popcount64 is not an active function-like macro. */
         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-            <$crate::__pgrx_c_macros::CInt as $crate::__pgrx_c_macros::expression::CType>::from_storage(
-                $crate::pg_popcount64(
-                    <
-                        $crate::__pgrx_c_macros::CUnsignedLongLong as $crate::__pgrx_c_macros::expression::CType
-                    >::into_storage(
-                        $crate::__pgrx_c_macros::expression::implicit::<
-                            $crate::__pgrx_c_macros::CUnsignedLongLong,
-                            _
-                        >(
-                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                                $crate::__pgrx_c_operand!(@value [true]; $w)
-                            )
-                        )
+            $crate::__pgrx_c_macros::expression::invoke(
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::load(
+                        $crate::__pgrx_c_macros::expression::place::<
+                            $crate::__pgrx_c_macros::expression::CFunction<
+                                $crate::__pgrx_c_generated::Signature_444701e17177993ad2e78449339544e7
+                            >>(::core::ptr::addr_of_mut!($crate::__pgrx_c_bindings::pg_popcount64))
+                    )
+                ),
+                (
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_operand!(@value [true]; $w)
                     ),
                 )
             )
@@ -730,13 +775,43 @@ macro_rules! bmw_popcount {
         $crate::__pgrx_c_args_bmw_popcount!(@collect __pgrx_emit_value []; $($raw)*)
     };
     (@__pgrx_emit_place; $w:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        /* PGRX: bmw_popcount remains expanded because pg_popcount64 is not an active function-like macro. */
+        $crate::__pgrx_c_macros::expression::invoke(
+            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                $crate::__pgrx_c_macros::expression::load(
+                    $crate::__pgrx_c_macros::expression::place::<
+                        $crate::__pgrx_c_macros::expression::CFunction<
+                            $crate::__pgrx_c_generated::Signature_444701e17177993ad2e78449339544e7
+                        >>(::core::ptr::addr_of_mut!($crate::__pgrx_c_bindings::pg_popcount64))
+                )
+            ),
+            (
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_operand!(@value [true]; $w)
+                ),
+            )
+        )
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_bmw_popcount!(@collect __pgrx_emit_place []; $($raw)*)
     };
     (@__pgrx_emit_read_place; $w:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
+        /* PGRX: bmw_popcount remains expanded because pg_popcount64 is not an active function-like macro. */
+        $crate::__pgrx_c_macros::expression::invoke(
+            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                $crate::__pgrx_c_macros::expression::load(
+                    $crate::__pgrx_c_macros::expression::place::<
+                        $crate::__pgrx_c_macros::expression::CFunction<
+                            $crate::__pgrx_c_generated::Signature_444701e17177993ad2e78449339544e7
+                        >>(::core::ptr::addr_of_mut!($crate::__pgrx_c_bindings::pg_popcount64))
+                )
+            ),
+            (
+                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_operand!(@value [true]; $w)
+                ),
+            )
+        )
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::__pgrx_c_args_bmw_popcount!(@collect __pgrx_emit_read_place []; $($raw)*)
@@ -753,22 +828,22 @@ macro_rules! bmw_popcount {
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                            <
-                                $crate::__pgrx_c_macros::CInt as $crate::__pgrx_c_macros::expression::CType
-                            >::from_storage(
-                                $crate::pg_popcount64(
-                                    <
-                                        $crate::__pgrx_c_macros::CUnsignedLongLong as $crate::__pgrx_c_macros::expression::CType
-                                    >::into_storage(
-                                        $crate::__pgrx_c_macros::expression::implicit::<
-                                            $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                            _
-                                        >(
-                                            $crate::__pgrx_c_macros::expression::profile_value::<
-                                                true,
-                                                _
-                                            >($crate::__pgrx_c_operand!(@value [true]; $w))
+                            $crate::__pgrx_c_macros::expression::invoke(
+                                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                    $crate::__pgrx_c_macros::expression::load(
+                                        $crate::__pgrx_c_macros::expression::place::<
+                                            $crate::__pgrx_c_macros::expression::CFunction<
+                                                $crate::__pgrx_c_generated::Signature_444701e17177993ad2e78449339544e7
+                                            >>(
+                                            ::core::ptr::addr_of_mut!(
+                                                $crate::__pgrx_c_bindings::pg_popcount64
+                                            )
                                         )
+                                    )
+                                ),
+                                (
+                                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                        $crate::__pgrx_c_operand!(@value [true]; $w)
                                     ),
                                 )
                             )
@@ -787,19 +862,20 @@ macro_rules! bmw_popcount {
         /* PGRX: bmw_popcount remains expanded because pg_popcount64 is not an active function-like macro. */
         {
             let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                <$crate::__pgrx_c_macros::CInt as $crate::__pgrx_c_macros::expression::CType>::from_storage(
-                    $crate::pg_popcount64(
-                        <
-                            $crate::__pgrx_c_macros::CUnsignedLongLong as $crate::__pgrx_c_macros::expression::CType
-                        >::into_storage(
-                            $crate::__pgrx_c_macros::expression::implicit::<
-                                $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                _
-                            >(
-                                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                                    $crate::__pgrx_c_operand!(@value [true]; $w)
-                                )
+                $crate::__pgrx_c_macros::expression::invoke(
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::load(
+                            $crate::__pgrx_c_macros::expression::place::<
+                                $crate::__pgrx_c_macros::expression::CFunction<
+                                    $crate::__pgrx_c_generated::Signature_444701e17177993ad2e78449339544e7
+                                >>(
+                                ::core::ptr::addr_of_mut!($crate::__pgrx_c_bindings::pg_popcount64)
                             )
+                        )
+                    ),
+                    (
+                        $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                            $crate::__pgrx_c_operand!(@value [true]; $w)
                         ),
                     )
                 )
@@ -815,8 +891,8 @@ macro_rules! bmw_popcount {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -847,21 +923,23 @@ macro_rules! __pgrx_c_args_bmw_rightmost_one_pos {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
         $crate::__pgrx_c_args_bmw_rightmost_one_pos!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_bmw_rightmost_one_pos!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_bmw_rightmost_one_pos!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_bmw_rightmost_one_pos!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_bmw_rightmost_one_pos!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -869,7 +947,9 @@ macro_rules! __pgrx_c_args_bmw_rightmost_one_pos {
         $crate::__pgrx_c_args_bmw_rightmost_one_pos!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_bmw_rightmost_one_pos!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_bmw_rightmost_one_pos!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -891,14 +971,18 @@ macro_rules! __pgrx_c_args_bmw_rightmost_one_pos {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_bmw_rightmost_one_pos!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_bmw_rightmost_one_pos!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_bmw_rightmost_one_pos!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_bmw_rightmost_one_pos!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_bmw_rightmost_one_pos!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -925,13 +1009,13 @@ macro_rules! __pgrx_c_args_bmw_rightmost_one_pos {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_bmw_rightmost_one_pos!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_bmw_rightmost_one_pos!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -977,12 +1061,12 @@ macro_rules! bmw_rightmost_one_pos {
         /* PGRX: bmw_rightmost_one_pos remains expanded because pg_rightmost_one_pos64 is not an active function-like macro. */
         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
             <$crate::__pgrx_c_macros::CInt as $crate::__pgrx_c_macros::expression::CType>::from_storage(
-                $crate::pg_rightmost_one_pos64(
+                $crate::__pgrx_c_bindings::pg_rightmost_one_pos64(
                     <
-                        $crate::__pgrx_c_macros::CUnsignedLongLong as $crate::__pgrx_c_macros::expression::CType
+                        $crate::__pgrx_c_macros::CUnsignedLong as $crate::__pgrx_c_macros::expression::CType
                     >::into_storage(
                         $crate::__pgrx_c_macros::expression::implicit::<
-                            $crate::__pgrx_c_macros::CUnsignedLongLong,
+                            $crate::__pgrx_c_macros::CUnsignedLong,
                             _
                         >(
                             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -1024,12 +1108,12 @@ macro_rules! bmw_rightmost_one_pos {
                             <
                                 $crate::__pgrx_c_macros::CInt as $crate::__pgrx_c_macros::expression::CType
                             >::from_storage(
-                                $crate::pg_rightmost_one_pos64(
+                                $crate::__pgrx_c_bindings::pg_rightmost_one_pos64(
                                     <
-                                        $crate::__pgrx_c_macros::CUnsignedLongLong as $crate::__pgrx_c_macros::expression::CType
+                                        $crate::__pgrx_c_macros::CUnsignedLong as $crate::__pgrx_c_macros::expression::CType
                                     >::into_storage(
                                         $crate::__pgrx_c_macros::expression::implicit::<
-                                            $crate::__pgrx_c_macros::CUnsignedLongLong,
+                                            $crate::__pgrx_c_macros::CUnsignedLong,
                                             _
                                         >(
                                             $crate::__pgrx_c_macros::expression::profile_value::<
@@ -1056,12 +1140,12 @@ macro_rules! bmw_rightmost_one_pos {
         {
             let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 <$crate::__pgrx_c_macros::CInt as $crate::__pgrx_c_macros::expression::CType>::from_storage(
-                    $crate::pg_rightmost_one_pos64(
+                    $crate::__pgrx_c_bindings::pg_rightmost_one_pos64(
                         <
-                            $crate::__pgrx_c_macros::CUnsignedLongLong as $crate::__pgrx_c_macros::expression::CType
+                            $crate::__pgrx_c_macros::CUnsignedLong as $crate::__pgrx_c_macros::expression::CType
                         >::into_storage(
                             $crate::__pgrx_c_macros::expression::implicit::<
-                                $crate::__pgrx_c_macros::CUnsignedLongLong,
+                                $crate::__pgrx_c_macros::CUnsignedLong,
                                 _
                             >(
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(

@@ -5,8 +5,8 @@ This code is generated for documentation purposes, so that it is easy to referen
 // C macros from relpath.h.
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -37,21 +37,23 @@ macro_rules! __pgrx_c_args_RelFileNumberIsValid {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
         $crate::__pgrx_c_args_RelFileNumberIsValid!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_RelFileNumberIsValid!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_RelFileNumberIsValid!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_RelFileNumberIsValid!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_RelFileNumberIsValid!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -59,7 +61,9 @@ macro_rules! __pgrx_c_args_RelFileNumberIsValid {
         $crate::__pgrx_c_args_RelFileNumberIsValid!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_RelFileNumberIsValid!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_RelFileNumberIsValid!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -81,14 +85,18 @@ macro_rules! __pgrx_c_args_RelFileNumberIsValid {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_RelFileNumberIsValid!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_RelFileNumberIsValid!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_RelFileNumberIsValid!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_RelFileNumberIsValid!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_RelFileNumberIsValid!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -115,13 +123,13 @@ macro_rules! __pgrx_c_args_RelFileNumberIsValid {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_RelFileNumberIsValid!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_RelFileNumberIsValid!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -178,10 +186,11 @@ macro_rules! RelFileNumberIsValid {
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::null_constant(
-                                        /* PGRX: InvalidRelFileNumber remains expanded because no integer constant binding is available in the defining Rust crate. */
                                         $crate::__pgrx_c_macros::CValue::<
                                             $crate::__pgrx_c_macros::CUnsignedInt
-                                        >::new(0u32)
+                                        >::new(
+                                            $crate::__pgrx_c_bindings::InvalidRelFileNumber as u32
+                                        )
                                     )
                                 )
                             )
@@ -241,10 +250,11 @@ macro_rules! RelFileNumberIsValid {
                                                 _
                                             >(
                                                 $crate::__pgrx_c_macros::expression::null_constant(
-                                                    /* PGRX: InvalidRelFileNumber remains expanded because no integer constant binding is available in the defining Rust crate. */
                                                     $crate::__pgrx_c_macros::CValue::<
                                                         $crate::__pgrx_c_macros::CUnsignedInt
-                                                    >::new(0u32)
+                                                    >::new(
+                                                        $crate::__pgrx_c_bindings::InvalidRelFileNumber as u32
+                                                    )
                                                 )
                                             )
                                         )
@@ -277,10 +287,11 @@ macro_rules! RelFileNumberIsValid {
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::null_constant(
-                                        /* PGRX: InvalidRelFileNumber remains expanded because no integer constant binding is available in the defining Rust crate. */
                                         $crate::__pgrx_c_macros::CValue::<
                                             $crate::__pgrx_c_macros::CUnsignedInt
-                                        >::new(0u32)
+                                        >::new(
+                                            $crate::__pgrx_c_bindings::InvalidRelFileNumber as u32
+                                        )
                                     )
                                 )
                             )
@@ -299,8 +310,8 @@ macro_rules! RelFileNumberIsValid {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -327,16 +338,25 @@ macro_rules! __pgrx_c_args_relpath {
         $crate::__pgrx_c_args_relpath!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_relpath!(@p1 $mode [$($done)* (@literal [- $argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_relpath!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+            $($rest)*
+        )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_relpath!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_relpath!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $($raw:tt)*) => {
         $crate::__pgrx_c_args_relpath!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
-        $crate::__pgrx_c_args_relpath!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_relpath!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
         $crate::__pgrx_c_classify!(
@@ -358,28 +378,46 @@ macro_rules! __pgrx_c_args_relpath {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_relpath!(@p1 $mode [$($done)* (@literal [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_relpath!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+            $($rest)*
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_relpath!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_relpath!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_relpath!(@p2 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_relpath!(
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative1 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_relpath!(@p2 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_relpath!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_relpath!(@p2 $mode [$($done)* (@literal [- $argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_relpath!(
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+            $($rest)*
+        )
     };
     (@negative1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_relpath!(@p2 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_relpath!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $($raw:tt)*) => {
         $crate::__pgrx_c_args_relpath!(@negative1 $mode [$($done)*]; - $($raw)*)
     };
     (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_relpath!(@p2 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_relpath!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -399,13 +437,20 @@ macro_rules! __pgrx_c_args_relpath {
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_relpath!(@p2 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_relpath!(
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_relpath!(@p2 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_relpath!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
-        $crate::__pgrx_c_args_relpath!(@p2 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_relpath!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
         $crate::__pgrx_c_classify!(
@@ -427,10 +472,16 @@ macro_rules! __pgrx_c_args_relpath {
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_relpath!(@p2 $mode [$($done)* (@literal [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_relpath!(
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+            $($rest)*
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_relpath!(@p2 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_relpath!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p2 $mode:ident [$($done:tt)*];) => {
         $crate::relpath!(@$mode; $($done)*)
@@ -483,17 +534,17 @@ macro_rules! relpath {
                     $crate::__pgrx_c_macros::expression::ReadWrite
                 > as $crate::__pgrx_c_macros::expression::CType
             >::from_storage(
-                $crate::__pgrx_c_generated::Inline_544695115086391e30aeaac9adc82cbd(
+                $crate::__pgrx_c_generated::Inline_deb463a3686381c51dea3d6705de7b94(
                     <
                         $crate::__pgrx_c_macros::expression::CIntegerStorage<
                             $crate::__pgrx_c_macros::CUnsignedInt,
-                            $crate::Oid
+                            $crate::__pgrx_c_bindings::Oid
                         > as $crate::__pgrx_c_macros::expression::CType
                     >::into_storage(
                         $crate::__pgrx_c_macros::expression::implicit::<
                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                 $crate::__pgrx_c_macros::CUnsignedInt,
-                                $crate::Oid
+                                $crate::__pgrx_c_bindings::Oid
                             >,
                             _
                         >(
@@ -519,13 +570,13 @@ macro_rules! relpath {
                     <
                         $crate::__pgrx_c_macros::expression::CIntegerStorage<
                             $crate::__pgrx_c_macros::CUnsignedInt,
-                            $crate::Oid
+                            $crate::__pgrx_c_bindings::Oid
                         > as $crate::__pgrx_c_macros::expression::CType
                     >::into_storage(
                         $crate::__pgrx_c_macros::expression::implicit::<
                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                 $crate::__pgrx_c_macros::CUnsignedInt,
-                                $crate::Oid
+                                $crate::__pgrx_c_bindings::Oid
                             >,
                             _
                         >(
@@ -551,13 +602,13 @@ macro_rules! relpath {
                     <
                         $crate::__pgrx_c_macros::expression::CIntegerStorage<
                             $crate::__pgrx_c_macros::CUnsignedInt,
-                            $crate::Oid
+                            $crate::__pgrx_c_bindings::Oid
                         > as $crate::__pgrx_c_macros::expression::CType
                     >::into_storage(
                         $crate::__pgrx_c_macros::expression::implicit::<
                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                 $crate::__pgrx_c_macros::CUnsignedInt,
-                                $crate::Oid
+                                $crate::__pgrx_c_bindings::Oid
                             >,
                             _
                         >(
@@ -657,17 +708,17 @@ macro_rules! relpath {
                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                 > as $crate::__pgrx_c_macros::expression::CType
                             >::from_storage(
-                                $crate::__pgrx_c_generated::Inline_544695115086391e30aeaac9adc82cbd(
+                                $crate::__pgrx_c_generated::Inline_deb463a3686381c51dea3d6705de7b94(
                                     <
                                         $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                             $crate::__pgrx_c_macros::CUnsignedInt,
-                                            $crate::Oid
+                                            $crate::__pgrx_c_bindings::Oid
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::into_storage(
                                         $crate::__pgrx_c_macros::expression::implicit::<
                                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                 $crate::__pgrx_c_macros::CUnsignedInt,
-                                                $crate::Oid
+                                                $crate::__pgrx_c_bindings::Oid
                                             >,
                                             _
                                         >(
@@ -703,13 +754,13 @@ macro_rules! relpath {
                                     <
                                         $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                             $crate::__pgrx_c_macros::CUnsignedInt,
-                                            $crate::Oid
+                                            $crate::__pgrx_c_bindings::Oid
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::into_storage(
                                         $crate::__pgrx_c_macros::expression::implicit::<
                                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                 $crate::__pgrx_c_macros::CUnsignedInt,
-                                                $crate::Oid
+                                                $crate::__pgrx_c_bindings::Oid
                                             >,
                                             _
                                         >(
@@ -745,13 +796,13 @@ macro_rules! relpath {
                                     <
                                         $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                             $crate::__pgrx_c_macros::CUnsignedInt,
-                                            $crate::Oid
+                                            $crate::__pgrx_c_bindings::Oid
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::into_storage(
                                         $crate::__pgrx_c_macros::expression::implicit::<
                                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                 $crate::__pgrx_c_macros::CUnsignedInt,
-                                                $crate::Oid
+                                                $crate::__pgrx_c_bindings::Oid
                                             >,
                                             _
                                         >(
@@ -859,17 +910,17 @@ macro_rules! relpath {
                         $crate::__pgrx_c_macros::expression::ReadWrite
                     > as $crate::__pgrx_c_macros::expression::CType
                 >::from_storage(
-                    $crate::__pgrx_c_generated::Inline_544695115086391e30aeaac9adc82cbd(
+                    $crate::__pgrx_c_generated::Inline_deb463a3686381c51dea3d6705de7b94(
                         <
                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                 $crate::__pgrx_c_macros::CUnsignedInt,
-                                $crate::Oid
+                                $crate::__pgrx_c_bindings::Oid
                             > as $crate::__pgrx_c_macros::expression::CType
                         >::into_storage(
                             $crate::__pgrx_c_macros::expression::implicit::<
                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                     $crate::__pgrx_c_macros::CUnsignedInt,
-                                    $crate::Oid
+                                    $crate::__pgrx_c_bindings::Oid
                                 >,
                                 _
                             >(
@@ -902,13 +953,13 @@ macro_rules! relpath {
                         <
                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                 $crate::__pgrx_c_macros::CUnsignedInt,
-                                $crate::Oid
+                                $crate::__pgrx_c_bindings::Oid
                             > as $crate::__pgrx_c_macros::expression::CType
                         >::into_storage(
                             $crate::__pgrx_c_macros::expression::implicit::<
                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                     $crate::__pgrx_c_macros::CUnsignedInt,
-                                    $crate::Oid
+                                    $crate::__pgrx_c_bindings::Oid
                                 >,
                                 _
                             >(
@@ -941,13 +992,13 @@ macro_rules! relpath {
                         <
                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                 $crate::__pgrx_c_macros::CUnsignedInt,
-                                $crate::Oid
+                                $crate::__pgrx_c_bindings::Oid
                             > as $crate::__pgrx_c_macros::expression::CType
                         >::into_storage(
                             $crate::__pgrx_c_macros::expression::implicit::<
                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                     $crate::__pgrx_c_macros::CUnsignedInt,
-                                    $crate::Oid
+                                    $crate::__pgrx_c_bindings::Oid
                                 >,
                                 _
                             >(
@@ -1029,8 +1080,8 @@ macro_rules! relpath {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -1058,13 +1109,13 @@ macro_rules! __pgrx_c_args_relpathbackend {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_relpathbackend!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_relpathbackend!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -1073,7 +1124,7 @@ macro_rules! __pgrx_c_args_relpathbackend {
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_relpathbackend!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -1100,25 +1151,25 @@ macro_rules! __pgrx_c_args_relpathbackend {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_relpathbackend!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_relpathbackend!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_relpathbackend!(
-            @p2 $mode [$($done)* (@literal [- $argument]),];
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_relpathbackend!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -1127,7 +1178,7 @@ macro_rules! __pgrx_c_args_relpathbackend {
     };
     (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_relpathbackend!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -1154,31 +1205,35 @@ macro_rules! __pgrx_c_args_relpathbackend {
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_relpathbackend!(
-            @p2 $mode [$($done)* (@literal [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_relpathbackend!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
     (@p2 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_relpathbackend!(@p3 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_relpathbackend!(
+            @p3 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative2 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_relpathbackend!(@p3 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_relpathbackend!(
+            @p3 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p2 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_relpathbackend!(
-            @p3 $mode [$($done)* (@literal [- $argument]),];
+            @p3 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative2 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_relpathbackend!(
-            @p3 $mode [$($done)* (@native [$argument]),];
+            @p3 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -1186,7 +1241,9 @@ macro_rules! __pgrx_c_args_relpathbackend {
         $crate::__pgrx_c_args_relpathbackend!(@negative2 $mode [$($done)*]; - $($raw)*)
     };
     (@p2 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_relpathbackend!(@p3 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_relpathbackend!(
+            @p3 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p2 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -1208,14 +1265,18 @@ macro_rules! __pgrx_c_args_relpathbackend {
         )
     };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_relpathbackend!(@p3 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_relpathbackend!(
+            @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p2 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_relpathbackend!(@p3 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_relpathbackend!(
+            @p3 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p2 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_relpathbackend!(
-            @p3 $mode [$($done)* (@native [$argument]),];
+            @p3 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -1242,13 +1303,13 @@ macro_rules! __pgrx_c_args_relpathbackend {
     };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_relpathbackend!(
-            @p3 $mode [$($done)* (@literal [$argument]),];
+            @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p2 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_relpathbackend!(
-            @p3 $mode [$($done)* (@native [$argument]),];
+            @p3 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -1304,17 +1365,17 @@ macro_rules! relpathbackend {
                     $crate::__pgrx_c_macros::expression::ReadWrite
                 > as $crate::__pgrx_c_macros::expression::CType
             >::from_storage(
-                $crate::__pgrx_c_generated::Inline_544695115086391e30aeaac9adc82cbd(
+                $crate::__pgrx_c_generated::Inline_deb463a3686381c51dea3d6705de7b94(
                     <
                         $crate::__pgrx_c_macros::expression::CIntegerStorage<
                             $crate::__pgrx_c_macros::CUnsignedInt,
-                            $crate::Oid
+                            $crate::__pgrx_c_bindings::Oid
                         > as $crate::__pgrx_c_macros::expression::CType
                     >::into_storage(
                         $crate::__pgrx_c_macros::expression::implicit::<
                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                 $crate::__pgrx_c_macros::CUnsignedInt,
-                                $crate::Oid
+                                $crate::__pgrx_c_bindings::Oid
                             >,
                             _
                         >(
@@ -1332,13 +1393,13 @@ macro_rules! relpathbackend {
                     <
                         $crate::__pgrx_c_macros::expression::CIntegerStorage<
                             $crate::__pgrx_c_macros::CUnsignedInt,
-                            $crate::Oid
+                            $crate::__pgrx_c_bindings::Oid
                         > as $crate::__pgrx_c_macros::expression::CType
                     >::into_storage(
                         $crate::__pgrx_c_macros::expression::implicit::<
                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                 $crate::__pgrx_c_macros::CUnsignedInt,
-                                $crate::Oid
+                                $crate::__pgrx_c_bindings::Oid
                             >,
                             _
                         >(
@@ -1356,13 +1417,13 @@ macro_rules! relpathbackend {
                     <
                         $crate::__pgrx_c_macros::expression::CIntegerStorage<
                             $crate::__pgrx_c_macros::CUnsignedInt,
-                            $crate::Oid
+                            $crate::__pgrx_c_bindings::Oid
                         > as $crate::__pgrx_c_macros::expression::CType
                     >::into_storage(
                         $crate::__pgrx_c_macros::expression::implicit::<
                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                 $crate::__pgrx_c_macros::CUnsignedInt,
-                                $crate::Oid
+                                $crate::__pgrx_c_bindings::Oid
                             >,
                             _
                         >(
@@ -1449,17 +1510,17 @@ macro_rules! relpathbackend {
                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                 > as $crate::__pgrx_c_macros::expression::CType
                             >::from_storage(
-                                $crate::__pgrx_c_generated::Inline_544695115086391e30aeaac9adc82cbd(
+                                $crate::__pgrx_c_generated::Inline_deb463a3686381c51dea3d6705de7b94(
                                     <
                                         $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                             $crate::__pgrx_c_macros::CUnsignedInt,
-                                            $crate::Oid
+                                            $crate::__pgrx_c_bindings::Oid
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::into_storage(
                                         $crate::__pgrx_c_macros::expression::implicit::<
                                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                 $crate::__pgrx_c_macros::CUnsignedInt,
-                                                $crate::Oid
+                                                $crate::__pgrx_c_bindings::Oid
                                             >,
                                             _
                                         >(
@@ -1487,13 +1548,13 @@ macro_rules! relpathbackend {
                                     <
                                         $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                             $crate::__pgrx_c_macros::CUnsignedInt,
-                                            $crate::Oid
+                                            $crate::__pgrx_c_bindings::Oid
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::into_storage(
                                         $crate::__pgrx_c_macros::expression::implicit::<
                                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                 $crate::__pgrx_c_macros::CUnsignedInt,
-                                                $crate::Oid
+                                                $crate::__pgrx_c_bindings::Oid
                                             >,
                                             _
                                         >(
@@ -1521,13 +1582,13 @@ macro_rules! relpathbackend {
                                     <
                                         $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                             $crate::__pgrx_c_macros::CUnsignedInt,
-                                            $crate::Oid
+                                            $crate::__pgrx_c_bindings::Oid
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::into_storage(
                                         $crate::__pgrx_c_macros::expression::implicit::<
                                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                 $crate::__pgrx_c_macros::CUnsignedInt,
-                                                $crate::Oid
+                                                $crate::__pgrx_c_bindings::Oid
                                             >,
                                             _
                                         >(
@@ -1612,17 +1673,17 @@ macro_rules! relpathbackend {
                         $crate::__pgrx_c_macros::expression::ReadWrite
                     > as $crate::__pgrx_c_macros::expression::CType
                 >::from_storage(
-                    $crate::__pgrx_c_generated::Inline_544695115086391e30aeaac9adc82cbd(
+                    $crate::__pgrx_c_generated::Inline_deb463a3686381c51dea3d6705de7b94(
                         <
                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                 $crate::__pgrx_c_macros::CUnsignedInt,
-                                $crate::Oid
+                                $crate::__pgrx_c_bindings::Oid
                             > as $crate::__pgrx_c_macros::expression::CType
                         >::into_storage(
                             $crate::__pgrx_c_macros::expression::implicit::<
                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                     $crate::__pgrx_c_macros::CUnsignedInt,
-                                    $crate::Oid
+                                    $crate::__pgrx_c_bindings::Oid
                                 >,
                                 _
                             >(
@@ -1640,13 +1701,13 @@ macro_rules! relpathbackend {
                         <
                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                 $crate::__pgrx_c_macros::CUnsignedInt,
-                                $crate::Oid
+                                $crate::__pgrx_c_bindings::Oid
                             > as $crate::__pgrx_c_macros::expression::CType
                         >::into_storage(
                             $crate::__pgrx_c_macros::expression::implicit::<
                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                     $crate::__pgrx_c_macros::CUnsignedInt,
-                                    $crate::Oid
+                                    $crate::__pgrx_c_bindings::Oid
                                 >,
                                 _
                             >(
@@ -1664,13 +1725,13 @@ macro_rules! relpathbackend {
                         <
                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                 $crate::__pgrx_c_macros::CUnsignedInt,
-                                $crate::Oid
+                                $crate::__pgrx_c_bindings::Oid
                             > as $crate::__pgrx_c_macros::expression::CType
                         >::into_storage(
                             $crate::__pgrx_c_macros::expression::implicit::<
                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                     $crate::__pgrx_c_macros::CUnsignedInt,
-                                    $crate::Oid
+                                    $crate::__pgrx_c_bindings::Oid
                                 >,
                                 _
                             >(
@@ -1731,8 +1792,8 @@ macro_rules! relpathbackend {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -1760,18 +1821,24 @@ macro_rules! __pgrx_c_args_relpathperm {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_relpathperm!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_relpathperm!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_relpathperm!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $($raw:tt)*) => {
         $crate::__pgrx_c_args_relpathperm!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
-        $crate::__pgrx_c_args_relpathperm!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_relpathperm!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
         $crate::__pgrx_c_classify!(
@@ -1793,31 +1860,46 @@ macro_rules! __pgrx_c_args_relpathperm {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_relpathperm!(@p1 $mode [$($done)* (@literal [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_relpathperm!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+            $($rest)*
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_relpathperm!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_relpathperm!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_relpathperm!(@p2 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_relpathperm!(
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative1 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_relpathperm!(@p2 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_relpathperm!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_relpathperm!(
-            @p2 $mode [$($done)* (@literal [- $argument]),];
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_relpathperm!(@p2 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_relpathperm!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $($raw:tt)*) => {
         $crate::__pgrx_c_args_relpathperm!(@negative1 $mode [$($done)*]; - $($raw)*)
     };
     (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_relpathperm!(@p2 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_relpathperm!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -1839,13 +1921,20 @@ macro_rules! __pgrx_c_args_relpathperm {
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_relpathperm!(@p2 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_relpathperm!(
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_relpathperm!(@p2 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_relpathperm!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
-        $crate::__pgrx_c_args_relpathperm!(@p2 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_relpathperm!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
         $crate::__pgrx_c_classify!(
@@ -1867,10 +1956,16 @@ macro_rules! __pgrx_c_args_relpathperm {
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_relpathperm!(@p2 $mode [$($done)* (@literal [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_relpathperm!(
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+            $($rest)*
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_relpathperm!(@p2 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_relpathperm!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p2 $mode:ident [$($done:tt)*];) => {
         $crate::relpathperm!(@$mode; $($done)*)
@@ -1923,17 +2018,17 @@ macro_rules! relpathperm {
                     $crate::__pgrx_c_macros::expression::ReadWrite
                 > as $crate::__pgrx_c_macros::expression::CType
             >::from_storage(
-                $crate::__pgrx_c_generated::Inline_544695115086391e30aeaac9adc82cbd(
+                $crate::__pgrx_c_generated::Inline_deb463a3686381c51dea3d6705de7b94(
                     <
                         $crate::__pgrx_c_macros::expression::CIntegerStorage<
                             $crate::__pgrx_c_macros::CUnsignedInt,
-                            $crate::Oid
+                            $crate::__pgrx_c_bindings::Oid
                         > as $crate::__pgrx_c_macros::expression::CType
                     >::into_storage(
                         $crate::__pgrx_c_macros::expression::implicit::<
                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                 $crate::__pgrx_c_macros::CUnsignedInt,
-                                $crate::Oid
+                                $crate::__pgrx_c_bindings::Oid
                             >,
                             _
                         >(
@@ -1951,13 +2046,13 @@ macro_rules! relpathperm {
                     <
                         $crate::__pgrx_c_macros::expression::CIntegerStorage<
                             $crate::__pgrx_c_macros::CUnsignedInt,
-                            $crate::Oid
+                            $crate::__pgrx_c_bindings::Oid
                         > as $crate::__pgrx_c_macros::expression::CType
                     >::into_storage(
                         $crate::__pgrx_c_macros::expression::implicit::<
                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                 $crate::__pgrx_c_macros::CUnsignedInt,
-                                $crate::Oid
+                                $crate::__pgrx_c_bindings::Oid
                             >,
                             _
                         >(
@@ -1975,13 +2070,13 @@ macro_rules! relpathperm {
                     <
                         $crate::__pgrx_c_macros::expression::CIntegerStorage<
                             $crate::__pgrx_c_macros::CUnsignedInt,
-                            $crate::Oid
+                            $crate::__pgrx_c_bindings::Oid
                         > as $crate::__pgrx_c_macros::expression::CType
                     >::into_storage(
                         $crate::__pgrx_c_macros::expression::implicit::<
                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                 $crate::__pgrx_c_macros::CUnsignedInt,
-                                $crate::Oid
+                                $crate::__pgrx_c_bindings::Oid
                             >,
                             _
                         >(
@@ -2003,7 +2098,7 @@ macro_rules! relpathperm {
                         >(
                             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                 $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                    $crate::INVALID_PROC_NUMBER as i32
+                                    $crate::__pgrx_c_bindings::INVALID_PROC_NUMBER as i32
                                 )
                             )
                         )
@@ -2069,17 +2164,17 @@ macro_rules! relpathperm {
                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                 > as $crate::__pgrx_c_macros::expression::CType
                             >::from_storage(
-                                $crate::__pgrx_c_generated::Inline_544695115086391e30aeaac9adc82cbd(
+                                $crate::__pgrx_c_generated::Inline_deb463a3686381c51dea3d6705de7b94(
                                     <
                                         $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                             $crate::__pgrx_c_macros::CUnsignedInt,
-                                            $crate::Oid
+                                            $crate::__pgrx_c_bindings::Oid
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::into_storage(
                                         $crate::__pgrx_c_macros::expression::implicit::<
                                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                 $crate::__pgrx_c_macros::CUnsignedInt,
-                                                $crate::Oid
+                                                $crate::__pgrx_c_bindings::Oid
                                             >,
                                             _
                                         >(
@@ -2107,13 +2202,13 @@ macro_rules! relpathperm {
                                     <
                                         $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                             $crate::__pgrx_c_macros::CUnsignedInt,
-                                            $crate::Oid
+                                            $crate::__pgrx_c_bindings::Oid
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::into_storage(
                                         $crate::__pgrx_c_macros::expression::implicit::<
                                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                 $crate::__pgrx_c_macros::CUnsignedInt,
-                                                $crate::Oid
+                                                $crate::__pgrx_c_bindings::Oid
                                             >,
                                             _
                                         >(
@@ -2141,13 +2236,13 @@ macro_rules! relpathperm {
                                     <
                                         $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                             $crate::__pgrx_c_macros::CUnsignedInt,
-                                            $crate::Oid
+                                            $crate::__pgrx_c_bindings::Oid
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::into_storage(
                                         $crate::__pgrx_c_macros::expression::implicit::<
                                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                 $crate::__pgrx_c_macros::CUnsignedInt,
-                                                $crate::Oid
+                                                $crate::__pgrx_c_bindings::Oid
                                             >,
                                             _
                                         >(
@@ -2185,7 +2280,9 @@ macro_rules! relpathperm {
                                             >(
                                                 $crate::__pgrx_c_macros::CValue::<
                                                     $crate::__pgrx_c_macros::CInt
-                                                >::new($crate::INVALID_PROC_NUMBER as i32)
+                                                >::new(
+                                                    $crate::__pgrx_c_bindings::INVALID_PROC_NUMBER as i32
+                                                )
                                             )
                                         )
                                     ),
@@ -2236,17 +2333,17 @@ macro_rules! relpathperm {
                         $crate::__pgrx_c_macros::expression::ReadWrite
                     > as $crate::__pgrx_c_macros::expression::CType
                 >::from_storage(
-                    $crate::__pgrx_c_generated::Inline_544695115086391e30aeaac9adc82cbd(
+                    $crate::__pgrx_c_generated::Inline_deb463a3686381c51dea3d6705de7b94(
                         <
                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                 $crate::__pgrx_c_macros::CUnsignedInt,
-                                $crate::Oid
+                                $crate::__pgrx_c_bindings::Oid
                             > as $crate::__pgrx_c_macros::expression::CType
                         >::into_storage(
                             $crate::__pgrx_c_macros::expression::implicit::<
                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                     $crate::__pgrx_c_macros::CUnsignedInt,
-                                    $crate::Oid
+                                    $crate::__pgrx_c_bindings::Oid
                                 >,
                                 _
                             >(
@@ -2264,13 +2361,13 @@ macro_rules! relpathperm {
                         <
                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                 $crate::__pgrx_c_macros::CUnsignedInt,
-                                $crate::Oid
+                                $crate::__pgrx_c_bindings::Oid
                             > as $crate::__pgrx_c_macros::expression::CType
                         >::into_storage(
                             $crate::__pgrx_c_macros::expression::implicit::<
                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                     $crate::__pgrx_c_macros::CUnsignedInt,
-                                    $crate::Oid
+                                    $crate::__pgrx_c_bindings::Oid
                                 >,
                                 _
                             >(
@@ -2288,13 +2385,13 @@ macro_rules! relpathperm {
                         <
                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                 $crate::__pgrx_c_macros::CUnsignedInt,
-                                $crate::Oid
+                                $crate::__pgrx_c_bindings::Oid
                             > as $crate::__pgrx_c_macros::expression::CType
                         >::into_storage(
                             $crate::__pgrx_c_macros::expression::implicit::<
                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                     $crate::__pgrx_c_macros::CUnsignedInt,
-                                    $crate::Oid
+                                    $crate::__pgrx_c_bindings::Oid
                                 >,
                                 _
                             >(
@@ -2318,7 +2415,7 @@ macro_rules! relpathperm {
                             >(
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                        $crate::INVALID_PROC_NUMBER as i32
+                                        $crate::__pgrx_c_bindings::INVALID_PROC_NUMBER as i32
                                     )
                                 )
                             )

@@ -2,6 +2,9 @@
 /* LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file. */
 #include <stdio.h>
 #include <string.h>
+/* Separate function executions retain defined C sequencing for repeated operands. */
+static unsigned int inline_evaluations;
+static unsigned int inline_next(void) { return ++inline_evaluations; }
 int main(void)
 {
     int value = 9;
@@ -28,10 +31,9 @@ int main(void)
     printf("void_pointer\t%d\t%u\n", void_pointer, inline_oracle_count());
     unsigned int nested = INLINE_NESTED(65537u);
     printf("nested\t%u\t%u\n", nested, inline_oracle_count());
-    unsigned int evaluations = 0;
-    unsigned int repeat = INLINE_REPEAT(++evaluations);
-    printf("repeat\t%u\t%u\t%u\n", repeat, evaluations, inline_oracle_count());
-    int lazy = INLINE_LAZY(0, ++evaluations);
+    unsigned int repeat = INLINE_REPEAT(inline_next());
+    printf("repeat\t%u\t%u\t%u\n", repeat, inline_evaluations, inline_oracle_count());
+    int lazy = INLINE_LAZY(0, inline_next());
     printf("lazy\t%d\t%u\n", lazy, inline_oracle_count());
     NativeWord word = (NativeWord)(void *)&value;
     NativeWord returned = INLINE_WORD(word);

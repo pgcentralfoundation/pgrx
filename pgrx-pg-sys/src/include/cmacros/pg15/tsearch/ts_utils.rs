@@ -5,8 +5,8 @@ This code is generated for documentation purposes, so that it is easy to referen
 // C macros from ts_utils.h.
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -33,20 +33,24 @@ macro_rules! __pgrx_c_args_DatumGetTSQuerySign {
         $crate::__pgrx_c_args_DatumGetTSQuerySign!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_DatumGetTSQuerySign!(@p1 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_DatumGetTSQuerySign!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_DatumGetTSQuerySign!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_DatumGetTSQuerySign!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_DatumGetTSQuerySign!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_DatumGetTSQuerySign!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -54,7 +58,9 @@ macro_rules! __pgrx_c_args_DatumGetTSQuerySign {
         $crate::__pgrx_c_args_DatumGetTSQuerySign!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_DatumGetTSQuerySign!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_DatumGetTSQuerySign!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -76,14 +82,18 @@ macro_rules! __pgrx_c_args_DatumGetTSQuerySign {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_DatumGetTSQuerySign!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_DatumGetTSQuerySign!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_DatumGetTSQuerySign!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_DatumGetTSQuerySign!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_DatumGetTSQuerySign!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -110,13 +120,13 @@ macro_rules! __pgrx_c_args_DatumGetTSQuerySign {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_DatumGetTSQuerySign!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_DatumGetTSQuerySign!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -163,14 +173,14 @@ macro_rules! DatumGetTSQuerySign {
         (
             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::cast_as::<
-                    $crate::TSQuerySign,
+                    $crate::__pgrx_c_bindings::TSQuerySign,
                     $crate::__pgrx_c_macros::CUnsignedLong,
                     _
                 >(
                     (
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::cast_as::<
-                                $crate::int64,
+                                $crate::__pgrx_c_bindings::int64,
                                 $crate::__pgrx_c_macros::CLong,
                                 _
                             >(
@@ -214,14 +224,14 @@ macro_rules! DatumGetTSQuerySign {
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::cast_as::<
-                                $crate::TSQuerySign,
+                                $crate::__pgrx_c_bindings::TSQuerySign,
                                 $crate::__pgrx_c_macros::CUnsignedLong,
                                 _
                             >(
                                 (
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::expression::cast_as::<
-                                            $crate::int64,
+                                            $crate::__pgrx_c_bindings::int64,
                                             $crate::__pgrx_c_macros::CLong,
                                             _
                                         >(
@@ -251,14 +261,14 @@ macro_rules! DatumGetTSQuerySign {
         {
             let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::cast_as::<
-                    $crate::TSQuerySign,
+                    $crate::__pgrx_c_bindings::TSQuerySign,
                     $crate::__pgrx_c_macros::CUnsignedLong,
                     _
                 >(
                     (
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::cast_as::<
-                                $crate::int64,
+                                $crate::__pgrx_c_bindings::int64,
                                 $crate::__pgrx_c_macros::CLong,
                                 _
                             >(
@@ -283,8 +293,8 @@ macro_rules! DatumGetTSQuerySign {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -311,25 +321,34 @@ macro_rules! __pgrx_c_args_ISOPERATOR {
         $crate::__pgrx_c_args_ISOPERATOR!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_ISOPERATOR!(@p1 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_ISOPERATOR!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_ISOPERATOR!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_ISOPERATOR!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_ISOPERATOR!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_ISOPERATOR!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_ISOPERATOR!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $($raw:tt)*) => {
         $crate::__pgrx_c_args_ISOPERATOR!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_ISOPERATOR!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_ISOPERATOR!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -351,13 +370,20 @@ macro_rules! __pgrx_c_args_ISOPERATOR {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_ISOPERATOR!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_ISOPERATOR!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_ISOPERATOR!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_ISOPERATOR!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
-        $crate::__pgrx_c_args_ISOPERATOR!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_ISOPERATOR!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
         $crate::__pgrx_c_classify!(
@@ -379,10 +405,16 @@ macro_rules! __pgrx_c_args_ISOPERATOR {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_ISOPERATOR!(@p1 $mode [$($done)* (@literal [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_ISOPERATOR!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+            $($rest)*
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_ISOPERATOR!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_ISOPERATOR!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p1 $mode:ident [$($done:tt)*];) => {
         $crate::ISOPERATOR!(@$mode; $($done)*)
@@ -1267,8 +1299,8 @@ macro_rules! ISOPERATOR {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -1302,7 +1334,7 @@ macro_rules! __pgrx_c_args_PG_GETARG_TSQUERYSIGN {
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_PG_GETARG_TSQUERYSIGN!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -1311,7 +1343,7 @@ macro_rules! __pgrx_c_args_PG_GETARG_TSQUERYSIGN {
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_PG_GETARG_TSQUERYSIGN!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -1338,33 +1370,35 @@ macro_rules! __pgrx_c_args_PG_GETARG_TSQUERYSIGN {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_PG_GETARG_TSQUERYSIGN!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:tt, $($rest:tt)*) => {
         $crate::__pgrx_c_args_PG_GETARG_TSQUERYSIGN!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $argument:literal) => {
         $crate::__pgrx_c_args_PG_GETARG_TSQUERYSIGN!(
-            @p2 $mode [$($done)* (@literal [- $argument]),];
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
         )
     };
     (@negative1 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_PG_GETARG_TSQUERYSIGN!(@p2 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_PG_GETARG_TSQUERYSIGN!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_PG_GETARG_TSQUERYSIGN!(
-            @p2 $mode [$($done)* (@literal [- $argument]),];
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_PG_GETARG_TSQUERYSIGN!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -1372,7 +1406,9 @@ macro_rules! __pgrx_c_args_PG_GETARG_TSQUERYSIGN {
         $crate::__pgrx_c_args_PG_GETARG_TSQUERYSIGN!(@negative1 $mode [$($done)*]; - $($raw)*)
     };
     (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_PG_GETARG_TSQUERYSIGN!(@p2 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_PG_GETARG_TSQUERYSIGN!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -1394,14 +1430,18 @@ macro_rules! __pgrx_c_args_PG_GETARG_TSQUERYSIGN {
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_PG_GETARG_TSQUERYSIGN!(@p2 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_PG_GETARG_TSQUERYSIGN!(
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_PG_GETARG_TSQUERYSIGN!(@p2 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_PG_GETARG_TSQUERYSIGN!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_PG_GETARG_TSQUERYSIGN!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -1428,13 +1468,13 @@ macro_rules! __pgrx_c_args_PG_GETARG_TSQUERYSIGN {
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_PG_GETARG_TSQUERYSIGN!(
-            @p2 $mode [$($done)* (@literal [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_PG_GETARG_TSQUERYSIGN!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -2320,8 +2360,8 @@ macro_rules! PG_GETARG_TSQUERYSIGN {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -2352,21 +2392,23 @@ macro_rules! __pgrx_c_args_PG_RETURN_TSQUERYSIGN {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
         $crate::__pgrx_c_args_PG_RETURN_TSQUERYSIGN!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_PG_RETURN_TSQUERYSIGN!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_PG_RETURN_TSQUERYSIGN!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_PG_RETURN_TSQUERYSIGN!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_PG_RETURN_TSQUERYSIGN!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -2374,7 +2416,9 @@ macro_rules! __pgrx_c_args_PG_RETURN_TSQUERYSIGN {
         $crate::__pgrx_c_args_PG_RETURN_TSQUERYSIGN!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_PG_RETURN_TSQUERYSIGN!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_PG_RETURN_TSQUERYSIGN!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -2396,14 +2440,18 @@ macro_rules! __pgrx_c_args_PG_RETURN_TSQUERYSIGN {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_PG_RETURN_TSQUERYSIGN!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_PG_RETURN_TSQUERYSIGN!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_PG_RETURN_TSQUERYSIGN!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_PG_RETURN_TSQUERYSIGN!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_PG_RETURN_TSQUERYSIGN!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -2430,13 +2478,13 @@ macro_rules! __pgrx_c_args_PG_RETURN_TSQUERYSIGN {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_PG_RETURN_TSQUERYSIGN!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_PG_RETURN_TSQUERYSIGN!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -2492,7 +2540,7 @@ macro_rules! PG_RETURN_TSQUERYSIGN {
                             (
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::cast_as::<
-                                        $crate::int64,
+                                        $crate::__pgrx_c_bindings::int64,
                                         $crate::__pgrx_c_macros::CLong,
                                         _
                                     >(
@@ -2531,7 +2579,7 @@ macro_rules! PG_RETURN_TSQUERYSIGN {
                             (
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::cast_as::<
-                                        $crate::int64,
+                                        $crate::__pgrx_c_bindings::int64,
                                         $crate::__pgrx_c_macros::CLong,
                                         _
                                     >(
@@ -2565,8 +2613,8 @@ macro_rules! PG_RETURN_TSQUERYSIGN {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -2593,20 +2641,24 @@ macro_rules! __pgrx_c_args_TSQuerySignGetDatum {
         $crate::__pgrx_c_args_TSQuerySignGetDatum!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_TSQuerySignGetDatum!(@p1 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_TSQuerySignGetDatum!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_TSQuerySignGetDatum!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_TSQuerySignGetDatum!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_TSQuerySignGetDatum!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_TSQuerySignGetDatum!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -2614,7 +2666,9 @@ macro_rules! __pgrx_c_args_TSQuerySignGetDatum {
         $crate::__pgrx_c_args_TSQuerySignGetDatum!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_TSQuerySignGetDatum!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_TSQuerySignGetDatum!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -2636,14 +2690,18 @@ macro_rules! __pgrx_c_args_TSQuerySignGetDatum {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_TSQuerySignGetDatum!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_TSQuerySignGetDatum!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_TSQuerySignGetDatum!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_TSQuerySignGetDatum!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_TSQuerySignGetDatum!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -2670,13 +2728,13 @@ macro_rules! __pgrx_c_args_TSQuerySignGetDatum {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_TSQuerySignGetDatum!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_TSQuerySignGetDatum!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -2725,7 +2783,7 @@ macro_rules! TSQuerySignGetDatum {
                 @compiled [
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::expression::cast_as::<
-                            $crate::int64,
+                            $crate::__pgrx_c_bindings::int64,
                             $crate::__pgrx_c_macros::CLong,
                             _
                         >(
@@ -2750,7 +2808,7 @@ macro_rules! TSQuerySignGetDatum {
                                 unsafe {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::expression::cast_as::<
-                                            $crate::int64,
+                                            $crate::__pgrx_c_bindings::int64,
                                             $crate::__pgrx_c_macros::CLong,
                                             _
                                         >(
@@ -2782,7 +2840,7 @@ macro_rules! TSQuerySignGetDatum {
                 @compiled [
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::expression::cast_as::<
-                            $crate::int64,
+                            $crate::__pgrx_c_bindings::int64,
                             $crate::__pgrx_c_macros::CLong,
                             _
                         >(
@@ -2807,7 +2865,7 @@ macro_rules! TSQuerySignGetDatum {
                                 unsafe {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::expression::cast_as::<
-                                            $crate::int64,
+                                            $crate::__pgrx_c_bindings::int64,
                                             $crate::__pgrx_c_macros::CLong,
                                             _
                                         >(
@@ -2839,7 +2897,7 @@ macro_rules! TSQuerySignGetDatum {
                 @compiled [
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::expression::cast_as::<
-                            $crate::int64,
+                            $crate::__pgrx_c_bindings::int64,
                             $crate::__pgrx_c_macros::CLong,
                             _
                         >(
@@ -2864,7 +2922,7 @@ macro_rules! TSQuerySignGetDatum {
                                 unsafe {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::expression::cast_as::<
-                                            $crate::int64,
+                                            $crate::__pgrx_c_bindings::int64,
                                             $crate::__pgrx_c_macros::CLong,
                                             _
                                         >(
@@ -2896,7 +2954,7 @@ macro_rules! TSQuerySignGetDatum {
                 @compiled [
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::expression::cast_as::<
-                            $crate::int64,
+                            $crate::__pgrx_c_bindings::int64,
                             $crate::__pgrx_c_macros::CLong,
                             _
                         >(
@@ -2921,7 +2979,7 @@ macro_rules! TSQuerySignGetDatum {
                                 unsafe {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::expression::cast_as::<
-                                            $crate::int64,
+                                            $crate::__pgrx_c_bindings::int64,
                                             $crate::__pgrx_c_macros::CLong,
                                             _
                                         >(
@@ -2953,7 +3011,7 @@ macro_rules! TSQuerySignGetDatum {
                 @compiled [
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::expression::cast_as::<
-                            $crate::int64,
+                            $crate::__pgrx_c_bindings::int64,
                             $crate::__pgrx_c_macros::CLong,
                             _
                         >(
@@ -2978,7 +3036,7 @@ macro_rules! TSQuerySignGetDatum {
                                 unsafe {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::expression::cast_as::<
-                                            $crate::int64,
+                                            $crate::__pgrx_c_bindings::int64,
                                             $crate::__pgrx_c_macros::CLong,
                                             _
                                         >(

@@ -5,8 +5,8 @@ This code is generated for documentation purposes, so that it is easy to referen
 // C macros from syscache.h.
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -37,13 +37,13 @@ macro_rules! __pgrx_c_args_GetSysCacheHashValue1 {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GetSysCacheHashValue1!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GetSysCacheHashValue1!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -52,7 +52,7 @@ macro_rules! __pgrx_c_args_GetSysCacheHashValue1 {
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_GetSysCacheHashValue1!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -79,33 +79,35 @@ macro_rules! __pgrx_c_args_GetSysCacheHashValue1 {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GetSysCacheHashValue1!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GetSysCacheHashValue1!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $argument:literal) => {
         $crate::__pgrx_c_args_GetSysCacheHashValue1!(
-            @p2 $mode [$($done)* (@literal [- $argument]),];
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
         )
     };
     (@negative1 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_GetSysCacheHashValue1!(@p2 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_GetSysCacheHashValue1!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GetSysCacheHashValue1!(
-            @p2 $mode [$($done)* (@literal [- $argument]),];
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GetSysCacheHashValue1!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -113,7 +115,9 @@ macro_rules! __pgrx_c_args_GetSysCacheHashValue1 {
         $crate::__pgrx_c_args_GetSysCacheHashValue1!(@negative1 $mode [$($done)*]; - $($raw)*)
     };
     (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_GetSysCacheHashValue1!(@p2 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_GetSysCacheHashValue1!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -135,14 +139,18 @@ macro_rules! __pgrx_c_args_GetSysCacheHashValue1 {
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_GetSysCacheHashValue1!(@p2 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_GetSysCacheHashValue1!(
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_GetSysCacheHashValue1!(@p2 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_GetSysCacheHashValue1!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_GetSysCacheHashValue1!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -169,13 +177,13 @@ macro_rules! __pgrx_c_args_GetSysCacheHashValue1 {
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GetSysCacheHashValue1!(
-            @p2 $mode [$($done)* (@literal [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GetSysCacheHashValue1!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -222,7 +230,7 @@ macro_rules! GetSysCacheHashValue1 {
         /* PGRX: GetSysCacheHashValue1 remains expanded because GetSysCacheHashValue is not an active function-like macro. */
         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
             <$crate::__pgrx_c_macros::CUnsignedInt as $crate::__pgrx_c_macros::expression::CType>::from_storage(
-                $crate::__pgrx_c_generated::Inline_ad070c2797e190b41bab2c6ad3e0d8a8(
+                $crate::__pgrx_c_generated::Inline_dc9150b43a9a706eed085de88ac34f88(
                     <
                         $crate::__pgrx_c_macros::expression::CEnumObject<
                             $crate::__pgrx_c_generated::EnumIdentity_e5adb9dcdce4e5857db2c1cb072bba4b4ec4ff23cb7ac50512160522ccfc3354,
@@ -245,14 +253,14 @@ macro_rules! GetSysCacheHashValue1 {
                     ),
                     <
                         $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                            $crate::__pgrx_c_macros::CUnsignedLongLong,
-                            $crate::Datum
+                            $crate::__pgrx_c_macros::CUnsignedLong,
+                            $crate::__pgrx_c_bindings::Datum
                         > as $crate::__pgrx_c_macros::expression::CType
                     >::into_storage(
                         $crate::__pgrx_c_macros::expression::implicit::<
                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                $crate::Datum
+                                $crate::__pgrx_c_macros::CUnsignedLong,
+                                $crate::__pgrx_c_bindings::Datum
                             >,
                             _
                         >(
@@ -263,14 +271,14 @@ macro_rules! GetSysCacheHashValue1 {
                     ),
                     <
                         $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                            $crate::__pgrx_c_macros::CUnsignedLongLong,
-                            $crate::Datum
+                            $crate::__pgrx_c_macros::CUnsignedLong,
+                            $crate::__pgrx_c_bindings::Datum
                         > as $crate::__pgrx_c_macros::expression::CType
                     >::into_storage(
                         $crate::__pgrx_c_macros::expression::implicit::<
                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                $crate::Datum
+                                $crate::__pgrx_c_macros::CUnsignedLong,
+                                $crate::__pgrx_c_bindings::Datum
                             >,
                             _
                         >(
@@ -285,14 +293,14 @@ macro_rules! GetSysCacheHashValue1 {
                     ),
                     <
                         $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                            $crate::__pgrx_c_macros::CUnsignedLongLong,
-                            $crate::Datum
+                            $crate::__pgrx_c_macros::CUnsignedLong,
+                            $crate::__pgrx_c_bindings::Datum
                         > as $crate::__pgrx_c_macros::expression::CType
                     >::into_storage(
                         $crate::__pgrx_c_macros::expression::implicit::<
                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                $crate::Datum
+                                $crate::__pgrx_c_macros::CUnsignedLong,
+                                $crate::__pgrx_c_bindings::Datum
                             >,
                             _
                         >(
@@ -307,14 +315,14 @@ macro_rules! GetSysCacheHashValue1 {
                     ),
                     <
                         $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                            $crate::__pgrx_c_macros::CUnsignedLongLong,
-                            $crate::Datum
+                            $crate::__pgrx_c_macros::CUnsignedLong,
+                            $crate::__pgrx_c_bindings::Datum
                         > as $crate::__pgrx_c_macros::expression::CType
                     >::into_storage(
                         $crate::__pgrx_c_macros::expression::implicit::<
                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                $crate::Datum
+                                $crate::__pgrx_c_macros::CUnsignedLong,
+                                $crate::__pgrx_c_bindings::Datum
                             >,
                             _
                         >(
@@ -362,7 +370,7 @@ macro_rules! GetSysCacheHashValue1 {
                             <
                                 $crate::__pgrx_c_macros::CUnsignedInt as $crate::__pgrx_c_macros::expression::CType
                             >::from_storage(
-                                $crate::__pgrx_c_generated::Inline_ad070c2797e190b41bab2c6ad3e0d8a8(
+                                $crate::__pgrx_c_generated::Inline_dc9150b43a9a706eed085de88ac34f88(
                                     <
                                         $crate::__pgrx_c_macros::expression::CEnumObject<
                                             $crate::__pgrx_c_generated::EnumIdentity_e5adb9dcdce4e5857db2c1cb072bba4b4ec4ff23cb7ac50512160522ccfc3354,
@@ -386,14 +394,14 @@ macro_rules! GetSysCacheHashValue1 {
                                     ),
                                     <
                                         $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                            $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                            $crate::Datum
+                                            $crate::__pgrx_c_macros::CUnsignedLong,
+                                            $crate::__pgrx_c_bindings::Datum
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::into_storage(
                                         $crate::__pgrx_c_macros::expression::implicit::<
                                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                                $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                                $crate::Datum
+                                                $crate::__pgrx_c_macros::CUnsignedLong,
+                                                $crate::__pgrx_c_bindings::Datum
                                             >,
                                             _
                                         >(
@@ -405,14 +413,14 @@ macro_rules! GetSysCacheHashValue1 {
                                     ),
                                     <
                                         $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                            $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                            $crate::Datum
+                                            $crate::__pgrx_c_macros::CUnsignedLong,
+                                            $crate::__pgrx_c_bindings::Datum
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::into_storage(
                                         $crate::__pgrx_c_macros::expression::implicit::<
                                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                                $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                                $crate::Datum
+                                                $crate::__pgrx_c_macros::CUnsignedLong,
+                                                $crate::__pgrx_c_bindings::Datum
                                             >,
                                             _
                                         >(
@@ -430,14 +438,14 @@ macro_rules! GetSysCacheHashValue1 {
                                     ),
                                     <
                                         $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                            $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                            $crate::Datum
+                                            $crate::__pgrx_c_macros::CUnsignedLong,
+                                            $crate::__pgrx_c_bindings::Datum
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::into_storage(
                                         $crate::__pgrx_c_macros::expression::implicit::<
                                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                                $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                                $crate::Datum
+                                                $crate::__pgrx_c_macros::CUnsignedLong,
+                                                $crate::__pgrx_c_bindings::Datum
                                             >,
                                             _
                                         >(
@@ -455,14 +463,14 @@ macro_rules! GetSysCacheHashValue1 {
                                     ),
                                     <
                                         $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                            $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                            $crate::Datum
+                                            $crate::__pgrx_c_macros::CUnsignedLong,
+                                            $crate::__pgrx_c_bindings::Datum
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::into_storage(
                                         $crate::__pgrx_c_macros::expression::implicit::<
                                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                                $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                                $crate::Datum
+                                                $crate::__pgrx_c_macros::CUnsignedLong,
+                                                $crate::__pgrx_c_bindings::Datum
                                             >,
                                             _
                                         >(
@@ -498,7 +506,7 @@ macro_rules! GetSysCacheHashValue1 {
                 <
                     $crate::__pgrx_c_macros::CUnsignedInt as $crate::__pgrx_c_macros::expression::CType
                 >::from_storage(
-                    $crate::__pgrx_c_generated::Inline_ad070c2797e190b41bab2c6ad3e0d8a8(
+                    $crate::__pgrx_c_generated::Inline_dc9150b43a9a706eed085de88ac34f88(
                         <
                             $crate::__pgrx_c_macros::expression::CEnumObject<
                                 $crate::__pgrx_c_generated::EnumIdentity_e5adb9dcdce4e5857db2c1cb072bba4b4ec4ff23cb7ac50512160522ccfc3354,
@@ -521,14 +529,14 @@ macro_rules! GetSysCacheHashValue1 {
                         ),
                         <
                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                $crate::Datum
+                                $crate::__pgrx_c_macros::CUnsignedLong,
+                                $crate::__pgrx_c_bindings::Datum
                             > as $crate::__pgrx_c_macros::expression::CType
                         >::into_storage(
                             $crate::__pgrx_c_macros::expression::implicit::<
                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                    $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                    $crate::Datum
+                                    $crate::__pgrx_c_macros::CUnsignedLong,
+                                    $crate::__pgrx_c_bindings::Datum
                                 >,
                                 _
                             >(
@@ -539,14 +547,14 @@ macro_rules! GetSysCacheHashValue1 {
                         ),
                         <
                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                $crate::Datum
+                                $crate::__pgrx_c_macros::CUnsignedLong,
+                                $crate::__pgrx_c_bindings::Datum
                             > as $crate::__pgrx_c_macros::expression::CType
                         >::into_storage(
                             $crate::__pgrx_c_macros::expression::implicit::<
                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                    $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                    $crate::Datum
+                                    $crate::__pgrx_c_macros::CUnsignedLong,
+                                    $crate::__pgrx_c_bindings::Datum
                                 >,
                                 _
                             >(
@@ -561,14 +569,14 @@ macro_rules! GetSysCacheHashValue1 {
                         ),
                         <
                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                $crate::Datum
+                                $crate::__pgrx_c_macros::CUnsignedLong,
+                                $crate::__pgrx_c_bindings::Datum
                             > as $crate::__pgrx_c_macros::expression::CType
                         >::into_storage(
                             $crate::__pgrx_c_macros::expression::implicit::<
                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                    $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                    $crate::Datum
+                                    $crate::__pgrx_c_macros::CUnsignedLong,
+                                    $crate::__pgrx_c_bindings::Datum
                                 >,
                                 _
                             >(
@@ -583,14 +591,14 @@ macro_rules! GetSysCacheHashValue1 {
                         ),
                         <
                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                $crate::Datum
+                                $crate::__pgrx_c_macros::CUnsignedLong,
+                                $crate::__pgrx_c_bindings::Datum
                             > as $crate::__pgrx_c_macros::expression::CType
                         >::into_storage(
                             $crate::__pgrx_c_macros::expression::implicit::<
                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                    $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                    $crate::Datum
+                                    $crate::__pgrx_c_macros::CUnsignedLong,
+                                    $crate::__pgrx_c_bindings::Datum
                                 >,
                                 _
                             >(
@@ -617,8 +625,8 @@ macro_rules! GetSysCacheHashValue1 {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -649,13 +657,13 @@ macro_rules! __pgrx_c_args_GetSysCacheHashValue2 {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GetSysCacheHashValue2!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GetSysCacheHashValue2!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -664,7 +672,7 @@ macro_rules! __pgrx_c_args_GetSysCacheHashValue2 {
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_GetSysCacheHashValue2!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -691,25 +699,25 @@ macro_rules! __pgrx_c_args_GetSysCacheHashValue2 {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GetSysCacheHashValue2!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GetSysCacheHashValue2!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GetSysCacheHashValue2!(
-            @p2 $mode [$($done)* (@literal [- $argument]),];
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GetSysCacheHashValue2!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -718,7 +726,7 @@ macro_rules! __pgrx_c_args_GetSysCacheHashValue2 {
     };
     (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_GetSysCacheHashValue2!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -745,33 +753,35 @@ macro_rules! __pgrx_c_args_GetSysCacheHashValue2 {
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GetSysCacheHashValue2!(
-            @p2 $mode [$($done)* (@literal [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GetSysCacheHashValue2!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
     (@p2 $mode:ident [$($done:tt)*]; - $argument:literal) => {
         $crate::__pgrx_c_args_GetSysCacheHashValue2!(
-            @p3 $mode [$($done)* (@literal [- $argument]),];
+            @p3 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
         )
     };
     (@negative2 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_GetSysCacheHashValue2!(@p3 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_GetSysCacheHashValue2!(
+            @p3 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p2 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GetSysCacheHashValue2!(
-            @p3 $mode [$($done)* (@literal [- $argument]),];
+            @p3 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative2 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GetSysCacheHashValue2!(
-            @p3 $mode [$($done)* (@native [$argument]),];
+            @p3 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -779,7 +789,9 @@ macro_rules! __pgrx_c_args_GetSysCacheHashValue2 {
         $crate::__pgrx_c_args_GetSysCacheHashValue2!(@negative2 $mode [$($done)*]; - $($raw)*)
     };
     (@p2 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_GetSysCacheHashValue2!(@p3 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_GetSysCacheHashValue2!(
+            @p3 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p2 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -801,14 +813,18 @@ macro_rules! __pgrx_c_args_GetSysCacheHashValue2 {
         )
     };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_GetSysCacheHashValue2!(@p3 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_GetSysCacheHashValue2!(
+            @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p2 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_GetSysCacheHashValue2!(@p3 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_GetSysCacheHashValue2!(
+            @p3 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p2 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_GetSysCacheHashValue2!(
-            @p3 $mode [$($done)* (@native [$argument]),];
+            @p3 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -835,13 +851,13 @@ macro_rules! __pgrx_c_args_GetSysCacheHashValue2 {
     };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GetSysCacheHashValue2!(
-            @p3 $mode [$($done)* (@literal [$argument]),];
+            @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p2 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GetSysCacheHashValue2!(
-            @p3 $mode [$($done)* (@native [$argument]),];
+            @p3 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -889,7 +905,7 @@ macro_rules! GetSysCacheHashValue2 {
         /* PGRX: GetSysCacheHashValue2 remains expanded because GetSysCacheHashValue is not an active function-like macro. */
         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
             <$crate::__pgrx_c_macros::CUnsignedInt as $crate::__pgrx_c_macros::expression::CType>::from_storage(
-                $crate::__pgrx_c_generated::Inline_ad070c2797e190b41bab2c6ad3e0d8a8(
+                $crate::__pgrx_c_generated::Inline_dc9150b43a9a706eed085de88ac34f88(
                     <
                         $crate::__pgrx_c_macros::expression::CEnumObject<
                             $crate::__pgrx_c_generated::EnumIdentity_e5adb9dcdce4e5857db2c1cb072bba4b4ec4ff23cb7ac50512160522ccfc3354,
@@ -912,14 +928,14 @@ macro_rules! GetSysCacheHashValue2 {
                     ),
                     <
                         $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                            $crate::__pgrx_c_macros::CUnsignedLongLong,
-                            $crate::Datum
+                            $crate::__pgrx_c_macros::CUnsignedLong,
+                            $crate::__pgrx_c_bindings::Datum
                         > as $crate::__pgrx_c_macros::expression::CType
                     >::into_storage(
                         $crate::__pgrx_c_macros::expression::implicit::<
                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                $crate::Datum
+                                $crate::__pgrx_c_macros::CUnsignedLong,
+                                $crate::__pgrx_c_bindings::Datum
                             >,
                             _
                         >(
@@ -930,14 +946,14 @@ macro_rules! GetSysCacheHashValue2 {
                     ),
                     <
                         $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                            $crate::__pgrx_c_macros::CUnsignedLongLong,
-                            $crate::Datum
+                            $crate::__pgrx_c_macros::CUnsignedLong,
+                            $crate::__pgrx_c_bindings::Datum
                         > as $crate::__pgrx_c_macros::expression::CType
                     >::into_storage(
                         $crate::__pgrx_c_macros::expression::implicit::<
                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                $crate::Datum
+                                $crate::__pgrx_c_macros::CUnsignedLong,
+                                $crate::__pgrx_c_bindings::Datum
                             >,
                             _
                         >(
@@ -948,14 +964,14 @@ macro_rules! GetSysCacheHashValue2 {
                     ),
                     <
                         $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                            $crate::__pgrx_c_macros::CUnsignedLongLong,
-                            $crate::Datum
+                            $crate::__pgrx_c_macros::CUnsignedLong,
+                            $crate::__pgrx_c_bindings::Datum
                         > as $crate::__pgrx_c_macros::expression::CType
                     >::into_storage(
                         $crate::__pgrx_c_macros::expression::implicit::<
                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                $crate::Datum
+                                $crate::__pgrx_c_macros::CUnsignedLong,
+                                $crate::__pgrx_c_bindings::Datum
                             >,
                             _
                         >(
@@ -970,14 +986,14 @@ macro_rules! GetSysCacheHashValue2 {
                     ),
                     <
                         $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                            $crate::__pgrx_c_macros::CUnsignedLongLong,
-                            $crate::Datum
+                            $crate::__pgrx_c_macros::CUnsignedLong,
+                            $crate::__pgrx_c_bindings::Datum
                         > as $crate::__pgrx_c_macros::expression::CType
                     >::into_storage(
                         $crate::__pgrx_c_macros::expression::implicit::<
                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                $crate::Datum
+                                $crate::__pgrx_c_macros::CUnsignedLong,
+                                $crate::__pgrx_c_bindings::Datum
                             >,
                             _
                         >(
@@ -1026,7 +1042,7 @@ macro_rules! GetSysCacheHashValue2 {
                             <
                                 $crate::__pgrx_c_macros::CUnsignedInt as $crate::__pgrx_c_macros::expression::CType
                             >::from_storage(
-                                $crate::__pgrx_c_generated::Inline_ad070c2797e190b41bab2c6ad3e0d8a8(
+                                $crate::__pgrx_c_generated::Inline_dc9150b43a9a706eed085de88ac34f88(
                                     <
                                         $crate::__pgrx_c_macros::expression::CEnumObject<
                                             $crate::__pgrx_c_generated::EnumIdentity_e5adb9dcdce4e5857db2c1cb072bba4b4ec4ff23cb7ac50512160522ccfc3354,
@@ -1050,14 +1066,14 @@ macro_rules! GetSysCacheHashValue2 {
                                     ),
                                     <
                                         $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                            $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                            $crate::Datum
+                                            $crate::__pgrx_c_macros::CUnsignedLong,
+                                            $crate::__pgrx_c_bindings::Datum
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::into_storage(
                                         $crate::__pgrx_c_macros::expression::implicit::<
                                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                                $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                                $crate::Datum
+                                                $crate::__pgrx_c_macros::CUnsignedLong,
+                                                $crate::__pgrx_c_bindings::Datum
                                             >,
                                             _
                                         >(
@@ -1069,14 +1085,14 @@ macro_rules! GetSysCacheHashValue2 {
                                     ),
                                     <
                                         $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                            $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                            $crate::Datum
+                                            $crate::__pgrx_c_macros::CUnsignedLong,
+                                            $crate::__pgrx_c_bindings::Datum
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::into_storage(
                                         $crate::__pgrx_c_macros::expression::implicit::<
                                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                                $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                                $crate::Datum
+                                                $crate::__pgrx_c_macros::CUnsignedLong,
+                                                $crate::__pgrx_c_bindings::Datum
                                             >,
                                             _
                                         >(
@@ -1088,14 +1104,14 @@ macro_rules! GetSysCacheHashValue2 {
                                     ),
                                     <
                                         $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                            $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                            $crate::Datum
+                                            $crate::__pgrx_c_macros::CUnsignedLong,
+                                            $crate::__pgrx_c_bindings::Datum
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::into_storage(
                                         $crate::__pgrx_c_macros::expression::implicit::<
                                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                                $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                                $crate::Datum
+                                                $crate::__pgrx_c_macros::CUnsignedLong,
+                                                $crate::__pgrx_c_bindings::Datum
                                             >,
                                             _
                                         >(
@@ -1113,14 +1129,14 @@ macro_rules! GetSysCacheHashValue2 {
                                     ),
                                     <
                                         $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                            $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                            $crate::Datum
+                                            $crate::__pgrx_c_macros::CUnsignedLong,
+                                            $crate::__pgrx_c_bindings::Datum
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::into_storage(
                                         $crate::__pgrx_c_macros::expression::implicit::<
                                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                                $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                                $crate::Datum
+                                                $crate::__pgrx_c_macros::CUnsignedLong,
+                                                $crate::__pgrx_c_bindings::Datum
                                             >,
                                             _
                                         >(
@@ -1156,7 +1172,7 @@ macro_rules! GetSysCacheHashValue2 {
                 <
                     $crate::__pgrx_c_macros::CUnsignedInt as $crate::__pgrx_c_macros::expression::CType
                 >::from_storage(
-                    $crate::__pgrx_c_generated::Inline_ad070c2797e190b41bab2c6ad3e0d8a8(
+                    $crate::__pgrx_c_generated::Inline_dc9150b43a9a706eed085de88ac34f88(
                         <
                             $crate::__pgrx_c_macros::expression::CEnumObject<
                                 $crate::__pgrx_c_generated::EnumIdentity_e5adb9dcdce4e5857db2c1cb072bba4b4ec4ff23cb7ac50512160522ccfc3354,
@@ -1179,14 +1195,14 @@ macro_rules! GetSysCacheHashValue2 {
                         ),
                         <
                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                $crate::Datum
+                                $crate::__pgrx_c_macros::CUnsignedLong,
+                                $crate::__pgrx_c_bindings::Datum
                             > as $crate::__pgrx_c_macros::expression::CType
                         >::into_storage(
                             $crate::__pgrx_c_macros::expression::implicit::<
                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                    $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                    $crate::Datum
+                                    $crate::__pgrx_c_macros::CUnsignedLong,
+                                    $crate::__pgrx_c_bindings::Datum
                                 >,
                                 _
                             >(
@@ -1197,14 +1213,14 @@ macro_rules! GetSysCacheHashValue2 {
                         ),
                         <
                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                $crate::Datum
+                                $crate::__pgrx_c_macros::CUnsignedLong,
+                                $crate::__pgrx_c_bindings::Datum
                             > as $crate::__pgrx_c_macros::expression::CType
                         >::into_storage(
                             $crate::__pgrx_c_macros::expression::implicit::<
                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                    $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                    $crate::Datum
+                                    $crate::__pgrx_c_macros::CUnsignedLong,
+                                    $crate::__pgrx_c_bindings::Datum
                                 >,
                                 _
                             >(
@@ -1215,14 +1231,14 @@ macro_rules! GetSysCacheHashValue2 {
                         ),
                         <
                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                $crate::Datum
+                                $crate::__pgrx_c_macros::CUnsignedLong,
+                                $crate::__pgrx_c_bindings::Datum
                             > as $crate::__pgrx_c_macros::expression::CType
                         >::into_storage(
                             $crate::__pgrx_c_macros::expression::implicit::<
                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                    $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                    $crate::Datum
+                                    $crate::__pgrx_c_macros::CUnsignedLong,
+                                    $crate::__pgrx_c_bindings::Datum
                                 >,
                                 _
                             >(
@@ -1237,14 +1253,14 @@ macro_rules! GetSysCacheHashValue2 {
                         ),
                         <
                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                $crate::Datum
+                                $crate::__pgrx_c_macros::CUnsignedLong,
+                                $crate::__pgrx_c_bindings::Datum
                             > as $crate::__pgrx_c_macros::expression::CType
                         >::into_storage(
                             $crate::__pgrx_c_macros::expression::implicit::<
                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                    $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                    $crate::Datum
+                                    $crate::__pgrx_c_macros::CUnsignedLong,
+                                    $crate::__pgrx_c_bindings::Datum
                                 >,
                                 _
                             >(
@@ -1271,8 +1287,8 @@ macro_rules! GetSysCacheHashValue2 {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -1303,13 +1319,13 @@ macro_rules! __pgrx_c_args_GetSysCacheHashValue3 {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GetSysCacheHashValue3!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GetSysCacheHashValue3!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -1318,7 +1334,7 @@ macro_rules! __pgrx_c_args_GetSysCacheHashValue3 {
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_GetSysCacheHashValue3!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -1345,25 +1361,25 @@ macro_rules! __pgrx_c_args_GetSysCacheHashValue3 {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GetSysCacheHashValue3!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GetSysCacheHashValue3!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GetSysCacheHashValue3!(
-            @p2 $mode [$($done)* (@literal [- $argument]),];
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GetSysCacheHashValue3!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -1372,7 +1388,7 @@ macro_rules! __pgrx_c_args_GetSysCacheHashValue3 {
     };
     (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_GetSysCacheHashValue3!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -1399,25 +1415,25 @@ macro_rules! __pgrx_c_args_GetSysCacheHashValue3 {
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GetSysCacheHashValue3!(
-            @p2 $mode [$($done)* (@literal [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GetSysCacheHashValue3!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
     (@p2 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GetSysCacheHashValue3!(
-            @p3 $mode [$($done)* (@literal [- $argument]),];
+            @p3 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative2 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GetSysCacheHashValue3!(
-            @p3 $mode [$($done)* (@native [$argument]),];
+            @p3 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -1426,7 +1442,7 @@ macro_rules! __pgrx_c_args_GetSysCacheHashValue3 {
     };
     (@p2 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_GetSysCacheHashValue3!(
-            @p3 $mode [$($done)* (@native [$argument]),];
+            @p3 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -1453,33 +1469,35 @@ macro_rules! __pgrx_c_args_GetSysCacheHashValue3 {
     };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GetSysCacheHashValue3!(
-            @p3 $mode [$($done)* (@literal [$argument]),];
+            @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p2 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GetSysCacheHashValue3!(
-            @p3 $mode [$($done)* (@native [$argument]),];
+            @p3 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
     (@p3 $mode:ident [$($done:tt)*]; - $argument:literal) => {
         $crate::__pgrx_c_args_GetSysCacheHashValue3!(
-            @p4 $mode [$($done)* (@literal [- $argument]),];
+            @p4 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
         )
     };
     (@negative3 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_GetSysCacheHashValue3!(@p4 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_GetSysCacheHashValue3!(
+            @p4 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p3 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GetSysCacheHashValue3!(
-            @p4 $mode [$($done)* (@literal [- $argument]),];
+            @p4 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative3 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GetSysCacheHashValue3!(
-            @p4 $mode [$($done)* (@native [$argument]),];
+            @p4 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -1487,7 +1505,9 @@ macro_rules! __pgrx_c_args_GetSysCacheHashValue3 {
         $crate::__pgrx_c_args_GetSysCacheHashValue3!(@negative3 $mode [$($done)*]; - $($raw)*)
     };
     (@p3 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_GetSysCacheHashValue3!(@p4 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_GetSysCacheHashValue3!(
+            @p4 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p3 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -1509,14 +1529,18 @@ macro_rules! __pgrx_c_args_GetSysCacheHashValue3 {
         )
     };
     (@p3 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_GetSysCacheHashValue3!(@p4 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_GetSysCacheHashValue3!(
+            @p4 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p3 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_GetSysCacheHashValue3!(@p4 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_GetSysCacheHashValue3!(
+            @p4 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p3 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_GetSysCacheHashValue3!(
-            @p4 $mode [$($done)* (@native [$argument]),];
+            @p4 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -1543,13 +1567,13 @@ macro_rules! __pgrx_c_args_GetSysCacheHashValue3 {
     };
     (@p3 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GetSysCacheHashValue3!(
-            @p4 $mode [$($done)* (@literal [$argument]),];
+            @p4 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p3 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GetSysCacheHashValue3!(
-            @p4 $mode [$($done)* (@native [$argument]),];
+            @p4 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -1598,7 +1622,7 @@ macro_rules! GetSysCacheHashValue3 {
         /* PGRX: GetSysCacheHashValue3 remains expanded because GetSysCacheHashValue is not an active function-like macro. */
         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
             <$crate::__pgrx_c_macros::CUnsignedInt as $crate::__pgrx_c_macros::expression::CType>::from_storage(
-                $crate::__pgrx_c_generated::Inline_ad070c2797e190b41bab2c6ad3e0d8a8(
+                $crate::__pgrx_c_generated::Inline_dc9150b43a9a706eed085de88ac34f88(
                     <
                         $crate::__pgrx_c_macros::expression::CEnumObject<
                             $crate::__pgrx_c_generated::EnumIdentity_e5adb9dcdce4e5857db2c1cb072bba4b4ec4ff23cb7ac50512160522ccfc3354,
@@ -1621,14 +1645,14 @@ macro_rules! GetSysCacheHashValue3 {
                     ),
                     <
                         $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                            $crate::__pgrx_c_macros::CUnsignedLongLong,
-                            $crate::Datum
+                            $crate::__pgrx_c_macros::CUnsignedLong,
+                            $crate::__pgrx_c_bindings::Datum
                         > as $crate::__pgrx_c_macros::expression::CType
                     >::into_storage(
                         $crate::__pgrx_c_macros::expression::implicit::<
                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                $crate::Datum
+                                $crate::__pgrx_c_macros::CUnsignedLong,
+                                $crate::__pgrx_c_bindings::Datum
                             >,
                             _
                         >(
@@ -1639,14 +1663,14 @@ macro_rules! GetSysCacheHashValue3 {
                     ),
                     <
                         $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                            $crate::__pgrx_c_macros::CUnsignedLongLong,
-                            $crate::Datum
+                            $crate::__pgrx_c_macros::CUnsignedLong,
+                            $crate::__pgrx_c_bindings::Datum
                         > as $crate::__pgrx_c_macros::expression::CType
                     >::into_storage(
                         $crate::__pgrx_c_macros::expression::implicit::<
                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                $crate::Datum
+                                $crate::__pgrx_c_macros::CUnsignedLong,
+                                $crate::__pgrx_c_bindings::Datum
                             >,
                             _
                         >(
@@ -1657,14 +1681,14 @@ macro_rules! GetSysCacheHashValue3 {
                     ),
                     <
                         $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                            $crate::__pgrx_c_macros::CUnsignedLongLong,
-                            $crate::Datum
+                            $crate::__pgrx_c_macros::CUnsignedLong,
+                            $crate::__pgrx_c_bindings::Datum
                         > as $crate::__pgrx_c_macros::expression::CType
                     >::into_storage(
                         $crate::__pgrx_c_macros::expression::implicit::<
                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                $crate::Datum
+                                $crate::__pgrx_c_macros::CUnsignedLong,
+                                $crate::__pgrx_c_bindings::Datum
                             >,
                             _
                         >(
@@ -1675,14 +1699,14 @@ macro_rules! GetSysCacheHashValue3 {
                     ),
                     <
                         $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                            $crate::__pgrx_c_macros::CUnsignedLongLong,
-                            $crate::Datum
+                            $crate::__pgrx_c_macros::CUnsignedLong,
+                            $crate::__pgrx_c_bindings::Datum
                         > as $crate::__pgrx_c_macros::expression::CType
                     >::into_storage(
                         $crate::__pgrx_c_macros::expression::implicit::<
                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                $crate::Datum
+                                $crate::__pgrx_c_macros::CUnsignedLong,
+                                $crate::__pgrx_c_bindings::Datum
                             >,
                             _
                         >(
@@ -1732,7 +1756,7 @@ macro_rules! GetSysCacheHashValue3 {
                             <
                                 $crate::__pgrx_c_macros::CUnsignedInt as $crate::__pgrx_c_macros::expression::CType
                             >::from_storage(
-                                $crate::__pgrx_c_generated::Inline_ad070c2797e190b41bab2c6ad3e0d8a8(
+                                $crate::__pgrx_c_generated::Inline_dc9150b43a9a706eed085de88ac34f88(
                                     <
                                         $crate::__pgrx_c_macros::expression::CEnumObject<
                                             $crate::__pgrx_c_generated::EnumIdentity_e5adb9dcdce4e5857db2c1cb072bba4b4ec4ff23cb7ac50512160522ccfc3354,
@@ -1756,14 +1780,14 @@ macro_rules! GetSysCacheHashValue3 {
                                     ),
                                     <
                                         $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                            $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                            $crate::Datum
+                                            $crate::__pgrx_c_macros::CUnsignedLong,
+                                            $crate::__pgrx_c_bindings::Datum
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::into_storage(
                                         $crate::__pgrx_c_macros::expression::implicit::<
                                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                                $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                                $crate::Datum
+                                                $crate::__pgrx_c_macros::CUnsignedLong,
+                                                $crate::__pgrx_c_bindings::Datum
                                             >,
                                             _
                                         >(
@@ -1775,14 +1799,14 @@ macro_rules! GetSysCacheHashValue3 {
                                     ),
                                     <
                                         $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                            $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                            $crate::Datum
+                                            $crate::__pgrx_c_macros::CUnsignedLong,
+                                            $crate::__pgrx_c_bindings::Datum
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::into_storage(
                                         $crate::__pgrx_c_macros::expression::implicit::<
                                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                                $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                                $crate::Datum
+                                                $crate::__pgrx_c_macros::CUnsignedLong,
+                                                $crate::__pgrx_c_bindings::Datum
                                             >,
                                             _
                                         >(
@@ -1794,14 +1818,14 @@ macro_rules! GetSysCacheHashValue3 {
                                     ),
                                     <
                                         $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                            $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                            $crate::Datum
+                                            $crate::__pgrx_c_macros::CUnsignedLong,
+                                            $crate::__pgrx_c_bindings::Datum
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::into_storage(
                                         $crate::__pgrx_c_macros::expression::implicit::<
                                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                                $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                                $crate::Datum
+                                                $crate::__pgrx_c_macros::CUnsignedLong,
+                                                $crate::__pgrx_c_bindings::Datum
                                             >,
                                             _
                                         >(
@@ -1813,14 +1837,14 @@ macro_rules! GetSysCacheHashValue3 {
                                     ),
                                     <
                                         $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                            $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                            $crate::Datum
+                                            $crate::__pgrx_c_macros::CUnsignedLong,
+                                            $crate::__pgrx_c_bindings::Datum
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::into_storage(
                                         $crate::__pgrx_c_macros::expression::implicit::<
                                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                                $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                                $crate::Datum
+                                                $crate::__pgrx_c_macros::CUnsignedLong,
+                                                $crate::__pgrx_c_bindings::Datum
                                             >,
                                             _
                                         >(
@@ -1856,7 +1880,7 @@ macro_rules! GetSysCacheHashValue3 {
                 <
                     $crate::__pgrx_c_macros::CUnsignedInt as $crate::__pgrx_c_macros::expression::CType
                 >::from_storage(
-                    $crate::__pgrx_c_generated::Inline_ad070c2797e190b41bab2c6ad3e0d8a8(
+                    $crate::__pgrx_c_generated::Inline_dc9150b43a9a706eed085de88ac34f88(
                         <
                             $crate::__pgrx_c_macros::expression::CEnumObject<
                                 $crate::__pgrx_c_generated::EnumIdentity_e5adb9dcdce4e5857db2c1cb072bba4b4ec4ff23cb7ac50512160522ccfc3354,
@@ -1879,14 +1903,14 @@ macro_rules! GetSysCacheHashValue3 {
                         ),
                         <
                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                $crate::Datum
+                                $crate::__pgrx_c_macros::CUnsignedLong,
+                                $crate::__pgrx_c_bindings::Datum
                             > as $crate::__pgrx_c_macros::expression::CType
                         >::into_storage(
                             $crate::__pgrx_c_macros::expression::implicit::<
                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                    $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                    $crate::Datum
+                                    $crate::__pgrx_c_macros::CUnsignedLong,
+                                    $crate::__pgrx_c_bindings::Datum
                                 >,
                                 _
                             >(
@@ -1897,14 +1921,14 @@ macro_rules! GetSysCacheHashValue3 {
                         ),
                         <
                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                $crate::Datum
+                                $crate::__pgrx_c_macros::CUnsignedLong,
+                                $crate::__pgrx_c_bindings::Datum
                             > as $crate::__pgrx_c_macros::expression::CType
                         >::into_storage(
                             $crate::__pgrx_c_macros::expression::implicit::<
                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                    $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                    $crate::Datum
+                                    $crate::__pgrx_c_macros::CUnsignedLong,
+                                    $crate::__pgrx_c_bindings::Datum
                                 >,
                                 _
                             >(
@@ -1915,14 +1939,14 @@ macro_rules! GetSysCacheHashValue3 {
                         ),
                         <
                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                $crate::Datum
+                                $crate::__pgrx_c_macros::CUnsignedLong,
+                                $crate::__pgrx_c_bindings::Datum
                             > as $crate::__pgrx_c_macros::expression::CType
                         >::into_storage(
                             $crate::__pgrx_c_macros::expression::implicit::<
                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                    $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                    $crate::Datum
+                                    $crate::__pgrx_c_macros::CUnsignedLong,
+                                    $crate::__pgrx_c_bindings::Datum
                                 >,
                                 _
                             >(
@@ -1933,14 +1957,14 @@ macro_rules! GetSysCacheHashValue3 {
                         ),
                         <
                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                $crate::Datum
+                                $crate::__pgrx_c_macros::CUnsignedLong,
+                                $crate::__pgrx_c_bindings::Datum
                             > as $crate::__pgrx_c_macros::expression::CType
                         >::into_storage(
                             $crate::__pgrx_c_macros::expression::implicit::<
                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                    $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                    $crate::Datum
+                                    $crate::__pgrx_c_macros::CUnsignedLong,
+                                    $crate::__pgrx_c_bindings::Datum
                                 >,
                                 _
                             >(
@@ -1967,8 +1991,8 @@ macro_rules! GetSysCacheHashValue3 {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -1999,13 +2023,13 @@ macro_rules! __pgrx_c_args_GetSysCacheHashValue4 {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GetSysCacheHashValue4!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GetSysCacheHashValue4!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -2014,7 +2038,7 @@ macro_rules! __pgrx_c_args_GetSysCacheHashValue4 {
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_GetSysCacheHashValue4!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -2041,25 +2065,25 @@ macro_rules! __pgrx_c_args_GetSysCacheHashValue4 {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GetSysCacheHashValue4!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GetSysCacheHashValue4!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GetSysCacheHashValue4!(
-            @p2 $mode [$($done)* (@literal [- $argument]),];
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GetSysCacheHashValue4!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -2068,7 +2092,7 @@ macro_rules! __pgrx_c_args_GetSysCacheHashValue4 {
     };
     (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_GetSysCacheHashValue4!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -2095,25 +2119,25 @@ macro_rules! __pgrx_c_args_GetSysCacheHashValue4 {
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GetSysCacheHashValue4!(
-            @p2 $mode [$($done)* (@literal [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GetSysCacheHashValue4!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
     (@p2 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GetSysCacheHashValue4!(
-            @p3 $mode [$($done)* (@literal [- $argument]),];
+            @p3 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative2 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GetSysCacheHashValue4!(
-            @p3 $mode [$($done)* (@native [$argument]),];
+            @p3 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -2122,7 +2146,7 @@ macro_rules! __pgrx_c_args_GetSysCacheHashValue4 {
     };
     (@p2 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_GetSysCacheHashValue4!(
-            @p3 $mode [$($done)* (@native [$argument]),];
+            @p3 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -2149,25 +2173,25 @@ macro_rules! __pgrx_c_args_GetSysCacheHashValue4 {
     };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GetSysCacheHashValue4!(
-            @p3 $mode [$($done)* (@literal [$argument]),];
+            @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p2 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GetSysCacheHashValue4!(
-            @p3 $mode [$($done)* (@native [$argument]),];
+            @p3 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
     (@p3 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GetSysCacheHashValue4!(
-            @p4 $mode [$($done)* (@literal [- $argument]),];
+            @p4 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative3 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GetSysCacheHashValue4!(
-            @p4 $mode [$($done)* (@native [$argument]),];
+            @p4 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -2176,7 +2200,7 @@ macro_rules! __pgrx_c_args_GetSysCacheHashValue4 {
     };
     (@p3 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_GetSysCacheHashValue4!(
-            @p4 $mode [$($done)* (@native [$argument]),];
+            @p4 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -2203,33 +2227,35 @@ macro_rules! __pgrx_c_args_GetSysCacheHashValue4 {
     };
     (@p3 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GetSysCacheHashValue4!(
-            @p4 $mode [$($done)* (@literal [$argument]),];
+            @p4 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p3 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GetSysCacheHashValue4!(
-            @p4 $mode [$($done)* (@native [$argument]),];
+            @p4 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
     (@p4 $mode:ident [$($done:tt)*]; - $argument:literal) => {
         $crate::__pgrx_c_args_GetSysCacheHashValue4!(
-            @p5 $mode [$($done)* (@literal [- $argument]),];
+            @p5 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
         )
     };
     (@negative4 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_GetSysCacheHashValue4!(@p5 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_GetSysCacheHashValue4!(
+            @p5 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p4 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GetSysCacheHashValue4!(
-            @p5 $mode [$($done)* (@literal [- $argument]),];
+            @p5 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative4 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GetSysCacheHashValue4!(
-            @p5 $mode [$($done)* (@native [$argument]),];
+            @p5 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -2237,7 +2263,9 @@ macro_rules! __pgrx_c_args_GetSysCacheHashValue4 {
         $crate::__pgrx_c_args_GetSysCacheHashValue4!(@negative4 $mode [$($done)*]; - $($raw)*)
     };
     (@p4 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_GetSysCacheHashValue4!(@p5 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_GetSysCacheHashValue4!(
+            @p5 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p4 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -2259,14 +2287,18 @@ macro_rules! __pgrx_c_args_GetSysCacheHashValue4 {
         )
     };
     (@p4 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_GetSysCacheHashValue4!(@p5 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_GetSysCacheHashValue4!(
+            @p5 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p4 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_GetSysCacheHashValue4!(@p5 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_GetSysCacheHashValue4!(
+            @p5 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p4 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_GetSysCacheHashValue4!(
-            @p5 $mode [$($done)* (@native [$argument]),];
+            @p5 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -2293,13 +2325,13 @@ macro_rules! __pgrx_c_args_GetSysCacheHashValue4 {
     };
     (@p4 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GetSysCacheHashValue4!(
-            @p5 $mode [$($done)* (@literal [$argument]),];
+            @p5 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p4 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GetSysCacheHashValue4!(
-            @p5 $mode [$($done)* (@native [$argument]),];
+            @p5 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -2349,7 +2381,7 @@ macro_rules! GetSysCacheHashValue4 {
         /* PGRX: GetSysCacheHashValue4 remains expanded because GetSysCacheHashValue is not an active function-like macro. */
         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
             <$crate::__pgrx_c_macros::CUnsignedInt as $crate::__pgrx_c_macros::expression::CType>::from_storage(
-                $crate::__pgrx_c_generated::Inline_ad070c2797e190b41bab2c6ad3e0d8a8(
+                $crate::__pgrx_c_generated::Inline_dc9150b43a9a706eed085de88ac34f88(
                     <
                         $crate::__pgrx_c_macros::expression::CEnumObject<
                             $crate::__pgrx_c_generated::EnumIdentity_e5adb9dcdce4e5857db2c1cb072bba4b4ec4ff23cb7ac50512160522ccfc3354,
@@ -2372,14 +2404,14 @@ macro_rules! GetSysCacheHashValue4 {
                     ),
                     <
                         $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                            $crate::__pgrx_c_macros::CUnsignedLongLong,
-                            $crate::Datum
+                            $crate::__pgrx_c_macros::CUnsignedLong,
+                            $crate::__pgrx_c_bindings::Datum
                         > as $crate::__pgrx_c_macros::expression::CType
                     >::into_storage(
                         $crate::__pgrx_c_macros::expression::implicit::<
                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                $crate::Datum
+                                $crate::__pgrx_c_macros::CUnsignedLong,
+                                $crate::__pgrx_c_bindings::Datum
                             >,
                             _
                         >(
@@ -2390,14 +2422,14 @@ macro_rules! GetSysCacheHashValue4 {
                     ),
                     <
                         $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                            $crate::__pgrx_c_macros::CUnsignedLongLong,
-                            $crate::Datum
+                            $crate::__pgrx_c_macros::CUnsignedLong,
+                            $crate::__pgrx_c_bindings::Datum
                         > as $crate::__pgrx_c_macros::expression::CType
                     >::into_storage(
                         $crate::__pgrx_c_macros::expression::implicit::<
                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                $crate::Datum
+                                $crate::__pgrx_c_macros::CUnsignedLong,
+                                $crate::__pgrx_c_bindings::Datum
                             >,
                             _
                         >(
@@ -2408,14 +2440,14 @@ macro_rules! GetSysCacheHashValue4 {
                     ),
                     <
                         $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                            $crate::__pgrx_c_macros::CUnsignedLongLong,
-                            $crate::Datum
+                            $crate::__pgrx_c_macros::CUnsignedLong,
+                            $crate::__pgrx_c_bindings::Datum
                         > as $crate::__pgrx_c_macros::expression::CType
                     >::into_storage(
                         $crate::__pgrx_c_macros::expression::implicit::<
                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                $crate::Datum
+                                $crate::__pgrx_c_macros::CUnsignedLong,
+                                $crate::__pgrx_c_bindings::Datum
                             >,
                             _
                         >(
@@ -2426,14 +2458,14 @@ macro_rules! GetSysCacheHashValue4 {
                     ),
                     <
                         $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                            $crate::__pgrx_c_macros::CUnsignedLongLong,
-                            $crate::Datum
+                            $crate::__pgrx_c_macros::CUnsignedLong,
+                            $crate::__pgrx_c_bindings::Datum
                         > as $crate::__pgrx_c_macros::expression::CType
                     >::into_storage(
                         $crate::__pgrx_c_macros::expression::implicit::<
                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                $crate::Datum
+                                $crate::__pgrx_c_macros::CUnsignedLong,
+                                $crate::__pgrx_c_bindings::Datum
                             >,
                             _
                         >(
@@ -2480,7 +2512,7 @@ macro_rules! GetSysCacheHashValue4 {
                             <
                                 $crate::__pgrx_c_macros::CUnsignedInt as $crate::__pgrx_c_macros::expression::CType
                             >::from_storage(
-                                $crate::__pgrx_c_generated::Inline_ad070c2797e190b41bab2c6ad3e0d8a8(
+                                $crate::__pgrx_c_generated::Inline_dc9150b43a9a706eed085de88ac34f88(
                                     <
                                         $crate::__pgrx_c_macros::expression::CEnumObject<
                                             $crate::__pgrx_c_generated::EnumIdentity_e5adb9dcdce4e5857db2c1cb072bba4b4ec4ff23cb7ac50512160522ccfc3354,
@@ -2504,14 +2536,14 @@ macro_rules! GetSysCacheHashValue4 {
                                     ),
                                     <
                                         $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                            $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                            $crate::Datum
+                                            $crate::__pgrx_c_macros::CUnsignedLong,
+                                            $crate::__pgrx_c_bindings::Datum
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::into_storage(
                                         $crate::__pgrx_c_macros::expression::implicit::<
                                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                                $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                                $crate::Datum
+                                                $crate::__pgrx_c_macros::CUnsignedLong,
+                                                $crate::__pgrx_c_bindings::Datum
                                             >,
                                             _
                                         >(
@@ -2523,14 +2555,14 @@ macro_rules! GetSysCacheHashValue4 {
                                     ),
                                     <
                                         $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                            $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                            $crate::Datum
+                                            $crate::__pgrx_c_macros::CUnsignedLong,
+                                            $crate::__pgrx_c_bindings::Datum
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::into_storage(
                                         $crate::__pgrx_c_macros::expression::implicit::<
                                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                                $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                                $crate::Datum
+                                                $crate::__pgrx_c_macros::CUnsignedLong,
+                                                $crate::__pgrx_c_bindings::Datum
                                             >,
                                             _
                                         >(
@@ -2542,14 +2574,14 @@ macro_rules! GetSysCacheHashValue4 {
                                     ),
                                     <
                                         $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                            $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                            $crate::Datum
+                                            $crate::__pgrx_c_macros::CUnsignedLong,
+                                            $crate::__pgrx_c_bindings::Datum
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::into_storage(
                                         $crate::__pgrx_c_macros::expression::implicit::<
                                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                                $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                                $crate::Datum
+                                                $crate::__pgrx_c_macros::CUnsignedLong,
+                                                $crate::__pgrx_c_bindings::Datum
                                             >,
                                             _
                                         >(
@@ -2561,14 +2593,14 @@ macro_rules! GetSysCacheHashValue4 {
                                     ),
                                     <
                                         $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                            $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                            $crate::Datum
+                                            $crate::__pgrx_c_macros::CUnsignedLong,
+                                            $crate::__pgrx_c_bindings::Datum
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::into_storage(
                                         $crate::__pgrx_c_macros::expression::implicit::<
                                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                                $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                                $crate::Datum
+                                                $crate::__pgrx_c_macros::CUnsignedLong,
+                                                $crate::__pgrx_c_bindings::Datum
                                             >,
                                             _
                                         >(
@@ -2598,7 +2630,7 @@ macro_rules! GetSysCacheHashValue4 {
                 <
                     $crate::__pgrx_c_macros::CUnsignedInt as $crate::__pgrx_c_macros::expression::CType
                 >::from_storage(
-                    $crate::__pgrx_c_generated::Inline_ad070c2797e190b41bab2c6ad3e0d8a8(
+                    $crate::__pgrx_c_generated::Inline_dc9150b43a9a706eed085de88ac34f88(
                         <
                             $crate::__pgrx_c_macros::expression::CEnumObject<
                                 $crate::__pgrx_c_generated::EnumIdentity_e5adb9dcdce4e5857db2c1cb072bba4b4ec4ff23cb7ac50512160522ccfc3354,
@@ -2621,14 +2653,14 @@ macro_rules! GetSysCacheHashValue4 {
                         ),
                         <
                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                $crate::Datum
+                                $crate::__pgrx_c_macros::CUnsignedLong,
+                                $crate::__pgrx_c_bindings::Datum
                             > as $crate::__pgrx_c_macros::expression::CType
                         >::into_storage(
                             $crate::__pgrx_c_macros::expression::implicit::<
                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                    $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                    $crate::Datum
+                                    $crate::__pgrx_c_macros::CUnsignedLong,
+                                    $crate::__pgrx_c_bindings::Datum
                                 >,
                                 _
                             >(
@@ -2639,14 +2671,14 @@ macro_rules! GetSysCacheHashValue4 {
                         ),
                         <
                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                $crate::Datum
+                                $crate::__pgrx_c_macros::CUnsignedLong,
+                                $crate::__pgrx_c_bindings::Datum
                             > as $crate::__pgrx_c_macros::expression::CType
                         >::into_storage(
                             $crate::__pgrx_c_macros::expression::implicit::<
                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                    $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                    $crate::Datum
+                                    $crate::__pgrx_c_macros::CUnsignedLong,
+                                    $crate::__pgrx_c_bindings::Datum
                                 >,
                                 _
                             >(
@@ -2657,14 +2689,14 @@ macro_rules! GetSysCacheHashValue4 {
                         ),
                         <
                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                $crate::Datum
+                                $crate::__pgrx_c_macros::CUnsignedLong,
+                                $crate::__pgrx_c_bindings::Datum
                             > as $crate::__pgrx_c_macros::expression::CType
                         >::into_storage(
                             $crate::__pgrx_c_macros::expression::implicit::<
                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                    $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                    $crate::Datum
+                                    $crate::__pgrx_c_macros::CUnsignedLong,
+                                    $crate::__pgrx_c_bindings::Datum
                                 >,
                                 _
                             >(
@@ -2675,14 +2707,14 @@ macro_rules! GetSysCacheHashValue4 {
                         ),
                         <
                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                $crate::Datum
+                                $crate::__pgrx_c_macros::CUnsignedLong,
+                                $crate::__pgrx_c_bindings::Datum
                             > as $crate::__pgrx_c_macros::expression::CType
                         >::into_storage(
                             $crate::__pgrx_c_macros::expression::implicit::<
                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                    $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                    $crate::Datum
+                                    $crate::__pgrx_c_macros::CUnsignedLong,
+                                    $crate::__pgrx_c_bindings::Datum
                                 >,
                                 _
                             >(
@@ -2705,8 +2737,8 @@ macro_rules! GetSysCacheHashValue4 {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -2734,13 +2766,13 @@ macro_rules! __pgrx_c_args_GetSysCacheOid1 {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GetSysCacheOid1!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GetSysCacheOid1!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -2749,7 +2781,7 @@ macro_rules! __pgrx_c_args_GetSysCacheOid1 {
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_GetSysCacheOid1!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -2776,25 +2808,25 @@ macro_rules! __pgrx_c_args_GetSysCacheOid1 {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GetSysCacheOid1!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GetSysCacheOid1!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GetSysCacheOid1!(
-            @p2 $mode [$($done)* (@literal [- $argument]),];
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GetSysCacheOid1!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -2803,7 +2835,7 @@ macro_rules! __pgrx_c_args_GetSysCacheOid1 {
     };
     (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_GetSysCacheOid1!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -2830,31 +2862,35 @@ macro_rules! __pgrx_c_args_GetSysCacheOid1 {
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GetSysCacheOid1!(
-            @p2 $mode [$($done)* (@literal [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GetSysCacheOid1!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
     (@p2 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_GetSysCacheOid1!(@p3 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_GetSysCacheOid1!(
+            @p3 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative2 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_GetSysCacheOid1!(@p3 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_GetSysCacheOid1!(
+            @p3 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p2 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GetSysCacheOid1!(
-            @p3 $mode [$($done)* (@literal [- $argument]),];
+            @p3 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative2 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GetSysCacheOid1!(
-            @p3 $mode [$($done)* (@native [$argument]),];
+            @p3 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -2862,7 +2898,9 @@ macro_rules! __pgrx_c_args_GetSysCacheOid1 {
         $crate::__pgrx_c_args_GetSysCacheOid1!(@negative2 $mode [$($done)*]; - $($raw)*)
     };
     (@p2 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_GetSysCacheOid1!(@p3 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_GetSysCacheOid1!(
+            @p3 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p2 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -2884,14 +2922,18 @@ macro_rules! __pgrx_c_args_GetSysCacheOid1 {
         )
     };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_GetSysCacheOid1!(@p3 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_GetSysCacheOid1!(
+            @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p2 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_GetSysCacheOid1!(@p3 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_GetSysCacheOid1!(
+            @p3 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p2 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_GetSysCacheOid1!(
-            @p3 $mode [$($done)* (@native [$argument]),];
+            @p3 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -2918,13 +2960,13 @@ macro_rules! __pgrx_c_args_GetSysCacheOid1 {
     };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GetSysCacheOid1!(
-            @p3 $mode [$($done)* (@literal [$argument]),];
+            @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p2 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GetSysCacheOid1!(
-            @p3 $mode [$($done)* (@native [$argument]),];
+            @p3 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -2974,10 +3016,10 @@ macro_rules! GetSysCacheOid1 {
             <
                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
                     $crate::__pgrx_c_macros::CUnsignedInt,
-                    $crate::Oid
+                    $crate::__pgrx_c_bindings::Oid
                 > as $crate::__pgrx_c_macros::expression::CType
             >::from_storage(
-                $crate::__pgrx_c_generated::Inline_681ad2383bdad1fc19b9cc08521e8cba(
+                $crate::__pgrx_c_generated::Inline_0878a15b9b4a5e606820c2fb94a3bfb9(
                     <
                         $crate::__pgrx_c_macros::expression::CEnumObject<
                             $crate::__pgrx_c_generated::EnumIdentity_e5adb9dcdce4e5857db2c1cb072bba4b4ec4ff23cb7ac50512160522ccfc3354,
@@ -3010,14 +3052,14 @@ macro_rules! GetSysCacheOid1 {
                     ),
                     <
                         $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                            $crate::__pgrx_c_macros::CUnsignedLongLong,
-                            $crate::Datum
+                            $crate::__pgrx_c_macros::CUnsignedLong,
+                            $crate::__pgrx_c_bindings::Datum
                         > as $crate::__pgrx_c_macros::expression::CType
                     >::into_storage(
                         $crate::__pgrx_c_macros::expression::implicit::<
                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                $crate::Datum
+                                $crate::__pgrx_c_macros::CUnsignedLong,
+                                $crate::__pgrx_c_bindings::Datum
                             >,
                             _
                         >(
@@ -3028,14 +3070,14 @@ macro_rules! GetSysCacheOid1 {
                     ),
                     <
                         $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                            $crate::__pgrx_c_macros::CUnsignedLongLong,
-                            $crate::Datum
+                            $crate::__pgrx_c_macros::CUnsignedLong,
+                            $crate::__pgrx_c_bindings::Datum
                         > as $crate::__pgrx_c_macros::expression::CType
                     >::into_storage(
                         $crate::__pgrx_c_macros::expression::implicit::<
                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                $crate::Datum
+                                $crate::__pgrx_c_macros::CUnsignedLong,
+                                $crate::__pgrx_c_bindings::Datum
                             >,
                             _
                         >(
@@ -3050,14 +3092,14 @@ macro_rules! GetSysCacheOid1 {
                     ),
                     <
                         $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                            $crate::__pgrx_c_macros::CUnsignedLongLong,
-                            $crate::Datum
+                            $crate::__pgrx_c_macros::CUnsignedLong,
+                            $crate::__pgrx_c_bindings::Datum
                         > as $crate::__pgrx_c_macros::expression::CType
                     >::into_storage(
                         $crate::__pgrx_c_macros::expression::implicit::<
                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                $crate::Datum
+                                $crate::__pgrx_c_macros::CUnsignedLong,
+                                $crate::__pgrx_c_bindings::Datum
                             >,
                             _
                         >(
@@ -3072,14 +3114,14 @@ macro_rules! GetSysCacheOid1 {
                     ),
                     <
                         $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                            $crate::__pgrx_c_macros::CUnsignedLongLong,
-                            $crate::Datum
+                            $crate::__pgrx_c_macros::CUnsignedLong,
+                            $crate::__pgrx_c_bindings::Datum
                         > as $crate::__pgrx_c_macros::expression::CType
                     >::into_storage(
                         $crate::__pgrx_c_macros::expression::implicit::<
                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                $crate::Datum
+                                $crate::__pgrx_c_macros::CUnsignedLong,
+                                $crate::__pgrx_c_bindings::Datum
                             >,
                             _
                         >(
@@ -3128,10 +3170,10 @@ macro_rules! GetSysCacheOid1 {
                             <
                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                     $crate::__pgrx_c_macros::CUnsignedInt,
-                                    $crate::Oid
+                                    $crate::__pgrx_c_bindings::Oid
                                 > as $crate::__pgrx_c_macros::expression::CType
                             >::from_storage(
-                                $crate::__pgrx_c_generated::Inline_681ad2383bdad1fc19b9cc08521e8cba(
+                                $crate::__pgrx_c_generated::Inline_0878a15b9b4a5e606820c2fb94a3bfb9(
                                     <
                                         $crate::__pgrx_c_macros::expression::CEnumObject<
                                             $crate::__pgrx_c_generated::EnumIdentity_e5adb9dcdce4e5857db2c1cb072bba4b4ec4ff23cb7ac50512160522ccfc3354,
@@ -3168,14 +3210,14 @@ macro_rules! GetSysCacheOid1 {
                                     ),
                                     <
                                         $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                            $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                            $crate::Datum
+                                            $crate::__pgrx_c_macros::CUnsignedLong,
+                                            $crate::__pgrx_c_bindings::Datum
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::into_storage(
                                         $crate::__pgrx_c_macros::expression::implicit::<
                                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                                $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                                $crate::Datum
+                                                $crate::__pgrx_c_macros::CUnsignedLong,
+                                                $crate::__pgrx_c_bindings::Datum
                                             >,
                                             _
                                         >(
@@ -3187,14 +3229,14 @@ macro_rules! GetSysCacheOid1 {
                                     ),
                                     <
                                         $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                            $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                            $crate::Datum
+                                            $crate::__pgrx_c_macros::CUnsignedLong,
+                                            $crate::__pgrx_c_bindings::Datum
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::into_storage(
                                         $crate::__pgrx_c_macros::expression::implicit::<
                                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                                $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                                $crate::Datum
+                                                $crate::__pgrx_c_macros::CUnsignedLong,
+                                                $crate::__pgrx_c_bindings::Datum
                                             >,
                                             _
                                         >(
@@ -3212,14 +3254,14 @@ macro_rules! GetSysCacheOid1 {
                                     ),
                                     <
                                         $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                            $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                            $crate::Datum
+                                            $crate::__pgrx_c_macros::CUnsignedLong,
+                                            $crate::__pgrx_c_bindings::Datum
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::into_storage(
                                         $crate::__pgrx_c_macros::expression::implicit::<
                                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                                $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                                $crate::Datum
+                                                $crate::__pgrx_c_macros::CUnsignedLong,
+                                                $crate::__pgrx_c_bindings::Datum
                                             >,
                                             _
                                         >(
@@ -3237,14 +3279,14 @@ macro_rules! GetSysCacheOid1 {
                                     ),
                                     <
                                         $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                            $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                            $crate::Datum
+                                            $crate::__pgrx_c_macros::CUnsignedLong,
+                                            $crate::__pgrx_c_bindings::Datum
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::into_storage(
                                         $crate::__pgrx_c_macros::expression::implicit::<
                                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                                $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                                $crate::Datum
+                                                $crate::__pgrx_c_macros::CUnsignedLong,
+                                                $crate::__pgrx_c_bindings::Datum
                                             >,
                                             _
                                         >(
@@ -3280,10 +3322,10 @@ macro_rules! GetSysCacheOid1 {
                 <
                     $crate::__pgrx_c_macros::expression::CIntegerStorage<
                         $crate::__pgrx_c_macros::CUnsignedInt,
-                        $crate::Oid
+                        $crate::__pgrx_c_bindings::Oid
                     > as $crate::__pgrx_c_macros::expression::CType
                 >::from_storage(
-                    $crate::__pgrx_c_generated::Inline_681ad2383bdad1fc19b9cc08521e8cba(
+                    $crate::__pgrx_c_generated::Inline_0878a15b9b4a5e606820c2fb94a3bfb9(
                         <
                             $crate::__pgrx_c_macros::expression::CEnumObject<
                                 $crate::__pgrx_c_generated::EnumIdentity_e5adb9dcdce4e5857db2c1cb072bba4b4ec4ff23cb7ac50512160522ccfc3354,
@@ -3318,14 +3360,14 @@ macro_rules! GetSysCacheOid1 {
                         ),
                         <
                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                $crate::Datum
+                                $crate::__pgrx_c_macros::CUnsignedLong,
+                                $crate::__pgrx_c_bindings::Datum
                             > as $crate::__pgrx_c_macros::expression::CType
                         >::into_storage(
                             $crate::__pgrx_c_macros::expression::implicit::<
                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                    $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                    $crate::Datum
+                                    $crate::__pgrx_c_macros::CUnsignedLong,
+                                    $crate::__pgrx_c_bindings::Datum
                                 >,
                                 _
                             >(
@@ -3336,14 +3378,14 @@ macro_rules! GetSysCacheOid1 {
                         ),
                         <
                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                $crate::Datum
+                                $crate::__pgrx_c_macros::CUnsignedLong,
+                                $crate::__pgrx_c_bindings::Datum
                             > as $crate::__pgrx_c_macros::expression::CType
                         >::into_storage(
                             $crate::__pgrx_c_macros::expression::implicit::<
                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                    $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                    $crate::Datum
+                                    $crate::__pgrx_c_macros::CUnsignedLong,
+                                    $crate::__pgrx_c_bindings::Datum
                                 >,
                                 _
                             >(
@@ -3358,14 +3400,14 @@ macro_rules! GetSysCacheOid1 {
                         ),
                         <
                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                $crate::Datum
+                                $crate::__pgrx_c_macros::CUnsignedLong,
+                                $crate::__pgrx_c_bindings::Datum
                             > as $crate::__pgrx_c_macros::expression::CType
                         >::into_storage(
                             $crate::__pgrx_c_macros::expression::implicit::<
                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                    $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                    $crate::Datum
+                                    $crate::__pgrx_c_macros::CUnsignedLong,
+                                    $crate::__pgrx_c_bindings::Datum
                                 >,
                                 _
                             >(
@@ -3380,14 +3422,14 @@ macro_rules! GetSysCacheOid1 {
                         ),
                         <
                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                $crate::Datum
+                                $crate::__pgrx_c_macros::CUnsignedLong,
+                                $crate::__pgrx_c_bindings::Datum
                             > as $crate::__pgrx_c_macros::expression::CType
                         >::into_storage(
                             $crate::__pgrx_c_macros::expression::implicit::<
                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                    $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                    $crate::Datum
+                                    $crate::__pgrx_c_macros::CUnsignedLong,
+                                    $crate::__pgrx_c_bindings::Datum
                                 >,
                                 _
                             >(
@@ -3414,8 +3456,8 @@ macro_rules! GetSysCacheOid1 {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -3443,13 +3485,13 @@ macro_rules! __pgrx_c_args_GetSysCacheOid2 {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GetSysCacheOid2!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GetSysCacheOid2!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -3458,7 +3500,7 @@ macro_rules! __pgrx_c_args_GetSysCacheOid2 {
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_GetSysCacheOid2!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -3485,25 +3527,25 @@ macro_rules! __pgrx_c_args_GetSysCacheOid2 {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GetSysCacheOid2!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GetSysCacheOid2!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GetSysCacheOid2!(
-            @p2 $mode [$($done)* (@literal [- $argument]),];
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GetSysCacheOid2!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -3512,7 +3554,7 @@ macro_rules! __pgrx_c_args_GetSysCacheOid2 {
     };
     (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_GetSysCacheOid2!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -3539,25 +3581,25 @@ macro_rules! __pgrx_c_args_GetSysCacheOid2 {
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GetSysCacheOid2!(
-            @p2 $mode [$($done)* (@literal [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GetSysCacheOid2!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
     (@p2 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GetSysCacheOid2!(
-            @p3 $mode [$($done)* (@literal [- $argument]),];
+            @p3 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative2 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GetSysCacheOid2!(
-            @p3 $mode [$($done)* (@native [$argument]),];
+            @p3 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -3566,7 +3608,7 @@ macro_rules! __pgrx_c_args_GetSysCacheOid2 {
     };
     (@p2 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_GetSysCacheOid2!(
-            @p3 $mode [$($done)* (@native [$argument]),];
+            @p3 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -3593,31 +3635,35 @@ macro_rules! __pgrx_c_args_GetSysCacheOid2 {
     };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GetSysCacheOid2!(
-            @p3 $mode [$($done)* (@literal [$argument]),];
+            @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p2 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GetSysCacheOid2!(
-            @p3 $mode [$($done)* (@native [$argument]),];
+            @p3 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
     (@p3 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_GetSysCacheOid2!(@p4 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_GetSysCacheOid2!(
+            @p4 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative3 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_GetSysCacheOid2!(@p4 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_GetSysCacheOid2!(
+            @p4 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p3 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GetSysCacheOid2!(
-            @p4 $mode [$($done)* (@literal [- $argument]),];
+            @p4 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative3 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GetSysCacheOid2!(
-            @p4 $mode [$($done)* (@native [$argument]),];
+            @p4 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -3625,7 +3671,9 @@ macro_rules! __pgrx_c_args_GetSysCacheOid2 {
         $crate::__pgrx_c_args_GetSysCacheOid2!(@negative3 $mode [$($done)*]; - $($raw)*)
     };
     (@p3 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_GetSysCacheOid2!(@p4 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_GetSysCacheOid2!(
+            @p4 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p3 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -3647,14 +3695,18 @@ macro_rules! __pgrx_c_args_GetSysCacheOid2 {
         )
     };
     (@p3 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_GetSysCacheOid2!(@p4 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_GetSysCacheOid2!(
+            @p4 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p3 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_GetSysCacheOid2!(@p4 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_GetSysCacheOid2!(
+            @p4 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p3 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_GetSysCacheOid2!(
-            @p4 $mode [$($done)* (@native [$argument]),];
+            @p4 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -3681,13 +3733,13 @@ macro_rules! __pgrx_c_args_GetSysCacheOid2 {
     };
     (@p3 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GetSysCacheOid2!(
-            @p4 $mode [$($done)* (@literal [$argument]),];
+            @p4 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p3 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GetSysCacheOid2!(
-            @p4 $mode [$($done)* (@native [$argument]),];
+            @p4 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -3738,10 +3790,10 @@ macro_rules! GetSysCacheOid2 {
             <
                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
                     $crate::__pgrx_c_macros::CUnsignedInt,
-                    $crate::Oid
+                    $crate::__pgrx_c_bindings::Oid
                 > as $crate::__pgrx_c_macros::expression::CType
             >::from_storage(
-                $crate::__pgrx_c_generated::Inline_681ad2383bdad1fc19b9cc08521e8cba(
+                $crate::__pgrx_c_generated::Inline_0878a15b9b4a5e606820c2fb94a3bfb9(
                     <
                         $crate::__pgrx_c_macros::expression::CEnumObject<
                             $crate::__pgrx_c_generated::EnumIdentity_e5adb9dcdce4e5857db2c1cb072bba4b4ec4ff23cb7ac50512160522ccfc3354,
@@ -3774,14 +3826,14 @@ macro_rules! GetSysCacheOid2 {
                     ),
                     <
                         $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                            $crate::__pgrx_c_macros::CUnsignedLongLong,
-                            $crate::Datum
+                            $crate::__pgrx_c_macros::CUnsignedLong,
+                            $crate::__pgrx_c_bindings::Datum
                         > as $crate::__pgrx_c_macros::expression::CType
                     >::into_storage(
                         $crate::__pgrx_c_macros::expression::implicit::<
                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                $crate::Datum
+                                $crate::__pgrx_c_macros::CUnsignedLong,
+                                $crate::__pgrx_c_bindings::Datum
                             >,
                             _
                         >(
@@ -3792,14 +3844,14 @@ macro_rules! GetSysCacheOid2 {
                     ),
                     <
                         $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                            $crate::__pgrx_c_macros::CUnsignedLongLong,
-                            $crate::Datum
+                            $crate::__pgrx_c_macros::CUnsignedLong,
+                            $crate::__pgrx_c_bindings::Datum
                         > as $crate::__pgrx_c_macros::expression::CType
                     >::into_storage(
                         $crate::__pgrx_c_macros::expression::implicit::<
                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                $crate::Datum
+                                $crate::__pgrx_c_macros::CUnsignedLong,
+                                $crate::__pgrx_c_bindings::Datum
                             >,
                             _
                         >(
@@ -3810,14 +3862,14 @@ macro_rules! GetSysCacheOid2 {
                     ),
                     <
                         $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                            $crate::__pgrx_c_macros::CUnsignedLongLong,
-                            $crate::Datum
+                            $crate::__pgrx_c_macros::CUnsignedLong,
+                            $crate::__pgrx_c_bindings::Datum
                         > as $crate::__pgrx_c_macros::expression::CType
                     >::into_storage(
                         $crate::__pgrx_c_macros::expression::implicit::<
                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                $crate::Datum
+                                $crate::__pgrx_c_macros::CUnsignedLong,
+                                $crate::__pgrx_c_bindings::Datum
                             >,
                             _
                         >(
@@ -3832,14 +3884,14 @@ macro_rules! GetSysCacheOid2 {
                     ),
                     <
                         $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                            $crate::__pgrx_c_macros::CUnsignedLongLong,
-                            $crate::Datum
+                            $crate::__pgrx_c_macros::CUnsignedLong,
+                            $crate::__pgrx_c_bindings::Datum
                         > as $crate::__pgrx_c_macros::expression::CType
                     >::into_storage(
                         $crate::__pgrx_c_macros::expression::implicit::<
                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                $crate::Datum
+                                $crate::__pgrx_c_macros::CUnsignedLong,
+                                $crate::__pgrx_c_bindings::Datum
                             >,
                             _
                         >(
@@ -3889,10 +3941,10 @@ macro_rules! GetSysCacheOid2 {
                             <
                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                     $crate::__pgrx_c_macros::CUnsignedInt,
-                                    $crate::Oid
+                                    $crate::__pgrx_c_bindings::Oid
                                 > as $crate::__pgrx_c_macros::expression::CType
                             >::from_storage(
-                                $crate::__pgrx_c_generated::Inline_681ad2383bdad1fc19b9cc08521e8cba(
+                                $crate::__pgrx_c_generated::Inline_0878a15b9b4a5e606820c2fb94a3bfb9(
                                     <
                                         $crate::__pgrx_c_macros::expression::CEnumObject<
                                             $crate::__pgrx_c_generated::EnumIdentity_e5adb9dcdce4e5857db2c1cb072bba4b4ec4ff23cb7ac50512160522ccfc3354,
@@ -3929,14 +3981,14 @@ macro_rules! GetSysCacheOid2 {
                                     ),
                                     <
                                         $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                            $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                            $crate::Datum
+                                            $crate::__pgrx_c_macros::CUnsignedLong,
+                                            $crate::__pgrx_c_bindings::Datum
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::into_storage(
                                         $crate::__pgrx_c_macros::expression::implicit::<
                                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                                $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                                $crate::Datum
+                                                $crate::__pgrx_c_macros::CUnsignedLong,
+                                                $crate::__pgrx_c_bindings::Datum
                                             >,
                                             _
                                         >(
@@ -3948,14 +4000,14 @@ macro_rules! GetSysCacheOid2 {
                                     ),
                                     <
                                         $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                            $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                            $crate::Datum
+                                            $crate::__pgrx_c_macros::CUnsignedLong,
+                                            $crate::__pgrx_c_bindings::Datum
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::into_storage(
                                         $crate::__pgrx_c_macros::expression::implicit::<
                                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                                $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                                $crate::Datum
+                                                $crate::__pgrx_c_macros::CUnsignedLong,
+                                                $crate::__pgrx_c_bindings::Datum
                                             >,
                                             _
                                         >(
@@ -3967,14 +4019,14 @@ macro_rules! GetSysCacheOid2 {
                                     ),
                                     <
                                         $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                            $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                            $crate::Datum
+                                            $crate::__pgrx_c_macros::CUnsignedLong,
+                                            $crate::__pgrx_c_bindings::Datum
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::into_storage(
                                         $crate::__pgrx_c_macros::expression::implicit::<
                                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                                $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                                $crate::Datum
+                                                $crate::__pgrx_c_macros::CUnsignedLong,
+                                                $crate::__pgrx_c_bindings::Datum
                                             >,
                                             _
                                         >(
@@ -3992,14 +4044,14 @@ macro_rules! GetSysCacheOid2 {
                                     ),
                                     <
                                         $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                            $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                            $crate::Datum
+                                            $crate::__pgrx_c_macros::CUnsignedLong,
+                                            $crate::__pgrx_c_bindings::Datum
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::into_storage(
                                         $crate::__pgrx_c_macros::expression::implicit::<
                                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                                $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                                $crate::Datum
+                                                $crate::__pgrx_c_macros::CUnsignedLong,
+                                                $crate::__pgrx_c_bindings::Datum
                                             >,
                                             _
                                         >(
@@ -4035,10 +4087,10 @@ macro_rules! GetSysCacheOid2 {
                 <
                     $crate::__pgrx_c_macros::expression::CIntegerStorage<
                         $crate::__pgrx_c_macros::CUnsignedInt,
-                        $crate::Oid
+                        $crate::__pgrx_c_bindings::Oid
                     > as $crate::__pgrx_c_macros::expression::CType
                 >::from_storage(
-                    $crate::__pgrx_c_generated::Inline_681ad2383bdad1fc19b9cc08521e8cba(
+                    $crate::__pgrx_c_generated::Inline_0878a15b9b4a5e606820c2fb94a3bfb9(
                         <
                             $crate::__pgrx_c_macros::expression::CEnumObject<
                                 $crate::__pgrx_c_generated::EnumIdentity_e5adb9dcdce4e5857db2c1cb072bba4b4ec4ff23cb7ac50512160522ccfc3354,
@@ -4073,14 +4125,14 @@ macro_rules! GetSysCacheOid2 {
                         ),
                         <
                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                $crate::Datum
+                                $crate::__pgrx_c_macros::CUnsignedLong,
+                                $crate::__pgrx_c_bindings::Datum
                             > as $crate::__pgrx_c_macros::expression::CType
                         >::into_storage(
                             $crate::__pgrx_c_macros::expression::implicit::<
                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                    $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                    $crate::Datum
+                                    $crate::__pgrx_c_macros::CUnsignedLong,
+                                    $crate::__pgrx_c_bindings::Datum
                                 >,
                                 _
                             >(
@@ -4091,14 +4143,14 @@ macro_rules! GetSysCacheOid2 {
                         ),
                         <
                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                $crate::Datum
+                                $crate::__pgrx_c_macros::CUnsignedLong,
+                                $crate::__pgrx_c_bindings::Datum
                             > as $crate::__pgrx_c_macros::expression::CType
                         >::into_storage(
                             $crate::__pgrx_c_macros::expression::implicit::<
                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                    $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                    $crate::Datum
+                                    $crate::__pgrx_c_macros::CUnsignedLong,
+                                    $crate::__pgrx_c_bindings::Datum
                                 >,
                                 _
                             >(
@@ -4109,14 +4161,14 @@ macro_rules! GetSysCacheOid2 {
                         ),
                         <
                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                $crate::Datum
+                                $crate::__pgrx_c_macros::CUnsignedLong,
+                                $crate::__pgrx_c_bindings::Datum
                             > as $crate::__pgrx_c_macros::expression::CType
                         >::into_storage(
                             $crate::__pgrx_c_macros::expression::implicit::<
                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                    $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                    $crate::Datum
+                                    $crate::__pgrx_c_macros::CUnsignedLong,
+                                    $crate::__pgrx_c_bindings::Datum
                                 >,
                                 _
                             >(
@@ -4131,14 +4183,14 @@ macro_rules! GetSysCacheOid2 {
                         ),
                         <
                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                $crate::Datum
+                                $crate::__pgrx_c_macros::CUnsignedLong,
+                                $crate::__pgrx_c_bindings::Datum
                             > as $crate::__pgrx_c_macros::expression::CType
                         >::into_storage(
                             $crate::__pgrx_c_macros::expression::implicit::<
                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                    $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                    $crate::Datum
+                                    $crate::__pgrx_c_macros::CUnsignedLong,
+                                    $crate::__pgrx_c_bindings::Datum
                                 >,
                                 _
                             >(
@@ -4165,8 +4217,8 @@ macro_rules! GetSysCacheOid2 {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -4194,13 +4246,13 @@ macro_rules! __pgrx_c_args_GetSysCacheOid3 {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GetSysCacheOid3!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GetSysCacheOid3!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -4209,7 +4261,7 @@ macro_rules! __pgrx_c_args_GetSysCacheOid3 {
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_GetSysCacheOid3!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -4236,25 +4288,25 @@ macro_rules! __pgrx_c_args_GetSysCacheOid3 {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GetSysCacheOid3!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GetSysCacheOid3!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GetSysCacheOid3!(
-            @p2 $mode [$($done)* (@literal [- $argument]),];
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GetSysCacheOid3!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -4263,7 +4315,7 @@ macro_rules! __pgrx_c_args_GetSysCacheOid3 {
     };
     (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_GetSysCacheOid3!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -4290,25 +4342,25 @@ macro_rules! __pgrx_c_args_GetSysCacheOid3 {
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GetSysCacheOid3!(
-            @p2 $mode [$($done)* (@literal [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GetSysCacheOid3!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
     (@p2 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GetSysCacheOid3!(
-            @p3 $mode [$($done)* (@literal [- $argument]),];
+            @p3 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative2 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GetSysCacheOid3!(
-            @p3 $mode [$($done)* (@native [$argument]),];
+            @p3 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -4317,7 +4369,7 @@ macro_rules! __pgrx_c_args_GetSysCacheOid3 {
     };
     (@p2 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_GetSysCacheOid3!(
-            @p3 $mode [$($done)* (@native [$argument]),];
+            @p3 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -4344,25 +4396,25 @@ macro_rules! __pgrx_c_args_GetSysCacheOid3 {
     };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GetSysCacheOid3!(
-            @p3 $mode [$($done)* (@literal [$argument]),];
+            @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p2 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GetSysCacheOid3!(
-            @p3 $mode [$($done)* (@native [$argument]),];
+            @p3 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
     (@p3 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GetSysCacheOid3!(
-            @p4 $mode [$($done)* (@literal [- $argument]),];
+            @p4 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative3 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GetSysCacheOid3!(
-            @p4 $mode [$($done)* (@native [$argument]),];
+            @p4 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -4371,7 +4423,7 @@ macro_rules! __pgrx_c_args_GetSysCacheOid3 {
     };
     (@p3 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_GetSysCacheOid3!(
-            @p4 $mode [$($done)* (@native [$argument]),];
+            @p4 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -4398,31 +4450,35 @@ macro_rules! __pgrx_c_args_GetSysCacheOid3 {
     };
     (@p3 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GetSysCacheOid3!(
-            @p4 $mode [$($done)* (@literal [$argument]),];
+            @p4 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p3 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GetSysCacheOid3!(
-            @p4 $mode [$($done)* (@native [$argument]),];
+            @p4 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
     (@p4 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_GetSysCacheOid3!(@p5 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_GetSysCacheOid3!(
+            @p5 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative4 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_GetSysCacheOid3!(@p5 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_GetSysCacheOid3!(
+            @p5 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p4 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GetSysCacheOid3!(
-            @p5 $mode [$($done)* (@literal [- $argument]),];
+            @p5 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative4 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GetSysCacheOid3!(
-            @p5 $mode [$($done)* (@native [$argument]),];
+            @p5 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -4430,7 +4486,9 @@ macro_rules! __pgrx_c_args_GetSysCacheOid3 {
         $crate::__pgrx_c_args_GetSysCacheOid3!(@negative4 $mode [$($done)*]; - $($raw)*)
     };
     (@p4 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_GetSysCacheOid3!(@p5 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_GetSysCacheOid3!(
+            @p5 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p4 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -4452,14 +4510,18 @@ macro_rules! __pgrx_c_args_GetSysCacheOid3 {
         )
     };
     (@p4 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_GetSysCacheOid3!(@p5 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_GetSysCacheOid3!(
+            @p5 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p4 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_GetSysCacheOid3!(@p5 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_GetSysCacheOid3!(
+            @p5 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p4 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_GetSysCacheOid3!(
-            @p5 $mode [$($done)* (@native [$argument]),];
+            @p5 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -4486,13 +4548,13 @@ macro_rules! __pgrx_c_args_GetSysCacheOid3 {
     };
     (@p4 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GetSysCacheOid3!(
-            @p5 $mode [$($done)* (@literal [$argument]),];
+            @p5 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p4 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GetSysCacheOid3!(
-            @p5 $mode [$($done)* (@native [$argument]),];
+            @p5 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -4544,10 +4606,10 @@ macro_rules! GetSysCacheOid3 {
             <
                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
                     $crate::__pgrx_c_macros::CUnsignedInt,
-                    $crate::Oid
+                    $crate::__pgrx_c_bindings::Oid
                 > as $crate::__pgrx_c_macros::expression::CType
             >::from_storage(
-                $crate::__pgrx_c_generated::Inline_681ad2383bdad1fc19b9cc08521e8cba(
+                $crate::__pgrx_c_generated::Inline_0878a15b9b4a5e606820c2fb94a3bfb9(
                     <
                         $crate::__pgrx_c_macros::expression::CEnumObject<
                             $crate::__pgrx_c_generated::EnumIdentity_e5adb9dcdce4e5857db2c1cb072bba4b4ec4ff23cb7ac50512160522ccfc3354,
@@ -4580,14 +4642,14 @@ macro_rules! GetSysCacheOid3 {
                     ),
                     <
                         $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                            $crate::__pgrx_c_macros::CUnsignedLongLong,
-                            $crate::Datum
+                            $crate::__pgrx_c_macros::CUnsignedLong,
+                            $crate::__pgrx_c_bindings::Datum
                         > as $crate::__pgrx_c_macros::expression::CType
                     >::into_storage(
                         $crate::__pgrx_c_macros::expression::implicit::<
                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                $crate::Datum
+                                $crate::__pgrx_c_macros::CUnsignedLong,
+                                $crate::__pgrx_c_bindings::Datum
                             >,
                             _
                         >(
@@ -4598,14 +4660,14 @@ macro_rules! GetSysCacheOid3 {
                     ),
                     <
                         $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                            $crate::__pgrx_c_macros::CUnsignedLongLong,
-                            $crate::Datum
+                            $crate::__pgrx_c_macros::CUnsignedLong,
+                            $crate::__pgrx_c_bindings::Datum
                         > as $crate::__pgrx_c_macros::expression::CType
                     >::into_storage(
                         $crate::__pgrx_c_macros::expression::implicit::<
                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                $crate::Datum
+                                $crate::__pgrx_c_macros::CUnsignedLong,
+                                $crate::__pgrx_c_bindings::Datum
                             >,
                             _
                         >(
@@ -4616,14 +4678,14 @@ macro_rules! GetSysCacheOid3 {
                     ),
                     <
                         $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                            $crate::__pgrx_c_macros::CUnsignedLongLong,
-                            $crate::Datum
+                            $crate::__pgrx_c_macros::CUnsignedLong,
+                            $crate::__pgrx_c_bindings::Datum
                         > as $crate::__pgrx_c_macros::expression::CType
                     >::into_storage(
                         $crate::__pgrx_c_macros::expression::implicit::<
                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                $crate::Datum
+                                $crate::__pgrx_c_macros::CUnsignedLong,
+                                $crate::__pgrx_c_bindings::Datum
                             >,
                             _
                         >(
@@ -4634,14 +4696,14 @@ macro_rules! GetSysCacheOid3 {
                     ),
                     <
                         $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                            $crate::__pgrx_c_macros::CUnsignedLongLong,
-                            $crate::Datum
+                            $crate::__pgrx_c_macros::CUnsignedLong,
+                            $crate::__pgrx_c_bindings::Datum
                         > as $crate::__pgrx_c_macros::expression::CType
                     >::into_storage(
                         $crate::__pgrx_c_macros::expression::implicit::<
                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                $crate::Datum
+                                $crate::__pgrx_c_macros::CUnsignedLong,
+                                $crate::__pgrx_c_bindings::Datum
                             >,
                             _
                         >(
@@ -4692,10 +4754,10 @@ macro_rules! GetSysCacheOid3 {
                             <
                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                     $crate::__pgrx_c_macros::CUnsignedInt,
-                                    $crate::Oid
+                                    $crate::__pgrx_c_bindings::Oid
                                 > as $crate::__pgrx_c_macros::expression::CType
                             >::from_storage(
-                                $crate::__pgrx_c_generated::Inline_681ad2383bdad1fc19b9cc08521e8cba(
+                                $crate::__pgrx_c_generated::Inline_0878a15b9b4a5e606820c2fb94a3bfb9(
                                     <
                                         $crate::__pgrx_c_macros::expression::CEnumObject<
                                             $crate::__pgrx_c_generated::EnumIdentity_e5adb9dcdce4e5857db2c1cb072bba4b4ec4ff23cb7ac50512160522ccfc3354,
@@ -4732,14 +4794,14 @@ macro_rules! GetSysCacheOid3 {
                                     ),
                                     <
                                         $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                            $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                            $crate::Datum
+                                            $crate::__pgrx_c_macros::CUnsignedLong,
+                                            $crate::__pgrx_c_bindings::Datum
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::into_storage(
                                         $crate::__pgrx_c_macros::expression::implicit::<
                                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                                $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                                $crate::Datum
+                                                $crate::__pgrx_c_macros::CUnsignedLong,
+                                                $crate::__pgrx_c_bindings::Datum
                                             >,
                                             _
                                         >(
@@ -4751,14 +4813,14 @@ macro_rules! GetSysCacheOid3 {
                                     ),
                                     <
                                         $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                            $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                            $crate::Datum
+                                            $crate::__pgrx_c_macros::CUnsignedLong,
+                                            $crate::__pgrx_c_bindings::Datum
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::into_storage(
                                         $crate::__pgrx_c_macros::expression::implicit::<
                                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                                $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                                $crate::Datum
+                                                $crate::__pgrx_c_macros::CUnsignedLong,
+                                                $crate::__pgrx_c_bindings::Datum
                                             >,
                                             _
                                         >(
@@ -4770,14 +4832,14 @@ macro_rules! GetSysCacheOid3 {
                                     ),
                                     <
                                         $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                            $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                            $crate::Datum
+                                            $crate::__pgrx_c_macros::CUnsignedLong,
+                                            $crate::__pgrx_c_bindings::Datum
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::into_storage(
                                         $crate::__pgrx_c_macros::expression::implicit::<
                                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                                $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                                $crate::Datum
+                                                $crate::__pgrx_c_macros::CUnsignedLong,
+                                                $crate::__pgrx_c_bindings::Datum
                                             >,
                                             _
                                         >(
@@ -4789,14 +4851,14 @@ macro_rules! GetSysCacheOid3 {
                                     ),
                                     <
                                         $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                            $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                            $crate::Datum
+                                            $crate::__pgrx_c_macros::CUnsignedLong,
+                                            $crate::__pgrx_c_bindings::Datum
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::into_storage(
                                         $crate::__pgrx_c_macros::expression::implicit::<
                                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                                $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                                $crate::Datum
+                                                $crate::__pgrx_c_macros::CUnsignedLong,
+                                                $crate::__pgrx_c_bindings::Datum
                                             >,
                                             _
                                         >(
@@ -4832,10 +4894,10 @@ macro_rules! GetSysCacheOid3 {
                 <
                     $crate::__pgrx_c_macros::expression::CIntegerStorage<
                         $crate::__pgrx_c_macros::CUnsignedInt,
-                        $crate::Oid
+                        $crate::__pgrx_c_bindings::Oid
                     > as $crate::__pgrx_c_macros::expression::CType
                 >::from_storage(
-                    $crate::__pgrx_c_generated::Inline_681ad2383bdad1fc19b9cc08521e8cba(
+                    $crate::__pgrx_c_generated::Inline_0878a15b9b4a5e606820c2fb94a3bfb9(
                         <
                             $crate::__pgrx_c_macros::expression::CEnumObject<
                                 $crate::__pgrx_c_generated::EnumIdentity_e5adb9dcdce4e5857db2c1cb072bba4b4ec4ff23cb7ac50512160522ccfc3354,
@@ -4870,14 +4932,14 @@ macro_rules! GetSysCacheOid3 {
                         ),
                         <
                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                $crate::Datum
+                                $crate::__pgrx_c_macros::CUnsignedLong,
+                                $crate::__pgrx_c_bindings::Datum
                             > as $crate::__pgrx_c_macros::expression::CType
                         >::into_storage(
                             $crate::__pgrx_c_macros::expression::implicit::<
                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                    $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                    $crate::Datum
+                                    $crate::__pgrx_c_macros::CUnsignedLong,
+                                    $crate::__pgrx_c_bindings::Datum
                                 >,
                                 _
                             >(
@@ -4888,14 +4950,14 @@ macro_rules! GetSysCacheOid3 {
                         ),
                         <
                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                $crate::Datum
+                                $crate::__pgrx_c_macros::CUnsignedLong,
+                                $crate::__pgrx_c_bindings::Datum
                             > as $crate::__pgrx_c_macros::expression::CType
                         >::into_storage(
                             $crate::__pgrx_c_macros::expression::implicit::<
                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                    $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                    $crate::Datum
+                                    $crate::__pgrx_c_macros::CUnsignedLong,
+                                    $crate::__pgrx_c_bindings::Datum
                                 >,
                                 _
                             >(
@@ -4906,14 +4968,14 @@ macro_rules! GetSysCacheOid3 {
                         ),
                         <
                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                $crate::Datum
+                                $crate::__pgrx_c_macros::CUnsignedLong,
+                                $crate::__pgrx_c_bindings::Datum
                             > as $crate::__pgrx_c_macros::expression::CType
                         >::into_storage(
                             $crate::__pgrx_c_macros::expression::implicit::<
                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                    $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                    $crate::Datum
+                                    $crate::__pgrx_c_macros::CUnsignedLong,
+                                    $crate::__pgrx_c_bindings::Datum
                                 >,
                                 _
                             >(
@@ -4924,14 +4986,14 @@ macro_rules! GetSysCacheOid3 {
                         ),
                         <
                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                $crate::Datum
+                                $crate::__pgrx_c_macros::CUnsignedLong,
+                                $crate::__pgrx_c_bindings::Datum
                             > as $crate::__pgrx_c_macros::expression::CType
                         >::into_storage(
                             $crate::__pgrx_c_macros::expression::implicit::<
                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                    $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                    $crate::Datum
+                                    $crate::__pgrx_c_macros::CUnsignedLong,
+                                    $crate::__pgrx_c_bindings::Datum
                                 >,
                                 _
                             >(
@@ -4958,8 +5020,8 @@ macro_rules! GetSysCacheOid3 {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -4987,13 +5049,13 @@ macro_rules! __pgrx_c_args_GetSysCacheOid4 {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GetSysCacheOid4!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GetSysCacheOid4!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -5002,7 +5064,7 @@ macro_rules! __pgrx_c_args_GetSysCacheOid4 {
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_GetSysCacheOid4!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -5029,25 +5091,25 @@ macro_rules! __pgrx_c_args_GetSysCacheOid4 {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GetSysCacheOid4!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GetSysCacheOid4!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GetSysCacheOid4!(
-            @p2 $mode [$($done)* (@literal [- $argument]),];
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GetSysCacheOid4!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -5056,7 +5118,7 @@ macro_rules! __pgrx_c_args_GetSysCacheOid4 {
     };
     (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_GetSysCacheOid4!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -5083,25 +5145,25 @@ macro_rules! __pgrx_c_args_GetSysCacheOid4 {
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GetSysCacheOid4!(
-            @p2 $mode [$($done)* (@literal [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GetSysCacheOid4!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
     (@p2 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GetSysCacheOid4!(
-            @p3 $mode [$($done)* (@literal [- $argument]),];
+            @p3 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative2 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GetSysCacheOid4!(
-            @p3 $mode [$($done)* (@native [$argument]),];
+            @p3 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -5110,7 +5172,7 @@ macro_rules! __pgrx_c_args_GetSysCacheOid4 {
     };
     (@p2 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_GetSysCacheOid4!(
-            @p3 $mode [$($done)* (@native [$argument]),];
+            @p3 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -5137,25 +5199,25 @@ macro_rules! __pgrx_c_args_GetSysCacheOid4 {
     };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GetSysCacheOid4!(
-            @p3 $mode [$($done)* (@literal [$argument]),];
+            @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p2 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GetSysCacheOid4!(
-            @p3 $mode [$($done)* (@native [$argument]),];
+            @p3 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
     (@p3 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GetSysCacheOid4!(
-            @p4 $mode [$($done)* (@literal [- $argument]),];
+            @p4 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative3 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GetSysCacheOid4!(
-            @p4 $mode [$($done)* (@native [$argument]),];
+            @p4 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -5164,7 +5226,7 @@ macro_rules! __pgrx_c_args_GetSysCacheOid4 {
     };
     (@p3 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_GetSysCacheOid4!(
-            @p4 $mode [$($done)* (@native [$argument]),];
+            @p4 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -5191,25 +5253,25 @@ macro_rules! __pgrx_c_args_GetSysCacheOid4 {
     };
     (@p3 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GetSysCacheOid4!(
-            @p4 $mode [$($done)* (@literal [$argument]),];
+            @p4 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p3 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GetSysCacheOid4!(
-            @p4 $mode [$($done)* (@native [$argument]),];
+            @p4 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
     (@p4 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GetSysCacheOid4!(
-            @p5 $mode [$($done)* (@literal [- $argument]),];
+            @p5 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative4 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GetSysCacheOid4!(
-            @p5 $mode [$($done)* (@native [$argument]),];
+            @p5 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -5218,7 +5280,7 @@ macro_rules! __pgrx_c_args_GetSysCacheOid4 {
     };
     (@p4 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_GetSysCacheOid4!(
-            @p5 $mode [$($done)* (@native [$argument]),];
+            @p5 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -5245,31 +5307,35 @@ macro_rules! __pgrx_c_args_GetSysCacheOid4 {
     };
     (@p4 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GetSysCacheOid4!(
-            @p5 $mode [$($done)* (@literal [$argument]),];
+            @p5 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p4 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GetSysCacheOid4!(
-            @p5 $mode [$($done)* (@native [$argument]),];
+            @p5 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
     (@p5 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_GetSysCacheOid4!(@p6 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_GetSysCacheOid4!(
+            @p6 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative5 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_GetSysCacheOid4!(@p6 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_GetSysCacheOid4!(
+            @p6 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p5 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GetSysCacheOid4!(
-            @p6 $mode [$($done)* (@literal [- $argument]),];
+            @p6 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative5 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GetSysCacheOid4!(
-            @p6 $mode [$($done)* (@native [$argument]),];
+            @p6 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -5277,7 +5343,9 @@ macro_rules! __pgrx_c_args_GetSysCacheOid4 {
         $crate::__pgrx_c_args_GetSysCacheOid4!(@negative5 $mode [$($done)*]; - $($raw)*)
     };
     (@p5 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_GetSysCacheOid4!(@p6 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_GetSysCacheOid4!(
+            @p6 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p5 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -5299,14 +5367,18 @@ macro_rules! __pgrx_c_args_GetSysCacheOid4 {
         )
     };
     (@p5 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_GetSysCacheOid4!(@p6 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_GetSysCacheOid4!(
+            @p6 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p5 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_GetSysCacheOid4!(@p6 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_GetSysCacheOid4!(
+            @p6 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p5 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_GetSysCacheOid4!(
-            @p6 $mode [$($done)* (@native [$argument]),];
+            @p6 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -5333,13 +5405,13 @@ macro_rules! __pgrx_c_args_GetSysCacheOid4 {
     };
     (@p5 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GetSysCacheOid4!(
-            @p6 $mode [$($done)* (@literal [$argument]),];
+            @p6 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p5 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GetSysCacheOid4!(
-            @p6 $mode [$($done)* (@native [$argument]),];
+            @p6 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -5408,10 +5480,10 @@ macro_rules! GetSysCacheOid4 {
             <
                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
                     $crate::__pgrx_c_macros::CUnsignedInt,
-                    $crate::Oid
+                    $crate::__pgrx_c_bindings::Oid
                 > as $crate::__pgrx_c_macros::expression::CType
             >::from_storage(
-                $crate::__pgrx_c_generated::Inline_681ad2383bdad1fc19b9cc08521e8cba(
+                $crate::__pgrx_c_generated::Inline_0878a15b9b4a5e606820c2fb94a3bfb9(
                     <
                         $crate::__pgrx_c_macros::expression::CEnumObject<
                             $crate::__pgrx_c_generated::EnumIdentity_e5adb9dcdce4e5857db2c1cb072bba4b4ec4ff23cb7ac50512160522ccfc3354,
@@ -5444,14 +5516,14 @@ macro_rules! GetSysCacheOid4 {
                     ),
                     <
                         $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                            $crate::__pgrx_c_macros::CUnsignedLongLong,
-                            $crate::Datum
+                            $crate::__pgrx_c_macros::CUnsignedLong,
+                            $crate::__pgrx_c_bindings::Datum
                         > as $crate::__pgrx_c_macros::expression::CType
                     >::into_storage(
                         $crate::__pgrx_c_macros::expression::implicit::<
                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                $crate::Datum
+                                $crate::__pgrx_c_macros::CUnsignedLong,
+                                $crate::__pgrx_c_bindings::Datum
                             >,
                             _
                         >(
@@ -5462,14 +5534,14 @@ macro_rules! GetSysCacheOid4 {
                     ),
                     <
                         $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                            $crate::__pgrx_c_macros::CUnsignedLongLong,
-                            $crate::Datum
+                            $crate::__pgrx_c_macros::CUnsignedLong,
+                            $crate::__pgrx_c_bindings::Datum
                         > as $crate::__pgrx_c_macros::expression::CType
                     >::into_storage(
                         $crate::__pgrx_c_macros::expression::implicit::<
                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                $crate::Datum
+                                $crate::__pgrx_c_macros::CUnsignedLong,
+                                $crate::__pgrx_c_bindings::Datum
                             >,
                             _
                         >(
@@ -5480,14 +5552,14 @@ macro_rules! GetSysCacheOid4 {
                     ),
                     <
                         $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                            $crate::__pgrx_c_macros::CUnsignedLongLong,
-                            $crate::Datum
+                            $crate::__pgrx_c_macros::CUnsignedLong,
+                            $crate::__pgrx_c_bindings::Datum
                         > as $crate::__pgrx_c_macros::expression::CType
                     >::into_storage(
                         $crate::__pgrx_c_macros::expression::implicit::<
                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                $crate::Datum
+                                $crate::__pgrx_c_macros::CUnsignedLong,
+                                $crate::__pgrx_c_bindings::Datum
                             >,
                             _
                         >(
@@ -5498,14 +5570,14 @@ macro_rules! GetSysCacheOid4 {
                     ),
                     <
                         $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                            $crate::__pgrx_c_macros::CUnsignedLongLong,
-                            $crate::Datum
+                            $crate::__pgrx_c_macros::CUnsignedLong,
+                            $crate::__pgrx_c_bindings::Datum
                         > as $crate::__pgrx_c_macros::expression::CType
                     >::into_storage(
                         $crate::__pgrx_c_macros::expression::implicit::<
                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                $crate::Datum
+                                $crate::__pgrx_c_macros::CUnsignedLong,
+                                $crate::__pgrx_c_bindings::Datum
                             >,
                             _
                         >(
@@ -5553,10 +5625,10 @@ macro_rules! GetSysCacheOid4 {
                             <
                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                     $crate::__pgrx_c_macros::CUnsignedInt,
-                                    $crate::Oid
+                                    $crate::__pgrx_c_bindings::Oid
                                 > as $crate::__pgrx_c_macros::expression::CType
                             >::from_storage(
-                                $crate::__pgrx_c_generated::Inline_681ad2383bdad1fc19b9cc08521e8cba(
+                                $crate::__pgrx_c_generated::Inline_0878a15b9b4a5e606820c2fb94a3bfb9(
                                     <
                                         $crate::__pgrx_c_macros::expression::CEnumObject<
                                             $crate::__pgrx_c_generated::EnumIdentity_e5adb9dcdce4e5857db2c1cb072bba4b4ec4ff23cb7ac50512160522ccfc3354,
@@ -5593,14 +5665,14 @@ macro_rules! GetSysCacheOid4 {
                                     ),
                                     <
                                         $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                            $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                            $crate::Datum
+                                            $crate::__pgrx_c_macros::CUnsignedLong,
+                                            $crate::__pgrx_c_bindings::Datum
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::into_storage(
                                         $crate::__pgrx_c_macros::expression::implicit::<
                                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                                $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                                $crate::Datum
+                                                $crate::__pgrx_c_macros::CUnsignedLong,
+                                                $crate::__pgrx_c_bindings::Datum
                                             >,
                                             _
                                         >(
@@ -5612,14 +5684,14 @@ macro_rules! GetSysCacheOid4 {
                                     ),
                                     <
                                         $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                            $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                            $crate::Datum
+                                            $crate::__pgrx_c_macros::CUnsignedLong,
+                                            $crate::__pgrx_c_bindings::Datum
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::into_storage(
                                         $crate::__pgrx_c_macros::expression::implicit::<
                                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                                $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                                $crate::Datum
+                                                $crate::__pgrx_c_macros::CUnsignedLong,
+                                                $crate::__pgrx_c_bindings::Datum
                                             >,
                                             _
                                         >(
@@ -5631,14 +5703,14 @@ macro_rules! GetSysCacheOid4 {
                                     ),
                                     <
                                         $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                            $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                            $crate::Datum
+                                            $crate::__pgrx_c_macros::CUnsignedLong,
+                                            $crate::__pgrx_c_bindings::Datum
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::into_storage(
                                         $crate::__pgrx_c_macros::expression::implicit::<
                                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                                $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                                $crate::Datum
+                                                $crate::__pgrx_c_macros::CUnsignedLong,
+                                                $crate::__pgrx_c_bindings::Datum
                                             >,
                                             _
                                         >(
@@ -5650,14 +5722,14 @@ macro_rules! GetSysCacheOid4 {
                                     ),
                                     <
                                         $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                            $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                            $crate::Datum
+                                            $crate::__pgrx_c_macros::CUnsignedLong,
+                                            $crate::__pgrx_c_bindings::Datum
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::into_storage(
                                         $crate::__pgrx_c_macros::expression::implicit::<
                                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                                $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                                $crate::Datum
+                                                $crate::__pgrx_c_macros::CUnsignedLong,
+                                                $crate::__pgrx_c_bindings::Datum
                                             >,
                                             _
                                         >(
@@ -5687,10 +5759,10 @@ macro_rules! GetSysCacheOid4 {
                 <
                     $crate::__pgrx_c_macros::expression::CIntegerStorage<
                         $crate::__pgrx_c_macros::CUnsignedInt,
-                        $crate::Oid
+                        $crate::__pgrx_c_bindings::Oid
                     > as $crate::__pgrx_c_macros::expression::CType
                 >::from_storage(
-                    $crate::__pgrx_c_generated::Inline_681ad2383bdad1fc19b9cc08521e8cba(
+                    $crate::__pgrx_c_generated::Inline_0878a15b9b4a5e606820c2fb94a3bfb9(
                         <
                             $crate::__pgrx_c_macros::expression::CEnumObject<
                                 $crate::__pgrx_c_generated::EnumIdentity_e5adb9dcdce4e5857db2c1cb072bba4b4ec4ff23cb7ac50512160522ccfc3354,
@@ -5725,14 +5797,14 @@ macro_rules! GetSysCacheOid4 {
                         ),
                         <
                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                $crate::Datum
+                                $crate::__pgrx_c_macros::CUnsignedLong,
+                                $crate::__pgrx_c_bindings::Datum
                             > as $crate::__pgrx_c_macros::expression::CType
                         >::into_storage(
                             $crate::__pgrx_c_macros::expression::implicit::<
                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                    $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                    $crate::Datum
+                                    $crate::__pgrx_c_macros::CUnsignedLong,
+                                    $crate::__pgrx_c_bindings::Datum
                                 >,
                                 _
                             >(
@@ -5743,14 +5815,14 @@ macro_rules! GetSysCacheOid4 {
                         ),
                         <
                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                $crate::Datum
+                                $crate::__pgrx_c_macros::CUnsignedLong,
+                                $crate::__pgrx_c_bindings::Datum
                             > as $crate::__pgrx_c_macros::expression::CType
                         >::into_storage(
                             $crate::__pgrx_c_macros::expression::implicit::<
                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                    $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                    $crate::Datum
+                                    $crate::__pgrx_c_macros::CUnsignedLong,
+                                    $crate::__pgrx_c_bindings::Datum
                                 >,
                                 _
                             >(
@@ -5761,14 +5833,14 @@ macro_rules! GetSysCacheOid4 {
                         ),
                         <
                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                $crate::Datum
+                                $crate::__pgrx_c_macros::CUnsignedLong,
+                                $crate::__pgrx_c_bindings::Datum
                             > as $crate::__pgrx_c_macros::expression::CType
                         >::into_storage(
                             $crate::__pgrx_c_macros::expression::implicit::<
                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                    $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                    $crate::Datum
+                                    $crate::__pgrx_c_macros::CUnsignedLong,
+                                    $crate::__pgrx_c_bindings::Datum
                                 >,
                                 _
                             >(
@@ -5779,14 +5851,14 @@ macro_rules! GetSysCacheOid4 {
                         ),
                         <
                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                $crate::Datum
+                                $crate::__pgrx_c_macros::CUnsignedLong,
+                                $crate::__pgrx_c_bindings::Datum
                             > as $crate::__pgrx_c_macros::expression::CType
                         >::into_storage(
                             $crate::__pgrx_c_macros::expression::implicit::<
                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                    $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                    $crate::Datum
+                                    $crate::__pgrx_c_macros::CUnsignedLong,
+                                    $crate::__pgrx_c_bindings::Datum
                                 >,
                                 _
                             >(
@@ -5809,8 +5881,8 @@ macro_rules! GetSysCacheOid4 {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -5837,20 +5909,24 @@ macro_rules! __pgrx_c_args_ReleaseSysCacheList {
         $crate::__pgrx_c_args_ReleaseSysCacheList!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_ReleaseSysCacheList!(@p1 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_ReleaseSysCacheList!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_ReleaseSysCacheList!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_ReleaseSysCacheList!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_ReleaseSysCacheList!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_ReleaseSysCacheList!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -5858,7 +5934,9 @@ macro_rules! __pgrx_c_args_ReleaseSysCacheList {
         $crate::__pgrx_c_args_ReleaseSysCacheList!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_ReleaseSysCacheList!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_ReleaseSysCacheList!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -5880,14 +5958,18 @@ macro_rules! __pgrx_c_args_ReleaseSysCacheList {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_ReleaseSysCacheList!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_ReleaseSysCacheList!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_ReleaseSysCacheList!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_ReleaseSysCacheList!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_ReleaseSysCacheList!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -5914,13 +5996,13 @@ macro_rules! __pgrx_c_args_ReleaseSysCacheList {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_ReleaseSysCacheList!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_ReleaseSysCacheList!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -5965,16 +6047,20 @@ macro_rules! ReleaseSysCacheList {
     (@__pgrx_emit_value; $x:tt $(,)?) => {
         /* PGRX: ReleaseSysCacheList remains expanded because ReleaseCatCacheList is not an active function-like macro. */
         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-            $crate::ReleaseCatCacheList(
+            $crate::__pgrx_c_bindings::ReleaseCatCacheList(
                 <
                     $crate::__pgrx_c_macros::expression::CPointer<
-                        $crate::__pgrx_c_macros::expression::CRecord<$crate::catclist>,
+                        $crate::__pgrx_c_macros::expression::CRecord<
+                            $crate::__pgrx_c_bindings::catclist
+                        >,
                         $crate::__pgrx_c_macros::expression::ReadWrite
                     > as $crate::__pgrx_c_macros::expression::CType
                 >::into_storage(
                     $crate::__pgrx_c_macros::expression::implicit::<
                         $crate::__pgrx_c_macros::expression::CPointer<
-                            $crate::__pgrx_c_macros::expression::CRecord<$crate::catclist>,
+                            $crate::__pgrx_c_macros::expression::CRecord<
+                                $crate::__pgrx_c_bindings::catclist
+                            >,
                             $crate::__pgrx_c_macros::expression::ReadWrite
                         >,
                         _
@@ -6014,11 +6100,11 @@ macro_rules! ReleaseSysCacheList {
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                            $crate::ReleaseCatCacheList(
+                            $crate::__pgrx_c_bindings::ReleaseCatCacheList(
                                 <
                                     $crate::__pgrx_c_macros::expression::CPointer<
                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                            $crate::catclist
+                                            $crate::__pgrx_c_bindings::catclist
                                         >,
                                         $crate::__pgrx_c_macros::expression::ReadWrite
                                     > as $crate::__pgrx_c_macros::expression::CType
@@ -6026,7 +6112,7 @@ macro_rules! ReleaseSysCacheList {
                                     $crate::__pgrx_c_macros::expression::implicit::<
                                         $crate::__pgrx_c_macros::expression::CPointer<
                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                $crate::catclist
+                                                $crate::__pgrx_c_bindings::catclist
                                             >,
                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                         >,
@@ -6054,16 +6140,20 @@ macro_rules! ReleaseSysCacheList {
         /* PGRX: ReleaseSysCacheList remains expanded because ReleaseCatCacheList is not an active function-like macro. */
         {
             let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                $crate::ReleaseCatCacheList(
+                $crate::__pgrx_c_bindings::ReleaseCatCacheList(
                     <
                         $crate::__pgrx_c_macros::expression::CPointer<
-                            $crate::__pgrx_c_macros::expression::CRecord<$crate::catclist>,
+                            $crate::__pgrx_c_macros::expression::CRecord<
+                                $crate::__pgrx_c_bindings::catclist
+                            >,
                             $crate::__pgrx_c_macros::expression::ReadWrite
                         > as $crate::__pgrx_c_macros::expression::CType
                     >::into_storage(
                         $crate::__pgrx_c_macros::expression::implicit::<
                             $crate::__pgrx_c_macros::expression::CPointer<
-                                $crate::__pgrx_c_macros::expression::CRecord<$crate::catclist>,
+                                $crate::__pgrx_c_macros::expression::CRecord<
+                                    $crate::__pgrx_c_bindings::catclist
+                                >,
                                 $crate::__pgrx_c_macros::expression::ReadWrite
                             >,
                             _
@@ -6086,8 +6176,8 @@ macro_rules! ReleaseSysCacheList {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -6115,13 +6205,13 @@ macro_rules! __pgrx_c_args_SearchSysCacheCopy1 {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SearchSysCacheCopy1!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SearchSysCacheCopy1!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -6130,7 +6220,7 @@ macro_rules! __pgrx_c_args_SearchSysCacheCopy1 {
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_SearchSysCacheCopy1!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -6157,31 +6247,35 @@ macro_rules! __pgrx_c_args_SearchSysCacheCopy1 {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SearchSysCacheCopy1!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SearchSysCacheCopy1!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_SearchSysCacheCopy1!(@p2 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_SearchSysCacheCopy1!(
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative1 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_SearchSysCacheCopy1!(@p2 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_SearchSysCacheCopy1!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SearchSysCacheCopy1!(
-            @p2 $mode [$($done)* (@literal [- $argument]),];
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SearchSysCacheCopy1!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -6189,7 +6283,9 @@ macro_rules! __pgrx_c_args_SearchSysCacheCopy1 {
         $crate::__pgrx_c_args_SearchSysCacheCopy1!(@negative1 $mode [$($done)*]; - $($raw)*)
     };
     (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_SearchSysCacheCopy1!(@p2 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_SearchSysCacheCopy1!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -6211,14 +6307,18 @@ macro_rules! __pgrx_c_args_SearchSysCacheCopy1 {
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_SearchSysCacheCopy1!(@p2 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_SearchSysCacheCopy1!(
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_SearchSysCacheCopy1!(@p2 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_SearchSysCacheCopy1!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_SearchSysCacheCopy1!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -6245,13 +6345,13 @@ macro_rules! __pgrx_c_args_SearchSysCacheCopy1 {
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SearchSysCacheCopy1!(
-            @p2 $mode [$($done)* (@literal [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SearchSysCacheCopy1!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -6299,11 +6399,13 @@ macro_rules! SearchSysCacheCopy1 {
         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
             <
                 $crate::__pgrx_c_macros::expression::CPointer<
-                    $crate::__pgrx_c_macros::expression::CRecord<$crate::HeapTupleData>,
+                    $crate::__pgrx_c_macros::expression::CRecord<
+                        $crate::__pgrx_c_bindings::HeapTupleData
+                    >,
                     $crate::__pgrx_c_macros::expression::ReadWrite
                 > as $crate::__pgrx_c_macros::expression::CType
             >::from_storage(
-                $crate::__pgrx_c_generated::Inline_4f32b3144d31c94ff9ea6026fbcdee54(
+                $crate::__pgrx_c_generated::Inline_499cf25baf495404aa24da1584a0e34c(
                     <
                         $crate::__pgrx_c_macros::expression::CEnumObject<
                             $crate::__pgrx_c_generated::EnumIdentity_e5adb9dcdce4e5857db2c1cb072bba4b4ec4ff23cb7ac50512160522ccfc3354,
@@ -6326,14 +6428,14 @@ macro_rules! SearchSysCacheCopy1 {
                     ),
                     <
                         $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                            $crate::__pgrx_c_macros::CUnsignedLongLong,
-                            $crate::Datum
+                            $crate::__pgrx_c_macros::CUnsignedLong,
+                            $crate::__pgrx_c_bindings::Datum
                         > as $crate::__pgrx_c_macros::expression::CType
                     >::into_storage(
                         $crate::__pgrx_c_macros::expression::implicit::<
                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                $crate::Datum
+                                $crate::__pgrx_c_macros::CUnsignedLong,
+                                $crate::__pgrx_c_bindings::Datum
                             >,
                             _
                         >(
@@ -6344,14 +6446,14 @@ macro_rules! SearchSysCacheCopy1 {
                     ),
                     <
                         $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                            $crate::__pgrx_c_macros::CUnsignedLongLong,
-                            $crate::Datum
+                            $crate::__pgrx_c_macros::CUnsignedLong,
+                            $crate::__pgrx_c_bindings::Datum
                         > as $crate::__pgrx_c_macros::expression::CType
                     >::into_storage(
                         $crate::__pgrx_c_macros::expression::implicit::<
                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                $crate::Datum
+                                $crate::__pgrx_c_macros::CUnsignedLong,
+                                $crate::__pgrx_c_bindings::Datum
                             >,
                             _
                         >(
@@ -6366,14 +6468,14 @@ macro_rules! SearchSysCacheCopy1 {
                     ),
                     <
                         $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                            $crate::__pgrx_c_macros::CUnsignedLongLong,
-                            $crate::Datum
+                            $crate::__pgrx_c_macros::CUnsignedLong,
+                            $crate::__pgrx_c_bindings::Datum
                         > as $crate::__pgrx_c_macros::expression::CType
                     >::into_storage(
                         $crate::__pgrx_c_macros::expression::implicit::<
                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                $crate::Datum
+                                $crate::__pgrx_c_macros::CUnsignedLong,
+                                $crate::__pgrx_c_bindings::Datum
                             >,
                             _
                         >(
@@ -6388,14 +6490,14 @@ macro_rules! SearchSysCacheCopy1 {
                     ),
                     <
                         $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                            $crate::__pgrx_c_macros::CUnsignedLongLong,
-                            $crate::Datum
+                            $crate::__pgrx_c_macros::CUnsignedLong,
+                            $crate::__pgrx_c_bindings::Datum
                         > as $crate::__pgrx_c_macros::expression::CType
                     >::into_storage(
                         $crate::__pgrx_c_macros::expression::implicit::<
                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                $crate::Datum
+                                $crate::__pgrx_c_macros::CUnsignedLong,
+                                $crate::__pgrx_c_bindings::Datum
                             >,
                             _
                         >(
@@ -6443,12 +6545,12 @@ macro_rules! SearchSysCacheCopy1 {
                             <
                                 $crate::__pgrx_c_macros::expression::CPointer<
                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                        $crate::HeapTupleData
+                                        $crate::__pgrx_c_bindings::HeapTupleData
                                     >,
                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                 > as $crate::__pgrx_c_macros::expression::CType
                             >::from_storage(
-                                $crate::__pgrx_c_generated::Inline_4f32b3144d31c94ff9ea6026fbcdee54(
+                                $crate::__pgrx_c_generated::Inline_499cf25baf495404aa24da1584a0e34c(
                                     <
                                         $crate::__pgrx_c_macros::expression::CEnumObject<
                                             $crate::__pgrx_c_generated::EnumIdentity_e5adb9dcdce4e5857db2c1cb072bba4b4ec4ff23cb7ac50512160522ccfc3354,
@@ -6472,14 +6574,14 @@ macro_rules! SearchSysCacheCopy1 {
                                     ),
                                     <
                                         $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                            $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                            $crate::Datum
+                                            $crate::__pgrx_c_macros::CUnsignedLong,
+                                            $crate::__pgrx_c_bindings::Datum
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::into_storage(
                                         $crate::__pgrx_c_macros::expression::implicit::<
                                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                                $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                                $crate::Datum
+                                                $crate::__pgrx_c_macros::CUnsignedLong,
+                                                $crate::__pgrx_c_bindings::Datum
                                             >,
                                             _
                                         >(
@@ -6491,14 +6593,14 @@ macro_rules! SearchSysCacheCopy1 {
                                     ),
                                     <
                                         $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                            $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                            $crate::Datum
+                                            $crate::__pgrx_c_macros::CUnsignedLong,
+                                            $crate::__pgrx_c_bindings::Datum
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::into_storage(
                                         $crate::__pgrx_c_macros::expression::implicit::<
                                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                                $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                                $crate::Datum
+                                                $crate::__pgrx_c_macros::CUnsignedLong,
+                                                $crate::__pgrx_c_bindings::Datum
                                             >,
                                             _
                                         >(
@@ -6516,14 +6618,14 @@ macro_rules! SearchSysCacheCopy1 {
                                     ),
                                     <
                                         $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                            $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                            $crate::Datum
+                                            $crate::__pgrx_c_macros::CUnsignedLong,
+                                            $crate::__pgrx_c_bindings::Datum
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::into_storage(
                                         $crate::__pgrx_c_macros::expression::implicit::<
                                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                                $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                                $crate::Datum
+                                                $crate::__pgrx_c_macros::CUnsignedLong,
+                                                $crate::__pgrx_c_bindings::Datum
                                             >,
                                             _
                                         >(
@@ -6541,14 +6643,14 @@ macro_rules! SearchSysCacheCopy1 {
                                     ),
                                     <
                                         $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                            $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                            $crate::Datum
+                                            $crate::__pgrx_c_macros::CUnsignedLong,
+                                            $crate::__pgrx_c_bindings::Datum
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::into_storage(
                                         $crate::__pgrx_c_macros::expression::implicit::<
                                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                                $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                                $crate::Datum
+                                                $crate::__pgrx_c_macros::CUnsignedLong,
+                                                $crate::__pgrx_c_bindings::Datum
                                             >,
                                             _
                                         >(
@@ -6583,11 +6685,13 @@ macro_rules! SearchSysCacheCopy1 {
             let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 <
                     $crate::__pgrx_c_macros::expression::CPointer<
-                        $crate::__pgrx_c_macros::expression::CRecord<$crate::HeapTupleData>,
+                        $crate::__pgrx_c_macros::expression::CRecord<
+                            $crate::__pgrx_c_bindings::HeapTupleData
+                        >,
                         $crate::__pgrx_c_macros::expression::ReadWrite
                     > as $crate::__pgrx_c_macros::expression::CType
                 >::from_storage(
-                    $crate::__pgrx_c_generated::Inline_4f32b3144d31c94ff9ea6026fbcdee54(
+                    $crate::__pgrx_c_generated::Inline_499cf25baf495404aa24da1584a0e34c(
                         <
                             $crate::__pgrx_c_macros::expression::CEnumObject<
                                 $crate::__pgrx_c_generated::EnumIdentity_e5adb9dcdce4e5857db2c1cb072bba4b4ec4ff23cb7ac50512160522ccfc3354,
@@ -6610,14 +6714,14 @@ macro_rules! SearchSysCacheCopy1 {
                         ),
                         <
                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                $crate::Datum
+                                $crate::__pgrx_c_macros::CUnsignedLong,
+                                $crate::__pgrx_c_bindings::Datum
                             > as $crate::__pgrx_c_macros::expression::CType
                         >::into_storage(
                             $crate::__pgrx_c_macros::expression::implicit::<
                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                    $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                    $crate::Datum
+                                    $crate::__pgrx_c_macros::CUnsignedLong,
+                                    $crate::__pgrx_c_bindings::Datum
                                 >,
                                 _
                             >(
@@ -6628,14 +6732,14 @@ macro_rules! SearchSysCacheCopy1 {
                         ),
                         <
                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                $crate::Datum
+                                $crate::__pgrx_c_macros::CUnsignedLong,
+                                $crate::__pgrx_c_bindings::Datum
                             > as $crate::__pgrx_c_macros::expression::CType
                         >::into_storage(
                             $crate::__pgrx_c_macros::expression::implicit::<
                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                    $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                    $crate::Datum
+                                    $crate::__pgrx_c_macros::CUnsignedLong,
+                                    $crate::__pgrx_c_bindings::Datum
                                 >,
                                 _
                             >(
@@ -6650,14 +6754,14 @@ macro_rules! SearchSysCacheCopy1 {
                         ),
                         <
                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                $crate::Datum
+                                $crate::__pgrx_c_macros::CUnsignedLong,
+                                $crate::__pgrx_c_bindings::Datum
                             > as $crate::__pgrx_c_macros::expression::CType
                         >::into_storage(
                             $crate::__pgrx_c_macros::expression::implicit::<
                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                    $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                    $crate::Datum
+                                    $crate::__pgrx_c_macros::CUnsignedLong,
+                                    $crate::__pgrx_c_bindings::Datum
                                 >,
                                 _
                             >(
@@ -6672,14 +6776,14 @@ macro_rules! SearchSysCacheCopy1 {
                         ),
                         <
                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                $crate::Datum
+                                $crate::__pgrx_c_macros::CUnsignedLong,
+                                $crate::__pgrx_c_bindings::Datum
                             > as $crate::__pgrx_c_macros::expression::CType
                         >::into_storage(
                             $crate::__pgrx_c_macros::expression::implicit::<
                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                    $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                    $crate::Datum
+                                    $crate::__pgrx_c_macros::CUnsignedLong,
+                                    $crate::__pgrx_c_bindings::Datum
                                 >,
                                 _
                             >(
@@ -6706,8 +6810,8 @@ macro_rules! SearchSysCacheCopy1 {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -6735,13 +6839,13 @@ macro_rules! __pgrx_c_args_SearchSysCacheCopy2 {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SearchSysCacheCopy2!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SearchSysCacheCopy2!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -6750,7 +6854,7 @@ macro_rules! __pgrx_c_args_SearchSysCacheCopy2 {
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_SearchSysCacheCopy2!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -6777,25 +6881,25 @@ macro_rules! __pgrx_c_args_SearchSysCacheCopy2 {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SearchSysCacheCopy2!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SearchSysCacheCopy2!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SearchSysCacheCopy2!(
-            @p2 $mode [$($done)* (@literal [- $argument]),];
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SearchSysCacheCopy2!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -6804,7 +6908,7 @@ macro_rules! __pgrx_c_args_SearchSysCacheCopy2 {
     };
     (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_SearchSysCacheCopy2!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -6831,31 +6935,35 @@ macro_rules! __pgrx_c_args_SearchSysCacheCopy2 {
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SearchSysCacheCopy2!(
-            @p2 $mode [$($done)* (@literal [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SearchSysCacheCopy2!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
     (@p2 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_SearchSysCacheCopy2!(@p3 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_SearchSysCacheCopy2!(
+            @p3 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative2 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_SearchSysCacheCopy2!(@p3 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_SearchSysCacheCopy2!(
+            @p3 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p2 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SearchSysCacheCopy2!(
-            @p3 $mode [$($done)* (@literal [- $argument]),];
+            @p3 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative2 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SearchSysCacheCopy2!(
-            @p3 $mode [$($done)* (@native [$argument]),];
+            @p3 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -6863,7 +6971,9 @@ macro_rules! __pgrx_c_args_SearchSysCacheCopy2 {
         $crate::__pgrx_c_args_SearchSysCacheCopy2!(@negative2 $mode [$($done)*]; - $($raw)*)
     };
     (@p2 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_SearchSysCacheCopy2!(@p3 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_SearchSysCacheCopy2!(
+            @p3 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p2 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -6885,14 +6995,18 @@ macro_rules! __pgrx_c_args_SearchSysCacheCopy2 {
         )
     };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_SearchSysCacheCopy2!(@p3 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_SearchSysCacheCopy2!(
+            @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p2 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_SearchSysCacheCopy2!(@p3 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_SearchSysCacheCopy2!(
+            @p3 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p2 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_SearchSysCacheCopy2!(
-            @p3 $mode [$($done)* (@native [$argument]),];
+            @p3 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -6919,13 +7033,13 @@ macro_rules! __pgrx_c_args_SearchSysCacheCopy2 {
     };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SearchSysCacheCopy2!(
-            @p3 $mode [$($done)* (@literal [$argument]),];
+            @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p2 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SearchSysCacheCopy2!(
-            @p3 $mode [$($done)* (@native [$argument]),];
+            @p3 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -6974,11 +7088,13 @@ macro_rules! SearchSysCacheCopy2 {
         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
             <
                 $crate::__pgrx_c_macros::expression::CPointer<
-                    $crate::__pgrx_c_macros::expression::CRecord<$crate::HeapTupleData>,
+                    $crate::__pgrx_c_macros::expression::CRecord<
+                        $crate::__pgrx_c_bindings::HeapTupleData
+                    >,
                     $crate::__pgrx_c_macros::expression::ReadWrite
                 > as $crate::__pgrx_c_macros::expression::CType
             >::from_storage(
-                $crate::__pgrx_c_generated::Inline_4f32b3144d31c94ff9ea6026fbcdee54(
+                $crate::__pgrx_c_generated::Inline_499cf25baf495404aa24da1584a0e34c(
                     <
                         $crate::__pgrx_c_macros::expression::CEnumObject<
                             $crate::__pgrx_c_generated::EnumIdentity_e5adb9dcdce4e5857db2c1cb072bba4b4ec4ff23cb7ac50512160522ccfc3354,
@@ -7001,14 +7117,14 @@ macro_rules! SearchSysCacheCopy2 {
                     ),
                     <
                         $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                            $crate::__pgrx_c_macros::CUnsignedLongLong,
-                            $crate::Datum
+                            $crate::__pgrx_c_macros::CUnsignedLong,
+                            $crate::__pgrx_c_bindings::Datum
                         > as $crate::__pgrx_c_macros::expression::CType
                     >::into_storage(
                         $crate::__pgrx_c_macros::expression::implicit::<
                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                $crate::Datum
+                                $crate::__pgrx_c_macros::CUnsignedLong,
+                                $crate::__pgrx_c_bindings::Datum
                             >,
                             _
                         >(
@@ -7019,14 +7135,14 @@ macro_rules! SearchSysCacheCopy2 {
                     ),
                     <
                         $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                            $crate::__pgrx_c_macros::CUnsignedLongLong,
-                            $crate::Datum
+                            $crate::__pgrx_c_macros::CUnsignedLong,
+                            $crate::__pgrx_c_bindings::Datum
                         > as $crate::__pgrx_c_macros::expression::CType
                     >::into_storage(
                         $crate::__pgrx_c_macros::expression::implicit::<
                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                $crate::Datum
+                                $crate::__pgrx_c_macros::CUnsignedLong,
+                                $crate::__pgrx_c_bindings::Datum
                             >,
                             _
                         >(
@@ -7037,14 +7153,14 @@ macro_rules! SearchSysCacheCopy2 {
                     ),
                     <
                         $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                            $crate::__pgrx_c_macros::CUnsignedLongLong,
-                            $crate::Datum
+                            $crate::__pgrx_c_macros::CUnsignedLong,
+                            $crate::__pgrx_c_bindings::Datum
                         > as $crate::__pgrx_c_macros::expression::CType
                     >::into_storage(
                         $crate::__pgrx_c_macros::expression::implicit::<
                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                $crate::Datum
+                                $crate::__pgrx_c_macros::CUnsignedLong,
+                                $crate::__pgrx_c_bindings::Datum
                             >,
                             _
                         >(
@@ -7059,14 +7175,14 @@ macro_rules! SearchSysCacheCopy2 {
                     ),
                     <
                         $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                            $crate::__pgrx_c_macros::CUnsignedLongLong,
-                            $crate::Datum
+                            $crate::__pgrx_c_macros::CUnsignedLong,
+                            $crate::__pgrx_c_bindings::Datum
                         > as $crate::__pgrx_c_macros::expression::CType
                     >::into_storage(
                         $crate::__pgrx_c_macros::expression::implicit::<
                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                $crate::Datum
+                                $crate::__pgrx_c_macros::CUnsignedLong,
+                                $crate::__pgrx_c_bindings::Datum
                             >,
                             _
                         >(
@@ -7115,12 +7231,12 @@ macro_rules! SearchSysCacheCopy2 {
                             <
                                 $crate::__pgrx_c_macros::expression::CPointer<
                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                        $crate::HeapTupleData
+                                        $crate::__pgrx_c_bindings::HeapTupleData
                                     >,
                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                 > as $crate::__pgrx_c_macros::expression::CType
                             >::from_storage(
-                                $crate::__pgrx_c_generated::Inline_4f32b3144d31c94ff9ea6026fbcdee54(
+                                $crate::__pgrx_c_generated::Inline_499cf25baf495404aa24da1584a0e34c(
                                     <
                                         $crate::__pgrx_c_macros::expression::CEnumObject<
                                             $crate::__pgrx_c_generated::EnumIdentity_e5adb9dcdce4e5857db2c1cb072bba4b4ec4ff23cb7ac50512160522ccfc3354,
@@ -7144,14 +7260,14 @@ macro_rules! SearchSysCacheCopy2 {
                                     ),
                                     <
                                         $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                            $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                            $crate::Datum
+                                            $crate::__pgrx_c_macros::CUnsignedLong,
+                                            $crate::__pgrx_c_bindings::Datum
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::into_storage(
                                         $crate::__pgrx_c_macros::expression::implicit::<
                                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                                $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                                $crate::Datum
+                                                $crate::__pgrx_c_macros::CUnsignedLong,
+                                                $crate::__pgrx_c_bindings::Datum
                                             >,
                                             _
                                         >(
@@ -7163,14 +7279,14 @@ macro_rules! SearchSysCacheCopy2 {
                                     ),
                                     <
                                         $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                            $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                            $crate::Datum
+                                            $crate::__pgrx_c_macros::CUnsignedLong,
+                                            $crate::__pgrx_c_bindings::Datum
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::into_storage(
                                         $crate::__pgrx_c_macros::expression::implicit::<
                                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                                $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                                $crate::Datum
+                                                $crate::__pgrx_c_macros::CUnsignedLong,
+                                                $crate::__pgrx_c_bindings::Datum
                                             >,
                                             _
                                         >(
@@ -7182,14 +7298,14 @@ macro_rules! SearchSysCacheCopy2 {
                                     ),
                                     <
                                         $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                            $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                            $crate::Datum
+                                            $crate::__pgrx_c_macros::CUnsignedLong,
+                                            $crate::__pgrx_c_bindings::Datum
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::into_storage(
                                         $crate::__pgrx_c_macros::expression::implicit::<
                                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                                $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                                $crate::Datum
+                                                $crate::__pgrx_c_macros::CUnsignedLong,
+                                                $crate::__pgrx_c_bindings::Datum
                                             >,
                                             _
                                         >(
@@ -7207,14 +7323,14 @@ macro_rules! SearchSysCacheCopy2 {
                                     ),
                                     <
                                         $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                            $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                            $crate::Datum
+                                            $crate::__pgrx_c_macros::CUnsignedLong,
+                                            $crate::__pgrx_c_bindings::Datum
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::into_storage(
                                         $crate::__pgrx_c_macros::expression::implicit::<
                                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                                $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                                $crate::Datum
+                                                $crate::__pgrx_c_macros::CUnsignedLong,
+                                                $crate::__pgrx_c_bindings::Datum
                                             >,
                                             _
                                         >(
@@ -7249,11 +7365,13 @@ macro_rules! SearchSysCacheCopy2 {
             let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 <
                     $crate::__pgrx_c_macros::expression::CPointer<
-                        $crate::__pgrx_c_macros::expression::CRecord<$crate::HeapTupleData>,
+                        $crate::__pgrx_c_macros::expression::CRecord<
+                            $crate::__pgrx_c_bindings::HeapTupleData
+                        >,
                         $crate::__pgrx_c_macros::expression::ReadWrite
                     > as $crate::__pgrx_c_macros::expression::CType
                 >::from_storage(
-                    $crate::__pgrx_c_generated::Inline_4f32b3144d31c94ff9ea6026fbcdee54(
+                    $crate::__pgrx_c_generated::Inline_499cf25baf495404aa24da1584a0e34c(
                         <
                             $crate::__pgrx_c_macros::expression::CEnumObject<
                                 $crate::__pgrx_c_generated::EnumIdentity_e5adb9dcdce4e5857db2c1cb072bba4b4ec4ff23cb7ac50512160522ccfc3354,
@@ -7276,14 +7394,14 @@ macro_rules! SearchSysCacheCopy2 {
                         ),
                         <
                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                $crate::Datum
+                                $crate::__pgrx_c_macros::CUnsignedLong,
+                                $crate::__pgrx_c_bindings::Datum
                             > as $crate::__pgrx_c_macros::expression::CType
                         >::into_storage(
                             $crate::__pgrx_c_macros::expression::implicit::<
                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                    $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                    $crate::Datum
+                                    $crate::__pgrx_c_macros::CUnsignedLong,
+                                    $crate::__pgrx_c_bindings::Datum
                                 >,
                                 _
                             >(
@@ -7294,14 +7412,14 @@ macro_rules! SearchSysCacheCopy2 {
                         ),
                         <
                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                $crate::Datum
+                                $crate::__pgrx_c_macros::CUnsignedLong,
+                                $crate::__pgrx_c_bindings::Datum
                             > as $crate::__pgrx_c_macros::expression::CType
                         >::into_storage(
                             $crate::__pgrx_c_macros::expression::implicit::<
                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                    $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                    $crate::Datum
+                                    $crate::__pgrx_c_macros::CUnsignedLong,
+                                    $crate::__pgrx_c_bindings::Datum
                                 >,
                                 _
                             >(
@@ -7312,14 +7430,14 @@ macro_rules! SearchSysCacheCopy2 {
                         ),
                         <
                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                $crate::Datum
+                                $crate::__pgrx_c_macros::CUnsignedLong,
+                                $crate::__pgrx_c_bindings::Datum
                             > as $crate::__pgrx_c_macros::expression::CType
                         >::into_storage(
                             $crate::__pgrx_c_macros::expression::implicit::<
                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                    $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                    $crate::Datum
+                                    $crate::__pgrx_c_macros::CUnsignedLong,
+                                    $crate::__pgrx_c_bindings::Datum
                                 >,
                                 _
                             >(
@@ -7334,14 +7452,14 @@ macro_rules! SearchSysCacheCopy2 {
                         ),
                         <
                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                $crate::Datum
+                                $crate::__pgrx_c_macros::CUnsignedLong,
+                                $crate::__pgrx_c_bindings::Datum
                             > as $crate::__pgrx_c_macros::expression::CType
                         >::into_storage(
                             $crate::__pgrx_c_macros::expression::implicit::<
                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                    $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                    $crate::Datum
+                                    $crate::__pgrx_c_macros::CUnsignedLong,
+                                    $crate::__pgrx_c_bindings::Datum
                                 >,
                                 _
                             >(
@@ -7368,8 +7486,8 @@ macro_rules! SearchSysCacheCopy2 {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -7397,13 +7515,13 @@ macro_rules! __pgrx_c_args_SearchSysCacheCopy3 {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SearchSysCacheCopy3!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SearchSysCacheCopy3!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -7412,7 +7530,7 @@ macro_rules! __pgrx_c_args_SearchSysCacheCopy3 {
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_SearchSysCacheCopy3!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -7439,25 +7557,25 @@ macro_rules! __pgrx_c_args_SearchSysCacheCopy3 {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SearchSysCacheCopy3!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SearchSysCacheCopy3!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SearchSysCacheCopy3!(
-            @p2 $mode [$($done)* (@literal [- $argument]),];
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SearchSysCacheCopy3!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -7466,7 +7584,7 @@ macro_rules! __pgrx_c_args_SearchSysCacheCopy3 {
     };
     (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_SearchSysCacheCopy3!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -7493,25 +7611,25 @@ macro_rules! __pgrx_c_args_SearchSysCacheCopy3 {
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SearchSysCacheCopy3!(
-            @p2 $mode [$($done)* (@literal [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SearchSysCacheCopy3!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
     (@p2 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SearchSysCacheCopy3!(
-            @p3 $mode [$($done)* (@literal [- $argument]),];
+            @p3 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative2 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SearchSysCacheCopy3!(
-            @p3 $mode [$($done)* (@native [$argument]),];
+            @p3 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -7520,7 +7638,7 @@ macro_rules! __pgrx_c_args_SearchSysCacheCopy3 {
     };
     (@p2 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_SearchSysCacheCopy3!(
-            @p3 $mode [$($done)* (@native [$argument]),];
+            @p3 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -7547,31 +7665,35 @@ macro_rules! __pgrx_c_args_SearchSysCacheCopy3 {
     };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SearchSysCacheCopy3!(
-            @p3 $mode [$($done)* (@literal [$argument]),];
+            @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p2 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SearchSysCacheCopy3!(
-            @p3 $mode [$($done)* (@native [$argument]),];
+            @p3 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
     (@p3 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_SearchSysCacheCopy3!(@p4 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_SearchSysCacheCopy3!(
+            @p4 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative3 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_SearchSysCacheCopy3!(@p4 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_SearchSysCacheCopy3!(
+            @p4 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p3 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SearchSysCacheCopy3!(
-            @p4 $mode [$($done)* (@literal [- $argument]),];
+            @p4 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative3 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SearchSysCacheCopy3!(
-            @p4 $mode [$($done)* (@native [$argument]),];
+            @p4 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -7579,7 +7701,9 @@ macro_rules! __pgrx_c_args_SearchSysCacheCopy3 {
         $crate::__pgrx_c_args_SearchSysCacheCopy3!(@negative3 $mode [$($done)*]; - $($raw)*)
     };
     (@p3 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_SearchSysCacheCopy3!(@p4 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_SearchSysCacheCopy3!(
+            @p4 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p3 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -7601,14 +7725,18 @@ macro_rules! __pgrx_c_args_SearchSysCacheCopy3 {
         )
     };
     (@p3 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_SearchSysCacheCopy3!(@p4 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_SearchSysCacheCopy3!(
+            @p4 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p3 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_SearchSysCacheCopy3!(@p4 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_SearchSysCacheCopy3!(
+            @p4 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p3 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_SearchSysCacheCopy3!(
-            @p4 $mode [$($done)* (@native [$argument]),];
+            @p4 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -7635,13 +7763,13 @@ macro_rules! __pgrx_c_args_SearchSysCacheCopy3 {
     };
     (@p3 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SearchSysCacheCopy3!(
-            @p4 $mode [$($done)* (@literal [$argument]),];
+            @p4 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p3 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SearchSysCacheCopy3!(
-            @p4 $mode [$($done)* (@native [$argument]),];
+            @p4 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -7691,11 +7819,13 @@ macro_rules! SearchSysCacheCopy3 {
         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
             <
                 $crate::__pgrx_c_macros::expression::CPointer<
-                    $crate::__pgrx_c_macros::expression::CRecord<$crate::HeapTupleData>,
+                    $crate::__pgrx_c_macros::expression::CRecord<
+                        $crate::__pgrx_c_bindings::HeapTupleData
+                    >,
                     $crate::__pgrx_c_macros::expression::ReadWrite
                 > as $crate::__pgrx_c_macros::expression::CType
             >::from_storage(
-                $crate::__pgrx_c_generated::Inline_4f32b3144d31c94ff9ea6026fbcdee54(
+                $crate::__pgrx_c_generated::Inline_499cf25baf495404aa24da1584a0e34c(
                     <
                         $crate::__pgrx_c_macros::expression::CEnumObject<
                             $crate::__pgrx_c_generated::EnumIdentity_e5adb9dcdce4e5857db2c1cb072bba4b4ec4ff23cb7ac50512160522ccfc3354,
@@ -7718,14 +7848,14 @@ macro_rules! SearchSysCacheCopy3 {
                     ),
                     <
                         $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                            $crate::__pgrx_c_macros::CUnsignedLongLong,
-                            $crate::Datum
+                            $crate::__pgrx_c_macros::CUnsignedLong,
+                            $crate::__pgrx_c_bindings::Datum
                         > as $crate::__pgrx_c_macros::expression::CType
                     >::into_storage(
                         $crate::__pgrx_c_macros::expression::implicit::<
                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                $crate::Datum
+                                $crate::__pgrx_c_macros::CUnsignedLong,
+                                $crate::__pgrx_c_bindings::Datum
                             >,
                             _
                         >(
@@ -7736,14 +7866,14 @@ macro_rules! SearchSysCacheCopy3 {
                     ),
                     <
                         $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                            $crate::__pgrx_c_macros::CUnsignedLongLong,
-                            $crate::Datum
+                            $crate::__pgrx_c_macros::CUnsignedLong,
+                            $crate::__pgrx_c_bindings::Datum
                         > as $crate::__pgrx_c_macros::expression::CType
                     >::into_storage(
                         $crate::__pgrx_c_macros::expression::implicit::<
                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                $crate::Datum
+                                $crate::__pgrx_c_macros::CUnsignedLong,
+                                $crate::__pgrx_c_bindings::Datum
                             >,
                             _
                         >(
@@ -7754,14 +7884,14 @@ macro_rules! SearchSysCacheCopy3 {
                     ),
                     <
                         $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                            $crate::__pgrx_c_macros::CUnsignedLongLong,
-                            $crate::Datum
+                            $crate::__pgrx_c_macros::CUnsignedLong,
+                            $crate::__pgrx_c_bindings::Datum
                         > as $crate::__pgrx_c_macros::expression::CType
                     >::into_storage(
                         $crate::__pgrx_c_macros::expression::implicit::<
                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                $crate::Datum
+                                $crate::__pgrx_c_macros::CUnsignedLong,
+                                $crate::__pgrx_c_bindings::Datum
                             >,
                             _
                         >(
@@ -7772,14 +7902,14 @@ macro_rules! SearchSysCacheCopy3 {
                     ),
                     <
                         $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                            $crate::__pgrx_c_macros::CUnsignedLongLong,
-                            $crate::Datum
+                            $crate::__pgrx_c_macros::CUnsignedLong,
+                            $crate::__pgrx_c_bindings::Datum
                         > as $crate::__pgrx_c_macros::expression::CType
                     >::into_storage(
                         $crate::__pgrx_c_macros::expression::implicit::<
                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                $crate::Datum
+                                $crate::__pgrx_c_macros::CUnsignedLong,
+                                $crate::__pgrx_c_bindings::Datum
                             >,
                             _
                         >(
@@ -7829,12 +7959,12 @@ macro_rules! SearchSysCacheCopy3 {
                             <
                                 $crate::__pgrx_c_macros::expression::CPointer<
                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                        $crate::HeapTupleData
+                                        $crate::__pgrx_c_bindings::HeapTupleData
                                     >,
                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                 > as $crate::__pgrx_c_macros::expression::CType
                             >::from_storage(
-                                $crate::__pgrx_c_generated::Inline_4f32b3144d31c94ff9ea6026fbcdee54(
+                                $crate::__pgrx_c_generated::Inline_499cf25baf495404aa24da1584a0e34c(
                                     <
                                         $crate::__pgrx_c_macros::expression::CEnumObject<
                                             $crate::__pgrx_c_generated::EnumIdentity_e5adb9dcdce4e5857db2c1cb072bba4b4ec4ff23cb7ac50512160522ccfc3354,
@@ -7858,14 +7988,14 @@ macro_rules! SearchSysCacheCopy3 {
                                     ),
                                     <
                                         $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                            $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                            $crate::Datum
+                                            $crate::__pgrx_c_macros::CUnsignedLong,
+                                            $crate::__pgrx_c_bindings::Datum
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::into_storage(
                                         $crate::__pgrx_c_macros::expression::implicit::<
                                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                                $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                                $crate::Datum
+                                                $crate::__pgrx_c_macros::CUnsignedLong,
+                                                $crate::__pgrx_c_bindings::Datum
                                             >,
                                             _
                                         >(
@@ -7877,14 +8007,14 @@ macro_rules! SearchSysCacheCopy3 {
                                     ),
                                     <
                                         $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                            $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                            $crate::Datum
+                                            $crate::__pgrx_c_macros::CUnsignedLong,
+                                            $crate::__pgrx_c_bindings::Datum
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::into_storage(
                                         $crate::__pgrx_c_macros::expression::implicit::<
                                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                                $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                                $crate::Datum
+                                                $crate::__pgrx_c_macros::CUnsignedLong,
+                                                $crate::__pgrx_c_bindings::Datum
                                             >,
                                             _
                                         >(
@@ -7896,14 +8026,14 @@ macro_rules! SearchSysCacheCopy3 {
                                     ),
                                     <
                                         $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                            $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                            $crate::Datum
+                                            $crate::__pgrx_c_macros::CUnsignedLong,
+                                            $crate::__pgrx_c_bindings::Datum
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::into_storage(
                                         $crate::__pgrx_c_macros::expression::implicit::<
                                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                                $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                                $crate::Datum
+                                                $crate::__pgrx_c_macros::CUnsignedLong,
+                                                $crate::__pgrx_c_bindings::Datum
                                             >,
                                             _
                                         >(
@@ -7915,14 +8045,14 @@ macro_rules! SearchSysCacheCopy3 {
                                     ),
                                     <
                                         $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                            $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                            $crate::Datum
+                                            $crate::__pgrx_c_macros::CUnsignedLong,
+                                            $crate::__pgrx_c_bindings::Datum
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::into_storage(
                                         $crate::__pgrx_c_macros::expression::implicit::<
                                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                                $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                                $crate::Datum
+                                                $crate::__pgrx_c_macros::CUnsignedLong,
+                                                $crate::__pgrx_c_bindings::Datum
                                             >,
                                             _
                                         >(
@@ -7957,11 +8087,13 @@ macro_rules! SearchSysCacheCopy3 {
             let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 <
                     $crate::__pgrx_c_macros::expression::CPointer<
-                        $crate::__pgrx_c_macros::expression::CRecord<$crate::HeapTupleData>,
+                        $crate::__pgrx_c_macros::expression::CRecord<
+                            $crate::__pgrx_c_bindings::HeapTupleData
+                        >,
                         $crate::__pgrx_c_macros::expression::ReadWrite
                     > as $crate::__pgrx_c_macros::expression::CType
                 >::from_storage(
-                    $crate::__pgrx_c_generated::Inline_4f32b3144d31c94ff9ea6026fbcdee54(
+                    $crate::__pgrx_c_generated::Inline_499cf25baf495404aa24da1584a0e34c(
                         <
                             $crate::__pgrx_c_macros::expression::CEnumObject<
                                 $crate::__pgrx_c_generated::EnumIdentity_e5adb9dcdce4e5857db2c1cb072bba4b4ec4ff23cb7ac50512160522ccfc3354,
@@ -7984,14 +8116,14 @@ macro_rules! SearchSysCacheCopy3 {
                         ),
                         <
                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                $crate::Datum
+                                $crate::__pgrx_c_macros::CUnsignedLong,
+                                $crate::__pgrx_c_bindings::Datum
                             > as $crate::__pgrx_c_macros::expression::CType
                         >::into_storage(
                             $crate::__pgrx_c_macros::expression::implicit::<
                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                    $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                    $crate::Datum
+                                    $crate::__pgrx_c_macros::CUnsignedLong,
+                                    $crate::__pgrx_c_bindings::Datum
                                 >,
                                 _
                             >(
@@ -8002,14 +8134,14 @@ macro_rules! SearchSysCacheCopy3 {
                         ),
                         <
                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                $crate::Datum
+                                $crate::__pgrx_c_macros::CUnsignedLong,
+                                $crate::__pgrx_c_bindings::Datum
                             > as $crate::__pgrx_c_macros::expression::CType
                         >::into_storage(
                             $crate::__pgrx_c_macros::expression::implicit::<
                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                    $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                    $crate::Datum
+                                    $crate::__pgrx_c_macros::CUnsignedLong,
+                                    $crate::__pgrx_c_bindings::Datum
                                 >,
                                 _
                             >(
@@ -8020,14 +8152,14 @@ macro_rules! SearchSysCacheCopy3 {
                         ),
                         <
                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                $crate::Datum
+                                $crate::__pgrx_c_macros::CUnsignedLong,
+                                $crate::__pgrx_c_bindings::Datum
                             > as $crate::__pgrx_c_macros::expression::CType
                         >::into_storage(
                             $crate::__pgrx_c_macros::expression::implicit::<
                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                    $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                    $crate::Datum
+                                    $crate::__pgrx_c_macros::CUnsignedLong,
+                                    $crate::__pgrx_c_bindings::Datum
                                 >,
                                 _
                             >(
@@ -8038,14 +8170,14 @@ macro_rules! SearchSysCacheCopy3 {
                         ),
                         <
                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                $crate::Datum
+                                $crate::__pgrx_c_macros::CUnsignedLong,
+                                $crate::__pgrx_c_bindings::Datum
                             > as $crate::__pgrx_c_macros::expression::CType
                         >::into_storage(
                             $crate::__pgrx_c_macros::expression::implicit::<
                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                    $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                    $crate::Datum
+                                    $crate::__pgrx_c_macros::CUnsignedLong,
+                                    $crate::__pgrx_c_bindings::Datum
                                 >,
                                 _
                             >(
@@ -8072,8 +8204,8 @@ macro_rules! SearchSysCacheCopy3 {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -8101,13 +8233,13 @@ macro_rules! __pgrx_c_args_SearchSysCacheCopy4 {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SearchSysCacheCopy4!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SearchSysCacheCopy4!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -8116,7 +8248,7 @@ macro_rules! __pgrx_c_args_SearchSysCacheCopy4 {
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_SearchSysCacheCopy4!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -8143,25 +8275,25 @@ macro_rules! __pgrx_c_args_SearchSysCacheCopy4 {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SearchSysCacheCopy4!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SearchSysCacheCopy4!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SearchSysCacheCopy4!(
-            @p2 $mode [$($done)* (@literal [- $argument]),];
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SearchSysCacheCopy4!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -8170,7 +8302,7 @@ macro_rules! __pgrx_c_args_SearchSysCacheCopy4 {
     };
     (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_SearchSysCacheCopy4!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -8197,25 +8329,25 @@ macro_rules! __pgrx_c_args_SearchSysCacheCopy4 {
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SearchSysCacheCopy4!(
-            @p2 $mode [$($done)* (@literal [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SearchSysCacheCopy4!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
     (@p2 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SearchSysCacheCopy4!(
-            @p3 $mode [$($done)* (@literal [- $argument]),];
+            @p3 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative2 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SearchSysCacheCopy4!(
-            @p3 $mode [$($done)* (@native [$argument]),];
+            @p3 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -8224,7 +8356,7 @@ macro_rules! __pgrx_c_args_SearchSysCacheCopy4 {
     };
     (@p2 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_SearchSysCacheCopy4!(
-            @p3 $mode [$($done)* (@native [$argument]),];
+            @p3 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -8251,25 +8383,25 @@ macro_rules! __pgrx_c_args_SearchSysCacheCopy4 {
     };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SearchSysCacheCopy4!(
-            @p3 $mode [$($done)* (@literal [$argument]),];
+            @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p2 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SearchSysCacheCopy4!(
-            @p3 $mode [$($done)* (@native [$argument]),];
+            @p3 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
     (@p3 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SearchSysCacheCopy4!(
-            @p4 $mode [$($done)* (@literal [- $argument]),];
+            @p4 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative3 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SearchSysCacheCopy4!(
-            @p4 $mode [$($done)* (@native [$argument]),];
+            @p4 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -8278,7 +8410,7 @@ macro_rules! __pgrx_c_args_SearchSysCacheCopy4 {
     };
     (@p3 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_SearchSysCacheCopy4!(
-            @p4 $mode [$($done)* (@native [$argument]),];
+            @p4 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -8305,31 +8437,35 @@ macro_rules! __pgrx_c_args_SearchSysCacheCopy4 {
     };
     (@p3 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SearchSysCacheCopy4!(
-            @p4 $mode [$($done)* (@literal [$argument]),];
+            @p4 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p3 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SearchSysCacheCopy4!(
-            @p4 $mode [$($done)* (@native [$argument]),];
+            @p4 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
     (@p4 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_SearchSysCacheCopy4!(@p5 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_SearchSysCacheCopy4!(
+            @p5 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative4 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_SearchSysCacheCopy4!(@p5 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_SearchSysCacheCopy4!(
+            @p5 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p4 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SearchSysCacheCopy4!(
-            @p5 $mode [$($done)* (@literal [- $argument]),];
+            @p5 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative4 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SearchSysCacheCopy4!(
-            @p5 $mode [$($done)* (@native [$argument]),];
+            @p5 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -8337,7 +8473,9 @@ macro_rules! __pgrx_c_args_SearchSysCacheCopy4 {
         $crate::__pgrx_c_args_SearchSysCacheCopy4!(@negative4 $mode [$($done)*]; - $($raw)*)
     };
     (@p4 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_SearchSysCacheCopy4!(@p5 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_SearchSysCacheCopy4!(
+            @p5 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p4 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -8359,14 +8497,18 @@ macro_rules! __pgrx_c_args_SearchSysCacheCopy4 {
         )
     };
     (@p4 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_SearchSysCacheCopy4!(@p5 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_SearchSysCacheCopy4!(
+            @p5 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p4 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_SearchSysCacheCopy4!(@p5 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_SearchSysCacheCopy4!(
+            @p5 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p4 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_SearchSysCacheCopy4!(
-            @p5 $mode [$($done)* (@native [$argument]),];
+            @p5 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -8393,13 +8535,13 @@ macro_rules! __pgrx_c_args_SearchSysCacheCopy4 {
     };
     (@p4 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SearchSysCacheCopy4!(
-            @p5 $mode [$($done)* (@literal [$argument]),];
+            @p5 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p4 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SearchSysCacheCopy4!(
-            @p5 $mode [$($done)* (@native [$argument]),];
+            @p5 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -8450,11 +8592,13 @@ macro_rules! SearchSysCacheCopy4 {
         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
             <
                 $crate::__pgrx_c_macros::expression::CPointer<
-                    $crate::__pgrx_c_macros::expression::CRecord<$crate::HeapTupleData>,
+                    $crate::__pgrx_c_macros::expression::CRecord<
+                        $crate::__pgrx_c_bindings::HeapTupleData
+                    >,
                     $crate::__pgrx_c_macros::expression::ReadWrite
                 > as $crate::__pgrx_c_macros::expression::CType
             >::from_storage(
-                $crate::__pgrx_c_generated::Inline_4f32b3144d31c94ff9ea6026fbcdee54(
+                $crate::__pgrx_c_generated::Inline_499cf25baf495404aa24da1584a0e34c(
                     <
                         $crate::__pgrx_c_macros::expression::CEnumObject<
                             $crate::__pgrx_c_generated::EnumIdentity_e5adb9dcdce4e5857db2c1cb072bba4b4ec4ff23cb7ac50512160522ccfc3354,
@@ -8477,14 +8621,14 @@ macro_rules! SearchSysCacheCopy4 {
                     ),
                     <
                         $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                            $crate::__pgrx_c_macros::CUnsignedLongLong,
-                            $crate::Datum
+                            $crate::__pgrx_c_macros::CUnsignedLong,
+                            $crate::__pgrx_c_bindings::Datum
                         > as $crate::__pgrx_c_macros::expression::CType
                     >::into_storage(
                         $crate::__pgrx_c_macros::expression::implicit::<
                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                $crate::Datum
+                                $crate::__pgrx_c_macros::CUnsignedLong,
+                                $crate::__pgrx_c_bindings::Datum
                             >,
                             _
                         >(
@@ -8495,14 +8639,14 @@ macro_rules! SearchSysCacheCopy4 {
                     ),
                     <
                         $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                            $crate::__pgrx_c_macros::CUnsignedLongLong,
-                            $crate::Datum
+                            $crate::__pgrx_c_macros::CUnsignedLong,
+                            $crate::__pgrx_c_bindings::Datum
                         > as $crate::__pgrx_c_macros::expression::CType
                     >::into_storage(
                         $crate::__pgrx_c_macros::expression::implicit::<
                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                $crate::Datum
+                                $crate::__pgrx_c_macros::CUnsignedLong,
+                                $crate::__pgrx_c_bindings::Datum
                             >,
                             _
                         >(
@@ -8513,14 +8657,14 @@ macro_rules! SearchSysCacheCopy4 {
                     ),
                     <
                         $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                            $crate::__pgrx_c_macros::CUnsignedLongLong,
-                            $crate::Datum
+                            $crate::__pgrx_c_macros::CUnsignedLong,
+                            $crate::__pgrx_c_bindings::Datum
                         > as $crate::__pgrx_c_macros::expression::CType
                     >::into_storage(
                         $crate::__pgrx_c_macros::expression::implicit::<
                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                $crate::Datum
+                                $crate::__pgrx_c_macros::CUnsignedLong,
+                                $crate::__pgrx_c_bindings::Datum
                             >,
                             _
                         >(
@@ -8531,14 +8675,14 @@ macro_rules! SearchSysCacheCopy4 {
                     ),
                     <
                         $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                            $crate::__pgrx_c_macros::CUnsignedLongLong,
-                            $crate::Datum
+                            $crate::__pgrx_c_macros::CUnsignedLong,
+                            $crate::__pgrx_c_bindings::Datum
                         > as $crate::__pgrx_c_macros::expression::CType
                     >::into_storage(
                         $crate::__pgrx_c_macros::expression::implicit::<
                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                $crate::Datum
+                                $crate::__pgrx_c_macros::CUnsignedLong,
+                                $crate::__pgrx_c_bindings::Datum
                             >,
                             _
                         >(
@@ -8585,12 +8729,12 @@ macro_rules! SearchSysCacheCopy4 {
                             <
                                 $crate::__pgrx_c_macros::expression::CPointer<
                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                        $crate::HeapTupleData
+                                        $crate::__pgrx_c_bindings::HeapTupleData
                                     >,
                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                 > as $crate::__pgrx_c_macros::expression::CType
                             >::from_storage(
-                                $crate::__pgrx_c_generated::Inline_4f32b3144d31c94ff9ea6026fbcdee54(
+                                $crate::__pgrx_c_generated::Inline_499cf25baf495404aa24da1584a0e34c(
                                     <
                                         $crate::__pgrx_c_macros::expression::CEnumObject<
                                             $crate::__pgrx_c_generated::EnumIdentity_e5adb9dcdce4e5857db2c1cb072bba4b4ec4ff23cb7ac50512160522ccfc3354,
@@ -8614,14 +8758,14 @@ macro_rules! SearchSysCacheCopy4 {
                                     ),
                                     <
                                         $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                            $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                            $crate::Datum
+                                            $crate::__pgrx_c_macros::CUnsignedLong,
+                                            $crate::__pgrx_c_bindings::Datum
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::into_storage(
                                         $crate::__pgrx_c_macros::expression::implicit::<
                                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                                $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                                $crate::Datum
+                                                $crate::__pgrx_c_macros::CUnsignedLong,
+                                                $crate::__pgrx_c_bindings::Datum
                                             >,
                                             _
                                         >(
@@ -8633,14 +8777,14 @@ macro_rules! SearchSysCacheCopy4 {
                                     ),
                                     <
                                         $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                            $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                            $crate::Datum
+                                            $crate::__pgrx_c_macros::CUnsignedLong,
+                                            $crate::__pgrx_c_bindings::Datum
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::into_storage(
                                         $crate::__pgrx_c_macros::expression::implicit::<
                                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                                $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                                $crate::Datum
+                                                $crate::__pgrx_c_macros::CUnsignedLong,
+                                                $crate::__pgrx_c_bindings::Datum
                                             >,
                                             _
                                         >(
@@ -8652,14 +8796,14 @@ macro_rules! SearchSysCacheCopy4 {
                                     ),
                                     <
                                         $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                            $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                            $crate::Datum
+                                            $crate::__pgrx_c_macros::CUnsignedLong,
+                                            $crate::__pgrx_c_bindings::Datum
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::into_storage(
                                         $crate::__pgrx_c_macros::expression::implicit::<
                                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                                $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                                $crate::Datum
+                                                $crate::__pgrx_c_macros::CUnsignedLong,
+                                                $crate::__pgrx_c_bindings::Datum
                                             >,
                                             _
                                         >(
@@ -8671,14 +8815,14 @@ macro_rules! SearchSysCacheCopy4 {
                                     ),
                                     <
                                         $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                            $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                            $crate::Datum
+                                            $crate::__pgrx_c_macros::CUnsignedLong,
+                                            $crate::__pgrx_c_bindings::Datum
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::into_storage(
                                         $crate::__pgrx_c_macros::expression::implicit::<
                                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                                $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                                $crate::Datum
+                                                $crate::__pgrx_c_macros::CUnsignedLong,
+                                                $crate::__pgrx_c_bindings::Datum
                                             >,
                                             _
                                         >(
@@ -8707,11 +8851,13 @@ macro_rules! SearchSysCacheCopy4 {
             let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 <
                     $crate::__pgrx_c_macros::expression::CPointer<
-                        $crate::__pgrx_c_macros::expression::CRecord<$crate::HeapTupleData>,
+                        $crate::__pgrx_c_macros::expression::CRecord<
+                            $crate::__pgrx_c_bindings::HeapTupleData
+                        >,
                         $crate::__pgrx_c_macros::expression::ReadWrite
                     > as $crate::__pgrx_c_macros::expression::CType
                 >::from_storage(
-                    $crate::__pgrx_c_generated::Inline_4f32b3144d31c94ff9ea6026fbcdee54(
+                    $crate::__pgrx_c_generated::Inline_499cf25baf495404aa24da1584a0e34c(
                         <
                             $crate::__pgrx_c_macros::expression::CEnumObject<
                                 $crate::__pgrx_c_generated::EnumIdentity_e5adb9dcdce4e5857db2c1cb072bba4b4ec4ff23cb7ac50512160522ccfc3354,
@@ -8734,14 +8880,14 @@ macro_rules! SearchSysCacheCopy4 {
                         ),
                         <
                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                $crate::Datum
+                                $crate::__pgrx_c_macros::CUnsignedLong,
+                                $crate::__pgrx_c_bindings::Datum
                             > as $crate::__pgrx_c_macros::expression::CType
                         >::into_storage(
                             $crate::__pgrx_c_macros::expression::implicit::<
                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                    $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                    $crate::Datum
+                                    $crate::__pgrx_c_macros::CUnsignedLong,
+                                    $crate::__pgrx_c_bindings::Datum
                                 >,
                                 _
                             >(
@@ -8752,14 +8898,14 @@ macro_rules! SearchSysCacheCopy4 {
                         ),
                         <
                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                $crate::Datum
+                                $crate::__pgrx_c_macros::CUnsignedLong,
+                                $crate::__pgrx_c_bindings::Datum
                             > as $crate::__pgrx_c_macros::expression::CType
                         >::into_storage(
                             $crate::__pgrx_c_macros::expression::implicit::<
                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                    $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                    $crate::Datum
+                                    $crate::__pgrx_c_macros::CUnsignedLong,
+                                    $crate::__pgrx_c_bindings::Datum
                                 >,
                                 _
                             >(
@@ -8770,14 +8916,14 @@ macro_rules! SearchSysCacheCopy4 {
                         ),
                         <
                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                $crate::Datum
+                                $crate::__pgrx_c_macros::CUnsignedLong,
+                                $crate::__pgrx_c_bindings::Datum
                             > as $crate::__pgrx_c_macros::expression::CType
                         >::into_storage(
                             $crate::__pgrx_c_macros::expression::implicit::<
                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                    $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                    $crate::Datum
+                                    $crate::__pgrx_c_macros::CUnsignedLong,
+                                    $crate::__pgrx_c_bindings::Datum
                                 >,
                                 _
                             >(
@@ -8788,14 +8934,14 @@ macro_rules! SearchSysCacheCopy4 {
                         ),
                         <
                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                $crate::Datum
+                                $crate::__pgrx_c_macros::CUnsignedLong,
+                                $crate::__pgrx_c_bindings::Datum
                             > as $crate::__pgrx_c_macros::expression::CType
                         >::into_storage(
                             $crate::__pgrx_c_macros::expression::implicit::<
                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                    $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                    $crate::Datum
+                                    $crate::__pgrx_c_macros::CUnsignedLong,
+                                    $crate::__pgrx_c_bindings::Datum
                                 >,
                                 _
                             >(
@@ -8818,8 +8964,8 @@ macro_rules! SearchSysCacheCopy4 {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -8850,13 +8996,13 @@ macro_rules! __pgrx_c_args_SearchSysCacheExists1 {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SearchSysCacheExists1!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SearchSysCacheExists1!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -8865,7 +9011,7 @@ macro_rules! __pgrx_c_args_SearchSysCacheExists1 {
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_SearchSysCacheExists1!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -8892,33 +9038,35 @@ macro_rules! __pgrx_c_args_SearchSysCacheExists1 {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SearchSysCacheExists1!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SearchSysCacheExists1!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $argument:literal) => {
         $crate::__pgrx_c_args_SearchSysCacheExists1!(
-            @p2 $mode [$($done)* (@literal [- $argument]),];
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
         )
     };
     (@negative1 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_SearchSysCacheExists1!(@p2 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_SearchSysCacheExists1!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SearchSysCacheExists1!(
-            @p2 $mode [$($done)* (@literal [- $argument]),];
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SearchSysCacheExists1!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -8926,7 +9074,9 @@ macro_rules! __pgrx_c_args_SearchSysCacheExists1 {
         $crate::__pgrx_c_args_SearchSysCacheExists1!(@negative1 $mode [$($done)*]; - $($raw)*)
     };
     (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_SearchSysCacheExists1!(@p2 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_SearchSysCacheExists1!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -8948,14 +9098,18 @@ macro_rules! __pgrx_c_args_SearchSysCacheExists1 {
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_SearchSysCacheExists1!(@p2 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_SearchSysCacheExists1!(
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_SearchSysCacheExists1!(@p2 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_SearchSysCacheExists1!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_SearchSysCacheExists1!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -8982,13 +9136,13 @@ macro_rules! __pgrx_c_args_SearchSysCacheExists1 {
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SearchSysCacheExists1!(
-            @p2 $mode [$($done)* (@literal [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SearchSysCacheExists1!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -9035,7 +9189,7 @@ macro_rules! SearchSysCacheExists1 {
         /* PGRX: SearchSysCacheExists1 remains expanded because SearchSysCacheExists is not an active function-like macro. */
         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
             <$crate::__pgrx_c_macros::CBool as $crate::__pgrx_c_macros::expression::CType>::from_storage(
-                $crate::__pgrx_c_generated::Inline_75593ae5047edb0ffd9296dea623e507(
+                $crate::__pgrx_c_generated::Inline_173ab9d4f30fd07bfc76288431aec7e8(
                     <
                         $crate::__pgrx_c_macros::expression::CEnumObject<
                             $crate::__pgrx_c_generated::EnumIdentity_e5adb9dcdce4e5857db2c1cb072bba4b4ec4ff23cb7ac50512160522ccfc3354,
@@ -9058,14 +9212,14 @@ macro_rules! SearchSysCacheExists1 {
                     ),
                     <
                         $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                            $crate::__pgrx_c_macros::CUnsignedLongLong,
-                            $crate::Datum
+                            $crate::__pgrx_c_macros::CUnsignedLong,
+                            $crate::__pgrx_c_bindings::Datum
                         > as $crate::__pgrx_c_macros::expression::CType
                     >::into_storage(
                         $crate::__pgrx_c_macros::expression::implicit::<
                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                $crate::Datum
+                                $crate::__pgrx_c_macros::CUnsignedLong,
+                                $crate::__pgrx_c_bindings::Datum
                             >,
                             _
                         >(
@@ -9076,14 +9230,14 @@ macro_rules! SearchSysCacheExists1 {
                     ),
                     <
                         $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                            $crate::__pgrx_c_macros::CUnsignedLongLong,
-                            $crate::Datum
+                            $crate::__pgrx_c_macros::CUnsignedLong,
+                            $crate::__pgrx_c_bindings::Datum
                         > as $crate::__pgrx_c_macros::expression::CType
                     >::into_storage(
                         $crate::__pgrx_c_macros::expression::implicit::<
                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                $crate::Datum
+                                $crate::__pgrx_c_macros::CUnsignedLong,
+                                $crate::__pgrx_c_bindings::Datum
                             >,
                             _
                         >(
@@ -9098,14 +9252,14 @@ macro_rules! SearchSysCacheExists1 {
                     ),
                     <
                         $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                            $crate::__pgrx_c_macros::CUnsignedLongLong,
-                            $crate::Datum
+                            $crate::__pgrx_c_macros::CUnsignedLong,
+                            $crate::__pgrx_c_bindings::Datum
                         > as $crate::__pgrx_c_macros::expression::CType
                     >::into_storage(
                         $crate::__pgrx_c_macros::expression::implicit::<
                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                $crate::Datum
+                                $crate::__pgrx_c_macros::CUnsignedLong,
+                                $crate::__pgrx_c_bindings::Datum
                             >,
                             _
                         >(
@@ -9120,14 +9274,14 @@ macro_rules! SearchSysCacheExists1 {
                     ),
                     <
                         $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                            $crate::__pgrx_c_macros::CUnsignedLongLong,
-                            $crate::Datum
+                            $crate::__pgrx_c_macros::CUnsignedLong,
+                            $crate::__pgrx_c_bindings::Datum
                         > as $crate::__pgrx_c_macros::expression::CType
                     >::into_storage(
                         $crate::__pgrx_c_macros::expression::implicit::<
                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                $crate::Datum
+                                $crate::__pgrx_c_macros::CUnsignedLong,
+                                $crate::__pgrx_c_bindings::Datum
                             >,
                             _
                         >(
@@ -9175,7 +9329,7 @@ macro_rules! SearchSysCacheExists1 {
                             <
                                 $crate::__pgrx_c_macros::CBool as $crate::__pgrx_c_macros::expression::CType
                             >::from_storage(
-                                $crate::__pgrx_c_generated::Inline_75593ae5047edb0ffd9296dea623e507(
+                                $crate::__pgrx_c_generated::Inline_173ab9d4f30fd07bfc76288431aec7e8(
                                     <
                                         $crate::__pgrx_c_macros::expression::CEnumObject<
                                             $crate::__pgrx_c_generated::EnumIdentity_e5adb9dcdce4e5857db2c1cb072bba4b4ec4ff23cb7ac50512160522ccfc3354,
@@ -9199,14 +9353,14 @@ macro_rules! SearchSysCacheExists1 {
                                     ),
                                     <
                                         $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                            $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                            $crate::Datum
+                                            $crate::__pgrx_c_macros::CUnsignedLong,
+                                            $crate::__pgrx_c_bindings::Datum
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::into_storage(
                                         $crate::__pgrx_c_macros::expression::implicit::<
                                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                                $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                                $crate::Datum
+                                                $crate::__pgrx_c_macros::CUnsignedLong,
+                                                $crate::__pgrx_c_bindings::Datum
                                             >,
                                             _
                                         >(
@@ -9218,14 +9372,14 @@ macro_rules! SearchSysCacheExists1 {
                                     ),
                                     <
                                         $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                            $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                            $crate::Datum
+                                            $crate::__pgrx_c_macros::CUnsignedLong,
+                                            $crate::__pgrx_c_bindings::Datum
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::into_storage(
                                         $crate::__pgrx_c_macros::expression::implicit::<
                                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                                $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                                $crate::Datum
+                                                $crate::__pgrx_c_macros::CUnsignedLong,
+                                                $crate::__pgrx_c_bindings::Datum
                                             >,
                                             _
                                         >(
@@ -9243,14 +9397,14 @@ macro_rules! SearchSysCacheExists1 {
                                     ),
                                     <
                                         $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                            $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                            $crate::Datum
+                                            $crate::__pgrx_c_macros::CUnsignedLong,
+                                            $crate::__pgrx_c_bindings::Datum
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::into_storage(
                                         $crate::__pgrx_c_macros::expression::implicit::<
                                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                                $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                                $crate::Datum
+                                                $crate::__pgrx_c_macros::CUnsignedLong,
+                                                $crate::__pgrx_c_bindings::Datum
                                             >,
                                             _
                                         >(
@@ -9268,14 +9422,14 @@ macro_rules! SearchSysCacheExists1 {
                                     ),
                                     <
                                         $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                            $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                            $crate::Datum
+                                            $crate::__pgrx_c_macros::CUnsignedLong,
+                                            $crate::__pgrx_c_bindings::Datum
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::into_storage(
                                         $crate::__pgrx_c_macros::expression::implicit::<
                                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                                $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                                $crate::Datum
+                                                $crate::__pgrx_c_macros::CUnsignedLong,
+                                                $crate::__pgrx_c_bindings::Datum
                                             >,
                                             _
                                         >(
@@ -9309,7 +9463,7 @@ macro_rules! SearchSysCacheExists1 {
         {
             let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 <$crate::__pgrx_c_macros::CBool as $crate::__pgrx_c_macros::expression::CType>::from_storage(
-                    $crate::__pgrx_c_generated::Inline_75593ae5047edb0ffd9296dea623e507(
+                    $crate::__pgrx_c_generated::Inline_173ab9d4f30fd07bfc76288431aec7e8(
                         <
                             $crate::__pgrx_c_macros::expression::CEnumObject<
                                 $crate::__pgrx_c_generated::EnumIdentity_e5adb9dcdce4e5857db2c1cb072bba4b4ec4ff23cb7ac50512160522ccfc3354,
@@ -9332,14 +9486,14 @@ macro_rules! SearchSysCacheExists1 {
                         ),
                         <
                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                $crate::Datum
+                                $crate::__pgrx_c_macros::CUnsignedLong,
+                                $crate::__pgrx_c_bindings::Datum
                             > as $crate::__pgrx_c_macros::expression::CType
                         >::into_storage(
                             $crate::__pgrx_c_macros::expression::implicit::<
                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                    $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                    $crate::Datum
+                                    $crate::__pgrx_c_macros::CUnsignedLong,
+                                    $crate::__pgrx_c_bindings::Datum
                                 >,
                                 _
                             >(
@@ -9350,14 +9504,14 @@ macro_rules! SearchSysCacheExists1 {
                         ),
                         <
                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                $crate::Datum
+                                $crate::__pgrx_c_macros::CUnsignedLong,
+                                $crate::__pgrx_c_bindings::Datum
                             > as $crate::__pgrx_c_macros::expression::CType
                         >::into_storage(
                             $crate::__pgrx_c_macros::expression::implicit::<
                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                    $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                    $crate::Datum
+                                    $crate::__pgrx_c_macros::CUnsignedLong,
+                                    $crate::__pgrx_c_bindings::Datum
                                 >,
                                 _
                             >(
@@ -9372,14 +9526,14 @@ macro_rules! SearchSysCacheExists1 {
                         ),
                         <
                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                $crate::Datum
+                                $crate::__pgrx_c_macros::CUnsignedLong,
+                                $crate::__pgrx_c_bindings::Datum
                             > as $crate::__pgrx_c_macros::expression::CType
                         >::into_storage(
                             $crate::__pgrx_c_macros::expression::implicit::<
                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                    $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                    $crate::Datum
+                                    $crate::__pgrx_c_macros::CUnsignedLong,
+                                    $crate::__pgrx_c_bindings::Datum
                                 >,
                                 _
                             >(
@@ -9394,14 +9548,14 @@ macro_rules! SearchSysCacheExists1 {
                         ),
                         <
                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                $crate::Datum
+                                $crate::__pgrx_c_macros::CUnsignedLong,
+                                $crate::__pgrx_c_bindings::Datum
                             > as $crate::__pgrx_c_macros::expression::CType
                         >::into_storage(
                             $crate::__pgrx_c_macros::expression::implicit::<
                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                    $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                    $crate::Datum
+                                    $crate::__pgrx_c_macros::CUnsignedLong,
+                                    $crate::__pgrx_c_bindings::Datum
                                 >,
                                 _
                             >(
@@ -9428,8 +9582,8 @@ macro_rules! SearchSysCacheExists1 {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -9460,13 +9614,13 @@ macro_rules! __pgrx_c_args_SearchSysCacheExists2 {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SearchSysCacheExists2!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SearchSysCacheExists2!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -9475,7 +9629,7 @@ macro_rules! __pgrx_c_args_SearchSysCacheExists2 {
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_SearchSysCacheExists2!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -9502,25 +9656,25 @@ macro_rules! __pgrx_c_args_SearchSysCacheExists2 {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SearchSysCacheExists2!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SearchSysCacheExists2!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SearchSysCacheExists2!(
-            @p2 $mode [$($done)* (@literal [- $argument]),];
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SearchSysCacheExists2!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -9529,7 +9683,7 @@ macro_rules! __pgrx_c_args_SearchSysCacheExists2 {
     };
     (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_SearchSysCacheExists2!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -9556,33 +9710,35 @@ macro_rules! __pgrx_c_args_SearchSysCacheExists2 {
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SearchSysCacheExists2!(
-            @p2 $mode [$($done)* (@literal [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SearchSysCacheExists2!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
     (@p2 $mode:ident [$($done:tt)*]; - $argument:literal) => {
         $crate::__pgrx_c_args_SearchSysCacheExists2!(
-            @p3 $mode [$($done)* (@literal [- $argument]),];
+            @p3 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
         )
     };
     (@negative2 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_SearchSysCacheExists2!(@p3 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_SearchSysCacheExists2!(
+            @p3 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p2 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SearchSysCacheExists2!(
-            @p3 $mode [$($done)* (@literal [- $argument]),];
+            @p3 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative2 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SearchSysCacheExists2!(
-            @p3 $mode [$($done)* (@native [$argument]),];
+            @p3 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -9590,7 +9746,9 @@ macro_rules! __pgrx_c_args_SearchSysCacheExists2 {
         $crate::__pgrx_c_args_SearchSysCacheExists2!(@negative2 $mode [$($done)*]; - $($raw)*)
     };
     (@p2 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_SearchSysCacheExists2!(@p3 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_SearchSysCacheExists2!(
+            @p3 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p2 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -9612,14 +9770,18 @@ macro_rules! __pgrx_c_args_SearchSysCacheExists2 {
         )
     };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_SearchSysCacheExists2!(@p3 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_SearchSysCacheExists2!(
+            @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p2 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_SearchSysCacheExists2!(@p3 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_SearchSysCacheExists2!(
+            @p3 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p2 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_SearchSysCacheExists2!(
-            @p3 $mode [$($done)* (@native [$argument]),];
+            @p3 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -9646,13 +9808,13 @@ macro_rules! __pgrx_c_args_SearchSysCacheExists2 {
     };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SearchSysCacheExists2!(
-            @p3 $mode [$($done)* (@literal [$argument]),];
+            @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p2 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SearchSysCacheExists2!(
-            @p3 $mode [$($done)* (@native [$argument]),];
+            @p3 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -9700,7 +9862,7 @@ macro_rules! SearchSysCacheExists2 {
         /* PGRX: SearchSysCacheExists2 remains expanded because SearchSysCacheExists is not an active function-like macro. */
         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
             <$crate::__pgrx_c_macros::CBool as $crate::__pgrx_c_macros::expression::CType>::from_storage(
-                $crate::__pgrx_c_generated::Inline_75593ae5047edb0ffd9296dea623e507(
+                $crate::__pgrx_c_generated::Inline_173ab9d4f30fd07bfc76288431aec7e8(
                     <
                         $crate::__pgrx_c_macros::expression::CEnumObject<
                             $crate::__pgrx_c_generated::EnumIdentity_e5adb9dcdce4e5857db2c1cb072bba4b4ec4ff23cb7ac50512160522ccfc3354,
@@ -9723,14 +9885,14 @@ macro_rules! SearchSysCacheExists2 {
                     ),
                     <
                         $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                            $crate::__pgrx_c_macros::CUnsignedLongLong,
-                            $crate::Datum
+                            $crate::__pgrx_c_macros::CUnsignedLong,
+                            $crate::__pgrx_c_bindings::Datum
                         > as $crate::__pgrx_c_macros::expression::CType
                     >::into_storage(
                         $crate::__pgrx_c_macros::expression::implicit::<
                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                $crate::Datum
+                                $crate::__pgrx_c_macros::CUnsignedLong,
+                                $crate::__pgrx_c_bindings::Datum
                             >,
                             _
                         >(
@@ -9741,14 +9903,14 @@ macro_rules! SearchSysCacheExists2 {
                     ),
                     <
                         $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                            $crate::__pgrx_c_macros::CUnsignedLongLong,
-                            $crate::Datum
+                            $crate::__pgrx_c_macros::CUnsignedLong,
+                            $crate::__pgrx_c_bindings::Datum
                         > as $crate::__pgrx_c_macros::expression::CType
                     >::into_storage(
                         $crate::__pgrx_c_macros::expression::implicit::<
                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                $crate::Datum
+                                $crate::__pgrx_c_macros::CUnsignedLong,
+                                $crate::__pgrx_c_bindings::Datum
                             >,
                             _
                         >(
@@ -9759,14 +9921,14 @@ macro_rules! SearchSysCacheExists2 {
                     ),
                     <
                         $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                            $crate::__pgrx_c_macros::CUnsignedLongLong,
-                            $crate::Datum
+                            $crate::__pgrx_c_macros::CUnsignedLong,
+                            $crate::__pgrx_c_bindings::Datum
                         > as $crate::__pgrx_c_macros::expression::CType
                     >::into_storage(
                         $crate::__pgrx_c_macros::expression::implicit::<
                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                $crate::Datum
+                                $crate::__pgrx_c_macros::CUnsignedLong,
+                                $crate::__pgrx_c_bindings::Datum
                             >,
                             _
                         >(
@@ -9781,14 +9943,14 @@ macro_rules! SearchSysCacheExists2 {
                     ),
                     <
                         $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                            $crate::__pgrx_c_macros::CUnsignedLongLong,
-                            $crate::Datum
+                            $crate::__pgrx_c_macros::CUnsignedLong,
+                            $crate::__pgrx_c_bindings::Datum
                         > as $crate::__pgrx_c_macros::expression::CType
                     >::into_storage(
                         $crate::__pgrx_c_macros::expression::implicit::<
                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                $crate::Datum
+                                $crate::__pgrx_c_macros::CUnsignedLong,
+                                $crate::__pgrx_c_bindings::Datum
                             >,
                             _
                         >(
@@ -9837,7 +9999,7 @@ macro_rules! SearchSysCacheExists2 {
                             <
                                 $crate::__pgrx_c_macros::CBool as $crate::__pgrx_c_macros::expression::CType
                             >::from_storage(
-                                $crate::__pgrx_c_generated::Inline_75593ae5047edb0ffd9296dea623e507(
+                                $crate::__pgrx_c_generated::Inline_173ab9d4f30fd07bfc76288431aec7e8(
                                     <
                                         $crate::__pgrx_c_macros::expression::CEnumObject<
                                             $crate::__pgrx_c_generated::EnumIdentity_e5adb9dcdce4e5857db2c1cb072bba4b4ec4ff23cb7ac50512160522ccfc3354,
@@ -9861,14 +10023,14 @@ macro_rules! SearchSysCacheExists2 {
                                     ),
                                     <
                                         $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                            $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                            $crate::Datum
+                                            $crate::__pgrx_c_macros::CUnsignedLong,
+                                            $crate::__pgrx_c_bindings::Datum
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::into_storage(
                                         $crate::__pgrx_c_macros::expression::implicit::<
                                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                                $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                                $crate::Datum
+                                                $crate::__pgrx_c_macros::CUnsignedLong,
+                                                $crate::__pgrx_c_bindings::Datum
                                             >,
                                             _
                                         >(
@@ -9880,14 +10042,14 @@ macro_rules! SearchSysCacheExists2 {
                                     ),
                                     <
                                         $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                            $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                            $crate::Datum
+                                            $crate::__pgrx_c_macros::CUnsignedLong,
+                                            $crate::__pgrx_c_bindings::Datum
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::into_storage(
                                         $crate::__pgrx_c_macros::expression::implicit::<
                                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                                $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                                $crate::Datum
+                                                $crate::__pgrx_c_macros::CUnsignedLong,
+                                                $crate::__pgrx_c_bindings::Datum
                                             >,
                                             _
                                         >(
@@ -9899,14 +10061,14 @@ macro_rules! SearchSysCacheExists2 {
                                     ),
                                     <
                                         $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                            $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                            $crate::Datum
+                                            $crate::__pgrx_c_macros::CUnsignedLong,
+                                            $crate::__pgrx_c_bindings::Datum
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::into_storage(
                                         $crate::__pgrx_c_macros::expression::implicit::<
                                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                                $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                                $crate::Datum
+                                                $crate::__pgrx_c_macros::CUnsignedLong,
+                                                $crate::__pgrx_c_bindings::Datum
                                             >,
                                             _
                                         >(
@@ -9924,14 +10086,14 @@ macro_rules! SearchSysCacheExists2 {
                                     ),
                                     <
                                         $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                            $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                            $crate::Datum
+                                            $crate::__pgrx_c_macros::CUnsignedLong,
+                                            $crate::__pgrx_c_bindings::Datum
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::into_storage(
                                         $crate::__pgrx_c_macros::expression::implicit::<
                                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                                $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                                $crate::Datum
+                                                $crate::__pgrx_c_macros::CUnsignedLong,
+                                                $crate::__pgrx_c_bindings::Datum
                                             >,
                                             _
                                         >(
@@ -9965,7 +10127,7 @@ macro_rules! SearchSysCacheExists2 {
         {
             let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 <$crate::__pgrx_c_macros::CBool as $crate::__pgrx_c_macros::expression::CType>::from_storage(
-                    $crate::__pgrx_c_generated::Inline_75593ae5047edb0ffd9296dea623e507(
+                    $crate::__pgrx_c_generated::Inline_173ab9d4f30fd07bfc76288431aec7e8(
                         <
                             $crate::__pgrx_c_macros::expression::CEnumObject<
                                 $crate::__pgrx_c_generated::EnumIdentity_e5adb9dcdce4e5857db2c1cb072bba4b4ec4ff23cb7ac50512160522ccfc3354,
@@ -9988,14 +10150,14 @@ macro_rules! SearchSysCacheExists2 {
                         ),
                         <
                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                $crate::Datum
+                                $crate::__pgrx_c_macros::CUnsignedLong,
+                                $crate::__pgrx_c_bindings::Datum
                             > as $crate::__pgrx_c_macros::expression::CType
                         >::into_storage(
                             $crate::__pgrx_c_macros::expression::implicit::<
                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                    $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                    $crate::Datum
+                                    $crate::__pgrx_c_macros::CUnsignedLong,
+                                    $crate::__pgrx_c_bindings::Datum
                                 >,
                                 _
                             >(
@@ -10006,14 +10168,14 @@ macro_rules! SearchSysCacheExists2 {
                         ),
                         <
                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                $crate::Datum
+                                $crate::__pgrx_c_macros::CUnsignedLong,
+                                $crate::__pgrx_c_bindings::Datum
                             > as $crate::__pgrx_c_macros::expression::CType
                         >::into_storage(
                             $crate::__pgrx_c_macros::expression::implicit::<
                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                    $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                    $crate::Datum
+                                    $crate::__pgrx_c_macros::CUnsignedLong,
+                                    $crate::__pgrx_c_bindings::Datum
                                 >,
                                 _
                             >(
@@ -10024,14 +10186,14 @@ macro_rules! SearchSysCacheExists2 {
                         ),
                         <
                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                $crate::Datum
+                                $crate::__pgrx_c_macros::CUnsignedLong,
+                                $crate::__pgrx_c_bindings::Datum
                             > as $crate::__pgrx_c_macros::expression::CType
                         >::into_storage(
                             $crate::__pgrx_c_macros::expression::implicit::<
                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                    $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                    $crate::Datum
+                                    $crate::__pgrx_c_macros::CUnsignedLong,
+                                    $crate::__pgrx_c_bindings::Datum
                                 >,
                                 _
                             >(
@@ -10046,14 +10208,14 @@ macro_rules! SearchSysCacheExists2 {
                         ),
                         <
                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                $crate::Datum
+                                $crate::__pgrx_c_macros::CUnsignedLong,
+                                $crate::__pgrx_c_bindings::Datum
                             > as $crate::__pgrx_c_macros::expression::CType
                         >::into_storage(
                             $crate::__pgrx_c_macros::expression::implicit::<
                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                    $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                    $crate::Datum
+                                    $crate::__pgrx_c_macros::CUnsignedLong,
+                                    $crate::__pgrx_c_bindings::Datum
                                 >,
                                 _
                             >(
@@ -10080,8 +10242,8 @@ macro_rules! SearchSysCacheExists2 {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -10112,13 +10274,13 @@ macro_rules! __pgrx_c_args_SearchSysCacheExists3 {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SearchSysCacheExists3!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SearchSysCacheExists3!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -10127,7 +10289,7 @@ macro_rules! __pgrx_c_args_SearchSysCacheExists3 {
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_SearchSysCacheExists3!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -10154,25 +10316,25 @@ macro_rules! __pgrx_c_args_SearchSysCacheExists3 {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SearchSysCacheExists3!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SearchSysCacheExists3!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SearchSysCacheExists3!(
-            @p2 $mode [$($done)* (@literal [- $argument]),];
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SearchSysCacheExists3!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -10181,7 +10343,7 @@ macro_rules! __pgrx_c_args_SearchSysCacheExists3 {
     };
     (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_SearchSysCacheExists3!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -10208,25 +10370,25 @@ macro_rules! __pgrx_c_args_SearchSysCacheExists3 {
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SearchSysCacheExists3!(
-            @p2 $mode [$($done)* (@literal [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SearchSysCacheExists3!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
     (@p2 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SearchSysCacheExists3!(
-            @p3 $mode [$($done)* (@literal [- $argument]),];
+            @p3 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative2 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SearchSysCacheExists3!(
-            @p3 $mode [$($done)* (@native [$argument]),];
+            @p3 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -10235,7 +10397,7 @@ macro_rules! __pgrx_c_args_SearchSysCacheExists3 {
     };
     (@p2 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_SearchSysCacheExists3!(
-            @p3 $mode [$($done)* (@native [$argument]),];
+            @p3 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -10262,33 +10424,35 @@ macro_rules! __pgrx_c_args_SearchSysCacheExists3 {
     };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SearchSysCacheExists3!(
-            @p3 $mode [$($done)* (@literal [$argument]),];
+            @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p2 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SearchSysCacheExists3!(
-            @p3 $mode [$($done)* (@native [$argument]),];
+            @p3 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
     (@p3 $mode:ident [$($done:tt)*]; - $argument:literal) => {
         $crate::__pgrx_c_args_SearchSysCacheExists3!(
-            @p4 $mode [$($done)* (@literal [- $argument]),];
+            @p4 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
         )
     };
     (@negative3 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_SearchSysCacheExists3!(@p4 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_SearchSysCacheExists3!(
+            @p4 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p3 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SearchSysCacheExists3!(
-            @p4 $mode [$($done)* (@literal [- $argument]),];
+            @p4 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative3 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SearchSysCacheExists3!(
-            @p4 $mode [$($done)* (@native [$argument]),];
+            @p4 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -10296,7 +10460,9 @@ macro_rules! __pgrx_c_args_SearchSysCacheExists3 {
         $crate::__pgrx_c_args_SearchSysCacheExists3!(@negative3 $mode [$($done)*]; - $($raw)*)
     };
     (@p3 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_SearchSysCacheExists3!(@p4 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_SearchSysCacheExists3!(
+            @p4 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p3 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -10318,14 +10484,18 @@ macro_rules! __pgrx_c_args_SearchSysCacheExists3 {
         )
     };
     (@p3 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_SearchSysCacheExists3!(@p4 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_SearchSysCacheExists3!(
+            @p4 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p3 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_SearchSysCacheExists3!(@p4 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_SearchSysCacheExists3!(
+            @p4 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p3 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_SearchSysCacheExists3!(
-            @p4 $mode [$($done)* (@native [$argument]),];
+            @p4 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -10352,13 +10522,13 @@ macro_rules! __pgrx_c_args_SearchSysCacheExists3 {
     };
     (@p3 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SearchSysCacheExists3!(
-            @p4 $mode [$($done)* (@literal [$argument]),];
+            @p4 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p3 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SearchSysCacheExists3!(
-            @p4 $mode [$($done)* (@native [$argument]),];
+            @p4 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -10407,7 +10577,7 @@ macro_rules! SearchSysCacheExists3 {
         /* PGRX: SearchSysCacheExists3 remains expanded because SearchSysCacheExists is not an active function-like macro. */
         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
             <$crate::__pgrx_c_macros::CBool as $crate::__pgrx_c_macros::expression::CType>::from_storage(
-                $crate::__pgrx_c_generated::Inline_75593ae5047edb0ffd9296dea623e507(
+                $crate::__pgrx_c_generated::Inline_173ab9d4f30fd07bfc76288431aec7e8(
                     <
                         $crate::__pgrx_c_macros::expression::CEnumObject<
                             $crate::__pgrx_c_generated::EnumIdentity_e5adb9dcdce4e5857db2c1cb072bba4b4ec4ff23cb7ac50512160522ccfc3354,
@@ -10430,14 +10600,14 @@ macro_rules! SearchSysCacheExists3 {
                     ),
                     <
                         $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                            $crate::__pgrx_c_macros::CUnsignedLongLong,
-                            $crate::Datum
+                            $crate::__pgrx_c_macros::CUnsignedLong,
+                            $crate::__pgrx_c_bindings::Datum
                         > as $crate::__pgrx_c_macros::expression::CType
                     >::into_storage(
                         $crate::__pgrx_c_macros::expression::implicit::<
                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                $crate::Datum
+                                $crate::__pgrx_c_macros::CUnsignedLong,
+                                $crate::__pgrx_c_bindings::Datum
                             >,
                             _
                         >(
@@ -10448,14 +10618,14 @@ macro_rules! SearchSysCacheExists3 {
                     ),
                     <
                         $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                            $crate::__pgrx_c_macros::CUnsignedLongLong,
-                            $crate::Datum
+                            $crate::__pgrx_c_macros::CUnsignedLong,
+                            $crate::__pgrx_c_bindings::Datum
                         > as $crate::__pgrx_c_macros::expression::CType
                     >::into_storage(
                         $crate::__pgrx_c_macros::expression::implicit::<
                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                $crate::Datum
+                                $crate::__pgrx_c_macros::CUnsignedLong,
+                                $crate::__pgrx_c_bindings::Datum
                             >,
                             _
                         >(
@@ -10466,14 +10636,14 @@ macro_rules! SearchSysCacheExists3 {
                     ),
                     <
                         $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                            $crate::__pgrx_c_macros::CUnsignedLongLong,
-                            $crate::Datum
+                            $crate::__pgrx_c_macros::CUnsignedLong,
+                            $crate::__pgrx_c_bindings::Datum
                         > as $crate::__pgrx_c_macros::expression::CType
                     >::into_storage(
                         $crate::__pgrx_c_macros::expression::implicit::<
                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                $crate::Datum
+                                $crate::__pgrx_c_macros::CUnsignedLong,
+                                $crate::__pgrx_c_bindings::Datum
                             >,
                             _
                         >(
@@ -10484,14 +10654,14 @@ macro_rules! SearchSysCacheExists3 {
                     ),
                     <
                         $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                            $crate::__pgrx_c_macros::CUnsignedLongLong,
-                            $crate::Datum
+                            $crate::__pgrx_c_macros::CUnsignedLong,
+                            $crate::__pgrx_c_bindings::Datum
                         > as $crate::__pgrx_c_macros::expression::CType
                     >::into_storage(
                         $crate::__pgrx_c_macros::expression::implicit::<
                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                $crate::Datum
+                                $crate::__pgrx_c_macros::CUnsignedLong,
+                                $crate::__pgrx_c_bindings::Datum
                             >,
                             _
                         >(
@@ -10541,7 +10711,7 @@ macro_rules! SearchSysCacheExists3 {
                             <
                                 $crate::__pgrx_c_macros::CBool as $crate::__pgrx_c_macros::expression::CType
                             >::from_storage(
-                                $crate::__pgrx_c_generated::Inline_75593ae5047edb0ffd9296dea623e507(
+                                $crate::__pgrx_c_generated::Inline_173ab9d4f30fd07bfc76288431aec7e8(
                                     <
                                         $crate::__pgrx_c_macros::expression::CEnumObject<
                                             $crate::__pgrx_c_generated::EnumIdentity_e5adb9dcdce4e5857db2c1cb072bba4b4ec4ff23cb7ac50512160522ccfc3354,
@@ -10565,14 +10735,14 @@ macro_rules! SearchSysCacheExists3 {
                                     ),
                                     <
                                         $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                            $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                            $crate::Datum
+                                            $crate::__pgrx_c_macros::CUnsignedLong,
+                                            $crate::__pgrx_c_bindings::Datum
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::into_storage(
                                         $crate::__pgrx_c_macros::expression::implicit::<
                                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                                $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                                $crate::Datum
+                                                $crate::__pgrx_c_macros::CUnsignedLong,
+                                                $crate::__pgrx_c_bindings::Datum
                                             >,
                                             _
                                         >(
@@ -10584,14 +10754,14 @@ macro_rules! SearchSysCacheExists3 {
                                     ),
                                     <
                                         $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                            $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                            $crate::Datum
+                                            $crate::__pgrx_c_macros::CUnsignedLong,
+                                            $crate::__pgrx_c_bindings::Datum
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::into_storage(
                                         $crate::__pgrx_c_macros::expression::implicit::<
                                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                                $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                                $crate::Datum
+                                                $crate::__pgrx_c_macros::CUnsignedLong,
+                                                $crate::__pgrx_c_bindings::Datum
                                             >,
                                             _
                                         >(
@@ -10603,14 +10773,14 @@ macro_rules! SearchSysCacheExists3 {
                                     ),
                                     <
                                         $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                            $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                            $crate::Datum
+                                            $crate::__pgrx_c_macros::CUnsignedLong,
+                                            $crate::__pgrx_c_bindings::Datum
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::into_storage(
                                         $crate::__pgrx_c_macros::expression::implicit::<
                                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                                $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                                $crate::Datum
+                                                $crate::__pgrx_c_macros::CUnsignedLong,
+                                                $crate::__pgrx_c_bindings::Datum
                                             >,
                                             _
                                         >(
@@ -10622,14 +10792,14 @@ macro_rules! SearchSysCacheExists3 {
                                     ),
                                     <
                                         $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                            $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                            $crate::Datum
+                                            $crate::__pgrx_c_macros::CUnsignedLong,
+                                            $crate::__pgrx_c_bindings::Datum
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::into_storage(
                                         $crate::__pgrx_c_macros::expression::implicit::<
                                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                                $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                                $crate::Datum
+                                                $crate::__pgrx_c_macros::CUnsignedLong,
+                                                $crate::__pgrx_c_bindings::Datum
                                             >,
                                             _
                                         >(
@@ -10663,7 +10833,7 @@ macro_rules! SearchSysCacheExists3 {
         {
             let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 <$crate::__pgrx_c_macros::CBool as $crate::__pgrx_c_macros::expression::CType>::from_storage(
-                    $crate::__pgrx_c_generated::Inline_75593ae5047edb0ffd9296dea623e507(
+                    $crate::__pgrx_c_generated::Inline_173ab9d4f30fd07bfc76288431aec7e8(
                         <
                             $crate::__pgrx_c_macros::expression::CEnumObject<
                                 $crate::__pgrx_c_generated::EnumIdentity_e5adb9dcdce4e5857db2c1cb072bba4b4ec4ff23cb7ac50512160522ccfc3354,
@@ -10686,14 +10856,14 @@ macro_rules! SearchSysCacheExists3 {
                         ),
                         <
                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                $crate::Datum
+                                $crate::__pgrx_c_macros::CUnsignedLong,
+                                $crate::__pgrx_c_bindings::Datum
                             > as $crate::__pgrx_c_macros::expression::CType
                         >::into_storage(
                             $crate::__pgrx_c_macros::expression::implicit::<
                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                    $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                    $crate::Datum
+                                    $crate::__pgrx_c_macros::CUnsignedLong,
+                                    $crate::__pgrx_c_bindings::Datum
                                 >,
                                 _
                             >(
@@ -10704,14 +10874,14 @@ macro_rules! SearchSysCacheExists3 {
                         ),
                         <
                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                $crate::Datum
+                                $crate::__pgrx_c_macros::CUnsignedLong,
+                                $crate::__pgrx_c_bindings::Datum
                             > as $crate::__pgrx_c_macros::expression::CType
                         >::into_storage(
                             $crate::__pgrx_c_macros::expression::implicit::<
                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                    $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                    $crate::Datum
+                                    $crate::__pgrx_c_macros::CUnsignedLong,
+                                    $crate::__pgrx_c_bindings::Datum
                                 >,
                                 _
                             >(
@@ -10722,14 +10892,14 @@ macro_rules! SearchSysCacheExists3 {
                         ),
                         <
                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                $crate::Datum
+                                $crate::__pgrx_c_macros::CUnsignedLong,
+                                $crate::__pgrx_c_bindings::Datum
                             > as $crate::__pgrx_c_macros::expression::CType
                         >::into_storage(
                             $crate::__pgrx_c_macros::expression::implicit::<
                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                    $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                    $crate::Datum
+                                    $crate::__pgrx_c_macros::CUnsignedLong,
+                                    $crate::__pgrx_c_bindings::Datum
                                 >,
                                 _
                             >(
@@ -10740,14 +10910,14 @@ macro_rules! SearchSysCacheExists3 {
                         ),
                         <
                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                $crate::Datum
+                                $crate::__pgrx_c_macros::CUnsignedLong,
+                                $crate::__pgrx_c_bindings::Datum
                             > as $crate::__pgrx_c_macros::expression::CType
                         >::into_storage(
                             $crate::__pgrx_c_macros::expression::implicit::<
                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                    $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                    $crate::Datum
+                                    $crate::__pgrx_c_macros::CUnsignedLong,
+                                    $crate::__pgrx_c_bindings::Datum
                                 >,
                                 _
                             >(
@@ -10774,8 +10944,8 @@ macro_rules! SearchSysCacheExists3 {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -10806,13 +10976,13 @@ macro_rules! __pgrx_c_args_SearchSysCacheExists4 {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SearchSysCacheExists4!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SearchSysCacheExists4!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -10821,7 +10991,7 @@ macro_rules! __pgrx_c_args_SearchSysCacheExists4 {
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_SearchSysCacheExists4!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -10848,25 +11018,25 @@ macro_rules! __pgrx_c_args_SearchSysCacheExists4 {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SearchSysCacheExists4!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SearchSysCacheExists4!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SearchSysCacheExists4!(
-            @p2 $mode [$($done)* (@literal [- $argument]),];
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SearchSysCacheExists4!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -10875,7 +11045,7 @@ macro_rules! __pgrx_c_args_SearchSysCacheExists4 {
     };
     (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_SearchSysCacheExists4!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -10902,25 +11072,25 @@ macro_rules! __pgrx_c_args_SearchSysCacheExists4 {
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SearchSysCacheExists4!(
-            @p2 $mode [$($done)* (@literal [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SearchSysCacheExists4!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
     (@p2 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SearchSysCacheExists4!(
-            @p3 $mode [$($done)* (@literal [- $argument]),];
+            @p3 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative2 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SearchSysCacheExists4!(
-            @p3 $mode [$($done)* (@native [$argument]),];
+            @p3 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -10929,7 +11099,7 @@ macro_rules! __pgrx_c_args_SearchSysCacheExists4 {
     };
     (@p2 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_SearchSysCacheExists4!(
-            @p3 $mode [$($done)* (@native [$argument]),];
+            @p3 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -10956,25 +11126,25 @@ macro_rules! __pgrx_c_args_SearchSysCacheExists4 {
     };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SearchSysCacheExists4!(
-            @p3 $mode [$($done)* (@literal [$argument]),];
+            @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p2 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SearchSysCacheExists4!(
-            @p3 $mode [$($done)* (@native [$argument]),];
+            @p3 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
     (@p3 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SearchSysCacheExists4!(
-            @p4 $mode [$($done)* (@literal [- $argument]),];
+            @p4 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative3 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SearchSysCacheExists4!(
-            @p4 $mode [$($done)* (@native [$argument]),];
+            @p4 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -10983,7 +11153,7 @@ macro_rules! __pgrx_c_args_SearchSysCacheExists4 {
     };
     (@p3 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_SearchSysCacheExists4!(
-            @p4 $mode [$($done)* (@native [$argument]),];
+            @p4 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -11010,33 +11180,35 @@ macro_rules! __pgrx_c_args_SearchSysCacheExists4 {
     };
     (@p3 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SearchSysCacheExists4!(
-            @p4 $mode [$($done)* (@literal [$argument]),];
+            @p4 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p3 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SearchSysCacheExists4!(
-            @p4 $mode [$($done)* (@native [$argument]),];
+            @p4 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
     (@p4 $mode:ident [$($done:tt)*]; - $argument:literal) => {
         $crate::__pgrx_c_args_SearchSysCacheExists4!(
-            @p5 $mode [$($done)* (@literal [- $argument]),];
+            @p5 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
         )
     };
     (@negative4 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_SearchSysCacheExists4!(@p5 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_SearchSysCacheExists4!(
+            @p5 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p4 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SearchSysCacheExists4!(
-            @p5 $mode [$($done)* (@literal [- $argument]),];
+            @p5 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative4 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SearchSysCacheExists4!(
-            @p5 $mode [$($done)* (@native [$argument]),];
+            @p5 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -11044,7 +11216,9 @@ macro_rules! __pgrx_c_args_SearchSysCacheExists4 {
         $crate::__pgrx_c_args_SearchSysCacheExists4!(@negative4 $mode [$($done)*]; - $($raw)*)
     };
     (@p4 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_SearchSysCacheExists4!(@p5 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_SearchSysCacheExists4!(
+            @p5 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p4 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -11066,14 +11240,18 @@ macro_rules! __pgrx_c_args_SearchSysCacheExists4 {
         )
     };
     (@p4 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_SearchSysCacheExists4!(@p5 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_SearchSysCacheExists4!(
+            @p5 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p4 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_SearchSysCacheExists4!(@p5 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_SearchSysCacheExists4!(
+            @p5 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p4 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_SearchSysCacheExists4!(
-            @p5 $mode [$($done)* (@native [$argument]),];
+            @p5 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -11100,13 +11278,13 @@ macro_rules! __pgrx_c_args_SearchSysCacheExists4 {
     };
     (@p4 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SearchSysCacheExists4!(
-            @p5 $mode [$($done)* (@literal [$argument]),];
+            @p5 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p4 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SearchSysCacheExists4!(
-            @p5 $mode [$($done)* (@native [$argument]),];
+            @p5 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -11156,7 +11334,7 @@ macro_rules! SearchSysCacheExists4 {
         /* PGRX: SearchSysCacheExists4 remains expanded because SearchSysCacheExists is not an active function-like macro. */
         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
             <$crate::__pgrx_c_macros::CBool as $crate::__pgrx_c_macros::expression::CType>::from_storage(
-                $crate::__pgrx_c_generated::Inline_75593ae5047edb0ffd9296dea623e507(
+                $crate::__pgrx_c_generated::Inline_173ab9d4f30fd07bfc76288431aec7e8(
                     <
                         $crate::__pgrx_c_macros::expression::CEnumObject<
                             $crate::__pgrx_c_generated::EnumIdentity_e5adb9dcdce4e5857db2c1cb072bba4b4ec4ff23cb7ac50512160522ccfc3354,
@@ -11179,14 +11357,14 @@ macro_rules! SearchSysCacheExists4 {
                     ),
                     <
                         $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                            $crate::__pgrx_c_macros::CUnsignedLongLong,
-                            $crate::Datum
+                            $crate::__pgrx_c_macros::CUnsignedLong,
+                            $crate::__pgrx_c_bindings::Datum
                         > as $crate::__pgrx_c_macros::expression::CType
                     >::into_storage(
                         $crate::__pgrx_c_macros::expression::implicit::<
                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                $crate::Datum
+                                $crate::__pgrx_c_macros::CUnsignedLong,
+                                $crate::__pgrx_c_bindings::Datum
                             >,
                             _
                         >(
@@ -11197,14 +11375,14 @@ macro_rules! SearchSysCacheExists4 {
                     ),
                     <
                         $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                            $crate::__pgrx_c_macros::CUnsignedLongLong,
-                            $crate::Datum
+                            $crate::__pgrx_c_macros::CUnsignedLong,
+                            $crate::__pgrx_c_bindings::Datum
                         > as $crate::__pgrx_c_macros::expression::CType
                     >::into_storage(
                         $crate::__pgrx_c_macros::expression::implicit::<
                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                $crate::Datum
+                                $crate::__pgrx_c_macros::CUnsignedLong,
+                                $crate::__pgrx_c_bindings::Datum
                             >,
                             _
                         >(
@@ -11215,14 +11393,14 @@ macro_rules! SearchSysCacheExists4 {
                     ),
                     <
                         $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                            $crate::__pgrx_c_macros::CUnsignedLongLong,
-                            $crate::Datum
+                            $crate::__pgrx_c_macros::CUnsignedLong,
+                            $crate::__pgrx_c_bindings::Datum
                         > as $crate::__pgrx_c_macros::expression::CType
                     >::into_storage(
                         $crate::__pgrx_c_macros::expression::implicit::<
                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                $crate::Datum
+                                $crate::__pgrx_c_macros::CUnsignedLong,
+                                $crate::__pgrx_c_bindings::Datum
                             >,
                             _
                         >(
@@ -11233,14 +11411,14 @@ macro_rules! SearchSysCacheExists4 {
                     ),
                     <
                         $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                            $crate::__pgrx_c_macros::CUnsignedLongLong,
-                            $crate::Datum
+                            $crate::__pgrx_c_macros::CUnsignedLong,
+                            $crate::__pgrx_c_bindings::Datum
                         > as $crate::__pgrx_c_macros::expression::CType
                     >::into_storage(
                         $crate::__pgrx_c_macros::expression::implicit::<
                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                $crate::Datum
+                                $crate::__pgrx_c_macros::CUnsignedLong,
+                                $crate::__pgrx_c_bindings::Datum
                             >,
                             _
                         >(
@@ -11287,7 +11465,7 @@ macro_rules! SearchSysCacheExists4 {
                             <
                                 $crate::__pgrx_c_macros::CBool as $crate::__pgrx_c_macros::expression::CType
                             >::from_storage(
-                                $crate::__pgrx_c_generated::Inline_75593ae5047edb0ffd9296dea623e507(
+                                $crate::__pgrx_c_generated::Inline_173ab9d4f30fd07bfc76288431aec7e8(
                                     <
                                         $crate::__pgrx_c_macros::expression::CEnumObject<
                                             $crate::__pgrx_c_generated::EnumIdentity_e5adb9dcdce4e5857db2c1cb072bba4b4ec4ff23cb7ac50512160522ccfc3354,
@@ -11311,14 +11489,14 @@ macro_rules! SearchSysCacheExists4 {
                                     ),
                                     <
                                         $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                            $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                            $crate::Datum
+                                            $crate::__pgrx_c_macros::CUnsignedLong,
+                                            $crate::__pgrx_c_bindings::Datum
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::into_storage(
                                         $crate::__pgrx_c_macros::expression::implicit::<
                                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                                $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                                $crate::Datum
+                                                $crate::__pgrx_c_macros::CUnsignedLong,
+                                                $crate::__pgrx_c_bindings::Datum
                                             >,
                                             _
                                         >(
@@ -11330,14 +11508,14 @@ macro_rules! SearchSysCacheExists4 {
                                     ),
                                     <
                                         $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                            $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                            $crate::Datum
+                                            $crate::__pgrx_c_macros::CUnsignedLong,
+                                            $crate::__pgrx_c_bindings::Datum
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::into_storage(
                                         $crate::__pgrx_c_macros::expression::implicit::<
                                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                                $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                                $crate::Datum
+                                                $crate::__pgrx_c_macros::CUnsignedLong,
+                                                $crate::__pgrx_c_bindings::Datum
                                             >,
                                             _
                                         >(
@@ -11349,14 +11527,14 @@ macro_rules! SearchSysCacheExists4 {
                                     ),
                                     <
                                         $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                            $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                            $crate::Datum
+                                            $crate::__pgrx_c_macros::CUnsignedLong,
+                                            $crate::__pgrx_c_bindings::Datum
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::into_storage(
                                         $crate::__pgrx_c_macros::expression::implicit::<
                                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                                $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                                $crate::Datum
+                                                $crate::__pgrx_c_macros::CUnsignedLong,
+                                                $crate::__pgrx_c_bindings::Datum
                                             >,
                                             _
                                         >(
@@ -11368,14 +11546,14 @@ macro_rules! SearchSysCacheExists4 {
                                     ),
                                     <
                                         $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                            $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                            $crate::Datum
+                                            $crate::__pgrx_c_macros::CUnsignedLong,
+                                            $crate::__pgrx_c_bindings::Datum
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::into_storage(
                                         $crate::__pgrx_c_macros::expression::implicit::<
                                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                                $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                                $crate::Datum
+                                                $crate::__pgrx_c_macros::CUnsignedLong,
+                                                $crate::__pgrx_c_bindings::Datum
                                             >,
                                             _
                                         >(
@@ -11403,7 +11581,7 @@ macro_rules! SearchSysCacheExists4 {
         {
             let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 <$crate::__pgrx_c_macros::CBool as $crate::__pgrx_c_macros::expression::CType>::from_storage(
-                    $crate::__pgrx_c_generated::Inline_75593ae5047edb0ffd9296dea623e507(
+                    $crate::__pgrx_c_generated::Inline_173ab9d4f30fd07bfc76288431aec7e8(
                         <
                             $crate::__pgrx_c_macros::expression::CEnumObject<
                                 $crate::__pgrx_c_generated::EnumIdentity_e5adb9dcdce4e5857db2c1cb072bba4b4ec4ff23cb7ac50512160522ccfc3354,
@@ -11426,14 +11604,14 @@ macro_rules! SearchSysCacheExists4 {
                         ),
                         <
                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                $crate::Datum
+                                $crate::__pgrx_c_macros::CUnsignedLong,
+                                $crate::__pgrx_c_bindings::Datum
                             > as $crate::__pgrx_c_macros::expression::CType
                         >::into_storage(
                             $crate::__pgrx_c_macros::expression::implicit::<
                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                    $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                    $crate::Datum
+                                    $crate::__pgrx_c_macros::CUnsignedLong,
+                                    $crate::__pgrx_c_bindings::Datum
                                 >,
                                 _
                             >(
@@ -11444,14 +11622,14 @@ macro_rules! SearchSysCacheExists4 {
                         ),
                         <
                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                $crate::Datum
+                                $crate::__pgrx_c_macros::CUnsignedLong,
+                                $crate::__pgrx_c_bindings::Datum
                             > as $crate::__pgrx_c_macros::expression::CType
                         >::into_storage(
                             $crate::__pgrx_c_macros::expression::implicit::<
                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                    $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                    $crate::Datum
+                                    $crate::__pgrx_c_macros::CUnsignedLong,
+                                    $crate::__pgrx_c_bindings::Datum
                                 >,
                                 _
                             >(
@@ -11462,14 +11640,14 @@ macro_rules! SearchSysCacheExists4 {
                         ),
                         <
                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                $crate::Datum
+                                $crate::__pgrx_c_macros::CUnsignedLong,
+                                $crate::__pgrx_c_bindings::Datum
                             > as $crate::__pgrx_c_macros::expression::CType
                         >::into_storage(
                             $crate::__pgrx_c_macros::expression::implicit::<
                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                    $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                    $crate::Datum
+                                    $crate::__pgrx_c_macros::CUnsignedLong,
+                                    $crate::__pgrx_c_bindings::Datum
                                 >,
                                 _
                             >(
@@ -11480,14 +11658,14 @@ macro_rules! SearchSysCacheExists4 {
                         ),
                         <
                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                $crate::Datum
+                                $crate::__pgrx_c_macros::CUnsignedLong,
+                                $crate::__pgrx_c_bindings::Datum
                             > as $crate::__pgrx_c_macros::expression::CType
                         >::into_storage(
                             $crate::__pgrx_c_macros::expression::implicit::<
                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                    $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                    $crate::Datum
+                                    $crate::__pgrx_c_macros::CUnsignedLong,
+                                    $crate::__pgrx_c_bindings::Datum
                                 >,
                                 _
                             >(
@@ -11510,8 +11688,8 @@ macro_rules! SearchSysCacheExists4 {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -11539,13 +11717,13 @@ macro_rules! __pgrx_c_args_SearchSysCacheList1 {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SearchSysCacheList1!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SearchSysCacheList1!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -11554,7 +11732,7 @@ macro_rules! __pgrx_c_args_SearchSysCacheList1 {
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_SearchSysCacheList1!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -11581,31 +11759,35 @@ macro_rules! __pgrx_c_args_SearchSysCacheList1 {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SearchSysCacheList1!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SearchSysCacheList1!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_SearchSysCacheList1!(@p2 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_SearchSysCacheList1!(
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative1 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_SearchSysCacheList1!(@p2 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_SearchSysCacheList1!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SearchSysCacheList1!(
-            @p2 $mode [$($done)* (@literal [- $argument]),];
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SearchSysCacheList1!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -11613,7 +11795,9 @@ macro_rules! __pgrx_c_args_SearchSysCacheList1 {
         $crate::__pgrx_c_args_SearchSysCacheList1!(@negative1 $mode [$($done)*]; - $($raw)*)
     };
     (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_SearchSysCacheList1!(@p2 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_SearchSysCacheList1!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -11635,14 +11819,18 @@ macro_rules! __pgrx_c_args_SearchSysCacheList1 {
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_SearchSysCacheList1!(@p2 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_SearchSysCacheList1!(
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_SearchSysCacheList1!(@p2 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_SearchSysCacheList1!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_SearchSysCacheList1!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -11669,13 +11857,13 @@ macro_rules! __pgrx_c_args_SearchSysCacheList1 {
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SearchSysCacheList1!(
-            @p2 $mode [$($done)* (@literal [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SearchSysCacheList1!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -11723,11 +11911,13 @@ macro_rules! SearchSysCacheList1 {
         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
             <
                 $crate::__pgrx_c_macros::expression::CPointer<
-                    $crate::__pgrx_c_macros::expression::CRecord<$crate::catclist>,
+                    $crate::__pgrx_c_macros::expression::CRecord<
+                        $crate::__pgrx_c_bindings::catclist
+                    >,
                     $crate::__pgrx_c_macros::expression::ReadWrite
                 > as $crate::__pgrx_c_macros::expression::CType
             >::from_storage(
-                $crate::__pgrx_c_generated::Inline_cd8d820f4218d82f8dab3581249a433a(
+                $crate::__pgrx_c_generated::Inline_099d336c14fd0e2e4745b3ba2e5076a0(
                     <
                         $crate::__pgrx_c_macros::expression::CEnumObject<
                             $crate::__pgrx_c_generated::EnumIdentity_e5adb9dcdce4e5857db2c1cb072bba4b4ec4ff23cb7ac50512160522ccfc3354,
@@ -11762,14 +11952,14 @@ macro_rules! SearchSysCacheList1 {
                     ),
                     <
                         $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                            $crate::__pgrx_c_macros::CUnsignedLongLong,
-                            $crate::Datum
+                            $crate::__pgrx_c_macros::CUnsignedLong,
+                            $crate::__pgrx_c_bindings::Datum
                         > as $crate::__pgrx_c_macros::expression::CType
                     >::into_storage(
                         $crate::__pgrx_c_macros::expression::implicit::<
                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                $crate::Datum
+                                $crate::__pgrx_c_macros::CUnsignedLong,
+                                $crate::__pgrx_c_bindings::Datum
                             >,
                             _
                         >(
@@ -11780,14 +11970,14 @@ macro_rules! SearchSysCacheList1 {
                     ),
                     <
                         $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                            $crate::__pgrx_c_macros::CUnsignedLongLong,
-                            $crate::Datum
+                            $crate::__pgrx_c_macros::CUnsignedLong,
+                            $crate::__pgrx_c_bindings::Datum
                         > as $crate::__pgrx_c_macros::expression::CType
                     >::into_storage(
                         $crate::__pgrx_c_macros::expression::implicit::<
                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                $crate::Datum
+                                $crate::__pgrx_c_macros::CUnsignedLong,
+                                $crate::__pgrx_c_bindings::Datum
                             >,
                             _
                         >(
@@ -11802,14 +11992,14 @@ macro_rules! SearchSysCacheList1 {
                     ),
                     <
                         $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                            $crate::__pgrx_c_macros::CUnsignedLongLong,
-                            $crate::Datum
+                            $crate::__pgrx_c_macros::CUnsignedLong,
+                            $crate::__pgrx_c_bindings::Datum
                         > as $crate::__pgrx_c_macros::expression::CType
                     >::into_storage(
                         $crate::__pgrx_c_macros::expression::implicit::<
                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                $crate::Datum
+                                $crate::__pgrx_c_macros::CUnsignedLong,
+                                $crate::__pgrx_c_bindings::Datum
                             >,
                             _
                         >(
@@ -11856,11 +12046,13 @@ macro_rules! SearchSysCacheList1 {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
                                 $crate::__pgrx_c_macros::expression::CPointer<
-                                    $crate::__pgrx_c_macros::expression::CRecord<$crate::catclist>,
+                                    $crate::__pgrx_c_macros::expression::CRecord<
+                                        $crate::__pgrx_c_bindings::catclist
+                                    >,
                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                 > as $crate::__pgrx_c_macros::expression::CType
                             >::from_storage(
-                                $crate::__pgrx_c_generated::Inline_cd8d820f4218d82f8dab3581249a433a(
+                                $crate::__pgrx_c_generated::Inline_099d336c14fd0e2e4745b3ba2e5076a0(
                                     <
                                         $crate::__pgrx_c_macros::expression::CEnumObject<
                                             $crate::__pgrx_c_generated::EnumIdentity_e5adb9dcdce4e5857db2c1cb072bba4b4ec4ff23cb7ac50512160522ccfc3354,
@@ -11901,14 +12093,14 @@ macro_rules! SearchSysCacheList1 {
                                     ),
                                     <
                                         $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                            $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                            $crate::Datum
+                                            $crate::__pgrx_c_macros::CUnsignedLong,
+                                            $crate::__pgrx_c_bindings::Datum
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::into_storage(
                                         $crate::__pgrx_c_macros::expression::implicit::<
                                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                                $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                                $crate::Datum
+                                                $crate::__pgrx_c_macros::CUnsignedLong,
+                                                $crate::__pgrx_c_bindings::Datum
                                             >,
                                             _
                                         >(
@@ -11920,14 +12112,14 @@ macro_rules! SearchSysCacheList1 {
                                     ),
                                     <
                                         $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                            $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                            $crate::Datum
+                                            $crate::__pgrx_c_macros::CUnsignedLong,
+                                            $crate::__pgrx_c_bindings::Datum
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::into_storage(
                                         $crate::__pgrx_c_macros::expression::implicit::<
                                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                                $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                                $crate::Datum
+                                                $crate::__pgrx_c_macros::CUnsignedLong,
+                                                $crate::__pgrx_c_bindings::Datum
                                             >,
                                             _
                                         >(
@@ -11945,14 +12137,14 @@ macro_rules! SearchSysCacheList1 {
                                     ),
                                     <
                                         $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                            $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                            $crate::Datum
+                                            $crate::__pgrx_c_macros::CUnsignedLong,
+                                            $crate::__pgrx_c_bindings::Datum
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::into_storage(
                                         $crate::__pgrx_c_macros::expression::implicit::<
                                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                                $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                                $crate::Datum
+                                                $crate::__pgrx_c_macros::CUnsignedLong,
+                                                $crate::__pgrx_c_bindings::Datum
                                             >,
                                             _
                                         >(
@@ -11987,11 +12179,13 @@ macro_rules! SearchSysCacheList1 {
             let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 <
                     $crate::__pgrx_c_macros::expression::CPointer<
-                        $crate::__pgrx_c_macros::expression::CRecord<$crate::catclist>,
+                        $crate::__pgrx_c_macros::expression::CRecord<
+                            $crate::__pgrx_c_bindings::catclist
+                        >,
                         $crate::__pgrx_c_macros::expression::ReadWrite
                     > as $crate::__pgrx_c_macros::expression::CType
                 >::from_storage(
-                    $crate::__pgrx_c_generated::Inline_cd8d820f4218d82f8dab3581249a433a(
+                    $crate::__pgrx_c_generated::Inline_099d336c14fd0e2e4745b3ba2e5076a0(
                         <
                             $crate::__pgrx_c_macros::expression::CEnumObject<
                                 $crate::__pgrx_c_generated::EnumIdentity_e5adb9dcdce4e5857db2c1cb072bba4b4ec4ff23cb7ac50512160522ccfc3354,
@@ -12028,14 +12222,14 @@ macro_rules! SearchSysCacheList1 {
                         ),
                         <
                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                $crate::Datum
+                                $crate::__pgrx_c_macros::CUnsignedLong,
+                                $crate::__pgrx_c_bindings::Datum
                             > as $crate::__pgrx_c_macros::expression::CType
                         >::into_storage(
                             $crate::__pgrx_c_macros::expression::implicit::<
                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                    $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                    $crate::Datum
+                                    $crate::__pgrx_c_macros::CUnsignedLong,
+                                    $crate::__pgrx_c_bindings::Datum
                                 >,
                                 _
                             >(
@@ -12046,14 +12240,14 @@ macro_rules! SearchSysCacheList1 {
                         ),
                         <
                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                $crate::Datum
+                                $crate::__pgrx_c_macros::CUnsignedLong,
+                                $crate::__pgrx_c_bindings::Datum
                             > as $crate::__pgrx_c_macros::expression::CType
                         >::into_storage(
                             $crate::__pgrx_c_macros::expression::implicit::<
                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                    $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                    $crate::Datum
+                                    $crate::__pgrx_c_macros::CUnsignedLong,
+                                    $crate::__pgrx_c_bindings::Datum
                                 >,
                                 _
                             >(
@@ -12068,14 +12262,14 @@ macro_rules! SearchSysCacheList1 {
                         ),
                         <
                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                $crate::Datum
+                                $crate::__pgrx_c_macros::CUnsignedLong,
+                                $crate::__pgrx_c_bindings::Datum
                             > as $crate::__pgrx_c_macros::expression::CType
                         >::into_storage(
                             $crate::__pgrx_c_macros::expression::implicit::<
                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                    $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                    $crate::Datum
+                                    $crate::__pgrx_c_macros::CUnsignedLong,
+                                    $crate::__pgrx_c_bindings::Datum
                                 >,
                                 _
                             >(
@@ -12102,8 +12296,8 @@ macro_rules! SearchSysCacheList1 {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -12131,13 +12325,13 @@ macro_rules! __pgrx_c_args_SearchSysCacheList2 {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SearchSysCacheList2!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SearchSysCacheList2!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -12146,7 +12340,7 @@ macro_rules! __pgrx_c_args_SearchSysCacheList2 {
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_SearchSysCacheList2!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -12173,25 +12367,25 @@ macro_rules! __pgrx_c_args_SearchSysCacheList2 {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SearchSysCacheList2!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SearchSysCacheList2!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SearchSysCacheList2!(
-            @p2 $mode [$($done)* (@literal [- $argument]),];
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SearchSysCacheList2!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -12200,7 +12394,7 @@ macro_rules! __pgrx_c_args_SearchSysCacheList2 {
     };
     (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_SearchSysCacheList2!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -12227,31 +12421,35 @@ macro_rules! __pgrx_c_args_SearchSysCacheList2 {
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SearchSysCacheList2!(
-            @p2 $mode [$($done)* (@literal [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SearchSysCacheList2!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
     (@p2 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_SearchSysCacheList2!(@p3 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_SearchSysCacheList2!(
+            @p3 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative2 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_SearchSysCacheList2!(@p3 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_SearchSysCacheList2!(
+            @p3 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p2 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SearchSysCacheList2!(
-            @p3 $mode [$($done)* (@literal [- $argument]),];
+            @p3 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative2 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SearchSysCacheList2!(
-            @p3 $mode [$($done)* (@native [$argument]),];
+            @p3 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -12259,7 +12457,9 @@ macro_rules! __pgrx_c_args_SearchSysCacheList2 {
         $crate::__pgrx_c_args_SearchSysCacheList2!(@negative2 $mode [$($done)*]; - $($raw)*)
     };
     (@p2 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_SearchSysCacheList2!(@p3 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_SearchSysCacheList2!(
+            @p3 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p2 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -12281,14 +12481,18 @@ macro_rules! __pgrx_c_args_SearchSysCacheList2 {
         )
     };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_SearchSysCacheList2!(@p3 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_SearchSysCacheList2!(
+            @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p2 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_SearchSysCacheList2!(@p3 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_SearchSysCacheList2!(
+            @p3 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p2 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_SearchSysCacheList2!(
-            @p3 $mode [$($done)* (@native [$argument]),];
+            @p3 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -12315,13 +12519,13 @@ macro_rules! __pgrx_c_args_SearchSysCacheList2 {
     };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SearchSysCacheList2!(
-            @p3 $mode [$($done)* (@literal [$argument]),];
+            @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p2 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SearchSysCacheList2!(
-            @p3 $mode [$($done)* (@native [$argument]),];
+            @p3 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -12370,11 +12574,13 @@ macro_rules! SearchSysCacheList2 {
         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
             <
                 $crate::__pgrx_c_macros::expression::CPointer<
-                    $crate::__pgrx_c_macros::expression::CRecord<$crate::catclist>,
+                    $crate::__pgrx_c_macros::expression::CRecord<
+                        $crate::__pgrx_c_bindings::catclist
+                    >,
                     $crate::__pgrx_c_macros::expression::ReadWrite
                 > as $crate::__pgrx_c_macros::expression::CType
             >::from_storage(
-                $crate::__pgrx_c_generated::Inline_cd8d820f4218d82f8dab3581249a433a(
+                $crate::__pgrx_c_generated::Inline_099d336c14fd0e2e4745b3ba2e5076a0(
                     <
                         $crate::__pgrx_c_macros::expression::CEnumObject<
                             $crate::__pgrx_c_generated::EnumIdentity_e5adb9dcdce4e5857db2c1cb072bba4b4ec4ff23cb7ac50512160522ccfc3354,
@@ -12409,14 +12615,14 @@ macro_rules! SearchSysCacheList2 {
                     ),
                     <
                         $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                            $crate::__pgrx_c_macros::CUnsignedLongLong,
-                            $crate::Datum
+                            $crate::__pgrx_c_macros::CUnsignedLong,
+                            $crate::__pgrx_c_bindings::Datum
                         > as $crate::__pgrx_c_macros::expression::CType
                     >::into_storage(
                         $crate::__pgrx_c_macros::expression::implicit::<
                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                $crate::Datum
+                                $crate::__pgrx_c_macros::CUnsignedLong,
+                                $crate::__pgrx_c_bindings::Datum
                             >,
                             _
                         >(
@@ -12427,14 +12633,14 @@ macro_rules! SearchSysCacheList2 {
                     ),
                     <
                         $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                            $crate::__pgrx_c_macros::CUnsignedLongLong,
-                            $crate::Datum
+                            $crate::__pgrx_c_macros::CUnsignedLong,
+                            $crate::__pgrx_c_bindings::Datum
                         > as $crate::__pgrx_c_macros::expression::CType
                     >::into_storage(
                         $crate::__pgrx_c_macros::expression::implicit::<
                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                $crate::Datum
+                                $crate::__pgrx_c_macros::CUnsignedLong,
+                                $crate::__pgrx_c_bindings::Datum
                             >,
                             _
                         >(
@@ -12445,14 +12651,14 @@ macro_rules! SearchSysCacheList2 {
                     ),
                     <
                         $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                            $crate::__pgrx_c_macros::CUnsignedLongLong,
-                            $crate::Datum
+                            $crate::__pgrx_c_macros::CUnsignedLong,
+                            $crate::__pgrx_c_bindings::Datum
                         > as $crate::__pgrx_c_macros::expression::CType
                     >::into_storage(
                         $crate::__pgrx_c_macros::expression::implicit::<
                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                $crate::Datum
+                                $crate::__pgrx_c_macros::CUnsignedLong,
+                                $crate::__pgrx_c_bindings::Datum
                             >,
                             _
                         >(
@@ -12500,11 +12706,13 @@ macro_rules! SearchSysCacheList2 {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
                                 $crate::__pgrx_c_macros::expression::CPointer<
-                                    $crate::__pgrx_c_macros::expression::CRecord<$crate::catclist>,
+                                    $crate::__pgrx_c_macros::expression::CRecord<
+                                        $crate::__pgrx_c_bindings::catclist
+                                    >,
                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                 > as $crate::__pgrx_c_macros::expression::CType
                             >::from_storage(
-                                $crate::__pgrx_c_generated::Inline_cd8d820f4218d82f8dab3581249a433a(
+                                $crate::__pgrx_c_generated::Inline_099d336c14fd0e2e4745b3ba2e5076a0(
                                     <
                                         $crate::__pgrx_c_macros::expression::CEnumObject<
                                             $crate::__pgrx_c_generated::EnumIdentity_e5adb9dcdce4e5857db2c1cb072bba4b4ec4ff23cb7ac50512160522ccfc3354,
@@ -12545,14 +12753,14 @@ macro_rules! SearchSysCacheList2 {
                                     ),
                                     <
                                         $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                            $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                            $crate::Datum
+                                            $crate::__pgrx_c_macros::CUnsignedLong,
+                                            $crate::__pgrx_c_bindings::Datum
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::into_storage(
                                         $crate::__pgrx_c_macros::expression::implicit::<
                                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                                $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                                $crate::Datum
+                                                $crate::__pgrx_c_macros::CUnsignedLong,
+                                                $crate::__pgrx_c_bindings::Datum
                                             >,
                                             _
                                         >(
@@ -12564,14 +12772,14 @@ macro_rules! SearchSysCacheList2 {
                                     ),
                                     <
                                         $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                            $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                            $crate::Datum
+                                            $crate::__pgrx_c_macros::CUnsignedLong,
+                                            $crate::__pgrx_c_bindings::Datum
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::into_storage(
                                         $crate::__pgrx_c_macros::expression::implicit::<
                                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                                $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                                $crate::Datum
+                                                $crate::__pgrx_c_macros::CUnsignedLong,
+                                                $crate::__pgrx_c_bindings::Datum
                                             >,
                                             _
                                         >(
@@ -12583,14 +12791,14 @@ macro_rules! SearchSysCacheList2 {
                                     ),
                                     <
                                         $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                            $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                            $crate::Datum
+                                            $crate::__pgrx_c_macros::CUnsignedLong,
+                                            $crate::__pgrx_c_bindings::Datum
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::into_storage(
                                         $crate::__pgrx_c_macros::expression::implicit::<
                                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                                $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                                $crate::Datum
+                                                $crate::__pgrx_c_macros::CUnsignedLong,
+                                                $crate::__pgrx_c_bindings::Datum
                                             >,
                                             _
                                         >(
@@ -12625,11 +12833,13 @@ macro_rules! SearchSysCacheList2 {
             let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 <
                     $crate::__pgrx_c_macros::expression::CPointer<
-                        $crate::__pgrx_c_macros::expression::CRecord<$crate::catclist>,
+                        $crate::__pgrx_c_macros::expression::CRecord<
+                            $crate::__pgrx_c_bindings::catclist
+                        >,
                         $crate::__pgrx_c_macros::expression::ReadWrite
                     > as $crate::__pgrx_c_macros::expression::CType
                 >::from_storage(
-                    $crate::__pgrx_c_generated::Inline_cd8d820f4218d82f8dab3581249a433a(
+                    $crate::__pgrx_c_generated::Inline_099d336c14fd0e2e4745b3ba2e5076a0(
                         <
                             $crate::__pgrx_c_macros::expression::CEnumObject<
                                 $crate::__pgrx_c_generated::EnumIdentity_e5adb9dcdce4e5857db2c1cb072bba4b4ec4ff23cb7ac50512160522ccfc3354,
@@ -12666,14 +12876,14 @@ macro_rules! SearchSysCacheList2 {
                         ),
                         <
                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                $crate::Datum
+                                $crate::__pgrx_c_macros::CUnsignedLong,
+                                $crate::__pgrx_c_bindings::Datum
                             > as $crate::__pgrx_c_macros::expression::CType
                         >::into_storage(
                             $crate::__pgrx_c_macros::expression::implicit::<
                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                    $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                    $crate::Datum
+                                    $crate::__pgrx_c_macros::CUnsignedLong,
+                                    $crate::__pgrx_c_bindings::Datum
                                 >,
                                 _
                             >(
@@ -12684,14 +12894,14 @@ macro_rules! SearchSysCacheList2 {
                         ),
                         <
                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                $crate::Datum
+                                $crate::__pgrx_c_macros::CUnsignedLong,
+                                $crate::__pgrx_c_bindings::Datum
                             > as $crate::__pgrx_c_macros::expression::CType
                         >::into_storage(
                             $crate::__pgrx_c_macros::expression::implicit::<
                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                    $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                    $crate::Datum
+                                    $crate::__pgrx_c_macros::CUnsignedLong,
+                                    $crate::__pgrx_c_bindings::Datum
                                 >,
                                 _
                             >(
@@ -12702,14 +12912,14 @@ macro_rules! SearchSysCacheList2 {
                         ),
                         <
                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                $crate::Datum
+                                $crate::__pgrx_c_macros::CUnsignedLong,
+                                $crate::__pgrx_c_bindings::Datum
                             > as $crate::__pgrx_c_macros::expression::CType
                         >::into_storage(
                             $crate::__pgrx_c_macros::expression::implicit::<
                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                    $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                    $crate::Datum
+                                    $crate::__pgrx_c_macros::CUnsignedLong,
+                                    $crate::__pgrx_c_bindings::Datum
                                 >,
                                 _
                             >(
@@ -12736,8 +12946,8 @@ macro_rules! SearchSysCacheList2 {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -12765,13 +12975,13 @@ macro_rules! __pgrx_c_args_SearchSysCacheList3 {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SearchSysCacheList3!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SearchSysCacheList3!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -12780,7 +12990,7 @@ macro_rules! __pgrx_c_args_SearchSysCacheList3 {
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_SearchSysCacheList3!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -12807,25 +13017,25 @@ macro_rules! __pgrx_c_args_SearchSysCacheList3 {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SearchSysCacheList3!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SearchSysCacheList3!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SearchSysCacheList3!(
-            @p2 $mode [$($done)* (@literal [- $argument]),];
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SearchSysCacheList3!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -12834,7 +13044,7 @@ macro_rules! __pgrx_c_args_SearchSysCacheList3 {
     };
     (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_SearchSysCacheList3!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -12861,25 +13071,25 @@ macro_rules! __pgrx_c_args_SearchSysCacheList3 {
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SearchSysCacheList3!(
-            @p2 $mode [$($done)* (@literal [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SearchSysCacheList3!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
     (@p2 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SearchSysCacheList3!(
-            @p3 $mode [$($done)* (@literal [- $argument]),];
+            @p3 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative2 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SearchSysCacheList3!(
-            @p3 $mode [$($done)* (@native [$argument]),];
+            @p3 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -12888,7 +13098,7 @@ macro_rules! __pgrx_c_args_SearchSysCacheList3 {
     };
     (@p2 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_SearchSysCacheList3!(
-            @p3 $mode [$($done)* (@native [$argument]),];
+            @p3 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -12915,31 +13125,35 @@ macro_rules! __pgrx_c_args_SearchSysCacheList3 {
     };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SearchSysCacheList3!(
-            @p3 $mode [$($done)* (@literal [$argument]),];
+            @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p2 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SearchSysCacheList3!(
-            @p3 $mode [$($done)* (@native [$argument]),];
+            @p3 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
     (@p3 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_SearchSysCacheList3!(@p4 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_SearchSysCacheList3!(
+            @p4 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative3 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_SearchSysCacheList3!(@p4 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_SearchSysCacheList3!(
+            @p4 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p3 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SearchSysCacheList3!(
-            @p4 $mode [$($done)* (@literal [- $argument]),];
+            @p4 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative3 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SearchSysCacheList3!(
-            @p4 $mode [$($done)* (@native [$argument]),];
+            @p4 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -12947,7 +13161,9 @@ macro_rules! __pgrx_c_args_SearchSysCacheList3 {
         $crate::__pgrx_c_args_SearchSysCacheList3!(@negative3 $mode [$($done)*]; - $($raw)*)
     };
     (@p3 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_SearchSysCacheList3!(@p4 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_SearchSysCacheList3!(
+            @p4 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p3 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -12969,14 +13185,18 @@ macro_rules! __pgrx_c_args_SearchSysCacheList3 {
         )
     };
     (@p3 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_SearchSysCacheList3!(@p4 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_SearchSysCacheList3!(
+            @p4 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p3 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_SearchSysCacheList3!(@p4 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_SearchSysCacheList3!(
+            @p4 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p3 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_SearchSysCacheList3!(
-            @p4 $mode [$($done)* (@native [$argument]),];
+            @p4 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -13003,13 +13223,13 @@ macro_rules! __pgrx_c_args_SearchSysCacheList3 {
     };
     (@p3 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SearchSysCacheList3!(
-            @p4 $mode [$($done)* (@literal [$argument]),];
+            @p4 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p3 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SearchSysCacheList3!(
-            @p4 $mode [$($done)* (@native [$argument]),];
+            @p4 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -13059,11 +13279,13 @@ macro_rules! SearchSysCacheList3 {
         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
             <
                 $crate::__pgrx_c_macros::expression::CPointer<
-                    $crate::__pgrx_c_macros::expression::CRecord<$crate::catclist>,
+                    $crate::__pgrx_c_macros::expression::CRecord<
+                        $crate::__pgrx_c_bindings::catclist
+                    >,
                     $crate::__pgrx_c_macros::expression::ReadWrite
                 > as $crate::__pgrx_c_macros::expression::CType
             >::from_storage(
-                $crate::__pgrx_c_generated::Inline_cd8d820f4218d82f8dab3581249a433a(
+                $crate::__pgrx_c_generated::Inline_099d336c14fd0e2e4745b3ba2e5076a0(
                     <
                         $crate::__pgrx_c_macros::expression::CEnumObject<
                             $crate::__pgrx_c_generated::EnumIdentity_e5adb9dcdce4e5857db2c1cb072bba4b4ec4ff23cb7ac50512160522ccfc3354,
@@ -13098,14 +13320,14 @@ macro_rules! SearchSysCacheList3 {
                     ),
                     <
                         $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                            $crate::__pgrx_c_macros::CUnsignedLongLong,
-                            $crate::Datum
+                            $crate::__pgrx_c_macros::CUnsignedLong,
+                            $crate::__pgrx_c_bindings::Datum
                         > as $crate::__pgrx_c_macros::expression::CType
                     >::into_storage(
                         $crate::__pgrx_c_macros::expression::implicit::<
                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                $crate::Datum
+                                $crate::__pgrx_c_macros::CUnsignedLong,
+                                $crate::__pgrx_c_bindings::Datum
                             >,
                             _
                         >(
@@ -13116,14 +13338,14 @@ macro_rules! SearchSysCacheList3 {
                     ),
                     <
                         $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                            $crate::__pgrx_c_macros::CUnsignedLongLong,
-                            $crate::Datum
+                            $crate::__pgrx_c_macros::CUnsignedLong,
+                            $crate::__pgrx_c_bindings::Datum
                         > as $crate::__pgrx_c_macros::expression::CType
                     >::into_storage(
                         $crate::__pgrx_c_macros::expression::implicit::<
                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                $crate::Datum
+                                $crate::__pgrx_c_macros::CUnsignedLong,
+                                $crate::__pgrx_c_bindings::Datum
                             >,
                             _
                         >(
@@ -13134,14 +13356,14 @@ macro_rules! SearchSysCacheList3 {
                     ),
                     <
                         $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                            $crate::__pgrx_c_macros::CUnsignedLongLong,
-                            $crate::Datum
+                            $crate::__pgrx_c_macros::CUnsignedLong,
+                            $crate::__pgrx_c_bindings::Datum
                         > as $crate::__pgrx_c_macros::expression::CType
                     >::into_storage(
                         $crate::__pgrx_c_macros::expression::implicit::<
                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                $crate::Datum
+                                $crate::__pgrx_c_macros::CUnsignedLong,
+                                $crate::__pgrx_c_bindings::Datum
                             >,
                             _
                         >(
@@ -13186,11 +13408,13 @@ macro_rules! SearchSysCacheList3 {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
                                 $crate::__pgrx_c_macros::expression::CPointer<
-                                    $crate::__pgrx_c_macros::expression::CRecord<$crate::catclist>,
+                                    $crate::__pgrx_c_macros::expression::CRecord<
+                                        $crate::__pgrx_c_bindings::catclist
+                                    >,
                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                 > as $crate::__pgrx_c_macros::expression::CType
                             >::from_storage(
-                                $crate::__pgrx_c_generated::Inline_cd8d820f4218d82f8dab3581249a433a(
+                                $crate::__pgrx_c_generated::Inline_099d336c14fd0e2e4745b3ba2e5076a0(
                                     <
                                         $crate::__pgrx_c_macros::expression::CEnumObject<
                                             $crate::__pgrx_c_generated::EnumIdentity_e5adb9dcdce4e5857db2c1cb072bba4b4ec4ff23cb7ac50512160522ccfc3354,
@@ -13231,14 +13455,14 @@ macro_rules! SearchSysCacheList3 {
                                     ),
                                     <
                                         $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                            $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                            $crate::Datum
+                                            $crate::__pgrx_c_macros::CUnsignedLong,
+                                            $crate::__pgrx_c_bindings::Datum
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::into_storage(
                                         $crate::__pgrx_c_macros::expression::implicit::<
                                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                                $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                                $crate::Datum
+                                                $crate::__pgrx_c_macros::CUnsignedLong,
+                                                $crate::__pgrx_c_bindings::Datum
                                             >,
                                             _
                                         >(
@@ -13250,14 +13474,14 @@ macro_rules! SearchSysCacheList3 {
                                     ),
                                     <
                                         $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                            $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                            $crate::Datum
+                                            $crate::__pgrx_c_macros::CUnsignedLong,
+                                            $crate::__pgrx_c_bindings::Datum
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::into_storage(
                                         $crate::__pgrx_c_macros::expression::implicit::<
                                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                                $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                                $crate::Datum
+                                                $crate::__pgrx_c_macros::CUnsignedLong,
+                                                $crate::__pgrx_c_bindings::Datum
                                             >,
                                             _
                                         >(
@@ -13269,14 +13493,14 @@ macro_rules! SearchSysCacheList3 {
                                     ),
                                     <
                                         $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                            $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                            $crate::Datum
+                                            $crate::__pgrx_c_macros::CUnsignedLong,
+                                            $crate::__pgrx_c_bindings::Datum
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::into_storage(
                                         $crate::__pgrx_c_macros::expression::implicit::<
                                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                                $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                                $crate::Datum
+                                                $crate::__pgrx_c_macros::CUnsignedLong,
+                                                $crate::__pgrx_c_bindings::Datum
                                             >,
                                             _
                                         >(
@@ -13305,11 +13529,13 @@ macro_rules! SearchSysCacheList3 {
             let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 <
                     $crate::__pgrx_c_macros::expression::CPointer<
-                        $crate::__pgrx_c_macros::expression::CRecord<$crate::catclist>,
+                        $crate::__pgrx_c_macros::expression::CRecord<
+                            $crate::__pgrx_c_bindings::catclist
+                        >,
                         $crate::__pgrx_c_macros::expression::ReadWrite
                     > as $crate::__pgrx_c_macros::expression::CType
                 >::from_storage(
-                    $crate::__pgrx_c_generated::Inline_cd8d820f4218d82f8dab3581249a433a(
+                    $crate::__pgrx_c_generated::Inline_099d336c14fd0e2e4745b3ba2e5076a0(
                         <
                             $crate::__pgrx_c_macros::expression::CEnumObject<
                                 $crate::__pgrx_c_generated::EnumIdentity_e5adb9dcdce4e5857db2c1cb072bba4b4ec4ff23cb7ac50512160522ccfc3354,
@@ -13346,14 +13572,14 @@ macro_rules! SearchSysCacheList3 {
                         ),
                         <
                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                $crate::Datum
+                                $crate::__pgrx_c_macros::CUnsignedLong,
+                                $crate::__pgrx_c_bindings::Datum
                             > as $crate::__pgrx_c_macros::expression::CType
                         >::into_storage(
                             $crate::__pgrx_c_macros::expression::implicit::<
                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                    $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                    $crate::Datum
+                                    $crate::__pgrx_c_macros::CUnsignedLong,
+                                    $crate::__pgrx_c_bindings::Datum
                                 >,
                                 _
                             >(
@@ -13364,14 +13590,14 @@ macro_rules! SearchSysCacheList3 {
                         ),
                         <
                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                $crate::Datum
+                                $crate::__pgrx_c_macros::CUnsignedLong,
+                                $crate::__pgrx_c_bindings::Datum
                             > as $crate::__pgrx_c_macros::expression::CType
                         >::into_storage(
                             $crate::__pgrx_c_macros::expression::implicit::<
                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                    $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                    $crate::Datum
+                                    $crate::__pgrx_c_macros::CUnsignedLong,
+                                    $crate::__pgrx_c_bindings::Datum
                                 >,
                                 _
                             >(
@@ -13382,14 +13608,14 @@ macro_rules! SearchSysCacheList3 {
                         ),
                         <
                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                $crate::Datum
+                                $crate::__pgrx_c_macros::CUnsignedLong,
+                                $crate::__pgrx_c_bindings::Datum
                             > as $crate::__pgrx_c_macros::expression::CType
                         >::into_storage(
                             $crate::__pgrx_c_macros::expression::implicit::<
                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
-                                    $crate::__pgrx_c_macros::CUnsignedLongLong,
-                                    $crate::Datum
+                                    $crate::__pgrx_c_macros::CUnsignedLong,
+                                    $crate::__pgrx_c_bindings::Datum
                                 >,
                                 _
                             >(

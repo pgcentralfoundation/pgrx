@@ -275,6 +275,7 @@ impl<'tu> Collector<'_, 'tu> {
             is_static: entity.get_storage_class() == Some(StorageClass::Static),
             is_inline: entity.is_inline_function(),
             definition_available: entity.is_definition() || entity.get_definition().is_some(),
+            definition: None,
         };
         self.catalog.function_signatures.insert(name, info);
         self.drain_types();

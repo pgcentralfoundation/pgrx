@@ -5,8 +5,8 @@ This code is generated for documentation purposes, so that it is easy to referen
 // C macros from syncrep.h.
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -59,7 +59,11 @@ macro_rules! SyncRepRequested {
                                     $crate::__pgrx_c_macros::expression::load(
                                         $crate::__pgrx_c_macros::expression::place::<
                                             $crate::__pgrx_c_macros::CInt
-                                        >(::core::ptr::addr_of_mut!($crate::max_wal_senders))
+                                        >(
+                                            ::core::ptr::addr_of_mut!(
+                                                $crate::__pgrx_c_bindings::max_wal_senders
+                                            )
+                                        )
                                     )
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -78,12 +82,16 @@ macro_rules! SyncRepRequested {
                                     $crate::__pgrx_c_macros::expression::load(
                                         $crate::__pgrx_c_macros::expression::place::<
                                             $crate::__pgrx_c_macros::CInt
-                                        >(::core::ptr::addr_of_mut!($crate::synchronous_commit))
+                                        >(
+                                            ::core::ptr::addr_of_mut!(
+                                                $crate::__pgrx_c_bindings::synchronous_commit
+                                            )
+                                        )
                                     )
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                        $crate::SyncCommitLevel::SYNCHRONOUS_COMMIT_LOCAL_FLUSH as i32
+                                        $crate::__pgrx_c_bindings::SyncCommitLevel::SYNCHRONOUS_COMMIT_LOCAL_FLUSH as i32
                                     )
                                 )
                             )
@@ -134,7 +142,7 @@ macro_rules! SyncRepRequested {
                                                         $crate::__pgrx_c_macros::CInt
                                                     >(
                                                         ::core::ptr::addr_of_mut!(
-                                                            $crate::max_wal_senders
+                                                            $crate::__pgrx_c_bindings::max_wal_senders
                                                         )
                                                     )
                                                 )
@@ -163,7 +171,7 @@ macro_rules! SyncRepRequested {
                                                         $crate::__pgrx_c_macros::CInt
                                                     >(
                                                         ::core::ptr::addr_of_mut!(
-                                                            $crate::synchronous_commit
+                                                            $crate::__pgrx_c_bindings::synchronous_commit
                                                         )
                                                     )
                                                 )
@@ -175,7 +183,7 @@ macro_rules! SyncRepRequested {
                                                 $crate::__pgrx_c_macros::CValue::<
                                                     $crate::__pgrx_c_macros::CInt
                                                 >::new(
-                                                    $crate::SyncCommitLevel::SYNCHRONOUS_COMMIT_LOCAL_FLUSH as i32
+                                                    $crate::__pgrx_c_bindings::SyncCommitLevel::SYNCHRONOUS_COMMIT_LOCAL_FLUSH as i32
                                                 )
                                             )
                                         )
@@ -208,7 +216,11 @@ macro_rules! SyncRepRequested {
                                     $crate::__pgrx_c_macros::expression::load(
                                         $crate::__pgrx_c_macros::expression::place::<
                                             $crate::__pgrx_c_macros::CInt
-                                        >(::core::ptr::addr_of_mut!($crate::max_wal_senders))
+                                        >(
+                                            ::core::ptr::addr_of_mut!(
+                                                $crate::__pgrx_c_bindings::max_wal_senders
+                                            )
+                                        )
                                     )
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -227,12 +239,16 @@ macro_rules! SyncRepRequested {
                                     $crate::__pgrx_c_macros::expression::load(
                                         $crate::__pgrx_c_macros::expression::place::<
                                             $crate::__pgrx_c_macros::CInt
-                                        >(::core::ptr::addr_of_mut!($crate::synchronous_commit))
+                                        >(
+                                            ::core::ptr::addr_of_mut!(
+                                                $crate::__pgrx_c_bindings::synchronous_commit
+                                            )
+                                        )
                                     )
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                        $crate::SyncCommitLevel::SYNCHRONOUS_COMMIT_LOCAL_FLUSH as i32
+                                        $crate::__pgrx_c_bindings::SyncCommitLevel::SYNCHRONOUS_COMMIT_LOCAL_FLUSH as i32
                                     )
                                 )
                             )

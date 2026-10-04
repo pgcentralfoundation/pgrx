@@ -42,6 +42,7 @@
 - **Automatic PostgreSQL C Macro Translation**
    + On verified target C profiles, pgrx automatically transpiles nearly all of PostgreSQL's function-style C `#define` macros into Rust `macro_rules!` macros during binding generation
    + Use them through `pgrx::`, with C semantics determined by the selected PostgreSQL installation, compiler flags, and target
+   + Call macros with their original C names and `!`
    + See [Using PostgreSQL C macros](docs/src/extension/c-macros.md) for extension examples and the [transpiler architecture](pgrx-c-macros/ARCHITECTURE.md) for implementation details
 - **Safety First**
    + Translates Rust `panic!`s into Postgres `ERROR`s that abort the transaction, not the process
@@ -78,6 +79,18 @@
 PGRX has been tested to work on x86_64 Linux, aarch64 Linux, aarch64 macOS, and x86_64 Windows targets⹋.
 It is currently expected to work on other "Unix" OS with possible small changes, but those remain untested.
 
+The generated C macro runtime admits compiler-verified LP64, LLP64, and ILP32
+profiles with either byte order, subject to a recognized Rust architecture, OS,
+and ABI guard. Cross builds can inspect matching target headers or import a
+complete target bundle with its generated macro and native support. See
+[target limits](docs/src/extension/c-macros.md#understand-refusals-and-runtime-limits).
+
+Plain C `char` follows the inspected compiler's signedness, independently of
+Rust's native `core::ffi::c_char` alias. Generated bridges verify its one-byte
+storage while explicit `CChar` tags preserve plain-char identity and promotion.
+Raw `i8` and `u8` operands retain the distinct C signed-char and unsigned-char
+identities.
+
 - A Rust toolchain: `rustc`, `cargo`, and `rustfmt`. The recommended way to get these is from https://rustup.rs †
 - `git`
 - `libclang` 11 or greater (for bindgen)
@@ -87,6 +100,7 @@ It is currently expected to work on other "Unix" OS with possible small changes,
 - C compiler
    - Linux and macOS: the generator's SHA-256 backend needs a host C compiler; optional C macro generation additionally needs a Clang executable compatible with the loaded `libclang`; ordinary bindings still build if macro inspection is unavailable, and `PGRX_C_MACROS=0` disables it explicitly; the `cshim` feature needs a target C compiler
    - Windows: MSVC or Clang
+   - Generated macro native support: a compatible GNU-style Clang driver and target headers/libraries; Unix uses adjacent `llvm-ar` or a compatible local `ar`, while Windows/MSVC uses LLVM's `llvm-lib` or `llvm-ar --format=coff`
 - [PostgreSQL's build dependencies](https://wiki.postgresql.org/wiki/Compile_and_Install_from_source_code) ‡
    - Debian-likes: `sudo apt-get install build-essential libreadline-dev zlib1g-dev flex bison libxml2-dev libxslt-dev libssl-dev libxml2-utils xsltproc ccache pkg-config`
    - RHEL-likes: `sudo yum install -y bison-devel readline-devel zlib-devel openssl-devel wget ccache && sudo yum groupinstall -y 'Development Tools'`
@@ -95,9 +109,10 @@ It is currently expected to work on other "Unix" OS with possible small changes,
 
  ‡ A local PostgreSQL server installation is not required. On Linux and MacOS, `cargo pgrx` can download and compile PostgreSQL versions on its own. On Windows, `cargo pgrx` downloads precompiled PostgreSQL versions from EnterpriseDB.
 
- ⹋ PGRX has not been tested to work on 32-bit, but the library attempts to handle conversion of `pg_sys::Datum`
-to and from `int8` and `double` types. Use it only at your own risk. We do not plan to add official support
-without considerable ongoing technical and financial contributions.
+ ⹋ PGRX has not been tested on 32-bit targets. The generated macro runtime's
+verified ILP32 model and the library's 32-bit Datum conversion code do not
+establish a supported 32-bit backend build. Official support would require
+ongoing technical and financial contributions.
 
 ### macOS
 
@@ -218,6 +233,12 @@ In order to cross-compile outside of nix, you will need two ingredients:
 1) A sysroot for the cross architecture, with rust configured to invoke the linker with flags to link against this sysroot.
 2) A `pg_config` program that provides values associated with postgres compiled for the desired cross architecture.
    This can be achieved by either emulating pg_config with qemu-user or similar, or replicating pg_config with a shell script.
+
+The target headers, compiler flags, and Clang target must also agree during C
+macro inspection. Precomputed raw bindings alone do not provide the macro
+profile or native adapters needed by pgrx; import a
+[complete target bundle](docs/src/extension/build/cross-compile.md#import-a-complete-target-bundle)
+when generating on the target machine instead.
 
 Then, modify the standard build process in the following ways:
 

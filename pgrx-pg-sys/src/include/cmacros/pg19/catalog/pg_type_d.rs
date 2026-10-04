@@ -5,8 +5,8 @@ This code is generated for documentation purposes, so that it is easy to referen
 // C macros from pg_type_d.h.
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -33,20 +33,24 @@ macro_rules! __pgrx_c_args_IsPolymorphicType {
         $crate::__pgrx_c_args_IsPolymorphicType!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_IsPolymorphicType!(@p1 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_IsPolymorphicType!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_IsPolymorphicType!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_IsPolymorphicType!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_IsPolymorphicType!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_IsPolymorphicType!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -54,7 +58,9 @@ macro_rules! __pgrx_c_args_IsPolymorphicType {
         $crate::__pgrx_c_args_IsPolymorphicType!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_IsPolymorphicType!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_IsPolymorphicType!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -76,14 +82,18 @@ macro_rules! __pgrx_c_args_IsPolymorphicType {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_IsPolymorphicType!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_IsPolymorphicType!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_IsPolymorphicType!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_IsPolymorphicType!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_IsPolymorphicType!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -110,13 +120,13 @@ macro_rules! __pgrx_c_args_IsPolymorphicType {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_IsPolymorphicType!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_IsPolymorphicType!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -221,7 +231,7 @@ macro_rules! IsPolymorphicType {
                                                                                                     $crate::__pgrx_c_macros::CValue::<
                                                                                                         $crate::__pgrx_c_macros::CInt
                                                                                                     >::new(
-                                                                                                        $crate::ANYELEMENTOID.to_u32() as i32
+                                                                                                        $crate::__pgrx_c_bindings::ANYELEMENTOID.to_u32() as i32
                                                                                                     )
                                                                                                 )
                                                                                             )
@@ -252,7 +262,7 @@ macro_rules! IsPolymorphicType {
                                                                                                     $crate::__pgrx_c_macros::CValue::<
                                                                                                         $crate::__pgrx_c_macros::CInt
                                                                                                     >::new(
-                                                                                                        $crate::ANYARRAYOID.to_u32() as i32
+                                                                                                        $crate::__pgrx_c_bindings::ANYARRAYOID.to_u32() as i32
                                                                                                     )
                                                                                                 )
                                                                                             )
@@ -290,7 +300,7 @@ macro_rules! IsPolymorphicType {
                                                                                         $crate::__pgrx_c_macros::CValue::<
                                                                                             $crate::__pgrx_c_macros::CInt
                                                                                         >::new(
-                                                                                            $crate::ANYNONARRAYOID.to_u32() as i32
+                                                                                            $crate::__pgrx_c_bindings::ANYNONARRAYOID.to_u32() as i32
                                                                                         )
                                                                                     )
                                                                                 )
@@ -326,7 +336,7 @@ macro_rules! IsPolymorphicType {
                                                                             $crate::__pgrx_c_macros::CValue::<
                                                                                 $crate::__pgrx_c_macros::CInt
                                                                             >::new(
-                                                                                $crate::ANYENUMOID.to_u32() as i32
+                                                                                $crate::__pgrx_c_bindings::ANYENUMOID.to_u32() as i32
                                                                             )
                                                                         )
                                                                     )
@@ -362,7 +372,7 @@ macro_rules! IsPolymorphicType {
                                                                 $crate::__pgrx_c_macros::CValue::<
                                                                     $crate::__pgrx_c_macros::CInt
                                                                 >::new(
-                                                                    $crate::ANYRANGEOID.to_u32() as i32
+                                                                    $crate::__pgrx_c_bindings::ANYRANGEOID.to_u32() as i32
                                                                 )
                                                             )
                                                         )
@@ -397,7 +407,9 @@ macro_rules! IsPolymorphicType {
                                                 >(
                                                     $crate::__pgrx_c_macros::CValue::<
                                                         $crate::__pgrx_c_macros::CInt
-                                                    >::new($crate::ANYMULTIRANGEOID.to_u32() as i32)
+                                                    >::new(
+                                                        $crate::__pgrx_c_bindings::ANYMULTIRANGEOID.to_u32() as i32
+                                                    )
                                                 )
                                             )
                                         )
@@ -463,7 +475,7 @@ macro_rules! IsPolymorphicType {
                                                                                         $crate::__pgrx_c_macros::CValue::<
                                                                                             $crate::__pgrx_c_macros::CInt
                                                                                         >::new(
-                                                                                            $crate::ANYCOMPATIBLEOID.to_u32() as i32
+                                                                                            $crate::__pgrx_c_bindings::ANYCOMPATIBLEOID.to_u32() as i32
                                                                                         )
                                                                                     )
                                                                                 )
@@ -494,7 +506,7 @@ macro_rules! IsPolymorphicType {
                                                                                         $crate::__pgrx_c_macros::CValue::<
                                                                                             $crate::__pgrx_c_macros::CInt
                                                                                         >::new(
-                                                                                            $crate::ANYCOMPATIBLEARRAYOID.to_u32() as i32
+                                                                                            $crate::__pgrx_c_bindings::ANYCOMPATIBLEARRAYOID.to_u32() as i32
                                                                                         )
                                                                                     )
                                                                                 )
@@ -530,7 +542,7 @@ macro_rules! IsPolymorphicType {
                                                                             $crate::__pgrx_c_macros::CValue::<
                                                                                 $crate::__pgrx_c_macros::CInt
                                                                             >::new(
-                                                                                $crate::ANYCOMPATIBLENONARRAYOID.to_u32() as i32
+                                                                                $crate::__pgrx_c_bindings::ANYCOMPATIBLENONARRAYOID.to_u32() as i32
                                                                             )
                                                                         )
                                                                     )
@@ -566,7 +578,7 @@ macro_rules! IsPolymorphicType {
                                                                 $crate::__pgrx_c_macros::CValue::<
                                                                     $crate::__pgrx_c_macros::CInt
                                                                 >::new(
-                                                                    $crate::ANYCOMPATIBLERANGEOID.to_u32() as i32
+                                                                    $crate::__pgrx_c_bindings::ANYCOMPATIBLERANGEOID.to_u32() as i32
                                                                 )
                                                             )
                                                         )
@@ -602,7 +614,7 @@ macro_rules! IsPolymorphicType {
                                                     $crate::__pgrx_c_macros::CValue::<
                                                         $crate::__pgrx_c_macros::CInt
                                                     >::new(
-                                                        $crate::ANYCOMPATIBLEMULTIRANGEOID.to_u32() as i32
+                                                        $crate::__pgrx_c_bindings::ANYCOMPATIBLEMULTIRANGEOID.to_u32() as i32
                                                     )
                                                 )
                                             )
@@ -719,7 +731,7 @@ macro_rules! IsPolymorphicType {
                                                                                                                 $crate::__pgrx_c_macros::CValue::<
                                                                                                                     $crate::__pgrx_c_macros::CInt
                                                                                                                 >::new(
-                                                                                                                    $crate::ANYELEMENTOID.to_u32() as i32
+                                                                                                                    $crate::__pgrx_c_bindings::ANYELEMENTOID.to_u32() as i32
                                                                                                                 )
                                                                                                             )
                                                                                                         )
@@ -750,7 +762,7 @@ macro_rules! IsPolymorphicType {
                                                                                                                 $crate::__pgrx_c_macros::CValue::<
                                                                                                                     $crate::__pgrx_c_macros::CInt
                                                                                                                 >::new(
-                                                                                                                    $crate::ANYARRAYOID.to_u32() as i32
+                                                                                                                    $crate::__pgrx_c_bindings::ANYARRAYOID.to_u32() as i32
                                                                                                                 )
                                                                                                             )
                                                                                                         )
@@ -788,7 +800,7 @@ macro_rules! IsPolymorphicType {
                                                                                                     $crate::__pgrx_c_macros::CValue::<
                                                                                                         $crate::__pgrx_c_macros::CInt
                                                                                                     >::new(
-                                                                                                        $crate::ANYNONARRAYOID.to_u32() as i32
+                                                                                                        $crate::__pgrx_c_bindings::ANYNONARRAYOID.to_u32() as i32
                                                                                                     )
                                                                                                 )
                                                                                             )
@@ -826,7 +838,7 @@ macro_rules! IsPolymorphicType {
                                                                                         $crate::__pgrx_c_macros::CValue::<
                                                                                             $crate::__pgrx_c_macros::CInt
                                                                                         >::new(
-                                                                                            $crate::ANYENUMOID.to_u32() as i32
+                                                                                            $crate::__pgrx_c_bindings::ANYENUMOID.to_u32() as i32
                                                                                         )
                                                                                     )
                                                                                 )
@@ -862,7 +874,7 @@ macro_rules! IsPolymorphicType {
                                                                             $crate::__pgrx_c_macros::CValue::<
                                                                                 $crate::__pgrx_c_macros::CInt
                                                                             >::new(
-                                                                                $crate::ANYRANGEOID.to_u32() as i32
+                                                                                $crate::__pgrx_c_bindings::ANYRANGEOID.to_u32() as i32
                                                                             )
                                                                         )
                                                                     )
@@ -898,7 +910,7 @@ macro_rules! IsPolymorphicType {
                                                                 $crate::__pgrx_c_macros::CValue::<
                                                                     $crate::__pgrx_c_macros::CInt
                                                                 >::new(
-                                                                    $crate::ANYMULTIRANGEOID.to_u32() as i32
+                                                                    $crate::__pgrx_c_bindings::ANYMULTIRANGEOID.to_u32() as i32
                                                                 )
                                                             )
                                                         )
@@ -970,7 +982,7 @@ macro_rules! IsPolymorphicType {
                                                                                                     $crate::__pgrx_c_macros::CValue::<
                                                                                                         $crate::__pgrx_c_macros::CInt
                                                                                                     >::new(
-                                                                                                        $crate::ANYCOMPATIBLEOID.to_u32() as i32
+                                                                                                        $crate::__pgrx_c_bindings::ANYCOMPATIBLEOID.to_u32() as i32
                                                                                                     )
                                                                                                 )
                                                                                             )
@@ -1001,7 +1013,7 @@ macro_rules! IsPolymorphicType {
                                                                                                     $crate::__pgrx_c_macros::CValue::<
                                                                                                         $crate::__pgrx_c_macros::CInt
                                                                                                     >::new(
-                                                                                                        $crate::ANYCOMPATIBLEARRAYOID.to_u32() as i32
+                                                                                                        $crate::__pgrx_c_bindings::ANYCOMPATIBLEARRAYOID.to_u32() as i32
                                                                                                     )
                                                                                                 )
                                                                                             )
@@ -1039,7 +1051,7 @@ macro_rules! IsPolymorphicType {
                                                                                         $crate::__pgrx_c_macros::CValue::<
                                                                                             $crate::__pgrx_c_macros::CInt
                                                                                         >::new(
-                                                                                            $crate::ANYCOMPATIBLENONARRAYOID.to_u32() as i32
+                                                                                            $crate::__pgrx_c_bindings::ANYCOMPATIBLENONARRAYOID.to_u32() as i32
                                                                                         )
                                                                                     )
                                                                                 )
@@ -1075,7 +1087,7 @@ macro_rules! IsPolymorphicType {
                                                                             $crate::__pgrx_c_macros::CValue::<
                                                                                 $crate::__pgrx_c_macros::CInt
                                                                             >::new(
-                                                                                $crate::ANYCOMPATIBLERANGEOID.to_u32() as i32
+                                                                                $crate::__pgrx_c_bindings::ANYCOMPATIBLERANGEOID.to_u32() as i32
                                                                             )
                                                                         )
                                                                     )
@@ -1111,7 +1123,7 @@ macro_rules! IsPolymorphicType {
                                                                 $crate::__pgrx_c_macros::CValue::<
                                                                     $crate::__pgrx_c_macros::CInt
                                                                 >::new(
-                                                                    $crate::ANYCOMPATIBLEMULTIRANGEOID.to_u32() as i32
+                                                                    $crate::__pgrx_c_bindings::ANYCOMPATIBLEMULTIRANGEOID.to_u32() as i32
                                                                 )
                                                             )
                                                         )
@@ -1208,7 +1220,7 @@ macro_rules! IsPolymorphicType {
                                                                                                     $crate::__pgrx_c_macros::CValue::<
                                                                                                         $crate::__pgrx_c_macros::CInt
                                                                                                     >::new(
-                                                                                                        $crate::ANYELEMENTOID.to_u32() as i32
+                                                                                                        $crate::__pgrx_c_bindings::ANYELEMENTOID.to_u32() as i32
                                                                                                     )
                                                                                                 )
                                                                                             )
@@ -1239,7 +1251,7 @@ macro_rules! IsPolymorphicType {
                                                                                                     $crate::__pgrx_c_macros::CValue::<
                                                                                                         $crate::__pgrx_c_macros::CInt
                                                                                                     >::new(
-                                                                                                        $crate::ANYARRAYOID.to_u32() as i32
+                                                                                                        $crate::__pgrx_c_bindings::ANYARRAYOID.to_u32() as i32
                                                                                                     )
                                                                                                 )
                                                                                             )
@@ -1277,7 +1289,7 @@ macro_rules! IsPolymorphicType {
                                                                                         $crate::__pgrx_c_macros::CValue::<
                                                                                             $crate::__pgrx_c_macros::CInt
                                                                                         >::new(
-                                                                                            $crate::ANYNONARRAYOID.to_u32() as i32
+                                                                                            $crate::__pgrx_c_bindings::ANYNONARRAYOID.to_u32() as i32
                                                                                         )
                                                                                     )
                                                                                 )
@@ -1313,7 +1325,7 @@ macro_rules! IsPolymorphicType {
                                                                             $crate::__pgrx_c_macros::CValue::<
                                                                                 $crate::__pgrx_c_macros::CInt
                                                                             >::new(
-                                                                                $crate::ANYENUMOID.to_u32() as i32
+                                                                                $crate::__pgrx_c_bindings::ANYENUMOID.to_u32() as i32
                                                                             )
                                                                         )
                                                                     )
@@ -1349,7 +1361,7 @@ macro_rules! IsPolymorphicType {
                                                                 $crate::__pgrx_c_macros::CValue::<
                                                                     $crate::__pgrx_c_macros::CInt
                                                                 >::new(
-                                                                    $crate::ANYRANGEOID.to_u32() as i32
+                                                                    $crate::__pgrx_c_bindings::ANYRANGEOID.to_u32() as i32
                                                                 )
                                                             )
                                                         )
@@ -1384,7 +1396,9 @@ macro_rules! IsPolymorphicType {
                                                 >(
                                                     $crate::__pgrx_c_macros::CValue::<
                                                         $crate::__pgrx_c_macros::CInt
-                                                    >::new($crate::ANYMULTIRANGEOID.to_u32() as i32)
+                                                    >::new(
+                                                        $crate::__pgrx_c_bindings::ANYMULTIRANGEOID.to_u32() as i32
+                                                    )
                                                 )
                                             )
                                         )
@@ -1450,7 +1464,7 @@ macro_rules! IsPolymorphicType {
                                                                                         $crate::__pgrx_c_macros::CValue::<
                                                                                             $crate::__pgrx_c_macros::CInt
                                                                                         >::new(
-                                                                                            $crate::ANYCOMPATIBLEOID.to_u32() as i32
+                                                                                            $crate::__pgrx_c_bindings::ANYCOMPATIBLEOID.to_u32() as i32
                                                                                         )
                                                                                     )
                                                                                 )
@@ -1481,7 +1495,7 @@ macro_rules! IsPolymorphicType {
                                                                                         $crate::__pgrx_c_macros::CValue::<
                                                                                             $crate::__pgrx_c_macros::CInt
                                                                                         >::new(
-                                                                                            $crate::ANYCOMPATIBLEARRAYOID.to_u32() as i32
+                                                                                            $crate::__pgrx_c_bindings::ANYCOMPATIBLEARRAYOID.to_u32() as i32
                                                                                         )
                                                                                     )
                                                                                 )
@@ -1517,7 +1531,7 @@ macro_rules! IsPolymorphicType {
                                                                             $crate::__pgrx_c_macros::CValue::<
                                                                                 $crate::__pgrx_c_macros::CInt
                                                                             >::new(
-                                                                                $crate::ANYCOMPATIBLENONARRAYOID.to_u32() as i32
+                                                                                $crate::__pgrx_c_bindings::ANYCOMPATIBLENONARRAYOID.to_u32() as i32
                                                                             )
                                                                         )
                                                                     )
@@ -1553,7 +1567,7 @@ macro_rules! IsPolymorphicType {
                                                                 $crate::__pgrx_c_macros::CValue::<
                                                                     $crate::__pgrx_c_macros::CInt
                                                                 >::new(
-                                                                    $crate::ANYCOMPATIBLERANGEOID.to_u32() as i32
+                                                                    $crate::__pgrx_c_bindings::ANYCOMPATIBLERANGEOID.to_u32() as i32
                                                                 )
                                                             )
                                                         )
@@ -1589,7 +1603,7 @@ macro_rules! IsPolymorphicType {
                                                     $crate::__pgrx_c_macros::CValue::<
                                                         $crate::__pgrx_c_macros::CInt
                                                     >::new(
-                                                        $crate::ANYCOMPATIBLEMULTIRANGEOID.to_u32() as i32
+                                                        $crate::__pgrx_c_bindings::ANYCOMPATIBLEMULTIRANGEOID.to_u32() as i32
                                                     )
                                                 )
                                             )
@@ -1620,8 +1634,8 @@ macro_rules! IsPolymorphicType {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -1652,23 +1666,23 @@ macro_rules! __pgrx_c_args_IsPolymorphicTypeFamily1 {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
         $crate::__pgrx_c_args_IsPolymorphicTypeFamily1!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_IsPolymorphicTypeFamily1!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_IsPolymorphicTypeFamily1!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_IsPolymorphicTypeFamily1!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -1677,7 +1691,7 @@ macro_rules! __pgrx_c_args_IsPolymorphicTypeFamily1 {
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
         $crate::__pgrx_c_args_IsPolymorphicTypeFamily1!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
@@ -1703,17 +1717,17 @@ macro_rules! __pgrx_c_args_IsPolymorphicTypeFamily1 {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_IsPolymorphicTypeFamily1!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_IsPolymorphicTypeFamily1!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_IsPolymorphicTypeFamily1!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -1740,13 +1754,13 @@ macro_rules! __pgrx_c_args_IsPolymorphicTypeFamily1 {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_IsPolymorphicTypeFamily1!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_IsPolymorphicTypeFamily1!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -1841,7 +1855,7 @@ macro_rules! IsPolymorphicTypeFamily1 {
                                                                                     $crate::__pgrx_c_macros::CValue::<
                                                                                         $crate::__pgrx_c_macros::CInt
                                                                                     >::new(
-                                                                                        $crate::ANYELEMENTOID.to_u32() as i32
+                                                                                        $crate::__pgrx_c_bindings::ANYELEMENTOID.to_u32() as i32
                                                                                     )
                                                                                 )
                                                                             )
@@ -1872,7 +1886,7 @@ macro_rules! IsPolymorphicTypeFamily1 {
                                                                                     $crate::__pgrx_c_macros::CValue::<
                                                                                         $crate::__pgrx_c_macros::CInt
                                                                                     >::new(
-                                                                                        $crate::ANYARRAYOID.to_u32() as i32
+                                                                                        $crate::__pgrx_c_bindings::ANYARRAYOID.to_u32() as i32
                                                                                     )
                                                                                 )
                                                                             )
@@ -1908,7 +1922,7 @@ macro_rules! IsPolymorphicTypeFamily1 {
                                                                         $crate::__pgrx_c_macros::CValue::<
                                                                             $crate::__pgrx_c_macros::CInt
                                                                         >::new(
-                                                                            $crate::ANYNONARRAYOID.to_u32() as i32
+                                                                            $crate::__pgrx_c_bindings::ANYNONARRAYOID.to_u32() as i32
                                                                         )
                                                                     )
                                                                 )
@@ -1944,7 +1958,7 @@ macro_rules! IsPolymorphicTypeFamily1 {
                                                             $crate::__pgrx_c_macros::CValue::<
                                                                 $crate::__pgrx_c_macros::CInt
                                                             >::new(
-                                                                $crate::ANYENUMOID.to_u32() as i32
+                                                                $crate::__pgrx_c_bindings::ANYENUMOID.to_u32() as i32
                                                             )
                                                         )
                                                     )
@@ -1971,7 +1985,9 @@ macro_rules! IsPolymorphicTypeFamily1 {
                                             >(
                                                 $crate::__pgrx_c_macros::CValue::<
                                                     $crate::__pgrx_c_macros::CInt
-                                                >::new($crate::ANYRANGEOID.to_u32() as i32)
+                                                >::new(
+                                                    $crate::__pgrx_c_bindings::ANYRANGEOID.to_u32() as i32
+                                                )
                                             )
                                         )
                                     )
@@ -1992,7 +2008,7 @@ macro_rules! IsPolymorphicTypeFamily1 {
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                        $crate::ANYMULTIRANGEOID.to_u32() as i32
+                                        $crate::__pgrx_c_bindings::ANYMULTIRANGEOID.to_u32() as i32
                                     )
                                 )
                             )
@@ -2091,7 +2107,7 @@ macro_rules! IsPolymorphicTypeFamily1 {
                                                                                                 $crate::__pgrx_c_macros::CValue::<
                                                                                                     $crate::__pgrx_c_macros::CInt
                                                                                                 >::new(
-                                                                                                    $crate::ANYELEMENTOID.to_u32() as i32
+                                                                                                    $crate::__pgrx_c_bindings::ANYELEMENTOID.to_u32() as i32
                                                                                                 )
                                                                                             )
                                                                                         )
@@ -2122,7 +2138,7 @@ macro_rules! IsPolymorphicTypeFamily1 {
                                                                                                 $crate::__pgrx_c_macros::CValue::<
                                                                                                     $crate::__pgrx_c_macros::CInt
                                                                                                 >::new(
-                                                                                                    $crate::ANYARRAYOID.to_u32() as i32
+                                                                                                    $crate::__pgrx_c_bindings::ANYARRAYOID.to_u32() as i32
                                                                                                 )
                                                                                             )
                                                                                         )
@@ -2160,7 +2176,7 @@ macro_rules! IsPolymorphicTypeFamily1 {
                                                                                     $crate::__pgrx_c_macros::CValue::<
                                                                                         $crate::__pgrx_c_macros::CInt
                                                                                     >::new(
-                                                                                        $crate::ANYNONARRAYOID.to_u32() as i32
+                                                                                        $crate::__pgrx_c_bindings::ANYNONARRAYOID.to_u32() as i32
                                                                                     )
                                                                                 )
                                                                             )
@@ -2196,7 +2212,7 @@ macro_rules! IsPolymorphicTypeFamily1 {
                                                                         $crate::__pgrx_c_macros::CValue::<
                                                                             $crate::__pgrx_c_macros::CInt
                                                                         >::new(
-                                                                            $crate::ANYENUMOID.to_u32() as i32
+                                                                            $crate::__pgrx_c_bindings::ANYENUMOID.to_u32() as i32
                                                                         )
                                                                     )
                                                                 )
@@ -2232,7 +2248,7 @@ macro_rules! IsPolymorphicTypeFamily1 {
                                                             $crate::__pgrx_c_macros::CValue::<
                                                                 $crate::__pgrx_c_macros::CInt
                                                             >::new(
-                                                                $crate::ANYRANGEOID.to_u32() as i32
+                                                                $crate::__pgrx_c_bindings::ANYRANGEOID.to_u32() as i32
                                                             )
                                                         )
                                                     )
@@ -2259,7 +2275,9 @@ macro_rules! IsPolymorphicTypeFamily1 {
                                             >(
                                                 $crate::__pgrx_c_macros::CValue::<
                                                     $crate::__pgrx_c_macros::CInt
-                                                >::new($crate::ANYMULTIRANGEOID.to_u32() as i32)
+                                                >::new(
+                                                    $crate::__pgrx_c_bindings::ANYMULTIRANGEOID.to_u32() as i32
+                                                )
                                             )
                                         )
                                     )
@@ -2334,7 +2352,7 @@ macro_rules! IsPolymorphicTypeFamily1 {
                                                                                     $crate::__pgrx_c_macros::CValue::<
                                                                                         $crate::__pgrx_c_macros::CInt
                                                                                     >::new(
-                                                                                        $crate::ANYELEMENTOID.to_u32() as i32
+                                                                                        $crate::__pgrx_c_bindings::ANYELEMENTOID.to_u32() as i32
                                                                                     )
                                                                                 )
                                                                             )
@@ -2365,7 +2383,7 @@ macro_rules! IsPolymorphicTypeFamily1 {
                                                                                     $crate::__pgrx_c_macros::CValue::<
                                                                                         $crate::__pgrx_c_macros::CInt
                                                                                     >::new(
-                                                                                        $crate::ANYARRAYOID.to_u32() as i32
+                                                                                        $crate::__pgrx_c_bindings::ANYARRAYOID.to_u32() as i32
                                                                                     )
                                                                                 )
                                                                             )
@@ -2401,7 +2419,7 @@ macro_rules! IsPolymorphicTypeFamily1 {
                                                                         $crate::__pgrx_c_macros::CValue::<
                                                                             $crate::__pgrx_c_macros::CInt
                                                                         >::new(
-                                                                            $crate::ANYNONARRAYOID.to_u32() as i32
+                                                                            $crate::__pgrx_c_bindings::ANYNONARRAYOID.to_u32() as i32
                                                                         )
                                                                     )
                                                                 )
@@ -2437,7 +2455,7 @@ macro_rules! IsPolymorphicTypeFamily1 {
                                                             $crate::__pgrx_c_macros::CValue::<
                                                                 $crate::__pgrx_c_macros::CInt
                                                             >::new(
-                                                                $crate::ANYENUMOID.to_u32() as i32
+                                                                $crate::__pgrx_c_bindings::ANYENUMOID.to_u32() as i32
                                                             )
                                                         )
                                                     )
@@ -2464,7 +2482,9 @@ macro_rules! IsPolymorphicTypeFamily1 {
                                             >(
                                                 $crate::__pgrx_c_macros::CValue::<
                                                     $crate::__pgrx_c_macros::CInt
-                                                >::new($crate::ANYRANGEOID.to_u32() as i32)
+                                                >::new(
+                                                    $crate::__pgrx_c_bindings::ANYRANGEOID.to_u32() as i32
+                                                )
                                             )
                                         )
                                     )
@@ -2485,7 +2505,7 @@ macro_rules! IsPolymorphicTypeFamily1 {
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                        $crate::ANYMULTIRANGEOID.to_u32() as i32
+                                        $crate::__pgrx_c_bindings::ANYMULTIRANGEOID.to_u32() as i32
                                     )
                                 )
                             )
@@ -2508,8 +2528,8 @@ macro_rules! IsPolymorphicTypeFamily1 {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -2540,23 +2560,23 @@ macro_rules! __pgrx_c_args_IsPolymorphicTypeFamily2 {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
         $crate::__pgrx_c_args_IsPolymorphicTypeFamily2!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_IsPolymorphicTypeFamily2!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_IsPolymorphicTypeFamily2!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_IsPolymorphicTypeFamily2!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -2565,7 +2585,7 @@ macro_rules! __pgrx_c_args_IsPolymorphicTypeFamily2 {
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
         $crate::__pgrx_c_args_IsPolymorphicTypeFamily2!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
@@ -2591,17 +2611,17 @@ macro_rules! __pgrx_c_args_IsPolymorphicTypeFamily2 {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_IsPolymorphicTypeFamily2!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_IsPolymorphicTypeFamily2!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_IsPolymorphicTypeFamily2!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -2628,13 +2648,13 @@ macro_rules! __pgrx_c_args_IsPolymorphicTypeFamily2 {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_IsPolymorphicTypeFamily2!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_IsPolymorphicTypeFamily2!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -2719,7 +2739,7 @@ macro_rules! IsPolymorphicTypeFamily2 {
                                                                         $crate::__pgrx_c_macros::CValue::<
                                                                             $crate::__pgrx_c_macros::CInt
                                                                         >::new(
-                                                                            $crate::ANYCOMPATIBLEOID.to_u32() as i32
+                                                                            $crate::__pgrx_c_bindings::ANYCOMPATIBLEOID.to_u32() as i32
                                                                         )
                                                                     )
                                                                 )
@@ -2748,7 +2768,7 @@ macro_rules! IsPolymorphicTypeFamily2 {
                                                                         $crate::__pgrx_c_macros::CValue::<
                                                                             $crate::__pgrx_c_macros::CInt
                                                                         >::new(
-                                                                            $crate::ANYCOMPATIBLEARRAYOID.to_u32() as i32
+                                                                            $crate::__pgrx_c_bindings::ANYCOMPATIBLEARRAYOID.to_u32() as i32
                                                                         )
                                                                     )
                                                                 )
@@ -2784,7 +2804,7 @@ macro_rules! IsPolymorphicTypeFamily2 {
                                                             $crate::__pgrx_c_macros::CValue::<
                                                                 $crate::__pgrx_c_macros::CInt
                                                             >::new(
-                                                                $crate::ANYCOMPATIBLENONARRAYOID.to_u32() as i32
+                                                                $crate::__pgrx_c_bindings::ANYCOMPATIBLENONARRAYOID.to_u32() as i32
                                                             )
                                                         )
                                                     )
@@ -2812,7 +2832,7 @@ macro_rules! IsPolymorphicTypeFamily2 {
                                                 $crate::__pgrx_c_macros::CValue::<
                                                     $crate::__pgrx_c_macros::CInt
                                                 >::new(
-                                                    $crate::ANYCOMPATIBLERANGEOID.to_u32() as i32
+                                                    $crate::__pgrx_c_bindings::ANYCOMPATIBLERANGEOID.to_u32() as i32
                                                 )
                                             )
                                         )
@@ -2834,7 +2854,7 @@ macro_rules! IsPolymorphicTypeFamily2 {
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                        $crate::ANYCOMPATIBLEMULTIRANGEOID.to_u32() as i32
+                                        $crate::__pgrx_c_bindings::ANYCOMPATIBLEMULTIRANGEOID.to_u32() as i32
                                     )
                                 )
                             )
@@ -2925,7 +2945,7 @@ macro_rules! IsPolymorphicTypeFamily2 {
                                                                                     $crate::__pgrx_c_macros::CValue::<
                                                                                         $crate::__pgrx_c_macros::CInt
                                                                                     >::new(
-                                                                                        $crate::ANYCOMPATIBLEOID.to_u32() as i32
+                                                                                        $crate::__pgrx_c_bindings::ANYCOMPATIBLEOID.to_u32() as i32
                                                                                     )
                                                                                 )
                                                                             )
@@ -2956,7 +2976,7 @@ macro_rules! IsPolymorphicTypeFamily2 {
                                                                                     $crate::__pgrx_c_macros::CValue::<
                                                                                         $crate::__pgrx_c_macros::CInt
                                                                                     >::new(
-                                                                                        $crate::ANYCOMPATIBLEARRAYOID.to_u32() as i32
+                                                                                        $crate::__pgrx_c_bindings::ANYCOMPATIBLEARRAYOID.to_u32() as i32
                                                                                     )
                                                                                 )
                                                                             )
@@ -2992,7 +3012,7 @@ macro_rules! IsPolymorphicTypeFamily2 {
                                                                         $crate::__pgrx_c_macros::CValue::<
                                                                             $crate::__pgrx_c_macros::CInt
                                                                         >::new(
-                                                                            $crate::ANYCOMPATIBLENONARRAYOID.to_u32() as i32
+                                                                            $crate::__pgrx_c_bindings::ANYCOMPATIBLENONARRAYOID.to_u32() as i32
                                                                         )
                                                                     )
                                                                 )
@@ -3028,7 +3048,7 @@ macro_rules! IsPolymorphicTypeFamily2 {
                                                             $crate::__pgrx_c_macros::CValue::<
                                                                 $crate::__pgrx_c_macros::CInt
                                                             >::new(
-                                                                $crate::ANYCOMPATIBLERANGEOID.to_u32() as i32
+                                                                $crate::__pgrx_c_bindings::ANYCOMPATIBLERANGEOID.to_u32() as i32
                                                             )
                                                         )
                                                     )
@@ -3056,7 +3076,7 @@ macro_rules! IsPolymorphicTypeFamily2 {
                                                 $crate::__pgrx_c_macros::CValue::<
                                                     $crate::__pgrx_c_macros::CInt
                                                 >::new(
-                                                    $crate::ANYCOMPATIBLEMULTIRANGEOID.to_u32() as i32
+                                                    $crate::__pgrx_c_bindings::ANYCOMPATIBLEMULTIRANGEOID.to_u32() as i32
                                                 )
                                             )
                                         )
@@ -3122,7 +3142,7 @@ macro_rules! IsPolymorphicTypeFamily2 {
                                                                         $crate::__pgrx_c_macros::CValue::<
                                                                             $crate::__pgrx_c_macros::CInt
                                                                         >::new(
-                                                                            $crate::ANYCOMPATIBLEOID.to_u32() as i32
+                                                                            $crate::__pgrx_c_bindings::ANYCOMPATIBLEOID.to_u32() as i32
                                                                         )
                                                                     )
                                                                 )
@@ -3151,7 +3171,7 @@ macro_rules! IsPolymorphicTypeFamily2 {
                                                                         $crate::__pgrx_c_macros::CValue::<
                                                                             $crate::__pgrx_c_macros::CInt
                                                                         >::new(
-                                                                            $crate::ANYCOMPATIBLEARRAYOID.to_u32() as i32
+                                                                            $crate::__pgrx_c_bindings::ANYCOMPATIBLEARRAYOID.to_u32() as i32
                                                                         )
                                                                     )
                                                                 )
@@ -3187,7 +3207,7 @@ macro_rules! IsPolymorphicTypeFamily2 {
                                                             $crate::__pgrx_c_macros::CValue::<
                                                                 $crate::__pgrx_c_macros::CInt
                                                             >::new(
-                                                                $crate::ANYCOMPATIBLENONARRAYOID.to_u32() as i32
+                                                                $crate::__pgrx_c_bindings::ANYCOMPATIBLENONARRAYOID.to_u32() as i32
                                                             )
                                                         )
                                                     )
@@ -3215,7 +3235,7 @@ macro_rules! IsPolymorphicTypeFamily2 {
                                                 $crate::__pgrx_c_macros::CValue::<
                                                     $crate::__pgrx_c_macros::CInt
                                                 >::new(
-                                                    $crate::ANYCOMPATIBLERANGEOID.to_u32() as i32
+                                                    $crate::__pgrx_c_bindings::ANYCOMPATIBLERANGEOID.to_u32() as i32
                                                 )
                                             )
                                         )
@@ -3237,7 +3257,7 @@ macro_rules! IsPolymorphicTypeFamily2 {
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                        $crate::ANYCOMPATIBLEMULTIRANGEOID.to_u32() as i32
+                                        $crate::__pgrx_c_bindings::ANYCOMPATIBLEMULTIRANGEOID.to_u32() as i32
                                     )
                                 )
                             )
@@ -3260,8 +3280,8 @@ macro_rules! IsPolymorphicTypeFamily2 {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -3288,20 +3308,24 @@ macro_rules! __pgrx_c_args_IsTrueArrayType {
         $crate::__pgrx_c_args_IsTrueArrayType!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_IsTrueArrayType!(@p1 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_IsTrueArrayType!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_IsTrueArrayType!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_IsTrueArrayType!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_IsTrueArrayType!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_IsTrueArrayType!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -3309,7 +3333,9 @@ macro_rules! __pgrx_c_args_IsTrueArrayType {
         $crate::__pgrx_c_args_IsTrueArrayType!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_IsTrueArrayType!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_IsTrueArrayType!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -3331,14 +3357,18 @@ macro_rules! __pgrx_c_args_IsTrueArrayType {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_IsTrueArrayType!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_IsTrueArrayType!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_IsTrueArrayType!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_IsTrueArrayType!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_IsTrueArrayType!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -3365,13 +3395,13 @@ macro_rules! __pgrx_c_args_IsTrueArrayType {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_IsTrueArrayType!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_IsTrueArrayType!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -3464,10 +3494,11 @@ macro_rules! IsTrueArrayType {
                                                     _
                                                 >(
                                                     $crate::__pgrx_c_macros::expression::null_constant(
-                                                        /* PGRX: InvalidOid remains expanded because no integer constant binding is available in the defining Rust crate. */
                                                         $crate::__pgrx_c_macros::CValue::<
                                                             $crate::__pgrx_c_macros::CUnsignedInt
-                                                        >::new(0u32)
+                                                        >::new(
+                                                            $crate::__pgrx_c_bindings::InvalidOid as u32
+                                                        )
                                                     )
                                                 )
                                             )
@@ -3504,7 +3535,7 @@ macro_rules! IsTrueArrayType {
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                        $crate::F_ARRAY_SUBSCRIPT_HANDLER as i32
+                                        $crate::__pgrx_c_bindings::F_ARRAY_SUBSCRIPT_HANDLER as i32
                                     )
                                 )
                             )
@@ -3597,10 +3628,11 @@ macro_rules! IsTrueArrayType {
                                                                 _
                                                             >(
                                                                 $crate::__pgrx_c_macros::expression::null_constant(
-                                                                    /* PGRX: InvalidOid remains expanded because no integer constant binding is available in the defining Rust crate. */
                                                                     $crate::__pgrx_c_macros::CValue::<
                                                                         $crate::__pgrx_c_macros::CUnsignedInt
-                                                                    >::new(0u32)
+                                                                    >::new(
+                                                                        $crate::__pgrx_c_bindings::InvalidOid as u32
+                                                                    )
                                                                 )
                                                             )
                                                         )
@@ -3644,7 +3676,9 @@ macro_rules! IsTrueArrayType {
                                             >(
                                                 $crate::__pgrx_c_macros::CValue::<
                                                     $crate::__pgrx_c_macros::CInt
-                                                >::new($crate::F_ARRAY_SUBSCRIPT_HANDLER as i32)
+                                                >::new(
+                                                    $crate::__pgrx_c_bindings::F_ARRAY_SUBSCRIPT_HANDLER as i32
+                                                )
                                             )
                                         )
                                     )
@@ -3716,10 +3750,11 @@ macro_rules! IsTrueArrayType {
                                                     _
                                                 >(
                                                     $crate::__pgrx_c_macros::expression::null_constant(
-                                                        /* PGRX: InvalidOid remains expanded because no integer constant binding is available in the defining Rust crate. */
                                                         $crate::__pgrx_c_macros::CValue::<
                                                             $crate::__pgrx_c_macros::CUnsignedInt
-                                                        >::new(0u32)
+                                                        >::new(
+                                                            $crate::__pgrx_c_bindings::InvalidOid as u32
+                                                        )
                                                     )
                                                 )
                                             )
@@ -3756,7 +3791,7 @@ macro_rules! IsTrueArrayType {
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                        $crate::F_ARRAY_SUBSCRIPT_HANDLER as i32
+                                        $crate::__pgrx_c_bindings::F_ARRAY_SUBSCRIPT_HANDLER as i32
                                     )
                                 )
                             )

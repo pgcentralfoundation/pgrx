@@ -5,8 +5,8 @@ This code is generated for documentation purposes, so that it is easy to referen
 // C macros from stringinfo.h.
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -37,13 +37,13 @@ macro_rules! __pgrx_c_args_appendStringInfoCharMacro {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_appendStringInfoCharMacro!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_appendStringInfoCharMacro!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -52,7 +52,7 @@ macro_rules! __pgrx_c_args_appendStringInfoCharMacro {
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_appendStringInfoCharMacro!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -79,35 +79,35 @@ macro_rules! __pgrx_c_args_appendStringInfoCharMacro {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_appendStringInfoCharMacro!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_appendStringInfoCharMacro!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $argument:literal) => {
         $crate::__pgrx_c_args_appendStringInfoCharMacro!(
-            @p2 $mode [$($done)* (@literal [- $argument]),];
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
         )
     };
     (@negative1 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_appendStringInfoCharMacro!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_appendStringInfoCharMacro!(
-            @p2 $mode [$($done)* (@literal [- $argument]),];
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_appendStringInfoCharMacro!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -116,7 +116,7 @@ macro_rules! __pgrx_c_args_appendStringInfoCharMacro {
     };
     (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
         $crate::__pgrx_c_args_appendStringInfoCharMacro!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
@@ -142,17 +142,17 @@ macro_rules! __pgrx_c_args_appendStringInfoCharMacro {
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_appendStringInfoCharMacro!(
-            @p2 $mode [$($done)* (@literal [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_appendStringInfoCharMacro!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_appendStringInfoCharMacro!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -179,13 +179,13 @@ macro_rules! __pgrx_c_args_appendStringInfoCharMacro {
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_appendStringInfoCharMacro!(
-            @p2 $mode [$($done)* (@literal [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_appendStringInfoCharMacro!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -310,11 +310,11 @@ macro_rules! appendStringInfoCharMacro {
                     ) {
                         $crate::__pgrx_c_macros::Either::Left(
                             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                                $crate::__pgrx_c_generated::Inline_713e1346ff271e734f28aa6b27cd8142(
+                                $crate::__pgrx_c_generated::Inline_03a1a448ebe6b0e119f8a66bd4198244(
                                     <
                                         $crate::__pgrx_c_macros::expression::CPointer<
                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                $crate::StringInfoData
+                                                $crate::__pgrx_c_bindings::StringInfoData
                                             >,
                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                         > as $crate::__pgrx_c_macros::expression::CType
@@ -322,7 +322,7 @@ macro_rules! appendStringInfoCharMacro {
                                         $crate::__pgrx_c_macros::expression::implicit::<
                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                    $crate::StringInfoData
+                                                    $crate::__pgrx_c_bindings::StringInfoData
                                                 >,
                                                 $crate::__pgrx_c_macros::expression::ReadWrite
                                             >,
@@ -651,11 +651,11 @@ macro_rules! appendStringInfoCharMacro {
                                             true,
                                             _
                                         >(
-                                            $crate::__pgrx_c_generated::Inline_713e1346ff271e734f28aa6b27cd8142(
+                                            $crate::__pgrx_c_generated::Inline_03a1a448ebe6b0e119f8a66bd4198244(
                                                 <
                                                     $crate::__pgrx_c_macros::expression::CPointer<
                                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                                            $crate::StringInfoData
+                                                            $crate::__pgrx_c_bindings::StringInfoData
                                                         >,
                                                         $crate::__pgrx_c_macros::expression::ReadWrite
                                                     > as $crate::__pgrx_c_macros::expression::CType
@@ -663,7 +663,7 @@ macro_rules! appendStringInfoCharMacro {
                                                     $crate::__pgrx_c_macros::expression::implicit::<
                                                         $crate::__pgrx_c_macros::expression::CPointer<
                                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                                $crate::StringInfoData
+                                                                $crate::__pgrx_c_bindings::StringInfoData
                                                             >,
                                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                                         >,
@@ -977,11 +977,11 @@ macro_rules! appendStringInfoCharMacro {
                     ) {
                         $crate::__pgrx_c_macros::Either::Left(
                             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                                $crate::__pgrx_c_generated::Inline_713e1346ff271e734f28aa6b27cd8142(
+                                $crate::__pgrx_c_generated::Inline_03a1a448ebe6b0e119f8a66bd4198244(
                                     <
                                         $crate::__pgrx_c_macros::expression::CPointer<
                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                $crate::StringInfoData
+                                                $crate::__pgrx_c_bindings::StringInfoData
                                             >,
                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                         > as $crate::__pgrx_c_macros::expression::CType
@@ -989,7 +989,7 @@ macro_rules! appendStringInfoCharMacro {
                                         $crate::__pgrx_c_macros::expression::implicit::<
                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                    $crate::StringInfoData
+                                                    $crate::__pgrx_c_bindings::StringInfoData
                                                 >,
                                                 $crate::__pgrx_c_macros::expression::ReadWrite
                                             >,

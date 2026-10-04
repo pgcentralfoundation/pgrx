@@ -5,8 +5,8 @@ This code is generated for documentation purposes, so that it is easy to referen
 // C macros from pathnodes.h.
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -37,21 +37,23 @@ macro_rules! __pgrx_c_args_EC_MUST_BE_REDUNDANT {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
         $crate::__pgrx_c_args_EC_MUST_BE_REDUNDANT!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_EC_MUST_BE_REDUNDANT!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_EC_MUST_BE_REDUNDANT!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_EC_MUST_BE_REDUNDANT!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_EC_MUST_BE_REDUNDANT!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -59,7 +61,9 @@ macro_rules! __pgrx_c_args_EC_MUST_BE_REDUNDANT {
         $crate::__pgrx_c_args_EC_MUST_BE_REDUNDANT!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_EC_MUST_BE_REDUNDANT!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_EC_MUST_BE_REDUNDANT!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -81,14 +85,18 @@ macro_rules! __pgrx_c_args_EC_MUST_BE_REDUNDANT {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_EC_MUST_BE_REDUNDANT!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_EC_MUST_BE_REDUNDANT!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_EC_MUST_BE_REDUNDANT!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_EC_MUST_BE_REDUNDANT!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_EC_MUST_BE_REDUNDANT!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -115,13 +123,13 @@ macro_rules! __pgrx_c_args_EC_MUST_BE_REDUNDANT {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_EC_MUST_BE_REDUNDANT!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_EC_MUST_BE_REDUNDANT!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -286,8 +294,8 @@ macro_rules! EC_MUST_BE_REDUNDANT {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -314,20 +322,24 @@ macro_rules! __pgrx_c_args_IS_DUMMY_APPEND {
         $crate::__pgrx_c_args_IS_DUMMY_APPEND!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_IS_DUMMY_APPEND!(@p1 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_IS_DUMMY_APPEND!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_IS_DUMMY_APPEND!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_IS_DUMMY_APPEND!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_IS_DUMMY_APPEND!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_IS_DUMMY_APPEND!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -335,7 +347,9 @@ macro_rules! __pgrx_c_args_IS_DUMMY_APPEND {
         $crate::__pgrx_c_args_IS_DUMMY_APPEND!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_IS_DUMMY_APPEND!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_IS_DUMMY_APPEND!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -357,14 +371,18 @@ macro_rules! __pgrx_c_args_IS_DUMMY_APPEND {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_IS_DUMMY_APPEND!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_IS_DUMMY_APPEND!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_IS_DUMMY_APPEND!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_IS_DUMMY_APPEND!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_IS_DUMMY_APPEND!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -391,13 +409,13 @@ macro_rules! __pgrx_c_args_IS_DUMMY_APPEND {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_IS_DUMMY_APPEND!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_IS_DUMMY_APPEND!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -466,10 +484,10 @@ macro_rules! IS_DUMMY_APPEND {
                                                                 _
                                                             >(
                                                                 $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                    *const $crate::Node,
+                                                                    *const $crate::__pgrx_c_bindings::Node,
                                                                     $crate::__pgrx_c_macros::expression::CPointer<
                                                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                                                            $crate::Node
+                                                                            $crate::__pgrx_c_bindings::Node
                                                                         >,
                                                                         $crate::__pgrx_c_macros::expression::ReadOnly
                                                                     >,
@@ -499,7 +517,9 @@ macro_rules! IS_DUMMY_APPEND {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::CValue::<
                                             $crate::__pgrx_c_macros::CInt
-                                        >::new($crate::NodeTag::T_AppendPath as i32)
+                                        >::new(
+                                            $crate::__pgrx_c_bindings::NodeTag::T_AppendPath as i32
+                                        )
                                     )
                                 )
                             )
@@ -521,10 +541,10 @@ macro_rules! IS_DUMMY_APPEND {
                                                         _
                                                     >(
                                                         $crate::__pgrx_c_macros::expression::cast_as::<
-                                                            *mut $crate::AppendPath,
+                                                            *mut $crate::__pgrx_c_bindings::AppendPath,
                                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                                    $crate::AppendPath
+                                                                    $crate::__pgrx_c_bindings::AppendPath
                                                                 >,
                                                                 $crate::__pgrx_c_macros::expression::ReadWrite
                                                             >,
@@ -551,10 +571,10 @@ macro_rules! IS_DUMMY_APPEND {
                                 (
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::expression::cast_as::<
-                                            *mut $crate::List,
+                                            *mut $crate::__pgrx_c_bindings::List,
                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                    $crate::List
+                                                    $crate::__pgrx_c_bindings::List
                                                 >,
                                                 $crate::__pgrx_c_macros::expression::ReadWrite
                                             >,
@@ -654,10 +674,10 @@ macro_rules! IS_DUMMY_APPEND {
                                                                             _
                                                                         >(
                                                                             $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                                *const $crate::Node,
+                                                                                *const $crate::__pgrx_c_bindings::Node,
                                                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                        $crate::Node
+                                                                                        $crate::__pgrx_c_bindings::Node
                                                                                     >,
                                                                                     $crate::__pgrx_c_macros::expression::ReadOnly
                                                                                 >,
@@ -692,7 +712,9 @@ macro_rules! IS_DUMMY_APPEND {
                                                 >(
                                                     $crate::__pgrx_c_macros::CValue::<
                                                         $crate::__pgrx_c_macros::CInt
-                                                    >::new($crate::NodeTag::T_AppendPath as i32)
+                                                    >::new(
+                                                        $crate::__pgrx_c_bindings::NodeTag::T_AppendPath as i32
+                                                    )
                                                 )
                                             )
                                         )
@@ -717,10 +739,10 @@ macro_rules! IS_DUMMY_APPEND {
                                                                     _
                                                                 >(
                                                                     $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                        *mut $crate::AppendPath,
+                                                                        *mut $crate::__pgrx_c_bindings::AppendPath,
                                                                         $crate::__pgrx_c_macros::expression::CPointer<
                                                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                $crate::AppendPath
+                                                                                $crate::__pgrx_c_bindings::AppendPath
                                                                             >,
                                                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                                                         >,
@@ -750,10 +772,10 @@ macro_rules! IS_DUMMY_APPEND {
                                                     _
                                                 >(
                                                     $crate::__pgrx_c_macros::expression::cast_as::<
-                                                        *mut $crate::List,
+                                                        *mut $crate::__pgrx_c_bindings::List,
                                                         $crate::__pgrx_c_macros::expression::CPointer<
                                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                                $crate::List
+                                                                $crate::__pgrx_c_bindings::List
                                                             >,
                                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                                         >,
@@ -835,10 +857,10 @@ macro_rules! IS_DUMMY_APPEND {
                                                                 _
                                                             >(
                                                                 $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                    *const $crate::Node,
+                                                                    *const $crate::__pgrx_c_bindings::Node,
                                                                     $crate::__pgrx_c_macros::expression::CPointer<
                                                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                                                            $crate::Node
+                                                                            $crate::__pgrx_c_bindings::Node
                                                                         >,
                                                                         $crate::__pgrx_c_macros::expression::ReadOnly
                                                                     >,
@@ -868,7 +890,9 @@ macro_rules! IS_DUMMY_APPEND {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::CValue::<
                                             $crate::__pgrx_c_macros::CInt
-                                        >::new($crate::NodeTag::T_AppendPath as i32)
+                                        >::new(
+                                            $crate::__pgrx_c_bindings::NodeTag::T_AppendPath as i32
+                                        )
                                     )
                                 )
                             )
@@ -890,10 +914,10 @@ macro_rules! IS_DUMMY_APPEND {
                                                         _
                                                     >(
                                                         $crate::__pgrx_c_macros::expression::cast_as::<
-                                                            *mut $crate::AppendPath,
+                                                            *mut $crate::__pgrx_c_bindings::AppendPath,
                                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                                    $crate::AppendPath
+                                                                    $crate::__pgrx_c_bindings::AppendPath
                                                                 >,
                                                                 $crate::__pgrx_c_macros::expression::ReadWrite
                                                             >,
@@ -920,10 +944,10 @@ macro_rules! IS_DUMMY_APPEND {
                                 (
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::expression::cast_as::<
-                                            *mut $crate::List,
+                                            *mut $crate::__pgrx_c_bindings::List,
                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                    $crate::List
+                                                    $crate::__pgrx_c_bindings::List
                                                 >,
                                                 $crate::__pgrx_c_macros::expression::ReadWrite
                                             >,
@@ -979,8 +1003,8 @@ macro_rules! IS_DUMMY_APPEND {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -1007,25 +1031,34 @@ macro_rules! __pgrx_c_args_IS_DUMMY_REL {
         $crate::__pgrx_c_args_IS_DUMMY_REL!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_IS_DUMMY_REL!(@p1 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_IS_DUMMY_REL!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_IS_DUMMY_REL!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_IS_DUMMY_REL!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_IS_DUMMY_REL!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_IS_DUMMY_REL!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_IS_DUMMY_REL!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $($raw:tt)*) => {
         $crate::__pgrx_c_args_IS_DUMMY_REL!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_IS_DUMMY_REL!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_IS_DUMMY_REL!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -1047,13 +1080,20 @@ macro_rules! __pgrx_c_args_IS_DUMMY_REL {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_IS_DUMMY_REL!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_IS_DUMMY_REL!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_IS_DUMMY_REL!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_IS_DUMMY_REL!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
-        $crate::__pgrx_c_args_IS_DUMMY_REL!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_IS_DUMMY_REL!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
         $crate::__pgrx_c_classify!(
@@ -1076,12 +1116,15 @@ macro_rules! __pgrx_c_args_IS_DUMMY_REL {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_IS_DUMMY_REL!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_IS_DUMMY_REL!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_IS_DUMMY_REL!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p1 $mode:ident [$($done:tt)*];) => {
         $crate::IS_DUMMY_REL!(@$mode; $($done)*)
@@ -1125,16 +1168,20 @@ macro_rules! IS_DUMMY_REL {
         /* PGRX: IS_DUMMY_REL remains expanded because is_dummy_rel is not an active function-like macro. */
         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
             <$crate::__pgrx_c_macros::CBool as $crate::__pgrx_c_macros::expression::CType>::from_storage(
-                $crate::is_dummy_rel(
+                $crate::__pgrx_c_bindings::is_dummy_rel(
                     <
                         $crate::__pgrx_c_macros::expression::CPointer<
-                            $crate::__pgrx_c_macros::expression::CRecord<$crate::RelOptInfo>,
+                            $crate::__pgrx_c_macros::expression::CRecord<
+                                $crate::__pgrx_c_bindings::RelOptInfo
+                            >,
                             $crate::__pgrx_c_macros::expression::ReadWrite
                         > as $crate::__pgrx_c_macros::expression::CType
                     >::into_storage(
                         $crate::__pgrx_c_macros::expression::implicit::<
                             $crate::__pgrx_c_macros::expression::CPointer<
-                                $crate::__pgrx_c_macros::expression::CRecord<$crate::RelOptInfo>,
+                                $crate::__pgrx_c_macros::expression::CRecord<
+                                    $crate::__pgrx_c_bindings::RelOptInfo
+                                >,
                                 $crate::__pgrx_c_macros::expression::ReadWrite
                             >,
                             _
@@ -1178,11 +1225,11 @@ macro_rules! IS_DUMMY_REL {
                             <
                                 $crate::__pgrx_c_macros::CBool as $crate::__pgrx_c_macros::expression::CType
                             >::from_storage(
-                                $crate::is_dummy_rel(
+                                $crate::__pgrx_c_bindings::is_dummy_rel(
                                     <
                                         $crate::__pgrx_c_macros::expression::CPointer<
                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                $crate::RelOptInfo
+                                                $crate::__pgrx_c_bindings::RelOptInfo
                                             >,
                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                         > as $crate::__pgrx_c_macros::expression::CType
@@ -1190,7 +1237,7 @@ macro_rules! IS_DUMMY_REL {
                                         $crate::__pgrx_c_macros::expression::implicit::<
                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                    $crate::RelOptInfo
+                                                    $crate::__pgrx_c_bindings::RelOptInfo
                                                 >,
                                                 $crate::__pgrx_c_macros::expression::ReadWrite
                                             >,
@@ -1220,16 +1267,20 @@ macro_rules! IS_DUMMY_REL {
         {
             let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 <$crate::__pgrx_c_macros::CBool as $crate::__pgrx_c_macros::expression::CType>::from_storage(
-                    $crate::is_dummy_rel(
+                    $crate::__pgrx_c_bindings::is_dummy_rel(
                         <
                             $crate::__pgrx_c_macros::expression::CPointer<
-                                $crate::__pgrx_c_macros::expression::CRecord<$crate::RelOptInfo>,
+                                $crate::__pgrx_c_macros::expression::CRecord<
+                                    $crate::__pgrx_c_bindings::RelOptInfo
+                                >,
                                 $crate::__pgrx_c_macros::expression::ReadWrite
                             > as $crate::__pgrx_c_macros::expression::CType
                         >::into_storage(
                             $crate::__pgrx_c_macros::expression::implicit::<
                                 $crate::__pgrx_c_macros::expression::CPointer<
-                                    $crate::__pgrx_c_macros::expression::CRecord<$crate::RelOptInfo>,
+                                    $crate::__pgrx_c_macros::expression::CRecord<
+                                        $crate::__pgrx_c_bindings::RelOptInfo
+                                    >,
                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                 >,
                                 _
@@ -1253,8 +1304,8 @@ macro_rules! IS_DUMMY_REL {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -1281,25 +1332,34 @@ macro_rules! __pgrx_c_args_IS_JOIN_REL {
         $crate::__pgrx_c_args_IS_JOIN_REL!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_IS_JOIN_REL!(@p1 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_IS_JOIN_REL!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_IS_JOIN_REL!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_IS_JOIN_REL!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_IS_JOIN_REL!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_IS_JOIN_REL!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_IS_JOIN_REL!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $($raw:tt)*) => {
         $crate::__pgrx_c_args_IS_JOIN_REL!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_IS_JOIN_REL!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_IS_JOIN_REL!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -1321,13 +1381,20 @@ macro_rules! __pgrx_c_args_IS_JOIN_REL {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_IS_JOIN_REL!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_IS_JOIN_REL!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_IS_JOIN_REL!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_IS_JOIN_REL!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
-        $crate::__pgrx_c_args_IS_JOIN_REL!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_IS_JOIN_REL!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
         $crate::__pgrx_c_classify!(
@@ -1349,10 +1416,16 @@ macro_rules! __pgrx_c_args_IS_JOIN_REL {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_IS_JOIN_REL!(@p1 $mode [$($done)* (@literal [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_IS_JOIN_REL!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+            $($rest)*
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_IS_JOIN_REL!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_IS_JOIN_REL!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p1 $mode:ident [$($done:tt)*];) => {
         $crate::IS_JOIN_REL!(@$mode; $($done)*)
@@ -1420,7 +1493,7 @@ macro_rules! IS_JOIN_REL {
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                        $crate::RelOptKind::RELOPT_JOINREL as i32
+                                        $crate::__pgrx_c_bindings::RelOptKind::RELOPT_JOINREL as i32
                                     )
                                 )
                             )
@@ -1453,7 +1526,7 @@ macro_rules! IS_JOIN_REL {
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                        $crate::RelOptKind::RELOPT_OTHER_JOINREL as i32
+                                        $crate::__pgrx_c_bindings::RelOptKind::RELOPT_OTHER_JOINREL as i32
                                     )
                                 )
                             )
@@ -1529,7 +1602,9 @@ macro_rules! IS_JOIN_REL {
                                             >(
                                                 $crate::__pgrx_c_macros::CValue::<
                                                     $crate::__pgrx_c_macros::CInt
-                                                >::new($crate::RelOptKind::RELOPT_JOINREL as i32)
+                                                >::new(
+                                                    $crate::__pgrx_c_bindings::RelOptKind::RELOPT_JOINREL as i32
+                                                )
                                             )
                                         )
                                     )
@@ -1569,7 +1644,7 @@ macro_rules! IS_JOIN_REL {
                                                 $crate::__pgrx_c_macros::CValue::<
                                                     $crate::__pgrx_c_macros::CInt
                                                 >::new(
-                                                    $crate::RelOptKind::RELOPT_OTHER_JOINREL as i32
+                                                    $crate::__pgrx_c_bindings::RelOptKind::RELOPT_OTHER_JOINREL as i32
                                                 )
                                             )
                                         )
@@ -1623,7 +1698,7 @@ macro_rules! IS_JOIN_REL {
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                        $crate::RelOptKind::RELOPT_JOINREL as i32
+                                        $crate::__pgrx_c_bindings::RelOptKind::RELOPT_JOINREL as i32
                                     )
                                 )
                             )
@@ -1656,7 +1731,7 @@ macro_rules! IS_JOIN_REL {
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                        $crate::RelOptKind::RELOPT_OTHER_JOINREL as i32
+                                        $crate::__pgrx_c_bindings::RelOptKind::RELOPT_OTHER_JOINREL as i32
                                     )
                                 )
                             )
@@ -1679,8 +1754,8 @@ macro_rules! IS_JOIN_REL {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -1707,25 +1782,34 @@ macro_rules! __pgrx_c_args_IS_OTHER_REL {
         $crate::__pgrx_c_args_IS_OTHER_REL!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_IS_OTHER_REL!(@p1 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_IS_OTHER_REL!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_IS_OTHER_REL!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_IS_OTHER_REL!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_IS_OTHER_REL!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_IS_OTHER_REL!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_IS_OTHER_REL!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $($raw:tt)*) => {
         $crate::__pgrx_c_args_IS_OTHER_REL!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_IS_OTHER_REL!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_IS_OTHER_REL!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -1747,13 +1831,20 @@ macro_rules! __pgrx_c_args_IS_OTHER_REL {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_IS_OTHER_REL!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_IS_OTHER_REL!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_IS_OTHER_REL!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_IS_OTHER_REL!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
-        $crate::__pgrx_c_args_IS_OTHER_REL!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_IS_OTHER_REL!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
         $crate::__pgrx_c_classify!(
@@ -1776,12 +1867,15 @@ macro_rules! __pgrx_c_args_IS_OTHER_REL {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_IS_OTHER_REL!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_IS_OTHER_REL!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_IS_OTHER_REL!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p1 $mode:ident [$($done:tt)*];) => {
         $crate::IS_OTHER_REL!(@$mode; $($done)*)
@@ -1860,7 +1954,7 @@ macro_rules! IS_OTHER_REL {
                                                 $crate::__pgrx_c_macros::CValue::<
                                                     $crate::__pgrx_c_macros::CInt
                                                 >::new(
-                                                    $crate::RelOptKind::RELOPT_OTHER_MEMBER_REL as i32
+                                                    $crate::__pgrx_c_bindings::RelOptKind::RELOPT_OTHER_MEMBER_REL as i32
                                                 )
                                             )
                                         )
@@ -1901,7 +1995,7 @@ macro_rules! IS_OTHER_REL {
                                                 $crate::__pgrx_c_macros::CValue::<
                                                     $crate::__pgrx_c_macros::CInt
                                                 >::new(
-                                                    $crate::RelOptKind::RELOPT_OTHER_JOINREL as i32
+                                                    $crate::__pgrx_c_bindings::RelOptKind::RELOPT_OTHER_JOINREL as i32
                                                 )
                                             )
                                         )
@@ -1941,7 +2035,7 @@ macro_rules! IS_OTHER_REL {
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                        $crate::RelOptKind::RELOPT_OTHER_UPPER_REL as i32
+                                        $crate::__pgrx_c_bindings::RelOptKind::RELOPT_OTHER_UPPER_REL as i32
                                     )
                                 )
                             )
@@ -2026,7 +2120,7 @@ macro_rules! IS_OTHER_REL {
                                                             $crate::__pgrx_c_macros::CValue::<
                                                                 $crate::__pgrx_c_macros::CInt
                                                             >::new(
-                                                                $crate::RelOptKind::RELOPT_OTHER_MEMBER_REL as i32
+                                                                $crate::__pgrx_c_bindings::RelOptKind::RELOPT_OTHER_MEMBER_REL as i32
                                                             )
                                                         )
                                                     )
@@ -2070,7 +2164,7 @@ macro_rules! IS_OTHER_REL {
                                                             $crate::__pgrx_c_macros::CValue::<
                                                                 $crate::__pgrx_c_macros::CInt
                                                             >::new(
-                                                                $crate::RelOptKind::RELOPT_OTHER_JOINREL as i32
+                                                                $crate::__pgrx_c_bindings::RelOptKind::RELOPT_OTHER_JOINREL as i32
                                                             )
                                                         )
                                                     )
@@ -2118,7 +2212,7 @@ macro_rules! IS_OTHER_REL {
                                                 $crate::__pgrx_c_macros::CValue::<
                                                     $crate::__pgrx_c_macros::CInt
                                                 >::new(
-                                                    $crate::RelOptKind::RELOPT_OTHER_UPPER_REL as i32
+                                                    $crate::__pgrx_c_bindings::RelOptKind::RELOPT_OTHER_UPPER_REL as i32
                                                 )
                                             )
                                         )
@@ -2183,7 +2277,7 @@ macro_rules! IS_OTHER_REL {
                                                 $crate::__pgrx_c_macros::CValue::<
                                                     $crate::__pgrx_c_macros::CInt
                                                 >::new(
-                                                    $crate::RelOptKind::RELOPT_OTHER_MEMBER_REL as i32
+                                                    $crate::__pgrx_c_bindings::RelOptKind::RELOPT_OTHER_MEMBER_REL as i32
                                                 )
                                             )
                                         )
@@ -2224,7 +2318,7 @@ macro_rules! IS_OTHER_REL {
                                                 $crate::__pgrx_c_macros::CValue::<
                                                     $crate::__pgrx_c_macros::CInt
                                                 >::new(
-                                                    $crate::RelOptKind::RELOPT_OTHER_JOINREL as i32
+                                                    $crate::__pgrx_c_bindings::RelOptKind::RELOPT_OTHER_JOINREL as i32
                                                 )
                                             )
                                         )
@@ -2264,7 +2358,7 @@ macro_rules! IS_OTHER_REL {
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                        $crate::RelOptKind::RELOPT_OTHER_UPPER_REL as i32
+                                        $crate::__pgrx_c_bindings::RelOptKind::RELOPT_OTHER_UPPER_REL as i32
                                     )
                                 )
                             )
@@ -2287,8 +2381,8 @@ macro_rules! IS_OTHER_REL {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -2315,20 +2409,24 @@ macro_rules! __pgrx_c_args_IS_PARTITIONED_REL {
         $crate::__pgrx_c_args_IS_PARTITIONED_REL!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_IS_PARTITIONED_REL!(@p1 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_IS_PARTITIONED_REL!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_IS_PARTITIONED_REL!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_IS_PARTITIONED_REL!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_IS_PARTITIONED_REL!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_IS_PARTITIONED_REL!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -2336,7 +2434,9 @@ macro_rules! __pgrx_c_args_IS_PARTITIONED_REL {
         $crate::__pgrx_c_args_IS_PARTITIONED_REL!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_IS_PARTITIONED_REL!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_IS_PARTITIONED_REL!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -2358,14 +2458,18 @@ macro_rules! __pgrx_c_args_IS_PARTITIONED_REL {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_IS_PARTITIONED_REL!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_IS_PARTITIONED_REL!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_IS_PARTITIONED_REL!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_IS_PARTITIONED_REL!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_IS_PARTITIONED_REL!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -2392,13 +2496,13 @@ macro_rules! __pgrx_c_args_IS_PARTITIONED_REL {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_IS_PARTITIONED_REL!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_IS_PARTITIONED_REL!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -2615,11 +2719,11 @@ macro_rules! IS_PARTITIONED_REL {
                                     <
                                         $crate::__pgrx_c_macros::CBool as $crate::__pgrx_c_macros::expression::CType
                                     >::from_storage(
-                                        $crate::is_dummy_rel(
+                                        $crate::__pgrx_c_bindings::is_dummy_rel(
                                             <
                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                        $crate::RelOptInfo
+                                                        $crate::__pgrx_c_bindings::RelOptInfo
                                                     >,
                                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                                 > as $crate::__pgrx_c_macros::expression::CType
@@ -2627,7 +2731,7 @@ macro_rules! IS_PARTITIONED_REL {
                                                 $crate::__pgrx_c_macros::expression::implicit::<
                                                     $crate::__pgrx_c_macros::expression::CPointer<
                                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                                            $crate::RelOptInfo
+                                                            $crate::__pgrx_c_bindings::RelOptInfo
                                                         >,
                                                         $crate::__pgrx_c_macros::expression::ReadWrite
                                                     >,
@@ -2869,11 +2973,11 @@ macro_rules! IS_PARTITIONED_REL {
                                                 <
                                                     $crate::__pgrx_c_macros::CBool as $crate::__pgrx_c_macros::expression::CType
                                                 >::from_storage(
-                                                    $crate::is_dummy_rel(
+                                                    $crate::__pgrx_c_bindings::is_dummy_rel(
                                                         <
                                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                                    $crate::RelOptInfo
+                                                                    $crate::__pgrx_c_bindings::RelOptInfo
                                                                 >,
                                                                 $crate::__pgrx_c_macros::expression::ReadWrite
                                                             > as $crate::__pgrx_c_macros::expression::CType
@@ -2881,7 +2985,7 @@ macro_rules! IS_PARTITIONED_REL {
                                                             $crate::__pgrx_c_macros::expression::implicit::<
                                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                                        $crate::RelOptInfo
+                                                                        $crate::__pgrx_c_bindings::RelOptInfo
                                                                     >,
                                                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                                                 >,
@@ -3095,11 +3199,11 @@ macro_rules! IS_PARTITIONED_REL {
                                     <
                                         $crate::__pgrx_c_macros::CBool as $crate::__pgrx_c_macros::expression::CType
                                     >::from_storage(
-                                        $crate::is_dummy_rel(
+                                        $crate::__pgrx_c_bindings::is_dummy_rel(
                                             <
                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                        $crate::RelOptInfo
+                                                        $crate::__pgrx_c_bindings::RelOptInfo
                                                     >,
                                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                                 > as $crate::__pgrx_c_macros::expression::CType
@@ -3107,7 +3211,7 @@ macro_rules! IS_PARTITIONED_REL {
                                                 $crate::__pgrx_c_macros::expression::implicit::<
                                                     $crate::__pgrx_c_macros::expression::CPointer<
                                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                                            $crate::RelOptInfo
+                                                            $crate::__pgrx_c_bindings::RelOptInfo
                                                         >,
                                                         $crate::__pgrx_c_macros::expression::ReadWrite
                                                     >,
@@ -3147,8 +3251,8 @@ macro_rules! IS_PARTITIONED_REL {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -3175,20 +3279,24 @@ macro_rules! __pgrx_c_args_IS_SIMPLE_REL {
         $crate::__pgrx_c_args_IS_SIMPLE_REL!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_IS_SIMPLE_REL!(@p1 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_IS_SIMPLE_REL!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_IS_SIMPLE_REL!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_IS_SIMPLE_REL!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_IS_SIMPLE_REL!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_IS_SIMPLE_REL!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -3196,7 +3304,9 @@ macro_rules! __pgrx_c_args_IS_SIMPLE_REL {
         $crate::__pgrx_c_args_IS_SIMPLE_REL!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_IS_SIMPLE_REL!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_IS_SIMPLE_REL!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -3218,14 +3328,18 @@ macro_rules! __pgrx_c_args_IS_SIMPLE_REL {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_IS_SIMPLE_REL!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_IS_SIMPLE_REL!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_IS_SIMPLE_REL!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_IS_SIMPLE_REL!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_IS_SIMPLE_REL!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -3252,13 +3366,13 @@ macro_rules! __pgrx_c_args_IS_SIMPLE_REL {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_IS_SIMPLE_REL!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_IS_SIMPLE_REL!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -3330,7 +3444,9 @@ macro_rules! IS_SIMPLE_REL {
                                     $crate::__pgrx_c_macros::expression::null_constant(
                                         $crate::__pgrx_c_macros::CValue::<
                                             $crate::__pgrx_c_macros::CInt
-                                        >::new($crate::RelOptKind::RELOPT_BASEREL as i32)
+                                        >::new(
+                                            $crate::__pgrx_c_bindings::RelOptKind::RELOPT_BASEREL as i32
+                                        )
                                     )
                                 )
                             )
@@ -3363,7 +3479,7 @@ macro_rules! IS_SIMPLE_REL {
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                        $crate::RelOptKind::RELOPT_OTHER_MEMBER_REL as i32
+                                        $crate::__pgrx_c_bindings::RelOptKind::RELOPT_OTHER_MEMBER_REL as i32
                                     )
                                 )
                             )
@@ -3441,7 +3557,7 @@ macro_rules! IS_SIMPLE_REL {
                                                     $crate::__pgrx_c_macros::CValue::<
                                                         $crate::__pgrx_c_macros::CInt
                                                     >::new(
-                                                        $crate::RelOptKind::RELOPT_BASEREL as i32
+                                                        $crate::__pgrx_c_bindings::RelOptKind::RELOPT_BASEREL as i32
                                                     )
                                                 )
                                             )
@@ -3483,7 +3599,7 @@ macro_rules! IS_SIMPLE_REL {
                                                 $crate::__pgrx_c_macros::CValue::<
                                                     $crate::__pgrx_c_macros::CInt
                                                 >::new(
-                                                    $crate::RelOptKind::RELOPT_OTHER_MEMBER_REL as i32
+                                                    $crate::__pgrx_c_bindings::RelOptKind::RELOPT_OTHER_MEMBER_REL as i32
                                                 )
                                             )
                                         )
@@ -3539,7 +3655,9 @@ macro_rules! IS_SIMPLE_REL {
                                     $crate::__pgrx_c_macros::expression::null_constant(
                                         $crate::__pgrx_c_macros::CValue::<
                                             $crate::__pgrx_c_macros::CInt
-                                        >::new($crate::RelOptKind::RELOPT_BASEREL as i32)
+                                        >::new(
+                                            $crate::__pgrx_c_bindings::RelOptKind::RELOPT_BASEREL as i32
+                                        )
                                     )
                                 )
                             )
@@ -3572,7 +3690,7 @@ macro_rules! IS_SIMPLE_REL {
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                        $crate::RelOptKind::RELOPT_OTHER_MEMBER_REL as i32
+                                        $crate::__pgrx_c_bindings::RelOptKind::RELOPT_OTHER_MEMBER_REL as i32
                                     )
                                 )
                             )
@@ -3595,8 +3713,8 @@ macro_rules! IS_SIMPLE_REL {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -3623,25 +3741,34 @@ macro_rules! __pgrx_c_args_IS_UPPER_REL {
         $crate::__pgrx_c_args_IS_UPPER_REL!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_IS_UPPER_REL!(@p1 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_IS_UPPER_REL!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_IS_UPPER_REL!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_IS_UPPER_REL!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_IS_UPPER_REL!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_IS_UPPER_REL!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_IS_UPPER_REL!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $($raw:tt)*) => {
         $crate::__pgrx_c_args_IS_UPPER_REL!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_IS_UPPER_REL!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_IS_UPPER_REL!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -3663,13 +3790,20 @@ macro_rules! __pgrx_c_args_IS_UPPER_REL {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_IS_UPPER_REL!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_IS_UPPER_REL!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_IS_UPPER_REL!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_IS_UPPER_REL!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
-        $crate::__pgrx_c_args_IS_UPPER_REL!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_IS_UPPER_REL!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
         $crate::__pgrx_c_classify!(
@@ -3692,12 +3826,15 @@ macro_rules! __pgrx_c_args_IS_UPPER_REL {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_IS_UPPER_REL!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_IS_UPPER_REL!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_IS_UPPER_REL!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p1 $mode:ident [$($done:tt)*];) => {
         $crate::IS_UPPER_REL!(@$mode; $($done)*)
@@ -3765,7 +3902,7 @@ macro_rules! IS_UPPER_REL {
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                        $crate::RelOptKind::RELOPT_UPPER_REL as i32
+                                        $crate::__pgrx_c_bindings::RelOptKind::RELOPT_UPPER_REL as i32
                                     )
                                 )
                             )
@@ -3798,7 +3935,7 @@ macro_rules! IS_UPPER_REL {
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                        $crate::RelOptKind::RELOPT_OTHER_UPPER_REL as i32
+                                        $crate::__pgrx_c_bindings::RelOptKind::RELOPT_OTHER_UPPER_REL as i32
                                     )
                                 )
                             )
@@ -3874,7 +4011,9 @@ macro_rules! IS_UPPER_REL {
                                             >(
                                                 $crate::__pgrx_c_macros::CValue::<
                                                     $crate::__pgrx_c_macros::CInt
-                                                >::new($crate::RelOptKind::RELOPT_UPPER_REL as i32)
+                                                >::new(
+                                                    $crate::__pgrx_c_bindings::RelOptKind::RELOPT_UPPER_REL as i32
+                                                )
                                             )
                                         )
                                     )
@@ -3914,7 +4053,7 @@ macro_rules! IS_UPPER_REL {
                                                 $crate::__pgrx_c_macros::CValue::<
                                                     $crate::__pgrx_c_macros::CInt
                                                 >::new(
-                                                    $crate::RelOptKind::RELOPT_OTHER_UPPER_REL as i32
+                                                    $crate::__pgrx_c_bindings::RelOptKind::RELOPT_OTHER_UPPER_REL as i32
                                                 )
                                             )
                                         )
@@ -3968,7 +4107,7 @@ macro_rules! IS_UPPER_REL {
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                        $crate::RelOptKind::RELOPT_UPPER_REL as i32
+                                        $crate::__pgrx_c_bindings::RelOptKind::RELOPT_UPPER_REL as i32
                                     )
                                 )
                             )
@@ -4001,7 +4140,7 @@ macro_rules! IS_UPPER_REL {
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                        $crate::RelOptKind::RELOPT_OTHER_UPPER_REL as i32
+                                        $crate::__pgrx_c_bindings::RelOptKind::RELOPT_OTHER_UPPER_REL as i32
                                     )
                                 )
                             )
@@ -4024,8 +4163,8 @@ macro_rules! IS_UPPER_REL {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -4052,20 +4191,24 @@ macro_rules! __pgrx_c_args_PATH_REQ_OUTER {
         $crate::__pgrx_c_args_PATH_REQ_OUTER!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_PATH_REQ_OUTER!(@p1 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_PATH_REQ_OUTER!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_PATH_REQ_OUTER!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_PATH_REQ_OUTER!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_PATH_REQ_OUTER!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_PATH_REQ_OUTER!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -4073,7 +4216,9 @@ macro_rules! __pgrx_c_args_PATH_REQ_OUTER {
         $crate::__pgrx_c_args_PATH_REQ_OUTER!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_PATH_REQ_OUTER!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_PATH_REQ_OUTER!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -4095,14 +4240,18 @@ macro_rules! __pgrx_c_args_PATH_REQ_OUTER {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_PATH_REQ_OUTER!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_PATH_REQ_OUTER!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_PATH_REQ_OUTER!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_PATH_REQ_OUTER!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_PATH_REQ_OUTER!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -4129,13 +4278,13 @@ macro_rules! __pgrx_c_args_PATH_REQ_OUTER {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_PATH_REQ_OUTER!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_PATH_REQ_OUTER!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -4246,10 +4395,10 @@ macro_rules! PATH_REQ_OUTER {
                         $crate::__pgrx_c_macros::Either::Right(
                             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                 $crate::__pgrx_c_macros::expression::cast_as::<
-                                    $crate::Relids,
+                                    $crate::__pgrx_c_bindings::Relids,
                                     $crate::__pgrx_c_macros::expression::CPointer<
                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                            $crate::Bitmapset
+                                            $crate::__pgrx_c_bindings::Bitmapset
                                         >,
                                         $crate::__pgrx_c_macros::expression::ReadWrite
                                     >,
@@ -4393,10 +4542,10 @@ macro_rules! PATH_REQ_OUTER {
                                             _
                                         >(
                                             $crate::__pgrx_c_macros::expression::cast_as::<
-                                                $crate::Relids,
+                                                $crate::__pgrx_c_bindings::Relids,
                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                        $crate::Bitmapset
+                                                        $crate::__pgrx_c_bindings::Bitmapset
                                                     >,
                                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                                 >,
@@ -4514,10 +4663,10 @@ macro_rules! PATH_REQ_OUTER {
                         $crate::__pgrx_c_macros::Either::Right(
                             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                 $crate::__pgrx_c_macros::expression::cast_as::<
-                                    $crate::Relids,
+                                    $crate::__pgrx_c_bindings::Relids,
                                     $crate::__pgrx_c_macros::expression::CPointer<
                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                            $crate::Bitmapset
+                                            $crate::__pgrx_c_bindings::Bitmapset
                                         >,
                                         $crate::__pgrx_c_macros::expression::ReadWrite
                                     >,
@@ -4567,8 +4716,8 @@ macro_rules! PATH_REQ_OUTER {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -4599,21 +4748,23 @@ macro_rules! __pgrx_c_args_REL_HAS_ALL_PART_PROPS {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
         $crate::__pgrx_c_args_REL_HAS_ALL_PART_PROPS!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_REL_HAS_ALL_PART_PROPS!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_REL_HAS_ALL_PART_PROPS!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_REL_HAS_ALL_PART_PROPS!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_REL_HAS_ALL_PART_PROPS!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -4621,7 +4772,9 @@ macro_rules! __pgrx_c_args_REL_HAS_ALL_PART_PROPS {
         $crate::__pgrx_c_args_REL_HAS_ALL_PART_PROPS!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_REL_HAS_ALL_PART_PROPS!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_REL_HAS_ALL_PART_PROPS!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -4646,15 +4799,17 @@ macro_rules! __pgrx_c_args_REL_HAS_ALL_PART_PROPS {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_REL_HAS_ALL_PART_PROPS!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_REL_HAS_ALL_PART_PROPS!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_REL_HAS_ALL_PART_PROPS!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_REL_HAS_ALL_PART_PROPS!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -4681,13 +4836,13 @@ macro_rules! __pgrx_c_args_REL_HAS_ALL_PART_PROPS {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_REL_HAS_ALL_PART_PROPS!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_REL_HAS_ALL_PART_PROPS!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -5500,8 +5655,8 @@ macro_rules! REL_HAS_ALL_PART_PROPS {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -5532,13 +5687,13 @@ macro_rules! __pgrx_c_args_RINFO_IS_PUSHED_DOWN {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_RINFO_IS_PUSHED_DOWN!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_RINFO_IS_PUSHED_DOWN!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -5547,7 +5702,7 @@ macro_rules! __pgrx_c_args_RINFO_IS_PUSHED_DOWN {
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_RINFO_IS_PUSHED_DOWN!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -5574,33 +5729,35 @@ macro_rules! __pgrx_c_args_RINFO_IS_PUSHED_DOWN {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_RINFO_IS_PUSHED_DOWN!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_RINFO_IS_PUSHED_DOWN!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $argument:literal) => {
         $crate::__pgrx_c_args_RINFO_IS_PUSHED_DOWN!(
-            @p2 $mode [$($done)* (@literal [- $argument]),];
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
         )
     };
     (@negative1 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_RINFO_IS_PUSHED_DOWN!(@p2 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_RINFO_IS_PUSHED_DOWN!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_RINFO_IS_PUSHED_DOWN!(
-            @p2 $mode [$($done)* (@literal [- $argument]),];
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_RINFO_IS_PUSHED_DOWN!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -5608,7 +5765,9 @@ macro_rules! __pgrx_c_args_RINFO_IS_PUSHED_DOWN {
         $crate::__pgrx_c_args_RINFO_IS_PUSHED_DOWN!(@negative1 $mode [$($done)*]; - $($raw)*)
     };
     (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_RINFO_IS_PUSHED_DOWN!(@p2 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_RINFO_IS_PUSHED_DOWN!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -5630,14 +5789,18 @@ macro_rules! __pgrx_c_args_RINFO_IS_PUSHED_DOWN {
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_RINFO_IS_PUSHED_DOWN!(@p2 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_RINFO_IS_PUSHED_DOWN!(
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_RINFO_IS_PUSHED_DOWN!(@p2 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_RINFO_IS_PUSHED_DOWN!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_RINFO_IS_PUSHED_DOWN!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -5664,13 +5827,13 @@ macro_rules! __pgrx_c_args_RINFO_IS_PUSHED_DOWN {
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_RINFO_IS_PUSHED_DOWN!(
-            @p2 $mode [$($done)* (@literal [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_RINFO_IS_PUSHED_DOWN!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -5743,11 +5906,11 @@ macro_rules! RINFO_IS_PUSHED_DOWN {
                                     <
                                         $crate::__pgrx_c_macros::CBool as $crate::__pgrx_c_macros::expression::CType
                                     >::from_storage(
-                                        $crate::bms_is_subset(
+                                        $crate::__pgrx_c_bindings::bms_is_subset(
                                             <
                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                        $crate::Bitmapset
+                                                        $crate::__pgrx_c_bindings::Bitmapset
                                                     >,
                                                     $crate::__pgrx_c_macros::expression::ReadOnly
                                                 > as $crate::__pgrx_c_macros::expression::CType
@@ -5755,7 +5918,7 @@ macro_rules! RINFO_IS_PUSHED_DOWN {
                                                 $crate::__pgrx_c_macros::expression::implicit::<
                                                     $crate::__pgrx_c_macros::expression::CPointer<
                                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                                            $crate::Bitmapset
+                                                            $crate::__pgrx_c_bindings::Bitmapset
                                                         >,
                                                         $crate::__pgrx_c_macros::expression::ReadOnly
                                                     >,
@@ -5792,7 +5955,7 @@ macro_rules! RINFO_IS_PUSHED_DOWN {
                                             <
                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                        $crate::Bitmapset
+                                                        $crate::__pgrx_c_bindings::Bitmapset
                                                     >,
                                                     $crate::__pgrx_c_macros::expression::ReadOnly
                                                 > as $crate::__pgrx_c_macros::expression::CType
@@ -5800,7 +5963,7 @@ macro_rules! RINFO_IS_PUSHED_DOWN {
                                                 $crate::__pgrx_c_macros::expression::implicit::<
                                                     $crate::__pgrx_c_macros::expression::CPointer<
                                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                                            $crate::Bitmapset
+                                                            $crate::__pgrx_c_bindings::Bitmapset
                                                         >,
                                                         $crate::__pgrx_c_macros::expression::ReadOnly
                                                     >,
@@ -5893,11 +6056,11 @@ macro_rules! RINFO_IS_PUSHED_DOWN {
                                                 <
                                                     $crate::__pgrx_c_macros::CBool as $crate::__pgrx_c_macros::expression::CType
                                                 >::from_storage(
-                                                    $crate::bms_is_subset(
+                                                    $crate::__pgrx_c_bindings::bms_is_subset(
                                                         <
                                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                                    $crate::Bitmapset
+                                                                    $crate::__pgrx_c_bindings::Bitmapset
                                                                 >,
                                                                 $crate::__pgrx_c_macros::expression::ReadOnly
                                                             > as $crate::__pgrx_c_macros::expression::CType
@@ -5905,7 +6068,7 @@ macro_rules! RINFO_IS_PUSHED_DOWN {
                                                             $crate::__pgrx_c_macros::expression::implicit::<
                                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                                        $crate::Bitmapset
+                                                                        $crate::__pgrx_c_bindings::Bitmapset
                                                                     >,
                                                                     $crate::__pgrx_c_macros::expression::ReadOnly
                                                                 >,
@@ -5944,7 +6107,7 @@ macro_rules! RINFO_IS_PUSHED_DOWN {
                                                         <
                                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                                    $crate::Bitmapset
+                                                                    $crate::__pgrx_c_bindings::Bitmapset
                                                                 >,
                                                                 $crate::__pgrx_c_macros::expression::ReadOnly
                                                             > as $crate::__pgrx_c_macros::expression::CType
@@ -5952,7 +6115,7 @@ macro_rules! RINFO_IS_PUSHED_DOWN {
                                                             $crate::__pgrx_c_macros::expression::implicit::<
                                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                                        $crate::Bitmapset
+                                                                        $crate::__pgrx_c_bindings::Bitmapset
                                                                     >,
                                                                     $crate::__pgrx_c_macros::expression::ReadOnly
                                                                 >,
@@ -6021,11 +6184,11 @@ macro_rules! RINFO_IS_PUSHED_DOWN {
                                     <
                                         $crate::__pgrx_c_macros::CBool as $crate::__pgrx_c_macros::expression::CType
                                     >::from_storage(
-                                        $crate::bms_is_subset(
+                                        $crate::__pgrx_c_bindings::bms_is_subset(
                                             <
                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                        $crate::Bitmapset
+                                                        $crate::__pgrx_c_bindings::Bitmapset
                                                     >,
                                                     $crate::__pgrx_c_macros::expression::ReadOnly
                                                 > as $crate::__pgrx_c_macros::expression::CType
@@ -6033,7 +6196,7 @@ macro_rules! RINFO_IS_PUSHED_DOWN {
                                                 $crate::__pgrx_c_macros::expression::implicit::<
                                                     $crate::__pgrx_c_macros::expression::CPointer<
                                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                                            $crate::Bitmapset
+                                                            $crate::__pgrx_c_bindings::Bitmapset
                                                         >,
                                                         $crate::__pgrx_c_macros::expression::ReadOnly
                                                     >,
@@ -6070,7 +6233,7 @@ macro_rules! RINFO_IS_PUSHED_DOWN {
                                             <
                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                        $crate::Bitmapset
+                                                        $crate::__pgrx_c_bindings::Bitmapset
                                                     >,
                                                     $crate::__pgrx_c_macros::expression::ReadOnly
                                                 > as $crate::__pgrx_c_macros::expression::CType
@@ -6078,7 +6241,7 @@ macro_rules! RINFO_IS_PUSHED_DOWN {
                                                 $crate::__pgrx_c_macros::expression::implicit::<
                                                     $crate::__pgrx_c_macros::expression::CPointer<
                                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                                            $crate::Bitmapset
+                                                            $crate::__pgrx_c_bindings::Bitmapset
                                                         >,
                                                         $crate::__pgrx_c_macros::expression::ReadOnly
                                                     >,
@@ -6118,8 +6281,8 @@ macro_rules! RINFO_IS_PUSHED_DOWN {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -6150,13 +6313,13 @@ macro_rules! __pgrx_c_args_get_pathtarget_sortgroupref {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_get_pathtarget_sortgroupref!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_get_pathtarget_sortgroupref!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -6165,7 +6328,7 @@ macro_rules! __pgrx_c_args_get_pathtarget_sortgroupref {
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_get_pathtarget_sortgroupref!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -6192,13 +6355,13 @@ macro_rules! __pgrx_c_args_get_pathtarget_sortgroupref {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_get_pathtarget_sortgroupref!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_get_pathtarget_sortgroupref!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -6207,7 +6370,7 @@ macro_rules! __pgrx_c_args_get_pathtarget_sortgroupref {
     };
     (@negative1 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_get_pathtarget_sortgroupref!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
@@ -6215,7 +6378,7 @@ macro_rules! __pgrx_c_args_get_pathtarget_sortgroupref {
     };
     (@negative1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_get_pathtarget_sortgroupref!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -6224,7 +6387,7 @@ macro_rules! __pgrx_c_args_get_pathtarget_sortgroupref {
     };
     (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
         $crate::__pgrx_c_args_get_pathtarget_sortgroupref!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
@@ -6250,17 +6413,17 @@ macro_rules! __pgrx_c_args_get_pathtarget_sortgroupref {
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_get_pathtarget_sortgroupref!(
-            @p2 $mode [$($done)* (@literal [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:tt) => {
         $crate::__pgrx_c_args_get_pathtarget_sortgroupref!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_get_pathtarget_sortgroupref!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -6287,13 +6450,13 @@ macro_rules! __pgrx_c_args_get_pathtarget_sortgroupref {
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_get_pathtarget_sortgroupref!(
-            @p2 $mode [$($done)* (@literal [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:tt, $($rest:tt)*) => {
         $crate::__pgrx_c_args_get_pathtarget_sortgroupref!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -6406,7 +6569,7 @@ macro_rules! get_pathtarget_sortgroupref {
                             $crate::__pgrx_c_macros::expression::null_constant(
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::cast_as::<
-                                        $crate::Index,
+                                        $crate::__pgrx_c_bindings::Index,
                                         $crate::__pgrx_c_macros::CUnsignedInt,
                                         _
                                     >(
@@ -6539,7 +6702,7 @@ macro_rules! get_pathtarget_sortgroupref {
                                                 _
                                             >(
                                                 $crate::__pgrx_c_macros::expression::cast_as::<
-                                                    $crate::Index,
+                                                    $crate::__pgrx_c_bindings::Index,
                                                     $crate::__pgrx_c_macros::CUnsignedInt,
                                                     _
                                                 >(
@@ -6637,7 +6800,7 @@ macro_rules! get_pathtarget_sortgroupref {
                             $crate::__pgrx_c_macros::expression::null_constant(
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::cast_as::<
-                                        $crate::Index,
+                                        $crate::__pgrx_c_bindings::Index,
                                         $crate::__pgrx_c_macros::CUnsignedInt,
                                         _
                                     >(
@@ -6672,8 +6835,8 @@ macro_rules! get_pathtarget_sortgroupref {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -6704,7 +6867,7 @@ macro_rules! __pgrx_c_args_planner_rt_fetch {
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_planner_rt_fetch!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -6713,7 +6876,7 @@ macro_rules! __pgrx_c_args_planner_rt_fetch {
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_planner_rt_fetch!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -6740,31 +6903,35 @@ macro_rules! __pgrx_c_args_planner_rt_fetch {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_planner_rt_fetch!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:tt, $($rest:tt)*) => {
         $crate::__pgrx_c_args_planner_rt_fetch!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_planner_rt_fetch!(@p2 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_planner_rt_fetch!(
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative1 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_planner_rt_fetch!(@p2 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_planner_rt_fetch!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_planner_rt_fetch!(
-            @p2 $mode [$($done)* (@literal [- $argument]),];
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_planner_rt_fetch!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -6772,7 +6939,9 @@ macro_rules! __pgrx_c_args_planner_rt_fetch {
         $crate::__pgrx_c_args_planner_rt_fetch!(@negative1 $mode [$($done)*]; - $($raw)*)
     };
     (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_planner_rt_fetch!(@p2 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_planner_rt_fetch!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -6794,14 +6963,18 @@ macro_rules! __pgrx_c_args_planner_rt_fetch {
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_planner_rt_fetch!(@p2 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_planner_rt_fetch!(
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_planner_rt_fetch!(@p2 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_planner_rt_fetch!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_planner_rt_fetch!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -6828,13 +7001,13 @@ macro_rules! __pgrx_c_args_planner_rt_fetch {
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_planner_rt_fetch!(
-            @p2 $mode [$($done)* (@literal [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_planner_rt_fetch!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -6945,10 +7118,10 @@ macro_rules! planner_rt_fetch {
                             (
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::cast_as::<
-                                        *mut $crate::RangeTblEntry,
+                                        *mut $crate::__pgrx_c_bindings::RangeTblEntry,
                                         $crate::__pgrx_c_macros::expression::CPointer<
                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                $crate::RangeTblEntry
+                                                $crate::__pgrx_c_bindings::RangeTblEntry
                                             >,
                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                         >,
@@ -6964,11 +7137,11 @@ macro_rules! planner_rt_fetch {
                                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                                 > as $crate::__pgrx_c_macros::expression::CType
                                             >::from_storage(
-                                                $crate::list_nth(
+                                                $crate::__pgrx_c_bindings::list_nth(
                                                     <
                                                         $crate::__pgrx_c_macros::expression::CPointer<
                                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                                $crate::List
+                                                                $crate::__pgrx_c_bindings::List
                                                             >,
                                                             $crate::__pgrx_c_macros::expression::ReadOnly
                                                         > as $crate::__pgrx_c_macros::expression::CType
@@ -6976,7 +7149,7 @@ macro_rules! planner_rt_fetch {
                                                         $crate::__pgrx_c_macros::expression::implicit::<
                                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                                    $crate::List
+                                                                    $crate::__pgrx_c_bindings::List
                                                                 >,
                                                                 $crate::__pgrx_c_macros::expression::ReadOnly
                                                             >,
@@ -7186,10 +7359,10 @@ macro_rules! planner_rt_fetch {
                                                 _
                                             >(
                                                 $crate::__pgrx_c_macros::expression::cast_as::<
-                                                    *mut $crate::RangeTblEntry,
+                                                    *mut $crate::__pgrx_c_bindings::RangeTblEntry,
                                                     $crate::__pgrx_c_macros::expression::CPointer<
                                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                                            $crate::RangeTblEntry
+                                                            $crate::__pgrx_c_bindings::RangeTblEntry
                                                         >,
                                                         $crate::__pgrx_c_macros::expression::ReadWrite
                                                     >,
@@ -7205,11 +7378,11 @@ macro_rules! planner_rt_fetch {
                                                                 $crate::__pgrx_c_macros::expression::ReadWrite
                                                             > as $crate::__pgrx_c_macros::expression::CType
                                                         >::from_storage(
-                                                            $crate::list_nth(
+                                                            $crate::__pgrx_c_bindings::list_nth(
                                                                 <
                                                                     $crate::__pgrx_c_macros::expression::CPointer<
                                                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                                                            $crate::List
+                                                                            $crate::__pgrx_c_bindings::List
                                                                         >,
                                                                         $crate::__pgrx_c_macros::expression::ReadOnly
                                                                     > as $crate::__pgrx_c_macros::expression::CType
@@ -7217,7 +7390,7 @@ macro_rules! planner_rt_fetch {
                                                                     $crate::__pgrx_c_macros::expression::implicit::<
                                                                         $crate::__pgrx_c_macros::expression::CPointer<
                                                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                $crate::List
+                                                                                $crate::__pgrx_c_bindings::List
                                                                             >,
                                                                             $crate::__pgrx_c_macros::expression::ReadOnly
                                                                         >,
@@ -7397,10 +7570,10 @@ macro_rules! planner_rt_fetch {
                             (
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::cast_as::<
-                                        *mut $crate::RangeTblEntry,
+                                        *mut $crate::__pgrx_c_bindings::RangeTblEntry,
                                         $crate::__pgrx_c_macros::expression::CPointer<
                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                $crate::RangeTblEntry
+                                                $crate::__pgrx_c_bindings::RangeTblEntry
                                             >,
                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                         >,
@@ -7416,11 +7589,11 @@ macro_rules! planner_rt_fetch {
                                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                                 > as $crate::__pgrx_c_macros::expression::CType
                                             >::from_storage(
-                                                $crate::list_nth(
+                                                $crate::__pgrx_c_bindings::list_nth(
                                                     <
                                                         $crate::__pgrx_c_macros::expression::CPointer<
                                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                                $crate::List
+                                                                $crate::__pgrx_c_bindings::List
                                                             >,
                                                             $crate::__pgrx_c_macros::expression::ReadOnly
                                                         > as $crate::__pgrx_c_macros::expression::CType
@@ -7428,7 +7601,7 @@ macro_rules! planner_rt_fetch {
                                                         $crate::__pgrx_c_macros::expression::implicit::<
                                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                                    $crate::List
+                                                                    $crate::__pgrx_c_bindings::List
                                                                 >,
                                                                 $crate::__pgrx_c_macros::expression::ReadOnly
                                                             >,
@@ -7539,8 +7712,8 @@ macro_rules! planner_rt_fetch {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -7571,13 +7744,13 @@ macro_rules! __pgrx_c_args_planner_subplan_get_plan {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_planner_subplan_get_plan!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_planner_subplan_get_plan!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -7586,7 +7759,7 @@ macro_rules! __pgrx_c_args_planner_subplan_get_plan {
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_planner_subplan_get_plan!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -7613,35 +7786,35 @@ macro_rules! __pgrx_c_args_planner_subplan_get_plan {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_planner_subplan_get_plan!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_planner_subplan_get_plan!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $argument:literal) => {
         $crate::__pgrx_c_args_planner_subplan_get_plan!(
-            @p2 $mode [$($done)* (@literal [- $argument]),];
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
         )
     };
     (@negative1 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_planner_subplan_get_plan!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_planner_subplan_get_plan!(
-            @p2 $mode [$($done)* (@literal [- $argument]),];
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_planner_subplan_get_plan!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -7650,7 +7823,7 @@ macro_rules! __pgrx_c_args_planner_subplan_get_plan {
     };
     (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
         $crate::__pgrx_c_args_planner_subplan_get_plan!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
@@ -7676,17 +7849,17 @@ macro_rules! __pgrx_c_args_planner_subplan_get_plan {
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_planner_subplan_get_plan!(
-            @p2 $mode [$($done)* (@literal [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_planner_subplan_get_plan!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_planner_subplan_get_plan!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -7713,13 +7886,13 @@ macro_rules! __pgrx_c_args_planner_subplan_get_plan {
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_planner_subplan_get_plan!(
-            @p2 $mode [$($done)* (@literal [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_planner_subplan_get_plan!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -7769,9 +7942,11 @@ macro_rules! planner_subplan_get_plan {
         (
             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::cast_as::<
-                    *mut $crate::Plan,
+                    *mut $crate::__pgrx_c_bindings::Plan,
                     $crate::__pgrx_c_macros::expression::CPointer<
-                        $crate::__pgrx_c_macros::expression::CRecord<$crate::Plan>,
+                        $crate::__pgrx_c_macros::expression::CRecord<
+                            $crate::__pgrx_c_bindings::Plan
+                        >,
                         $crate::__pgrx_c_macros::expression::ReadWrite
                     >,
                     _
@@ -7783,17 +7958,19 @@ macro_rules! planner_subplan_get_plan {
                                 $crate::__pgrx_c_macros::expression::ReadWrite
                             > as $crate::__pgrx_c_macros::expression::CType
                         >::from_storage(
-                            $crate::list_nth(
+                            $crate::__pgrx_c_bindings::list_nth(
                                 <
                                     $crate::__pgrx_c_macros::expression::CPointer<
-                                        $crate::__pgrx_c_macros::expression::CRecord<$crate::List>,
+                                        $crate::__pgrx_c_macros::expression::CRecord<
+                                            $crate::__pgrx_c_bindings::List
+                                        >,
                                         $crate::__pgrx_c_macros::expression::ReadOnly
                                     > as $crate::__pgrx_c_macros::expression::CType
                                 >::into_storage(
                                     $crate::__pgrx_c_macros::expression::implicit::<
                                         $crate::__pgrx_c_macros::expression::CPointer<
                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                $crate::List
+                                                $crate::__pgrx_c_bindings::List
                                             >,
                                             $crate::__pgrx_c_macros::expression::ReadOnly
                                         >,
@@ -7934,9 +8111,11 @@ macro_rules! planner_subplan_get_plan {
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::cast_as::<
-                                *mut $crate::Plan,
+                                *mut $crate::__pgrx_c_bindings::Plan,
                                 $crate::__pgrx_c_macros::expression::CPointer<
-                                    $crate::__pgrx_c_macros::expression::CRecord<$crate::Plan>,
+                                    $crate::__pgrx_c_macros::expression::CRecord<
+                                        $crate::__pgrx_c_bindings::Plan
+                                    >,
                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                 >,
                                 _
@@ -7948,11 +8127,11 @@ macro_rules! planner_subplan_get_plan {
                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::from_storage(
-                                        $crate::list_nth(
+                                        $crate::__pgrx_c_bindings::list_nth(
                                             <
                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                        $crate::List
+                                                        $crate::__pgrx_c_bindings::List
                                                     >,
                                                     $crate::__pgrx_c_macros::expression::ReadOnly
                                                 > as $crate::__pgrx_c_macros::expression::CType
@@ -7960,7 +8139,7 @@ macro_rules! planner_subplan_get_plan {
                                                 $crate::__pgrx_c_macros::expression::implicit::<
                                                     $crate::__pgrx_c_macros::expression::CPointer<
                                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                                            $crate::List
+                                                            $crate::__pgrx_c_bindings::List
                                                         >,
                                                         $crate::__pgrx_c_macros::expression::ReadOnly
                                                     >,
@@ -8086,9 +8265,11 @@ macro_rules! planner_subplan_get_plan {
         {
             let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::cast_as::<
-                    *mut $crate::Plan,
+                    *mut $crate::__pgrx_c_bindings::Plan,
                     $crate::__pgrx_c_macros::expression::CPointer<
-                        $crate::__pgrx_c_macros::expression::CRecord<$crate::Plan>,
+                        $crate::__pgrx_c_macros::expression::CRecord<
+                            $crate::__pgrx_c_bindings::Plan
+                        >,
                         $crate::__pgrx_c_macros::expression::ReadWrite
                     >,
                     _
@@ -8100,17 +8281,19 @@ macro_rules! planner_subplan_get_plan {
                                 $crate::__pgrx_c_macros::expression::ReadWrite
                             > as $crate::__pgrx_c_macros::expression::CType
                         >::from_storage(
-                            $crate::list_nth(
+                            $crate::__pgrx_c_bindings::list_nth(
                                 <
                                     $crate::__pgrx_c_macros::expression::CPointer<
-                                        $crate::__pgrx_c_macros::expression::CRecord<$crate::List>,
+                                        $crate::__pgrx_c_macros::expression::CRecord<
+                                            $crate::__pgrx_c_bindings::List
+                                        >,
                                         $crate::__pgrx_c_macros::expression::ReadOnly
                                     > as $crate::__pgrx_c_macros::expression::CType
                                 >::into_storage(
                                     $crate::__pgrx_c_macros::expression::implicit::<
                                         $crate::__pgrx_c_macros::expression::CPointer<
                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                $crate::List
+                                                $crate::__pgrx_c_bindings::List
                                             >,
                                             $crate::__pgrx_c_macros::expression::ReadOnly
                                         >,

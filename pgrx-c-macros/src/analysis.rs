@@ -24,8 +24,8 @@ use crate::model::{
 };
 use crate::syntax::{
     BinaryOperator, Expression, ExpressionKind, IntegerLiteral, NodeId, OffsetComponent,
-    OffsetRecord, Statement, SyntaxError, SyntaxErrorKind, TokenRange, UnaryOperator,
-    parse_expression, parse_replacement,
+    OffsetRecord, Statement, StringPart, SyntaxError, SyntaxErrorKind, TokenRange, UnaryOperator,
+    parse_expanded_replacement, parse_expression, parse_replacement,
 };
 use crate::{MacroKind, SourceSpan, Token, TokenKind};
 use serde::Serialize;
@@ -95,6 +95,8 @@ pub enum SkipReasonCode {
     /// The selected definition has no function-style parameter list and is retained only as expansion
     /// context.
     NotFunctionLike,
+    /// An explicitly selected object expression is defined as a function-style macro.
+    NotObjectLike,
     /// Multiple physical definitions match the final active body, so unique source ownership is
     /// unproved.
     ProvenanceAmbiguous,
@@ -192,6 +194,8 @@ pub enum ParameterOrigin {
 pub enum ParameterRole {
     /// An evaluated expression operand whose C conversion/evaluation rules remain symbolic.
     Value,
+    /// Raw invocation token spelling consumed without evaluating the formal.
+    Spelling,
     /// A non-evaluated type operand requiring a Rust type fragment rather than an expression.
     Type,
     /// An identifier/designator substitution that must retain C structural spelling.
@@ -466,7 +470,7 @@ pub(crate) fn analyze_active_with_constants(
             );
         }
     }
-    if definition.kind != MacroKind::FunctionLike {
+    if definition.kind != MacroKind::FunctionLike && !compiler_expanded {
         return result.skip(
             SkipReasonCode::NotFunctionLike,
             "only function-like macros are primary analysis candidates",
@@ -480,9 +484,13 @@ pub(crate) fn analyze_active_with_constants(
             None,
         );
     }
-    let (parameters, body_start) = match formal_parameters(&definition.tokens, name) {
-        Ok(value) => value,
-        Err((code, message)) => return result.skip(code, message, None),
+    let (parameters, body_start) = if definition.kind == MacroKind::ObjectLike {
+        (Vec::new(), 1)
+    } else {
+        match formal_parameters(&definition.tokens, name) {
+            Ok(value) => value,
+            Err((code, message)) => return result.skip(code, message, None),
+        }
     };
     let body = &definition.tokens[body_start..];
     let parameter_indices = parameters
@@ -566,9 +574,13 @@ pub(crate) fn analyze_active_with_constants(
         return result.skip(SkipReasonCode::InvalidTarget, message, None);
     }
     let catalog = frontend.declarations();
-    let mut syntax = match parse_replacement(body, &parameters, |name| {
-        recognized_type(name, catalog, &profile.target)
-    }) {
+    let is_type = |name: &str| recognized_type(name, catalog, &profile.target);
+    let parsed = if compiler_expanded {
+        parse_expanded_replacement(body, &parameters, is_type)
+    } else {
+        parse_replacement(body, &parameters, is_type)
+    };
+    let mut syntax = match parsed {
         Ok(syntax) => syntax,
         Err(error) => return result.syntax_error(error),
     };
@@ -733,6 +745,28 @@ pub(crate) fn analyze_active_with_constants(
             }
         }
     }
+    for node in &syntax.nodes {
+        if let ExpressionKind::Stringification { parts } = &node.kind {
+            for part in parts {
+                if let StringPart::Parameter { index } = part {
+                    let parameter = &mut result.parameters[*index];
+                    parameter.roles.retain(|role| {
+                        !matches!(role, ParameterRole::Unknown | ParameterRole::Unused)
+                    });
+                    if !parameter.roles.contains(&ParameterRole::Spelling) {
+                        parameter.roles.push(ParameterRole::Spelling);
+                    }
+                    parameter.uses.push(ParameterUse { tokens: node.tokens, grouped: true });
+                }
+            }
+        }
+    }
+    for parameter in &mut result.parameters {
+        parameter.uses.sort_by_key(|usage| usage.tokens.start);
+    }
+    if let Err((code, message, tokens)) = validate_diagnostic_strings(&syntax, catalog) {
+        return result.skip(code, message, Some(tokens));
+    }
     let atomic_arguments =
         result.parameters.iter().flat_map(|parameter| &parameter.uses).any(|usage| !usage.grouped);
     match analyze_types(&syntax, catalog, &profile.target, object_constants) {
@@ -753,6 +787,9 @@ pub(crate) fn analyze_active_with_constants(
                     root.kind,
                     ExpressionKind::Group { .. }
                         | ExpressionKind::IntegerLiteral { .. }
+                        | ExpressionKind::StringLiteral { .. }
+                        | ExpressionKind::InvocationFile
+                        | ExpressionKind::InvocationLine
                         | ExpressionKind::Identifier { .. }
                         | ExpressionKind::Empty
                         | ExpressionKind::Parameter { .. }
@@ -855,6 +892,7 @@ impl MacroAnalysis {
         let code = match error.kind {
             SyntaxErrorKind::InvalidExpression => SkipReasonCode::InvalidExpression,
             SyntaxErrorKind::UnsupportedLiteral => SkipReasonCode::UnsupportedLiteral,
+            SyntaxErrorKind::Stringification => SkipReasonCode::Stringification,
             SyntaxErrorKind::PointerOperation => SkipReasonCode::PointerOperation,
             SyntaxErrorKind::Mutation => SkipReasonCode::Mutation,
             SyntaxErrorKind::Statement => SkipReasonCode::Statement,
@@ -932,6 +970,65 @@ fn formal_parameters(
 
 /// The stable skip category and explanation produced when a symbolic C type cannot be established.
 type TypeFailure = (SkipReasonCode, String, TokenRange);
+
+/// Admit operand spelling only as a grouped native diagnostic argument.
+///
+/// A fixed void-returning prototype with `const char *` storage supplies the
+/// bounded diagnostic boundary. Returning the string, pointer arithmetic,
+/// adjacent literal arrays, sizeof and address-taking remain unsupported.
+fn validate_diagnostic_strings(
+    expression: &Expression,
+    catalog: &DeclarationCatalog,
+) -> Result<(), TypeFailure> {
+    let mut admitted = BTreeSet::new();
+    for node in &expression.nodes {
+        let ExpressionKind::Call { callee, arguments } = &node.kind else { continue };
+        let mut callee = *callee;
+        while let ExpressionKind::Group { operand } = expression.nodes[callee].kind {
+            callee = operand;
+        }
+        let ExpressionKind::Identifier { name } = &expression.nodes[callee].kind else {
+            continue;
+        };
+        let Some(function) = catalog.function_signatures.get(name) else { continue };
+        let signature = &function.signature;
+        let Some(parameters) = &signature.parameters else { continue };
+        if signature.result.category != TypeCategory::Void || signature.variadic {
+            continue;
+        }
+        for (argument, parameter) in arguments.iter().zip(parameters) {
+            let mut argument = *argument;
+            while let ExpressionKind::Group { operand } = expression.nodes[argument].kind {
+                argument = operand;
+            }
+            if !matches!(expression.nodes[argument].kind, ExpressionKind::Stringification { .. }) {
+                continue;
+            }
+            let Some(crate::TypeShape { kind: crate::TypeShapeKind::Pointer { pointee }, .. }) =
+                catalog.type_shapes.get(&parameter.canonical_spelling)
+            else {
+                continue;
+            };
+            if pointee.category == TypeCategory::Integer(IntegerKind::Char)
+                && pointee.is_const
+                && !pointee.is_volatile
+            {
+                admitted.insert(argument);
+            }
+        }
+    }
+    for (index, node) in expression.nodes.iter().enumerate() {
+        if matches!(node.kind, ExpressionKind::Stringification { .. }) && !admitted.contains(&index)
+        {
+            return Err((
+                SkipReasonCode::Stringification,
+                "operand-dependent stringification requires a direct const-char argument to a fixed native void diagnostic; C array extent and other value uses are not established".into(),
+                node.tokens,
+            ));
+        }
+    }
+    Ok(())
+}
 /// Parallel symbolic result types and resolved constants returned by the type-analysis pass.
 type TypeAnalysis = (Vec<TypeExpression>, Vec<ResolvedConstant>, BTreeSet<HelperRequirement>);
 
@@ -1107,7 +1204,29 @@ fn analyze_types(
                     node.tokens,
                 ))? }
             }
+            ExpressionKind::StringLiteral { .. }
+            | ExpressionKind::Stringification { .. }
+            | ExpressionKind::InvocationFile => {
+                if !target.ascii_execution_charset || target.char_bits != 8 {
+                    return Err((
+                        SkipReasonCode::UnsupportedLiteral,
+                        "ordinary strings require verified eight-bit ASCII C char storage".into(),
+                        node.tokens,
+                    ));
+                }
+                // Lowering retains complete immutable char-array storage until
+                // its consumer requests size, address or pointer decay.
+                TypeExpression::Deferred
+            }
+            ExpressionKind::InvocationLine => TypeExpression::Concrete { ty: int },
             ExpressionKind::Identifier { name } => {
+                if matches!(name.as_str(), "__func__" | "__FUNCTION__" | "__PRETTY_FUNCTION__") {
+                    return Err((
+                        SkipReasonCode::DynamicBuiltin,
+                        "function diagnostics need a Rust function-name and C string-storage contract".into(),
+                        node.tokens,
+                    ));
+                }
                 if let Some(reason) = catalog.builtin_unavailable.get(name) {
                     return Err((
                         SkipReasonCode::DynamicBuiltin,

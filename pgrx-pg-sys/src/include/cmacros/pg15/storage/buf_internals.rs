@@ -5,8 +5,8 @@ This code is generated for documentation purposes, so that it is easy to referen
 // C macros from buf_internals.h.
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -34,13 +34,13 @@ macro_rules! __pgrx_c_args_BUFFERTAGS_EQUAL {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_BUFFERTAGS_EQUAL!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_BUFFERTAGS_EQUAL!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -49,7 +49,7 @@ macro_rules! __pgrx_c_args_BUFFERTAGS_EQUAL {
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_BUFFERTAGS_EQUAL!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -76,31 +76,35 @@ macro_rules! __pgrx_c_args_BUFFERTAGS_EQUAL {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_BUFFERTAGS_EQUAL!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_BUFFERTAGS_EQUAL!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_BUFFERTAGS_EQUAL!(@p2 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_BUFFERTAGS_EQUAL!(
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative1 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_BUFFERTAGS_EQUAL!(@p2 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_BUFFERTAGS_EQUAL!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_BUFFERTAGS_EQUAL!(
-            @p2 $mode [$($done)* (@literal [- $argument]),];
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_BUFFERTAGS_EQUAL!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -108,7 +112,9 @@ macro_rules! __pgrx_c_args_BUFFERTAGS_EQUAL {
         $crate::__pgrx_c_args_BUFFERTAGS_EQUAL!(@negative1 $mode [$($done)*]; - $($raw)*)
     };
     (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_BUFFERTAGS_EQUAL!(@p2 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_BUFFERTAGS_EQUAL!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -130,14 +136,18 @@ macro_rules! __pgrx_c_args_BUFFERTAGS_EQUAL {
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_BUFFERTAGS_EQUAL!(@p2 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_BUFFERTAGS_EQUAL!(
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_BUFFERTAGS_EQUAL!(@p2 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_BUFFERTAGS_EQUAL!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_BUFFERTAGS_EQUAL!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -164,13 +174,13 @@ macro_rules! __pgrx_c_args_BUFFERTAGS_EQUAL {
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_BUFFERTAGS_EQUAL!(
-            @p2 $mode [$($done)* (@literal [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_BUFFERTAGS_EQUAL!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -1157,8 +1167,8 @@ macro_rules! BUFFERTAGS_EQUAL {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -1189,21 +1199,23 @@ macro_rules! __pgrx_c_args_BUF_STATE_GET_REFCOUNT {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
         $crate::__pgrx_c_args_BUF_STATE_GET_REFCOUNT!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_BUF_STATE_GET_REFCOUNT!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_BUF_STATE_GET_REFCOUNT!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_BUF_STATE_GET_REFCOUNT!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_BUF_STATE_GET_REFCOUNT!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -1211,7 +1223,9 @@ macro_rules! __pgrx_c_args_BUF_STATE_GET_REFCOUNT {
         $crate::__pgrx_c_args_BUF_STATE_GET_REFCOUNT!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_BUF_STATE_GET_REFCOUNT!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_BUF_STATE_GET_REFCOUNT!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -1236,15 +1250,17 @@ macro_rules! __pgrx_c_args_BUF_STATE_GET_REFCOUNT {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_BUF_STATE_GET_REFCOUNT!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_BUF_STATE_GET_REFCOUNT!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_BUF_STATE_GET_REFCOUNT!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_BUF_STATE_GET_REFCOUNT!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -1271,13 +1287,13 @@ macro_rules! __pgrx_c_args_BUF_STATE_GET_REFCOUNT {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_BUF_STATE_GET_REFCOUNT!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_BUF_STATE_GET_REFCOUNT!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -1329,7 +1345,7 @@ macro_rules! BUF_STATE_GET_REFCOUNT {
                     ),
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CUnsignedInt>::new(
-                            $crate::BUF_REFCOUNT_MASK as u32
+                            $crate::__pgrx_c_bindings::BUF_REFCOUNT_MASK as u32
                         )
                     )
                 )
@@ -1371,7 +1387,7 @@ macro_rules! BUF_STATE_GET_REFCOUNT {
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::CValue::<
                                         $crate::__pgrx_c_macros::CUnsignedInt
-                                    >::new($crate::BUF_REFCOUNT_MASK as u32)
+                                    >::new($crate::__pgrx_c_bindings::BUF_REFCOUNT_MASK as u32)
                                 )
                             )
                         )
@@ -1396,7 +1412,7 @@ macro_rules! BUF_STATE_GET_REFCOUNT {
                     ),
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CUnsignedInt>::new(
-                            $crate::BUF_REFCOUNT_MASK as u32
+                            $crate::__pgrx_c_bindings::BUF_REFCOUNT_MASK as u32
                         )
                     )
                 )
@@ -1412,8 +1428,8 @@ macro_rules! BUF_STATE_GET_REFCOUNT {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -1444,23 +1460,23 @@ macro_rules! __pgrx_c_args_BUF_STATE_GET_USAGECOUNT {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
         $crate::__pgrx_c_args_BUF_STATE_GET_USAGECOUNT!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_BUF_STATE_GET_USAGECOUNT!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_BUF_STATE_GET_USAGECOUNT!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_BUF_STATE_GET_USAGECOUNT!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -1469,7 +1485,7 @@ macro_rules! __pgrx_c_args_BUF_STATE_GET_USAGECOUNT {
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
         $crate::__pgrx_c_args_BUF_STATE_GET_USAGECOUNT!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
@@ -1495,17 +1511,17 @@ macro_rules! __pgrx_c_args_BUF_STATE_GET_USAGECOUNT {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_BUF_STATE_GET_USAGECOUNT!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_BUF_STATE_GET_USAGECOUNT!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_BUF_STATE_GET_USAGECOUNT!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -1532,13 +1548,13 @@ macro_rules! __pgrx_c_args_BUF_STATE_GET_USAGECOUNT {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_BUF_STATE_GET_USAGECOUNT!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_BUF_STATE_GET_USAGECOUNT!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -1598,14 +1614,14 @@ macro_rules! BUF_STATE_GET_USAGECOUNT {
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::CValue::<
                                         $crate::__pgrx_c_macros::CUnsignedInt
-                                    >::new($crate::BUF_USAGECOUNT_MASK as u32)
+                                    >::new($crate::__pgrx_c_bindings::BUF_USAGECOUNT_MASK as u32)
                                 )
                             )
                         )
                     ),
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                            $crate::BUF_USAGECOUNT_SHIFT as i32
+                            $crate::__pgrx_c_bindings::BUF_USAGECOUNT_SHIFT as i32
                         )
                     )
                 )
@@ -1657,14 +1673,16 @@ macro_rules! BUF_STATE_GET_USAGECOUNT {
                                             >(
                                                 $crate::__pgrx_c_macros::CValue::<
                                                     $crate::__pgrx_c_macros::CUnsignedInt
-                                                >::new($crate::BUF_USAGECOUNT_MASK as u32)
+                                                >::new(
+                                                    $crate::__pgrx_c_bindings::BUF_USAGECOUNT_MASK as u32
+                                                )
                                             )
                                         )
                                     )
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                        $crate::BUF_USAGECOUNT_SHIFT as i32
+                                        $crate::__pgrx_c_bindings::BUF_USAGECOUNT_SHIFT as i32
                                     )
                                 )
                             )
@@ -1694,14 +1712,14 @@ macro_rules! BUF_STATE_GET_USAGECOUNT {
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::CValue::<
                                         $crate::__pgrx_c_macros::CUnsignedInt
-                                    >::new($crate::BUF_USAGECOUNT_MASK as u32)
+                                    >::new($crate::__pgrx_c_bindings::BUF_USAGECOUNT_MASK as u32)
                                 )
                             )
                         )
                     ),
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                            $crate::BUF_USAGECOUNT_SHIFT as i32
+                            $crate::__pgrx_c_bindings::BUF_USAGECOUNT_SHIFT as i32
                         )
                     )
                 )
@@ -1717,8 +1735,8 @@ macro_rules! BUF_STATE_GET_USAGECOUNT {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -1749,23 +1767,23 @@ macro_rules! __pgrx_c_args_BufMappingPartitionLock {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
         $crate::__pgrx_c_args_BufMappingPartitionLock!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_BufMappingPartitionLock!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_BufMappingPartitionLock!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_BufMappingPartitionLock!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -1774,7 +1792,7 @@ macro_rules! __pgrx_c_args_BufMappingPartitionLock {
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
         $crate::__pgrx_c_args_BufMappingPartitionLock!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
@@ -1800,17 +1818,17 @@ macro_rules! __pgrx_c_args_BufMappingPartitionLock {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_BufMappingPartitionLock!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_BufMappingPartitionLock!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_BufMappingPartitionLock!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -1837,13 +1855,13 @@ macro_rules! __pgrx_c_args_BufMappingPartitionLock {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_BufMappingPartitionLock!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_BufMappingPartitionLock!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -1904,10 +1922,14 @@ macro_rules! BufMappingPartitionLock {
                                     $crate::__pgrx_c_macros::expression::place::<
                                         $crate::__pgrx_c_macros::expression::CPointer<
                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                $crate::LWLockPadded
+                                                $crate::__pgrx_c_bindings::LWLockPadded
                                             >,
                                             $crate::__pgrx_c_macros::expression::ReadWrite
-                                        >>(::core::ptr::addr_of_mut!($crate::MainLWLockArray))
+                                        >>(
+                                        ::core::ptr::addr_of_mut!(
+                                            $crate::__pgrx_c_bindings::MainLWLockArray
+                                        )
+                                    )
                                 )
                             ),
                             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -1919,7 +1941,9 @@ macro_rules! BufMappingPartitionLock {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::CValue::<
                                             $crate::__pgrx_c_macros::CInt
-                                        >::new($crate::BUFFER_MAPPING_LWLOCK_OFFSET as i32)
+                                        >::new(
+                                            $crate::__pgrx_c_bindings::BUFFER_MAPPING_LWLOCK_OFFSET as i32
+                                        )
                                     ),
                                     (
                                         $crate::__pgrx_c_macros::expression::profile_value::<
@@ -1944,7 +1968,9 @@ macro_rules! BufMappingPartitionLock {
                                                 >(
                                                     $crate::__pgrx_c_macros::CValue::<
                                                         $crate::__pgrx_c_macros::CInt
-                                                    >::new($crate::NUM_BUFFER_PARTITIONS as i32)
+                                                    >::new(
+                                                        $crate::__pgrx_c_bindings::NUM_BUFFER_PARTITIONS as i32
+                                                    )
                                                 )
                                             )
                                         )
@@ -1999,12 +2025,12 @@ macro_rules! BufMappingPartitionLock {
                                                 $crate::__pgrx_c_macros::expression::place::<
                                                     $crate::__pgrx_c_macros::expression::CPointer<
                                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                                            $crate::LWLockPadded
+                                                            $crate::__pgrx_c_bindings::LWLockPadded
                                                         >,
                                                         $crate::__pgrx_c_macros::expression::ReadWrite
                                                     >>(
                                                     ::core::ptr::addr_of_mut!(
-                                                        $crate::MainLWLockArray
+                                                        $crate::__pgrx_c_bindings::MainLWLockArray
                                                     )
                                                 )
                                             )
@@ -2025,7 +2051,7 @@ macro_rules! BufMappingPartitionLock {
                                                     $crate::__pgrx_c_macros::CValue::<
                                                         $crate::__pgrx_c_macros::CInt
                                                     >::new(
-                                                        $crate::BUFFER_MAPPING_LWLOCK_OFFSET as i32
+                                                        $crate::__pgrx_c_bindings::BUFFER_MAPPING_LWLOCK_OFFSET as i32
                                                     )
                                                 ),
                                                 (
@@ -2052,7 +2078,7 @@ macro_rules! BufMappingPartitionLock {
                                                                 $crate::__pgrx_c_macros::CValue::<
                                                                     $crate::__pgrx_c_macros::CInt
                                                                 >::new(
-                                                                    $crate::NUM_BUFFER_PARTITIONS as i32
+                                                                    $crate::__pgrx_c_bindings::NUM_BUFFER_PARTITIONS as i32
                                                                 )
                                                             )
                                                         )
@@ -2090,10 +2116,14 @@ macro_rules! BufMappingPartitionLock {
                                     $crate::__pgrx_c_macros::expression::place::<
                                         $crate::__pgrx_c_macros::expression::CPointer<
                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                $crate::LWLockPadded
+                                                $crate::__pgrx_c_bindings::LWLockPadded
                                             >,
                                             $crate::__pgrx_c_macros::expression::ReadWrite
-                                        >>(::core::ptr::addr_of_mut!($crate::MainLWLockArray))
+                                        >>(
+                                        ::core::ptr::addr_of_mut!(
+                                            $crate::__pgrx_c_bindings::MainLWLockArray
+                                        )
+                                    )
                                 )
                             ),
                             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -2105,7 +2135,9 @@ macro_rules! BufMappingPartitionLock {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::CValue::<
                                             $crate::__pgrx_c_macros::CInt
-                                        >::new($crate::BUFFER_MAPPING_LWLOCK_OFFSET as i32)
+                                        >::new(
+                                            $crate::__pgrx_c_bindings::BUFFER_MAPPING_LWLOCK_OFFSET as i32
+                                        )
                                     ),
                                     (
                                         $crate::__pgrx_c_macros::expression::profile_value::<
@@ -2130,7 +2162,9 @@ macro_rules! BufMappingPartitionLock {
                                                 >(
                                                     $crate::__pgrx_c_macros::CValue::<
                                                         $crate::__pgrx_c_macros::CInt
-                                                    >::new($crate::NUM_BUFFER_PARTITIONS as i32)
+                                                    >::new(
+                                                        $crate::__pgrx_c_bindings::NUM_BUFFER_PARTITIONS as i32
+                                                    )
                                                 )
                                             )
                                         )
@@ -2152,8 +2186,8 @@ macro_rules! BufMappingPartitionLock {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -2184,23 +2218,23 @@ macro_rules! __pgrx_c_args_BufMappingPartitionLockByIndex {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
         $crate::__pgrx_c_args_BufMappingPartitionLockByIndex!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_BufMappingPartitionLockByIndex!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_BufMappingPartitionLockByIndex!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_BufMappingPartitionLockByIndex!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -2212,7 +2246,7 @@ macro_rules! __pgrx_c_args_BufMappingPartitionLockByIndex {
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
         $crate::__pgrx_c_args_BufMappingPartitionLockByIndex!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
@@ -2238,17 +2272,17 @@ macro_rules! __pgrx_c_args_BufMappingPartitionLockByIndex {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_BufMappingPartitionLockByIndex!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_BufMappingPartitionLockByIndex!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_BufMappingPartitionLockByIndex!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -2275,13 +2309,13 @@ macro_rules! __pgrx_c_args_BufMappingPartitionLockByIndex {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_BufMappingPartitionLockByIndex!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_BufMappingPartitionLockByIndex!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -2341,10 +2375,14 @@ macro_rules! BufMappingPartitionLockByIndex {
                                     $crate::__pgrx_c_macros::expression::place::<
                                         $crate::__pgrx_c_macros::expression::CPointer<
                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                $crate::LWLockPadded
+                                                $crate::__pgrx_c_bindings::LWLockPadded
                                             >,
                                             $crate::__pgrx_c_macros::expression::ReadWrite
-                                        >>(::core::ptr::addr_of_mut!($crate::MainLWLockArray))
+                                        >>(
+                                        ::core::ptr::addr_of_mut!(
+                                            $crate::__pgrx_c_bindings::MainLWLockArray
+                                        )
+                                    )
                                 )
                             ),
                             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -2356,7 +2394,9 @@ macro_rules! BufMappingPartitionLockByIndex {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::CValue::<
                                             $crate::__pgrx_c_macros::CInt
-                                        >::new($crate::BUFFER_MAPPING_LWLOCK_OFFSET as i32)
+                                        >::new(
+                                            $crate::__pgrx_c_bindings::BUFFER_MAPPING_LWLOCK_OFFSET as i32
+                                        )
                                     ),
                                     (
                                         $crate::__pgrx_c_macros::expression::profile_value::<
@@ -2422,12 +2462,12 @@ macro_rules! BufMappingPartitionLockByIndex {
                                                 $crate::__pgrx_c_macros::expression::place::<
                                                     $crate::__pgrx_c_macros::expression::CPointer<
                                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                                            $crate::LWLockPadded
+                                                            $crate::__pgrx_c_bindings::LWLockPadded
                                                         >,
                                                         $crate::__pgrx_c_macros::expression::ReadWrite
                                                     >>(
                                                     ::core::ptr::addr_of_mut!(
-                                                        $crate::MainLWLockArray
+                                                        $crate::__pgrx_c_bindings::MainLWLockArray
                                                     )
                                                 )
                                             )
@@ -2448,7 +2488,7 @@ macro_rules! BufMappingPartitionLockByIndex {
                                                     $crate::__pgrx_c_macros::CValue::<
                                                         $crate::__pgrx_c_macros::CInt
                                                     >::new(
-                                                        $crate::BUFFER_MAPPING_LWLOCK_OFFSET as i32
+                                                        $crate::__pgrx_c_bindings::BUFFER_MAPPING_LWLOCK_OFFSET as i32
                                                     )
                                                 ),
                                                 (
@@ -2491,10 +2531,14 @@ macro_rules! BufMappingPartitionLockByIndex {
                                     $crate::__pgrx_c_macros::expression::place::<
                                         $crate::__pgrx_c_macros::expression::CPointer<
                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                $crate::LWLockPadded
+                                                $crate::__pgrx_c_bindings::LWLockPadded
                                             >,
                                             $crate::__pgrx_c_macros::expression::ReadWrite
-                                        >>(::core::ptr::addr_of_mut!($crate::MainLWLockArray))
+                                        >>(
+                                        ::core::ptr::addr_of_mut!(
+                                            $crate::__pgrx_c_bindings::MainLWLockArray
+                                        )
+                                    )
                                 )
                             ),
                             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -2506,7 +2550,9 @@ macro_rules! BufMappingPartitionLockByIndex {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::CValue::<
                                             $crate::__pgrx_c_macros::CInt
-                                        >::new($crate::BUFFER_MAPPING_LWLOCK_OFFSET as i32)
+                                        >::new(
+                                            $crate::__pgrx_c_bindings::BUFFER_MAPPING_LWLOCK_OFFSET as i32
+                                        )
                                     ),
                                     (
                                         $crate::__pgrx_c_macros::expression::profile_value::<
@@ -2537,8 +2583,8 @@ macro_rules! BufMappingPartitionLockByIndex {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -2569,21 +2615,23 @@ macro_rules! __pgrx_c_args_BufTableHashPartition {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
         $crate::__pgrx_c_args_BufTableHashPartition!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_BufTableHashPartition!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_BufTableHashPartition!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_BufTableHashPartition!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_BufTableHashPartition!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -2591,7 +2639,9 @@ macro_rules! __pgrx_c_args_BufTableHashPartition {
         $crate::__pgrx_c_args_BufTableHashPartition!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_BufTableHashPartition!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_BufTableHashPartition!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -2613,14 +2663,18 @@ macro_rules! __pgrx_c_args_BufTableHashPartition {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_BufTableHashPartition!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_BufTableHashPartition!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_BufTableHashPartition!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_BufTableHashPartition!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_BufTableHashPartition!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -2647,13 +2701,13 @@ macro_rules! __pgrx_c_args_BufTableHashPartition {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_BufTableHashPartition!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_BufTableHashPartition!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -2706,7 +2760,7 @@ macro_rules! BufTableHashPartition {
                     ),
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                            $crate::NUM_BUFFER_PARTITIONS as i32
+                            $crate::__pgrx_c_bindings::NUM_BUFFER_PARTITIONS as i32
                         )
                     )
                 )
@@ -2747,7 +2801,7 @@ macro_rules! BufTableHashPartition {
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                        $crate::NUM_BUFFER_PARTITIONS as i32
+                                        $crate::__pgrx_c_bindings::NUM_BUFFER_PARTITIONS as i32
                                     )
                                 )
                             )
@@ -2773,7 +2827,7 @@ macro_rules! BufTableHashPartition {
                     ),
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                            $crate::NUM_BUFFER_PARTITIONS as i32
+                            $crate::__pgrx_c_bindings::NUM_BUFFER_PARTITIONS as i32
                         )
                     )
                 )
@@ -2789,8 +2843,8 @@ macro_rules! BufTableHashPartition {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -2821,23 +2875,23 @@ macro_rules! __pgrx_c_args_BufferDescriptorGetBuffer {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
         $crate::__pgrx_c_args_BufferDescriptorGetBuffer!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_BufferDescriptorGetBuffer!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_BufferDescriptorGetBuffer!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_BufferDescriptorGetBuffer!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -2846,7 +2900,7 @@ macro_rules! __pgrx_c_args_BufferDescriptorGetBuffer {
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
         $crate::__pgrx_c_args_BufferDescriptorGetBuffer!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
@@ -2872,17 +2926,17 @@ macro_rules! __pgrx_c_args_BufferDescriptorGetBuffer {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_BufferDescriptorGetBuffer!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_BufferDescriptorGetBuffer!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_BufferDescriptorGetBuffer!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -2909,13 +2963,13 @@ macro_rules! __pgrx_c_args_BufferDescriptorGetBuffer {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_BufferDescriptorGetBuffer!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_BufferDescriptorGetBuffer!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -3101,8 +3155,8 @@ macro_rules! BufferDescriptorGetBuffer {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -3133,23 +3187,23 @@ macro_rules! __pgrx_c_args_BufferDescriptorGetContentLock {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
         $crate::__pgrx_c_args_BufferDescriptorGetContentLock!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_BufferDescriptorGetContentLock!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_BufferDescriptorGetContentLock!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_BufferDescriptorGetContentLock!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -3161,7 +3215,7 @@ macro_rules! __pgrx_c_args_BufferDescriptorGetContentLock {
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
         $crate::__pgrx_c_args_BufferDescriptorGetContentLock!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
@@ -3187,17 +3241,17 @@ macro_rules! __pgrx_c_args_BufferDescriptorGetContentLock {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_BufferDescriptorGetContentLock!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_BufferDescriptorGetContentLock!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_BufferDescriptorGetContentLock!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -3224,13 +3278,13 @@ macro_rules! __pgrx_c_args_BufferDescriptorGetContentLock {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_BufferDescriptorGetContentLock!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_BufferDescriptorGetContentLock!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -3279,9 +3333,11 @@ macro_rules! BufferDescriptorGetContentLock {
         (
             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::cast_as::<
-                    *mut $crate::LWLock,
+                    *mut $crate::__pgrx_c_bindings::LWLock,
                     $crate::__pgrx_c_macros::expression::CPointer<
-                        $crate::__pgrx_c_macros::expression::CRecord<$crate::LWLock>,
+                        $crate::__pgrx_c_macros::expression::CRecord<
+                            $crate::__pgrx_c_bindings::LWLock
+                        >,
                         $crate::__pgrx_c_macros::expression::ReadWrite
                     >,
                     _
@@ -3346,9 +3402,11 @@ macro_rules! BufferDescriptorGetContentLock {
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::cast_as::<
-                                *mut $crate::LWLock,
+                                *mut $crate::__pgrx_c_bindings::LWLock,
                                 $crate::__pgrx_c_macros::expression::CPointer<
-                                    $crate::__pgrx_c_macros::expression::CRecord<$crate::LWLock>,
+                                    $crate::__pgrx_c_macros::expression::CRecord<
+                                        $crate::__pgrx_c_bindings::LWLock
+                                    >,
                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                 >,
                                 _
@@ -3397,9 +3455,11 @@ macro_rules! BufferDescriptorGetContentLock {
         {
             let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::cast_as::<
-                    *mut $crate::LWLock,
+                    *mut $crate::__pgrx_c_bindings::LWLock,
                     $crate::__pgrx_c_macros::expression::CPointer<
-                        $crate::__pgrx_c_macros::expression::CRecord<$crate::LWLock>,
+                        $crate::__pgrx_c_macros::expression::CRecord<
+                            $crate::__pgrx_c_bindings::LWLock
+                        >,
                         $crate::__pgrx_c_macros::expression::ReadWrite
                     >,
                     _
@@ -3443,8 +3503,8 @@ macro_rules! BufferDescriptorGetContentLock {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -3475,23 +3535,23 @@ macro_rules! __pgrx_c_args_BufferDescriptorGetIOCV {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
         $crate::__pgrx_c_args_BufferDescriptorGetIOCV!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_BufferDescriptorGetIOCV!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_BufferDescriptorGetIOCV!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_BufferDescriptorGetIOCV!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -3500,7 +3560,7 @@ macro_rules! __pgrx_c_args_BufferDescriptorGetIOCV {
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
         $crate::__pgrx_c_args_BufferDescriptorGetIOCV!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
@@ -3526,17 +3586,17 @@ macro_rules! __pgrx_c_args_BufferDescriptorGetIOCV {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_BufferDescriptorGetIOCV!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_BufferDescriptorGetIOCV!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_BufferDescriptorGetIOCV!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -3563,13 +3623,13 @@ macro_rules! __pgrx_c_args_BufferDescriptorGetIOCV {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_BufferDescriptorGetIOCV!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_BufferDescriptorGetIOCV!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -3626,10 +3686,14 @@ macro_rules! BufferDescriptorGetIOCV {
                                         $crate::__pgrx_c_macros::expression::place::<
                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                    $crate::ConditionVariableMinimallyPadded
+                                                    $crate::__pgrx_c_bindings::ConditionVariableMinimallyPadded
                                                 >,
                                                 $crate::__pgrx_c_macros::expression::ReadWrite
-                                            >>(::core::ptr::addr_of_mut!($crate::BufferIOCVArray))
+                                            >>(
+                                            ::core::ptr::addr_of_mut!(
+                                                $crate::__pgrx_c_bindings::BufferIOCVArray
+                                            )
+                                        )
                                     )
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -3704,12 +3768,12 @@ macro_rules! BufferDescriptorGetIOCV {
                                                     $crate::__pgrx_c_macros::expression::place::<
                                                         $crate::__pgrx_c_macros::expression::CPointer<
                                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                                $crate::ConditionVariableMinimallyPadded
+                                                                $crate::__pgrx_c_bindings::ConditionVariableMinimallyPadded
                                                             >,
                                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                                         >>(
                                                         ::core::ptr::addr_of_mut!(
-                                                            $crate::BufferIOCVArray
+                                                            $crate::__pgrx_c_bindings::BufferIOCVArray
                                                         )
                                                     )
                                                 )
@@ -3771,10 +3835,14 @@ macro_rules! BufferDescriptorGetIOCV {
                                         $crate::__pgrx_c_macros::expression::place::<
                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                    $crate::ConditionVariableMinimallyPadded
+                                                    $crate::__pgrx_c_bindings::ConditionVariableMinimallyPadded
                                                 >,
                                                 $crate::__pgrx_c_macros::expression::ReadWrite
-                                            >>(::core::ptr::addr_of_mut!($crate::BufferIOCVArray))
+                                            >>(
+                                            ::core::ptr::addr_of_mut!(
+                                                $crate::__pgrx_c_bindings::BufferIOCVArray
+                                            )
+                                        )
                                     )
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -3816,8 +3884,8 @@ macro_rules! BufferDescriptorGetIOCV {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -3844,20 +3912,24 @@ macro_rules! __pgrx_c_args_CLEAR_BUFFERTAG {
         $crate::__pgrx_c_args_CLEAR_BUFFERTAG!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_CLEAR_BUFFERTAG!(@p1 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_CLEAR_BUFFERTAG!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_CLEAR_BUFFERTAG!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_CLEAR_BUFFERTAG!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_CLEAR_BUFFERTAG!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_CLEAR_BUFFERTAG!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -3865,7 +3937,9 @@ macro_rules! __pgrx_c_args_CLEAR_BUFFERTAG {
         $crate::__pgrx_c_args_CLEAR_BUFFERTAG!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_CLEAR_BUFFERTAG!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_CLEAR_BUFFERTAG!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -3887,14 +3961,18 @@ macro_rules! __pgrx_c_args_CLEAR_BUFFERTAG {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_CLEAR_BUFFERTAG!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_CLEAR_BUFFERTAG!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_CLEAR_BUFFERTAG!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_CLEAR_BUFFERTAG!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_CLEAR_BUFFERTAG!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -3921,13 +3999,13 @@ macro_rules! __pgrx_c_args_CLEAR_BUFFERTAG {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_CLEAR_BUFFERTAG!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_CLEAR_BUFFERTAG!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -4013,10 +4091,11 @@ macro_rules! CLEAR_BUFFERTAG {
                                                                         _
                                                                     >(
                                                                         $crate::__pgrx_c_macros::expression::null_constant(
-                                                                            /* PGRX: InvalidOid remains expanded because no integer constant binding is available in the defining Rust crate. */
                                                                             $crate::__pgrx_c_macros::CValue::<
                                                                                 $crate::__pgrx_c_macros::CUnsignedInt
-                                                                            >::new(0u32)
+                                                                            >::new(
+                                                                                $crate::__pgrx_c_bindings::InvalidOid as u32
+                                                                            )
                                                                         )
                                                                     )
                                                                 )
@@ -4050,10 +4129,11 @@ macro_rules! CLEAR_BUFFERTAG {
                                                                     _
                                                                 >(
                                                                     $crate::__pgrx_c_macros::expression::null_constant(
-                                                                        /* PGRX: InvalidOid remains expanded because no integer constant binding is available in the defining Rust crate. */
                                                                         $crate::__pgrx_c_macros::CValue::<
                                                                             $crate::__pgrx_c_macros::CUnsignedInt
-                                                                        >::new(0u32)
+                                                                        >::new(
+                                                                            $crate::__pgrx_c_bindings::InvalidOid as u32
+                                                                        )
                                                                     )
                                                                 )
                                                             )
@@ -4082,10 +4162,11 @@ macro_rules! CLEAR_BUFFERTAG {
                                                         _
                                                     >(
                                                         $crate::__pgrx_c_macros::expression::null_constant(
-                                                            /* PGRX: InvalidOid remains expanded because no integer constant binding is available in the defining Rust crate. */
                                                             $crate::__pgrx_c_macros::CValue::<
                                                                 $crate::__pgrx_c_macros::CUnsignedInt
-                                                            >::new(0u32)
+                                                            >::new(
+                                                                $crate::__pgrx_c_bindings::InvalidOid as u32
+                                                            )
                                                         )
                                                     )
                                                 )
@@ -4106,7 +4187,9 @@ macro_rules! CLEAR_BUFFERTAG {
                                         >(
                                             $crate::__pgrx_c_macros::CValue::<
                                                 $crate::__pgrx_c_macros::CInt
-                                            >::new($crate::ForkNumber::InvalidForkNumber as i32)
+                                            >::new(
+                                                $crate::__pgrx_c_bindings::ForkNumber::InvalidForkNumber as i32
+                                            )
                                         )
                                     )
                                 )
@@ -4121,10 +4204,9 @@ macro_rules! CLEAR_BUFFERTAG {
                                 _
                             >(($crate::__pgrx_c_operand!(@place; $a))),
                             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                                /* PGRX: InvalidBlockNumber remains expanded because no integer constant binding is available in the defining Rust crate. */
                                 $crate::__pgrx_c_macros::CValue::<
                                     $crate::__pgrx_c_macros::CUnsignedInt
-                                >::new(4294967295u32)
+                                >::new($crate::__pgrx_c_bindings::InvalidBlockNumber as u32)
                             )
                         )
                     )
@@ -4206,10 +4288,11 @@ macro_rules! CLEAR_BUFFERTAG {
                                                                                     _
                                                                                 >(
                                                                                     $crate::__pgrx_c_macros::expression::null_constant(
-                                                                                        /* PGRX: InvalidOid remains expanded because no integer constant binding is available in the defining Rust crate. */
                                                                                         $crate::__pgrx_c_macros::CValue::<
                                                                                             $crate::__pgrx_c_macros::CUnsignedInt
-                                                                                        >::new(0u32)
+                                                                                        >::new(
+                                                                                            $crate::__pgrx_c_bindings::InvalidOid as u32
+                                                                                        )
                                                                                     )
                                                                                 )
                                                                             )
@@ -4243,10 +4326,11 @@ macro_rules! CLEAR_BUFFERTAG {
                                                                                 _
                                                                             >(
                                                                                 $crate::__pgrx_c_macros::expression::null_constant(
-                                                                                    /* PGRX: InvalidOid remains expanded because no integer constant binding is available in the defining Rust crate. */
                                                                                     $crate::__pgrx_c_macros::CValue::<
                                                                                         $crate::__pgrx_c_macros::CUnsignedInt
-                                                                                    >::new(0u32)
+                                                                                    >::new(
+                                                                                        $crate::__pgrx_c_bindings::InvalidOid as u32
+                                                                                    )
                                                                                 )
                                                                             )
                                                                         )
@@ -4282,10 +4366,11 @@ macro_rules! CLEAR_BUFFERTAG {
                                                                     _
                                                                 >(
                                                                     $crate::__pgrx_c_macros::expression::null_constant(
-                                                                        /* PGRX: InvalidOid remains expanded because no integer constant binding is available in the defining Rust crate. */
                                                                         $crate::__pgrx_c_macros::CValue::<
                                                                             $crate::__pgrx_c_macros::CUnsignedInt
-                                                                        >::new(0u32)
+                                                                        >::new(
+                                                                            $crate::__pgrx_c_bindings::InvalidOid as u32
+                                                                        )
                                                                     )
                                                                 )
                                                             )
@@ -4310,7 +4395,7 @@ macro_rules! CLEAR_BUFFERTAG {
                                                         $crate::__pgrx_c_macros::CValue::<
                                                             $crate::__pgrx_c_macros::CInt
                                                         >::new(
-                                                            $crate::ForkNumber::InvalidForkNumber as i32
+                                                            $crate::__pgrx_c_bindings::ForkNumber::InvalidForkNumber as i32
                                                         )
                                                     )
                                                 )
@@ -4329,10 +4414,11 @@ macro_rules! CLEAR_BUFFERTAG {
                                             true,
                                             _
                                         >(
-                                            /* PGRX: InvalidBlockNumber remains expanded because no integer constant binding is available in the defining Rust crate. */
                                             $crate::__pgrx_c_macros::CValue::<
                                                 $crate::__pgrx_c_macros::CUnsignedInt
-                                            >::new(4294967295u32)
+                                            >::new(
+                                                $crate::__pgrx_c_bindings::InvalidBlockNumber as u32
+                                            )
                                         )
                                     )
                                 )
@@ -4396,10 +4482,11 @@ macro_rules! CLEAR_BUFFERTAG {
                                                                         _
                                                                     >(
                                                                         $crate::__pgrx_c_macros::expression::null_constant(
-                                                                            /* PGRX: InvalidOid remains expanded because no integer constant binding is available in the defining Rust crate. */
                                                                             $crate::__pgrx_c_macros::CValue::<
                                                                                 $crate::__pgrx_c_macros::CUnsignedInt
-                                                                            >::new(0u32)
+                                                                            >::new(
+                                                                                $crate::__pgrx_c_bindings::InvalidOid as u32
+                                                                            )
                                                                         )
                                                                     )
                                                                 )
@@ -4433,10 +4520,11 @@ macro_rules! CLEAR_BUFFERTAG {
                                                                     _
                                                                 >(
                                                                     $crate::__pgrx_c_macros::expression::null_constant(
-                                                                        /* PGRX: InvalidOid remains expanded because no integer constant binding is available in the defining Rust crate. */
                                                                         $crate::__pgrx_c_macros::CValue::<
                                                                             $crate::__pgrx_c_macros::CUnsignedInt
-                                                                        >::new(0u32)
+                                                                        >::new(
+                                                                            $crate::__pgrx_c_bindings::InvalidOid as u32
+                                                                        )
                                                                     )
                                                                 )
                                                             )
@@ -4465,10 +4553,11 @@ macro_rules! CLEAR_BUFFERTAG {
                                                         _
                                                     >(
                                                         $crate::__pgrx_c_macros::expression::null_constant(
-                                                            /* PGRX: InvalidOid remains expanded because no integer constant binding is available in the defining Rust crate. */
                                                             $crate::__pgrx_c_macros::CValue::<
                                                                 $crate::__pgrx_c_macros::CUnsignedInt
-                                                            >::new(0u32)
+                                                            >::new(
+                                                                $crate::__pgrx_c_bindings::InvalidOid as u32
+                                                            )
                                                         )
                                                     )
                                                 )
@@ -4489,7 +4578,9 @@ macro_rules! CLEAR_BUFFERTAG {
                                         >(
                                             $crate::__pgrx_c_macros::CValue::<
                                                 $crate::__pgrx_c_macros::CInt
-                                            >::new($crate::ForkNumber::InvalidForkNumber as i32)
+                                            >::new(
+                                                $crate::__pgrx_c_bindings::ForkNumber::InvalidForkNumber as i32
+                                            )
                                         )
                                     )
                                 )
@@ -4504,10 +4595,9 @@ macro_rules! CLEAR_BUFFERTAG {
                                 _
                             >(($crate::__pgrx_c_operand!(@place; $a))),
                             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                                /* PGRX: InvalidBlockNumber remains expanded because no integer constant binding is available in the defining Rust crate. */
                                 $crate::__pgrx_c_macros::CValue::<
                                     $crate::__pgrx_c_macros::CUnsignedInt
-                                >::new(4294967295u32)
+                                >::new($crate::__pgrx_c_bindings::InvalidBlockNumber as u32)
                             )
                         )
                     )
@@ -4524,8 +4614,8 @@ macro_rules! CLEAR_BUFFERTAG {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -4552,20 +4642,24 @@ macro_rules! __pgrx_c_args_GetBufferDescriptor {
         $crate::__pgrx_c_args_GetBufferDescriptor!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_GetBufferDescriptor!(@p1 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_GetBufferDescriptor!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_GetBufferDescriptor!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_GetBufferDescriptor!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GetBufferDescriptor!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GetBufferDescriptor!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -4573,7 +4667,9 @@ macro_rules! __pgrx_c_args_GetBufferDescriptor {
         $crate::__pgrx_c_args_GetBufferDescriptor!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_GetBufferDescriptor!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_GetBufferDescriptor!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -4595,14 +4691,18 @@ macro_rules! __pgrx_c_args_GetBufferDescriptor {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_GetBufferDescriptor!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_GetBufferDescriptor!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_GetBufferDescriptor!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_GetBufferDescriptor!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_GetBufferDescriptor!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -4629,13 +4729,13 @@ macro_rules! __pgrx_c_args_GetBufferDescriptor {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GetBufferDescriptor!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GetBufferDescriptor!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -4688,10 +4788,14 @@ macro_rules! GetBufferDescriptor {
                                     $crate::__pgrx_c_macros::expression::place::<
                                         $crate::__pgrx_c_macros::expression::CPointer<
                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                $crate::BufferDescPadded
+                                                $crate::__pgrx_c_bindings::BufferDescPadded
                                             >,
                                             $crate::__pgrx_c_macros::expression::ReadWrite
-                                        >>(::core::ptr::addr_of_mut!($crate::BufferDescriptors))
+                                        >>(
+                                        ::core::ptr::addr_of_mut!(
+                                            $crate::__pgrx_c_bindings::BufferDescriptors
+                                        )
+                                    )
                                 )
                             ),
                             (
@@ -4746,12 +4850,12 @@ macro_rules! GetBufferDescriptor {
                                                 $crate::__pgrx_c_macros::expression::place::<
                                                     $crate::__pgrx_c_macros::expression::CPointer<
                                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                                            $crate::BufferDescPadded
+                                                            $crate::__pgrx_c_bindings::BufferDescPadded
                                                         >,
                                                         $crate::__pgrx_c_macros::expression::ReadWrite
                                                     >>(
                                                     ::core::ptr::addr_of_mut!(
-                                                        $crate::BufferDescriptors
+                                                        $crate::__pgrx_c_bindings::BufferDescriptors
                                                     )
                                                 )
                                             )
@@ -4791,10 +4895,14 @@ macro_rules! GetBufferDescriptor {
                                     $crate::__pgrx_c_macros::expression::place::<
                                         $crate::__pgrx_c_macros::expression::CPointer<
                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                $crate::BufferDescPadded
+                                                $crate::__pgrx_c_bindings::BufferDescPadded
                                             >,
                                             $crate::__pgrx_c_macros::expression::ReadWrite
-                                        >>(::core::ptr::addr_of_mut!($crate::BufferDescriptors))
+                                        >>(
+                                        ::core::ptr::addr_of_mut!(
+                                            $crate::__pgrx_c_bindings::BufferDescriptors
+                                        )
+                                    )
                                 )
                             ),
                             (
@@ -4817,8 +4925,8 @@ macro_rules! GetBufferDescriptor {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -4849,23 +4957,23 @@ macro_rules! __pgrx_c_args_GetLocalBufferDescriptor {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
         $crate::__pgrx_c_args_GetLocalBufferDescriptor!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_GetLocalBufferDescriptor!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GetLocalBufferDescriptor!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GetLocalBufferDescriptor!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -4874,7 +4982,7 @@ macro_rules! __pgrx_c_args_GetLocalBufferDescriptor {
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
         $crate::__pgrx_c_args_GetLocalBufferDescriptor!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
@@ -4900,17 +5008,17 @@ macro_rules! __pgrx_c_args_GetLocalBufferDescriptor {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_GetLocalBufferDescriptor!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_GetLocalBufferDescriptor!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_GetLocalBufferDescriptor!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -4937,13 +5045,13 @@ macro_rules! __pgrx_c_args_GetLocalBufferDescriptor {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GetLocalBufferDescriptor!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GetLocalBufferDescriptor!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -4994,10 +5102,14 @@ macro_rules! GetLocalBufferDescriptor {
                                 $crate::__pgrx_c_macros::expression::place::<
                                     $crate::__pgrx_c_macros::expression::CPointer<
                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                            $crate::BufferDesc
+                                            $crate::__pgrx_c_bindings::BufferDesc
                                         >,
                                         $crate::__pgrx_c_macros::expression::ReadWrite
-                                    >>(::core::ptr::addr_of_mut!($crate::LocalBufferDescriptors))
+                                    >>(
+                                    ::core::ptr::addr_of_mut!(
+                                        $crate::__pgrx_c_bindings::LocalBufferDescriptors
+                                    )
+                                )
                             )
                         ),
                         (
@@ -5046,12 +5158,12 @@ macro_rules! GetLocalBufferDescriptor {
                                             $crate::__pgrx_c_macros::expression::place::<
                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                        $crate::BufferDesc
+                                                        $crate::__pgrx_c_bindings::BufferDesc
                                                     >,
                                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                                 >>(
                                                 ::core::ptr::addr_of_mut!(
-                                                    $crate::LocalBufferDescriptors
+                                                    $crate::__pgrx_c_bindings::LocalBufferDescriptors
                                                 )
                                             )
                                         )
@@ -5085,10 +5197,14 @@ macro_rules! GetLocalBufferDescriptor {
                                 $crate::__pgrx_c_macros::expression::place::<
                                     $crate::__pgrx_c_macros::expression::CPointer<
                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                            $crate::BufferDesc
+                                            $crate::__pgrx_c_bindings::BufferDesc
                                         >,
                                         $crate::__pgrx_c_macros::expression::ReadWrite
-                                    >>(::core::ptr::addr_of_mut!($crate::LocalBufferDescriptors))
+                                    >>(
+                                    ::core::ptr::addr_of_mut!(
+                                        $crate::__pgrx_c_bindings::LocalBufferDescriptors
+                                    )
+                                )
                             )
                         ),
                         (
@@ -5110,8 +5226,8 @@ macro_rules! GetLocalBufferDescriptor {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -5139,13 +5255,13 @@ macro_rules! __pgrx_c_args_INIT_BUFFERTAG {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_INIT_BUFFERTAG!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_INIT_BUFFERTAG!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -5154,7 +5270,7 @@ macro_rules! __pgrx_c_args_INIT_BUFFERTAG {
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_INIT_BUFFERTAG!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -5181,25 +5297,25 @@ macro_rules! __pgrx_c_args_INIT_BUFFERTAG {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_INIT_BUFFERTAG!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_INIT_BUFFERTAG!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_INIT_BUFFERTAG!(
-            @p2 $mode [$($done)* (@literal [- $argument]),];
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_INIT_BUFFERTAG!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -5208,7 +5324,7 @@ macro_rules! __pgrx_c_args_INIT_BUFFERTAG {
     };
     (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_INIT_BUFFERTAG!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -5235,25 +5351,25 @@ macro_rules! __pgrx_c_args_INIT_BUFFERTAG {
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_INIT_BUFFERTAG!(
-            @p2 $mode [$($done)* (@literal [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_INIT_BUFFERTAG!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
     (@p2 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_INIT_BUFFERTAG!(
-            @p3 $mode [$($done)* (@literal [- $argument]),];
+            @p3 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative2 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_INIT_BUFFERTAG!(
-            @p3 $mode [$($done)* (@native [$argument]),];
+            @p3 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -5262,7 +5378,7 @@ macro_rules! __pgrx_c_args_INIT_BUFFERTAG {
     };
     (@p2 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_INIT_BUFFERTAG!(
-            @p3 $mode [$($done)* (@native [$argument]),];
+            @p3 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -5289,31 +5405,35 @@ macro_rules! __pgrx_c_args_INIT_BUFFERTAG {
     };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_INIT_BUFFERTAG!(
-            @p3 $mode [$($done)* (@literal [$argument]),];
+            @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p2 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_INIT_BUFFERTAG!(
-            @p3 $mode [$($done)* (@native [$argument]),];
+            @p3 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
     (@p3 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_INIT_BUFFERTAG!(@p4 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_INIT_BUFFERTAG!(
+            @p4 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative3 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_INIT_BUFFERTAG!(@p4 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_INIT_BUFFERTAG!(
+            @p4 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p3 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_INIT_BUFFERTAG!(
-            @p4 $mode [$($done)* (@literal [- $argument]),];
+            @p4 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative3 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_INIT_BUFFERTAG!(
-            @p4 $mode [$($done)* (@native [$argument]),];
+            @p4 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -5321,7 +5441,9 @@ macro_rules! __pgrx_c_args_INIT_BUFFERTAG {
         $crate::__pgrx_c_args_INIT_BUFFERTAG!(@negative3 $mode [$($done)*]; - $($raw)*)
     };
     (@p3 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_INIT_BUFFERTAG!(@p4 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_INIT_BUFFERTAG!(
+            @p4 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p3 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -5343,14 +5465,18 @@ macro_rules! __pgrx_c_args_INIT_BUFFERTAG {
         )
     };
     (@p3 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_INIT_BUFFERTAG!(@p4 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_INIT_BUFFERTAG!(
+            @p4 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p3 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_INIT_BUFFERTAG!(@p4 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_INIT_BUFFERTAG!(
+            @p4 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p3 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_INIT_BUFFERTAG!(
-            @p4 $mode [$($done)* (@native [$argument]),];
+            @p4 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -5377,13 +5503,13 @@ macro_rules! __pgrx_c_args_INIT_BUFFERTAG {
     };
     (@p3 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_INIT_BUFFERTAG!(
-            @p4 $mode [$($done)* (@literal [$argument]),];
+            @p4 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p3 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_INIT_BUFFERTAG!(
-            @p4 $mode [$($done)* (@native [$argument]),];
+            @p4 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };

@@ -5,8 +5,8 @@ This code is generated for documentation purposes, so that it is easy to referen
 // C macros from itup.h.
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -37,23 +37,23 @@ macro_rules! __pgrx_c_args_IndexInfoFindDataOffset {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
         $crate::__pgrx_c_args_IndexInfoFindDataOffset!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_IndexInfoFindDataOffset!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_IndexInfoFindDataOffset!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_IndexInfoFindDataOffset!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -62,7 +62,7 @@ macro_rules! __pgrx_c_args_IndexInfoFindDataOffset {
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
         $crate::__pgrx_c_args_IndexInfoFindDataOffset!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
@@ -88,17 +88,17 @@ macro_rules! __pgrx_c_args_IndexInfoFindDataOffset {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_IndexInfoFindDataOffset!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_IndexInfoFindDataOffset!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_IndexInfoFindDataOffset!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -125,13 +125,13 @@ macro_rules! __pgrx_c_args_IndexInfoFindDataOffset {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_IndexInfoFindDataOffset!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_IndexInfoFindDataOffset!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -208,7 +208,9 @@ macro_rules! IndexInfoFindDataOffset {
                                                 >(
                                                     $crate::__pgrx_c_macros::CValue::<
                                                         $crate::__pgrx_c_macros::CInt
-                                                    >::new($crate::INDEX_NULL_MASK as i32)
+                                                    >::new(
+                                                        $crate::__pgrx_c_bindings::INDEX_NULL_MASK as i32
+                                                    )
                                                 )
                                             )
                                         )
@@ -221,7 +223,7 @@ macro_rules! IndexInfoFindDataOffset {
                             (
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::cast_as::<
-                                        $crate::Size,
+                                        $crate::__pgrx_c_bindings::Size,
                                         $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                             $crate::__pgrx_c_macros::CUnsignedLong,
                                             usize
@@ -261,7 +263,7 @@ macro_rules! IndexInfoFindDataOffset {
                                                                                 >(
                                                                                     $crate::__pgrx_c_macros::expression::size_of::<
                                                                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                            $crate::IndexTupleData
+                                                                                            $crate::__pgrx_c_bindings::IndexTupleData
                                                                                         >>()
                                                                                 )
                                                                             )
@@ -286,7 +288,7 @@ macro_rules! IndexInfoFindDataOffset {
                                                                                     $crate::__pgrx_c_macros::CValue::<
                                                                                         $crate::__pgrx_c_macros::CInt
                                                                                     >::new(
-                                                                                        $crate::MAXIMUM_ALIGNOF as i32
+                                                                                        $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                                     )
                                                                                 )
                                                                             ),
@@ -337,7 +339,7 @@ macro_rules! IndexInfoFindDataOffset {
                                                                                             $crate::__pgrx_c_macros::CValue::<
                                                                                                 $crate::__pgrx_c_macros::CInt
                                                                                             >::new(
-                                                                                                $crate::MAXIMUM_ALIGNOF as i32
+                                                                                                $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                                             )
                                                                                         )
                                                                                     ),
@@ -369,7 +371,7 @@ macro_rules! IndexInfoFindDataOffset {
                             (
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::cast_as::<
-                                        $crate::Size,
+                                        $crate::__pgrx_c_bindings::Size,
                                         $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                             $crate::__pgrx_c_macros::CUnsignedLong,
                                             usize
@@ -418,7 +420,7 @@ macro_rules! IndexInfoFindDataOffset {
                                                                                         >(
                                                                                             $crate::__pgrx_c_macros::expression::size_of::<
                                                                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                    $crate::IndexTupleData
+                                                                                                    $crate::__pgrx_c_bindings::IndexTupleData
                                                                                                 >>()
                                                                                         ),
                                                                                         $crate::__pgrx_c_macros::expression::profile_value::<
@@ -427,7 +429,7 @@ macro_rules! IndexInfoFindDataOffset {
                                                                                         >(
                                                                                             $crate::__pgrx_c_macros::expression::size_of::<
                                                                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                    $crate::IndexAttributeBitMapData
+                                                                                                    $crate::__pgrx_c_bindings::IndexAttributeBitMapData
                                                                                                 >>()
                                                                                         )
                                                                                     )
@@ -454,7 +456,7 @@ macro_rules! IndexInfoFindDataOffset {
                                                                                     $crate::__pgrx_c_macros::CValue::<
                                                                                         $crate::__pgrx_c_macros::CInt
                                                                                     >::new(
-                                                                                        $crate::MAXIMUM_ALIGNOF as i32
+                                                                                        $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                                     )
                                                                                 )
                                                                             ),
@@ -505,7 +507,7 @@ macro_rules! IndexInfoFindDataOffset {
                                                                                             $crate::__pgrx_c_macros::CValue::<
                                                                                                 $crate::__pgrx_c_macros::CInt
                                                                                             >::new(
-                                                                                                $crate::MAXIMUM_ALIGNOF as i32
+                                                                                                $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                                             )
                                                                                         )
                                                                                     ),
@@ -596,7 +598,7 @@ macro_rules! IndexInfoFindDataOffset {
                                                                 $crate::__pgrx_c_macros::CValue::<
                                                                     $crate::__pgrx_c_macros::CInt
                                                                 >::new(
-                                                                    $crate::INDEX_NULL_MASK as i32
+                                                                    $crate::__pgrx_c_bindings::INDEX_NULL_MASK as i32
                                                                 )
                                                             )
                                                         )
@@ -613,7 +615,7 @@ macro_rules! IndexInfoFindDataOffset {
                                                 _
                                             >(
                                                 $crate::__pgrx_c_macros::expression::cast_as::<
-                                                    $crate::Size,
+                                                    $crate::__pgrx_c_bindings::Size,
                                                     $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                         $crate::__pgrx_c_macros::CUnsignedLong,
                                                         usize
@@ -653,7 +655,7 @@ macro_rules! IndexInfoFindDataOffset {
                                                                                             >(
                                                                                                 $crate::__pgrx_c_macros::expression::size_of::<
                                                                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                        $crate::IndexTupleData
+                                                                                                        $crate::__pgrx_c_bindings::IndexTupleData
                                                                                                     >>()
                                                                                             )
                                                                                         )
@@ -678,7 +680,7 @@ macro_rules! IndexInfoFindDataOffset {
                                                                                                 $crate::__pgrx_c_macros::CValue::<
                                                                                                     $crate::__pgrx_c_macros::CInt
                                                                                                 >::new(
-                                                                                                    $crate::MAXIMUM_ALIGNOF as i32
+                                                                                                    $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                                                 )
                                                                                             )
                                                                                         ),
@@ -731,7 +733,7 @@ macro_rules! IndexInfoFindDataOffset {
                                                                                                         $crate::__pgrx_c_macros::CValue::<
                                                                                                             $crate::__pgrx_c_macros::CInt
                                                                                                         >::new(
-                                                                                                            $crate::MAXIMUM_ALIGNOF as i32
+                                                                                                            $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                                                         )
                                                                                                     )
                                                                                                 ),
@@ -768,7 +770,7 @@ macro_rules! IndexInfoFindDataOffset {
                                                 _
                                             >(
                                                 $crate::__pgrx_c_macros::expression::cast_as::<
-                                                    $crate::Size,
+                                                    $crate::__pgrx_c_bindings::Size,
                                                     $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                         $crate::__pgrx_c_macros::CUnsignedLong,
                                                         usize
@@ -817,7 +819,7 @@ macro_rules! IndexInfoFindDataOffset {
                                                                                                     >(
                                                                                                         $crate::__pgrx_c_macros::expression::size_of::<
                                                                                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                                $crate::IndexTupleData
+                                                                                                                $crate::__pgrx_c_bindings::IndexTupleData
                                                                                                             >>()
                                                                                                     ),
                                                                                                     $crate::__pgrx_c_macros::expression::profile_value::<
@@ -826,7 +828,7 @@ macro_rules! IndexInfoFindDataOffset {
                                                                                                     >(
                                                                                                         $crate::__pgrx_c_macros::expression::size_of::<
                                                                                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                                $crate::IndexAttributeBitMapData
+                                                                                                                $crate::__pgrx_c_bindings::IndexAttributeBitMapData
                                                                                                             >>()
                                                                                                     )
                                                                                                 )
@@ -853,7 +855,7 @@ macro_rules! IndexInfoFindDataOffset {
                                                                                                 $crate::__pgrx_c_macros::CValue::<
                                                                                                     $crate::__pgrx_c_macros::CInt
                                                                                                 >::new(
-                                                                                                    $crate::MAXIMUM_ALIGNOF as i32
+                                                                                                    $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                                                 )
                                                                                             )
                                                                                         ),
@@ -906,7 +908,7 @@ macro_rules! IndexInfoFindDataOffset {
                                                                                                         $crate::__pgrx_c_macros::CValue::<
                                                                                                             $crate::__pgrx_c_macros::CInt
                                                                                                         >::new(
-                                                                                                            $crate::MAXIMUM_ALIGNOF as i32
+                                                                                                            $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                                                         )
                                                                                                     )
                                                                                                 ),
@@ -980,7 +982,9 @@ macro_rules! IndexInfoFindDataOffset {
                                                 >(
                                                     $crate::__pgrx_c_macros::CValue::<
                                                         $crate::__pgrx_c_macros::CInt
-                                                    >::new($crate::INDEX_NULL_MASK as i32)
+                                                    >::new(
+                                                        $crate::__pgrx_c_bindings::INDEX_NULL_MASK as i32
+                                                    )
                                                 )
                                             )
                                         )
@@ -993,7 +997,7 @@ macro_rules! IndexInfoFindDataOffset {
                             (
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::cast_as::<
-                                        $crate::Size,
+                                        $crate::__pgrx_c_bindings::Size,
                                         $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                             $crate::__pgrx_c_macros::CUnsignedLong,
                                             usize
@@ -1033,7 +1037,7 @@ macro_rules! IndexInfoFindDataOffset {
                                                                                 >(
                                                                                     $crate::__pgrx_c_macros::expression::size_of::<
                                                                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                            $crate::IndexTupleData
+                                                                                            $crate::__pgrx_c_bindings::IndexTupleData
                                                                                         >>()
                                                                                 )
                                                                             )
@@ -1058,7 +1062,7 @@ macro_rules! IndexInfoFindDataOffset {
                                                                                     $crate::__pgrx_c_macros::CValue::<
                                                                                         $crate::__pgrx_c_macros::CInt
                                                                                     >::new(
-                                                                                        $crate::MAXIMUM_ALIGNOF as i32
+                                                                                        $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                                     )
                                                                                 )
                                                                             ),
@@ -1109,7 +1113,7 @@ macro_rules! IndexInfoFindDataOffset {
                                                                                             $crate::__pgrx_c_macros::CValue::<
                                                                                                 $crate::__pgrx_c_macros::CInt
                                                                                             >::new(
-                                                                                                $crate::MAXIMUM_ALIGNOF as i32
+                                                                                                $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                                             )
                                                                                         )
                                                                                     ),
@@ -1141,7 +1145,7 @@ macro_rules! IndexInfoFindDataOffset {
                             (
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::cast_as::<
-                                        $crate::Size,
+                                        $crate::__pgrx_c_bindings::Size,
                                         $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                             $crate::__pgrx_c_macros::CUnsignedLong,
                                             usize
@@ -1190,7 +1194,7 @@ macro_rules! IndexInfoFindDataOffset {
                                                                                         >(
                                                                                             $crate::__pgrx_c_macros::expression::size_of::<
                                                                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                    $crate::IndexTupleData
+                                                                                                    $crate::__pgrx_c_bindings::IndexTupleData
                                                                                                 >>()
                                                                                         ),
                                                                                         $crate::__pgrx_c_macros::expression::profile_value::<
@@ -1199,7 +1203,7 @@ macro_rules! IndexInfoFindDataOffset {
                                                                                         >(
                                                                                             $crate::__pgrx_c_macros::expression::size_of::<
                                                                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                    $crate::IndexAttributeBitMapData
+                                                                                                    $crate::__pgrx_c_bindings::IndexAttributeBitMapData
                                                                                                 >>()
                                                                                         )
                                                                                     )
@@ -1226,7 +1230,7 @@ macro_rules! IndexInfoFindDataOffset {
                                                                                     $crate::__pgrx_c_macros::CValue::<
                                                                                         $crate::__pgrx_c_macros::CInt
                                                                                     >::new(
-                                                                                        $crate::MAXIMUM_ALIGNOF as i32
+                                                                                        $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                                     )
                                                                                 )
                                                                             ),
@@ -1277,7 +1281,7 @@ macro_rules! IndexInfoFindDataOffset {
                                                                                             $crate::__pgrx_c_macros::CValue::<
                                                                                                 $crate::__pgrx_c_macros::CInt
                                                                                             >::new(
-                                                                                                $crate::MAXIMUM_ALIGNOF as i32
+                                                                                                $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                                             )
                                                                                         )
                                                                                     ),
@@ -1318,8 +1322,8 @@ macro_rules! IndexInfoFindDataOffset {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -1346,20 +1350,24 @@ macro_rules! __pgrx_c_args_IndexTupleHasNulls {
         $crate::__pgrx_c_args_IndexTupleHasNulls!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_IndexTupleHasNulls!(@p1 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_IndexTupleHasNulls!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_IndexTupleHasNulls!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_IndexTupleHasNulls!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_IndexTupleHasNulls!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_IndexTupleHasNulls!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -1367,7 +1375,9 @@ macro_rules! __pgrx_c_args_IndexTupleHasNulls {
         $crate::__pgrx_c_args_IndexTupleHasNulls!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_IndexTupleHasNulls!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_IndexTupleHasNulls!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -1389,14 +1399,18 @@ macro_rules! __pgrx_c_args_IndexTupleHasNulls {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_IndexTupleHasNulls!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_IndexTupleHasNulls!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_IndexTupleHasNulls!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_IndexTupleHasNulls!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_IndexTupleHasNulls!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -1423,13 +1437,13 @@ macro_rules! __pgrx_c_args_IndexTupleHasNulls {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_IndexTupleHasNulls!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_IndexTupleHasNulls!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -1490,10 +1504,10 @@ macro_rules! IndexTupleHasNulls {
                                                 _
                                             >(
                                                 $crate::__pgrx_c_macros::expression::cast_as::<
-                                                    $crate::IndexTuple,
+                                                    $crate::__pgrx_c_bindings::IndexTuple,
                                                     $crate::__pgrx_c_macros::expression::CPointer<
                                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                                            $crate::IndexTupleData
+                                                            $crate::__pgrx_c_bindings::IndexTupleData
                                                         >,
                                                         $crate::__pgrx_c_macros::expression::ReadWrite
                                                     >,
@@ -1519,7 +1533,7 @@ macro_rules! IndexTupleHasNulls {
                         ),
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                $crate::INDEX_NULL_MASK as i32
+                                $crate::__pgrx_c_bindings::INDEX_NULL_MASK as i32
                             )
                         )
                     )
@@ -1568,10 +1582,10 @@ macro_rules! IndexTupleHasNulls {
                                                         _
                                                     >(
                                                         $crate::__pgrx_c_macros::expression::cast_as::<
-                                                            $crate::IndexTuple,
+                                                            $crate::__pgrx_c_bindings::IndexTuple,
                                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                                    $crate::IndexTupleData
+                                                                    $crate::__pgrx_c_bindings::IndexTupleData
                                                                 >,
                                                                 $crate::__pgrx_c_macros::expression::ReadWrite
                                                             >,
@@ -1597,7 +1611,7 @@ macro_rules! IndexTupleHasNulls {
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                        $crate::INDEX_NULL_MASK as i32
+                                        $crate::__pgrx_c_bindings::INDEX_NULL_MASK as i32
                                     )
                                 )
                             )
@@ -1630,10 +1644,10 @@ macro_rules! IndexTupleHasNulls {
                                             _
                                         >(
                                             $crate::__pgrx_c_macros::expression::cast_as::<
-                                                $crate::IndexTuple,
+                                                $crate::__pgrx_c_bindings::IndexTuple,
                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                        $crate::IndexTupleData
+                                                        $crate::__pgrx_c_bindings::IndexTupleData
                                                     >,
                                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                                 >,
@@ -1659,7 +1673,7 @@ macro_rules! IndexTupleHasNulls {
                     ),
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                            $crate::INDEX_NULL_MASK as i32
+                            $crate::__pgrx_c_bindings::INDEX_NULL_MASK as i32
                         )
                     )
                 )
@@ -1675,8 +1689,8 @@ macro_rules! IndexTupleHasNulls {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -1707,21 +1721,23 @@ macro_rules! __pgrx_c_args_IndexTupleHasVarwidths {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
         $crate::__pgrx_c_args_IndexTupleHasVarwidths!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_IndexTupleHasVarwidths!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_IndexTupleHasVarwidths!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_IndexTupleHasVarwidths!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_IndexTupleHasVarwidths!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -1729,7 +1745,9 @@ macro_rules! __pgrx_c_args_IndexTupleHasVarwidths {
         $crate::__pgrx_c_args_IndexTupleHasVarwidths!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_IndexTupleHasVarwidths!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_IndexTupleHasVarwidths!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -1754,15 +1772,17 @@ macro_rules! __pgrx_c_args_IndexTupleHasVarwidths {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_IndexTupleHasVarwidths!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_IndexTupleHasVarwidths!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_IndexTupleHasVarwidths!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_IndexTupleHasVarwidths!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -1789,13 +1809,13 @@ macro_rules! __pgrx_c_args_IndexTupleHasVarwidths {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_IndexTupleHasVarwidths!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_IndexTupleHasVarwidths!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -1859,10 +1879,10 @@ macro_rules! IndexTupleHasVarwidths {
                                                 _
                                             >(
                                                 $crate::__pgrx_c_macros::expression::cast_as::<
-                                                    $crate::IndexTuple,
+                                                    $crate::__pgrx_c_bindings::IndexTuple,
                                                     $crate::__pgrx_c_macros::expression::CPointer<
                                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                                            $crate::IndexTupleData
+                                                            $crate::__pgrx_c_bindings::IndexTupleData
                                                         >,
                                                         $crate::__pgrx_c_macros::expression::ReadWrite
                                                     >,
@@ -1888,7 +1908,7 @@ macro_rules! IndexTupleHasVarwidths {
                         ),
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                $crate::INDEX_VAR_MASK as i32
+                                $crate::__pgrx_c_bindings::INDEX_VAR_MASK as i32
                             )
                         )
                     )
@@ -1937,10 +1957,10 @@ macro_rules! IndexTupleHasVarwidths {
                                                         _
                                                     >(
                                                         $crate::__pgrx_c_macros::expression::cast_as::<
-                                                            $crate::IndexTuple,
+                                                            $crate::__pgrx_c_bindings::IndexTuple,
                                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                                    $crate::IndexTupleData
+                                                                    $crate::__pgrx_c_bindings::IndexTupleData
                                                                 >,
                                                                 $crate::__pgrx_c_macros::expression::ReadWrite
                                                             >,
@@ -1966,7 +1986,7 @@ macro_rules! IndexTupleHasVarwidths {
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                        $crate::INDEX_VAR_MASK as i32
+                                        $crate::__pgrx_c_bindings::INDEX_VAR_MASK as i32
                                     )
                                 )
                             )
@@ -1999,10 +2019,10 @@ macro_rules! IndexTupleHasVarwidths {
                                             _
                                         >(
                                             $crate::__pgrx_c_macros::expression::cast_as::<
-                                                $crate::IndexTuple,
+                                                $crate::__pgrx_c_bindings::IndexTuple,
                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                        $crate::IndexTupleData
+                                                        $crate::__pgrx_c_bindings::IndexTupleData
                                                     >,
                                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                                 >,
@@ -2028,7 +2048,7 @@ macro_rules! IndexTupleHasVarwidths {
                     ),
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                            $crate::INDEX_VAR_MASK as i32
+                            $crate::__pgrx_c_bindings::INDEX_VAR_MASK as i32
                         )
                     )
                 )
@@ -2044,8 +2064,8 @@ macro_rules! IndexTupleHasVarwidths {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -2072,20 +2092,24 @@ macro_rules! __pgrx_c_args_IndexTupleSize {
         $crate::__pgrx_c_args_IndexTupleSize!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_IndexTupleSize!(@p1 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_IndexTupleSize!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_IndexTupleSize!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_IndexTupleSize!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_IndexTupleSize!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_IndexTupleSize!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -2093,7 +2117,9 @@ macro_rules! __pgrx_c_args_IndexTupleSize {
         $crate::__pgrx_c_args_IndexTupleSize!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_IndexTupleSize!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_IndexTupleSize!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -2115,14 +2141,18 @@ macro_rules! __pgrx_c_args_IndexTupleSize {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_IndexTupleSize!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_IndexTupleSize!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_IndexTupleSize!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_IndexTupleSize!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_IndexTupleSize!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -2149,13 +2179,13 @@ macro_rules! __pgrx_c_args_IndexTupleSize {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_IndexTupleSize!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_IndexTupleSize!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -2201,7 +2231,7 @@ macro_rules! IndexTupleSize {
         (
             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::cast_as::<
-                    $crate::Size,
+                    $crate::__pgrx_c_bindings::Size,
                     $crate::__pgrx_c_macros::expression::CIntegerStorage<
                         $crate::__pgrx_c_macros::CUnsignedLong,
                         usize
@@ -2236,7 +2266,7 @@ macro_rules! IndexTupleSize {
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                        $crate::INDEX_SIZE_MASK as i32
+                                        $crate::__pgrx_c_bindings::INDEX_SIZE_MASK as i32
                                     )
                                 )
                             )
@@ -2273,7 +2303,7 @@ macro_rules! IndexTupleSize {
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::cast_as::<
-                                $crate::Size,
+                                $crate::__pgrx_c_bindings::Size,
                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                     $crate::__pgrx_c_macros::CUnsignedLong,
                                     usize
@@ -2315,7 +2345,9 @@ macro_rules! IndexTupleSize {
                                             >(
                                                 $crate::__pgrx_c_macros::CValue::<
                                                     $crate::__pgrx_c_macros::CInt
-                                                >::new($crate::INDEX_SIZE_MASK as i32)
+                                                >::new(
+                                                    $crate::__pgrx_c_bindings::INDEX_SIZE_MASK as i32
+                                                )
                                             )
                                         )
                                     )
@@ -2336,7 +2368,7 @@ macro_rules! IndexTupleSize {
         {
             let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::cast_as::<
-                    $crate::Size,
+                    $crate::__pgrx_c_bindings::Size,
                     $crate::__pgrx_c_macros::expression::CIntegerStorage<
                         $crate::__pgrx_c_macros::CUnsignedLong,
                         usize
@@ -2371,7 +2403,7 @@ macro_rules! IndexTupleSize {
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                        $crate::INDEX_SIZE_MASK as i32
+                                        $crate::__pgrx_c_bindings::INDEX_SIZE_MASK as i32
                                     )
                                 )
                             )

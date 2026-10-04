@@ -6,6 +6,10 @@ This code is generated for documentation purposes, so that it is easy to referen
 mod hashfn;
 #[allow(unused_imports)]
 pub use hashfn::*;
+#[path = "kwlookup.rs"]
+mod kwlookup;
+#[allow(unused_imports)]
+pub use kwlookup::*;
 #[path = "pg_lzcompress.rs"]
 mod pg_lzcompress;
 #[allow(unused_imports)]

@@ -4,8 +4,9 @@ This document describes how to rebuild the `pgrx-c-macros` pipeline and its
 integration with pgrx. It explains the data passed between phases, the algorithms
 that establish C semantics, the generated Rust and C code, and the conditions
 under which generation must refuse a macro. The implementation described here
-is the current runtime transpiler; it does not promise const evaluation or
-support for arbitrary C programs.
+is the current runtime transpiler. Its macro definitions do not promise const
+evaluation or support for arbitrary C programs; independently proved object
+constants use a separate binding path.
 
 The intended readers understand Rust, C expressions, and basic compiler concepts.
 An *identity* below means a C type or declaration, including distinctions that
@@ -18,17 +19,22 @@ that establishes a fact needed by the next phase.
 The input is a PostgreSQL installation, pgrx's version-specific wrapper header,
 and that installation's C compilation settings. The output is:
 
-- Rust `macro_rules!` definitions for supported function-like C macros.
+- Rust `macro_rules!` definitions for supported function-like C macros and
+  explicitly selected object expressions with zero-argument invocation.
+- Independently compiler-proved integer object constants missing from bindgen.
 - Shared Rust capability implementations derived from C declarations and the
   actual Rust bindings for the selected build.
-- Optional generated C accessors and call adapters, compiled into a static
-  archive and linked into the extension.
+- Generated C accessors, call adapters, static-inline wrappers and immutable
+  declaration metadata, compiled into the active version's native archive.
 - A report containing the selected profile, original definitions, provenance,
   analysis, emitted source, and reasons for skipping other macros.
 
-Object-like macros and external headers remain available as preprocessing
-context. They do not become public macro candidates. Handwritten pgrx ports
-are useful for finding test subjects, but never establish the meaning of C.
+Unselected object-like macros and external headers remain preprocessing context.
+Ordinary CLI discovery still lists function-like definitions. Library callers can
+select object roots; the binding build selects owned objects that depend on
+declared variables, while pure integer objects are candidates for constants.
+Original installed C definitions establish semantics. Test-only primitive names
+survive deletion of handwritten Rust ports and confer no production signature.
 
 ```text
  pgrx-pg-config                 pgrx-pg-sys/include/pgNN.h
@@ -44,7 +50,7 @@ are useful for finding test subjects, but never establish the meaning of C.
            FrontendOutput
                     |
           +---------v----------+
-          | Prepared session   |  expansion, constant and zero proofs
+          | Prepared session   |  function/object roots, constant + zero proofs
           +---------+----------+
                     |
           +---------v----------+       fresh bindgen output
@@ -59,9 +65,9 @@ are useful for finding test subjects, but never establish the meaning of C.
                       | Rust macro lowering   |
                       +-----------+-----------+
                                   |
-                    MacroGeneration
+                    MacroGeneration + immutable C metadata
                  /                |                 \
-        macro definitions    Rust support         C support
+        macro definitions    Rust support         C support + inline wrappers
                  |                |                 |
                  +--------+-------+           compile + archive
                           |                         |
@@ -70,6 +76,14 @@ are useful for finding test subjects, but never establish the meaning of C.
                      pgrx-pg-sys <-------------------+
                           |
                    pgrx root exports
+
+             trusted matching target build
+                    |
+ Complete target bundle: raw bindings + macros/report + wrapper/native archive
+                    |
+           bounded integrity/domain checks
+                    |
+           same publication/link path (no header inspection on import)
 ```
 
 The transpiler owns the interpretation of the supported expression and statement
@@ -117,7 +131,7 @@ the generated expression uses an allowed order.
 | --- | --- |
 | `pgrx-c-macros` | Discovery, compiler agreement, expansion, parsing, analysis, reconciliation, demand planning, and source emission. |
 | `pgrx-pg-config` | Installation/version resolution and PostgreSQL's recorded build settings. |
-| `pgrx-bindgen` | The current bindgen invocation, collection of Rust binding facts, artifact publication, Cargo invalidation, and native archive linkage. |
+| `pgrx-bindgen` | The current bindgen invocation, collection of Rust binding facts, immutable C metadata bridges, complete target bundles, publication, Cargo invalidation, and native archive linkage. |
 | `pgrx-pg-sys/src/c_macros/` | The reusable Rust implementation of modeled C value, conversion, place, and statement semantics. |
 | `pgrx-pg-sys` generated code | Build-specific C identities, native storage bridges, field/call capabilities, and public macros. |
 | `pgrx` | Reexports of the generated public macro modules. |
@@ -147,8 +161,8 @@ different names:
 | `MacroGeneration` | Per-root `MacroEmission` values and one `MacroSupportArtifact` containing Rust and optional C source. | Macros and their required support must be published together. |
 
 The target model includes the C triple, byte order, byte and pointer widths,
-function-pointer layout, `size_t` identity, integer widths/ranks, signed plain
-`char`, floating representation and mode, supported C standard, basic character
+function-pointer layout, `size_t` identity, integer widths/ranks, plain-char
+signedness, floating representation and mode, supported C standard, basic character
 encoding, and verified `offsetof` behavior. Structural types retain const and
 volatile qualification at each relevant layer. Array bounds, incomplete arrays,
 records, functions, and pointers remain structural relationships rather than
@@ -213,6 +227,26 @@ can run without accepting options that write unrelated outputs or replace the
 input language. Preserve language, target, include, macro, ABI, and semantic
 settings. Classify known semantic flags explicitly. Unknown semantic settings
 remain visible in `unsupported_options`; generation must not guess their effect.
+Recorded MSVC fragments use Windows argument quoting rather than POSIX shell
+escaping. Translate only reviewed options to GNU-style Clang semantics; refuse
+unknown options instead of dropping a potentially relevant mode. This supports
+a checked x86_64 Windows/MSVC LLP64 family, not arbitrary Windows compilers or
+proof of backend execution on that platform.
+
+Runtime options are ordered intermediate markers until the complete MSVC argv
+has been assembled. `lower_msvc_runtime_flags` selects its final `/MD[d]` or
+`/MT[d]` mode once across recorded fragments and explicit profile arguments.
+Place the selected `_MT`, optional `_DLL` and optional `_DEBUG` predefines before
+user `-D`/`-U` arguments, and retain the selected CRT plus `oldnames` as closed
+cc1 dependent-library options. Static modes also retain the CL driver's standard
+library visibility setting. These options preserve original native COFF linker
+directives without requiring the newer `-fms-runtime-lib` driver switch.
+Known option operands cannot become runtime selectors; refuse unknown arity when
+folding is required. Bindgen's internally appended environment tail must not
+contain a runtime selection that would make inspection and binding flags differ.
+The inspected MSVC ABI can carry a numeric version suffix; use the same
+`TargetFacts::uses_msvc_abi` decision for object extensions, archive conventions
+and omission of the unsupported GNU PIC flag.
 
 Signed arithmetic follows the recorded `Undefined`, `Wrapping`, or `Trapping`
 policy. The current helper gate accepts the first two and refuses trapping
@@ -231,11 +265,15 @@ by the compiler's layout facts; other attributes still need a specific proof.
 The initial parse may skip function bodies. Three bounded passes add facts that
 cannot be inferred from a declaration's name or broad type category:
 
-1. **Static inline definitions.** Gather unresolved internal-linkage static
+1. **Static inline definitions.** Gather internal-linkage static
    inline candidates, then reparse once with bodies enabled. Require an actual
    definition and agreement on linkage, inline status, result, parameters,
    variadic status, and calling convention. A declaration with braces nearby
-   does not establish that the included definition is available.
+   does not establish that the included definition is available. Retain physical
+   source spans, original formals and bounded definition text from that same
+   parse. Header contents are copied once per physical source, rather than once
+   per function; the common input fingerprints identify bodies for native adapter
+   hashes, which serialize only the prototype and linkage.
 2. **Bitfield operations.** For each named bitfield whose containing record has
    a usable C spelling, probe unary-plus promotion, assignment-result type and
    promotion, and postfix-result type and
@@ -271,15 +309,21 @@ origin or record unresolved/ambiguous provenance. Logical `#line` locations do
 not establish physical file ownership. Keep the main file's original spelling:
 canonicalizing it for invocation could change symlink-relative quoted includes.
 Ignore comment tokens in matching and deduplicate repeated observations of the
-same physical `(file, offset)` definition. Tokenize the driver dump through a
+same physical `(file, offset)` definition. Within one exact signature, repeated
+definitions without a physical location describe one compiler or command-line
+context; they do not create competing header origins. A source-less match remains
+distinct from every physical match, so mixed origins still require an ambiguity
+report. Tokenize the driver dump through a
 protected replay with terminal markers so one literal trailing backslash cannot
 splice the next dumped definition.
 
 Public candidates are final active function-like definitions whose physical
 header resolves inside `pg_config --includedir-server`. Canonicalize the ownership
 comparison, so symlinks, `..`, and similarly named neighboring directories cannot
-bypass it. External definitions, object macros, wrapper definitions outside the
-server tree, command-line macros, and compiler predefines remain context.
+bypass it. `postgres_object_macro_names` applies the same ownership/provenance
+rules to explicitly selected object roots. External definitions, unselected
+objects, wrapper definitions outside the server tree, command-line macros, and
+compiler predefines remain context.
 If final provenance is unresolved or ambiguous but PostgreSQL-owned historical
 definitions exist, retain the selected name for a provenance skip report rather
 than silently losing it from the analysis results. `list` remains a historical
@@ -332,6 +376,31 @@ and restoration entirely between checks can escape fingerprint detection.
 
 `AnalysisSession::prepare` expands the requested names as a batch. Its output
 must preserve formal holes without assigning them one observed concrete type.
+`prepare_objects` selects object-like expression roots, and
+`prepare_with_objects` accepts separate object/function lists in one coherent
+batch. Object expansion observes `NAME`, not a fictitious C `NAME()` invocation;
+the generated Rust interface is `NAME!()`. Original object provenance and kind
+remain in the report. Statement/declaration fragments do not acquire support
+merely because they were selected as roots.
+
+`prepare_with_inline_functions` accepts a separate list of compiler-owned inline
+roots. Each must have a matching original internal-linkage static inline
+definition, a complete fixed C prototype and the admitted default convention.
+The original macro environment and expansion results remain unchanged. An active
+C macro wins a name collision. A private immutable root map feeds protected
+`(name)(arguments...)` call syntax to the existing analyzer, with private holes
+outside the declared identifier namespace. Original formals and physical source
+are retained separately for reporting and documentation. No preprocessing of a
+synthetic definition or per-function translation unit is needed.
+
+The normal native capability path preserves prototype conversions, qualifiers,
+original C result identity and guard boundaries. Function operands evaluate once;
+macro roots retain substitution, repetition and lazy/unevaluated contexts. Void
+calls produce a `CExpression<()>`, whose `.get()` yields `()`. An explicit
+`.is_true()` accepts C integer and bool predicate results without normalizing
+their original C types. Unsupported prototypes, ABIs, transport or source budgets
+retain structured refusals. Call source uses the shared root/token/source limits;
+refusal records can cover the bounded 16,384-function compiler catalog.
 
 ### Symbolic probes
 
@@ -357,7 +426,8 @@ probe's boundaries; isolate compiler-rejected probes rather than treating a
 partially successful batch as proof.
 
 Inspect each root's active dependency closure before and during expansion.
-Reject unsupported variadics, stringification, dynamic preprocessing builtins,
+Reject unsupported variadics, root stringification, dynamic preprocessing builtins
+outside the invocation-location contract,
 unproved pastes, ambiguous provenance, and budget overflows. A dependency's
 origin span is useful for an explanation; it is not an exact source map for each
 fully expanded token.
@@ -400,6 +470,23 @@ The retention recipe is deliberately stricter than general expression support:
 Numeric equality alone does not prove this transformation: masking can change
 rescan, token pasting, or C precedence. Optional typed batches bisect failures
 within a 32-attempt isolation bound.
+
+### Integer bindings omitted by bindgen
+
+`probe_integer_object_constants` is separate from atomic name retention. The
+binding build selects missing owned numeric object candidates, then proves valid
+constant initialization, canonical integer identity, and value with libclang and
+independent driver witnesses. Closed literal-suffix pastes require the compiler's
+actual typed result. Runtime calls/loads, dynamic builtins, incomplete facts, and failed
+witnesses cannot supply constants. Budgeted diagnostic isolation refuses bad
+candidates without treating a successful sibling as evidence for them.
+
+Rust storage follows the proved target signedness/width and `size_t` identity.
+Only absent bindings are supplemented; existing value disagreements still skip
+macros and their dependents. `ObjectIntegerConstants` retains accepted facts and
+rejected reasons in the report. Optional expression-name retention can fail even
+when a missing constant is proved: numeric equality does not authorize changing
+an ungrouped replacement list into one expression atom.
 
 ### Closed token pastes
 
@@ -498,8 +585,29 @@ suffix metadata. Decimal and nondecimal literals have different candidate C
 type lists. Select the first representable C type under the inspected target
 rules. Unary minus is a separate operation, not part of literal magnitude.
 Basic character constants require the established execution-character-set
-contract. Unsupported strings, character encodings, literal forms, and
-unrepresentable magnitudes produce explicit errors.
+contract. Ordinary closed strings decode the verified ASCII subset and modeled
+escapes, concatenate adjacent literals, preserve embedded zero bytes, and append
+one final zero. They lower to immutable static C char-array places with exact
+extent; value context decays the array, while size/address contexts retain it.
+They confer no write permission even though C string-literal syntax has array
+type. Wide/UTF-prefixed strings, unproved encodings, out-of-range escapes and
+unrepresentable integer magnitudes produce explicit errors.
+
+Clang can resolve closed dependency stringification into such literals. A
+dependency string containing formal markers retains its C text template and
+holes, but is admitted only as a grouped direct `const char *` argument of a
+fixed nonvariadic native void diagnostic. The emitted holes stringify outer
+Rust invocation tokens without evaluation; ASCII token spelling is checked.
+This contract does not promise a caller-dependent C array extent. Returning,
+addressing, measuring, concatenating, or doing pointer arithmetic on these
+diagnostic holes is refused, as is root `#` stringification.
+
+Invocation `__FILE__` and `__LINE__` remain symbolic until Rust expansion and
+use `file!()`/`line!()` rather than generator locations. Filename bytes become
+static zero-terminated storage; the line must fit the inspected C int. A
+dependency stringification of these markers remains a refusal because it would
+mix C preprocessing spelling with a Rust source-location contract. Other dynamic
+builtins, such as `__COUNTER__` and `__func__`, stay unsupported.
 
 ### Statement grammar
 
@@ -589,6 +697,18 @@ The baseline families are:
 | signed/unsigned `long` | 32 or 64 | 4 | Same kind |
 | signed/unsigned `long long` | 64 | 5 | Same kind |
 | signed/unsigned `__int128`, when available | 128 | 6 | Same kind |
+
+The frontend independently proves each fact; a triple alone cannot supply the
+table. Generated `__pgrx_c_types` aliases associate inspected integer typedefs
+with their precise C marker. Use those identities for `int64`, `Size`, timestamps
+and pointer-sized operands instead of selecting C long from storage width.
+Missing or incompatible target facts fail the support gate.
+
+`CSignedChar` and `CUnsignedChar` remain separate nominal types backed by `i8` and
+`u8`. Primitive operands and pointers retain those identities even when
+`core::ffi::c_char` aliases the same Rust primitive. Plain-char operands require
+an explicit `CValue<CChar>` or `Pointer<CChar, _>` tag; native fields, function
+signatures, and generated string arrays receive their compiler-established tag.
 
 Implement integer promotions first, then usual arithmetic conversions:
 
@@ -943,22 +1063,55 @@ not seeing an incompatible witness among selected macros does not prove
 uniqueness. Identity-only use does not retain nested callable machinery
 unnecessarily.
 
+Selected validated typedefs also receive aliases under `__pgrx_c_callbacks`,
+mirroring their actual Rust binding module paths. Each alias names
+`FunctionValue<its nominal marker>`; `.new(pointer)` accepts only that marker's
+exact native storage. This explicit selection adds no ABI cast and does not
+pretend ambiguous raw storage globally identifies one C prototype. Conflicting
+paths fail; rejected/unproven prototypes receive no constructor. The safe
+constructor does not call the pointer or discharge the unsafe invocation contract.
+
 ## 13. Generated C and native safety
 
 The macro bodies are translated to Rust. Some required primitives use generated
 C because Rust bindings alone do not provide the original C access or function
-identity. The C artifact contains three families:
+identity. The production C artifact includes these families:
 
 | Family | Generated C operation | Why C is needed |
 | --- | --- | --- |
 | Bitfields | Read/write the original named bitfield, with qualified/alignment variants. | Bindgen's backing storage/accessors cannot safely read an arbitrary partly initialized record as a Rust value. |
 | Native function adapters | Call the original declared function, including static inline definitions, with validated ABI transport. | A static inline function can have no ordinary exported symbol; aggregate and enum transport need validity-aware bridges. |
 | Original-address getters | Return the original C function address. | A Rust error-guard wrapper or a generated call thunk has a different address. |
+| Bindgen static-inline wrappers | Bind the original inline definition with ordinary guarded Rust FFI. | PostgreSQL versions can replace macros with inline functions; availability must not depend on `cshim`. |
+| Immutable declaration metadata | Initialize module magic and declare V1 function info through original C macros. | Initializer/declaration fragments are not runtime expression macro bodies. |
 
-These are access/call primitives, not wrappers that run the entire C macro in C
-instead of transpiling it. Branch-prediction hints and byte swaps use Rust
-support. C source is produced mechanically from the catalog and retained
-demands; there is no macro-name signature list or handwritten macro port.
+### Immutable declaration data
+
+The binding integration initializes a static const `Pg_magic_struct` with the
+original `PG_MODULE_MAGIC_DATA`, using its actual object/function invocation
+kind, and invokes `PG_FUNCTION_INFO_V1` with a profile-specific native name. Its
+actual emitted getter supplies the immutable function-info record. No copied
+magic version arithmetic, API-version literal or aggregate initializer supplies
+these values. Exported Rust entry points and custom static module name/version
+controls remain in pgrx; module magic is cached once.
+
+Before Rust copies or borrows these records, recursively reconcile exact binding
+paths, field types, fixed arrays and nested records against the Clang catalog.
+Emit C and Rust size/alignment and field-offset assertions, plus typed Rust field
+witnesses. Unrestricted integer storage and raw pointers with fully proved scalar
+pointee types/qualifications must be established;
+bools, enums, references, function pointers, packed/unresolved storage and other
+unproved aggregate validity do not pass merely because their bytes fit. These
+getters read immutable linked-module static data only: no backend state, callback
+or PostgreSQL ERROR can occur, so no backend guard is introduced around them.
+Profile-specific link names and hidden helper visibility prevent ordinary helper
+interposition from substituting another extension's layouts.
+
+Runtime expression macros still lower to Rust; their C helpers provide validated
+access/call primitives. Declaration metadata deliberately uses the original C
+initializer/declaration instead of copying it into Rust. Branch-prediction hints
+and byte swaps use Rust support. Catalog facts and retained demands generate
+runtime primitives without a macro-name signature list or handwritten port.
 
 ### Layout and access proofs
 
@@ -1051,18 +1204,27 @@ with `-x cpp-output`, so backend options cannot change header branches such as
 first phase only. The native backend suppresses unused-argument diagnostics for
 those already-consumed preprocessing flags with `-Qunused-arguments`.
 
-Native backend arguments append `-fPIC`, `-fno-lto`, `-ffunction-sections`, and
-`-fdata-sections`. Disabling LTO keeps ordinary machine code independent of LLVM
+Native backend arguments append `-fno-lto`, `-fvisibility=hidden`,
+`-ffunction-sections`, and `-fdata-sections`, plus `-fPIC` outside Windows targets.
+Verified MSVC objects retain one `oldnames` dependent-library directive for the
+CRT's legacy POSIX aliases, even when no runtime mode was recorded. This native
+linkage directive does not select a CRT or alter preprocessing definitions.
+Disabling LTO keeps ordinary machine code independent of LLVM
 release; section flags let the linker discard unused PostgreSQL entry points.
 Position-independent-code settings can affect compiler predefines; freezing the
 original preprocessing result preserves the selected C header semantics while
 still producing a shared-library-compatible object. The extra bounded compiler
 invocation is per native artifact, rather than per macro.
+Archive format follows the target: Unix-style `.a` or MSVC `.lib`. Archiver
+executable spelling follows the host running Clang, including Unix-host MSVC
+cross-compilation. This format/tool selection is not evidence of a working
+Windows PostgreSQL backend.
 
 Only the active Cargo PostgreSQL major gets a native archive linked. Release
 generation may still emit Rust snapshots for all configured supported versions.
-When `cshim` is enabled and macro C support is required, compile both sources in
-one translation unit:
+Bindgen static-inline wrappers are emitted unconditionally. When `cshim` is
+enabled, compile it with the wrappers, macro primitives and metadata in one
+translation unit:
 
 ```text
  generated pgrx_c_macros_pgNN.c
@@ -1072,7 +1234,7 @@ one translation unit:
        +--> version-specific bindgen static wrapper
                   |
                   +--> original pgNN.h (one include)
-   generated macro access/call/address helpers
+   generated macro access/call/address helpers + immutable metadata
        |
        v
  one object --> libpgrx_c_macros_pgNN.a --> extension
@@ -1081,9 +1243,10 @@ one translation unit:
 Some PostgreSQL implementation headers define external functions and have no
 include guard. Two objects, or a second header inclusion in one object, can
 redefine them. Combining the sources preserves shared external function/global
-identity without renaming those definitions. The build returns whether cshim
-was integrated; otherwise the existing standalone cshim build remains the
-fallback. Do not infer integration from an old file's existence.
+identity without renaming those definitions. The build returns whether cshim was
+integrated. Without cshim, the same active version archive still contains native
+inline wrappers, required primitives and metadata. Do not infer integration from
+an old file's existence.
 
 ## 14. Dependency failures and reports
 
@@ -1136,11 +1299,13 @@ do not force clients to classify English message fragments.
 
 A candidate is not a success. `MacroEmission::status` is either emitted source
 with its contract or a skip. Shared adapter failures or incoherent compiler
-inputs can fail the generation call as a whole before a new report is
-published. Every completed generation or unavailable result writes its JSON
-report. Cargo warnings are an independent output policy: unset or
+inputs can fail the library generation call as a whole before a new report is
+returned. The optional binding-build integration records such failures as
+unavailable macro support and publishes its availability classifier. Every
+completed generation writes its JSON report. Cargo warnings are an independent
+output policy: unset or
 `PGRX_MACRO_DEBUG=0` keeps macro-generation diagnostics quiet, while exactly
-`PGRX_MACRO_DEBUG=1` emits the summary, unavailable-profile notices, and each
+`PGRX_MACRO_DEBUG=1` emits the summary and each
 skip reason with its macro name. Flatten CR/LF in a compiler rejection message
 so it remains one Cargo directive; retain the original text in the report.
 Track this variable through
@@ -1156,16 +1321,22 @@ CLI commands retain their own requested output and stderr diagnostics.
 1. Resolve configurations and active Cargo major.
 2. Inspect optional macros with recorded CFLAGS plus the established binding
    target, CPPFLAGS, include settings and environment overrides.
-3. Select PostgreSQL function macro names and prepare one session.
+3. Select PostgreSQL function macros, owned variable-dependent object roots and
+   every compiler-proven server-owned static inline definition; prepare these
+   explicit root kinds in one session. Canonical physical definition ownership
+   excludes external headers, including symlink and `..` aliases. Ordinary macro
+   inventory/list output remains definitions only.
 4. Establish target guards and pgrx opaque integer bridges.
 5. Run bindgen with its established CPPFLAGS/include/target invocation; verify
    that the inspected inputs stayed unchanged, then parse its fresh output.
-6. Normalize the parsed copy's C foreign/callback ABI to the final binding
-   storage's `C-unwind` ABI, then collect the actual `BindingCatalog` and its FFI
+6. Prove and add missing owned integer object constants without overwriting
+   existing bindings. Normalize the parsed copy's C foreign/callback ABI to the
+   final binding storage's `C-unwind` ABI, then collect the actual `BindingCatalog` and its FFI
    guard path. The existing foreign-function guard rewrite happens afterward.
-7. Call `generate_with_bindings`; append shared Rust support.
-8. Compile optional native support for the active major, integrating cshim when
-   required, then verify inputs again.
+7. Call `generate_with_bindings`; append shared Rust support and independently
+   proved immutable C metadata bridges.
+8. Compile native static-inline wrappers, required macro primitives and metadata
+   for the active major, integrating optional cshim, then verify inputs again.
 9. Apply the existing foreign-function guards and binding rewrites, render the
    macro tree, reports, bindings, and OIDs, and publish fresh artifacts.
 
@@ -1189,9 +1360,10 @@ Typical output layout is:
    pgNN.rs
    pgNN_oids.rs
    pgNN_macro_report.json
-   pgrx_c_macros_pgNN.c          # if native support is required
+   pgrx-cshim-static-pgNN.c      # bindgen native inline wrappers
+   pgrx_c_macros_pgNN.c          # active version primitives + metadata
    pgrx_c_macros_pgNN.o
-   libpgrx_c_macros_pgNN.a
+   libpgrx_c_macros_pgNN.a       # pgrx_c_macros_pgNN.lib on MSVC
    cmacros/
      pgNN/
        mod.rs
@@ -1237,6 +1409,10 @@ version's generated macro tree. Publish documentation snapshots when
 `PGRX_PG_SYS_GENERATE_BINDINGS_FOR_RELEASE=1` selects release generation. Normal
 builds compile current `OUT_DIR` files; checked-in snapshots are not current
 platform inputs. Documentation compatibility is a separate validation pass.
+Snapshots retain generated adapter modules and typedef exports; only target
+`compile_error!` items are excluded under docsrs. Native interfaces can be
+type-checked without PostgreSQL or Clang, but calling their C symbols still
+requires a matching archive. Documentation layouts remain release-target facts.
 
 `pgrx-pg-sys/src/include.rs` exposes the `cmacros` selector in
 `src/include/cmacros/mod.rs`, which includes the selected `OUT_DIR` tree or
@@ -1244,6 +1420,20 @@ documentation snapshot. `#[macro_export]` defines crate-root macro identifiers;
 header modules reexport those identifiers, their parent modules collect them, and
 `pgrx/src/lib.rs` uses `pub use pg_sys::cmacros::*`. Thus callers can use
 `pgrx::MACRO_NAME!` without caring which header module owns its definition.
+
+Production binding paths start at `$crate::__pgrx_c_bindings`, a public hidden
+namespace that reexports only the selected generated binding module. Collect
+relative names from that namespace before reconciling declarations, including
+aliases, records, fields, callbacks, constants and functions; explicit `crate`
+and standard-library paths keep their original targets. Record this root in
+`BindingCatalog::namespace`: C-name lookups prepend it, storage lookups retain
+complete Rust paths, and imported integer bridges reconcile their exact path
+before the matching root-relative path. Callback tags omit this synthetic root
+from their public names. Detect top-level OID rewrites at this root rather than
+assuming an empty path. This ensures a
+handwritten helper or compatibility reexport at the crate root cannot replace
+the symbol whose type and value the generator proved. Standalone library
+consumers choose the namespace that actually owns their binding declarations.
 
 Cargo invalidation tracks consumed file contents, include/resource directories,
 compiler lookup paths, relevant environment values, and PostgreSQL/configuration
@@ -1270,8 +1460,8 @@ floating and pointer representations, byte order, and a recognized Rust
 architecture/OS guard. ARM EABI soft/hard-float and PowerPC64 ELFv1/ELFv2
 come from protected compiler witnesses, with matching Rust `target_abi` guards;
 integer width agreement cannot establish those procedure-call conventions.
-Unmodeled explicit ABI switches remain refused. It admits LP64, LLP64, and ILP32 with either plain-char
-signedness and byte order. The compiler proves `size_t` and pointer-difference
+Unmodeled explicit ABI switches remain refused. It admits LP64, LLP64, and ILP32
+with either plain-char signedness and byte order. The compiler proves `size_t` and pointer-difference
 rank separately; equal widths do not identify C types. Build-script cfg values
 select these runtime identities for the active PostgreSQL version.
 
@@ -1287,6 +1477,34 @@ Windows recorded flags use Microsoft quote/backslash rules and a bounded MSVC
 option translation; Unix flags use shell quoting. Ordinary bindgen retains its
 established CPPFLAGS invocation independently of this optional inspection.
 
+### Complete cross-target artifacts
+
+`PGRX_PG_SYS_EXTRA_TARGET_INFO_PATH` exports a bundle for the active freshly
+compiled major. `PGRX_TARGET_INFO_PATH_PGnn` imports that complete bundle;
+`PGRX_PG_SYS_EXTRA_OUTPUT_PATH` remains the separate raw-binding-file export.
+The manifest inventories raw bindings, the generated macro/support tree, the
+compiler report, bindgen wrapper source, native source and target archive. It
+records member SHA-256 hashes/lengths, PostgreSQL major, exact Cargo Rust target,
+generator version and cshim feature. The report's canonical compiler target must
+agree with the expected Rust target too.
+Manifest format 2 includes the uniform inline-call interface. Reject older
+bundles before publication and regenerate them with the current generator.
+
+Import owns bounded validated bytes before parsing or publishing native linkage.
+Missing, corrupt, extra, escaping or mixed-domain members are errors; no raw-only,
+checked-in snapshot or handwritten fallback supplies omitted macro/metadata
+operations. Bundle-root/internal symlinks are refused; configured ancestor
+aliases are resolved. Export stages a complete tree and replaces only an intact
+same-domain owned bundle or an empty directory, preserving unrelated data.
+
+Hashes detect corruption, not malicious producers. Generated Rust and native
+archives are trusted build code; use a matching pgrx release/revision and target
+configuration. Import requires the target PostgreSQL configuration/linker but
+does not rerun Clang header inspection. See the
+[cross-compilation guide](../docs/src/extension/build/cross-compile.md) for commands
+and domain requirements; transport validation is not a claim of cross-target
+backend execution.
+
 ## 16. A complete generation algorithm
 
 The following pseudocode describes the dependency ordering. Failure handling in
@@ -1295,15 +1513,25 @@ the preceding sections is part of the algorithm, not an optional polish pass.
 ```text
 generate(version, extra_arguments):
     installation = resolve_like_cargo_pgrx(version)
+    if complete_target_bundle_is_configured(version):
+        raw, macros, native = validate_bundle_for_exact_target_major_features()
+        publish_with_existing_binding_guards(raw, macros)
+        link_verified_archive_if_active(native)
+        return
     arguments = recorded_arguments_then_overrides(installation, extra_arguments)
     frontend = inspect_matching_driver_and_libclang(wrapper(version), arguments)
-    names = final_active_postgres_function_names(frontend)
-    session = prepare_expansions_constants_and_zero_proofs(frontend, names)
+    macros = final_active_postgres_function_macro_names(frontend)
+    objects = owned_variable_dependent_object_roots(frontend)
+    inlines = owned_compiler_proven_static_inline_names(frontend)
+    session = prepare_with_inline_functions(frontend, macros, objects, inlines)
+    names = union_of_prepared_root_names_with_active_macro_precedence(session)
 
     target_guard_and_integer_bridges = validate_runtime_profile(frontend)
     fresh_rust = run_bindgen_using_existing_cppflags_includes_target_environment(installation)
     verify_session_inputs_again(session)
     binding_ast = parse_fresh_bindings(fresh_rust)
+    constants = prove_missing_owned_integer_objects(frontend, binding_ast)
+    append_only_missing_constants(fresh_rust, binding_ast, constants)
     normalize_c_to_c_unwind_abi(binding_ast)
     bindings = collect_actual_rust_binding_storage(binding_ast)
     bindings.ffi_boundary = postgres_guard_path
@@ -1319,19 +1547,24 @@ generate(version, extra_arguments):
         adapters = build_validated_adapters_in_dependency_order(retained, bindings)
     support = render_shared_adapters_and_argument_classifiers(adapters, emissions)
 
-    if active_major(version) and support.c_source is not empty:
-        compile_fresh_native_archive_with_optional_combined_cshim(frontend, support)
+    metadata = prove_original_immutable_c_metadata(frontend, bindings)
+    support.rust += metadata.rust
+    support.c_source += metadata.c_source
+    if active_major(version):
+        compile_fresh_archive_with_inline_wrappers_and_optional_cshim(frontend, support)
     verify_session_inputs_again(session)
     files = organize_by_header_provenance(support.rust, emissions)
     final_rust = apply_existing_guards_and_binding_rewrites(fresh_rust)
     record = report(frontend, emissions)
     publish_verified_native_linkage_if_present(support)
     format_stage_and_publish(files, final_rust, record)
+    export_complete_target_bundle_if_requested(fresh_rust, files, record, native)
     track_cargo_inputs(session.inputs)
 ```
 
-The real build has fallback/unavailability paths and stable writes. The core
-library can also inspect an arbitrary C wrapper, analyze selected roots, or
+The real build also has the optional unavailable paths described above,
+per-macro refusals, coherent bundle imports and stable writes. The core
+library can inspect an arbitrary C wrapper, analyze selected roots, or
 emit standalone macros without pgrx integration. `emit_support_with_bindings`
 must return an error if native C support is required; callers that need it use
 `generate_with_bindings` or `emit_support_artifact_with_bindings` and compile
@@ -1386,6 +1619,7 @@ truncate the source into an apparently successful macro.
 | Production compiler/archiver child duration | 60 seconds |
 | Production captured output limit | 16 MiB per stream |
 | Static inline candidates | 16,384 |
+| Original inline definition text / total retained text | 64 KiB / 16 MiB |
 | Bitfield candidates / source / isolation batches | 16,384 / 4 MiB / 128 |
 | Builtin source / typed diagnostics | 4 MiB / 256 |
 | Builtin LLVM instructions / batches | 128 per witness / 5 |
@@ -1409,6 +1643,8 @@ truncate the source into an apparently successful macro.
 | Structural/alias/offset walks | 64 layers or path components |
 | Statement capture guard | 64 locals, 4,096 stringified argument bytes |
 | Support fragment split threshold | 256 KiB, at complete items |
+| Target bundle member / total bytes | 128 MiB / 512 MiB |
+| Target bundle manifest / entries / path depth | 4 MiB / 8,192 / 64 components |
 | Ordinary C/Rust oracle child duration / output | 30 seconds / 8 MiB |
 | Shipping integration child duration / output | 300 seconds / 16 MiB |
 
@@ -1462,8 +1698,10 @@ Installed-header comparisons run in ordinary tests against all configured
 supported versions, or the exact `PG_VER` selected by CI. An explicit selection
 must resolve an installation; unselected runs without configuration report
 omitted coverage. Unsupported runtime profiles must prove an exact macro
-refusal before omitting C/Rust comparisons. Full generated-binding and release
-tests remain separate explicit tests:
+refusal before omitting C/Rust comparisons. The historically named
+`postgres_handports` target uses test-only original-header roots for migrated
+primitives under those same installation-selection rules. Full generated-binding
+and release tests remain separate explicit tests:
 
 ```sh
 cargo test -p pgrx-c-macros --test postgres_emission
@@ -1525,6 +1763,7 @@ generalized; do not add a macro-name exception.
 | Rust semantic runtime | [`pgrx-pg-sys/src/c_macros/`](../pgrx-pg-sys/src/c_macros/). |
 | Production binding collector | [`binding_symbols.rs`](../pgrx-bindgen/src/build/binding_symbols.rs). |
 | Build/publication/native linkage | [`build.rs`](../pgrx-bindgen/src/build.rs), [`macro_files.rs`](../pgrx-bindgen/src/build/macro_files.rs), [`macro_support.rs`](../pgrx-bindgen/src/build/macro_support.rs). |
+| Immutable metadata and target bundles | [`metadata_support.rs`](../pgrx-bindgen/src/build/metadata_support.rs), [`target_artifacts.rs`](../pgrx-bindgen/src/build/target_artifacts.rs). |
 | Runtime export | [`pgrx-pg-sys/src/lib.rs`](../pgrx-pg-sys/src/lib.rs), [`pgrx/src/lib.rs`](../pgrx/src/lib.rs). |
 | Oracle infrastructure | [`tests/support/`](tests/support/), [`tests/fixtures/`](tests/fixtures/), [`pgrx-bindgen/tests/`](../pgrx-bindgen/tests/). |
 

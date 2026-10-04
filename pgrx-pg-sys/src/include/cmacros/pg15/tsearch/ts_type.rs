@@ -5,8 +5,8 @@ This code is generated for documentation purposes, so that it is easy to referen
 // C macros from ts_type.h.
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -33,22 +33,34 @@ macro_rules! __pgrx_c_args_ARRPTR {
         $crate::__pgrx_c_args_ARRPTR!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_ARRPTR!(@p1 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_ARRPTR!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_ARRPTR!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_ARRPTR!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_ARRPTR!(@p1 $mode [$($done)* (@literal [- $argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_ARRPTR!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+            $($rest)*
+        )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_ARRPTR!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_ARRPTR!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $($raw:tt)*) => {
         $crate::__pgrx_c_args_ARRPTR!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_ARRPTR!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_ARRPTR!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -68,13 +80,20 @@ macro_rules! __pgrx_c_args_ARRPTR {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_ARRPTR!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_ARRPTR!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_ARRPTR!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_ARRPTR!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
-        $crate::__pgrx_c_args_ARRPTR!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_ARRPTR!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
         $crate::__pgrx_c_classify!(
@@ -96,10 +115,16 @@ macro_rules! __pgrx_c_args_ARRPTR {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_ARRPTR!(@p1 $mode [$($done)* (@literal [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_ARRPTR!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+            $($rest)*
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_ARRPTR!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_ARRPTR!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p1 $mode:ident [$($done:tt)*];) => {
         $crate::ARRPTR!(@$mode; $($done)*)
@@ -260,8 +285,8 @@ macro_rules! ARRPTR {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -289,18 +314,24 @@ macro_rules! __pgrx_c_args_CALCDATASIZE {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_CALCDATASIZE!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_CALCDATASIZE!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_CALCDATASIZE!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $($raw:tt)*) => {
         $crate::__pgrx_c_args_CALCDATASIZE!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
-        $crate::__pgrx_c_args_CALCDATASIZE!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_CALCDATASIZE!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
         $crate::__pgrx_c_classify!(
@@ -323,33 +354,45 @@ macro_rules! __pgrx_c_args_CALCDATASIZE {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_CALCDATASIZE!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_CALCDATASIZE!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_CALCDATASIZE!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_CALCDATASIZE!(@p2 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_CALCDATASIZE!(
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative1 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_CALCDATASIZE!(@p2 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_CALCDATASIZE!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_CALCDATASIZE!(
-            @p2 $mode [$($done)* (@literal [- $argument]),];
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_CALCDATASIZE!(@p2 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_CALCDATASIZE!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $($raw:tt)*) => {
         $crate::__pgrx_c_args_CALCDATASIZE!(@negative1 $mode [$($done)*]; - $($raw)*)
     };
     (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_CALCDATASIZE!(@p2 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_CALCDATASIZE!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -371,13 +414,20 @@ macro_rules! __pgrx_c_args_CALCDATASIZE {
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_CALCDATASIZE!(@p2 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_CALCDATASIZE!(
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_CALCDATASIZE!(@p2 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_CALCDATASIZE!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
-        $crate::__pgrx_c_args_CALCDATASIZE!(@p2 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_CALCDATASIZE!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
         $crate::__pgrx_c_classify!(
@@ -400,12 +450,15 @@ macro_rules! __pgrx_c_args_CALCDATASIZE {
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_CALCDATASIZE!(
-            @p2 $mode [$($done)* (@literal [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_CALCDATASIZE!(@p2 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_CALCDATASIZE!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p2 $mode:ident [$($done:tt)*];) => {
         $crate::CALCDATASIZE!(@$mode; $($done)*)
@@ -461,7 +514,7 @@ macro_rules! CALCDATASIZE {
                                 $crate::__pgrx_c_macros::expression::profile_value::<false, _>(
                                     $crate::__pgrx_c_macros::expression::offset_of::<
                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                            $crate::TSVectorData
+                                            $crate::__pgrx_c_bindings::TSVectorData
                                         >,
                                         $crate::__pgrx_c_field_marker!(@path; entries)
                                     >()
@@ -482,7 +535,7 @@ macro_rules! CALCDATASIZE {
                                     $crate::__pgrx_c_macros::expression::profile_value::<false, _>(
                                         $crate::__pgrx_c_macros::expression::size_of::<
                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                $crate::WordEntry
+                                                $crate::__pgrx_c_bindings::WordEntry
                                             >>()
                                     )
                                 )
@@ -544,7 +597,7 @@ macro_rules! CALCDATASIZE {
                                             >(
                                                 $crate::__pgrx_c_macros::expression::offset_of::<
                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                        $crate::TSVectorData
+                                                        $crate::__pgrx_c_bindings::TSVectorData
                                                     >,
                                                     $crate::__pgrx_c_field_marker!(@path; entries)
                                                 >()
@@ -576,7 +629,7 @@ macro_rules! CALCDATASIZE {
                                                 >(
                                                     $crate::__pgrx_c_macros::expression::size_of::<
                                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                                            $crate::WordEntry
+                                                            $crate::__pgrx_c_bindings::WordEntry
                                                         >>()
                                                 )
                                             )
@@ -615,7 +668,7 @@ macro_rules! CALCDATASIZE {
                                 $crate::__pgrx_c_macros::expression::profile_value::<false, _>(
                                     $crate::__pgrx_c_macros::expression::offset_of::<
                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                            $crate::TSVectorData
+                                            $crate::__pgrx_c_bindings::TSVectorData
                                         >,
                                         $crate::__pgrx_c_field_marker!(@path; entries)
                                     >()
@@ -636,7 +689,7 @@ macro_rules! CALCDATASIZE {
                                     $crate::__pgrx_c_macros::expression::profile_value::<false, _>(
                                         $crate::__pgrx_c_macros::expression::size_of::<
                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                $crate::WordEntry
+                                                $crate::__pgrx_c_bindings::WordEntry
                                             >>()
                                     )
                                 )
@@ -661,8 +714,8 @@ macro_rules! CALCDATASIZE {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -690,18 +743,24 @@ macro_rules! __pgrx_c_args_COMPUTESIZE {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_COMPUTESIZE!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_COMPUTESIZE!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_COMPUTESIZE!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $($raw:tt)*) => {
         $crate::__pgrx_c_args_COMPUTESIZE!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
-        $crate::__pgrx_c_args_COMPUTESIZE!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_COMPUTESIZE!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
         $crate::__pgrx_c_classify!(
@@ -723,31 +782,46 @@ macro_rules! __pgrx_c_args_COMPUTESIZE {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_COMPUTESIZE!(@p1 $mode [$($done)* (@literal [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_COMPUTESIZE!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+            $($rest)*
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_COMPUTESIZE!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_COMPUTESIZE!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_COMPUTESIZE!(@p2 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_COMPUTESIZE!(
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative1 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_COMPUTESIZE!(@p2 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_COMPUTESIZE!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_COMPUTESIZE!(
-            @p2 $mode [$($done)* (@literal [- $argument]),];
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_COMPUTESIZE!(@p2 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_COMPUTESIZE!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $($raw:tt)*) => {
         $crate::__pgrx_c_args_COMPUTESIZE!(@negative1 $mode [$($done)*]; - $($raw)*)
     };
     (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_COMPUTESIZE!(@p2 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_COMPUTESIZE!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -769,13 +843,20 @@ macro_rules! __pgrx_c_args_COMPUTESIZE {
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_COMPUTESIZE!(@p2 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_COMPUTESIZE!(
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_COMPUTESIZE!(@p2 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_COMPUTESIZE!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
-        $crate::__pgrx_c_args_COMPUTESIZE!(@p2 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_COMPUTESIZE!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
         $crate::__pgrx_c_classify!(
@@ -797,10 +878,16 @@ macro_rules! __pgrx_c_args_COMPUTESIZE {
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_COMPUTESIZE!(@p2 $mode [$($done)* (@literal [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_COMPUTESIZE!(
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+            $($rest)*
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_COMPUTESIZE!(@p2 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_COMPUTESIZE!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p2 $mode:ident [$($done:tt)*];) => {
         $crate::COMPUTESIZE!(@$mode; $($done)*)
@@ -865,7 +952,7 @@ macro_rules! COMPUTESIZE {
                                                 _
                                             >(
                                                 $crate::__pgrx_c_macros::expression::cast_as::<
-                                                    $crate::int32,
+                                                    $crate::__pgrx_c_bindings::int32,
                                                     $crate::__pgrx_c_macros::CInt,
                                                     _
                                                 >(
@@ -906,7 +993,7 @@ macro_rules! COMPUTESIZE {
                                     $crate::__pgrx_c_macros::expression::profile_value::<false, _>(
                                         $crate::__pgrx_c_macros::expression::size_of::<
                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                $crate::QueryItem
+                                                $crate::__pgrx_c_bindings::QueryItem
                                             >>()
                                     )
                                 )
@@ -977,7 +1064,7 @@ macro_rules! COMPUTESIZE {
                                                             _
                                                         >(
                                                             $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                $crate::int32,
+                                                                $crate::__pgrx_c_bindings::int32,
                                                                 $crate::__pgrx_c_macros::CInt,
                                                                 _
                                                             >(
@@ -1029,7 +1116,7 @@ macro_rules! COMPUTESIZE {
                                                 >(
                                                     $crate::__pgrx_c_macros::expression::size_of::<
                                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                                            $crate::QueryItem
+                                                            $crate::__pgrx_c_bindings::QueryItem
                                                         >>()
                                                 )
                                             )
@@ -1077,7 +1164,7 @@ macro_rules! COMPUTESIZE {
                                                 _
                                             >(
                                                 $crate::__pgrx_c_macros::expression::cast_as::<
-                                                    $crate::int32,
+                                                    $crate::__pgrx_c_bindings::int32,
                                                     $crate::__pgrx_c_macros::CInt,
                                                     _
                                                 >(
@@ -1118,7 +1205,7 @@ macro_rules! COMPUTESIZE {
                                     $crate::__pgrx_c_macros::expression::profile_value::<false, _>(
                                         $crate::__pgrx_c_macros::expression::size_of::<
                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                $crate::QueryItem
+                                                $crate::__pgrx_c_bindings::QueryItem
                                             >>()
                                     )
                                 )
@@ -1143,8 +1230,8 @@ macro_rules! COMPUTESIZE {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -1171,20 +1258,24 @@ macro_rules! __pgrx_c_args_DatumGetTSQuery {
         $crate::__pgrx_c_args_DatumGetTSQuery!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_DatumGetTSQuery!(@p1 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_DatumGetTSQuery!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_DatumGetTSQuery!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_DatumGetTSQuery!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_DatumGetTSQuery!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_DatumGetTSQuery!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -1192,7 +1283,9 @@ macro_rules! __pgrx_c_args_DatumGetTSQuery {
         $crate::__pgrx_c_args_DatumGetTSQuery!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_DatumGetTSQuery!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_DatumGetTSQuery!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -1214,14 +1307,18 @@ macro_rules! __pgrx_c_args_DatumGetTSQuery {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_DatumGetTSQuery!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_DatumGetTSQuery!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_DatumGetTSQuery!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_DatumGetTSQuery!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_DatumGetTSQuery!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -1248,13 +1345,13 @@ macro_rules! __pgrx_c_args_DatumGetTSQuery {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_DatumGetTSQuery!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_DatumGetTSQuery!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -1301,9 +1398,11 @@ macro_rules! DatumGetTSQuery {
         (
             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::cast_as::<
-                    $crate::TSQuery,
+                    $crate::__pgrx_c_bindings::TSQuery,
                     $crate::__pgrx_c_macros::expression::CPointer<
-                        $crate::__pgrx_c_macros::expression::CRecord<$crate::TSQueryData>,
+                        $crate::__pgrx_c_macros::expression::CRecord<
+                            $crate::__pgrx_c_bindings::TSQueryData
+                        >,
                         $crate::__pgrx_c_macros::expression::ReadWrite
                     >,
                     _
@@ -1311,7 +1410,7 @@ macro_rules! DatumGetTSQuery {
                     (
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::cast_as::<
-                                $crate::Pointer,
+                                $crate::__pgrx_c_bindings::Pointer,
                                 $crate::__pgrx_c_macros::expression::CPointer<
                                     $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                         $crate::__pgrx_c_macros::CChar,
@@ -1361,10 +1460,10 @@ macro_rules! DatumGetTSQuery {
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::cast_as::<
-                                $crate::TSQuery,
+                                $crate::__pgrx_c_bindings::TSQuery,
                                 $crate::__pgrx_c_macros::expression::CPointer<
                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                        $crate::TSQueryData
+                                        $crate::__pgrx_c_bindings::TSQueryData
                                     >,
                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                 >,
@@ -1373,7 +1472,7 @@ macro_rules! DatumGetTSQuery {
                                 (
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::expression::cast_as::<
-                                            $crate::Pointer,
+                                            $crate::__pgrx_c_bindings::Pointer,
                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                     $crate::__pgrx_c_macros::CChar,
@@ -1409,9 +1508,11 @@ macro_rules! DatumGetTSQuery {
         {
             let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::cast_as::<
-                    $crate::TSQuery,
+                    $crate::__pgrx_c_bindings::TSQuery,
                     $crate::__pgrx_c_macros::expression::CPointer<
-                        $crate::__pgrx_c_macros::expression::CRecord<$crate::TSQueryData>,
+                        $crate::__pgrx_c_macros::expression::CRecord<
+                            $crate::__pgrx_c_bindings::TSQueryData
+                        >,
                         $crate::__pgrx_c_macros::expression::ReadWrite
                     >,
                     _
@@ -1419,7 +1520,7 @@ macro_rules! DatumGetTSQuery {
                     (
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::cast_as::<
-                                $crate::Pointer,
+                                $crate::__pgrx_c_bindings::Pointer,
                                 $crate::__pgrx_c_macros::expression::CPointer<
                                     $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                         $crate::__pgrx_c_macros::CChar,
@@ -1450,8 +1551,8 @@ macro_rules! DatumGetTSQuery {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -1478,20 +1579,24 @@ macro_rules! __pgrx_c_args_DatumGetTSQueryCopy {
         $crate::__pgrx_c_args_DatumGetTSQueryCopy!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_DatumGetTSQueryCopy!(@p1 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_DatumGetTSQueryCopy!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_DatumGetTSQueryCopy!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_DatumGetTSQueryCopy!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_DatumGetTSQueryCopy!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_DatumGetTSQueryCopy!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -1499,7 +1604,9 @@ macro_rules! __pgrx_c_args_DatumGetTSQueryCopy {
         $crate::__pgrx_c_args_DatumGetTSQueryCopy!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_DatumGetTSQueryCopy!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_DatumGetTSQueryCopy!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -1521,14 +1628,18 @@ macro_rules! __pgrx_c_args_DatumGetTSQueryCopy {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_DatumGetTSQueryCopy!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_DatumGetTSQueryCopy!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_DatumGetTSQueryCopy!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_DatumGetTSQueryCopy!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_DatumGetTSQueryCopy!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -1555,13 +1666,13 @@ macro_rules! __pgrx_c_args_DatumGetTSQueryCopy {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_DatumGetTSQueryCopy!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_DatumGetTSQueryCopy!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -1608,9 +1719,11 @@ macro_rules! DatumGetTSQueryCopy {
         (
             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::cast_as::<
-                    $crate::TSQuery,
+                    $crate::__pgrx_c_bindings::TSQuery,
                     $crate::__pgrx_c_macros::expression::CPointer<
-                        $crate::__pgrx_c_macros::expression::CRecord<$crate::TSQueryData>,
+                        $crate::__pgrx_c_macros::expression::CRecord<
+                            $crate::__pgrx_c_bindings::TSQueryData
+                        >,
                         $crate::__pgrx_c_macros::expression::ReadWrite
                     >,
                     _
@@ -1618,15 +1731,17 @@ macro_rules! DatumGetTSQueryCopy {
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         <
                             $crate::__pgrx_c_macros::expression::CPointer<
-                                $crate::__pgrx_c_macros::expression::CRecord<$crate::varlena>,
+                                $crate::__pgrx_c_macros::expression::CRecord<
+                                    $crate::__pgrx_c_bindings::varlena
+                                >,
                                 $crate::__pgrx_c_macros::expression::ReadWrite
                             > as $crate::__pgrx_c_macros::expression::CType
                         >::from_storage(
-                            $crate::pg_detoast_datum_copy(
+                            $crate::__pgrx_c_bindings::pg_detoast_datum_copy(
                                 <
                                     $crate::__pgrx_c_macros::expression::CPointer<
                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                            $crate::varlena
+                                            $crate::__pgrx_c_bindings::varlena
                                         >,
                                         $crate::__pgrx_c_macros::expression::ReadWrite
                                     > as $crate::__pgrx_c_macros::expression::CType
@@ -1634,7 +1749,7 @@ macro_rules! DatumGetTSQueryCopy {
                                     $crate::__pgrx_c_macros::expression::implicit::<
                                         $crate::__pgrx_c_macros::expression::CPointer<
                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                $crate::varlena
+                                                $crate::__pgrx_c_bindings::varlena
                                             >,
                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                         >,
@@ -1645,10 +1760,10 @@ macro_rules! DatumGetTSQueryCopy {
                                             _
                                         >(
                                             $crate::__pgrx_c_macros::expression::cast_as::<
-                                                *mut $crate::varlena,
+                                                *mut $crate::__pgrx_c_bindings::varlena,
                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                        $crate::varlena
+                                                        $crate::__pgrx_c_bindings::varlena
                                                     >,
                                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                                 >,
@@ -1660,7 +1775,7 @@ macro_rules! DatumGetTSQueryCopy {
                                                         _
                                                     >(
                                                         $crate::__pgrx_c_macros::expression::cast_as::<
-                                                            $crate::Pointer,
+                                                            $crate::__pgrx_c_bindings::Pointer,
                                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                                     $crate::__pgrx_c_macros::CChar,
@@ -1723,10 +1838,10 @@ macro_rules! DatumGetTSQueryCopy {
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::cast_as::<
-                                $crate::TSQuery,
+                                $crate::__pgrx_c_bindings::TSQuery,
                                 $crate::__pgrx_c_macros::expression::CPointer<
                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                        $crate::TSQueryData
+                                        $crate::__pgrx_c_bindings::TSQueryData
                                     >,
                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                 >,
@@ -1736,16 +1851,16 @@ macro_rules! DatumGetTSQueryCopy {
                                     <
                                         $crate::__pgrx_c_macros::expression::CPointer<
                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                $crate::varlena
+                                                $crate::__pgrx_c_bindings::varlena
                                             >,
                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::from_storage(
-                                        $crate::pg_detoast_datum_copy(
+                                        $crate::__pgrx_c_bindings::pg_detoast_datum_copy(
                                             <
                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                        $crate::varlena
+                                                        $crate::__pgrx_c_bindings::varlena
                                                     >,
                                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                                 > as $crate::__pgrx_c_macros::expression::CType
@@ -1753,7 +1868,7 @@ macro_rules! DatumGetTSQueryCopy {
                                                 $crate::__pgrx_c_macros::expression::implicit::<
                                                     $crate::__pgrx_c_macros::expression::CPointer<
                                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                                            $crate::varlena
+                                                            $crate::__pgrx_c_bindings::varlena
                                                         >,
                                                         $crate::__pgrx_c_macros::expression::ReadWrite
                                                     >,
@@ -1764,10 +1879,10 @@ macro_rules! DatumGetTSQueryCopy {
                                                         _
                                                     >(
                                                         $crate::__pgrx_c_macros::expression::cast_as::<
-                                                            *mut $crate::varlena,
+                                                            *mut $crate::__pgrx_c_bindings::varlena,
                                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                                    $crate::varlena
+                                                                    $crate::__pgrx_c_bindings::varlena
                                                                 >,
                                                                 $crate::__pgrx_c_macros::expression::ReadWrite
                                                             >,
@@ -1779,7 +1894,7 @@ macro_rules! DatumGetTSQueryCopy {
                                                                     _
                                                                 >(
                                                                     $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                        $crate::Pointer,
+                                                                        $crate::__pgrx_c_bindings::Pointer,
                                                                         $crate::__pgrx_c_macros::expression::CPointer<
                                                                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                                                 $crate::__pgrx_c_macros::CChar,
@@ -1827,9 +1942,11 @@ macro_rules! DatumGetTSQueryCopy {
         {
             let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::cast_as::<
-                    $crate::TSQuery,
+                    $crate::__pgrx_c_bindings::TSQuery,
                     $crate::__pgrx_c_macros::expression::CPointer<
-                        $crate::__pgrx_c_macros::expression::CRecord<$crate::TSQueryData>,
+                        $crate::__pgrx_c_macros::expression::CRecord<
+                            $crate::__pgrx_c_bindings::TSQueryData
+                        >,
                         $crate::__pgrx_c_macros::expression::ReadWrite
                     >,
                     _
@@ -1837,15 +1954,17 @@ macro_rules! DatumGetTSQueryCopy {
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         <
                             $crate::__pgrx_c_macros::expression::CPointer<
-                                $crate::__pgrx_c_macros::expression::CRecord<$crate::varlena>,
+                                $crate::__pgrx_c_macros::expression::CRecord<
+                                    $crate::__pgrx_c_bindings::varlena
+                                >,
                                 $crate::__pgrx_c_macros::expression::ReadWrite
                             > as $crate::__pgrx_c_macros::expression::CType
                         >::from_storage(
-                            $crate::pg_detoast_datum_copy(
+                            $crate::__pgrx_c_bindings::pg_detoast_datum_copy(
                                 <
                                     $crate::__pgrx_c_macros::expression::CPointer<
                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                            $crate::varlena
+                                            $crate::__pgrx_c_bindings::varlena
                                         >,
                                         $crate::__pgrx_c_macros::expression::ReadWrite
                                     > as $crate::__pgrx_c_macros::expression::CType
@@ -1853,7 +1972,7 @@ macro_rules! DatumGetTSQueryCopy {
                                     $crate::__pgrx_c_macros::expression::implicit::<
                                         $crate::__pgrx_c_macros::expression::CPointer<
                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                $crate::varlena
+                                                $crate::__pgrx_c_bindings::varlena
                                             >,
                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                         >,
@@ -1864,10 +1983,10 @@ macro_rules! DatumGetTSQueryCopy {
                                             _
                                         >(
                                             $crate::__pgrx_c_macros::expression::cast_as::<
-                                                *mut $crate::varlena,
+                                                *mut $crate::__pgrx_c_bindings::varlena,
                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                        $crate::varlena
+                                                        $crate::__pgrx_c_bindings::varlena
                                                     >,
                                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                                 >,
@@ -1879,7 +1998,7 @@ macro_rules! DatumGetTSQueryCopy {
                                                         _
                                                     >(
                                                         $crate::__pgrx_c_macros::expression::cast_as::<
-                                                            $crate::Pointer,
+                                                            $crate::__pgrx_c_bindings::Pointer,
                                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                                     $crate::__pgrx_c_macros::CChar,
@@ -1923,8 +2042,8 @@ macro_rules! DatumGetTSQueryCopy {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -1951,20 +2070,24 @@ macro_rules! __pgrx_c_args_DatumGetTSVector {
         $crate::__pgrx_c_args_DatumGetTSVector!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_DatumGetTSVector!(@p1 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_DatumGetTSVector!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_DatumGetTSVector!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_DatumGetTSVector!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_DatumGetTSVector!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_DatumGetTSVector!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -1972,7 +2095,9 @@ macro_rules! __pgrx_c_args_DatumGetTSVector {
         $crate::__pgrx_c_args_DatumGetTSVector!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_DatumGetTSVector!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_DatumGetTSVector!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -1994,14 +2119,18 @@ macro_rules! __pgrx_c_args_DatumGetTSVector {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_DatumGetTSVector!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_DatumGetTSVector!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_DatumGetTSVector!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_DatumGetTSVector!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_DatumGetTSVector!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -2028,13 +2157,13 @@ macro_rules! __pgrx_c_args_DatumGetTSVector {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_DatumGetTSVector!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_DatumGetTSVector!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -2081,9 +2210,11 @@ macro_rules! DatumGetTSVector {
         (
             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::cast_as::<
-                    $crate::TSVector,
+                    $crate::__pgrx_c_bindings::TSVector,
                     $crate::__pgrx_c_macros::expression::CPointer<
-                        $crate::__pgrx_c_macros::expression::CRecord<$crate::TSVectorData>,
+                        $crate::__pgrx_c_macros::expression::CRecord<
+                            $crate::__pgrx_c_bindings::TSVectorData
+                        >,
                         $crate::__pgrx_c_macros::expression::ReadWrite
                     >,
                     _
@@ -2091,15 +2222,17 @@ macro_rules! DatumGetTSVector {
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         <
                             $crate::__pgrx_c_macros::expression::CPointer<
-                                $crate::__pgrx_c_macros::expression::CRecord<$crate::varlena>,
+                                $crate::__pgrx_c_macros::expression::CRecord<
+                                    $crate::__pgrx_c_bindings::varlena
+                                >,
                                 $crate::__pgrx_c_macros::expression::ReadWrite
                             > as $crate::__pgrx_c_macros::expression::CType
                         >::from_storage(
-                            $crate::pg_detoast_datum(
+                            $crate::__pgrx_c_bindings::pg_detoast_datum(
                                 <
                                     $crate::__pgrx_c_macros::expression::CPointer<
                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                            $crate::varlena
+                                            $crate::__pgrx_c_bindings::varlena
                                         >,
                                         $crate::__pgrx_c_macros::expression::ReadWrite
                                     > as $crate::__pgrx_c_macros::expression::CType
@@ -2107,7 +2240,7 @@ macro_rules! DatumGetTSVector {
                                     $crate::__pgrx_c_macros::expression::implicit::<
                                         $crate::__pgrx_c_macros::expression::CPointer<
                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                $crate::varlena
+                                                $crate::__pgrx_c_bindings::varlena
                                             >,
                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                         >,
@@ -2118,10 +2251,10 @@ macro_rules! DatumGetTSVector {
                                             _
                                         >(
                                             $crate::__pgrx_c_macros::expression::cast_as::<
-                                                *mut $crate::varlena,
+                                                *mut $crate::__pgrx_c_bindings::varlena,
                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                        $crate::varlena
+                                                        $crate::__pgrx_c_bindings::varlena
                                                     >,
                                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                                 >,
@@ -2133,7 +2266,7 @@ macro_rules! DatumGetTSVector {
                                                         _
                                                     >(
                                                         $crate::__pgrx_c_macros::expression::cast_as::<
-                                                            $crate::Pointer,
+                                                            $crate::__pgrx_c_bindings::Pointer,
                                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                                     $crate::__pgrx_c_macros::CChar,
@@ -2196,10 +2329,10 @@ macro_rules! DatumGetTSVector {
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::cast_as::<
-                                $crate::TSVector,
+                                $crate::__pgrx_c_bindings::TSVector,
                                 $crate::__pgrx_c_macros::expression::CPointer<
                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                        $crate::TSVectorData
+                                        $crate::__pgrx_c_bindings::TSVectorData
                                     >,
                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                 >,
@@ -2209,16 +2342,16 @@ macro_rules! DatumGetTSVector {
                                     <
                                         $crate::__pgrx_c_macros::expression::CPointer<
                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                $crate::varlena
+                                                $crate::__pgrx_c_bindings::varlena
                                             >,
                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::from_storage(
-                                        $crate::pg_detoast_datum(
+                                        $crate::__pgrx_c_bindings::pg_detoast_datum(
                                             <
                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                        $crate::varlena
+                                                        $crate::__pgrx_c_bindings::varlena
                                                     >,
                                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                                 > as $crate::__pgrx_c_macros::expression::CType
@@ -2226,7 +2359,7 @@ macro_rules! DatumGetTSVector {
                                                 $crate::__pgrx_c_macros::expression::implicit::<
                                                     $crate::__pgrx_c_macros::expression::CPointer<
                                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                                            $crate::varlena
+                                                            $crate::__pgrx_c_bindings::varlena
                                                         >,
                                                         $crate::__pgrx_c_macros::expression::ReadWrite
                                                     >,
@@ -2237,10 +2370,10 @@ macro_rules! DatumGetTSVector {
                                                         _
                                                     >(
                                                         $crate::__pgrx_c_macros::expression::cast_as::<
-                                                            *mut $crate::varlena,
+                                                            *mut $crate::__pgrx_c_bindings::varlena,
                                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                                    $crate::varlena
+                                                                    $crate::__pgrx_c_bindings::varlena
                                                                 >,
                                                                 $crate::__pgrx_c_macros::expression::ReadWrite
                                                             >,
@@ -2252,7 +2385,7 @@ macro_rules! DatumGetTSVector {
                                                                     _
                                                                 >(
                                                                     $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                        $crate::Pointer,
+                                                                        $crate::__pgrx_c_bindings::Pointer,
                                                                         $crate::__pgrx_c_macros::expression::CPointer<
                                                                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                                                 $crate::__pgrx_c_macros::CChar,
@@ -2300,9 +2433,11 @@ macro_rules! DatumGetTSVector {
         {
             let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::cast_as::<
-                    $crate::TSVector,
+                    $crate::__pgrx_c_bindings::TSVector,
                     $crate::__pgrx_c_macros::expression::CPointer<
-                        $crate::__pgrx_c_macros::expression::CRecord<$crate::TSVectorData>,
+                        $crate::__pgrx_c_macros::expression::CRecord<
+                            $crate::__pgrx_c_bindings::TSVectorData
+                        >,
                         $crate::__pgrx_c_macros::expression::ReadWrite
                     >,
                     _
@@ -2310,15 +2445,17 @@ macro_rules! DatumGetTSVector {
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         <
                             $crate::__pgrx_c_macros::expression::CPointer<
-                                $crate::__pgrx_c_macros::expression::CRecord<$crate::varlena>,
+                                $crate::__pgrx_c_macros::expression::CRecord<
+                                    $crate::__pgrx_c_bindings::varlena
+                                >,
                                 $crate::__pgrx_c_macros::expression::ReadWrite
                             > as $crate::__pgrx_c_macros::expression::CType
                         >::from_storage(
-                            $crate::pg_detoast_datum(
+                            $crate::__pgrx_c_bindings::pg_detoast_datum(
                                 <
                                     $crate::__pgrx_c_macros::expression::CPointer<
                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                            $crate::varlena
+                                            $crate::__pgrx_c_bindings::varlena
                                         >,
                                         $crate::__pgrx_c_macros::expression::ReadWrite
                                     > as $crate::__pgrx_c_macros::expression::CType
@@ -2326,7 +2463,7 @@ macro_rules! DatumGetTSVector {
                                     $crate::__pgrx_c_macros::expression::implicit::<
                                         $crate::__pgrx_c_macros::expression::CPointer<
                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                $crate::varlena
+                                                $crate::__pgrx_c_bindings::varlena
                                             >,
                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                         >,
@@ -2337,10 +2474,10 @@ macro_rules! DatumGetTSVector {
                                             _
                                         >(
                                             $crate::__pgrx_c_macros::expression::cast_as::<
-                                                *mut $crate::varlena,
+                                                *mut $crate::__pgrx_c_bindings::varlena,
                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                        $crate::varlena
+                                                        $crate::__pgrx_c_bindings::varlena
                                                     >,
                                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                                 >,
@@ -2352,7 +2489,7 @@ macro_rules! DatumGetTSVector {
                                                         _
                                                     >(
                                                         $crate::__pgrx_c_macros::expression::cast_as::<
-                                                            $crate::Pointer,
+                                                            $crate::__pgrx_c_bindings::Pointer,
                                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                                     $crate::__pgrx_c_macros::CChar,
@@ -2396,8 +2533,8 @@ macro_rules! DatumGetTSVector {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -2428,21 +2565,23 @@ macro_rules! __pgrx_c_args_DatumGetTSVectorCopy {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
         $crate::__pgrx_c_args_DatumGetTSVectorCopy!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_DatumGetTSVectorCopy!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_DatumGetTSVectorCopy!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_DatumGetTSVectorCopy!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_DatumGetTSVectorCopy!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -2450,7 +2589,9 @@ macro_rules! __pgrx_c_args_DatumGetTSVectorCopy {
         $crate::__pgrx_c_args_DatumGetTSVectorCopy!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_DatumGetTSVectorCopy!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_DatumGetTSVectorCopy!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -2472,14 +2613,18 @@ macro_rules! __pgrx_c_args_DatumGetTSVectorCopy {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_DatumGetTSVectorCopy!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_DatumGetTSVectorCopy!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_DatumGetTSVectorCopy!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_DatumGetTSVectorCopy!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_DatumGetTSVectorCopy!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -2506,13 +2651,13 @@ macro_rules! __pgrx_c_args_DatumGetTSVectorCopy {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_DatumGetTSVectorCopy!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_DatumGetTSVectorCopy!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -2559,9 +2704,11 @@ macro_rules! DatumGetTSVectorCopy {
         (
             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::cast_as::<
-                    $crate::TSVector,
+                    $crate::__pgrx_c_bindings::TSVector,
                     $crate::__pgrx_c_macros::expression::CPointer<
-                        $crate::__pgrx_c_macros::expression::CRecord<$crate::TSVectorData>,
+                        $crate::__pgrx_c_macros::expression::CRecord<
+                            $crate::__pgrx_c_bindings::TSVectorData
+                        >,
                         $crate::__pgrx_c_macros::expression::ReadWrite
                     >,
                     _
@@ -2569,15 +2716,17 @@ macro_rules! DatumGetTSVectorCopy {
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         <
                             $crate::__pgrx_c_macros::expression::CPointer<
-                                $crate::__pgrx_c_macros::expression::CRecord<$crate::varlena>,
+                                $crate::__pgrx_c_macros::expression::CRecord<
+                                    $crate::__pgrx_c_bindings::varlena
+                                >,
                                 $crate::__pgrx_c_macros::expression::ReadWrite
                             > as $crate::__pgrx_c_macros::expression::CType
                         >::from_storage(
-                            $crate::pg_detoast_datum_copy(
+                            $crate::__pgrx_c_bindings::pg_detoast_datum_copy(
                                 <
                                     $crate::__pgrx_c_macros::expression::CPointer<
                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                            $crate::varlena
+                                            $crate::__pgrx_c_bindings::varlena
                                         >,
                                         $crate::__pgrx_c_macros::expression::ReadWrite
                                     > as $crate::__pgrx_c_macros::expression::CType
@@ -2585,7 +2734,7 @@ macro_rules! DatumGetTSVectorCopy {
                                     $crate::__pgrx_c_macros::expression::implicit::<
                                         $crate::__pgrx_c_macros::expression::CPointer<
                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                $crate::varlena
+                                                $crate::__pgrx_c_bindings::varlena
                                             >,
                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                         >,
@@ -2596,10 +2745,10 @@ macro_rules! DatumGetTSVectorCopy {
                                             _
                                         >(
                                             $crate::__pgrx_c_macros::expression::cast_as::<
-                                                *mut $crate::varlena,
+                                                *mut $crate::__pgrx_c_bindings::varlena,
                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                        $crate::varlena
+                                                        $crate::__pgrx_c_bindings::varlena
                                                     >,
                                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                                 >,
@@ -2611,7 +2760,7 @@ macro_rules! DatumGetTSVectorCopy {
                                                         _
                                                     >(
                                                         $crate::__pgrx_c_macros::expression::cast_as::<
-                                                            $crate::Pointer,
+                                                            $crate::__pgrx_c_bindings::Pointer,
                                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                                     $crate::__pgrx_c_macros::CChar,
@@ -2674,10 +2823,10 @@ macro_rules! DatumGetTSVectorCopy {
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::cast_as::<
-                                $crate::TSVector,
+                                $crate::__pgrx_c_bindings::TSVector,
                                 $crate::__pgrx_c_macros::expression::CPointer<
                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                        $crate::TSVectorData
+                                        $crate::__pgrx_c_bindings::TSVectorData
                                     >,
                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                 >,
@@ -2687,16 +2836,16 @@ macro_rules! DatumGetTSVectorCopy {
                                     <
                                         $crate::__pgrx_c_macros::expression::CPointer<
                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                $crate::varlena
+                                                $crate::__pgrx_c_bindings::varlena
                                             >,
                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::from_storage(
-                                        $crate::pg_detoast_datum_copy(
+                                        $crate::__pgrx_c_bindings::pg_detoast_datum_copy(
                                             <
                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                        $crate::varlena
+                                                        $crate::__pgrx_c_bindings::varlena
                                                     >,
                                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                                 > as $crate::__pgrx_c_macros::expression::CType
@@ -2704,7 +2853,7 @@ macro_rules! DatumGetTSVectorCopy {
                                                 $crate::__pgrx_c_macros::expression::implicit::<
                                                     $crate::__pgrx_c_macros::expression::CPointer<
                                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                                            $crate::varlena
+                                                            $crate::__pgrx_c_bindings::varlena
                                                         >,
                                                         $crate::__pgrx_c_macros::expression::ReadWrite
                                                     >,
@@ -2715,10 +2864,10 @@ macro_rules! DatumGetTSVectorCopy {
                                                         _
                                                     >(
                                                         $crate::__pgrx_c_macros::expression::cast_as::<
-                                                            *mut $crate::varlena,
+                                                            *mut $crate::__pgrx_c_bindings::varlena,
                                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                                    $crate::varlena
+                                                                    $crate::__pgrx_c_bindings::varlena
                                                                 >,
                                                                 $crate::__pgrx_c_macros::expression::ReadWrite
                                                             >,
@@ -2730,7 +2879,7 @@ macro_rules! DatumGetTSVectorCopy {
                                                                     _
                                                                 >(
                                                                     $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                        $crate::Pointer,
+                                                                        $crate::__pgrx_c_bindings::Pointer,
                                                                         $crate::__pgrx_c_macros::expression::CPointer<
                                                                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                                                 $crate::__pgrx_c_macros::CChar,
@@ -2778,9 +2927,11 @@ macro_rules! DatumGetTSVectorCopy {
         {
             let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::cast_as::<
-                    $crate::TSVector,
+                    $crate::__pgrx_c_bindings::TSVector,
                     $crate::__pgrx_c_macros::expression::CPointer<
-                        $crate::__pgrx_c_macros::expression::CRecord<$crate::TSVectorData>,
+                        $crate::__pgrx_c_macros::expression::CRecord<
+                            $crate::__pgrx_c_bindings::TSVectorData
+                        >,
                         $crate::__pgrx_c_macros::expression::ReadWrite
                     >,
                     _
@@ -2788,15 +2939,17 @@ macro_rules! DatumGetTSVectorCopy {
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         <
                             $crate::__pgrx_c_macros::expression::CPointer<
-                                $crate::__pgrx_c_macros::expression::CRecord<$crate::varlena>,
+                                $crate::__pgrx_c_macros::expression::CRecord<
+                                    $crate::__pgrx_c_bindings::varlena
+                                >,
                                 $crate::__pgrx_c_macros::expression::ReadWrite
                             > as $crate::__pgrx_c_macros::expression::CType
                         >::from_storage(
-                            $crate::pg_detoast_datum_copy(
+                            $crate::__pgrx_c_bindings::pg_detoast_datum_copy(
                                 <
                                     $crate::__pgrx_c_macros::expression::CPointer<
                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                            $crate::varlena
+                                            $crate::__pgrx_c_bindings::varlena
                                         >,
                                         $crate::__pgrx_c_macros::expression::ReadWrite
                                     > as $crate::__pgrx_c_macros::expression::CType
@@ -2804,7 +2957,7 @@ macro_rules! DatumGetTSVectorCopy {
                                     $crate::__pgrx_c_macros::expression::implicit::<
                                         $crate::__pgrx_c_macros::expression::CPointer<
                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                $crate::varlena
+                                                $crate::__pgrx_c_bindings::varlena
                                             >,
                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                         >,
@@ -2815,10 +2968,10 @@ macro_rules! DatumGetTSVectorCopy {
                                             _
                                         >(
                                             $crate::__pgrx_c_macros::expression::cast_as::<
-                                                *mut $crate::varlena,
+                                                *mut $crate::__pgrx_c_bindings::varlena,
                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                        $crate::varlena
+                                                        $crate::__pgrx_c_bindings::varlena
                                                     >,
                                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                                 >,
@@ -2830,7 +2983,7 @@ macro_rules! DatumGetTSVectorCopy {
                                                         _
                                                     >(
                                                         $crate::__pgrx_c_macros::expression::cast_as::<
-                                                            $crate::Pointer,
+                                                            $crate::__pgrx_c_bindings::Pointer,
                                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                                     $crate::__pgrx_c_macros::CChar,
@@ -2874,8 +3027,8 @@ macro_rules! DatumGetTSVectorCopy {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -2902,25 +3055,34 @@ macro_rules! __pgrx_c_args_GETOPERAND {
         $crate::__pgrx_c_args_GETOPERAND!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_GETOPERAND!(@p1 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_GETOPERAND!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_GETOPERAND!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_GETOPERAND!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GETOPERAND!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_GETOPERAND!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_GETOPERAND!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $($raw:tt)*) => {
         $crate::__pgrx_c_args_GETOPERAND!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_GETOPERAND!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_GETOPERAND!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -2942,13 +3104,20 @@ macro_rules! __pgrx_c_args_GETOPERAND {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_GETOPERAND!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_GETOPERAND!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_GETOPERAND!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_GETOPERAND!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
-        $crate::__pgrx_c_args_GETOPERAND!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_GETOPERAND!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
         $crate::__pgrx_c_classify!(
@@ -2970,10 +3139,16 @@ macro_rules! __pgrx_c_args_GETOPERAND {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_GETOPERAND!(@p1 $mode [$($done)* (@literal [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_GETOPERAND!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+            $($rest)*
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_GETOPERAND!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_GETOPERAND!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p1 $mode:ident [$($done:tt)*];) => {
         $crate::GETOPERAND!(@$mode; $($done)*)
@@ -3029,10 +3204,10 @@ macro_rules! GETOPERAND {
                             (
                                 $crate::__pgrx_c_macros::expression::profile_value::<false, _>(
                                     $crate::__pgrx_c_macros::expression::cast_as::<
-                                        *mut $crate::QueryItem,
+                                        *mut $crate::__pgrx_c_bindings::QueryItem,
                                         $crate::__pgrx_c_macros::expression::CPointer<
                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                $crate::QueryItem
+                                                $crate::__pgrx_c_bindings::QueryItem
                                             >,
                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                         >,
@@ -3088,7 +3263,7 @@ macro_rules! GETOPERAND {
                                                                         _
                                                                     >(
                                                                         $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                            $crate::int32,
+                                                                            $crate::__pgrx_c_bindings::int32,
                                                                             $crate::__pgrx_c_macros::CInt,
                                                                             _
                                                                         >(
@@ -3142,10 +3317,10 @@ macro_rules! GETOPERAND {
                                                     _
                                                 >(
                                                     $crate::__pgrx_c_macros::expression::cast_as::<
-                                                        $crate::TSQuery,
+                                                        $crate::__pgrx_c_bindings::TSQuery,
                                                         $crate::__pgrx_c_macros::expression::CPointer<
                                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                                $crate::TSQueryData
+                                                                $crate::__pgrx_c_bindings::TSQueryData
                                                             >,
                                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                                         >,
@@ -3171,7 +3346,9 @@ macro_rules! GETOPERAND {
                             ),
                             $crate::__pgrx_c_macros::expression::profile_value::<false, _>(
                                 $crate::__pgrx_c_macros::expression::size_of::<
-                                    $crate::__pgrx_c_macros::expression::CRecord<$crate::QueryItem>>()
+                                    $crate::__pgrx_c_macros::expression::CRecord<
+                                        $crate::__pgrx_c_bindings::QueryItem
+                                    >>()
                             )
                         )
                     )
@@ -3225,10 +3402,10 @@ macro_rules! GETOPERAND {
                                                 _
                                             >(
                                                 $crate::__pgrx_c_macros::expression::cast_as::<
-                                                    *mut $crate::QueryItem,
+                                                    *mut $crate::__pgrx_c_bindings::QueryItem,
                                                     $crate::__pgrx_c_macros::expression::CPointer<
                                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                                            $crate::QueryItem
+                                                            $crate::__pgrx_c_bindings::QueryItem
                                                         >,
                                                         $crate::__pgrx_c_macros::expression::ReadWrite
                                                     >,
@@ -3284,7 +3461,7 @@ macro_rules! GETOPERAND {
                                                                                     _
                                                                                 >(
                                                                                     $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                                        $crate::int32,
+                                                                                        $crate::__pgrx_c_bindings::int32,
                                                                                         $crate::__pgrx_c_macros::CInt,
                                                                                         _
                                                                                     >(
@@ -3341,10 +3518,10 @@ macro_rules! GETOPERAND {
                                                                 _
                                                             >(
                                                                 $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                    $crate::TSQuery,
+                                                                    $crate::__pgrx_c_bindings::TSQuery,
                                                                     $crate::__pgrx_c_macros::expression::CPointer<
                                                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                                                            $crate::TSQueryData
+                                                                            $crate::__pgrx_c_bindings::TSQueryData
                                                                         >,
                                                                         $crate::__pgrx_c_macros::expression::ReadWrite
                                                                     >,
@@ -3374,7 +3551,7 @@ macro_rules! GETOPERAND {
                                         >(
                                             $crate::__pgrx_c_macros::expression::size_of::<
                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                    $crate::QueryItem
+                                                    $crate::__pgrx_c_bindings::QueryItem
                                                 >>()
                                         )
                                     )
@@ -3407,10 +3584,10 @@ macro_rules! GETOPERAND {
                             (
                                 $crate::__pgrx_c_macros::expression::profile_value::<false, _>(
                                     $crate::__pgrx_c_macros::expression::cast_as::<
-                                        *mut $crate::QueryItem,
+                                        *mut $crate::__pgrx_c_bindings::QueryItem,
                                         $crate::__pgrx_c_macros::expression::CPointer<
                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                $crate::QueryItem
+                                                $crate::__pgrx_c_bindings::QueryItem
                                             >,
                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                         >,
@@ -3466,7 +3643,7 @@ macro_rules! GETOPERAND {
                                                                         _
                                                                     >(
                                                                         $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                            $crate::int32,
+                                                                            $crate::__pgrx_c_bindings::int32,
                                                                             $crate::__pgrx_c_macros::CInt,
                                                                             _
                                                                         >(
@@ -3520,10 +3697,10 @@ macro_rules! GETOPERAND {
                                                     _
                                                 >(
                                                     $crate::__pgrx_c_macros::expression::cast_as::<
-                                                        $crate::TSQuery,
+                                                        $crate::__pgrx_c_bindings::TSQuery,
                                                         $crate::__pgrx_c_macros::expression::CPointer<
                                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                                $crate::TSQueryData
+                                                                $crate::__pgrx_c_bindings::TSQueryData
                                                             >,
                                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                                         >,
@@ -3549,7 +3726,9 @@ macro_rules! GETOPERAND {
                             ),
                             $crate::__pgrx_c_macros::expression::profile_value::<false, _>(
                                 $crate::__pgrx_c_macros::expression::size_of::<
-                                    $crate::__pgrx_c_macros::expression::CRecord<$crate::QueryItem>>()
+                                    $crate::__pgrx_c_macros::expression::CRecord<
+                                        $crate::__pgrx_c_bindings::QueryItem
+                                    >>()
                             )
                         )
                     )
@@ -3566,8 +3745,8 @@ macro_rules! GETOPERAND {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -3594,22 +3773,34 @@ macro_rules! __pgrx_c_args_GETQUERY {
         $crate::__pgrx_c_args_GETQUERY!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_GETQUERY!(@p1 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_GETQUERY!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_GETQUERY!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_GETQUERY!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_GETQUERY!(@p1 $mode [$($done)* (@literal [- $argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_GETQUERY!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+            $($rest)*
+        )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_GETQUERY!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_GETQUERY!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $($raw:tt)*) => {
         $crate::__pgrx_c_args_GETQUERY!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_GETQUERY!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_GETQUERY!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -3631,13 +3822,20 @@ macro_rules! __pgrx_c_args_GETQUERY {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_GETQUERY!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_GETQUERY!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_GETQUERY!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_GETQUERY!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
-        $crate::__pgrx_c_args_GETQUERY!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_GETQUERY!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
         $crate::__pgrx_c_classify!(
@@ -3659,10 +3857,16 @@ macro_rules! __pgrx_c_args_GETQUERY {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_GETQUERY!(@p1 $mode [$($done)* (@literal [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_GETQUERY!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+            $($rest)*
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_GETQUERY!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_GETQUERY!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p1 $mode:ident [$($done:tt)*];) => {
         $crate::GETQUERY!(@$mode; $($done)*)
@@ -3707,9 +3911,11 @@ macro_rules! GETQUERY {
         (
             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::cast_as::<
-                    *mut $crate::QueryItem,
+                    *mut $crate::__pgrx_c_bindings::QueryItem,
                     $crate::__pgrx_c_macros::expression::CPointer<
-                        $crate::__pgrx_c_macros::expression::CRecord<$crate::QueryItem>,
+                        $crate::__pgrx_c_macros::expression::CRecord<
+                            $crate::__pgrx_c_bindings::QueryItem
+                        >,
                         $crate::__pgrx_c_macros::expression::ReadWrite
                     >,
                     _
@@ -3750,7 +3956,7 @@ macro_rules! GETQUERY {
                                                     _
                                                 >(
                                                     $crate::__pgrx_c_macros::expression::cast_as::<
-                                                        $crate::int32,
+                                                        $crate::__pgrx_c_bindings::int32,
                                                         $crate::__pgrx_c_macros::CInt,
                                                         _
                                                     >(
@@ -3811,9 +4017,11 @@ macro_rules! GETQUERY {
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::cast_as::<
-                                *mut $crate::QueryItem,
+                                *mut $crate::__pgrx_c_bindings::QueryItem,
                                 $crate::__pgrx_c_macros::expression::CPointer<
-                                    $crate::__pgrx_c_macros::expression::CRecord<$crate::QueryItem>,
+                                    $crate::__pgrx_c_macros::expression::CRecord<
+                                        $crate::__pgrx_c_bindings::QueryItem
+                                    >,
                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                 >,
                                 _
@@ -3865,7 +4073,7 @@ macro_rules! GETQUERY {
                                                                 _
                                                             >(
                                                                 $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                    $crate::int32,
+                                                                    $crate::__pgrx_c_bindings::int32,
                                                                     $crate::__pgrx_c_macros::CInt,
                                                                     _
                                                                 >(
@@ -3911,9 +4119,11 @@ macro_rules! GETQUERY {
         {
             let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::cast_as::<
-                    *mut $crate::QueryItem,
+                    *mut $crate::__pgrx_c_bindings::QueryItem,
                     $crate::__pgrx_c_macros::expression::CPointer<
-                        $crate::__pgrx_c_macros::expression::CRecord<$crate::QueryItem>,
+                        $crate::__pgrx_c_macros::expression::CRecord<
+                            $crate::__pgrx_c_bindings::QueryItem
+                        >,
                         $crate::__pgrx_c_macros::expression::ReadWrite
                     >,
                     _
@@ -3954,7 +4164,7 @@ macro_rules! GETQUERY {
                                                     _
                                                 >(
                                                     $crate::__pgrx_c_macros::expression::cast_as::<
-                                                        $crate::int32,
+                                                        $crate::__pgrx_c_bindings::int32,
                                                         $crate::__pgrx_c_macros::CInt,
                                                         _
                                                     >(
@@ -3996,8 +4206,8 @@ macro_rules! GETQUERY {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -4024,22 +4234,34 @@ macro_rules! __pgrx_c_args_LIMITPOS {
         $crate::__pgrx_c_args_LIMITPOS!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_LIMITPOS!(@p1 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_LIMITPOS!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_LIMITPOS!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_LIMITPOS!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_LIMITPOS!(@p1 $mode [$($done)* (@literal [- $argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_LIMITPOS!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+            $($rest)*
+        )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_LIMITPOS!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_LIMITPOS!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $($raw:tt)*) => {
         $crate::__pgrx_c_args_LIMITPOS!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_LIMITPOS!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_LIMITPOS!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -4061,13 +4283,20 @@ macro_rules! __pgrx_c_args_LIMITPOS {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_LIMITPOS!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_LIMITPOS!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_LIMITPOS!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_LIMITPOS!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
-        $crate::__pgrx_c_args_LIMITPOS!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_LIMITPOS!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
         $crate::__pgrx_c_classify!(
@@ -4089,10 +4318,16 @@ macro_rules! __pgrx_c_args_LIMITPOS {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_LIMITPOS!(@p1 $mode [$($done)* (@literal [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_LIMITPOS!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+            $($rest)*
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_LIMITPOS!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_LIMITPOS!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p1 $mode:ident [$($done:tt)*];) => {
         $crate::LIMITPOS!(@$mode; $($done)*)
@@ -4149,7 +4384,7 @@ macro_rules! LIMITPOS {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::CValue::<
                                             $crate::__pgrx_c_macros::CInt
-                                        >::new($crate::MAXENTRYPOS as i32)
+                                        >::new($crate::__pgrx_c_bindings::MAXENTRYPOS as i32)
                                     )
                                 )
                             )
@@ -4169,7 +4404,7 @@ macro_rules! LIMITPOS {
                                         >(
                                             $crate::__pgrx_c_macros::CValue::<
                                                 $crate::__pgrx_c_macros::CInt
-                                            >::new($crate::MAXENTRYPOS as i32)
+                                            >::new($crate::__pgrx_c_bindings::MAXENTRYPOS as i32)
                                         ),
                                         $crate::__pgrx_c_macros::expression::profile_value::<
                                             true,
@@ -4242,7 +4477,9 @@ macro_rules! LIMITPOS {
                                                 >(
                                                     $crate::__pgrx_c_macros::CValue::<
                                                         $crate::__pgrx_c_macros::CInt
-                                                    >::new($crate::MAXENTRYPOS as i32)
+                                                    >::new(
+                                                        $crate::__pgrx_c_bindings::MAXENTRYPOS as i32
+                                                    )
                                                 )
                                             )
                                         )
@@ -4265,7 +4502,9 @@ macro_rules! LIMITPOS {
                                                     >(
                                                         $crate::__pgrx_c_macros::CValue::<
                                                             $crate::__pgrx_c_macros::CInt
-                                                        >::new($crate::MAXENTRYPOS as i32)
+                                                        >::new(
+                                                            $crate::__pgrx_c_bindings::MAXENTRYPOS as i32
+                                                        )
                                                     ),
                                                     $crate::__pgrx_c_macros::expression::profile_value::<
                                                         true,
@@ -4318,7 +4557,7 @@ macro_rules! LIMITPOS {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::CValue::<
                                             $crate::__pgrx_c_macros::CInt
-                                        >::new($crate::MAXENTRYPOS as i32)
+                                        >::new($crate::__pgrx_c_bindings::MAXENTRYPOS as i32)
                                     )
                                 )
                             )
@@ -4338,7 +4577,7 @@ macro_rules! LIMITPOS {
                                         >(
                                             $crate::__pgrx_c_macros::CValue::<
                                                 $crate::__pgrx_c_macros::CInt
-                                            >::new($crate::MAXENTRYPOS as i32)
+                                            >::new($crate::__pgrx_c_bindings::MAXENTRYPOS as i32)
                                         ),
                                         $crate::__pgrx_c_macros::expression::profile_value::<
                                             true,
@@ -4374,8 +4613,8 @@ macro_rules! LIMITPOS {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -4402,25 +4641,34 @@ macro_rules! __pgrx_c_args_OP_PRIORITY {
         $crate::__pgrx_c_args_OP_PRIORITY!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_OP_PRIORITY!(@p1 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_OP_PRIORITY!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_OP_PRIORITY!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_OP_PRIORITY!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_OP_PRIORITY!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_OP_PRIORITY!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_OP_PRIORITY!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $($raw:tt)*) => {
         $crate::__pgrx_c_args_OP_PRIORITY!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_OP_PRIORITY!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_OP_PRIORITY!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -4442,13 +4690,20 @@ macro_rules! __pgrx_c_args_OP_PRIORITY {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_OP_PRIORITY!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_OP_PRIORITY!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_OP_PRIORITY!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_OP_PRIORITY!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
-        $crate::__pgrx_c_args_OP_PRIORITY!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_OP_PRIORITY!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
         $crate::__pgrx_c_classify!(
@@ -4470,10 +4725,16 @@ macro_rules! __pgrx_c_args_OP_PRIORITY {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_OP_PRIORITY!(@p1 $mode [$($done)* (@literal [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_OP_PRIORITY!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+            $($rest)*
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_OP_PRIORITY!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_OP_PRIORITY!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p1 $mode:ident [$($done:tt)*];) => {
         $crate::OP_PRIORITY!(@$mode; $($done)*)
@@ -4524,7 +4785,11 @@ macro_rules! OP_PRIORITY {
                                     $crate::__pgrx_c_macros::expression::CArray<
                                         $crate::__pgrx_c_macros::CInt,
                                         4
-                                    >>(::core::ptr::addr_of!($crate::tsearch_op_priority))
+                                    >>(
+                                    ::core::ptr::addr_of!(
+                                        $crate::__pgrx_c_bindings::tsearch_op_priority
+                                    )
+                                )
                             )
                         ),
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -4562,7 +4827,9 @@ macro_rules! OP_PRIORITY {
                             $crate::__pgrx_c_macros::expression::CArray<
                                 $crate::__pgrx_c_macros::CInt,
                                 4
-                            >>(::core::ptr::addr_of!($crate::tsearch_op_priority))
+                            >>(
+                            ::core::ptr::addr_of!($crate::__pgrx_c_bindings::tsearch_op_priority)
+                        )
                     )
                 ),
                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -4598,7 +4865,9 @@ macro_rules! OP_PRIORITY {
                             $crate::__pgrx_c_macros::expression::CArray<
                                 $crate::__pgrx_c_macros::CInt,
                                 4
-                            >>(::core::ptr::addr_of!($crate::tsearch_op_priority))
+                            >>(
+                            ::core::ptr::addr_of!($crate::__pgrx_c_bindings::tsearch_op_priority)
+                        )
                     )
                 ),
                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -4642,7 +4911,11 @@ macro_rules! OP_PRIORITY {
                                         $crate::__pgrx_c_macros::expression::CArray<
                                             $crate::__pgrx_c_macros::CInt,
                                             4
-                                        >>(::core::ptr::addr_of!($crate::tsearch_op_priority))
+                                        >>(
+                                        ::core::ptr::addr_of!(
+                                            $crate::__pgrx_c_bindings::tsearch_op_priority
+                                        )
+                                    )
                                 )
                             ),
                             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -4686,7 +4959,11 @@ macro_rules! OP_PRIORITY {
                                     $crate::__pgrx_c_macros::expression::CArray<
                                         $crate::__pgrx_c_macros::CInt,
                                         4
-                                    >>(::core::ptr::addr_of!($crate::tsearch_op_priority))
+                                    >>(
+                                    ::core::ptr::addr_of!(
+                                        $crate::__pgrx_c_bindings::tsearch_op_priority
+                                    )
+                                )
                             )
                         ),
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -4721,8 +4998,8 @@ macro_rules! OP_PRIORITY {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -4753,7 +5030,7 @@ macro_rules! __pgrx_c_args_PG_GETARG_TSQUERY {
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_PG_GETARG_TSQUERY!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -4762,7 +5039,7 @@ macro_rules! __pgrx_c_args_PG_GETARG_TSQUERY {
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_PG_GETARG_TSQUERY!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -4789,31 +5066,35 @@ macro_rules! __pgrx_c_args_PG_GETARG_TSQUERY {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_PG_GETARG_TSQUERY!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:tt, $($rest:tt)*) => {
         $crate::__pgrx_c_args_PG_GETARG_TSQUERY!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_PG_GETARG_TSQUERY!(@p2 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_PG_GETARG_TSQUERY!(
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative1 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_PG_GETARG_TSQUERY!(@p2 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_PG_GETARG_TSQUERY!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_PG_GETARG_TSQUERY!(
-            @p2 $mode [$($done)* (@literal [- $argument]),];
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_PG_GETARG_TSQUERY!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -4821,7 +5102,9 @@ macro_rules! __pgrx_c_args_PG_GETARG_TSQUERY {
         $crate::__pgrx_c_args_PG_GETARG_TSQUERY!(@negative1 $mode [$($done)*]; - $($raw)*)
     };
     (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_PG_GETARG_TSQUERY!(@p2 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_PG_GETARG_TSQUERY!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -4843,14 +5126,18 @@ macro_rules! __pgrx_c_args_PG_GETARG_TSQUERY {
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_PG_GETARG_TSQUERY!(@p2 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_PG_GETARG_TSQUERY!(
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_PG_GETARG_TSQUERY!(@p2 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_PG_GETARG_TSQUERY!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_PG_GETARG_TSQUERY!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -4877,13 +5164,13 @@ macro_rules! __pgrx_c_args_PG_GETARG_TSQUERY {
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_PG_GETARG_TSQUERY!(
-            @p2 $mode [$($done)* (@literal [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_PG_GETARG_TSQUERY!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -4933,9 +5220,11 @@ macro_rules! PG_GETARG_TSQUERY {
         (
             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::cast_as::<
-                    $crate::TSQuery,
+                    $crate::__pgrx_c_bindings::TSQuery,
                     $crate::__pgrx_c_macros::expression::CPointer<
-                        $crate::__pgrx_c_macros::expression::CRecord<$crate::TSQueryData>,
+                        $crate::__pgrx_c_macros::expression::CRecord<
+                            $crate::__pgrx_c_bindings::TSQueryData
+                        >,
                         $crate::__pgrx_c_macros::expression::ReadWrite
                     >,
                     _
@@ -4943,7 +5232,7 @@ macro_rules! PG_GETARG_TSQUERY {
                     (
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::cast_as::<
-                                $crate::Pointer,
+                                $crate::__pgrx_c_bindings::Pointer,
                                 $crate::__pgrx_c_macros::expression::CPointer<
                                     $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                         $crate::__pgrx_c_macros::CChar,
@@ -5041,10 +5330,10 @@ macro_rules! PG_GETARG_TSQUERY {
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::cast_as::<
-                                $crate::TSQuery,
+                                $crate::__pgrx_c_bindings::TSQuery,
                                 $crate::__pgrx_c_macros::expression::CPointer<
                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                        $crate::TSQueryData
+                                        $crate::__pgrx_c_bindings::TSQueryData
                                     >,
                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                 >,
@@ -5053,7 +5342,7 @@ macro_rules! PG_GETARG_TSQUERY {
                                 (
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::expression::cast_as::<
-                                            $crate::Pointer,
+                                            $crate::__pgrx_c_bindings::Pointer,
                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                     $crate::__pgrx_c_macros::CChar,
@@ -5137,9 +5426,11 @@ macro_rules! PG_GETARG_TSQUERY {
         {
             let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::cast_as::<
-                    $crate::TSQuery,
+                    $crate::__pgrx_c_bindings::TSQuery,
                     $crate::__pgrx_c_macros::expression::CPointer<
-                        $crate::__pgrx_c_macros::expression::CRecord<$crate::TSQueryData>,
+                        $crate::__pgrx_c_macros::expression::CRecord<
+                            $crate::__pgrx_c_bindings::TSQueryData
+                        >,
                         $crate::__pgrx_c_macros::expression::ReadWrite
                     >,
                     _
@@ -5147,7 +5438,7 @@ macro_rules! PG_GETARG_TSQUERY {
                     (
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::cast_as::<
-                                $crate::Pointer,
+                                $crate::__pgrx_c_bindings::Pointer,
                                 $crate::__pgrx_c_macros::expression::CPointer<
                                     $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                         $crate::__pgrx_c_macros::CChar,
@@ -5225,8 +5516,8 @@ macro_rules! PG_GETARG_TSQUERY {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -5260,7 +5551,7 @@ macro_rules! __pgrx_c_args_PG_GETARG_TSQUERY_COPY {
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_PG_GETARG_TSQUERY_COPY!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -5269,7 +5560,7 @@ macro_rules! __pgrx_c_args_PG_GETARG_TSQUERY_COPY {
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_PG_GETARG_TSQUERY_COPY!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -5296,33 +5587,35 @@ macro_rules! __pgrx_c_args_PG_GETARG_TSQUERY_COPY {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_PG_GETARG_TSQUERY_COPY!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:tt, $($rest:tt)*) => {
         $crate::__pgrx_c_args_PG_GETARG_TSQUERY_COPY!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $argument:literal) => {
         $crate::__pgrx_c_args_PG_GETARG_TSQUERY_COPY!(
-            @p2 $mode [$($done)* (@literal [- $argument]),];
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
         )
     };
     (@negative1 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_PG_GETARG_TSQUERY_COPY!(@p2 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_PG_GETARG_TSQUERY_COPY!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_PG_GETARG_TSQUERY_COPY!(
-            @p2 $mode [$($done)* (@literal [- $argument]),];
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_PG_GETARG_TSQUERY_COPY!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -5330,7 +5623,9 @@ macro_rules! __pgrx_c_args_PG_GETARG_TSQUERY_COPY {
         $crate::__pgrx_c_args_PG_GETARG_TSQUERY_COPY!(@negative1 $mode [$($done)*]; - $($raw)*)
     };
     (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_PG_GETARG_TSQUERY_COPY!(@p2 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_PG_GETARG_TSQUERY_COPY!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -5355,15 +5650,17 @@ macro_rules! __pgrx_c_args_PG_GETARG_TSQUERY_COPY {
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_PG_GETARG_TSQUERY_COPY!(
-            @p2 $mode [$($done)* (@literal [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_PG_GETARG_TSQUERY_COPY!(@p2 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_PG_GETARG_TSQUERY_COPY!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_PG_GETARG_TSQUERY_COPY!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -5390,13 +5687,13 @@ macro_rules! __pgrx_c_args_PG_GETARG_TSQUERY_COPY {
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_PG_GETARG_TSQUERY_COPY!(
-            @p2 $mode [$($done)* (@literal [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_PG_GETARG_TSQUERY_COPY!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -5449,9 +5746,11 @@ macro_rules! PG_GETARG_TSQUERY_COPY {
         (
             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::cast_as::<
-                    $crate::TSQuery,
+                    $crate::__pgrx_c_bindings::TSQuery,
                     $crate::__pgrx_c_macros::expression::CPointer<
-                        $crate::__pgrx_c_macros::expression::CRecord<$crate::TSQueryData>,
+                        $crate::__pgrx_c_macros::expression::CRecord<
+                            $crate::__pgrx_c_bindings::TSQueryData
+                        >,
                         $crate::__pgrx_c_macros::expression::ReadWrite
                     >,
                     _
@@ -5459,15 +5758,17 @@ macro_rules! PG_GETARG_TSQUERY_COPY {
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         <
                             $crate::__pgrx_c_macros::expression::CPointer<
-                                $crate::__pgrx_c_macros::expression::CRecord<$crate::varlena>,
+                                $crate::__pgrx_c_macros::expression::CRecord<
+                                    $crate::__pgrx_c_bindings::varlena
+                                >,
                                 $crate::__pgrx_c_macros::expression::ReadWrite
                             > as $crate::__pgrx_c_macros::expression::CType
                         >::from_storage(
-                            $crate::pg_detoast_datum_copy(
+                            $crate::__pgrx_c_bindings::pg_detoast_datum_copy(
                                 <
                                     $crate::__pgrx_c_macros::expression::CPointer<
                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                            $crate::varlena
+                                            $crate::__pgrx_c_bindings::varlena
                                         >,
                                         $crate::__pgrx_c_macros::expression::ReadWrite
                                     > as $crate::__pgrx_c_macros::expression::CType
@@ -5475,7 +5776,7 @@ macro_rules! PG_GETARG_TSQUERY_COPY {
                                     $crate::__pgrx_c_macros::expression::implicit::<
                                         $crate::__pgrx_c_macros::expression::CPointer<
                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                $crate::varlena
+                                                $crate::__pgrx_c_bindings::varlena
                                             >,
                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                         >,
@@ -5486,10 +5787,10 @@ macro_rules! PG_GETARG_TSQUERY_COPY {
                                             _
                                         >(
                                             $crate::__pgrx_c_macros::expression::cast_as::<
-                                                *mut $crate::varlena,
+                                                *mut $crate::__pgrx_c_bindings::varlena,
                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                        $crate::varlena
+                                                        $crate::__pgrx_c_bindings::varlena
                                                     >,
                                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                                 >,
@@ -5501,7 +5802,7 @@ macro_rules! PG_GETARG_TSQUERY_COPY {
                                                         _
                                                     >(
                                                         $crate::__pgrx_c_macros::expression::cast_as::<
-                                                            $crate::Pointer,
+                                                            $crate::__pgrx_c_bindings::Pointer,
                                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                                     $crate::__pgrx_c_macros::CChar,
@@ -5610,10 +5911,10 @@ macro_rules! PG_GETARG_TSQUERY_COPY {
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::cast_as::<
-                                $crate::TSQuery,
+                                $crate::__pgrx_c_bindings::TSQuery,
                                 $crate::__pgrx_c_macros::expression::CPointer<
                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                        $crate::TSQueryData
+                                        $crate::__pgrx_c_bindings::TSQueryData
                                     >,
                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                 >,
@@ -5623,16 +5924,16 @@ macro_rules! PG_GETARG_TSQUERY_COPY {
                                     <
                                         $crate::__pgrx_c_macros::expression::CPointer<
                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                $crate::varlena
+                                                $crate::__pgrx_c_bindings::varlena
                                             >,
                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::from_storage(
-                                        $crate::pg_detoast_datum_copy(
+                                        $crate::__pgrx_c_bindings::pg_detoast_datum_copy(
                                             <
                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                        $crate::varlena
+                                                        $crate::__pgrx_c_bindings::varlena
                                                     >,
                                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                                 > as $crate::__pgrx_c_macros::expression::CType
@@ -5640,7 +5941,7 @@ macro_rules! PG_GETARG_TSQUERY_COPY {
                                                 $crate::__pgrx_c_macros::expression::implicit::<
                                                     $crate::__pgrx_c_macros::expression::CPointer<
                                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                                            $crate::varlena
+                                                            $crate::__pgrx_c_bindings::varlena
                                                         >,
                                                         $crate::__pgrx_c_macros::expression::ReadWrite
                                                     >,
@@ -5651,10 +5952,10 @@ macro_rules! PG_GETARG_TSQUERY_COPY {
                                                         _
                                                     >(
                                                         $crate::__pgrx_c_macros::expression::cast_as::<
-                                                            *mut $crate::varlena,
+                                                            *mut $crate::__pgrx_c_bindings::varlena,
                                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                                    $crate::varlena
+                                                                    $crate::__pgrx_c_bindings::varlena
                                                                 >,
                                                                 $crate::__pgrx_c_macros::expression::ReadWrite
                                                             >,
@@ -5666,7 +5967,7 @@ macro_rules! PG_GETARG_TSQUERY_COPY {
                                                                     _
                                                                 >(
                                                                     $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                        $crate::Pointer,
+                                                                        $crate::__pgrx_c_bindings::Pointer,
                                                                         $crate::__pgrx_c_macros::expression::CPointer<
                                                                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                                                 $crate::__pgrx_c_macros::CChar,
@@ -5759,9 +6060,11 @@ macro_rules! PG_GETARG_TSQUERY_COPY {
         {
             let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::cast_as::<
-                    $crate::TSQuery,
+                    $crate::__pgrx_c_bindings::TSQuery,
                     $crate::__pgrx_c_macros::expression::CPointer<
-                        $crate::__pgrx_c_macros::expression::CRecord<$crate::TSQueryData>,
+                        $crate::__pgrx_c_macros::expression::CRecord<
+                            $crate::__pgrx_c_bindings::TSQueryData
+                        >,
                         $crate::__pgrx_c_macros::expression::ReadWrite
                     >,
                     _
@@ -5769,15 +6072,17 @@ macro_rules! PG_GETARG_TSQUERY_COPY {
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         <
                             $crate::__pgrx_c_macros::expression::CPointer<
-                                $crate::__pgrx_c_macros::expression::CRecord<$crate::varlena>,
+                                $crate::__pgrx_c_macros::expression::CRecord<
+                                    $crate::__pgrx_c_bindings::varlena
+                                >,
                                 $crate::__pgrx_c_macros::expression::ReadWrite
                             > as $crate::__pgrx_c_macros::expression::CType
                         >::from_storage(
-                            $crate::pg_detoast_datum_copy(
+                            $crate::__pgrx_c_bindings::pg_detoast_datum_copy(
                                 <
                                     $crate::__pgrx_c_macros::expression::CPointer<
                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                            $crate::varlena
+                                            $crate::__pgrx_c_bindings::varlena
                                         >,
                                         $crate::__pgrx_c_macros::expression::ReadWrite
                                     > as $crate::__pgrx_c_macros::expression::CType
@@ -5785,7 +6090,7 @@ macro_rules! PG_GETARG_TSQUERY_COPY {
                                     $crate::__pgrx_c_macros::expression::implicit::<
                                         $crate::__pgrx_c_macros::expression::CPointer<
                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                $crate::varlena
+                                                $crate::__pgrx_c_bindings::varlena
                                             >,
                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                         >,
@@ -5796,10 +6101,10 @@ macro_rules! PG_GETARG_TSQUERY_COPY {
                                             _
                                         >(
                                             $crate::__pgrx_c_macros::expression::cast_as::<
-                                                *mut $crate::varlena,
+                                                *mut $crate::__pgrx_c_bindings::varlena,
                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                        $crate::varlena
+                                                        $crate::__pgrx_c_bindings::varlena
                                                     >,
                                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                                 >,
@@ -5811,7 +6116,7 @@ macro_rules! PG_GETARG_TSQUERY_COPY {
                                                         _
                                                     >(
                                                         $crate::__pgrx_c_macros::expression::cast_as::<
-                                                            $crate::Pointer,
+                                                            $crate::__pgrx_c_bindings::Pointer,
                                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                                     $crate::__pgrx_c_macros::CChar,
@@ -5900,8 +6205,8 @@ macro_rules! PG_GETARG_TSQUERY_COPY {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -5932,7 +6237,7 @@ macro_rules! __pgrx_c_args_PG_GETARG_TSVECTOR {
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_PG_GETARG_TSVECTOR!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -5941,7 +6246,7 @@ macro_rules! __pgrx_c_args_PG_GETARG_TSVECTOR {
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_PG_GETARG_TSVECTOR!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -5968,31 +6273,35 @@ macro_rules! __pgrx_c_args_PG_GETARG_TSVECTOR {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_PG_GETARG_TSVECTOR!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:tt, $($rest:tt)*) => {
         $crate::__pgrx_c_args_PG_GETARG_TSVECTOR!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_PG_GETARG_TSVECTOR!(@p2 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_PG_GETARG_TSVECTOR!(
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative1 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_PG_GETARG_TSVECTOR!(@p2 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_PG_GETARG_TSVECTOR!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_PG_GETARG_TSVECTOR!(
-            @p2 $mode [$($done)* (@literal [- $argument]),];
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_PG_GETARG_TSVECTOR!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -6000,7 +6309,9 @@ macro_rules! __pgrx_c_args_PG_GETARG_TSVECTOR {
         $crate::__pgrx_c_args_PG_GETARG_TSVECTOR!(@negative1 $mode [$($done)*]; - $($raw)*)
     };
     (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_PG_GETARG_TSVECTOR!(@p2 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_PG_GETARG_TSVECTOR!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -6022,14 +6333,18 @@ macro_rules! __pgrx_c_args_PG_GETARG_TSVECTOR {
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_PG_GETARG_TSVECTOR!(@p2 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_PG_GETARG_TSVECTOR!(
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_PG_GETARG_TSVECTOR!(@p2 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_PG_GETARG_TSVECTOR!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_PG_GETARG_TSVECTOR!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -6056,13 +6371,13 @@ macro_rules! __pgrx_c_args_PG_GETARG_TSVECTOR {
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_PG_GETARG_TSVECTOR!(
-            @p2 $mode [$($done)* (@literal [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_PG_GETARG_TSVECTOR!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -6112,9 +6427,11 @@ macro_rules! PG_GETARG_TSVECTOR {
         (
             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::cast_as::<
-                    $crate::TSVector,
+                    $crate::__pgrx_c_bindings::TSVector,
                     $crate::__pgrx_c_macros::expression::CPointer<
-                        $crate::__pgrx_c_macros::expression::CRecord<$crate::TSVectorData>,
+                        $crate::__pgrx_c_macros::expression::CRecord<
+                            $crate::__pgrx_c_bindings::TSVectorData
+                        >,
                         $crate::__pgrx_c_macros::expression::ReadWrite
                     >,
                     _
@@ -6122,15 +6439,17 @@ macro_rules! PG_GETARG_TSVECTOR {
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         <
                             $crate::__pgrx_c_macros::expression::CPointer<
-                                $crate::__pgrx_c_macros::expression::CRecord<$crate::varlena>,
+                                $crate::__pgrx_c_macros::expression::CRecord<
+                                    $crate::__pgrx_c_bindings::varlena
+                                >,
                                 $crate::__pgrx_c_macros::expression::ReadWrite
                             > as $crate::__pgrx_c_macros::expression::CType
                         >::from_storage(
-                            $crate::pg_detoast_datum(
+                            $crate::__pgrx_c_bindings::pg_detoast_datum(
                                 <
                                     $crate::__pgrx_c_macros::expression::CPointer<
                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                            $crate::varlena
+                                            $crate::__pgrx_c_bindings::varlena
                                         >,
                                         $crate::__pgrx_c_macros::expression::ReadWrite
                                     > as $crate::__pgrx_c_macros::expression::CType
@@ -6138,7 +6457,7 @@ macro_rules! PG_GETARG_TSVECTOR {
                                     $crate::__pgrx_c_macros::expression::implicit::<
                                         $crate::__pgrx_c_macros::expression::CPointer<
                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                $crate::varlena
+                                                $crate::__pgrx_c_bindings::varlena
                                             >,
                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                         >,
@@ -6149,10 +6468,10 @@ macro_rules! PG_GETARG_TSVECTOR {
                                             _
                                         >(
                                             $crate::__pgrx_c_macros::expression::cast_as::<
-                                                *mut $crate::varlena,
+                                                *mut $crate::__pgrx_c_bindings::varlena,
                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                        $crate::varlena
+                                                        $crate::__pgrx_c_bindings::varlena
                                                     >,
                                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                                 >,
@@ -6164,7 +6483,7 @@ macro_rules! PG_GETARG_TSVECTOR {
                                                         _
                                                     >(
                                                         $crate::__pgrx_c_macros::expression::cast_as::<
-                                                            $crate::Pointer,
+                                                            $crate::__pgrx_c_bindings::Pointer,
                                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                                     $crate::__pgrx_c_macros::CChar,
@@ -6273,10 +6592,10 @@ macro_rules! PG_GETARG_TSVECTOR {
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::cast_as::<
-                                $crate::TSVector,
+                                $crate::__pgrx_c_bindings::TSVector,
                                 $crate::__pgrx_c_macros::expression::CPointer<
                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                        $crate::TSVectorData
+                                        $crate::__pgrx_c_bindings::TSVectorData
                                     >,
                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                 >,
@@ -6286,16 +6605,16 @@ macro_rules! PG_GETARG_TSVECTOR {
                                     <
                                         $crate::__pgrx_c_macros::expression::CPointer<
                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                $crate::varlena
+                                                $crate::__pgrx_c_bindings::varlena
                                             >,
                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::from_storage(
-                                        $crate::pg_detoast_datum(
+                                        $crate::__pgrx_c_bindings::pg_detoast_datum(
                                             <
                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                        $crate::varlena
+                                                        $crate::__pgrx_c_bindings::varlena
                                                     >,
                                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                                 > as $crate::__pgrx_c_macros::expression::CType
@@ -6303,7 +6622,7 @@ macro_rules! PG_GETARG_TSVECTOR {
                                                 $crate::__pgrx_c_macros::expression::implicit::<
                                                     $crate::__pgrx_c_macros::expression::CPointer<
                                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                                            $crate::varlena
+                                                            $crate::__pgrx_c_bindings::varlena
                                                         >,
                                                         $crate::__pgrx_c_macros::expression::ReadWrite
                                                     >,
@@ -6314,10 +6633,10 @@ macro_rules! PG_GETARG_TSVECTOR {
                                                         _
                                                     >(
                                                         $crate::__pgrx_c_macros::expression::cast_as::<
-                                                            *mut $crate::varlena,
+                                                            *mut $crate::__pgrx_c_bindings::varlena,
                                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                                    $crate::varlena
+                                                                    $crate::__pgrx_c_bindings::varlena
                                                                 >,
                                                                 $crate::__pgrx_c_macros::expression::ReadWrite
                                                             >,
@@ -6329,7 +6648,7 @@ macro_rules! PG_GETARG_TSVECTOR {
                                                                     _
                                                                 >(
                                                                     $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                        $crate::Pointer,
+                                                                        $crate::__pgrx_c_bindings::Pointer,
                                                                         $crate::__pgrx_c_macros::expression::CPointer<
                                                                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                                                 $crate::__pgrx_c_macros::CChar,
@@ -6422,9 +6741,11 @@ macro_rules! PG_GETARG_TSVECTOR {
         {
             let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::cast_as::<
-                    $crate::TSVector,
+                    $crate::__pgrx_c_bindings::TSVector,
                     $crate::__pgrx_c_macros::expression::CPointer<
-                        $crate::__pgrx_c_macros::expression::CRecord<$crate::TSVectorData>,
+                        $crate::__pgrx_c_macros::expression::CRecord<
+                            $crate::__pgrx_c_bindings::TSVectorData
+                        >,
                         $crate::__pgrx_c_macros::expression::ReadWrite
                     >,
                     _
@@ -6432,15 +6753,17 @@ macro_rules! PG_GETARG_TSVECTOR {
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         <
                             $crate::__pgrx_c_macros::expression::CPointer<
-                                $crate::__pgrx_c_macros::expression::CRecord<$crate::varlena>,
+                                $crate::__pgrx_c_macros::expression::CRecord<
+                                    $crate::__pgrx_c_bindings::varlena
+                                >,
                                 $crate::__pgrx_c_macros::expression::ReadWrite
                             > as $crate::__pgrx_c_macros::expression::CType
                         >::from_storage(
-                            $crate::pg_detoast_datum(
+                            $crate::__pgrx_c_bindings::pg_detoast_datum(
                                 <
                                     $crate::__pgrx_c_macros::expression::CPointer<
                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                            $crate::varlena
+                                            $crate::__pgrx_c_bindings::varlena
                                         >,
                                         $crate::__pgrx_c_macros::expression::ReadWrite
                                     > as $crate::__pgrx_c_macros::expression::CType
@@ -6448,7 +6771,7 @@ macro_rules! PG_GETARG_TSVECTOR {
                                     $crate::__pgrx_c_macros::expression::implicit::<
                                         $crate::__pgrx_c_macros::expression::CPointer<
                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                $crate::varlena
+                                                $crate::__pgrx_c_bindings::varlena
                                             >,
                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                         >,
@@ -6459,10 +6782,10 @@ macro_rules! PG_GETARG_TSVECTOR {
                                             _
                                         >(
                                             $crate::__pgrx_c_macros::expression::cast_as::<
-                                                *mut $crate::varlena,
+                                                *mut $crate::__pgrx_c_bindings::varlena,
                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                        $crate::varlena
+                                                        $crate::__pgrx_c_bindings::varlena
                                                     >,
                                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                                 >,
@@ -6474,7 +6797,7 @@ macro_rules! PG_GETARG_TSVECTOR {
                                                         _
                                                     >(
                                                         $crate::__pgrx_c_macros::expression::cast_as::<
-                                                            $crate::Pointer,
+                                                            $crate::__pgrx_c_bindings::Pointer,
                                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                                     $crate::__pgrx_c_macros::CChar,
@@ -6563,8 +6886,8 @@ macro_rules! PG_GETARG_TSVECTOR {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -6598,7 +6921,7 @@ macro_rules! __pgrx_c_args_PG_GETARG_TSVECTOR_COPY {
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_PG_GETARG_TSVECTOR_COPY!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -6607,7 +6930,7 @@ macro_rules! __pgrx_c_args_PG_GETARG_TSVECTOR_COPY {
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_PG_GETARG_TSVECTOR_COPY!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -6634,35 +6957,35 @@ macro_rules! __pgrx_c_args_PG_GETARG_TSVECTOR_COPY {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_PG_GETARG_TSVECTOR_COPY!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:tt, $($rest:tt)*) => {
         $crate::__pgrx_c_args_PG_GETARG_TSVECTOR_COPY!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $argument:literal) => {
         $crate::__pgrx_c_args_PG_GETARG_TSVECTOR_COPY!(
-            @p2 $mode [$($done)* (@literal [- $argument]),];
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
         )
     };
     (@negative1 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_PG_GETARG_TSVECTOR_COPY!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_PG_GETARG_TSVECTOR_COPY!(
-            @p2 $mode [$($done)* (@literal [- $argument]),];
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_PG_GETARG_TSVECTOR_COPY!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -6671,7 +6994,7 @@ macro_rules! __pgrx_c_args_PG_GETARG_TSVECTOR_COPY {
     };
     (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
         $crate::__pgrx_c_args_PG_GETARG_TSVECTOR_COPY!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
@@ -6697,17 +7020,17 @@ macro_rules! __pgrx_c_args_PG_GETARG_TSVECTOR_COPY {
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_PG_GETARG_TSVECTOR_COPY!(
-            @p2 $mode [$($done)* (@literal [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_PG_GETARG_TSVECTOR_COPY!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_PG_GETARG_TSVECTOR_COPY!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -6734,13 +7057,13 @@ macro_rules! __pgrx_c_args_PG_GETARG_TSVECTOR_COPY {
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_PG_GETARG_TSVECTOR_COPY!(
-            @p2 $mode [$($done)* (@literal [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_PG_GETARG_TSVECTOR_COPY!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -6793,9 +7116,11 @@ macro_rules! PG_GETARG_TSVECTOR_COPY {
         (
             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::cast_as::<
-                    $crate::TSVector,
+                    $crate::__pgrx_c_bindings::TSVector,
                     $crate::__pgrx_c_macros::expression::CPointer<
-                        $crate::__pgrx_c_macros::expression::CRecord<$crate::TSVectorData>,
+                        $crate::__pgrx_c_macros::expression::CRecord<
+                            $crate::__pgrx_c_bindings::TSVectorData
+                        >,
                         $crate::__pgrx_c_macros::expression::ReadWrite
                     >,
                     _
@@ -6803,15 +7128,17 @@ macro_rules! PG_GETARG_TSVECTOR_COPY {
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         <
                             $crate::__pgrx_c_macros::expression::CPointer<
-                                $crate::__pgrx_c_macros::expression::CRecord<$crate::varlena>,
+                                $crate::__pgrx_c_macros::expression::CRecord<
+                                    $crate::__pgrx_c_bindings::varlena
+                                >,
                                 $crate::__pgrx_c_macros::expression::ReadWrite
                             > as $crate::__pgrx_c_macros::expression::CType
                         >::from_storage(
-                            $crate::pg_detoast_datum_copy(
+                            $crate::__pgrx_c_bindings::pg_detoast_datum_copy(
                                 <
                                     $crate::__pgrx_c_macros::expression::CPointer<
                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                            $crate::varlena
+                                            $crate::__pgrx_c_bindings::varlena
                                         >,
                                         $crate::__pgrx_c_macros::expression::ReadWrite
                                     > as $crate::__pgrx_c_macros::expression::CType
@@ -6819,7 +7146,7 @@ macro_rules! PG_GETARG_TSVECTOR_COPY {
                                     $crate::__pgrx_c_macros::expression::implicit::<
                                         $crate::__pgrx_c_macros::expression::CPointer<
                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                $crate::varlena
+                                                $crate::__pgrx_c_bindings::varlena
                                             >,
                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                         >,
@@ -6830,10 +7157,10 @@ macro_rules! PG_GETARG_TSVECTOR_COPY {
                                             _
                                         >(
                                             $crate::__pgrx_c_macros::expression::cast_as::<
-                                                *mut $crate::varlena,
+                                                *mut $crate::__pgrx_c_bindings::varlena,
                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                        $crate::varlena
+                                                        $crate::__pgrx_c_bindings::varlena
                                                     >,
                                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                                 >,
@@ -6845,7 +7172,7 @@ macro_rules! PG_GETARG_TSVECTOR_COPY {
                                                         _
                                                     >(
                                                         $crate::__pgrx_c_macros::expression::cast_as::<
-                                                            $crate::Pointer,
+                                                            $crate::__pgrx_c_bindings::Pointer,
                                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                                     $crate::__pgrx_c_macros::CChar,
@@ -6954,10 +7281,10 @@ macro_rules! PG_GETARG_TSVECTOR_COPY {
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::cast_as::<
-                                $crate::TSVector,
+                                $crate::__pgrx_c_bindings::TSVector,
                                 $crate::__pgrx_c_macros::expression::CPointer<
                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                        $crate::TSVectorData
+                                        $crate::__pgrx_c_bindings::TSVectorData
                                     >,
                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                 >,
@@ -6967,16 +7294,16 @@ macro_rules! PG_GETARG_TSVECTOR_COPY {
                                     <
                                         $crate::__pgrx_c_macros::expression::CPointer<
                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                $crate::varlena
+                                                $crate::__pgrx_c_bindings::varlena
                                             >,
                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::from_storage(
-                                        $crate::pg_detoast_datum_copy(
+                                        $crate::__pgrx_c_bindings::pg_detoast_datum_copy(
                                             <
                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                        $crate::varlena
+                                                        $crate::__pgrx_c_bindings::varlena
                                                     >,
                                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                                 > as $crate::__pgrx_c_macros::expression::CType
@@ -6984,7 +7311,7 @@ macro_rules! PG_GETARG_TSVECTOR_COPY {
                                                 $crate::__pgrx_c_macros::expression::implicit::<
                                                     $crate::__pgrx_c_macros::expression::CPointer<
                                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                                            $crate::varlena
+                                                            $crate::__pgrx_c_bindings::varlena
                                                         >,
                                                         $crate::__pgrx_c_macros::expression::ReadWrite
                                                     >,
@@ -6995,10 +7322,10 @@ macro_rules! PG_GETARG_TSVECTOR_COPY {
                                                         _
                                                     >(
                                                         $crate::__pgrx_c_macros::expression::cast_as::<
-                                                            *mut $crate::varlena,
+                                                            *mut $crate::__pgrx_c_bindings::varlena,
                                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                                    $crate::varlena
+                                                                    $crate::__pgrx_c_bindings::varlena
                                                                 >,
                                                                 $crate::__pgrx_c_macros::expression::ReadWrite
                                                             >,
@@ -7010,7 +7337,7 @@ macro_rules! PG_GETARG_TSVECTOR_COPY {
                                                                     _
                                                                 >(
                                                                     $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                        $crate::Pointer,
+                                                                        $crate::__pgrx_c_bindings::Pointer,
                                                                         $crate::__pgrx_c_macros::expression::CPointer<
                                                                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                                                 $crate::__pgrx_c_macros::CChar,
@@ -7103,9 +7430,11 @@ macro_rules! PG_GETARG_TSVECTOR_COPY {
         {
             let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::cast_as::<
-                    $crate::TSVector,
+                    $crate::__pgrx_c_bindings::TSVector,
                     $crate::__pgrx_c_macros::expression::CPointer<
-                        $crate::__pgrx_c_macros::expression::CRecord<$crate::TSVectorData>,
+                        $crate::__pgrx_c_macros::expression::CRecord<
+                            $crate::__pgrx_c_bindings::TSVectorData
+                        >,
                         $crate::__pgrx_c_macros::expression::ReadWrite
                     >,
                     _
@@ -7113,15 +7442,17 @@ macro_rules! PG_GETARG_TSVECTOR_COPY {
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         <
                             $crate::__pgrx_c_macros::expression::CPointer<
-                                $crate::__pgrx_c_macros::expression::CRecord<$crate::varlena>,
+                                $crate::__pgrx_c_macros::expression::CRecord<
+                                    $crate::__pgrx_c_bindings::varlena
+                                >,
                                 $crate::__pgrx_c_macros::expression::ReadWrite
                             > as $crate::__pgrx_c_macros::expression::CType
                         >::from_storage(
-                            $crate::pg_detoast_datum_copy(
+                            $crate::__pgrx_c_bindings::pg_detoast_datum_copy(
                                 <
                                     $crate::__pgrx_c_macros::expression::CPointer<
                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                            $crate::varlena
+                                            $crate::__pgrx_c_bindings::varlena
                                         >,
                                         $crate::__pgrx_c_macros::expression::ReadWrite
                                     > as $crate::__pgrx_c_macros::expression::CType
@@ -7129,7 +7460,7 @@ macro_rules! PG_GETARG_TSVECTOR_COPY {
                                     $crate::__pgrx_c_macros::expression::implicit::<
                                         $crate::__pgrx_c_macros::expression::CPointer<
                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                $crate::varlena
+                                                $crate::__pgrx_c_bindings::varlena
                                             >,
                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                         >,
@@ -7140,10 +7471,10 @@ macro_rules! PG_GETARG_TSVECTOR_COPY {
                                             _
                                         >(
                                             $crate::__pgrx_c_macros::expression::cast_as::<
-                                                *mut $crate::varlena,
+                                                *mut $crate::__pgrx_c_bindings::varlena,
                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                        $crate::varlena
+                                                        $crate::__pgrx_c_bindings::varlena
                                                     >,
                                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                                 >,
@@ -7155,7 +7486,7 @@ macro_rules! PG_GETARG_TSVECTOR_COPY {
                                                         _
                                                     >(
                                                         $crate::__pgrx_c_macros::expression::cast_as::<
-                                                            $crate::Pointer,
+                                                            $crate::__pgrx_c_bindings::Pointer,
                                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                                     $crate::__pgrx_c_macros::CChar,
@@ -7244,8 +7575,8 @@ macro_rules! PG_GETARG_TSVECTOR_COPY {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -7272,20 +7603,24 @@ macro_rules! __pgrx_c_args_PG_RETURN_TSQUERY {
         $crate::__pgrx_c_args_PG_RETURN_TSQUERY!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_PG_RETURN_TSQUERY!(@p1 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_PG_RETURN_TSQUERY!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_PG_RETURN_TSQUERY!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_PG_RETURN_TSQUERY!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_PG_RETURN_TSQUERY!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_PG_RETURN_TSQUERY!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -7293,7 +7628,9 @@ macro_rules! __pgrx_c_args_PG_RETURN_TSQUERY {
         $crate::__pgrx_c_args_PG_RETURN_TSQUERY!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_PG_RETURN_TSQUERY!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_PG_RETURN_TSQUERY!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -7315,14 +7652,18 @@ macro_rules! __pgrx_c_args_PG_RETURN_TSQUERY {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_PG_RETURN_TSQUERY!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_PG_RETURN_TSQUERY!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_PG_RETURN_TSQUERY!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_PG_RETURN_TSQUERY!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_PG_RETURN_TSQUERY!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -7349,13 +7690,13 @@ macro_rules! __pgrx_c_args_PG_RETURN_TSQUERY {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_PG_RETURN_TSQUERY!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_PG_RETURN_TSQUERY!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -7462,8 +7803,8 @@ macro_rules! PG_RETURN_TSQUERY {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -7490,20 +7831,24 @@ macro_rules! __pgrx_c_args_PG_RETURN_TSVECTOR {
         $crate::__pgrx_c_args_PG_RETURN_TSVECTOR!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_PG_RETURN_TSVECTOR!(@p1 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_PG_RETURN_TSVECTOR!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_PG_RETURN_TSVECTOR!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_PG_RETURN_TSVECTOR!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_PG_RETURN_TSVECTOR!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_PG_RETURN_TSVECTOR!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -7511,7 +7856,9 @@ macro_rules! __pgrx_c_args_PG_RETURN_TSVECTOR {
         $crate::__pgrx_c_args_PG_RETURN_TSVECTOR!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_PG_RETURN_TSVECTOR!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_PG_RETURN_TSVECTOR!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -7533,14 +7880,18 @@ macro_rules! __pgrx_c_args_PG_RETURN_TSVECTOR {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_PG_RETURN_TSVECTOR!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_PG_RETURN_TSVECTOR!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_PG_RETURN_TSVECTOR!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_PG_RETURN_TSVECTOR!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_PG_RETURN_TSVECTOR!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -7567,13 +7918,13 @@ macro_rules! __pgrx_c_args_PG_RETURN_TSVECTOR {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_PG_RETURN_TSVECTOR!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_PG_RETURN_TSVECTOR!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -7680,8 +8031,8 @@ macro_rules! PG_RETURN_TSVECTOR {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -7709,18 +8060,24 @@ macro_rules! __pgrx_c_args_POSDATALEN {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_POSDATALEN!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_POSDATALEN!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_POSDATALEN!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $($raw:tt)*) => {
         $crate::__pgrx_c_args_POSDATALEN!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
-        $crate::__pgrx_c_args_POSDATALEN!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_POSDATALEN!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
         $crate::__pgrx_c_classify!(
@@ -7742,31 +8099,46 @@ macro_rules! __pgrx_c_args_POSDATALEN {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_POSDATALEN!(@p1 $mode [$($done)* (@literal [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_POSDATALEN!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+            $($rest)*
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_POSDATALEN!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_POSDATALEN!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_POSDATALEN!(@p2 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_POSDATALEN!(
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative1 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_POSDATALEN!(@p2 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_POSDATALEN!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_POSDATALEN!(
-            @p2 $mode [$($done)* (@literal [- $argument]),];
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_POSDATALEN!(@p2 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_POSDATALEN!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $($raw:tt)*) => {
         $crate::__pgrx_c_args_POSDATALEN!(@negative1 $mode [$($done)*]; - $($raw)*)
     };
     (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_POSDATALEN!(@p2 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_POSDATALEN!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -7788,13 +8160,20 @@ macro_rules! __pgrx_c_args_POSDATALEN {
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_POSDATALEN!(@p2 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_POSDATALEN!(
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_POSDATALEN!(@p2 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_POSDATALEN!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
-        $crate::__pgrx_c_args_POSDATALEN!(@p2 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_POSDATALEN!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
         $crate::__pgrx_c_classify!(
@@ -7816,10 +8195,16 @@ macro_rules! __pgrx_c_args_POSDATALEN {
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_POSDATALEN!(@p2 $mode [$($done)* (@literal [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_POSDATALEN!(
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+            $($rest)*
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_POSDATALEN!(@p2 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_POSDATALEN!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p2 $mode:ident [$($done:tt)*];) => {
         $crate::POSDATALEN!(@$mode; $($done)*)
@@ -7903,10 +8288,10 @@ macro_rules! POSDATALEN {
                                                         _
                                                     >(
                                                         $crate::__pgrx_c_macros::expression::cast_as::<
-                                                            *mut $crate::WordEntryPosVector,
+                                                            *mut $crate::__pgrx_c_bindings::WordEntryPosVector,
                                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                                    $crate::WordEntryPosVector
+                                                                    $crate::__pgrx_c_bindings::WordEntryPosVector
                                                                 >,
                                                                 $crate::__pgrx_c_macros::expression::ReadWrite
                                                             >,
@@ -8118,7 +8503,7 @@ macro_rules! POSDATALEN {
                                                                                                                     $crate::__pgrx_c_macros::CValue::<
                                                                                                                         $crate::__pgrx_c_macros::CInt
                                                                                                                     >::new(
-                                                                                                                        $crate::ALIGNOF_SHORT as i32
+                                                                                                                        $crate::__pgrx_c_bindings::ALIGNOF_SHORT as i32
                                                                                                                     )
                                                                                                                 )
                                                                                                             ),
@@ -8171,7 +8556,7 @@ macro_rules! POSDATALEN {
                                                                                                                             $crate::__pgrx_c_macros::CValue::<
                                                                                                                                 $crate::__pgrx_c_macros::CInt
                                                                                                                             >::new(
-                                                                                                                                $crate::ALIGNOF_SHORT as i32
+                                                                                                                                $crate::__pgrx_c_bindings::ALIGNOF_SHORT as i32
                                                                                                                             )
                                                                                                                         )
                                                                                                                     ),
@@ -8301,10 +8686,10 @@ macro_rules! POSDATALEN {
                                                                     _
                                                                 >(
                                                                     $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                        *mut $crate::WordEntryPosVector,
+                                                                        *mut $crate::__pgrx_c_bindings::WordEntryPosVector,
                                                                         $crate::__pgrx_c_macros::expression::CPointer<
                                                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                $crate::WordEntryPosVector
+                                                                                $crate::__pgrx_c_bindings::WordEntryPosVector
                                                                             >,
                                                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                                                         >,
@@ -8516,7 +8901,7 @@ macro_rules! POSDATALEN {
                                                                                                                                 $crate::__pgrx_c_macros::CValue::<
                                                                                                                                     $crate::__pgrx_c_macros::CInt
                                                                                                                                 >::new(
-                                                                                                                                    $crate::ALIGNOF_SHORT as i32
+                                                                                                                                    $crate::__pgrx_c_bindings::ALIGNOF_SHORT as i32
                                                                                                                                 )
                                                                                                                             )
                                                                                                                         ),
@@ -8569,7 +8954,7 @@ macro_rules! POSDATALEN {
                                                                                                                                         $crate::__pgrx_c_macros::CValue::<
                                                                                                                                             $crate::__pgrx_c_macros::CInt
                                                                                                                                         >::new(
-                                                                                                                                            $crate::ALIGNOF_SHORT as i32
+                                                                                                                                            $crate::__pgrx_c_bindings::ALIGNOF_SHORT as i32
                                                                                                                                         )
                                                                                                                                     )
                                                                                                                                 ),
@@ -8675,10 +9060,10 @@ macro_rules! POSDATALEN {
                                                         _
                                                     >(
                                                         $crate::__pgrx_c_macros::expression::cast_as::<
-                                                            *mut $crate::WordEntryPosVector,
+                                                            *mut $crate::__pgrx_c_bindings::WordEntryPosVector,
                                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                                    $crate::WordEntryPosVector
+                                                                    $crate::__pgrx_c_bindings::WordEntryPosVector
                                                                 >,
                                                                 $crate::__pgrx_c_macros::expression::ReadWrite
                                                             >,
@@ -8890,7 +9275,7 @@ macro_rules! POSDATALEN {
                                                                                                                     $crate::__pgrx_c_macros::CValue::<
                                                                                                                         $crate::__pgrx_c_macros::CInt
                                                                                                                     >::new(
-                                                                                                                        $crate::ALIGNOF_SHORT as i32
+                                                                                                                        $crate::__pgrx_c_bindings::ALIGNOF_SHORT as i32
                                                                                                                     )
                                                                                                                 )
                                                                                                             ),
@@ -8943,7 +9328,7 @@ macro_rules! POSDATALEN {
                                                                                                                             $crate::__pgrx_c_macros::CValue::<
                                                                                                                                 $crate::__pgrx_c_macros::CInt
                                                                                                                             >::new(
-                                                                                                                                $crate::ALIGNOF_SHORT as i32
+                                                                                                                                $crate::__pgrx_c_bindings::ALIGNOF_SHORT as i32
                                                                                                                             )
                                                                                                                         )
                                                                                                                     ),
@@ -9004,8 +9389,8 @@ macro_rules! POSDATALEN {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -9033,18 +9418,24 @@ macro_rules! __pgrx_c_args_POSDATAPTR {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_POSDATAPTR!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_POSDATAPTR!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_POSDATAPTR!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $($raw:tt)*) => {
         $crate::__pgrx_c_args_POSDATAPTR!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
-        $crate::__pgrx_c_args_POSDATAPTR!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_POSDATAPTR!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
         $crate::__pgrx_c_classify!(
@@ -9066,31 +9457,46 @@ macro_rules! __pgrx_c_args_POSDATAPTR {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_POSDATAPTR!(@p1 $mode [$($done)* (@literal [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_POSDATAPTR!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+            $($rest)*
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_POSDATAPTR!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_POSDATAPTR!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_POSDATAPTR!(@p2 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_POSDATAPTR!(
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative1 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_POSDATAPTR!(@p2 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_POSDATAPTR!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_POSDATAPTR!(
-            @p2 $mode [$($done)* (@literal [- $argument]),];
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_POSDATAPTR!(@p2 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_POSDATAPTR!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $($raw:tt)*) => {
         $crate::__pgrx_c_args_POSDATAPTR!(@negative1 $mode [$($done)*]; - $($raw)*)
     };
     (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_POSDATAPTR!(@p2 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_POSDATAPTR!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -9112,13 +9518,20 @@ macro_rules! __pgrx_c_args_POSDATAPTR {
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_POSDATAPTR!(@p2 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_POSDATAPTR!(
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_POSDATAPTR!(@p2 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_POSDATAPTR!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
-        $crate::__pgrx_c_args_POSDATAPTR!(@p2 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_POSDATAPTR!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
         $crate::__pgrx_c_classify!(
@@ -9140,10 +9553,16 @@ macro_rules! __pgrx_c_args_POSDATAPTR {
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_POSDATAPTR!(@p2 $mode [$($done)* (@literal [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_POSDATAPTR!(
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+            $($rest)*
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_POSDATAPTR!(@p2 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_POSDATAPTR!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p2 $mode:ident [$($done:tt)*];) => {
         $crate::POSDATAPTR!(@$mode; $($done)*)
@@ -9198,10 +9617,10 @@ macro_rules! POSDATAPTR {
                             (
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::cast_as::<
-                                        *mut $crate::WordEntryPosVector,
+                                        *mut $crate::__pgrx_c_bindings::WordEntryPosVector,
                                         $crate::__pgrx_c_macros::expression::CPointer<
                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                $crate::WordEntryPosVector
+                                                $crate::__pgrx_c_bindings::WordEntryPosVector
                                             >,
                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                         >,
@@ -9413,7 +9832,7 @@ macro_rules! POSDATAPTR {
                                                                                                 $crate::__pgrx_c_macros::CValue::<
                                                                                                     $crate::__pgrx_c_macros::CInt
                                                                                                 >::new(
-                                                                                                    $crate::ALIGNOF_SHORT as i32
+                                                                                                    $crate::__pgrx_c_bindings::ALIGNOF_SHORT as i32
                                                                                                 )
                                                                                             )
                                                                                         ),
@@ -9466,7 +9885,7 @@ macro_rules! POSDATAPTR {
                                                                                                         $crate::__pgrx_c_macros::CValue::<
                                                                                                             $crate::__pgrx_c_macros::CInt
                                                                                                         >::new(
-                                                                                                            $crate::ALIGNOF_SHORT as i32
+                                                                                                            $crate::__pgrx_c_bindings::ALIGNOF_SHORT as i32
                                                                                                         )
                                                                                                     )
                                                                                                 ),
@@ -9518,10 +9937,10 @@ macro_rules! POSDATAPTR {
                     (
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::cast_as::<
-                                *mut $crate::WordEntryPosVector,
+                                *mut $crate::__pgrx_c_bindings::WordEntryPosVector,
                                 $crate::__pgrx_c_macros::expression::CPointer<
                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                        $crate::WordEntryPosVector
+                                        $crate::__pgrx_c_bindings::WordEntryPosVector
                                     >,
                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                 >,
@@ -9730,7 +10149,7 @@ macro_rules! POSDATAPTR {
                                                                                         $crate::__pgrx_c_macros::CValue::<
                                                                                             $crate::__pgrx_c_macros::CInt
                                                                                         >::new(
-                                                                                            $crate::ALIGNOF_SHORT as i32
+                                                                                            $crate::__pgrx_c_bindings::ALIGNOF_SHORT as i32
                                                                                         )
                                                                                     )
                                                                                 ),
@@ -9781,7 +10200,7 @@ macro_rules! POSDATAPTR {
                                                                                                 $crate::__pgrx_c_macros::CValue::<
                                                                                                     $crate::__pgrx_c_macros::CInt
                                                                                                 >::new(
-                                                                                                    $crate::ALIGNOF_SHORT as i32
+                                                                                                    $crate::__pgrx_c_bindings::ALIGNOF_SHORT as i32
                                                                                                 )
                                                                                             )
                                                                                         ),
@@ -9831,10 +10250,10 @@ macro_rules! POSDATAPTR {
                     (
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::cast_as::<
-                                *mut $crate::WordEntryPosVector,
+                                *mut $crate::__pgrx_c_bindings::WordEntryPosVector,
                                 $crate::__pgrx_c_macros::expression::CPointer<
                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                        $crate::WordEntryPosVector
+                                        $crate::__pgrx_c_bindings::WordEntryPosVector
                                     >,
                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                 >,
@@ -10043,7 +10462,7 @@ macro_rules! POSDATAPTR {
                                                                                         $crate::__pgrx_c_macros::CValue::<
                                                                                             $crate::__pgrx_c_macros::CInt
                                                                                         >::new(
-                                                                                            $crate::ALIGNOF_SHORT as i32
+                                                                                            $crate::__pgrx_c_bindings::ALIGNOF_SHORT as i32
                                                                                         )
                                                                                     )
                                                                                 ),
@@ -10094,7 +10513,7 @@ macro_rules! POSDATAPTR {
                                                                                                 $crate::__pgrx_c_macros::CValue::<
                                                                                                     $crate::__pgrx_c_macros::CInt
                                                                                                 >::new(
-                                                                                                    $crate::ALIGNOF_SHORT as i32
+                                                                                                    $crate::__pgrx_c_bindings::ALIGNOF_SHORT as i32
                                                                                                 )
                                                                                             )
                                                                                         ),
@@ -10153,10 +10572,10 @@ macro_rules! POSDATAPTR {
                                 (
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::expression::cast_as::<
-                                            *mut $crate::WordEntryPosVector,
+                                            *mut $crate::__pgrx_c_bindings::WordEntryPosVector,
                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                    $crate::WordEntryPosVector
+                                                    $crate::__pgrx_c_bindings::WordEntryPosVector
                                                 >,
                                                 $crate::__pgrx_c_macros::expression::ReadWrite
                                             >,
@@ -10368,7 +10787,7 @@ macro_rules! POSDATAPTR {
                                                                                                     $crate::__pgrx_c_macros::CValue::<
                                                                                                         $crate::__pgrx_c_macros::CInt
                                                                                                     >::new(
-                                                                                                        $crate::ALIGNOF_SHORT as i32
+                                                                                                        $crate::__pgrx_c_bindings::ALIGNOF_SHORT as i32
                                                                                                     )
                                                                                                 )
                                                                                             ),
@@ -10421,7 +10840,7 @@ macro_rules! POSDATAPTR {
                                                                                                             $crate::__pgrx_c_macros::CValue::<
                                                                                                                 $crate::__pgrx_c_macros::CInt
                                                                                                             >::new(
-                                                                                                                $crate::ALIGNOF_SHORT as i32
+                                                                                                                $crate::__pgrx_c_bindings::ALIGNOF_SHORT as i32
                                                                                                             )
                                                                                                         )
                                                                                                     ),
@@ -10478,10 +10897,10 @@ macro_rules! POSDATAPTR {
                             (
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::cast_as::<
-                                        *mut $crate::WordEntryPosVector,
+                                        *mut $crate::__pgrx_c_bindings::WordEntryPosVector,
                                         $crate::__pgrx_c_macros::expression::CPointer<
                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                $crate::WordEntryPosVector
+                                                $crate::__pgrx_c_bindings::WordEntryPosVector
                                             >,
                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                         >,
@@ -10693,7 +11112,7 @@ macro_rules! POSDATAPTR {
                                                                                                 $crate::__pgrx_c_macros::CValue::<
                                                                                                     $crate::__pgrx_c_macros::CInt
                                                                                                 >::new(
-                                                                                                    $crate::ALIGNOF_SHORT as i32
+                                                                                                    $crate::__pgrx_c_bindings::ALIGNOF_SHORT as i32
                                                                                                 )
                                                                                             )
                                                                                         ),
@@ -10746,7 +11165,7 @@ macro_rules! POSDATAPTR {
                                                                                                         $crate::__pgrx_c_macros::CValue::<
                                                                                                             $crate::__pgrx_c_macros::CInt
                                                                                                         >::new(
-                                                                                                            $crate::ALIGNOF_SHORT as i32
+                                                                                                            $crate::__pgrx_c_bindings::ALIGNOF_SHORT as i32
                                                                                                         )
                                                                                                     )
                                                                                                 ),
@@ -10792,8 +11211,8 @@ macro_rules! POSDATAPTR {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -10820,25 +11239,34 @@ macro_rules! __pgrx_c_args_QO_PRIORITY {
         $crate::__pgrx_c_args_QO_PRIORITY!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_QO_PRIORITY!(@p1 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_QO_PRIORITY!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_QO_PRIORITY!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_QO_PRIORITY!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_QO_PRIORITY!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_QO_PRIORITY!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_QO_PRIORITY!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $($raw:tt)*) => {
         $crate::__pgrx_c_args_QO_PRIORITY!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_QO_PRIORITY!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_QO_PRIORITY!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -10860,13 +11288,20 @@ macro_rules! __pgrx_c_args_QO_PRIORITY {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_QO_PRIORITY!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_QO_PRIORITY!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_QO_PRIORITY!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_QO_PRIORITY!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
-        $crate::__pgrx_c_args_QO_PRIORITY!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_QO_PRIORITY!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
         $crate::__pgrx_c_classify!(
@@ -10888,10 +11323,16 @@ macro_rules! __pgrx_c_args_QO_PRIORITY {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_QO_PRIORITY!(@p1 $mode [$($done)* (@literal [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_QO_PRIORITY!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+            $($rest)*
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_QO_PRIORITY!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_QO_PRIORITY!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p1 $mode:ident [$($done:tt)*];) => {
         $crate::QO_PRIORITY!(@$mode; $($done)*)
@@ -10943,7 +11384,11 @@ macro_rules! QO_PRIORITY {
                                     $crate::__pgrx_c_macros::expression::CArray<
                                         $crate::__pgrx_c_macros::CInt,
                                         4
-                                    >>(::core::ptr::addr_of!($crate::tsearch_op_priority))
+                                    >>(
+                                    ::core::ptr::addr_of!(
+                                        $crate::__pgrx_c_bindings::tsearch_op_priority
+                                    )
+                                )
                             )
                         ),
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -10967,10 +11412,10 @@ macro_rules! QO_PRIORITY {
                                                             _
                                                         >(
                                                             $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                *mut $crate::QueryOperator,
+                                                                *mut $crate::__pgrx_c_bindings::QueryOperator,
                                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                                        $crate::QueryOperator
+                                                                        $crate::__pgrx_c_bindings::QueryOperator
                                                                     >,
                                                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                                                 >,
@@ -11020,7 +11465,9 @@ macro_rules! QO_PRIORITY {
                             $crate::__pgrx_c_macros::expression::CArray<
                                 $crate::__pgrx_c_macros::CInt,
                                 4
-                            >>(::core::ptr::addr_of!($crate::tsearch_op_priority))
+                            >>(
+                            ::core::ptr::addr_of!($crate::__pgrx_c_bindings::tsearch_op_priority)
+                        )
                     )
                 ),
                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -11044,10 +11491,10 @@ macro_rules! QO_PRIORITY {
                                                     _
                                                 >(
                                                     $crate::__pgrx_c_macros::expression::cast_as::<
-                                                        *mut $crate::QueryOperator,
+                                                        *mut $crate::__pgrx_c_bindings::QueryOperator,
                                                         $crate::__pgrx_c_macros::expression::CPointer<
                                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                                $crate::QueryOperator
+                                                                $crate::__pgrx_c_bindings::QueryOperator
                                                             >,
                                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                                         >,
@@ -11095,7 +11542,9 @@ macro_rules! QO_PRIORITY {
                             $crate::__pgrx_c_macros::expression::CArray<
                                 $crate::__pgrx_c_macros::CInt,
                                 4
-                            >>(::core::ptr::addr_of!($crate::tsearch_op_priority))
+                            >>(
+                            ::core::ptr::addr_of!($crate::__pgrx_c_bindings::tsearch_op_priority)
+                        )
                     )
                 ),
                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -11119,10 +11568,10 @@ macro_rules! QO_PRIORITY {
                                                     _
                                                 >(
                                                     $crate::__pgrx_c_macros::expression::cast_as::<
-                                                        *mut $crate::QueryOperator,
+                                                        *mut $crate::__pgrx_c_bindings::QueryOperator,
                                                         $crate::__pgrx_c_macros::expression::CPointer<
                                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                                $crate::QueryOperator
+                                                                $crate::__pgrx_c_bindings::QueryOperator
                                                             >,
                                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                                         >,
@@ -11178,7 +11627,11 @@ macro_rules! QO_PRIORITY {
                                         $crate::__pgrx_c_macros::expression::CArray<
                                             $crate::__pgrx_c_macros::CInt,
                                             4
-                                        >>(::core::ptr::addr_of!($crate::tsearch_op_priority))
+                                        >>(
+                                        ::core::ptr::addr_of!(
+                                            $crate::__pgrx_c_bindings::tsearch_op_priority
+                                        )
+                                    )
                                 )
                             ),
                             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -11205,10 +11658,10 @@ macro_rules! QO_PRIORITY {
                                                                 _
                                                             >(
                                                                 $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                    *mut $crate::QueryOperator,
+                                                                    *mut $crate::__pgrx_c_bindings::QueryOperator,
                                                                     $crate::__pgrx_c_macros::expression::CPointer<
                                                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                                                            $crate::QueryOperator
+                                                                            $crate::__pgrx_c_bindings::QueryOperator
                                                                         >,
                                                                         $crate::__pgrx_c_macros::expression::ReadWrite
                                                                     >,
@@ -11263,7 +11716,11 @@ macro_rules! QO_PRIORITY {
                                     $crate::__pgrx_c_macros::expression::CArray<
                                         $crate::__pgrx_c_macros::CInt,
                                         4
-                                    >>(::core::ptr::addr_of!($crate::tsearch_op_priority))
+                                    >>(
+                                    ::core::ptr::addr_of!(
+                                        $crate::__pgrx_c_bindings::tsearch_op_priority
+                                    )
+                                )
                             )
                         ),
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -11287,10 +11744,10 @@ macro_rules! QO_PRIORITY {
                                                             _
                                                         >(
                                                             $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                *mut $crate::QueryOperator,
+                                                                *mut $crate::__pgrx_c_bindings::QueryOperator,
                                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                                        $crate::QueryOperator
+                                                                        $crate::__pgrx_c_bindings::QueryOperator
                                                                     >,
                                                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                                                 >,
@@ -11336,8 +11793,8 @@ macro_rules! QO_PRIORITY {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -11364,22 +11821,34 @@ macro_rules! __pgrx_c_args_STRPTR {
         $crate::__pgrx_c_args_STRPTR!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_STRPTR!(@p1 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_STRPTR!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_STRPTR!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_STRPTR!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_STRPTR!(@p1 $mode [$($done)* (@literal [- $argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_STRPTR!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+            $($rest)*
+        )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_STRPTR!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_STRPTR!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $($raw:tt)*) => {
         $crate::__pgrx_c_args_STRPTR!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_STRPTR!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_STRPTR!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -11399,13 +11868,20 @@ macro_rules! __pgrx_c_args_STRPTR {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_STRPTR!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_STRPTR!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_STRPTR!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_STRPTR!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
-        $crate::__pgrx_c_args_STRPTR!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_STRPTR!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
         $crate::__pgrx_c_classify!(
@@ -11427,10 +11903,16 @@ macro_rules! __pgrx_c_args_STRPTR {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_STRPTR!(@p1 $mode [$($done)* (@literal [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_STRPTR!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+            $($rest)*
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_STRPTR!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_STRPTR!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p1 $mode:ident [$($done:tt)*];) => {
         $crate::STRPTR!(@$mode; $($done)*)
@@ -11692,8 +12174,8 @@ macro_rules! STRPTR {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -11721,13 +12203,13 @@ macro_rules! __pgrx_c_args_TSQUERY_TOO_BIG {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_TSQUERY_TOO_BIG!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_TSQUERY_TOO_BIG!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -11736,7 +12218,7 @@ macro_rules! __pgrx_c_args_TSQUERY_TOO_BIG {
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_TSQUERY_TOO_BIG!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -11763,31 +12245,35 @@ macro_rules! __pgrx_c_args_TSQUERY_TOO_BIG {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_TSQUERY_TOO_BIG!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_TSQUERY_TOO_BIG!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_TSQUERY_TOO_BIG!(@p2 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_TSQUERY_TOO_BIG!(
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative1 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_TSQUERY_TOO_BIG!(@p2 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_TSQUERY_TOO_BIG!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_TSQUERY_TOO_BIG!(
-            @p2 $mode [$($done)* (@literal [- $argument]),];
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_TSQUERY_TOO_BIG!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -11795,7 +12281,9 @@ macro_rules! __pgrx_c_args_TSQUERY_TOO_BIG {
         $crate::__pgrx_c_args_TSQUERY_TOO_BIG!(@negative1 $mode [$($done)*]; - $($raw)*)
     };
     (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_TSQUERY_TOO_BIG!(@p2 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_TSQUERY_TOO_BIG!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -11817,14 +12305,18 @@ macro_rules! __pgrx_c_args_TSQUERY_TOO_BIG {
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_TSQUERY_TOO_BIG!(@p2 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_TSQUERY_TOO_BIG!(
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_TSQUERY_TOO_BIG!(@p2 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_TSQUERY_TOO_BIG!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_TSQUERY_TOO_BIG!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -11851,13 +12343,13 @@ macro_rules! __pgrx_c_args_TSQUERY_TOO_BIG {
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_TSQUERY_TOO_BIG!(
-            @p2 $mode [$($done)* (@literal [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_TSQUERY_TOO_BIG!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -11932,10 +12424,11 @@ macro_rules! TSQUERY_TOO_BIG {
                                                     true,
                                                     _
                                                 >(
-                                                    /* PGRX: MaxAllocSize remains expanded because no integer constant binding is available in the defining Rust crate. */
                                                     $crate::__pgrx_c_macros::CValue::<
                                                         $crate::__pgrx_c_macros::CUnsignedLong
-                                                    >::new(1073741823u64)
+                                                    >::new(
+                                                        $crate::__pgrx_c_bindings::MaxAllocSize as u64
+                                                    )
                                                 ),
                                                 (
                                                     $crate::__pgrx_c_macros::expression::profile_value::<
@@ -11953,7 +12446,7 @@ macro_rules! TSQUERY_TOO_BIG {
                                                                     _
                                                                 >(
                                                                     $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                        $crate::int32,
+                                                                        $crate::__pgrx_c_bindings::int32,
                                                                         $crate::__pgrx_c_macros::CInt,
                                                                         _
                                                                     >(
@@ -11997,7 +12490,9 @@ macro_rules! TSQUERY_TOO_BIG {
                             ),
                             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                 $crate::__pgrx_c_macros::expression::size_of::<
-                                    $crate::__pgrx_c_macros::expression::CRecord<$crate::QueryItem>>()
+                                    $crate::__pgrx_c_macros::expression::CRecord<
+                                        $crate::__pgrx_c_bindings::QueryItem
+                                    >>()
                             )
                         )
                     )
@@ -12064,10 +12559,11 @@ macro_rules! TSQUERY_TOO_BIG {
                                                                 true,
                                                                 _
                                                             >(
-                                                                /* PGRX: MaxAllocSize remains expanded because no integer constant binding is available in the defining Rust crate. */
                                                                 $crate::__pgrx_c_macros::CValue::<
                                                                     $crate::__pgrx_c_macros::CUnsignedLong
-                                                                >::new(1073741823u64)
+                                                                >::new(
+                                                                    $crate::__pgrx_c_bindings::MaxAllocSize as u64
+                                                                )
                                                             ),
                                                             (
                                                                 $crate::__pgrx_c_macros::expression::profile_value::<
@@ -12085,7 +12581,7 @@ macro_rules! TSQUERY_TOO_BIG {
                                                                                 _
                                                                             >(
                                                                                 $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                                    $crate::int32,
+                                                                                    $crate::__pgrx_c_bindings::int32,
                                                                                     $crate::__pgrx_c_macros::CInt,
                                                                                     _
                                                                                 >(
@@ -12133,7 +12629,7 @@ macro_rules! TSQUERY_TOO_BIG {
                                         >(
                                             $crate::__pgrx_c_macros::expression::size_of::<
                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                    $crate::QueryItem
+                                                    $crate::__pgrx_c_bindings::QueryItem
                                                 >>()
                                         )
                                     )
@@ -12182,10 +12678,11 @@ macro_rules! TSQUERY_TOO_BIG {
                                                     true,
                                                     _
                                                 >(
-                                                    /* PGRX: MaxAllocSize remains expanded because no integer constant binding is available in the defining Rust crate. */
                                                     $crate::__pgrx_c_macros::CValue::<
                                                         $crate::__pgrx_c_macros::CUnsignedLong
-                                                    >::new(1073741823u64)
+                                                    >::new(
+                                                        $crate::__pgrx_c_bindings::MaxAllocSize as u64
+                                                    )
                                                 ),
                                                 (
                                                     $crate::__pgrx_c_macros::expression::profile_value::<
@@ -12203,7 +12700,7 @@ macro_rules! TSQUERY_TOO_BIG {
                                                                     _
                                                                 >(
                                                                     $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                        $crate::int32,
+                                                                        $crate::__pgrx_c_bindings::int32,
                                                                         $crate::__pgrx_c_macros::CInt,
                                                                         _
                                                                     >(
@@ -12247,7 +12744,9 @@ macro_rules! TSQUERY_TOO_BIG {
                             ),
                             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                 $crate::__pgrx_c_macros::expression::size_of::<
-                                    $crate::__pgrx_c_macros::expression::CRecord<$crate::QueryItem>>()
+                                    $crate::__pgrx_c_macros::expression::CRecord<
+                                        $crate::__pgrx_c_bindings::QueryItem
+                                    >>()
                             )
                         )
                     )
@@ -12264,8 +12763,8 @@ macro_rules! TSQUERY_TOO_BIG {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -12292,20 +12791,24 @@ macro_rules! __pgrx_c_args_TSQueryGetDatum {
         $crate::__pgrx_c_args_TSQueryGetDatum!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_TSQueryGetDatum!(@p1 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_TSQueryGetDatum!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_TSQueryGetDatum!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_TSQueryGetDatum!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_TSQueryGetDatum!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_TSQueryGetDatum!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -12313,7 +12816,9 @@ macro_rules! __pgrx_c_args_TSQueryGetDatum {
         $crate::__pgrx_c_args_TSQueryGetDatum!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_TSQueryGetDatum!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_TSQueryGetDatum!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -12335,14 +12840,18 @@ macro_rules! __pgrx_c_args_TSQueryGetDatum {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_TSQueryGetDatum!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_TSQueryGetDatum!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_TSQueryGetDatum!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_TSQueryGetDatum!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_TSQueryGetDatum!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -12369,13 +12878,13 @@ macro_rules! __pgrx_c_args_TSQueryGetDatum {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_TSQueryGetDatum!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_TSQueryGetDatum!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -12453,8 +12962,8 @@ macro_rules! TSQueryGetDatum {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -12481,20 +12990,24 @@ macro_rules! __pgrx_c_args_TSVectorGetDatum {
         $crate::__pgrx_c_args_TSVectorGetDatum!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_TSVectorGetDatum!(@p1 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_TSVectorGetDatum!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_TSVectorGetDatum!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_TSVectorGetDatum!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_TSVectorGetDatum!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_TSVectorGetDatum!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -12502,7 +13015,9 @@ macro_rules! __pgrx_c_args_TSVectorGetDatum {
         $crate::__pgrx_c_args_TSVectorGetDatum!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_TSVectorGetDatum!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_TSVectorGetDatum!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -12524,14 +13039,18 @@ macro_rules! __pgrx_c_args_TSVectorGetDatum {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_TSVectorGetDatum!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_TSVectorGetDatum!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_TSVectorGetDatum!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_TSVectorGetDatum!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_TSVectorGetDatum!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -12558,13 +13077,13 @@ macro_rules! __pgrx_c_args_TSVectorGetDatum {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_TSVectorGetDatum!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_TSVectorGetDatum!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -12642,8 +13161,8 @@ macro_rules! TSVectorGetDatum {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -12670,25 +13189,34 @@ macro_rules! __pgrx_c_args_WEP_GETPOS {
         $crate::__pgrx_c_args_WEP_GETPOS!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_WEP_GETPOS!(@p1 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_WEP_GETPOS!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_WEP_GETPOS!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_WEP_GETPOS!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_WEP_GETPOS!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_WEP_GETPOS!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_WEP_GETPOS!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $($raw:tt)*) => {
         $crate::__pgrx_c_args_WEP_GETPOS!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_WEP_GETPOS!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_WEP_GETPOS!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -12710,13 +13238,20 @@ macro_rules! __pgrx_c_args_WEP_GETPOS {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_WEP_GETPOS!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_WEP_GETPOS!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_WEP_GETPOS!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_WEP_GETPOS!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
-        $crate::__pgrx_c_args_WEP_GETPOS!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_WEP_GETPOS!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
         $crate::__pgrx_c_classify!(
@@ -12738,10 +13273,16 @@ macro_rules! __pgrx_c_args_WEP_GETPOS {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_WEP_GETPOS!(@p1 $mode [$($done)* (@literal [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_WEP_GETPOS!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+            $($rest)*
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_WEP_GETPOS!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_WEP_GETPOS!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p1 $mode:ident [$($done:tt)*];) => {
         $crate::WEP_GETPOS!(@$mode; $($done)*)
@@ -12871,8 +13412,8 @@ macro_rules! WEP_GETPOS {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -12899,20 +13440,24 @@ macro_rules! __pgrx_c_args_WEP_GETWEIGHT {
         $crate::__pgrx_c_args_WEP_GETWEIGHT!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_WEP_GETWEIGHT!(@p1 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_WEP_GETWEIGHT!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_WEP_GETWEIGHT!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_WEP_GETWEIGHT!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_WEP_GETWEIGHT!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_WEP_GETWEIGHT!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -12920,7 +13465,9 @@ macro_rules! __pgrx_c_args_WEP_GETWEIGHT {
         $crate::__pgrx_c_args_WEP_GETWEIGHT!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_WEP_GETWEIGHT!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_WEP_GETWEIGHT!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -12942,14 +13489,18 @@ macro_rules! __pgrx_c_args_WEP_GETWEIGHT {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_WEP_GETWEIGHT!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_WEP_GETWEIGHT!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_WEP_GETWEIGHT!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_WEP_GETWEIGHT!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_WEP_GETWEIGHT!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -12976,13 +13527,13 @@ macro_rules! __pgrx_c_args_WEP_GETWEIGHT {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_WEP_GETWEIGHT!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_WEP_GETWEIGHT!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -13114,8 +13665,8 @@ macro_rules! WEP_GETWEIGHT {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -13143,18 +13694,24 @@ macro_rules! __pgrx_c_args_WEP_SETPOS {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_WEP_SETPOS!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_WEP_SETPOS!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_WEP_SETPOS!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $($raw:tt)*) => {
         $crate::__pgrx_c_args_WEP_SETPOS!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
-        $crate::__pgrx_c_args_WEP_SETPOS!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_WEP_SETPOS!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
         $crate::__pgrx_c_classify!(
@@ -13176,31 +13733,46 @@ macro_rules! __pgrx_c_args_WEP_SETPOS {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_WEP_SETPOS!(@p1 $mode [$($done)* (@literal [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_WEP_SETPOS!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+            $($rest)*
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_WEP_SETPOS!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_WEP_SETPOS!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_WEP_SETPOS!(@p2 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_WEP_SETPOS!(
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative1 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_WEP_SETPOS!(@p2 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_WEP_SETPOS!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_WEP_SETPOS!(
-            @p2 $mode [$($done)* (@literal [- $argument]),];
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_WEP_SETPOS!(@p2 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_WEP_SETPOS!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $($raw:tt)*) => {
         $crate::__pgrx_c_args_WEP_SETPOS!(@negative1 $mode [$($done)*]; - $($raw)*)
     };
     (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_WEP_SETPOS!(@p2 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_WEP_SETPOS!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -13222,13 +13794,20 @@ macro_rules! __pgrx_c_args_WEP_SETPOS {
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_WEP_SETPOS!(@p2 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_WEP_SETPOS!(
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_WEP_SETPOS!(@p2 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_WEP_SETPOS!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
-        $crate::__pgrx_c_args_WEP_SETPOS!(@p2 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_WEP_SETPOS!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
         $crate::__pgrx_c_classify!(
@@ -13250,10 +13829,16 @@ macro_rules! __pgrx_c_args_WEP_SETPOS {
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_WEP_SETPOS!(@p2 $mode [$($done)* (@literal [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_WEP_SETPOS!(
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+            $($rest)*
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_WEP_SETPOS!(@p2 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_WEP_SETPOS!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p2 $mode:ident [$($done:tt)*];) => {
         $crate::WEP_SETPOS!(@$mode; $($done)*)
@@ -13506,8 +14091,8 @@ macro_rules! WEP_SETPOS {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -13535,13 +14120,13 @@ macro_rules! __pgrx_c_args_WEP_SETWEIGHT {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_WEP_SETWEIGHT!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_WEP_SETWEIGHT!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -13550,7 +14135,7 @@ macro_rules! __pgrx_c_args_WEP_SETWEIGHT {
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_WEP_SETWEIGHT!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -13577,31 +14162,35 @@ macro_rules! __pgrx_c_args_WEP_SETWEIGHT {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_WEP_SETWEIGHT!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_WEP_SETWEIGHT!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_WEP_SETWEIGHT!(@p2 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_WEP_SETWEIGHT!(
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative1 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_WEP_SETWEIGHT!(@p2 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_WEP_SETWEIGHT!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_WEP_SETWEIGHT!(
-            @p2 $mode [$($done)* (@literal [- $argument]),];
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_WEP_SETWEIGHT!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -13609,7 +14198,9 @@ macro_rules! __pgrx_c_args_WEP_SETWEIGHT {
         $crate::__pgrx_c_args_WEP_SETWEIGHT!(@negative1 $mode [$($done)*]; - $($raw)*)
     };
     (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_WEP_SETWEIGHT!(@p2 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_WEP_SETWEIGHT!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -13631,14 +14222,18 @@ macro_rules! __pgrx_c_args_WEP_SETWEIGHT {
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_WEP_SETWEIGHT!(@p2 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_WEP_SETWEIGHT!(
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_WEP_SETWEIGHT!(@p2 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_WEP_SETWEIGHT!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_WEP_SETWEIGHT!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -13665,13 +14260,13 @@ macro_rules! __pgrx_c_args_WEP_SETWEIGHT {
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_WEP_SETWEIGHT!(
-            @p2 $mode [$($done)* (@literal [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_WEP_SETWEIGHT!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -13942,8 +14537,8 @@ macro_rules! WEP_SETWEIGHT {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -13971,18 +14566,24 @@ macro_rules! __pgrx_c_args__POSVECPTR {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args__POSVECPTR!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
-        $crate::__pgrx_c_args__POSVECPTR!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args__POSVECPTR!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $($raw:tt)*) => {
         $crate::__pgrx_c_args__POSVECPTR!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
-        $crate::__pgrx_c_args__POSVECPTR!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args__POSVECPTR!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
         $crate::__pgrx_c_classify!(
@@ -14004,31 +14605,46 @@ macro_rules! __pgrx_c_args__POSVECPTR {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
-        $crate::__pgrx_c_args__POSVECPTR!(@p1 $mode [$($done)* (@literal [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args__POSVECPTR!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+            $($rest)*
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
-        $crate::__pgrx_c_args__POSVECPTR!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args__POSVECPTR!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args__POSVECPTR!(@p2 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args__POSVECPTR!(
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative1 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args__POSVECPTR!(@p2 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args__POSVECPTR!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args__POSVECPTR!(
-            @p2 $mode [$($done)* (@literal [- $argument]),];
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
-        $crate::__pgrx_c_args__POSVECPTR!(@p2 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args__POSVECPTR!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $($raw:tt)*) => {
         $crate::__pgrx_c_args__POSVECPTR!(@negative1 $mode [$($done)*]; - $($raw)*)
     };
     (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args__POSVECPTR!(@p2 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args__POSVECPTR!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -14050,13 +14666,20 @@ macro_rules! __pgrx_c_args__POSVECPTR {
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args__POSVECPTR!(@p2 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args__POSVECPTR!(
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args__POSVECPTR!(@p2 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args__POSVECPTR!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
-        $crate::__pgrx_c_args__POSVECPTR!(@p2 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args__POSVECPTR!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
         $crate::__pgrx_c_classify!(
@@ -14078,10 +14701,16 @@ macro_rules! __pgrx_c_args__POSVECPTR {
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
-        $crate::__pgrx_c_args__POSVECPTR!(@p2 $mode [$($done)* (@literal [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args__POSVECPTR!(
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+            $($rest)*
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
-        $crate::__pgrx_c_args__POSVECPTR!(@p2 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args__POSVECPTR!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p2 $mode:ident [$($done:tt)*];) => {
         $crate::_POSVECPTR!(@$mode; $($done)*)
@@ -14127,9 +14756,11 @@ macro_rules! _POSVECPTR {
         (
             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::cast_as::<
-                    *mut $crate::WordEntryPosVector,
+                    *mut $crate::__pgrx_c_bindings::WordEntryPosVector,
                     $crate::__pgrx_c_macros::expression::CPointer<
-                        $crate::__pgrx_c_macros::expression::CRecord<$crate::WordEntryPosVector>,
+                        $crate::__pgrx_c_macros::expression::CRecord<
+                            $crate::__pgrx_c_bindings::WordEntryPosVector
+                        >,
                         $crate::__pgrx_c_macros::expression::ReadWrite
                     >,
                     _
@@ -14327,7 +14958,7 @@ macro_rules! _POSVECPTR {
                                                                             $crate::__pgrx_c_macros::CValue::<
                                                                                 $crate::__pgrx_c_macros::CInt
                                                                             >::new(
-                                                                                $crate::ALIGNOF_SHORT as i32
+                                                                                $crate::__pgrx_c_bindings::ALIGNOF_SHORT as i32
                                                                             )
                                                                         )
                                                                     ),
@@ -14378,7 +15009,7 @@ macro_rules! _POSVECPTR {
                                                                                     $crate::__pgrx_c_macros::CValue::<
                                                                                         $crate::__pgrx_c_macros::CInt
                                                                                     >::new(
-                                                                                        $crate::ALIGNOF_SHORT as i32
+                                                                                        $crate::__pgrx_c_bindings::ALIGNOF_SHORT as i32
                                                                                     )
                                                                                 )
                                                                             ),
@@ -14437,10 +15068,10 @@ macro_rules! _POSVECPTR {
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::cast_as::<
-                                *mut $crate::WordEntryPosVector,
+                                *mut $crate::__pgrx_c_bindings::WordEntryPosVector,
                                 $crate::__pgrx_c_macros::expression::CPointer<
                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                        $crate::WordEntryPosVector
+                                        $crate::__pgrx_c_bindings::WordEntryPosVector
                                     >,
                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                 >,
@@ -14649,7 +15280,7 @@ macro_rules! _POSVECPTR {
                                                                                         $crate::__pgrx_c_macros::CValue::<
                                                                                             $crate::__pgrx_c_macros::CInt
                                                                                         >::new(
-                                                                                            $crate::ALIGNOF_SHORT as i32
+                                                                                            $crate::__pgrx_c_bindings::ALIGNOF_SHORT as i32
                                                                                         )
                                                                                     )
                                                                                 ),
@@ -14700,7 +15331,7 @@ macro_rules! _POSVECPTR {
                                                                                                 $crate::__pgrx_c_macros::CValue::<
                                                                                                     $crate::__pgrx_c_macros::CInt
                                                                                                 >::new(
-                                                                                                    $crate::ALIGNOF_SHORT as i32
+                                                                                                    $crate::__pgrx_c_bindings::ALIGNOF_SHORT as i32
                                                                                                 )
                                                                                             )
                                                                                         ),
@@ -14745,9 +15376,11 @@ macro_rules! _POSVECPTR {
         {
             let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::cast_as::<
-                    *mut $crate::WordEntryPosVector,
+                    *mut $crate::__pgrx_c_bindings::WordEntryPosVector,
                     $crate::__pgrx_c_macros::expression::CPointer<
-                        $crate::__pgrx_c_macros::expression::CRecord<$crate::WordEntryPosVector>,
+                        $crate::__pgrx_c_macros::expression::CRecord<
+                            $crate::__pgrx_c_bindings::WordEntryPosVector
+                        >,
                         $crate::__pgrx_c_macros::expression::ReadWrite
                     >,
                     _
@@ -14945,7 +15578,7 @@ macro_rules! _POSVECPTR {
                                                                             $crate::__pgrx_c_macros::CValue::<
                                                                                 $crate::__pgrx_c_macros::CInt
                                                                             >::new(
-                                                                                $crate::ALIGNOF_SHORT as i32
+                                                                                $crate::__pgrx_c_bindings::ALIGNOF_SHORT as i32
                                                                             )
                                                                         )
                                                                     ),
@@ -14996,7 +15629,7 @@ macro_rules! _POSVECPTR {
                                                                                     $crate::__pgrx_c_macros::CValue::<
                                                                                         $crate::__pgrx_c_macros::CInt
                                                                                     >::new(
-                                                                                        $crate::ALIGNOF_SHORT as i32
+                                                                                        $crate::__pgrx_c_bindings::ALIGNOF_SHORT as i32
                                                                                     )
                                                                                 )
                                                                             ),

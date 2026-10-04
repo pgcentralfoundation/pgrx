@@ -233,6 +233,7 @@ mod tests {
                 is_static: false,
                 is_inline: false,
                 definition_available: false,
+                definition: None,
             },
         );
         declarations.functions.insert(

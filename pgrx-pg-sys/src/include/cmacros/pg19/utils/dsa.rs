@@ -5,8 +5,8 @@ This code is generated for documentation purposes, so that it is easy to referen
 // C macros from dsa.h.
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -33,20 +33,24 @@ macro_rules! __pgrx_c_args_DsaPointerIsValid {
         $crate::__pgrx_c_args_DsaPointerIsValid!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_DsaPointerIsValid!(@p1 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_DsaPointerIsValid!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_DsaPointerIsValid!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_DsaPointerIsValid!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_DsaPointerIsValid!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_DsaPointerIsValid!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -54,7 +58,9 @@ macro_rules! __pgrx_c_args_DsaPointerIsValid {
         $crate::__pgrx_c_args_DsaPointerIsValid!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_DsaPointerIsValid!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_DsaPointerIsValid!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -76,14 +82,18 @@ macro_rules! __pgrx_c_args_DsaPointerIsValid {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_DsaPointerIsValid!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_DsaPointerIsValid!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_DsaPointerIsValid!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_DsaPointerIsValid!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_DsaPointerIsValid!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -110,13 +120,13 @@ macro_rules! __pgrx_c_args_DsaPointerIsValid {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_DsaPointerIsValid!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_DsaPointerIsValid!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -165,10 +175,9 @@ macro_rules! DsaPointerIsValid {
                     ),
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::expression::null_constant(
-                            /* PGRX: InvalidDsaPointer remains expanded because no integer constant binding is available in the defining Rust crate. */
                             $crate::__pgrx_c_macros::CValue::<
-                                $crate::__pgrx_c_macros::CUnsignedLongLong
-                            >::new(0u64)
+                                $crate::__pgrx_c_macros::CUnsignedLong
+                            >::new($crate::__pgrx_c_bindings::InvalidDsaPointer as u64)
                         )
                     )
                 )
@@ -209,10 +218,9 @@ macro_rules! DsaPointerIsValid {
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::null_constant(
-                                        /* PGRX: InvalidDsaPointer remains expanded because no integer constant binding is available in the defining Rust crate. */
                                         $crate::__pgrx_c_macros::CValue::<
-                                            $crate::__pgrx_c_macros::CUnsignedLongLong
-                                        >::new(0u64)
+                                            $crate::__pgrx_c_macros::CUnsignedLong
+                                        >::new($crate::__pgrx_c_bindings::InvalidDsaPointer as u64)
                                     )
                                 )
                             )
@@ -238,10 +246,9 @@ macro_rules! DsaPointerIsValid {
                     ),
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::expression::null_constant(
-                            /* PGRX: InvalidDsaPointer remains expanded because no integer constant binding is available in the defining Rust crate. */
                             $crate::__pgrx_c_macros::CValue::<
-                                $crate::__pgrx_c_macros::CUnsignedLongLong
-                            >::new(0u64)
+                                $crate::__pgrx_c_macros::CUnsignedLong
+                            >::new($crate::__pgrx_c_bindings::InvalidDsaPointer as u64)
                         )
                     )
                 )
@@ -257,8 +264,8 @@ macro_rules! DsaPointerIsValid {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -286,18 +293,24 @@ macro_rules! __pgrx_c_args_dsa_allocate {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_dsa_allocate!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_dsa_allocate!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_dsa_allocate!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $($raw:tt)*) => {
         $crate::__pgrx_c_args_dsa_allocate!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
-        $crate::__pgrx_c_args_dsa_allocate!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_dsa_allocate!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
         $crate::__pgrx_c_classify!(
@@ -320,33 +333,45 @@ macro_rules! __pgrx_c_args_dsa_allocate {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_dsa_allocate!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_dsa_allocate!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_dsa_allocate!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_dsa_allocate!(@p2 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_dsa_allocate!(
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative1 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_dsa_allocate!(@p2 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_dsa_allocate!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_dsa_allocate!(
-            @p2 $mode [$($done)* (@literal [- $argument]),];
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_dsa_allocate!(@p2 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_dsa_allocate!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $($raw:tt)*) => {
         $crate::__pgrx_c_args_dsa_allocate!(@negative1 $mode [$($done)*]; - $($raw)*)
     };
     (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_dsa_allocate!(@p2 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_dsa_allocate!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -368,13 +393,20 @@ macro_rules! __pgrx_c_args_dsa_allocate {
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_dsa_allocate!(@p2 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_dsa_allocate!(
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_dsa_allocate!(@p2 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_dsa_allocate!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
-        $crate::__pgrx_c_args_dsa_allocate!(@p2 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_dsa_allocate!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
         $crate::__pgrx_c_classify!(
@@ -397,12 +429,15 @@ macro_rules! __pgrx_c_args_dsa_allocate {
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_dsa_allocate!(
-            @p2 $mode [$($done)* (@literal [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_dsa_allocate!(@p2 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_dsa_allocate!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p2 $mode:ident [$($done:tt)*];) => {
         $crate::dsa_allocate!(@$mode; $($done)*)
@@ -446,19 +481,21 @@ macro_rules! dsa_allocate {
     (@__pgrx_emit_value; $area:tt, $size:tt $(,)?) => {
         /* PGRX: dsa_allocate remains expanded because dsa_allocate_extended is not an active function-like macro. */
         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-            <
-                $crate::__pgrx_c_macros::CUnsignedLongLong as $crate::__pgrx_c_macros::expression::CType
-            >::from_storage(
-                $crate::dsa_allocate_extended(
+            <$crate::__pgrx_c_macros::CUnsignedLong as $crate::__pgrx_c_macros::expression::CType>::from_storage(
+                $crate::__pgrx_c_bindings::dsa_allocate_extended(
                     <
                         $crate::__pgrx_c_macros::expression::CPointer<
-                            $crate::__pgrx_c_macros::expression::COpaque<$crate::dsa_area>,
+                            $crate::__pgrx_c_macros::expression::COpaque<
+                                $crate::__pgrx_c_bindings::dsa_area
+                            >,
                             $crate::__pgrx_c_macros::expression::ReadWrite
                         > as $crate::__pgrx_c_macros::expression::CType
                     >::into_storage(
                         $crate::__pgrx_c_macros::expression::implicit::<
                             $crate::__pgrx_c_macros::expression::CPointer<
-                                $crate::__pgrx_c_macros::expression::COpaque<$crate::dsa_area>,
+                                $crate::__pgrx_c_macros::expression::COpaque<
+                                    $crate::__pgrx_c_bindings::dsa_area
+                                >,
                                 $crate::__pgrx_c_macros::expression::ReadWrite
                             >,
                             _
@@ -533,13 +570,13 @@ macro_rules! dsa_allocate {
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
-                                $crate::__pgrx_c_macros::CUnsignedLongLong as $crate::__pgrx_c_macros::expression::CType
+                                $crate::__pgrx_c_macros::CUnsignedLong as $crate::__pgrx_c_macros::expression::CType
                             >::from_storage(
-                                $crate::dsa_allocate_extended(
+                                $crate::__pgrx_c_bindings::dsa_allocate_extended(
                                     <
                                         $crate::__pgrx_c_macros::expression::CPointer<
                                             $crate::__pgrx_c_macros::expression::COpaque<
-                                                $crate::dsa_area
+                                                $crate::__pgrx_c_bindings::dsa_area
                                             >,
                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                         > as $crate::__pgrx_c_macros::expression::CType
@@ -547,7 +584,7 @@ macro_rules! dsa_allocate {
                                         $crate::__pgrx_c_macros::expression::implicit::<
                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                 $crate::__pgrx_c_macros::expression::COpaque<
-                                                    $crate::dsa_area
+                                                    $crate::__pgrx_c_bindings::dsa_area
                                                 >,
                                                 $crate::__pgrx_c_macros::expression::ReadWrite
                                             >,
@@ -615,18 +652,22 @@ macro_rules! dsa_allocate {
         {
             let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 <
-                    $crate::__pgrx_c_macros::CUnsignedLongLong as $crate::__pgrx_c_macros::expression::CType
+                    $crate::__pgrx_c_macros::CUnsignedLong as $crate::__pgrx_c_macros::expression::CType
                 >::from_storage(
-                    $crate::dsa_allocate_extended(
+                    $crate::__pgrx_c_bindings::dsa_allocate_extended(
                         <
                             $crate::__pgrx_c_macros::expression::CPointer<
-                                $crate::__pgrx_c_macros::expression::COpaque<$crate::dsa_area>,
+                                $crate::__pgrx_c_macros::expression::COpaque<
+                                    $crate::__pgrx_c_bindings::dsa_area
+                                >,
                                 $crate::__pgrx_c_macros::expression::ReadWrite
                             > as $crate::__pgrx_c_macros::expression::CType
                         >::into_storage(
                             $crate::__pgrx_c_macros::expression::implicit::<
                                 $crate::__pgrx_c_macros::expression::CPointer<
-                                    $crate::__pgrx_c_macros::expression::COpaque<$crate::dsa_area>,
+                                    $crate::__pgrx_c_macros::expression::COpaque<
+                                        $crate::__pgrx_c_bindings::dsa_area
+                                    >,
                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                 >,
                                 _
@@ -684,8 +725,8 @@ macro_rules! dsa_allocate {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -713,13 +754,13 @@ macro_rules! __pgrx_c_args_dsa_allocate0 {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_dsa_allocate0!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_dsa_allocate0!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -728,7 +769,7 @@ macro_rules! __pgrx_c_args_dsa_allocate0 {
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_dsa_allocate0!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -755,31 +796,35 @@ macro_rules! __pgrx_c_args_dsa_allocate0 {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_dsa_allocate0!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_dsa_allocate0!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_dsa_allocate0!(@p2 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_dsa_allocate0!(
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative1 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_dsa_allocate0!(@p2 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_dsa_allocate0!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_dsa_allocate0!(
-            @p2 $mode [$($done)* (@literal [- $argument]),];
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_dsa_allocate0!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -787,7 +832,9 @@ macro_rules! __pgrx_c_args_dsa_allocate0 {
         $crate::__pgrx_c_args_dsa_allocate0!(@negative1 $mode [$($done)*]; - $($raw)*)
     };
     (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_dsa_allocate0!(@p2 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_dsa_allocate0!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -809,14 +856,18 @@ macro_rules! __pgrx_c_args_dsa_allocate0 {
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_dsa_allocate0!(@p2 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_dsa_allocate0!(
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_dsa_allocate0!(@p2 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_dsa_allocate0!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_dsa_allocate0!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -843,13 +894,13 @@ macro_rules! __pgrx_c_args_dsa_allocate0 {
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_dsa_allocate0!(
-            @p2 $mode [$($done)* (@literal [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_dsa_allocate0!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -895,19 +946,21 @@ macro_rules! dsa_allocate0 {
     (@__pgrx_emit_value; $area:tt, $size:tt $(,)?) => {
         /* PGRX: dsa_allocate0 remains expanded because dsa_allocate_extended is not an active function-like macro. */
         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-            <
-                $crate::__pgrx_c_macros::CUnsignedLongLong as $crate::__pgrx_c_macros::expression::CType
-            >::from_storage(
-                $crate::dsa_allocate_extended(
+            <$crate::__pgrx_c_macros::CUnsignedLong as $crate::__pgrx_c_macros::expression::CType>::from_storage(
+                $crate::__pgrx_c_bindings::dsa_allocate_extended(
                     <
                         $crate::__pgrx_c_macros::expression::CPointer<
-                            $crate::__pgrx_c_macros::expression::COpaque<$crate::dsa_area>,
+                            $crate::__pgrx_c_macros::expression::COpaque<
+                                $crate::__pgrx_c_bindings::dsa_area
+                            >,
                             $crate::__pgrx_c_macros::expression::ReadWrite
                         > as $crate::__pgrx_c_macros::expression::CType
                     >::into_storage(
                         $crate::__pgrx_c_macros::expression::implicit::<
                             $crate::__pgrx_c_macros::expression::CPointer<
-                                $crate::__pgrx_c_macros::expression::COpaque<$crate::dsa_area>,
+                                $crate::__pgrx_c_macros::expression::COpaque<
+                                    $crate::__pgrx_c_bindings::dsa_area
+                                >,
                                 $crate::__pgrx_c_macros::expression::ReadWrite
                             >,
                             _
@@ -942,7 +995,7 @@ macro_rules! dsa_allocate0 {
                         >(
                             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                 $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                    $crate::DSA_ALLOC_ZERO as i32
+                                    $crate::__pgrx_c_bindings::DSA_ALLOC_ZERO as i32
                                 )
                             )
                         )
@@ -980,13 +1033,13 @@ macro_rules! dsa_allocate0 {
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
-                                $crate::__pgrx_c_macros::CUnsignedLongLong as $crate::__pgrx_c_macros::expression::CType
+                                $crate::__pgrx_c_macros::CUnsignedLong as $crate::__pgrx_c_macros::expression::CType
                             >::from_storage(
-                                $crate::dsa_allocate_extended(
+                                $crate::__pgrx_c_bindings::dsa_allocate_extended(
                                     <
                                         $crate::__pgrx_c_macros::expression::CPointer<
                                             $crate::__pgrx_c_macros::expression::COpaque<
-                                                $crate::dsa_area
+                                                $crate::__pgrx_c_bindings::dsa_area
                                             >,
                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                         > as $crate::__pgrx_c_macros::expression::CType
@@ -994,7 +1047,7 @@ macro_rules! dsa_allocate0 {
                                         $crate::__pgrx_c_macros::expression::implicit::<
                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                 $crate::__pgrx_c_macros::expression::COpaque<
-                                                    $crate::dsa_area
+                                                    $crate::__pgrx_c_bindings::dsa_area
                                                 >,
                                                 $crate::__pgrx_c_macros::expression::ReadWrite
                                             >,
@@ -1038,7 +1091,9 @@ macro_rules! dsa_allocate0 {
                                             >(
                                                 $crate::__pgrx_c_macros::CValue::<
                                                     $crate::__pgrx_c_macros::CInt
-                                                >::new($crate::DSA_ALLOC_ZERO as i32)
+                                                >::new(
+                                                    $crate::__pgrx_c_bindings::DSA_ALLOC_ZERO as i32
+                                                )
                                             )
                                         )
                                     ),
@@ -1060,18 +1115,22 @@ macro_rules! dsa_allocate0 {
         {
             let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 <
-                    $crate::__pgrx_c_macros::CUnsignedLongLong as $crate::__pgrx_c_macros::expression::CType
+                    $crate::__pgrx_c_macros::CUnsignedLong as $crate::__pgrx_c_macros::expression::CType
                 >::from_storage(
-                    $crate::dsa_allocate_extended(
+                    $crate::__pgrx_c_bindings::dsa_allocate_extended(
                         <
                             $crate::__pgrx_c_macros::expression::CPointer<
-                                $crate::__pgrx_c_macros::expression::COpaque<$crate::dsa_area>,
+                                $crate::__pgrx_c_macros::expression::COpaque<
+                                    $crate::__pgrx_c_bindings::dsa_area
+                                >,
                                 $crate::__pgrx_c_macros::expression::ReadWrite
                             > as $crate::__pgrx_c_macros::expression::CType
                         >::into_storage(
                             $crate::__pgrx_c_macros::expression::implicit::<
                                 $crate::__pgrx_c_macros::expression::CPointer<
-                                    $crate::__pgrx_c_macros::expression::COpaque<$crate::dsa_area>,
+                                    $crate::__pgrx_c_macros::expression::COpaque<
+                                        $crate::__pgrx_c_bindings::dsa_area
+                                    >,
                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                 >,
                                 _
@@ -1108,7 +1167,7 @@ macro_rules! dsa_allocate0 {
                             >(
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                        $crate::DSA_ALLOC_ZERO as i32
+                                        $crate::__pgrx_c_bindings::DSA_ALLOC_ZERO as i32
                                     )
                                 )
                             )
@@ -1127,8 +1186,8 @@ macro_rules! dsa_allocate0 {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -1155,25 +1214,34 @@ macro_rules! __pgrx_c_args_dsa_create {
         $crate::__pgrx_c_args_dsa_create!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_dsa_create!(@p1 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_dsa_create!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_dsa_create!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_dsa_create!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_dsa_create!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_dsa_create!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_dsa_create!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $($raw:tt)*) => {
         $crate::__pgrx_c_args_dsa_create!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_dsa_create!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_dsa_create!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -1195,13 +1263,20 @@ macro_rules! __pgrx_c_args_dsa_create {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_dsa_create!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_dsa_create!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_dsa_create!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_dsa_create!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
-        $crate::__pgrx_c_args_dsa_create!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_dsa_create!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
         $crate::__pgrx_c_classify!(
@@ -1223,10 +1298,16 @@ macro_rules! __pgrx_c_args_dsa_create {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_dsa_create!(@p1 $mode [$($done)* (@literal [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_dsa_create!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+            $($rest)*
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_dsa_create!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_dsa_create!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p1 $mode:ident [$($done:tt)*];) => {
         $crate::dsa_create!(@$mode; $($done)*)
@@ -1271,11 +1352,13 @@ macro_rules! dsa_create {
         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
             <
                 $crate::__pgrx_c_macros::expression::CPointer<
-                    $crate::__pgrx_c_macros::expression::COpaque<$crate::dsa_area>,
+                    $crate::__pgrx_c_macros::expression::COpaque<
+                        $crate::__pgrx_c_bindings::dsa_area
+                    >,
                     $crate::__pgrx_c_macros::expression::ReadWrite
                 > as $crate::__pgrx_c_macros::expression::CType
             >::from_storage(
-                $crate::dsa_create_ext(
+                $crate::__pgrx_c_bindings::dsa_create_ext(
                     <$crate::__pgrx_c_macros::CInt as $crate::__pgrx_c_macros::expression::CType>::into_storage(
                         $crate::__pgrx_c_macros::expression::implicit::<
                             $crate::__pgrx_c_macros::CInt,
@@ -1300,10 +1383,11 @@ macro_rules! dsa_create {
                             _
                         >(
                             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                                /* PGRX: DSA_DEFAULT_INIT_SEGMENT_SIZE remains expanded because no integer constant binding is available in the defining Rust crate. */
                                 $crate::__pgrx_c_macros::CValue::<
                                     $crate::__pgrx_c_macros::CUnsignedLong
-                                >::new(1048576u64)
+                                >::new(
+                                    $crate::__pgrx_c_bindings::DSA_DEFAULT_INIT_SEGMENT_SIZE as u64
+                                )
                             )
                         )
                     ),
@@ -1321,10 +1405,9 @@ macro_rules! dsa_create {
                             _
                         >(
                             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                                /* PGRX: DSA_MAX_SEGMENT_SIZE remains expanded because no integer constant binding is available in the defining Rust crate. */
                                 $crate::__pgrx_c_macros::CValue::<
                                     $crate::__pgrx_c_macros::CUnsignedLong
-                                >::new(1099511627776u64)
+                                >::new($crate::__pgrx_c_bindings::DSA_MAX_SEGMENT_SIZE as u64)
                             )
                         )
                     ),
@@ -1361,11 +1444,13 @@ macro_rules! dsa_create {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
                                 $crate::__pgrx_c_macros::expression::CPointer<
-                                    $crate::__pgrx_c_macros::expression::COpaque<$crate::dsa_area>,
+                                    $crate::__pgrx_c_macros::expression::COpaque<
+                                        $crate::__pgrx_c_bindings::dsa_area
+                                    >,
                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                 > as $crate::__pgrx_c_macros::expression::CType
                             >::from_storage(
-                                $crate::dsa_create_ext(
+                                $crate::__pgrx_c_bindings::dsa_create_ext(
                                     <
                                         $crate::__pgrx_c_macros::CInt as $crate::__pgrx_c_macros::expression::CType
                                     >::into_storage(
@@ -1396,10 +1481,11 @@ macro_rules! dsa_create {
                                                 true,
                                                 _
                                             >(
-                                                /* PGRX: DSA_DEFAULT_INIT_SEGMENT_SIZE remains expanded because no integer constant binding is available in the defining Rust crate. */
                                                 $crate::__pgrx_c_macros::CValue::<
                                                     $crate::__pgrx_c_macros::CUnsignedLong
-                                                >::new(1048576u64)
+                                                >::new(
+                                                    $crate::__pgrx_c_bindings::DSA_DEFAULT_INIT_SEGMENT_SIZE as u64
+                                                )
                                             )
                                         )
                                     ),
@@ -1420,10 +1506,11 @@ macro_rules! dsa_create {
                                                 true,
                                                 _
                                             >(
-                                                /* PGRX: DSA_MAX_SEGMENT_SIZE remains expanded because no integer constant binding is available in the defining Rust crate. */
                                                 $crate::__pgrx_c_macros::CValue::<
                                                     $crate::__pgrx_c_macros::CUnsignedLong
-                                                >::new(1099511627776u64)
+                                                >::new(
+                                                    $crate::__pgrx_c_bindings::DSA_MAX_SEGMENT_SIZE as u64
+                                                )
                                             )
                                         )
                                     ),
@@ -1446,11 +1533,13 @@ macro_rules! dsa_create {
             let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 <
                     $crate::__pgrx_c_macros::expression::CPointer<
-                        $crate::__pgrx_c_macros::expression::COpaque<$crate::dsa_area>,
+                        $crate::__pgrx_c_macros::expression::COpaque<
+                            $crate::__pgrx_c_bindings::dsa_area
+                        >,
                         $crate::__pgrx_c_macros::expression::ReadWrite
                     > as $crate::__pgrx_c_macros::expression::CType
                 >::from_storage(
-                    $crate::dsa_create_ext(
+                    $crate::__pgrx_c_bindings::dsa_create_ext(
                         <
                             $crate::__pgrx_c_macros::CInt as $crate::__pgrx_c_macros::expression::CType
                         >::into_storage(
@@ -1477,10 +1566,11 @@ macro_rules! dsa_create {
                                 _
                             >(
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                                    /* PGRX: DSA_DEFAULT_INIT_SEGMENT_SIZE remains expanded because no integer constant binding is available in the defining Rust crate. */
                                     $crate::__pgrx_c_macros::CValue::<
                                         $crate::__pgrx_c_macros::CUnsignedLong
-                                    >::new(1048576u64)
+                                    >::new(
+                                        $crate::__pgrx_c_bindings::DSA_DEFAULT_INIT_SEGMENT_SIZE as u64
+                                    )
                                 )
                             )
                         ),
@@ -1498,10 +1588,9 @@ macro_rules! dsa_create {
                                 _
                             >(
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                                    /* PGRX: DSA_MAX_SEGMENT_SIZE remains expanded because no integer constant binding is available in the defining Rust crate. */
                                     $crate::__pgrx_c_macros::CValue::<
                                         $crate::__pgrx_c_macros::CUnsignedLong
-                                    >::new(1099511627776u64)
+                                    >::new($crate::__pgrx_c_bindings::DSA_MAX_SEGMENT_SIZE as u64)
                                 )
                             )
                         ),
@@ -1519,8 +1608,8 @@ macro_rules! dsa_create {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -1548,13 +1637,13 @@ macro_rules! __pgrx_c_args_dsa_create_in_place {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_dsa_create_in_place!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_dsa_create_in_place!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -1563,7 +1652,7 @@ macro_rules! __pgrx_c_args_dsa_create_in_place {
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_dsa_create_in_place!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -1590,25 +1679,25 @@ macro_rules! __pgrx_c_args_dsa_create_in_place {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_dsa_create_in_place!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_dsa_create_in_place!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_dsa_create_in_place!(
-            @p2 $mode [$($done)* (@literal [- $argument]),];
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_dsa_create_in_place!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -1617,7 +1706,7 @@ macro_rules! __pgrx_c_args_dsa_create_in_place {
     };
     (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_dsa_create_in_place!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -1644,25 +1733,25 @@ macro_rules! __pgrx_c_args_dsa_create_in_place {
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_dsa_create_in_place!(
-            @p2 $mode [$($done)* (@literal [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_dsa_create_in_place!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
     (@p2 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_dsa_create_in_place!(
-            @p3 $mode [$($done)* (@literal [- $argument]),];
+            @p3 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative2 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_dsa_create_in_place!(
-            @p3 $mode [$($done)* (@native [$argument]),];
+            @p3 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -1671,7 +1760,7 @@ macro_rules! __pgrx_c_args_dsa_create_in_place {
     };
     (@p2 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_dsa_create_in_place!(
-            @p3 $mode [$($done)* (@native [$argument]),];
+            @p3 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -1698,31 +1787,35 @@ macro_rules! __pgrx_c_args_dsa_create_in_place {
     };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_dsa_create_in_place!(
-            @p3 $mode [$($done)* (@literal [$argument]),];
+            @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p2 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_dsa_create_in_place!(
-            @p3 $mode [$($done)* (@native [$argument]),];
+            @p3 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
     (@p3 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_dsa_create_in_place!(@p4 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_dsa_create_in_place!(
+            @p4 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative3 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_dsa_create_in_place!(@p4 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_dsa_create_in_place!(
+            @p4 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p3 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_dsa_create_in_place!(
-            @p4 $mode [$($done)* (@literal [- $argument]),];
+            @p4 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative3 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_dsa_create_in_place!(
-            @p4 $mode [$($done)* (@native [$argument]),];
+            @p4 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -1730,7 +1823,9 @@ macro_rules! __pgrx_c_args_dsa_create_in_place {
         $crate::__pgrx_c_args_dsa_create_in_place!(@negative3 $mode [$($done)*]; - $($raw)*)
     };
     (@p3 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_dsa_create_in_place!(@p4 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_dsa_create_in_place!(
+            @p4 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p3 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -1752,14 +1847,18 @@ macro_rules! __pgrx_c_args_dsa_create_in_place {
         )
     };
     (@p3 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_dsa_create_in_place!(@p4 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_dsa_create_in_place!(
+            @p4 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p3 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_dsa_create_in_place!(@p4 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_dsa_create_in_place!(
+            @p4 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p3 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_dsa_create_in_place!(
-            @p4 $mode [$($done)* (@native [$argument]),];
+            @p4 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -1786,13 +1885,13 @@ macro_rules! __pgrx_c_args_dsa_create_in_place {
     };
     (@p3 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_dsa_create_in_place!(
-            @p4 $mode [$($done)* (@literal [$argument]),];
+            @p4 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p3 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_dsa_create_in_place!(
-            @p4 $mode [$($done)* (@native [$argument]),];
+            @p4 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -1842,11 +1941,13 @@ macro_rules! dsa_create_in_place {
         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
             <
                 $crate::__pgrx_c_macros::expression::CPointer<
-                    $crate::__pgrx_c_macros::expression::COpaque<$crate::dsa_area>,
+                    $crate::__pgrx_c_macros::expression::COpaque<
+                        $crate::__pgrx_c_bindings::dsa_area
+                    >,
                     $crate::__pgrx_c_macros::expression::ReadWrite
                 > as $crate::__pgrx_c_macros::expression::CType
             >::from_storage(
-                $crate::dsa_create_in_place_ext(
+                $crate::__pgrx_c_bindings::dsa_create_in_place_ext(
                     <
                         $crate::__pgrx_c_macros::expression::CPointer<
                             $crate::__pgrx_c_macros::expression::CVoid,
@@ -1895,13 +1996,17 @@ macro_rules! dsa_create_in_place {
                     ),
                     <
                         $crate::__pgrx_c_macros::expression::CPointer<
-                            $crate::__pgrx_c_macros::expression::COpaque<$crate::dsm_segment>,
+                            $crate::__pgrx_c_macros::expression::COpaque<
+                                $crate::__pgrx_c_bindings::dsm_segment
+                            >,
                             $crate::__pgrx_c_macros::expression::ReadWrite
                         > as $crate::__pgrx_c_macros::expression::CType
                     >::into_storage(
                         $crate::__pgrx_c_macros::expression::implicit::<
                             $crate::__pgrx_c_macros::expression::CPointer<
-                                $crate::__pgrx_c_macros::expression::COpaque<$crate::dsm_segment>,
+                                $crate::__pgrx_c_macros::expression::COpaque<
+                                    $crate::__pgrx_c_bindings::dsm_segment
+                                >,
                                 $crate::__pgrx_c_macros::expression::ReadWrite
                             >,
                             _
@@ -1925,10 +2030,11 @@ macro_rules! dsa_create_in_place {
                             _
                         >(
                             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                                /* PGRX: DSA_DEFAULT_INIT_SEGMENT_SIZE remains expanded because no integer constant binding is available in the defining Rust crate. */
                                 $crate::__pgrx_c_macros::CValue::<
                                     $crate::__pgrx_c_macros::CUnsignedLong
-                                >::new(1048576u64)
+                                >::new(
+                                    $crate::__pgrx_c_bindings::DSA_DEFAULT_INIT_SEGMENT_SIZE as u64
+                                )
                             )
                         )
                     ),
@@ -1946,10 +2052,9 @@ macro_rules! dsa_create_in_place {
                             _
                         >(
                             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                                /* PGRX: DSA_MAX_SEGMENT_SIZE remains expanded because no integer constant binding is available in the defining Rust crate. */
                                 $crate::__pgrx_c_macros::CValue::<
                                     $crate::__pgrx_c_macros::CUnsignedLong
-                                >::new(1099511627776u64)
+                                >::new($crate::__pgrx_c_bindings::DSA_MAX_SEGMENT_SIZE as u64)
                             )
                         )
                     ),
@@ -1989,11 +2094,13 @@ macro_rules! dsa_create_in_place {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
                                 $crate::__pgrx_c_macros::expression::CPointer<
-                                    $crate::__pgrx_c_macros::expression::COpaque<$crate::dsa_area>,
+                                    $crate::__pgrx_c_macros::expression::COpaque<
+                                        $crate::__pgrx_c_bindings::dsa_area
+                                    >,
                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                 > as $crate::__pgrx_c_macros::expression::CType
                             >::from_storage(
-                                $crate::dsa_create_in_place_ext(
+                                $crate::__pgrx_c_bindings::dsa_create_in_place_ext(
                                     <
                                         $crate::__pgrx_c_macros::expression::CPointer<
                                             $crate::__pgrx_c_macros::expression::CVoid,
@@ -2048,7 +2155,7 @@ macro_rules! dsa_create_in_place {
                                     <
                                         $crate::__pgrx_c_macros::expression::CPointer<
                                             $crate::__pgrx_c_macros::expression::COpaque<
-                                                $crate::dsm_segment
+                                                $crate::__pgrx_c_bindings::dsm_segment
                                             >,
                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                         > as $crate::__pgrx_c_macros::expression::CType
@@ -2056,7 +2163,7 @@ macro_rules! dsa_create_in_place {
                                         $crate::__pgrx_c_macros::expression::implicit::<
                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                 $crate::__pgrx_c_macros::expression::COpaque<
-                                                    $crate::dsm_segment
+                                                    $crate::__pgrx_c_bindings::dsm_segment
                                                 >,
                                                 $crate::__pgrx_c_macros::expression::ReadWrite
                                             >,
@@ -2085,10 +2192,11 @@ macro_rules! dsa_create_in_place {
                                                 true,
                                                 _
                                             >(
-                                                /* PGRX: DSA_DEFAULT_INIT_SEGMENT_SIZE remains expanded because no integer constant binding is available in the defining Rust crate. */
                                                 $crate::__pgrx_c_macros::CValue::<
                                                     $crate::__pgrx_c_macros::CUnsignedLong
-                                                >::new(1048576u64)
+                                                >::new(
+                                                    $crate::__pgrx_c_bindings::DSA_DEFAULT_INIT_SEGMENT_SIZE as u64
+                                                )
                                             )
                                         )
                                     ),
@@ -2109,10 +2217,11 @@ macro_rules! dsa_create_in_place {
                                                 true,
                                                 _
                                             >(
-                                                /* PGRX: DSA_MAX_SEGMENT_SIZE remains expanded because no integer constant binding is available in the defining Rust crate. */
                                                 $crate::__pgrx_c_macros::CValue::<
                                                     $crate::__pgrx_c_macros::CUnsignedLong
-                                                >::new(1099511627776u64)
+                                                >::new(
+                                                    $crate::__pgrx_c_bindings::DSA_MAX_SEGMENT_SIZE as u64
+                                                )
                                             )
                                         )
                                     ),
@@ -2135,11 +2244,13 @@ macro_rules! dsa_create_in_place {
             let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 <
                     $crate::__pgrx_c_macros::expression::CPointer<
-                        $crate::__pgrx_c_macros::expression::COpaque<$crate::dsa_area>,
+                        $crate::__pgrx_c_macros::expression::COpaque<
+                            $crate::__pgrx_c_bindings::dsa_area
+                        >,
                         $crate::__pgrx_c_macros::expression::ReadWrite
                     > as $crate::__pgrx_c_macros::expression::CType
                 >::from_storage(
-                    $crate::dsa_create_in_place_ext(
+                    $crate::__pgrx_c_bindings::dsa_create_in_place_ext(
                         <
                             $crate::__pgrx_c_macros::expression::CPointer<
                                 $crate::__pgrx_c_macros::expression::CVoid,
@@ -2190,14 +2301,16 @@ macro_rules! dsa_create_in_place {
                         ),
                         <
                             $crate::__pgrx_c_macros::expression::CPointer<
-                                $crate::__pgrx_c_macros::expression::COpaque<$crate::dsm_segment>,
+                                $crate::__pgrx_c_macros::expression::COpaque<
+                                    $crate::__pgrx_c_bindings::dsm_segment
+                                >,
                                 $crate::__pgrx_c_macros::expression::ReadWrite
                             > as $crate::__pgrx_c_macros::expression::CType
                         >::into_storage(
                             $crate::__pgrx_c_macros::expression::implicit::<
                                 $crate::__pgrx_c_macros::expression::CPointer<
                                     $crate::__pgrx_c_macros::expression::COpaque<
-                                        $crate::dsm_segment
+                                        $crate::__pgrx_c_bindings::dsm_segment
                                     >,
                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                 >,
@@ -2222,10 +2335,11 @@ macro_rules! dsa_create_in_place {
                                 _
                             >(
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                                    /* PGRX: DSA_DEFAULT_INIT_SEGMENT_SIZE remains expanded because no integer constant binding is available in the defining Rust crate. */
                                     $crate::__pgrx_c_macros::CValue::<
                                         $crate::__pgrx_c_macros::CUnsignedLong
-                                    >::new(1048576u64)
+                                    >::new(
+                                        $crate::__pgrx_c_bindings::DSA_DEFAULT_INIT_SEGMENT_SIZE as u64
+                                    )
                                 )
                             )
                         ),
@@ -2243,10 +2357,9 @@ macro_rules! dsa_create_in_place {
                                 _
                             >(
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                                    /* PGRX: DSA_MAX_SEGMENT_SIZE remains expanded because no integer constant binding is available in the defining Rust crate. */
                                     $crate::__pgrx_c_macros::CValue::<
                                         $crate::__pgrx_c_macros::CUnsignedLong
-                                    >::new(1099511627776u64)
+                                    >::new($crate::__pgrx_c_bindings::DSA_MAX_SEGMENT_SIZE as u64)
                                 )
                             )
                         ),

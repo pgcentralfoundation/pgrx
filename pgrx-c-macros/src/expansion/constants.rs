@@ -50,6 +50,111 @@ struct ConstantContext<'a> {
     limits: ExpansionLimits,
 }
 
+/// Compiler-established values for object macros missing from a binding generator.
+/// Existing Rust bindings must never be overwritten with these observations.
+#[derive(Debug, serde::Serialize)]
+pub struct ObjectIntegerConstants {
+    /// Values whose original C expression, integer identity and driver witness agree.
+    pub constants: BTreeMap<String, IntegerConstant>,
+    /// Definitions without a complete constant/type proof, including budget refusals.
+    pub rejected: BTreeMap<String, String>,
+}
+
+/// Probe selected object macros as independent integer constants under the inspected profile.
+///
+/// This supplements absent bindings, not disagreed binding values. It establishes
+/// constant initialization and exact C type/value with the same witnesses used
+/// for macro symbol retention; callers still choose their Rust storage explicitly.
+pub fn probe_integer_object_constants(
+    scanner: &MacroScanner,
+    frontend: &FrontendOutput,
+    names: &[impl AsRef<str>],
+) -> Result<ObjectIntegerConstants, FrontendError> {
+    let limits = ExpansionLimits::default();
+    super::verify_environment(frontend)?;
+    crate::frontend::verify_input_files(&frontend.profile().inputs)?;
+    let directory = ProbeDirectory::new()?;
+    let mut original = Vec::new();
+    std::fs::File::open(&frontend.profile().header)
+        .map_err(|source| FrontendError::CompilerIo {
+            compiler: frontend.profile().header.clone(),
+            source,
+        })?
+        .take(u64::try_from(limits.source_bytes).unwrap_or(u64::MAX).saturating_add(1))
+        .read_to_end(&mut original)
+        .map_err(|source| FrontendError::CompilerIo {
+            compiler: frontend.profile().header.clone(),
+            source,
+        })?;
+    if original.len().saturating_add(2) > limits.source_bytes || names.len() > limits.macros {
+        return Err(FrontendError::Output(
+            "object constant probe exceeds its source/count budget".into(),
+        ));
+    }
+    original.extend_from_slice(b"\n\n");
+    verify_original_environment(
+        scanner,
+        frontend,
+        &directory.0,
+        &original,
+        &frontend.profile().inputs,
+    )?;
+    let prefix = namespace(frontend);
+    let mut rejected = BTreeMap::new();
+    let mut supported = BTreeMap::new();
+    let mut dependencies =
+        super::Dependencies { frontend, nodes: HashMap::new(), tokens: 0, limits };
+    for name in names {
+        let name = name.as_ref();
+        let Some((name, active)) = frontend.environment().active.get_key_value(name) else {
+            rejected.insert(name.to_owned(), "object macro is not active".into());
+            continue;
+        };
+        if active.definition.kind != MacroKind::ObjectLike {
+            rejected.insert(name.clone(), "definition is not an object macro".into());
+            continue;
+        }
+        match dependencies.closure(name) {
+            Ok((closure, _)) => {
+                let invocation_sensitive = closure.iter().any(|dependency| {
+                    frontend.environment().active[&dependency.name]
+                        .definition
+                        .tokens
+                        .iter()
+                        .any(|token| matches!(token.spelling.as_str(), "__FILE__" | "__LINE__"))
+                }) || active
+                    .definition
+                    .tokens
+                    .iter()
+                    .any(|token| matches!(token.spelling.as_str(), "__FILE__" | "__LINE__"));
+                if invocation_sensitive {
+                    rejected.insert(
+                        name.clone(),
+                        "object value depends on its invocation location".into(),
+                    );
+                } else {
+                    supported.insert(name.clone(), Vec::new());
+                }
+            }
+            Err(reason) => {
+                rejected.insert(name.clone(), reason.message);
+            }
+        }
+    }
+    let context = ConstantContext {
+        scanner,
+        frontend,
+        directory: &directory.0,
+        original: &original,
+        prefix: &prefix,
+        limits,
+    };
+    let result = probe_constants(&context, &supported, &mut rejected);
+    crate::frontend::verify_input_files(&frontend.profile().inputs)?;
+    super::verify_environment(frontend)?;
+    Ok(ObjectIntegerConstants { constants: result?, rejected })
+}
+
 /// The caller must verify the inspected inputs before and after this compiler phase.
 pub(crate) fn retain_integer_constants(
     scanner: &MacroScanner,
@@ -65,8 +170,11 @@ pub(crate) fn retain_integer_constants(
         if !batch.discovered_dependencies.contains_key(&expansion.name) {
             continue;
         }
-        let (_, start) =
-            parameters(&expansion.definition).expect("prepared function signatures remain intact");
+        let start = if expansion.definition.kind == MacroKind::ObjectLike {
+            1
+        } else {
+            parameters(&expansion.definition).expect("prepared function signatures remain intact").1
+        };
         record_integer_references(
             frontend,
             &expansion.name,
@@ -466,9 +574,12 @@ fn probe_constants(
         let mut probes = BTreeMap::new();
         let mut over_budget = false;
         for (index, name) in names[start..end].iter().enumerate() {
+            if rejected.contains_key(*name) {
+                continue;
+            }
             let probe = format!("{prefix}constant_value_{index}");
             let declaration = format!(
-                "_Static_assert(__builtin_constant_p(({name})), \"pgrx_constant_initializer\");\nstatic __typeof__(({name})) {probe} __attribute__((unused)) = ({name});\n"
+                "#line 1 \"{probe}\"\n_Static_assert(__builtin_constant_p(({name})), \"pgrx_constant_initializer\");\nstatic __typeof__(({name})) {probe} __attribute__((unused)) = ({name});\n"
             );
             if source.len().saturating_add(declaration.len()) > limits.source_bytes {
                 over_budget = true;
@@ -485,6 +596,9 @@ fn probe_constants(
         match result {
             Ok(found) => {
                 for name in &names[start..end] {
+                    if rejected.contains_key(*name) {
+                        continue;
+                    }
                     if let Some(constant) = found.get(*name) {
                         constants.insert((*name).clone(), constant.clone());
                     } else {
@@ -493,6 +607,37 @@ fn probe_constants(
                 }
             }
             Err(error) if optional_failure(&error) => {
+                // A primary diagnostic names its own isolated witness. Remove
+                // only those candidates and require a clean compiler pass for
+                // the remainder; malformed siblings cannot consume the entire
+                // binary-isolation budget before valid constants are visited.
+                let failed = if let FrontendError::CompilerFailed { diagnostics, .. } = &error {
+                    probes
+                        .iter()
+                        .filter_map(|(probe, name)| {
+                            diagnostics
+                                .lines()
+                                .any(|line| {
+                                    line.starts_with(&format!("{probe}:"))
+                                        && (line.contains(": error:")
+                                            || line.contains(": fatal error:"))
+                                })
+                                .then_some(name.clone())
+                        })
+                        .collect::<Vec<_>>()
+                } else {
+                    Vec::new()
+                };
+                if !failed.is_empty() {
+                    for name in failed {
+                        rejected.insert(
+                            name,
+                            "Clang rejected the independently typed constant probe".into(),
+                        );
+                    }
+                    pending.push((start, end));
+                    continue;
+                }
                 if end - start > 1 {
                     let middle = start + (end - start) / 2;
                     pending.push((middle, end));
@@ -635,6 +780,7 @@ fn mask_constants(
 ) -> Result<(), FrontendError> {
     let ConstantContext { scanner, frontend, directory, original, prefix, limits } = context;
     let mut source = original.to_vec();
+    source.extend_from_slice(super::invocation_diagnostic_preamble(prefix).as_bytes());
     let mut markers = HashMap::new();
     for (index, name) in eligible.keys().enumerate() {
         let marker = super::constant_marker(prefix, index);
@@ -655,14 +801,18 @@ fn mask_constants(
     for (index, result) in batch.results.values().enumerate() {
         let ExpansionResult::Expanded { expansion } = result else { continue };
         let definition = &frontend.environment().active[&expansion.name].definition;
-        let (_, body_start) = parameters(definition)
-            .expect("successfully expanded macros have an established parameter list");
+        let body_start = if definition.kind == MacroKind::ObjectLike {
+            1
+        } else {
+            parameters(definition)
+                .expect("successfully expanded macros have an established parameter list")
+                .1
+        };
         let begin = format!("{prefix}retained_begin_{index}");
         let end = format!("{prefix}retained_end_{index}");
         let invocation = format!(
-            "{begin}\n{}({})\n{end}\n",
-            expansion.name,
-            expansion.symbolic_parameters.join(",")
+            "{begin}\n{}\n{end}\n",
+            super::symbolic_invocation(definition, &expansion.symbolic_parameters)
         );
         if source.len().saturating_add(invocation.len()) > limits.source_bytes {
             for name in eligible.keys() {
@@ -705,6 +855,7 @@ fn mask_constants(
     };
     let mut total_tokens = 0usize;
     for (item, mut body) in prepared.into_iter().zip(bodies) {
+        super::restore_invocation_diagnostics(&mut body, prefix);
         let Some(ExpansionResult::Expanded { expansion }) =
             batch.results.get_mut(&item.definition.name)
         else {

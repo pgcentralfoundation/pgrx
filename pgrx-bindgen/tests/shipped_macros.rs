@@ -7,7 +7,7 @@
 //! The harness builds isolated consumers and inspects their versioned snapshots,
 //! formatting, reports, and exported adapter modules. It distinguishes ordinary
 //! host generation from docs.rs consumption, where PostgreSQL and Clang may be
-//! absent and installation-specific native adapters must stay disabled.
+//! absent while the generated native adapter types remain available to check.
 
 #![cfg(unix)]
 
@@ -282,10 +282,17 @@ impl Drop for Fixture {
     }
 }
 
-/// Checks that docsrs exports generated adapter modules and accepts support free snapshots.
+/// Check ordinary and docsrs exports with and without generated adapter modules.
 #[test]
 fn docsrs_exports_generated_adapter_modules_and_accepts_support_free_snapshots() {
     let fixture = Fixture::new();
+    let support = Path::new(env!("CARGO_MANIFEST_DIR"))
+        .join("../pgrx-pg-sys/src/c_macros/support.rs")
+        .canonicalize()
+        .unwrap();
+    let support = syn::LitStr::new(support.to_str().unwrap(), proc_macro2::Span::call_site());
+    let out_dir = fixture.0.join("out");
+    fs::create_dir(&out_dir).unwrap();
     let postgres_module = |ident: &syn::Ident| {
         ident
             .to_string()
@@ -324,13 +331,39 @@ fn docsrs_exports_generated_adapter_modules_and_accepts_support_free_snapshots()
     let mut library = syn::parse_file(include_str!("../../pgrx-pg-sys/src/lib.rs")).unwrap();
     library.attrs = vec![syn::parse_quote!(#![allow(unused_imports)])];
     library.items.retain(|item| match item {
-        syn::Item::Mod(module) => module.ident == "include",
+        syn::Item::Mod(module) => {
+            matches!(
+                module.ident.to_string().as_str(),
+                "include" | "__pgrx_c_macros" | "__pgrx_c_bindings"
+            )
+        }
         syn::Item::Use(import) => {
             matches!(&import.tree, syn::UseTree::Path(path) if path.ident == "include")
         }
         _ => false,
     });
-    assert_eq!(library.items.len(), 2, "use the defining crate's actual include/export path");
+    assert_eq!(
+        library.items.len(),
+        4,
+        "use the defining crate's actual runtime/include/export paths"
+    );
+    for item in &mut library.items {
+        if let syn::Item::Mod(module) = item
+            && module.ident == "__pgrx_c_macros"
+        {
+            let path = module
+                .attrs
+                .iter_mut()
+                .find(|attribute| attribute.path().is_ident("path"))
+                .expect("the runtime module has its actual source path");
+            *path = syn::parse_quote!(#[path = #support]);
+        }
+    }
+    // These unused Rust declarations satisfy the actual namespace's bridge
+    // reexports; the fixture neither registers integer bridges nor performs C
+    // arithmetic with them. The real runtime keeps its target defaults because
+    // these synthetic constant-only modules have no inspected C profile.
+    library.items.extend(syn::parse_file("pub struct Datum; pub struct Oid; pub struct TransactionId; pub type MultiXactId = TransactionId; pub trait PgNode {}").unwrap().items);
     let library_path = fixture.0.join("src/lib.rs");
     fs::write(&library_path, library.into_token_stream().to_string()).unwrap();
 
@@ -342,9 +375,9 @@ fn docsrs_exports_generated_adapter_modules_and_accepts_support_free_snapshots()
             ""
         };
         let expression = if with_support {
-            "$crate::__pgrx_c_generated::ADAPTER + $crate::BINDING"
+            "$crate::__pgrx_c_generated::ADAPTER + $crate::__pgrx_c_bindings::BINDING"
         } else {
-            "$crate::BINDING"
+            "$crate::__pgrx_c_bindings::BINDING"
         };
         for major in &versions {
             fs::write(
@@ -361,46 +394,63 @@ fn docsrs_exports_generated_adapter_modules_and_accepts_support_free_snapshots()
             )
             .unwrap();
             fs::write(fixture.0.join(format!("src/include/pg{major}_oids.rs")), "").unwrap();
+            fs::copy(
+                fixture.0.join(format!("src/include/pg{major}.rs")),
+                out_dir.join(format!("pg{major}.rs")),
+            )
+            .unwrap();
+            fs::write(out_dir.join(format!("pg{major}_oids.rs")), "").unwrap();
+            let ordinary_macros = out_dir.join(format!("cmacros/pg{major}"));
+            fs::create_dir_all(&ordinary_macros).unwrap();
+            for name in ["mod.rs", "server.rs"] {
+                fs::copy(macros.join(name), ordinary_macros.join(name)).unwrap();
+            }
         }
-        for major in &versions {
-            let phase = format!("docsrs-pg{major}-{kind}");
-            let archive = fixture.0.join(format!("libdocs_snapshot_pg{major}_{kind}.rlib"));
-            fixture.successful_output(
-                Command::new("rustc")
+        for docsrs in [false, true] {
+            for major in &versions {
+                let mode = if docsrs { "docsrs" } else { "ordinary" };
+                let phase = format!("{mode}-pg{major}-{kind}");
+                let archive = fixture.0.join(format!("libdocs_snapshot_pg{major}_{kind}.rlib"));
+                let mut command = Command::new("rustc");
+                command
                     .args(["--edition=2024", "--crate-name=docs_snapshot", "--crate-type=rlib"])
-                    .args(["--cfg", "docsrs", "--cfg"])
+                    .args(["--cfg", "pgrx_c_macros", "--cfg"])
                     .arg(format!("feature=\"pg{major}\""))
+                    .env("OUT_DIR", &out_dir)
                     .arg(&library_path)
                     .arg("-o")
-                    .arg(&archive),
-                &format!("{phase}-library"),
-            );
-            let adapter_assertion = if with_support {
-                "assert_eq!(renamed::__pgrx_c_generated::ADAPTER, 12);"
-            } else {
-                ""
-            };
-            let consumer = fixture.0.join(format!("{phase}.rs"));
-            fs::write(
+                    .arg(&archive);
+                if docsrs {
+                    command.args(["--cfg", "docsrs"]);
+                }
+                fixture.successful_output(&mut command, &format!("{phase}-library"));
+                let adapter_assertion = if with_support {
+                    "assert_eq!(renamed::__pgrx_c_generated::ADAPTER, 12);"
+                } else {
+                    ""
+                };
+                let consumer = fixture.0.join(format!("{phase}.rs"));
+                fs::write(
                 &consumer,
                 format!("extern crate docs_snapshot as renamed;\nfn main() {{ {adapter_assertion} println!(\"{{}}\", renamed::SNAPSHOT_ADAPTER_VALUE!()); }}\n"),
             )
             .unwrap();
-            let executable = fixture.0.join(&phase);
-            fixture.successful_output(
-                Command::new("rustc")
-                    .args(["--edition=2024", "--crate-name=docs_consumer", "--extern"])
-                    .arg(format!("docs_snapshot={}", archive.display()))
-                    .arg(&consumer)
-                    .arg("-o")
-                    .arg(&executable),
-                &format!("{phase}-consumer"),
-            );
-            assert_eq!(
-                fixture.successful_output(&mut Command::new(executable), &phase),
-                format!("{}\n", u32::from(*major) + if with_support { 12 } else { 0 }),
-                "actual include exports must resolve adapter paths under docsrs"
-            );
+                let executable = fixture.0.join(&phase);
+                fixture.successful_output(
+                    Command::new("rustc")
+                        .args(["--edition=2024", "--crate-name=docs_consumer", "--extern"])
+                        .arg(format!("docs_snapshot={}", archive.display()))
+                        .arg(&consumer)
+                        .arg("-o")
+                        .arg(&executable),
+                    &format!("{phase}-consumer"),
+                );
+                assert_eq!(
+                    fixture.successful_output(&mut Command::new(executable), &phase),
+                    format!("{}\n", u32::from(*major) + if with_support { 12 } else { 0 }),
+                    "actual include exports must resolve adapter paths in {mode} builds"
+                );
+            }
         }
     }
 }
@@ -413,11 +463,12 @@ fn docsrs_exports_generated_adapter_modules_and_accepts_support_free_snapshots()
 fn release_ships_macros_and_docsrs_uses_them_without_postgres_or_clang() {
     let fixture = Fixture::new();
     let bindgen = Path::new(env!("CARGO_MANIFEST_DIR"));
+    let macros = bindgen.parent().unwrap().join("pgrx-macros");
     let support = bindgen.parent().unwrap().join("pgrx-pg-sys/src/c_macros/support.rs");
     fs::write(
         fixture.0.join("Cargo.toml"),
         format!(
-            "[package]\nname = \"shipped-macro-consumer\"\nversion = \"0.0.0\"\nedition = \"2024\"\n[workspace]\n[features]\npg18 = []\n[build-dependencies]\npgrx-bindgen = {{ path = {bindgen:?} }}\n[profile.dev.package.sha2]\nopt-level = 3\n"
+            "[package]\nname = \"shipped-macro-consumer\"\nversion = \"0.0.0\"\nedition = \"2024\"\n[workspace]\n[features]\npg18 = []\n[dependencies]\npgrx-macros = {{ path = {macros:?} }}\n[build-dependencies]\npgrx-bindgen = {{ path = {bindgen:?} }}\n[profile.dev.package.sha2]\nopt-level = 3\n"
         ),
     )
     .unwrap();
@@ -425,10 +476,12 @@ fn release_ships_macros_and_docsrs_uses_them_without_postgres_or_clang() {
         .unwrap();
     fs::write(fixture.0.join("pgrx-cshim.c"), "").unwrap();
     fs::write(fixture.0.join("include/pg18.h"), "#include <server.h>\n").unwrap();
+    fs::write(fixture.0.join("server/metadata.h"), include_str!("fixtures/metadata.h")).unwrap();
     fs::write(
         fixture.0.join("server/server.h"),
         r#"typedef unsigned int Oid;
 typedef unsigned int TransactionId;
+#include "metadata.h"
 #define SNAPSHOT_ADD(left, right) (((left) + (right)) & 0xFFFFFFFF)
 #define SNAPSHOT_HUGE (0xFFFFFFFFFFFFFFFFUL / 2)
 #define SNAPSHOT_VALID(size) ((__SIZE_TYPE__) (size) <= SNAPSHOT_HUGE)
@@ -442,6 +495,12 @@ typedef unsigned int TransactionId;
 #define SNAPSHOT_SPLIT 1 + 2
 #define SNAPSHOT_GROUPING(len) ((len) * SNAPSHOT_SPLIT)
 #define SNAPSHOT_STRINGIFY(value) #value
+typedef struct { int value; } SnapshotRecord;
+typedef int (*SnapshotCallback)(int);
+static inline int snapshot_native_add(int value) { return value + 13; }
+#define SNAPSHOT_NATIVE(value) snapshot_native_add(value)
+#define SNAPSHOT_FIELD(record) ((record)->value)
+#define SNAPSHOT_CALLBACK(callback,value) (((SnapshotCallback)(callback))(value))
 "#,
     )
     .unwrap();
@@ -472,6 +531,15 @@ impl TransactionId {{ pub fn into_inner(self) -> u32 {{ self.0 }} pub fn from_in
 pub type MultiXactId = TransactionId;
 pub struct Datum;
 pub trait PgNode {{}}
+/// Only pure scalar C functions and Rust callbacks are used by this fixture.
+pub mod ffi {{
+    /// Execute the fixture's callback without accessing a PostgreSQL backend.
+    ///
+    /// # Safety
+    /// The closure must call only this fixture's initialized scalar operations,
+    /// which cannot perform PostgreSQL errors, access state, or unwind from C.
+    pub unsafe fn pg_guard_ffi_boundary<T, F: FnOnce() -> T>(f: F) -> T {{ f() }}
+}}
 #[path = {support:?}] pub mod __pgrx_c_macros;
 #[cfg(not(docsrs))] mod pg18 {{
     include!(concat!(env!("OUT_DIR"), "/pg18.rs"));
@@ -480,6 +548,10 @@ pub trait PgNode {{}}
     include!("include/pg18.rs");
 }}
 pub use pg18::*;
+#[doc(hidden)] pub mod __pgrx_c_bindings {{
+    pub use crate::pg18::*;
+    pub use crate::{{Datum, MultiXactId, Oid, PgNode, TransactionId}};
+}}
 #[cfg(not(docsrs))] pub mod cmacros {{
     include!(concat!(env!("OUT_DIR"), "/cmacros/pg18/mod.rs"));
 }}
@@ -492,6 +564,20 @@ pub use cmacros::*;
     fs::write(
         fixture.0.join("src/main.rs"),
         r#"use shipped_macro_consumer as renamed;
+unsafe extern "C-unwind" fn callback(value: i32) -> i32 { value + 11 }
+
+// Docs builds must type-check original native adapters and metadata interfaces.
+// Only generation builds call them, since docs do not supply native archives.
+#[allow(dead_code)]
+fn native_adapters() {
+    // SAFETY: The original native function operates only on initialized C ints.
+    unsafe {
+        assert_eq!(renamed::snapshot_native_add(5), 18);
+        assert_eq!(renamed::SNAPSHOT_NATIVE!(5_i32).get(), 18);
+    }
+    assert_eq!(renamed::__pgrx_module_magic_data().version, 37);
+    assert_eq!(renamed::__pgrx_function_info_v1().api_version, 23);
+}
 fn main() {
     use renamed::__pgrx_c_macros::{CValue, CUnsignedLong};
     let untouched: u32 = renamed::SNAPSHOT_HUGE;
@@ -500,6 +586,18 @@ fn main() {
     assert_eq!(renamed::SNAPSHOT_SMALL_VALID_WRAPPER!(CValue::<CUnsignedLong>::new(18)).get(), 0);
     assert_eq!(renamed::SNAPSHOT_BUFFERALIGN!(33_i32).get(), 64);
     assert_eq!(renamed::SNAPSHOT_GROUPING!(5_i32).get(), 7);
+    let mut record = renamed::SnapshotRecord { value: 19 };
+    let record = core::ptr::addr_of_mut!(record);
+    let callback = renamed::__pgrx_c_callbacks::SnapshotCallback::new(Some(callback));
+    // SAFETY: The field pointer designates this live aligned initialized local
+    // record. The callback has the inspected C-unwind int signature, touches no
+    // backend state, and neither unwinds nor raises a PostgreSQL error.
+    unsafe {
+        assert_eq!(renamed::SNAPSHOT_FIELD!(record).get(), 19);
+        assert_eq!(renamed::SNAPSHOT_CALLBACK!(callback, 4_i32).get(), 15);
+    }
+    #[cfg(not(docsrs))]
+    native_adapters();
     println!("{}", renamed::SNAPSHOT_ADD!(renamed::Oid(10), renamed::TransactionId(2)).get());
 }
 "#,
@@ -549,7 +647,7 @@ fn main() {
     let generated_source = generated.values().map(String::as_str).collect::<Vec<_>>().join("\n");
     let shipped_source = shipped.values().map(String::as_str).collect::<Vec<_>>().join("\n");
     assert!(
-        shipped_source.contains("$crate::SNAPSHOT_SMALL"),
+        shipped_source.contains("$crate::__pgrx_c_bindings::SNAPSHOT_SMALL"),
         "matching constants remain binding references"
     );
     assert!(
@@ -611,15 +709,8 @@ fn main() {
                     guards += usize::from(target_guard);
                     (&mut item.attrs, target_guard)
                 }
-                syn::Item::Mod(item) => {
-                    let support = item.ident == "__pgrx_c_generated";
-                    (&mut item.attrs, support)
-                }
-                syn::Item::Use(item) => {
-                    let support =
-                        item.tree.to_token_stream().to_string().contains("__pgrx_c_generated");
-                    (&mut item.attrs, support)
-                }
+                syn::Item::Mod(item) => (&mut item.attrs, false),
+                syn::Item::Use(item) => (&mut item.attrs, false),
                 _ => continue,
             };
             let original_attrs: &[syn::Attribute] = match original {
@@ -684,9 +775,8 @@ fn main() {
         }
     }
 
-    // Precomputed target bindings deliberately lack an inspected macro profile.
-    // Exercise that report/warning path in this existing target directory, then
-    // restore the original consumer for the full docs.rs snapshot assertions.
+    // Raw-only imports cannot supply the macro adapters now used by pgrx.
+    // Verify refusal, then restore the consumer for the docs.rs snapshot check.
     let original_main = fs::read_to_string(fixture.0.join("src/main.rs")).unwrap();
     let target_info = fixture.0.join("target-info");
     fs::create_dir(&target_info).unwrap();
@@ -697,30 +787,15 @@ fn main() {
         "fn main() { println!(\"{}\", shipped_macro_consumer::PRECOMPUTED); }\n",
     )
     .unwrap();
-    fixture.run(
-        fixture
-            .command()
-            .env("PGRX_TARGET_INFO_PATH_PG18", &target_info)
-            .env("PGRX_MACRO_DEBUG", "0"),
-        "unavailable-zero",
-    );
-    let unavailable_report = fixture.assert_macro_warnings("unavailable-zero", false);
-    assert_eq!(unavailable_report["status"], "unavailable");
-    assert!(unavailable_report.get("profile").is_none());
-    assert!(unavailable_report["reason"].as_str().unwrap().contains("precomputed target bindings"));
-    for (value, phase) in [(Some("1"), "unavailable-debug"), (None, "unavailable-unset")] {
+    for value in [Some("0"), Some("1"), None] {
         let mut command = fixture.command();
         command.env("PGRX_TARGET_INFO_PATH_PG18", &target_info);
         if let Some(value) = value {
             command.env("PGRX_MACRO_DEBUG", value);
         }
-        fixture.run(&mut command, phase);
-        fixture.assert_rerun(phase);
-        assert_eq!(
-            fixture.assert_macro_warnings(phase, value == Some("1")),
-            unavailable_report,
-            "{phase} retains the same unavailability audit data"
-        );
+        let output = command.output().unwrap();
+        assert!(!output.status.success(), "raw-only import must fail in every diagnostic mode");
+        assert!(String::from_utf8_lossy(&output.stderr).contains("complete target bundle"));
     }
     fs::write(fixture.0.join("src/main.rs"), original_main).unwrap();
     fs::remove_file(pg_config).unwrap();

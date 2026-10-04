@@ -21,20 +21,35 @@ use syn::{Expr, Item, Lit, Type, UnOp};
 
 /// Discover bindgen's actual values and paths without changing its bindings.
 /// The emitter compares these values with Clang before referencing them.
+#[cfg(test)]
 pub(super) fn collect_bindings(
     file: &syn::File,
     objects: &BTreeMap<String, IntegerConstant>,
     declarations: &DeclarationCatalog,
     target: &TargetFacts,
 ) -> BindingCatalog {
-    let mut bindings = BindingCatalog::default();
+    collect_bindings_at(file, objects, declarations, target, &[])
+}
+
+/// Resolve generated declarations inside their public binding namespace, so a
+/// handwritten crate-root helper cannot replace a compiler-verified symbol.
+/// Explicit crate and standard-library paths retain their original identities.
+pub(super) fn collect_bindings_at(
+    file: &syn::File,
+    objects: &BTreeMap<String, IntegerConstant>,
+    declarations: &DeclarationCatalog,
+    target: &TargetFacts,
+    namespace: &[String],
+) -> BindingCatalog {
+    let mut bindings =
+        BindingCatalog { namespace: namespace.to_vec(), ..BindingCatalog::default() };
     let mut duplicates = BTreeSet::new();
-    collect(&file.items, &mut Vec::new(), target, &mut bindings, &mut duplicates);
-    let wrappers = flexible_array_helpers(&file.items, &mut Vec::new());
+    collect(&file.items, &mut namespace.to_vec(), target, &mut bindings, &mut duplicates);
+    let wrappers = flexible_array_helpers(&file.items, &mut namespace.to_vec());
     let mut structured_duplicates = StructuredDuplicates::default();
     collect_structures(
         &file.items,
-        &mut Vec::new(),
+        &mut namespace.to_vec(),
         target,
         &mut bindings,
         &mut structured_duplicates,
@@ -77,7 +92,7 @@ pub(super) fn collect_bindings(
         !duplicates.contains(name)
             && (objects.contains_key(name) || declarations.integer_constants.contains_key(name))
     });
-    collect_bitfields(&file.items, &mut Vec::new(), target, &mut bindings, &wrappers);
+    collect_bitfields(&file.items, &mut namespace.to_vec(), target, &mut bindings, &wrappers);
     bindings
 }
 
@@ -860,7 +875,7 @@ fn collect(
                     continue;
                 }
                 let name = item.ident.to_string().trim_start_matches("r#").to_owned();
-                let representation = if path.is_empty()
+                let representation = if path.as_slice() == catalog.namespace.as_slice()
                     && super::is_builtin_oid(&name)
                     && matches!(item.ty.as_ref(), Type::Path(ty) if ty.path.is_ident("u32"))
                 {
@@ -1453,5 +1468,418 @@ pub mod storage {
                 }),
             }
         );
+    }
+
+    /// Reuse the bounded standalone Rust compiler oracle for namespace-sensitive consumers.
+    mod namespace_oracle {
+        include!(concat!(
+            env!("CARGO_MANIFEST_DIR"),
+            "/../pgrx-c-macros/tests/support/rust_oracle.rs"
+        ));
+    }
+
+    /// Namespace declaration and relative type paths together while preserving explicit crate and
+    /// standard-library identities, including nested callbacks and enum constants.
+    #[test]
+    fn namespaced_catalog_preserves_declarations_types_and_explicit_roots() {
+        let file = syn::parse_file(
+            r#"
+/// Native count storage.
+pub type Count = ::core::ffi::c_uint;
+/// Compiler typedef whose semantic name excludes the Rust binding namespace.
+pub type Size = ::core::ffi::c_ulong;
+/// An explicitly crate-owned type remains outside the generated namespace.
+pub type Explicit = crate::RootType;
+/// A standard-library opaque type retains its canonical path.
+pub type Opaque = ::core::ffi::c_void;
+/// A nullable C callback uses generated record and integer typedefs.
+pub type Callback = ::core::option::Option<unsafe extern "C" fn(*const Packet, Count) -> Count>;
+/// An actual scalar binding constant.
+pub const LIMIT: u32 = 17;
+/// Top-level built-in OID storage is rewritten by the binding build.
+pub const BINDINGOID: u32 = 23;
+/// Native record storage whose fields retain independent type identities.
+#[repr(C)]
+#[derive(Copy, Clone)]
+pub struct Packet {
+    /// Relative integer typedef.
+    pub count: self::Count,
+    /// Relative callback typedef.
+    pub callback: Callback,
+    /// Explicit crate-owned pointer.
+    pub root: *mut crate::RootType,
+    /// Explicit standard-library pointer.
+    pub opaque: *const ::core::ffi::c_void,
+    /// Native Rust char alias, independent of inspected C char signedness.
+    pub byte: ::core::ffi::c_char,
+}
+unsafe extern "C" {
+    /// Original native callable signature.
+    pub fn transform(packet: *const Packet, count: Count, callback: Callback) -> Count;
+    /// Mutable native pointer variable.
+    pub static mut Current: *mut Packet;
+    /// Read-only native pointer variable.
+    pub static Frozen: *const Packet;
+}
+/// Generated nested declarations retain their complete module paths.
+pub mod nested {
+    /// Parent-relative integer typedef.
+    pub type Local = super::Count;
+    /// Nested integral binding constant.
+    pub const INNER: u32 = 9;
+    /// A nested similarly named integer is outside the root OID rewrite.
+    pub const NESTEDOID: u32 = 29;
+    /// Nested rustified C enum.
+    #[repr(u32)]
+    pub enum Tag {
+        /// Compiler enumerator.
+        PICK = 7,
+    }
+    /// Nested native record with parent and local type paths.
+    #[repr(C)]
+    pub struct Node {
+        /// Parent-relative record pointer.
+        pub parent: *const super::Packet,
+        /// Local integer typedef.
+        pub count: Local,
+        /// Parent-relative callback typedef.
+        pub callback: super::Callback,
+    }
+    unsafe extern "C" {
+        /// Nested native callable signature.
+        pub fn child(value: Local, node: *mut self::Node) -> super::Count;
+        /// Nested mutable native variable.
+        pub static mut Nested: *mut Node;
+    }
+    /// A second nesting level exercises multi-component parent resolution.
+    pub mod deeper {
+        /// Type owned two levels above this generated module.
+        pub type Parent = super::super::Packet;
+        /// Deep integral binding constant.
+        pub const DEEP: u32 = 31;
+    }
+}
+"#,
+        )
+        .unwrap();
+        let objects =
+            [("LIMIT", 17), ("INNER", 9), ("DEEP", 31), ("BINDINGOID", 23), ("NESTEDOID", 29)]
+                .into_iter()
+                .map(|(name, value)| {
+                    (name.into(), constant(IntegerKind::Int, IntegerValue::Signed(value)))
+                })
+                .collect();
+        let declarations = DeclarationCatalog {
+            integer_constants: BTreeMap::from([(
+                "PICK".into(),
+                constant(IntegerKind::Int, IntegerValue::Signed(7)),
+            )]),
+            ..DeclarationCatalog::default()
+        };
+        let original = file.to_token_stream().to_string();
+        let mut catalog = collect_bindings_at(
+            &file,
+            &objects,
+            &declarations,
+            &target(),
+            &["__pgrx_c_bindings".into()],
+        );
+        let count =
+            RustBindingType::Named { path: vec!["__pgrx_c_bindings".into(), "Count".into()] };
+        let packet =
+            RustBindingType::Named { path: vec!["__pgrx_c_bindings".into(), "Packet".into()] };
+        let callback =
+            RustBindingType::Named { path: vec!["__pgrx_c_bindings".into(), "Callback".into()] };
+        assert_eq!(catalog.functions["transform"].path, ["__pgrx_c_bindings", "transform"]);
+        assert_eq!(
+            catalog.functions["transform"].parameters,
+            [
+                RustBindingType::Pointer { pointee: Box::new(packet.clone()), mutable: false },
+                count.clone(),
+                callback.clone(),
+            ]
+        );
+        assert_eq!(catalog.functions["transform"].result, count);
+        assert_eq!(catalog.variables["Current"].path, ["__pgrx_c_bindings", "Current"]);
+        assert_eq!(
+            catalog.variables["Current"].ty,
+            RustBindingType::Pointer { pointee: Box::new(packet.clone()), mutable: true }
+        );
+        assert!(catalog.variables["Current"].mutable);
+        assert_eq!(catalog.variables["Frozen"].path, ["__pgrx_c_bindings", "Frozen"]);
+        assert!(!catalog.variables["Frozen"].mutable);
+        assert_eq!(catalog.integer_constants["LIMIT"].path, ["__pgrx_c_bindings", "LIMIT"]);
+        assert_eq!(catalog.integer_constants["LIMIT"].value, IntegerValue::Unsigned(17));
+        assert_eq!(
+            catalog.integer_constants["INNER"].path,
+            ["__pgrx_c_bindings", "nested", "INNER"]
+        );
+        assert_eq!(
+            catalog.integer_constants["DEEP"].path,
+            ["__pgrx_c_bindings", "nested", "deeper", "DEEP"]
+        );
+        assert_eq!(
+            catalog.integer_constants["PICK"].path,
+            ["__pgrx_c_bindings", "nested", "Tag", "PICK"]
+        );
+        assert_eq!(catalog.enums["Tag"].path, ["__pgrx_c_bindings", "nested", "Tag"]);
+        assert_eq!(catalog.types["__pgrx_c_bindings::Count"].path, ["__pgrx_c_bindings", "Count"]);
+        assert_eq!(
+            catalog.types["__pgrx_c_bindings::Count"].target,
+            RustBindingType::Integer { signed: false, bits: 32 }
+        );
+        assert_eq!(
+            catalog.types["__pgrx_c_bindings::Explicit"].target,
+            RustBindingType::Named { path: vec!["RootType".into()] }
+        );
+        assert_eq!(
+            catalog.types["__pgrx_c_bindings::Opaque"].target,
+            RustBindingType::Named { path: vec!["core".into(), "ffi".into(), "c_void".into()] }
+        );
+        assert_eq!(
+            catalog.types["__pgrx_c_bindings::Callback"].target,
+            RustBindingType::Option {
+                value: Box::new(RustBindingType::Function {
+                    parameters: vec![
+                        RustBindingType::Pointer {
+                            pointee: Box::new(packet.clone()),
+                            mutable: false
+                        },
+                        count.clone()
+                    ],
+                    result: Box::new(count.clone()),
+                    abi: "C".into(),
+                    unsafe_: true,
+                    variadic: false,
+                })
+            }
+        );
+        let fields = &catalog.records["Packet"].fields;
+        assert_eq!(catalog.records["Packet"].path, ["__pgrx_c_bindings", "Packet"]);
+        assert_eq!(fields["count"].ty, count);
+        assert_eq!(fields["callback"].ty, callback);
+        assert_eq!(
+            fields["root"].ty,
+            RustBindingType::Pointer {
+                pointee: Box::new(RustBindingType::Named { path: vec!["RootType".into()] }),
+                mutable: true
+            }
+        );
+        assert_eq!(
+            fields["opaque"].ty,
+            RustBindingType::Pointer {
+                pointee: Box::new(RustBindingType::Named {
+                    path: vec!["core".into(), "ffi".into(), "c_void".into()]
+                }),
+                mutable: false
+            }
+        );
+        assert_eq!(fields["byte"].ty, RustBindingType::NativeChar);
+        let local = RustBindingType::Named {
+            path: vec!["__pgrx_c_bindings".into(), "nested".into(), "Local".into()],
+        };
+        assert_eq!(catalog.types["__pgrx_c_bindings::nested::Local"].target, count);
+        assert_eq!(
+            catalog.types["__pgrx_c_bindings::nested::deeper::Parent"].target,
+            packet.clone()
+        );
+        assert_eq!(catalog.records["Node"].path, ["__pgrx_c_bindings", "nested", "Node"]);
+        assert_eq!(
+            catalog.records["Node"].fields["parent"].ty,
+            RustBindingType::Pointer { pointee: Box::new(packet), mutable: false }
+        );
+        assert_eq!(catalog.records["Node"].fields["count"].ty, local.clone());
+        assert_eq!(catalog.records["Node"].fields["callback"].ty, callback);
+        assert_eq!(catalog.functions["child"].path, ["__pgrx_c_bindings", "nested", "child"]);
+        assert_eq!(
+            catalog.functions["child"].parameters,
+            [
+                local,
+                RustBindingType::Pointer {
+                    pointee: Box::new(RustBindingType::Named {
+                        path: vec!["__pgrx_c_bindings".into(), "nested".into(), "Node".into()]
+                    }),
+                    mutable: true,
+                }
+            ]
+        );
+        assert_eq!(catalog.functions["child"].result, count);
+        assert_eq!(catalog.variables["Nested"].path, ["__pgrx_c_bindings", "nested", "Nested"]);
+        assert_eq!(catalog.namespace, ["__pgrx_c_bindings"]);
+        assert!(matches!(
+            catalog.integer_constants["BINDINGOID"].representation,
+            IntegerBindingRepresentation::Oid
+        ));
+        assert!(matches!(
+            catalog.integer_constants["NESTEDOID"].representation,
+            IntegerBindingRepresentation::Primitive
+        ));
+        // C typedef lookup keeps semantic names relative while retaining exact Rust storage paths.
+        assert_eq!(catalog.type_alias("Size").unwrap().path, ["__pgrx_c_bindings", "Size"]);
+        assert_eq!(
+            catalog.type_alias("Size").unwrap().target,
+            RustBindingType::Integer { signed: false, bits: 64 }
+        );
+        assert_eq!(
+            catalog.type_alias("nested::Local").unwrap().path,
+            ["__pgrx_c_bindings", "nested", "Local"]
+        );
+        assert_eq!(catalog.relative_type_name("__pgrx_c_bindings::Size"), Some("Size"));
+        assert_eq!(
+            catalog.relative_type_name("__pgrx_c_bindings::nested::Local"),
+            Some("nested::Local")
+        );
+        assert_eq!(
+            catalog.relative_path(&catalog.type_alias("nested::Local").unwrap().path),
+            Some(["nested".into(), "Local".into()].as_slice())
+        );
+        for key in [
+            "Size",
+            "outside::Size",
+            "__pgrx_c_bindings_extra::Size",
+            "__pgrx_c_bindingsSize",
+            "__pgrx_c_bindings",
+        ] {
+            assert_eq!(catalog.relative_type_name(key), None, "outside alias key {key}");
+        }
+        for path in [
+            vec!["Oid".into()],
+            vec!["outside".into(), "Oid".into()],
+            vec!["__pgrx_c_bindings_extra".into(), "Oid".into()],
+            vec!["core".into(), "ffi".into(), "c_uint".into()],
+        ] {
+            assert_eq!(catalog.relative_path(&path), None, "outside storage path {path:?}");
+        }
+        catalog.types.insert(
+            "Size".into(),
+            AliasBinding {
+                path: vec!["Size".into()],
+                target: RustBindingType::Integer { signed: true, bits: 32 },
+            },
+        );
+        assert_eq!(
+            catalog.type_alias("Size").unwrap().path,
+            ["__pgrx_c_bindings", "Size"],
+            "a root shadow cannot supply the C typedef's binding storage"
+        );
+        assert!(catalog.type_alias("__pgrx_c_bindings::Size").is_none());
+        assert!(catalog.type_alias("outside::Size").is_none());
+        // Model canonical bridge registrations and one distinct fully qualified registration.
+        catalog.integer_storage.extend([
+            ("Oid".into(), IntegerKind::UnsignedInt),
+            ("TransactionId".into(), IntegerKind::UnsignedInt),
+            ("MultiXactId".into(), IntegerKind::UnsignedInt),
+            ("Datum".into(), IntegerKind::UnsignedLong),
+            ("ExactBridge".into(), IntegerKind::UnsignedInt),
+            ("__pgrx_c_bindings::ExactBridge".into(), IntegerKind::Long),
+        ]);
+        for (name, kind) in [
+            ("Oid", IntegerKind::UnsignedInt),
+            ("TransactionId", IntegerKind::UnsignedInt),
+            ("MultiXactId", IntegerKind::UnsignedInt),
+            ("Datum", IntegerKind::UnsignedLong),
+        ] {
+            assert_eq!(catalog.integer_kind(&[name.into()]), Some(kind));
+            assert_eq!(
+                catalog.integer_kind(&["__pgrx_c_bindings".into(), name.into()]),
+                Some(kind)
+            );
+            for prefix in ["outside", "__pgrx_c_bindings_extra"] {
+                assert_eq!(catalog.integer_kind(&[prefix.into(), name.into()]), None);
+            }
+            assert_eq!(
+                catalog.integer_kind(&["__pgrx_c_bindings".into(), "nested".into(), name.into()]),
+                None
+            );
+        }
+        assert_eq!(
+            catalog.integer_kind(&["__pgrx_c_bindings".into(), "ExactBridge".into()]),
+            Some(IntegerKind::Long),
+            "an exact qualified registration takes precedence over a relative bridge"
+        );
+        assert_eq!(
+            catalog.type_alias("Size").unwrap().path,
+            ["__pgrx_c_bindings", "Size"],
+            "semantic identity lookup must preserve the qualified Rust storage"
+        );
+        assert_eq!(
+            file.to_token_stream().to_string(),
+            original,
+            "collecting a namespace cannot mutate its binding source"
+        );
+    }
+
+    /// Compile and execute the collected native function and constant paths even when crate-root
+    /// names deliberately expose incompatible argument and value types.
+    #[test]
+    fn namespaced_call_and_constant_compile_despite_incompatible_root_shadows() {
+        let binding_source = r#"
+use crate::Oid;
+/// Binding alias whose root bridge was privately imported by the raw module.
+pub type Bridge = Oid;
+/// Independently parsed numeric binding constant.
+pub const LIMIT: u32 = 17;
+unsafe extern "C" {
+    /// Stateless native function supplied by the isolated Rust C-ABI fixture.
+    #[link_name = "__pgrx_namespace_oracle_native"]
+    pub fn native(value: i32) -> i32;
+}
+"#;
+        let file = syn::parse_file(binding_source).unwrap();
+        let objects = BTreeMap::from([(
+            "LIMIT".into(),
+            constant(IntegerKind::Int, IntegerValue::Signed(17)),
+        )]);
+        let catalog = collect_bindings_at(
+            &file,
+            &objects,
+            &DeclarationCatalog::default(),
+            &target(),
+            &["__pgrx_c_bindings".into()],
+        );
+        let function = catalog.functions["native"].path.join("::");
+        let limit = catalog.integer_constants["LIMIT"].path.join("::");
+        let bridge = catalog.types["__pgrx_c_bindings::Bridge"].path.join("::");
+        assert_eq!(
+            catalog.types["__pgrx_c_bindings::Bridge"].target,
+            RustBindingType::Named { path: vec!["__pgrx_c_bindings".into(), "Oid".into()] }
+        );
+        let source = format!(
+            r#"
+/// Root shadow whose argument and result cannot satisfy the native C signature.
+pub fn native(_value: &str) -> bool {{ false }}
+/// Root shadow whose storage cannot satisfy an integer binding reference.
+pub const LIMIT: &str = "root shadow";
+/// Numeric root bridge privately imported by fresh raw bindings.
+#[repr(transparent)]
+pub struct Oid {{
+    /// Initialized numeric bridge storage.
+    pub value: u32,
+}}
+/// Raw bindings privately import the unchanged root bridge type.
+mod pg18 {{ {binding_source} }}
+/// Actual binding declarations and the root bridge share the production public namespace.
+pub mod __pgrx_c_bindings {{ pub use crate::pg18::*; pub use crate::Oid; }}
+/// Provide a stateless C-ABI symbol owned exclusively by this standalone fixture.
+// SAFETY: The unique exported symbol matches the fixture's exact i32 -> i32 C ABI declaration.
+#[unsafe(export_name = "__pgrx_namespace_oracle_native")]
+pub extern "C" fn original(value: i32) -> i32 {{ value + 7 }}
+/// Require collected paths to use numeric declarations independently of root shadows.
+fn main() {{
+    // SAFETY: The target is the initialized stateless fixture symbol with its exact scalar ABI.
+    let actual: i32 = unsafe {{ crate::{function}(5) }};
+    let binding: u32 = crate::{limit};
+    let bridge: crate::{bridge} = crate::Oid {{ value: binding }};
+    let root_bridge: crate::__pgrx_c_bindings::Oid = bridge;
+    assert_eq!(root_bridge.value, 17);
+    assert_eq!(actual, 12);
+    assert_eq!(binding, 17);
+    assert!(!crate::native("shadow"));
+    assert_eq!(crate::LIMIT, "root shadow");
+    println!("{{actual}}:{{binding}}");
+}}
+"#
+        );
+        assert_eq!(namespace_oracle::run_rust(&source), "12:17\n");
     }
 }

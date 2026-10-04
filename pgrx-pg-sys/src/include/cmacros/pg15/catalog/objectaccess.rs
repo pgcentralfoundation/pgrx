@@ -5,8 +5,8 @@ This code is generated for documentation purposes, so that it is easy to referen
 // C macros from objectaccess.h.
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -37,23 +37,23 @@ macro_rules! __pgrx_c_args_InvokeFunctionExecuteHook {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
         $crate::__pgrx_c_args_InvokeFunctionExecuteHook!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_InvokeFunctionExecuteHook!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeFunctionExecuteHook!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeFunctionExecuteHook!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -62,7 +62,7 @@ macro_rules! __pgrx_c_args_InvokeFunctionExecuteHook {
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
         $crate::__pgrx_c_args_InvokeFunctionExecuteHook!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
@@ -88,17 +88,17 @@ macro_rules! __pgrx_c_args_InvokeFunctionExecuteHook {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_InvokeFunctionExecuteHook!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_InvokeFunctionExecuteHook!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeFunctionExecuteHook!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -125,13 +125,13 @@ macro_rules! __pgrx_c_args_InvokeFunctionExecuteHook {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeFunctionExecuteHook!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeFunctionExecuteHook!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -181,25 +181,29 @@ macro_rules! InvokeFunctionExecuteHook {
                         $crate::__pgrx_c_macros::expression::load(
                             $crate::__pgrx_c_macros::expression::place::<
                                 $crate::__pgrx_c_macros::expression::CFunction<
-                                    $crate::__pgrx_c_generated::Signature_4cceafdee9ba53046d128725fb9f4554
-                                >>(::core::ptr::addr_of_mut!($crate::object_access_hook))
+                                    $crate::__pgrx_c_generated::Signature_3cab36baaf9f7af106d045154630e449
+                                >>(
+                                ::core::ptr::addr_of_mut!(
+                                    $crate::__pgrx_c_bindings::object_access_hook
+                                )
+                            )
                         )
                     )
                 )
             ) {
                 {
                     let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                        $crate::RunFunctionExecuteHook(
+                        $crate::__pgrx_c_bindings::RunFunctionExecuteHook(
                             <
                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                     $crate::__pgrx_c_macros::CUnsignedInt,
-                                    $crate::Oid
+                                    $crate::__pgrx_c_bindings::Oid
                                 > as $crate::__pgrx_c_macros::expression::CType
                             >::into_storage(
                                 $crate::__pgrx_c_macros::expression::implicit::<
                                     $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                         $crate::__pgrx_c_macros::CUnsignedInt,
-                                        $crate::Oid
+                                        $crate::__pgrx_c_bindings::Oid
                                     >,
                                     _
                                 >(
@@ -229,8 +233,8 @@ macro_rules! InvokeFunctionExecuteHook {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -261,23 +265,23 @@ macro_rules! __pgrx_c_args_InvokeFunctionExecuteHookStr {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
         $crate::__pgrx_c_args_InvokeFunctionExecuteHookStr!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_InvokeFunctionExecuteHookStr!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeFunctionExecuteHookStr!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeFunctionExecuteHookStr!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -289,7 +293,7 @@ macro_rules! __pgrx_c_args_InvokeFunctionExecuteHookStr {
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
         $crate::__pgrx_c_args_InvokeFunctionExecuteHookStr!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
@@ -315,17 +319,17 @@ macro_rules! __pgrx_c_args_InvokeFunctionExecuteHookStr {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_InvokeFunctionExecuteHookStr!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_InvokeFunctionExecuteHookStr!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeFunctionExecuteHookStr!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -352,13 +356,13 @@ macro_rules! __pgrx_c_args_InvokeFunctionExecuteHookStr {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeFunctionExecuteHookStr!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeFunctionExecuteHookStr!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -408,15 +412,19 @@ macro_rules! InvokeFunctionExecuteHookStr {
                         $crate::__pgrx_c_macros::expression::load(
                             $crate::__pgrx_c_macros::expression::place::<
                                 $crate::__pgrx_c_macros::expression::CFunction<
-                                    $crate::__pgrx_c_generated::Signature_533260ae4b5599aa10b2f947a4bbab7a
-                                >>(::core::ptr::addr_of_mut!($crate::object_access_hook_str))
+                                    $crate::__pgrx_c_generated::Signature_6b09b7fb6fe6562acf1f1edec1ca76e3
+                                >>(
+                                ::core::ptr::addr_of_mut!(
+                                    $crate::__pgrx_c_bindings::object_access_hook_str
+                                )
+                            )
                         )
                     )
                 )
             ) {
                 {
                     let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                        $crate::RunFunctionExecuteHookStr(
+                        $crate::__pgrx_c_bindings::RunFunctionExecuteHookStr(
                             <
                                 $crate::__pgrx_c_macros::expression::CPointer<
                                     $crate::__pgrx_c_macros::expression::CIntegerStorage<
@@ -468,8 +476,8 @@ macro_rules! InvokeFunctionExecuteHookStr {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -500,13 +508,13 @@ macro_rules! __pgrx_c_args_InvokeNamespaceSearchHook {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeNamespaceSearchHook!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeNamespaceSearchHook!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -515,7 +523,7 @@ macro_rules! __pgrx_c_args_InvokeNamespaceSearchHook {
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeNamespaceSearchHook!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -542,35 +550,35 @@ macro_rules! __pgrx_c_args_InvokeNamespaceSearchHook {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeNamespaceSearchHook!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeNamespaceSearchHook!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $argument:literal) => {
         $crate::__pgrx_c_args_InvokeNamespaceSearchHook!(
-            @p2 $mode [$($done)* (@literal [- $argument]),];
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
         )
     };
     (@negative1 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_InvokeNamespaceSearchHook!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeNamespaceSearchHook!(
-            @p2 $mode [$($done)* (@literal [- $argument]),];
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeNamespaceSearchHook!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -579,7 +587,7 @@ macro_rules! __pgrx_c_args_InvokeNamespaceSearchHook {
     };
     (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
         $crate::__pgrx_c_args_InvokeNamespaceSearchHook!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
@@ -605,17 +613,17 @@ macro_rules! __pgrx_c_args_InvokeNamespaceSearchHook {
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_InvokeNamespaceSearchHook!(
-            @p2 $mode [$($done)* (@literal [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_InvokeNamespaceSearchHook!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeNamespaceSearchHook!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -642,13 +650,13 @@ macro_rules! __pgrx_c_args_InvokeNamespaceSearchHook {
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeNamespaceSearchHook!(
-            @p2 $mode [$($done)* (@literal [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeNamespaceSearchHook!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -705,9 +713,11 @@ macro_rules! InvokeNamespaceSearchHook {
                                     $crate::__pgrx_c_macros::expression::load(
                                         $crate::__pgrx_c_macros::expression::place::<
                                             $crate::__pgrx_c_macros::expression::CFunction<
-                                                $crate::__pgrx_c_generated::Signature_4cceafdee9ba53046d128725fb9f4554
+                                                $crate::__pgrx_c_generated::Signature_3cab36baaf9f7af106d045154630e449
                                             >>(
-                                            ::core::ptr::addr_of_mut!($crate::object_access_hook)
+                                            ::core::ptr::addr_of_mut!(
+                                                $crate::__pgrx_c_bindings::object_access_hook
+                                            )
                                         )
                                     )
                                 )
@@ -728,17 +738,17 @@ macro_rules! InvokeNamespaceSearchHook {
                                 <
                                     $crate::__pgrx_c_macros::CBool as $crate::__pgrx_c_macros::expression::CType
                                 >::from_storage(
-                                    $crate::RunNamespaceSearchHook(
+                                    $crate::__pgrx_c_bindings::RunNamespaceSearchHook(
                                         <
                                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                 $crate::__pgrx_c_macros::CUnsignedInt,
-                                                $crate::Oid
+                                                $crate::__pgrx_c_bindings::Oid
                                             > as $crate::__pgrx_c_macros::expression::CType
                                         >::into_storage(
                                             $crate::__pgrx_c_macros::expression::implicit::<
                                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                     $crate::__pgrx_c_macros::CUnsignedInt,
-                                                    $crate::Oid
+                                                    $crate::__pgrx_c_bindings::Oid
                                                 >,
                                                 _
                                             >(
@@ -825,10 +835,10 @@ macro_rules! InvokeNamespaceSearchHook {
                                                 $crate::__pgrx_c_macros::expression::load(
                                                     $crate::__pgrx_c_macros::expression::place::<
                                                         $crate::__pgrx_c_macros::expression::CFunction<
-                                                            $crate::__pgrx_c_generated::Signature_4cceafdee9ba53046d128725fb9f4554
+                                                            $crate::__pgrx_c_generated::Signature_3cab36baaf9f7af106d045154630e449
                                                         >>(
                                                         ::core::ptr::addr_of_mut!(
-                                                            $crate::object_access_hook
+                                                            $crate::__pgrx_c_bindings::object_access_hook
                                                         )
                                                     )
                                                 )
@@ -856,17 +866,17 @@ macro_rules! InvokeNamespaceSearchHook {
                                             <
                                                 $crate::__pgrx_c_macros::CBool as $crate::__pgrx_c_macros::expression::CType
                                             >::from_storage(
-                                                $crate::RunNamespaceSearchHook(
+                                                $crate::__pgrx_c_bindings::RunNamespaceSearchHook(
                                                     <
                                                         $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                             $crate::__pgrx_c_macros::CUnsignedInt,
-                                                            $crate::Oid
+                                                            $crate::__pgrx_c_bindings::Oid
                                                         > as $crate::__pgrx_c_macros::expression::CType
                                                     >::into_storage(
                                                         $crate::__pgrx_c_macros::expression::implicit::<
                                                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                                 $crate::__pgrx_c_macros::CUnsignedInt,
-                                                                $crate::Oid
+                                                                $crate::__pgrx_c_bindings::Oid
                                                             >,
                                                             _
                                                         >(
@@ -931,9 +941,11 @@ macro_rules! InvokeNamespaceSearchHook {
                                     $crate::__pgrx_c_macros::expression::load(
                                         $crate::__pgrx_c_macros::expression::place::<
                                             $crate::__pgrx_c_macros::expression::CFunction<
-                                                $crate::__pgrx_c_generated::Signature_4cceafdee9ba53046d128725fb9f4554
+                                                $crate::__pgrx_c_generated::Signature_3cab36baaf9f7af106d045154630e449
                                             >>(
-                                            ::core::ptr::addr_of_mut!($crate::object_access_hook)
+                                            ::core::ptr::addr_of_mut!(
+                                                $crate::__pgrx_c_bindings::object_access_hook
+                                            )
                                         )
                                     )
                                 )
@@ -954,17 +966,17 @@ macro_rules! InvokeNamespaceSearchHook {
                                 <
                                     $crate::__pgrx_c_macros::CBool as $crate::__pgrx_c_macros::expression::CType
                                 >::from_storage(
-                                    $crate::RunNamespaceSearchHook(
+                                    $crate::__pgrx_c_bindings::RunNamespaceSearchHook(
                                         <
                                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                 $crate::__pgrx_c_macros::CUnsignedInt,
-                                                $crate::Oid
+                                                $crate::__pgrx_c_bindings::Oid
                                             > as $crate::__pgrx_c_macros::expression::CType
                                         >::into_storage(
                                             $crate::__pgrx_c_macros::expression::implicit::<
                                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                     $crate::__pgrx_c_macros::CUnsignedInt,
-                                                    $crate::Oid
+                                                    $crate::__pgrx_c_bindings::Oid
                                                 >,
                                                 _
                                             >(
@@ -1019,8 +1031,8 @@ macro_rules! InvokeNamespaceSearchHook {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -1051,13 +1063,13 @@ macro_rules! __pgrx_c_args_InvokeNamespaceSearchHookStr {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeNamespaceSearchHookStr!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeNamespaceSearchHookStr!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -1069,7 +1081,7 @@ macro_rules! __pgrx_c_args_InvokeNamespaceSearchHookStr {
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeNamespaceSearchHookStr!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -1096,35 +1108,35 @@ macro_rules! __pgrx_c_args_InvokeNamespaceSearchHookStr {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeNamespaceSearchHookStr!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeNamespaceSearchHookStr!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $argument:literal) => {
         $crate::__pgrx_c_args_InvokeNamespaceSearchHookStr!(
-            @p2 $mode [$($done)* (@literal [- $argument]),];
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
         )
     };
     (@negative1 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_InvokeNamespaceSearchHookStr!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeNamespaceSearchHookStr!(
-            @p2 $mode [$($done)* (@literal [- $argument]),];
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeNamespaceSearchHookStr!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -1136,7 +1148,7 @@ macro_rules! __pgrx_c_args_InvokeNamespaceSearchHookStr {
     };
     (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
         $crate::__pgrx_c_args_InvokeNamespaceSearchHookStr!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
@@ -1162,17 +1174,17 @@ macro_rules! __pgrx_c_args_InvokeNamespaceSearchHookStr {
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_InvokeNamespaceSearchHookStr!(
-            @p2 $mode [$($done)* (@literal [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_InvokeNamespaceSearchHookStr!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeNamespaceSearchHookStr!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -1199,13 +1211,13 @@ macro_rules! __pgrx_c_args_InvokeNamespaceSearchHookStr {
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeNamespaceSearchHookStr!(
-            @p2 $mode [$($done)* (@literal [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeNamespaceSearchHookStr!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -1266,10 +1278,10 @@ macro_rules! InvokeNamespaceSearchHookStr {
                                     $crate::__pgrx_c_macros::expression::load(
                                         $crate::__pgrx_c_macros::expression::place::<
                                             $crate::__pgrx_c_macros::expression::CFunction<
-                                                $crate::__pgrx_c_generated::Signature_533260ae4b5599aa10b2f947a4bbab7a
+                                                $crate::__pgrx_c_generated::Signature_6b09b7fb6fe6562acf1f1edec1ca76e3
                                             >>(
                                             ::core::ptr::addr_of_mut!(
-                                                $crate::object_access_hook_str
+                                                $crate::__pgrx_c_bindings::object_access_hook_str
                                             )
                                         )
                                     )
@@ -1291,7 +1303,7 @@ macro_rules! InvokeNamespaceSearchHookStr {
                                 <
                                     $crate::__pgrx_c_macros::CBool as $crate::__pgrx_c_macros::expression::CType
                                 >::from_storage(
-                                    $crate::RunNamespaceSearchHookStr(
+                                    $crate::__pgrx_c_bindings::RunNamespaceSearchHookStr(
                                         <
                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
@@ -1394,10 +1406,10 @@ macro_rules! InvokeNamespaceSearchHookStr {
                                                 $crate::__pgrx_c_macros::expression::load(
                                                     $crate::__pgrx_c_macros::expression::place::<
                                                         $crate::__pgrx_c_macros::expression::CFunction<
-                                                            $crate::__pgrx_c_generated::Signature_533260ae4b5599aa10b2f947a4bbab7a
+                                                            $crate::__pgrx_c_generated::Signature_6b09b7fb6fe6562acf1f1edec1ca76e3
                                                         >>(
                                                         ::core::ptr::addr_of_mut!(
-                                                            $crate::object_access_hook_str
+                                                            $crate::__pgrx_c_bindings::object_access_hook_str
                                                         )
                                                     )
                                                 )
@@ -1425,7 +1437,7 @@ macro_rules! InvokeNamespaceSearchHookStr {
                                             <
                                                 $crate::__pgrx_c_macros::CBool as $crate::__pgrx_c_macros::expression::CType
                                             >::from_storage(
-                                                $crate::RunNamespaceSearchHookStr(
+                                                $crate::__pgrx_c_bindings::RunNamespaceSearchHookStr(
                                                     <
                                                         $crate::__pgrx_c_macros::expression::CPointer<
                                                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
@@ -1506,10 +1518,10 @@ macro_rules! InvokeNamespaceSearchHookStr {
                                     $crate::__pgrx_c_macros::expression::load(
                                         $crate::__pgrx_c_macros::expression::place::<
                                             $crate::__pgrx_c_macros::expression::CFunction<
-                                                $crate::__pgrx_c_generated::Signature_533260ae4b5599aa10b2f947a4bbab7a
+                                                $crate::__pgrx_c_generated::Signature_6b09b7fb6fe6562acf1f1edec1ca76e3
                                             >>(
                                             ::core::ptr::addr_of_mut!(
-                                                $crate::object_access_hook_str
+                                                $crate::__pgrx_c_bindings::object_access_hook_str
                                             )
                                         )
                                     )
@@ -1531,7 +1543,7 @@ macro_rules! InvokeNamespaceSearchHookStr {
                                 <
                                     $crate::__pgrx_c_macros::CBool as $crate::__pgrx_c_macros::expression::CType
                                 >::from_storage(
-                                    $crate::RunNamespaceSearchHookStr(
+                                    $crate::__pgrx_c_bindings::RunNamespaceSearchHookStr(
                                         <
                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
@@ -1608,8 +1620,8 @@ macro_rules! InvokeNamespaceSearchHookStr {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -1640,13 +1652,13 @@ macro_rules! __pgrx_c_args_InvokeObjectDropHook {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeObjectDropHook!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeObjectDropHook!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -1655,7 +1667,7 @@ macro_rules! __pgrx_c_args_InvokeObjectDropHook {
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeObjectDropHook!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -1682,25 +1694,25 @@ macro_rules! __pgrx_c_args_InvokeObjectDropHook {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeObjectDropHook!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeObjectDropHook!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeObjectDropHook!(
-            @p2 $mode [$($done)* (@literal [- $argument]),];
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeObjectDropHook!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -1709,7 +1721,7 @@ macro_rules! __pgrx_c_args_InvokeObjectDropHook {
     };
     (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeObjectDropHook!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -1736,33 +1748,35 @@ macro_rules! __pgrx_c_args_InvokeObjectDropHook {
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeObjectDropHook!(
-            @p2 $mode [$($done)* (@literal [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeObjectDropHook!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
     (@p2 $mode:ident [$($done:tt)*]; - $argument:literal) => {
         $crate::__pgrx_c_args_InvokeObjectDropHook!(
-            @p3 $mode [$($done)* (@literal [- $argument]),];
+            @p3 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
         )
     };
     (@negative2 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_InvokeObjectDropHook!(@p3 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_InvokeObjectDropHook!(
+            @p3 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p2 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeObjectDropHook!(
-            @p3 $mode [$($done)* (@literal [- $argument]),];
+            @p3 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative2 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeObjectDropHook!(
-            @p3 $mode [$($done)* (@native [$argument]),];
+            @p3 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -1770,7 +1784,9 @@ macro_rules! __pgrx_c_args_InvokeObjectDropHook {
         $crate::__pgrx_c_args_InvokeObjectDropHook!(@negative2 $mode [$($done)*]; - $($raw)*)
     };
     (@p2 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_InvokeObjectDropHook!(@p3 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_InvokeObjectDropHook!(
+            @p3 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p2 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -1792,14 +1808,18 @@ macro_rules! __pgrx_c_args_InvokeObjectDropHook {
         )
     };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_InvokeObjectDropHook!(@p3 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_InvokeObjectDropHook!(
+            @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p2 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_InvokeObjectDropHook!(@p3 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_InvokeObjectDropHook!(
+            @p3 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p2 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeObjectDropHook!(
-            @p3 $mode [$($done)* (@native [$argument]),];
+            @p3 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -1826,13 +1846,13 @@ macro_rules! __pgrx_c_args_InvokeObjectDropHook {
     };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeObjectDropHook!(
-            @p3 $mode [$($done)* (@literal [$argument]),];
+            @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p2 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeObjectDropHook!(
-            @p3 $mode [$($done)* (@native [$argument]),];
+            @p3 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -1882,25 +1902,29 @@ macro_rules! InvokeObjectDropHook {
                         $crate::__pgrx_c_macros::expression::load(
                             $crate::__pgrx_c_macros::expression::place::<
                                 $crate::__pgrx_c_macros::expression::CFunction<
-                                    $crate::__pgrx_c_generated::Signature_4cceafdee9ba53046d128725fb9f4554
-                                >>(::core::ptr::addr_of_mut!($crate::object_access_hook))
+                                    $crate::__pgrx_c_generated::Signature_3cab36baaf9f7af106d045154630e449
+                                >>(
+                                ::core::ptr::addr_of_mut!(
+                                    $crate::__pgrx_c_bindings::object_access_hook
+                                )
+                            )
                         )
                     )
                 )
             ) {
                 {
                     let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                        $crate::RunObjectDropHook(
+                        $crate::__pgrx_c_bindings::RunObjectDropHook(
                             <
                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                     $crate::__pgrx_c_macros::CUnsignedInt,
-                                    $crate::Oid
+                                    $crate::__pgrx_c_bindings::Oid
                                 > as $crate::__pgrx_c_macros::expression::CType
                             >::into_storage(
                                 $crate::__pgrx_c_macros::expression::implicit::<
                                     $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                         $crate::__pgrx_c_macros::CUnsignedInt,
-                                        $crate::Oid
+                                        $crate::__pgrx_c_bindings::Oid
                                     >,
                                     _
                                 >(
@@ -1917,13 +1941,13 @@ macro_rules! InvokeObjectDropHook {
                             <
                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                     $crate::__pgrx_c_macros::CUnsignedInt,
-                                    $crate::Oid
+                                    $crate::__pgrx_c_bindings::Oid
                                 > as $crate::__pgrx_c_macros::expression::CType
                             >::into_storage(
                                 $crate::__pgrx_c_macros::expression::implicit::<
                                     $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                         $crate::__pgrx_c_macros::CUnsignedInt,
-                                        $crate::Oid
+                                        $crate::__pgrx_c_bindings::Oid
                                     >,
                                     _
                                 >(
@@ -1996,8 +2020,8 @@ macro_rules! InvokeObjectDropHook {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -2028,13 +2052,13 @@ macro_rules! __pgrx_c_args_InvokeObjectDropHookArg {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeObjectDropHookArg!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeObjectDropHookArg!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -2043,7 +2067,7 @@ macro_rules! __pgrx_c_args_InvokeObjectDropHookArg {
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeObjectDropHookArg!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -2070,25 +2094,25 @@ macro_rules! __pgrx_c_args_InvokeObjectDropHookArg {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeObjectDropHookArg!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeObjectDropHookArg!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeObjectDropHookArg!(
-            @p2 $mode [$($done)* (@literal [- $argument]),];
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeObjectDropHookArg!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -2097,7 +2121,7 @@ macro_rules! __pgrx_c_args_InvokeObjectDropHookArg {
     };
     (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeObjectDropHookArg!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -2124,25 +2148,25 @@ macro_rules! __pgrx_c_args_InvokeObjectDropHookArg {
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeObjectDropHookArg!(
-            @p2 $mode [$($done)* (@literal [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeObjectDropHookArg!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
     (@p2 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeObjectDropHookArg!(
-            @p3 $mode [$($done)* (@literal [- $argument]),];
+            @p3 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative2 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeObjectDropHookArg!(
-            @p3 $mode [$($done)* (@native [$argument]),];
+            @p3 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -2151,7 +2175,7 @@ macro_rules! __pgrx_c_args_InvokeObjectDropHookArg {
     };
     (@p2 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeObjectDropHookArg!(
-            @p3 $mode [$($done)* (@native [$argument]),];
+            @p3 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -2178,35 +2202,35 @@ macro_rules! __pgrx_c_args_InvokeObjectDropHookArg {
     };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeObjectDropHookArg!(
-            @p3 $mode [$($done)* (@literal [$argument]),];
+            @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p2 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeObjectDropHookArg!(
-            @p3 $mode [$($done)* (@native [$argument]),];
+            @p3 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
     (@p3 $mode:ident [$($done:tt)*]; - $argument:literal) => {
         $crate::__pgrx_c_args_InvokeObjectDropHookArg!(
-            @p4 $mode [$($done)* (@literal [- $argument]),];
+            @p4 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
         )
     };
     (@negative3 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_InvokeObjectDropHookArg!(
-            @p4 $mode [$($done)* (@native [$argument]),];
+            @p4 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p3 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeObjectDropHookArg!(
-            @p4 $mode [$($done)* (@literal [- $argument]),];
+            @p4 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative3 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeObjectDropHookArg!(
-            @p4 $mode [$($done)* (@native [$argument]),];
+            @p4 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -2215,7 +2239,7 @@ macro_rules! __pgrx_c_args_InvokeObjectDropHookArg {
     };
     (@p3 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
         $crate::__pgrx_c_args_InvokeObjectDropHookArg!(
-            @p4 $mode [$($done)* (@native [$argument]),];
+            @p4 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p3 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
@@ -2241,17 +2265,17 @@ macro_rules! __pgrx_c_args_InvokeObjectDropHookArg {
     };
     (@p3 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_InvokeObjectDropHookArg!(
-            @p4 $mode [$($done)* (@literal [$argument]),];
+            @p4 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
         )
     };
     (@p3 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_InvokeObjectDropHookArg!(
-            @p4 $mode [$($done)* (@native [$argument]),];
+            @p4 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p3 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeObjectDropHookArg!(
-            @p4 $mode [$($done)* (@native [$argument]),];
+            @p4 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -2278,13 +2302,13 @@ macro_rules! __pgrx_c_args_InvokeObjectDropHookArg {
     };
     (@p3 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeObjectDropHookArg!(
-            @p4 $mode [$($done)* (@literal [$argument]),];
+            @p4 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p3 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeObjectDropHookArg!(
-            @p4 $mode [$($done)* (@native [$argument]),];
+            @p4 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -2337,25 +2361,29 @@ macro_rules! InvokeObjectDropHookArg {
                         $crate::__pgrx_c_macros::expression::load(
                             $crate::__pgrx_c_macros::expression::place::<
                                 $crate::__pgrx_c_macros::expression::CFunction<
-                                    $crate::__pgrx_c_generated::Signature_4cceafdee9ba53046d128725fb9f4554
-                                >>(::core::ptr::addr_of_mut!($crate::object_access_hook))
+                                    $crate::__pgrx_c_generated::Signature_3cab36baaf9f7af106d045154630e449
+                                >>(
+                                ::core::ptr::addr_of_mut!(
+                                    $crate::__pgrx_c_bindings::object_access_hook
+                                )
+                            )
                         )
                     )
                 )
             ) {
                 {
                     let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                        $crate::RunObjectDropHook(
+                        $crate::__pgrx_c_bindings::RunObjectDropHook(
                             <
                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                     $crate::__pgrx_c_macros::CUnsignedInt,
-                                    $crate::Oid
+                                    $crate::__pgrx_c_bindings::Oid
                                 > as $crate::__pgrx_c_macros::expression::CType
                             >::into_storage(
                                 $crate::__pgrx_c_macros::expression::implicit::<
                                     $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                         $crate::__pgrx_c_macros::CUnsignedInt,
-                                        $crate::Oid
+                                        $crate::__pgrx_c_bindings::Oid
                                     >,
                                     _
                                 >(
@@ -2370,13 +2398,13 @@ macro_rules! InvokeObjectDropHookArg {
                             <
                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                     $crate::__pgrx_c_macros::CUnsignedInt,
-                                    $crate::Oid
+                                    $crate::__pgrx_c_bindings::Oid
                                 > as $crate::__pgrx_c_macros::expression::CType
                             >::into_storage(
                                 $crate::__pgrx_c_macros::expression::implicit::<
                                     $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                         $crate::__pgrx_c_macros::CUnsignedInt,
-                                        $crate::Oid
+                                        $crate::__pgrx_c_bindings::Oid
                                     >,
                                     _
                                 >(
@@ -2445,8 +2473,8 @@ macro_rules! InvokeObjectDropHookArg {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -2477,13 +2505,13 @@ macro_rules! __pgrx_c_args_InvokeObjectDropHookArgStr {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeObjectDropHookArgStr!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeObjectDropHookArgStr!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -2492,7 +2520,7 @@ macro_rules! __pgrx_c_args_InvokeObjectDropHookArgStr {
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeObjectDropHookArgStr!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -2519,25 +2547,25 @@ macro_rules! __pgrx_c_args_InvokeObjectDropHookArgStr {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeObjectDropHookArgStr!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeObjectDropHookArgStr!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeObjectDropHookArgStr!(
-            @p2 $mode [$($done)* (@literal [- $argument]),];
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeObjectDropHookArgStr!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -2546,7 +2574,7 @@ macro_rules! __pgrx_c_args_InvokeObjectDropHookArgStr {
     };
     (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeObjectDropHookArgStr!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -2573,25 +2601,25 @@ macro_rules! __pgrx_c_args_InvokeObjectDropHookArgStr {
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeObjectDropHookArgStr!(
-            @p2 $mode [$($done)* (@literal [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeObjectDropHookArgStr!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
     (@p2 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeObjectDropHookArgStr!(
-            @p3 $mode [$($done)* (@literal [- $argument]),];
+            @p3 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative2 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeObjectDropHookArgStr!(
-            @p3 $mode [$($done)* (@native [$argument]),];
+            @p3 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -2600,7 +2628,7 @@ macro_rules! __pgrx_c_args_InvokeObjectDropHookArgStr {
     };
     (@p2 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeObjectDropHookArgStr!(
-            @p3 $mode [$($done)* (@native [$argument]),];
+            @p3 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -2627,35 +2655,35 @@ macro_rules! __pgrx_c_args_InvokeObjectDropHookArgStr {
     };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeObjectDropHookArgStr!(
-            @p3 $mode [$($done)* (@literal [$argument]),];
+            @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p2 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeObjectDropHookArgStr!(
-            @p3 $mode [$($done)* (@native [$argument]),];
+            @p3 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
     (@p3 $mode:ident [$($done:tt)*]; - $argument:literal) => {
         $crate::__pgrx_c_args_InvokeObjectDropHookArgStr!(
-            @p4 $mode [$($done)* (@literal [- $argument]),];
+            @p4 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
         )
     };
     (@negative3 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_InvokeObjectDropHookArgStr!(
-            @p4 $mode [$($done)* (@native [$argument]),];
+            @p4 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p3 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeObjectDropHookArgStr!(
-            @p4 $mode [$($done)* (@literal [- $argument]),];
+            @p4 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative3 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeObjectDropHookArgStr!(
-            @p4 $mode [$($done)* (@native [$argument]),];
+            @p4 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -2664,7 +2692,7 @@ macro_rules! __pgrx_c_args_InvokeObjectDropHookArgStr {
     };
     (@p3 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
         $crate::__pgrx_c_args_InvokeObjectDropHookArgStr!(
-            @p4 $mode [$($done)* (@native [$argument]),];
+            @p4 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p3 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
@@ -2690,17 +2718,17 @@ macro_rules! __pgrx_c_args_InvokeObjectDropHookArgStr {
     };
     (@p3 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_InvokeObjectDropHookArgStr!(
-            @p4 $mode [$($done)* (@literal [$argument]),];
+            @p4 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
         )
     };
     (@p3 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_InvokeObjectDropHookArgStr!(
-            @p4 $mode [$($done)* (@native [$argument]),];
+            @p4 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p3 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeObjectDropHookArgStr!(
-            @p4 $mode [$($done)* (@native [$argument]),];
+            @p4 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -2727,13 +2755,13 @@ macro_rules! __pgrx_c_args_InvokeObjectDropHookArgStr {
     };
     (@p3 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeObjectDropHookArgStr!(
-            @p4 $mode [$($done)* (@literal [$argument]),];
+            @p4 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p3 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeObjectDropHookArgStr!(
-            @p4 $mode [$($done)* (@native [$argument]),];
+            @p4 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -2786,25 +2814,29 @@ macro_rules! InvokeObjectDropHookArgStr {
                         $crate::__pgrx_c_macros::expression::load(
                             $crate::__pgrx_c_macros::expression::place::<
                                 $crate::__pgrx_c_macros::expression::CFunction<
-                                    $crate::__pgrx_c_generated::Signature_533260ae4b5599aa10b2f947a4bbab7a
-                                >>(::core::ptr::addr_of_mut!($crate::object_access_hook_str))
+                                    $crate::__pgrx_c_generated::Signature_6b09b7fb6fe6562acf1f1edec1ca76e3
+                                >>(
+                                ::core::ptr::addr_of_mut!(
+                                    $crate::__pgrx_c_bindings::object_access_hook_str
+                                )
+                            )
                         )
                     )
                 )
             ) {
                 {
                     let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                        $crate::RunObjectDropHookStr(
+                        $crate::__pgrx_c_bindings::RunObjectDropHookStr(
                             <
                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                     $crate::__pgrx_c_macros::CUnsignedInt,
-                                    $crate::Oid
+                                    $crate::__pgrx_c_bindings::Oid
                                 > as $crate::__pgrx_c_macros::expression::CType
                             >::into_storage(
                                 $crate::__pgrx_c_macros::expression::implicit::<
                                     $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                         $crate::__pgrx_c_macros::CUnsignedInt,
-                                        $crate::Oid
+                                        $crate::__pgrx_c_bindings::Oid
                                     >,
                                     _
                                 >(
@@ -2900,8 +2932,8 @@ macro_rules! InvokeObjectDropHookArgStr {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -2932,13 +2964,13 @@ macro_rules! __pgrx_c_args_InvokeObjectDropHookStr {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeObjectDropHookStr!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeObjectDropHookStr!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -2947,7 +2979,7 @@ macro_rules! __pgrx_c_args_InvokeObjectDropHookStr {
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeObjectDropHookStr!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -2974,25 +3006,25 @@ macro_rules! __pgrx_c_args_InvokeObjectDropHookStr {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeObjectDropHookStr!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeObjectDropHookStr!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeObjectDropHookStr!(
-            @p2 $mode [$($done)* (@literal [- $argument]),];
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeObjectDropHookStr!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -3001,7 +3033,7 @@ macro_rules! __pgrx_c_args_InvokeObjectDropHookStr {
     };
     (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeObjectDropHookStr!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -3028,35 +3060,35 @@ macro_rules! __pgrx_c_args_InvokeObjectDropHookStr {
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeObjectDropHookStr!(
-            @p2 $mode [$($done)* (@literal [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeObjectDropHookStr!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
     (@p2 $mode:ident [$($done:tt)*]; - $argument:literal) => {
         $crate::__pgrx_c_args_InvokeObjectDropHookStr!(
-            @p3 $mode [$($done)* (@literal [- $argument]),];
+            @p3 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
         )
     };
     (@negative2 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_InvokeObjectDropHookStr!(
-            @p3 $mode [$($done)* (@native [$argument]),];
+            @p3 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p2 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeObjectDropHookStr!(
-            @p3 $mode [$($done)* (@literal [- $argument]),];
+            @p3 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative2 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeObjectDropHookStr!(
-            @p3 $mode [$($done)* (@native [$argument]),];
+            @p3 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -3065,7 +3097,7 @@ macro_rules! __pgrx_c_args_InvokeObjectDropHookStr {
     };
     (@p2 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
         $crate::__pgrx_c_args_InvokeObjectDropHookStr!(
-            @p3 $mode [$($done)* (@native [$argument]),];
+            @p3 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p2 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
@@ -3091,17 +3123,17 @@ macro_rules! __pgrx_c_args_InvokeObjectDropHookStr {
     };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_InvokeObjectDropHookStr!(
-            @p3 $mode [$($done)* (@literal [$argument]),];
+            @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
         )
     };
     (@p2 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_InvokeObjectDropHookStr!(
-            @p3 $mode [$($done)* (@native [$argument]),];
+            @p3 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p2 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeObjectDropHookStr!(
-            @p3 $mode [$($done)* (@native [$argument]),];
+            @p3 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -3128,13 +3160,13 @@ macro_rules! __pgrx_c_args_InvokeObjectDropHookStr {
     };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeObjectDropHookStr!(
-            @p3 $mode [$($done)* (@literal [$argument]),];
+            @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p2 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeObjectDropHookStr!(
-            @p3 $mode [$($done)* (@native [$argument]),];
+            @p3 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -3187,25 +3219,29 @@ macro_rules! InvokeObjectDropHookStr {
                         $crate::__pgrx_c_macros::expression::load(
                             $crate::__pgrx_c_macros::expression::place::<
                                 $crate::__pgrx_c_macros::expression::CFunction<
-                                    $crate::__pgrx_c_generated::Signature_533260ae4b5599aa10b2f947a4bbab7a
-                                >>(::core::ptr::addr_of_mut!($crate::object_access_hook_str))
+                                    $crate::__pgrx_c_generated::Signature_6b09b7fb6fe6562acf1f1edec1ca76e3
+                                >>(
+                                ::core::ptr::addr_of_mut!(
+                                    $crate::__pgrx_c_bindings::object_access_hook_str
+                                )
+                            )
                         )
                     )
                 )
             ) {
                 {
                     let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                        $crate::RunObjectDropHookStr(
+                        $crate::__pgrx_c_bindings::RunObjectDropHookStr(
                             <
                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                     $crate::__pgrx_c_macros::CUnsignedInt,
-                                    $crate::Oid
+                                    $crate::__pgrx_c_bindings::Oid
                                 > as $crate::__pgrx_c_macros::expression::CType
                             >::into_storage(
                                 $crate::__pgrx_c_macros::expression::implicit::<
                                     $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                         $crate::__pgrx_c_macros::CUnsignedInt,
-                                        $crate::Oid
+                                        $crate::__pgrx_c_bindings::Oid
                                     >,
                                     _
                                 >(
@@ -3307,8 +3343,8 @@ macro_rules! InvokeObjectDropHookStr {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -3339,13 +3375,13 @@ macro_rules! __pgrx_c_args_InvokeObjectPostAlterHook {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeObjectPostAlterHook!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeObjectPostAlterHook!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -3354,7 +3390,7 @@ macro_rules! __pgrx_c_args_InvokeObjectPostAlterHook {
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeObjectPostAlterHook!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -3381,25 +3417,25 @@ macro_rules! __pgrx_c_args_InvokeObjectPostAlterHook {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeObjectPostAlterHook!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeObjectPostAlterHook!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeObjectPostAlterHook!(
-            @p2 $mode [$($done)* (@literal [- $argument]),];
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeObjectPostAlterHook!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -3408,7 +3444,7 @@ macro_rules! __pgrx_c_args_InvokeObjectPostAlterHook {
     };
     (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeObjectPostAlterHook!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -3435,35 +3471,35 @@ macro_rules! __pgrx_c_args_InvokeObjectPostAlterHook {
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeObjectPostAlterHook!(
-            @p2 $mode [$($done)* (@literal [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeObjectPostAlterHook!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
     (@p2 $mode:ident [$($done:tt)*]; - $argument:literal) => {
         $crate::__pgrx_c_args_InvokeObjectPostAlterHook!(
-            @p3 $mode [$($done)* (@literal [- $argument]),];
+            @p3 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
         )
     };
     (@negative2 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_InvokeObjectPostAlterHook!(
-            @p3 $mode [$($done)* (@native [$argument]),];
+            @p3 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p2 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeObjectPostAlterHook!(
-            @p3 $mode [$($done)* (@literal [- $argument]),];
+            @p3 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative2 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeObjectPostAlterHook!(
-            @p3 $mode [$($done)* (@native [$argument]),];
+            @p3 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -3472,7 +3508,7 @@ macro_rules! __pgrx_c_args_InvokeObjectPostAlterHook {
     };
     (@p2 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
         $crate::__pgrx_c_args_InvokeObjectPostAlterHook!(
-            @p3 $mode [$($done)* (@native [$argument]),];
+            @p3 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p2 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
@@ -3498,17 +3534,17 @@ macro_rules! __pgrx_c_args_InvokeObjectPostAlterHook {
     };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_InvokeObjectPostAlterHook!(
-            @p3 $mode [$($done)* (@literal [$argument]),];
+            @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
         )
     };
     (@p2 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_InvokeObjectPostAlterHook!(
-            @p3 $mode [$($done)* (@native [$argument]),];
+            @p3 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p2 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeObjectPostAlterHook!(
-            @p3 $mode [$($done)* (@native [$argument]),];
+            @p3 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -3535,13 +3571,13 @@ macro_rules! __pgrx_c_args_InvokeObjectPostAlterHook {
     };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeObjectPostAlterHook!(
-            @p3 $mode [$($done)* (@literal [$argument]),];
+            @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p2 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeObjectPostAlterHook!(
-            @p3 $mode [$($done)* (@native [$argument]),];
+            @p3 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -3594,25 +3630,29 @@ macro_rules! InvokeObjectPostAlterHook {
                         $crate::__pgrx_c_macros::expression::load(
                             $crate::__pgrx_c_macros::expression::place::<
                                 $crate::__pgrx_c_macros::expression::CFunction<
-                                    $crate::__pgrx_c_generated::Signature_4cceafdee9ba53046d128725fb9f4554
-                                >>(::core::ptr::addr_of_mut!($crate::object_access_hook))
+                                    $crate::__pgrx_c_generated::Signature_3cab36baaf9f7af106d045154630e449
+                                >>(
+                                ::core::ptr::addr_of_mut!(
+                                    $crate::__pgrx_c_bindings::object_access_hook
+                                )
+                            )
                         )
                     )
                 )
             ) {
                 {
                     let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                        $crate::RunObjectPostAlterHook(
+                        $crate::__pgrx_c_bindings::RunObjectPostAlterHook(
                             <
                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                     $crate::__pgrx_c_macros::CUnsignedInt,
-                                    $crate::Oid
+                                    $crate::__pgrx_c_bindings::Oid
                                 > as $crate::__pgrx_c_macros::expression::CType
                             >::into_storage(
                                 $crate::__pgrx_c_macros::expression::implicit::<
                                     $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                         $crate::__pgrx_c_macros::CUnsignedInt,
-                                        $crate::Oid
+                                        $crate::__pgrx_c_bindings::Oid
                                     >,
                                     _
                                 >(
@@ -3629,13 +3669,13 @@ macro_rules! InvokeObjectPostAlterHook {
                             <
                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                     $crate::__pgrx_c_macros::CUnsignedInt,
-                                    $crate::Oid
+                                    $crate::__pgrx_c_bindings::Oid
                                 > as $crate::__pgrx_c_macros::expression::CType
                             >::into_storage(
                                 $crate::__pgrx_c_macros::expression::implicit::<
                                     $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                         $crate::__pgrx_c_macros::CUnsignedInt,
-                                        $crate::Oid
+                                        $crate::__pgrx_c_bindings::Oid
                                     >,
                                     _
                                 >(
@@ -3669,13 +3709,13 @@ macro_rules! InvokeObjectPostAlterHook {
                             <
                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                     $crate::__pgrx_c_macros::CUnsignedInt,
-                                    $crate::Oid
+                                    $crate::__pgrx_c_bindings::Oid
                                 > as $crate::__pgrx_c_macros::expression::CType
                             >::into_storage(
                                 $crate::__pgrx_c_macros::expression::implicit::<
                                     $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                         $crate::__pgrx_c_macros::CUnsignedInt,
-                                        $crate::Oid
+                                        $crate::__pgrx_c_bindings::Oid
                                     >,
                                     _
                                 >(
@@ -3685,10 +3725,9 @@ macro_rules! InvokeObjectPostAlterHook {
                                             _
                                         >(
                                             $crate::__pgrx_c_macros::expression::null_constant(
-                                                /* PGRX: InvalidOid remains expanded because no integer constant binding is available in the defining Rust crate. */
                                                 $crate::__pgrx_c_macros::CValue::<
                                                     $crate::__pgrx_c_macros::CUnsignedInt
-                                                >::new(0u32)
+                                                >::new($crate::__pgrx_c_bindings::InvalidOid as u32)
                                             )
                                         )
                                     )
@@ -3737,8 +3776,8 @@ macro_rules! InvokeObjectPostAlterHook {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -3769,13 +3808,13 @@ macro_rules! __pgrx_c_args_InvokeObjectPostAlterHookArg {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeObjectPostAlterHookArg!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeObjectPostAlterHookArg!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -3787,7 +3826,7 @@ macro_rules! __pgrx_c_args_InvokeObjectPostAlterHookArg {
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeObjectPostAlterHookArg!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -3814,25 +3853,25 @@ macro_rules! __pgrx_c_args_InvokeObjectPostAlterHookArg {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeObjectPostAlterHookArg!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeObjectPostAlterHookArg!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeObjectPostAlterHookArg!(
-            @p2 $mode [$($done)* (@literal [- $argument]),];
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeObjectPostAlterHookArg!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -3844,7 +3883,7 @@ macro_rules! __pgrx_c_args_InvokeObjectPostAlterHookArg {
     };
     (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeObjectPostAlterHookArg!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -3871,25 +3910,25 @@ macro_rules! __pgrx_c_args_InvokeObjectPostAlterHookArg {
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeObjectPostAlterHookArg!(
-            @p2 $mode [$($done)* (@literal [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeObjectPostAlterHookArg!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
     (@p2 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeObjectPostAlterHookArg!(
-            @p3 $mode [$($done)* (@literal [- $argument]),];
+            @p3 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative2 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeObjectPostAlterHookArg!(
-            @p3 $mode [$($done)* (@native [$argument]),];
+            @p3 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -3901,7 +3940,7 @@ macro_rules! __pgrx_c_args_InvokeObjectPostAlterHookArg {
     };
     (@p2 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeObjectPostAlterHookArg!(
-            @p3 $mode [$($done)* (@native [$argument]),];
+            @p3 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -3928,25 +3967,25 @@ macro_rules! __pgrx_c_args_InvokeObjectPostAlterHookArg {
     };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeObjectPostAlterHookArg!(
-            @p3 $mode [$($done)* (@literal [$argument]),];
+            @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p2 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeObjectPostAlterHookArg!(
-            @p3 $mode [$($done)* (@native [$argument]),];
+            @p3 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
     (@p3 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeObjectPostAlterHookArg!(
-            @p4 $mode [$($done)* (@literal [- $argument]),];
+            @p4 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative3 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeObjectPostAlterHookArg!(
-            @p4 $mode [$($done)* (@native [$argument]),];
+            @p4 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -3958,7 +3997,7 @@ macro_rules! __pgrx_c_args_InvokeObjectPostAlterHookArg {
     };
     (@p3 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeObjectPostAlterHookArg!(
-            @p4 $mode [$($done)* (@native [$argument]),];
+            @p4 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -3985,35 +4024,35 @@ macro_rules! __pgrx_c_args_InvokeObjectPostAlterHookArg {
     };
     (@p3 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeObjectPostAlterHookArg!(
-            @p4 $mode [$($done)* (@literal [$argument]),];
+            @p4 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p3 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeObjectPostAlterHookArg!(
-            @p4 $mode [$($done)* (@native [$argument]),];
+            @p4 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
     (@p4 $mode:ident [$($done:tt)*]; - $argument:literal) => {
         $crate::__pgrx_c_args_InvokeObjectPostAlterHookArg!(
-            @p5 $mode [$($done)* (@literal [- $argument]),];
+            @p5 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
         )
     };
     (@negative4 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_InvokeObjectPostAlterHookArg!(
-            @p5 $mode [$($done)* (@native [$argument]),];
+            @p5 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p4 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeObjectPostAlterHookArg!(
-            @p5 $mode [$($done)* (@literal [- $argument]),];
+            @p5 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative4 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeObjectPostAlterHookArg!(
-            @p5 $mode [$($done)* (@native [$argument]),];
+            @p5 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -4025,7 +4064,7 @@ macro_rules! __pgrx_c_args_InvokeObjectPostAlterHookArg {
     };
     (@p4 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
         $crate::__pgrx_c_args_InvokeObjectPostAlterHookArg!(
-            @p5 $mode [$($done)* (@native [$argument]),];
+            @p5 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p4 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
@@ -4051,17 +4090,17 @@ macro_rules! __pgrx_c_args_InvokeObjectPostAlterHookArg {
     };
     (@p4 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_InvokeObjectPostAlterHookArg!(
-            @p5 $mode [$($done)* (@literal [$argument]),];
+            @p5 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
         )
     };
     (@p4 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_InvokeObjectPostAlterHookArg!(
-            @p5 $mode [$($done)* (@native [$argument]),];
+            @p5 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p4 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeObjectPostAlterHookArg!(
-            @p5 $mode [$($done)* (@native [$argument]),];
+            @p5 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -4088,13 +4127,13 @@ macro_rules! __pgrx_c_args_InvokeObjectPostAlterHookArg {
     };
     (@p4 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeObjectPostAlterHookArg!(
-            @p5 $mode [$($done)* (@literal [$argument]),];
+            @p5 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p4 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeObjectPostAlterHookArg!(
-            @p5 $mode [$($done)* (@native [$argument]),];
+            @p5 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -4162,25 +4201,29 @@ macro_rules! InvokeObjectPostAlterHookArg {
                         $crate::__pgrx_c_macros::expression::load(
                             $crate::__pgrx_c_macros::expression::place::<
                                 $crate::__pgrx_c_macros::expression::CFunction<
-                                    $crate::__pgrx_c_generated::Signature_4cceafdee9ba53046d128725fb9f4554
-                                >>(::core::ptr::addr_of_mut!($crate::object_access_hook))
+                                    $crate::__pgrx_c_generated::Signature_3cab36baaf9f7af106d045154630e449
+                                >>(
+                                ::core::ptr::addr_of_mut!(
+                                    $crate::__pgrx_c_bindings::object_access_hook
+                                )
+                            )
                         )
                     )
                 )
             ) {
                 {
                     let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                        $crate::RunObjectPostAlterHook(
+                        $crate::__pgrx_c_bindings::RunObjectPostAlterHook(
                             <
                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                     $crate::__pgrx_c_macros::CUnsignedInt,
-                                    $crate::Oid
+                                    $crate::__pgrx_c_bindings::Oid
                                 > as $crate::__pgrx_c_macros::expression::CType
                             >::into_storage(
                                 $crate::__pgrx_c_macros::expression::implicit::<
                                     $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                         $crate::__pgrx_c_macros::CUnsignedInt,
-                                        $crate::Oid
+                                        $crate::__pgrx_c_bindings::Oid
                                     >,
                                     _
                                 >(
@@ -4195,13 +4238,13 @@ macro_rules! InvokeObjectPostAlterHookArg {
                             <
                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                     $crate::__pgrx_c_macros::CUnsignedInt,
-                                    $crate::Oid
+                                    $crate::__pgrx_c_bindings::Oid
                                 > as $crate::__pgrx_c_macros::expression::CType
                             >::into_storage(
                                 $crate::__pgrx_c_macros::expression::implicit::<
                                     $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                         $crate::__pgrx_c_macros::CUnsignedInt,
-                                        $crate::Oid
+                                        $crate::__pgrx_c_bindings::Oid
                                     >,
                                     _
                                 >(
@@ -4231,13 +4274,13 @@ macro_rules! InvokeObjectPostAlterHookArg {
                             <
                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                     $crate::__pgrx_c_macros::CUnsignedInt,
-                                    $crate::Oid
+                                    $crate::__pgrx_c_bindings::Oid
                                 > as $crate::__pgrx_c_macros::expression::CType
                             >::into_storage(
                                 $crate::__pgrx_c_macros::expression::implicit::<
                                     $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                         $crate::__pgrx_c_macros::CUnsignedInt,
-                                        $crate::Oid
+                                        $crate::__pgrx_c_bindings::Oid
                                     >,
                                     _
                                 >(
@@ -4305,8 +4348,8 @@ macro_rules! InvokeObjectPostAlterHookArg {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -4337,13 +4380,13 @@ macro_rules! __pgrx_c_args_InvokeObjectPostAlterHookArgStr {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeObjectPostAlterHookArgStr!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeObjectPostAlterHookArgStr!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -4355,7 +4398,7 @@ macro_rules! __pgrx_c_args_InvokeObjectPostAlterHookArgStr {
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeObjectPostAlterHookArgStr!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -4382,25 +4425,25 @@ macro_rules! __pgrx_c_args_InvokeObjectPostAlterHookArgStr {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeObjectPostAlterHookArgStr!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeObjectPostAlterHookArgStr!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeObjectPostAlterHookArgStr!(
-            @p2 $mode [$($done)* (@literal [- $argument]),];
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeObjectPostAlterHookArgStr!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -4412,7 +4455,7 @@ macro_rules! __pgrx_c_args_InvokeObjectPostAlterHookArgStr {
     };
     (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeObjectPostAlterHookArgStr!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -4439,25 +4482,25 @@ macro_rules! __pgrx_c_args_InvokeObjectPostAlterHookArgStr {
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeObjectPostAlterHookArgStr!(
-            @p2 $mode [$($done)* (@literal [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeObjectPostAlterHookArgStr!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
     (@p2 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeObjectPostAlterHookArgStr!(
-            @p3 $mode [$($done)* (@literal [- $argument]),];
+            @p3 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative2 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeObjectPostAlterHookArgStr!(
-            @p3 $mode [$($done)* (@native [$argument]),];
+            @p3 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -4469,7 +4512,7 @@ macro_rules! __pgrx_c_args_InvokeObjectPostAlterHookArgStr {
     };
     (@p2 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeObjectPostAlterHookArgStr!(
-            @p3 $mode [$($done)* (@native [$argument]),];
+            @p3 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -4496,25 +4539,25 @@ macro_rules! __pgrx_c_args_InvokeObjectPostAlterHookArgStr {
     };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeObjectPostAlterHookArgStr!(
-            @p3 $mode [$($done)* (@literal [$argument]),];
+            @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p2 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeObjectPostAlterHookArgStr!(
-            @p3 $mode [$($done)* (@native [$argument]),];
+            @p3 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
     (@p3 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeObjectPostAlterHookArgStr!(
-            @p4 $mode [$($done)* (@literal [- $argument]),];
+            @p4 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative3 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeObjectPostAlterHookArgStr!(
-            @p4 $mode [$($done)* (@native [$argument]),];
+            @p4 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -4526,7 +4569,7 @@ macro_rules! __pgrx_c_args_InvokeObjectPostAlterHookArgStr {
     };
     (@p3 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeObjectPostAlterHookArgStr!(
-            @p4 $mode [$($done)* (@native [$argument]),];
+            @p4 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -4553,35 +4596,35 @@ macro_rules! __pgrx_c_args_InvokeObjectPostAlterHookArgStr {
     };
     (@p3 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeObjectPostAlterHookArgStr!(
-            @p4 $mode [$($done)* (@literal [$argument]),];
+            @p4 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p3 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeObjectPostAlterHookArgStr!(
-            @p4 $mode [$($done)* (@native [$argument]),];
+            @p4 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
     (@p4 $mode:ident [$($done:tt)*]; - $argument:literal) => {
         $crate::__pgrx_c_args_InvokeObjectPostAlterHookArgStr!(
-            @p5 $mode [$($done)* (@literal [- $argument]),];
+            @p5 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
         )
     };
     (@negative4 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_InvokeObjectPostAlterHookArgStr!(
-            @p5 $mode [$($done)* (@native [$argument]),];
+            @p5 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p4 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeObjectPostAlterHookArgStr!(
-            @p5 $mode [$($done)* (@literal [- $argument]),];
+            @p5 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative4 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeObjectPostAlterHookArgStr!(
-            @p5 $mode [$($done)* (@native [$argument]),];
+            @p5 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -4593,7 +4636,7 @@ macro_rules! __pgrx_c_args_InvokeObjectPostAlterHookArgStr {
     };
     (@p4 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
         $crate::__pgrx_c_args_InvokeObjectPostAlterHookArgStr!(
-            @p5 $mode [$($done)* (@native [$argument]),];
+            @p5 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p4 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
@@ -4619,17 +4662,17 @@ macro_rules! __pgrx_c_args_InvokeObjectPostAlterHookArgStr {
     };
     (@p4 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_InvokeObjectPostAlterHookArgStr!(
-            @p5 $mode [$($done)* (@literal [$argument]),];
+            @p5 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
         )
     };
     (@p4 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_InvokeObjectPostAlterHookArgStr!(
-            @p5 $mode [$($done)* (@native [$argument]),];
+            @p5 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p4 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeObjectPostAlterHookArgStr!(
-            @p5 $mode [$($done)* (@native [$argument]),];
+            @p5 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -4656,13 +4699,13 @@ macro_rules! __pgrx_c_args_InvokeObjectPostAlterHookArgStr {
     };
     (@p4 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeObjectPostAlterHookArgStr!(
-            @p5 $mode [$($done)* (@literal [$argument]),];
+            @p5 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p4 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeObjectPostAlterHookArgStr!(
-            @p5 $mode [$($done)* (@native [$argument]),];
+            @p5 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -4730,25 +4773,29 @@ macro_rules! InvokeObjectPostAlterHookArgStr {
                         $crate::__pgrx_c_macros::expression::load(
                             $crate::__pgrx_c_macros::expression::place::<
                                 $crate::__pgrx_c_macros::expression::CFunction<
-                                    $crate::__pgrx_c_generated::Signature_533260ae4b5599aa10b2f947a4bbab7a
-                                >>(::core::ptr::addr_of_mut!($crate::object_access_hook_str))
+                                    $crate::__pgrx_c_generated::Signature_6b09b7fb6fe6562acf1f1edec1ca76e3
+                                >>(
+                                ::core::ptr::addr_of_mut!(
+                                    $crate::__pgrx_c_bindings::object_access_hook_str
+                                )
+                            )
                         )
                     )
                 )
             ) {
                 {
                     let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                        $crate::RunObjectPostAlterHookStr(
+                        $crate::__pgrx_c_bindings::RunObjectPostAlterHookStr(
                             <
                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                     $crate::__pgrx_c_macros::CUnsignedInt,
-                                    $crate::Oid
+                                    $crate::__pgrx_c_bindings::Oid
                                 > as $crate::__pgrx_c_macros::expression::CType
                             >::into_storage(
                                 $crate::__pgrx_c_macros::expression::implicit::<
                                     $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                         $crate::__pgrx_c_macros::CUnsignedInt,
-                                        $crate::Oid
+                                        $crate::__pgrx_c_bindings::Oid
                                     >,
                                     _
                                 >(
@@ -4805,13 +4852,13 @@ macro_rules! InvokeObjectPostAlterHookArgStr {
                             <
                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                     $crate::__pgrx_c_macros::CUnsignedInt,
-                                    $crate::Oid
+                                    $crate::__pgrx_c_bindings::Oid
                                 > as $crate::__pgrx_c_macros::expression::CType
                             >::into_storage(
                                 $crate::__pgrx_c_macros::expression::implicit::<
                                     $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                         $crate::__pgrx_c_macros::CUnsignedInt,
-                                        $crate::Oid
+                                        $crate::__pgrx_c_bindings::Oid
                                     >,
                                     _
                                 >(
@@ -4879,8 +4926,8 @@ macro_rules! InvokeObjectPostAlterHookArgStr {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -4911,13 +4958,13 @@ macro_rules! __pgrx_c_args_InvokeObjectPostAlterHookStr {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeObjectPostAlterHookStr!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeObjectPostAlterHookStr!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -4929,7 +4976,7 @@ macro_rules! __pgrx_c_args_InvokeObjectPostAlterHookStr {
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeObjectPostAlterHookStr!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -4956,25 +5003,25 @@ macro_rules! __pgrx_c_args_InvokeObjectPostAlterHookStr {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeObjectPostAlterHookStr!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeObjectPostAlterHookStr!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeObjectPostAlterHookStr!(
-            @p2 $mode [$($done)* (@literal [- $argument]),];
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeObjectPostAlterHookStr!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -4986,7 +5033,7 @@ macro_rules! __pgrx_c_args_InvokeObjectPostAlterHookStr {
     };
     (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeObjectPostAlterHookStr!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -5013,35 +5060,35 @@ macro_rules! __pgrx_c_args_InvokeObjectPostAlterHookStr {
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeObjectPostAlterHookStr!(
-            @p2 $mode [$($done)* (@literal [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeObjectPostAlterHookStr!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
     (@p2 $mode:ident [$($done:tt)*]; - $argument:literal) => {
         $crate::__pgrx_c_args_InvokeObjectPostAlterHookStr!(
-            @p3 $mode [$($done)* (@literal [- $argument]),];
+            @p3 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
         )
     };
     (@negative2 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_InvokeObjectPostAlterHookStr!(
-            @p3 $mode [$($done)* (@native [$argument]),];
+            @p3 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p2 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeObjectPostAlterHookStr!(
-            @p3 $mode [$($done)* (@literal [- $argument]),];
+            @p3 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative2 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeObjectPostAlterHookStr!(
-            @p3 $mode [$($done)* (@native [$argument]),];
+            @p3 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -5053,7 +5100,7 @@ macro_rules! __pgrx_c_args_InvokeObjectPostAlterHookStr {
     };
     (@p2 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
         $crate::__pgrx_c_args_InvokeObjectPostAlterHookStr!(
-            @p3 $mode [$($done)* (@native [$argument]),];
+            @p3 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p2 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
@@ -5079,17 +5126,17 @@ macro_rules! __pgrx_c_args_InvokeObjectPostAlterHookStr {
     };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_InvokeObjectPostAlterHookStr!(
-            @p3 $mode [$($done)* (@literal [$argument]),];
+            @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
         )
     };
     (@p2 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_InvokeObjectPostAlterHookStr!(
-            @p3 $mode [$($done)* (@native [$argument]),];
+            @p3 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p2 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeObjectPostAlterHookStr!(
-            @p3 $mode [$($done)* (@native [$argument]),];
+            @p3 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -5116,13 +5163,13 @@ macro_rules! __pgrx_c_args_InvokeObjectPostAlterHookStr {
     };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeObjectPostAlterHookStr!(
-            @p3 $mode [$($done)* (@literal [$argument]),];
+            @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p2 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeObjectPostAlterHookStr!(
-            @p3 $mode [$($done)* (@native [$argument]),];
+            @p3 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -5175,25 +5222,29 @@ macro_rules! InvokeObjectPostAlterHookStr {
                         $crate::__pgrx_c_macros::expression::load(
                             $crate::__pgrx_c_macros::expression::place::<
                                 $crate::__pgrx_c_macros::expression::CFunction<
-                                    $crate::__pgrx_c_generated::Signature_533260ae4b5599aa10b2f947a4bbab7a
-                                >>(::core::ptr::addr_of_mut!($crate::object_access_hook_str))
+                                    $crate::__pgrx_c_generated::Signature_6b09b7fb6fe6562acf1f1edec1ca76e3
+                                >>(
+                                ::core::ptr::addr_of_mut!(
+                                    $crate::__pgrx_c_bindings::object_access_hook_str
+                                )
+                            )
                         )
                     )
                 )
             ) {
                 {
                     let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                        $crate::RunObjectPostAlterHookStr(
+                        $crate::__pgrx_c_bindings::RunObjectPostAlterHookStr(
                             <
                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                     $crate::__pgrx_c_macros::CUnsignedInt,
-                                    $crate::Oid
+                                    $crate::__pgrx_c_bindings::Oid
                                 > as $crate::__pgrx_c_macros::expression::CType
                             >::into_storage(
                                 $crate::__pgrx_c_macros::expression::implicit::<
                                     $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                         $crate::__pgrx_c_macros::CUnsignedInt,
-                                        $crate::Oid
+                                        $crate::__pgrx_c_bindings::Oid
                                     >,
                                     _
                                 >(
@@ -5256,13 +5307,13 @@ macro_rules! InvokeObjectPostAlterHookStr {
                             <
                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                     $crate::__pgrx_c_macros::CUnsignedInt,
-                                    $crate::Oid
+                                    $crate::__pgrx_c_bindings::Oid
                                 > as $crate::__pgrx_c_macros::expression::CType
                             >::into_storage(
                                 $crate::__pgrx_c_macros::expression::implicit::<
                                     $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                         $crate::__pgrx_c_macros::CUnsignedInt,
-                                        $crate::Oid
+                                        $crate::__pgrx_c_bindings::Oid
                                     >,
                                     _
                                 >(
@@ -5272,10 +5323,9 @@ macro_rules! InvokeObjectPostAlterHookStr {
                                             _
                                         >(
                                             $crate::__pgrx_c_macros::expression::null_constant(
-                                                /* PGRX: InvalidOid remains expanded because no integer constant binding is available in the defining Rust crate. */
                                                 $crate::__pgrx_c_macros::CValue::<
                                                     $crate::__pgrx_c_macros::CUnsignedInt
-                                                >::new(0u32)
+                                                >::new($crate::__pgrx_c_bindings::InvalidOid as u32)
                                             )
                                         )
                                     )
@@ -5330,8 +5380,8 @@ macro_rules! InvokeObjectPostAlterHookStr {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -5362,13 +5412,13 @@ macro_rules! __pgrx_c_args_InvokeObjectPostCreateHook {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeObjectPostCreateHook!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeObjectPostCreateHook!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -5377,7 +5427,7 @@ macro_rules! __pgrx_c_args_InvokeObjectPostCreateHook {
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeObjectPostCreateHook!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -5404,25 +5454,25 @@ macro_rules! __pgrx_c_args_InvokeObjectPostCreateHook {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeObjectPostCreateHook!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeObjectPostCreateHook!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeObjectPostCreateHook!(
-            @p2 $mode [$($done)* (@literal [- $argument]),];
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeObjectPostCreateHook!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -5431,7 +5481,7 @@ macro_rules! __pgrx_c_args_InvokeObjectPostCreateHook {
     };
     (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeObjectPostCreateHook!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -5458,35 +5508,35 @@ macro_rules! __pgrx_c_args_InvokeObjectPostCreateHook {
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeObjectPostCreateHook!(
-            @p2 $mode [$($done)* (@literal [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeObjectPostCreateHook!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
     (@p2 $mode:ident [$($done:tt)*]; - $argument:literal) => {
         $crate::__pgrx_c_args_InvokeObjectPostCreateHook!(
-            @p3 $mode [$($done)* (@literal [- $argument]),];
+            @p3 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
         )
     };
     (@negative2 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_InvokeObjectPostCreateHook!(
-            @p3 $mode [$($done)* (@native [$argument]),];
+            @p3 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p2 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeObjectPostCreateHook!(
-            @p3 $mode [$($done)* (@literal [- $argument]),];
+            @p3 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative2 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeObjectPostCreateHook!(
-            @p3 $mode [$($done)* (@native [$argument]),];
+            @p3 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -5495,7 +5545,7 @@ macro_rules! __pgrx_c_args_InvokeObjectPostCreateHook {
     };
     (@p2 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
         $crate::__pgrx_c_args_InvokeObjectPostCreateHook!(
-            @p3 $mode [$($done)* (@native [$argument]),];
+            @p3 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p2 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
@@ -5521,17 +5571,17 @@ macro_rules! __pgrx_c_args_InvokeObjectPostCreateHook {
     };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_InvokeObjectPostCreateHook!(
-            @p3 $mode [$($done)* (@literal [$argument]),];
+            @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
         )
     };
     (@p2 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_InvokeObjectPostCreateHook!(
-            @p3 $mode [$($done)* (@native [$argument]),];
+            @p3 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p2 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeObjectPostCreateHook!(
-            @p3 $mode [$($done)* (@native [$argument]),];
+            @p3 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -5558,13 +5608,13 @@ macro_rules! __pgrx_c_args_InvokeObjectPostCreateHook {
     };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeObjectPostCreateHook!(
-            @p3 $mode [$($done)* (@literal [$argument]),];
+            @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p2 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeObjectPostCreateHook!(
-            @p3 $mode [$($done)* (@native [$argument]),];
+            @p3 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -5617,25 +5667,29 @@ macro_rules! InvokeObjectPostCreateHook {
                         $crate::__pgrx_c_macros::expression::load(
                             $crate::__pgrx_c_macros::expression::place::<
                                 $crate::__pgrx_c_macros::expression::CFunction<
-                                    $crate::__pgrx_c_generated::Signature_4cceafdee9ba53046d128725fb9f4554
-                                >>(::core::ptr::addr_of_mut!($crate::object_access_hook))
+                                    $crate::__pgrx_c_generated::Signature_3cab36baaf9f7af106d045154630e449
+                                >>(
+                                ::core::ptr::addr_of_mut!(
+                                    $crate::__pgrx_c_bindings::object_access_hook
+                                )
+                            )
                         )
                     )
                 )
             ) {
                 {
                     let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                        $crate::RunObjectPostCreateHook(
+                        $crate::__pgrx_c_bindings::RunObjectPostCreateHook(
                             <
                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                     $crate::__pgrx_c_macros::CUnsignedInt,
-                                    $crate::Oid
+                                    $crate::__pgrx_c_bindings::Oid
                                 > as $crate::__pgrx_c_macros::expression::CType
                             >::into_storage(
                                 $crate::__pgrx_c_macros::expression::implicit::<
                                     $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                         $crate::__pgrx_c_macros::CUnsignedInt,
-                                        $crate::Oid
+                                        $crate::__pgrx_c_bindings::Oid
                                     >,
                                     _
                                 >(
@@ -5652,13 +5706,13 @@ macro_rules! InvokeObjectPostCreateHook {
                             <
                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                     $crate::__pgrx_c_macros::CUnsignedInt,
-                                    $crate::Oid
+                                    $crate::__pgrx_c_bindings::Oid
                                 > as $crate::__pgrx_c_macros::expression::CType
                             >::into_storage(
                                 $crate::__pgrx_c_macros::expression::implicit::<
                                     $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                         $crate::__pgrx_c_macros::CUnsignedInt,
-                                        $crate::Oid
+                                        $crate::__pgrx_c_bindings::Oid
                                     >,
                                     _
                                 >(
@@ -5732,8 +5786,8 @@ macro_rules! InvokeObjectPostCreateHook {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -5764,13 +5818,13 @@ macro_rules! __pgrx_c_args_InvokeObjectPostCreateHookArg {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeObjectPostCreateHookArg!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeObjectPostCreateHookArg!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -5782,7 +5836,7 @@ macro_rules! __pgrx_c_args_InvokeObjectPostCreateHookArg {
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeObjectPostCreateHookArg!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -5809,25 +5863,25 @@ macro_rules! __pgrx_c_args_InvokeObjectPostCreateHookArg {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeObjectPostCreateHookArg!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeObjectPostCreateHookArg!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeObjectPostCreateHookArg!(
-            @p2 $mode [$($done)* (@literal [- $argument]),];
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeObjectPostCreateHookArg!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -5839,7 +5893,7 @@ macro_rules! __pgrx_c_args_InvokeObjectPostCreateHookArg {
     };
     (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeObjectPostCreateHookArg!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -5866,25 +5920,25 @@ macro_rules! __pgrx_c_args_InvokeObjectPostCreateHookArg {
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeObjectPostCreateHookArg!(
-            @p2 $mode [$($done)* (@literal [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeObjectPostCreateHookArg!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
     (@p2 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeObjectPostCreateHookArg!(
-            @p3 $mode [$($done)* (@literal [- $argument]),];
+            @p3 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative2 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeObjectPostCreateHookArg!(
-            @p3 $mode [$($done)* (@native [$argument]),];
+            @p3 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -5896,7 +5950,7 @@ macro_rules! __pgrx_c_args_InvokeObjectPostCreateHookArg {
     };
     (@p2 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeObjectPostCreateHookArg!(
-            @p3 $mode [$($done)* (@native [$argument]),];
+            @p3 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -5923,35 +5977,35 @@ macro_rules! __pgrx_c_args_InvokeObjectPostCreateHookArg {
     };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeObjectPostCreateHookArg!(
-            @p3 $mode [$($done)* (@literal [$argument]),];
+            @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p2 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeObjectPostCreateHookArg!(
-            @p3 $mode [$($done)* (@native [$argument]),];
+            @p3 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
     (@p3 $mode:ident [$($done:tt)*]; - $argument:literal) => {
         $crate::__pgrx_c_args_InvokeObjectPostCreateHookArg!(
-            @p4 $mode [$($done)* (@literal [- $argument]),];
+            @p4 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
         )
     };
     (@negative3 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_InvokeObjectPostCreateHookArg!(
-            @p4 $mode [$($done)* (@native [$argument]),];
+            @p4 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p3 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeObjectPostCreateHookArg!(
-            @p4 $mode [$($done)* (@literal [- $argument]),];
+            @p4 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative3 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeObjectPostCreateHookArg!(
-            @p4 $mode [$($done)* (@native [$argument]),];
+            @p4 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -5963,7 +6017,7 @@ macro_rules! __pgrx_c_args_InvokeObjectPostCreateHookArg {
     };
     (@p3 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
         $crate::__pgrx_c_args_InvokeObjectPostCreateHookArg!(
-            @p4 $mode [$($done)* (@native [$argument]),];
+            @p4 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p3 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
@@ -5989,17 +6043,17 @@ macro_rules! __pgrx_c_args_InvokeObjectPostCreateHookArg {
     };
     (@p3 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_InvokeObjectPostCreateHookArg!(
-            @p4 $mode [$($done)* (@literal [$argument]),];
+            @p4 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
         )
     };
     (@p3 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_InvokeObjectPostCreateHookArg!(
-            @p4 $mode [$($done)* (@native [$argument]),];
+            @p4 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p3 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeObjectPostCreateHookArg!(
-            @p4 $mode [$($done)* (@native [$argument]),];
+            @p4 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -6026,13 +6080,13 @@ macro_rules! __pgrx_c_args_InvokeObjectPostCreateHookArg {
     };
     (@p3 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeObjectPostCreateHookArg!(
-            @p4 $mode [$($done)* (@literal [$argument]),];
+            @p4 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p3 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeObjectPostCreateHookArg!(
-            @p4 $mode [$($done)* (@native [$argument]),];
+            @p4 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -6085,25 +6139,29 @@ macro_rules! InvokeObjectPostCreateHookArg {
                         $crate::__pgrx_c_macros::expression::load(
                             $crate::__pgrx_c_macros::expression::place::<
                                 $crate::__pgrx_c_macros::expression::CFunction<
-                                    $crate::__pgrx_c_generated::Signature_4cceafdee9ba53046d128725fb9f4554
-                                >>(::core::ptr::addr_of_mut!($crate::object_access_hook))
+                                    $crate::__pgrx_c_generated::Signature_3cab36baaf9f7af106d045154630e449
+                                >>(
+                                ::core::ptr::addr_of_mut!(
+                                    $crate::__pgrx_c_bindings::object_access_hook
+                                )
+                            )
                         )
                     )
                 )
             ) {
                 {
                     let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                        $crate::RunObjectPostCreateHook(
+                        $crate::__pgrx_c_bindings::RunObjectPostCreateHook(
                             <
                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                     $crate::__pgrx_c_macros::CUnsignedInt,
-                                    $crate::Oid
+                                    $crate::__pgrx_c_bindings::Oid
                                 > as $crate::__pgrx_c_macros::expression::CType
                             >::into_storage(
                                 $crate::__pgrx_c_macros::expression::implicit::<
                                     $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                         $crate::__pgrx_c_macros::CUnsignedInt,
-                                        $crate::Oid
+                                        $crate::__pgrx_c_bindings::Oid
                                     >,
                                     _
                                 >(
@@ -6118,13 +6176,13 @@ macro_rules! InvokeObjectPostCreateHookArg {
                             <
                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                     $crate::__pgrx_c_macros::CUnsignedInt,
-                                    $crate::Oid
+                                    $crate::__pgrx_c_bindings::Oid
                                 > as $crate::__pgrx_c_macros::expression::CType
                             >::into_storage(
                                 $crate::__pgrx_c_macros::expression::implicit::<
                                     $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                         $crate::__pgrx_c_macros::CUnsignedInt,
-                                        $crate::Oid
+                                        $crate::__pgrx_c_bindings::Oid
                                     >,
                                     _
                                 >(
@@ -6199,8 +6257,8 @@ macro_rules! InvokeObjectPostCreateHookArg {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -6231,13 +6289,13 @@ macro_rules! __pgrx_c_args_InvokeObjectPostCreateHookArgStr {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeObjectPostCreateHookArgStr!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeObjectPostCreateHookArgStr!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -6249,7 +6307,7 @@ macro_rules! __pgrx_c_args_InvokeObjectPostCreateHookArgStr {
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeObjectPostCreateHookArgStr!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -6276,25 +6334,25 @@ macro_rules! __pgrx_c_args_InvokeObjectPostCreateHookArgStr {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeObjectPostCreateHookArgStr!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeObjectPostCreateHookArgStr!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeObjectPostCreateHookArgStr!(
-            @p2 $mode [$($done)* (@literal [- $argument]),];
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeObjectPostCreateHookArgStr!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -6306,7 +6364,7 @@ macro_rules! __pgrx_c_args_InvokeObjectPostCreateHookArgStr {
     };
     (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeObjectPostCreateHookArgStr!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -6333,25 +6391,25 @@ macro_rules! __pgrx_c_args_InvokeObjectPostCreateHookArgStr {
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeObjectPostCreateHookArgStr!(
-            @p2 $mode [$($done)* (@literal [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeObjectPostCreateHookArgStr!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
     (@p2 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeObjectPostCreateHookArgStr!(
-            @p3 $mode [$($done)* (@literal [- $argument]),];
+            @p3 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative2 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeObjectPostCreateHookArgStr!(
-            @p3 $mode [$($done)* (@native [$argument]),];
+            @p3 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -6363,7 +6421,7 @@ macro_rules! __pgrx_c_args_InvokeObjectPostCreateHookArgStr {
     };
     (@p2 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeObjectPostCreateHookArgStr!(
-            @p3 $mode [$($done)* (@native [$argument]),];
+            @p3 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -6390,35 +6448,35 @@ macro_rules! __pgrx_c_args_InvokeObjectPostCreateHookArgStr {
     };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeObjectPostCreateHookArgStr!(
-            @p3 $mode [$($done)* (@literal [$argument]),];
+            @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p2 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeObjectPostCreateHookArgStr!(
-            @p3 $mode [$($done)* (@native [$argument]),];
+            @p3 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
     (@p3 $mode:ident [$($done:tt)*]; - $argument:literal) => {
         $crate::__pgrx_c_args_InvokeObjectPostCreateHookArgStr!(
-            @p4 $mode [$($done)* (@literal [- $argument]),];
+            @p4 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
         )
     };
     (@negative3 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_InvokeObjectPostCreateHookArgStr!(
-            @p4 $mode [$($done)* (@native [$argument]),];
+            @p4 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p3 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeObjectPostCreateHookArgStr!(
-            @p4 $mode [$($done)* (@literal [- $argument]),];
+            @p4 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative3 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeObjectPostCreateHookArgStr!(
-            @p4 $mode [$($done)* (@native [$argument]),];
+            @p4 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -6430,7 +6488,7 @@ macro_rules! __pgrx_c_args_InvokeObjectPostCreateHookArgStr {
     };
     (@p3 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
         $crate::__pgrx_c_args_InvokeObjectPostCreateHookArgStr!(
-            @p4 $mode [$($done)* (@native [$argument]),];
+            @p4 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p3 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
@@ -6456,17 +6514,17 @@ macro_rules! __pgrx_c_args_InvokeObjectPostCreateHookArgStr {
     };
     (@p3 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_InvokeObjectPostCreateHookArgStr!(
-            @p4 $mode [$($done)* (@literal [$argument]),];
+            @p4 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
         )
     };
     (@p3 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_InvokeObjectPostCreateHookArgStr!(
-            @p4 $mode [$($done)* (@native [$argument]),];
+            @p4 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p3 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeObjectPostCreateHookArgStr!(
-            @p4 $mode [$($done)* (@native [$argument]),];
+            @p4 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -6493,13 +6551,13 @@ macro_rules! __pgrx_c_args_InvokeObjectPostCreateHookArgStr {
     };
     (@p3 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeObjectPostCreateHookArgStr!(
-            @p4 $mode [$($done)* (@literal [$argument]),];
+            @p4 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p3 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeObjectPostCreateHookArgStr!(
-            @p4 $mode [$($done)* (@native [$argument]),];
+            @p4 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -6552,25 +6610,29 @@ macro_rules! InvokeObjectPostCreateHookArgStr {
                         $crate::__pgrx_c_macros::expression::load(
                             $crate::__pgrx_c_macros::expression::place::<
                                 $crate::__pgrx_c_macros::expression::CFunction<
-                                    $crate::__pgrx_c_generated::Signature_533260ae4b5599aa10b2f947a4bbab7a
-                                >>(::core::ptr::addr_of_mut!($crate::object_access_hook_str))
+                                    $crate::__pgrx_c_generated::Signature_6b09b7fb6fe6562acf1f1edec1ca76e3
+                                >>(
+                                ::core::ptr::addr_of_mut!(
+                                    $crate::__pgrx_c_bindings::object_access_hook_str
+                                )
+                            )
                         )
                     )
                 )
             ) {
                 {
                     let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                        $crate::RunObjectPostCreateHookStr(
+                        $crate::__pgrx_c_bindings::RunObjectPostCreateHookStr(
                             <
                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                     $crate::__pgrx_c_macros::CUnsignedInt,
-                                    $crate::Oid
+                                    $crate::__pgrx_c_bindings::Oid
                                 > as $crate::__pgrx_c_macros::expression::CType
                             >::into_storage(
                                 $crate::__pgrx_c_macros::expression::implicit::<
                                     $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                         $crate::__pgrx_c_macros::CUnsignedInt,
-                                        $crate::Oid
+                                        $crate::__pgrx_c_bindings::Oid
                                     >,
                                     _
                                 >(
@@ -6672,8 +6734,8 @@ macro_rules! InvokeObjectPostCreateHookArgStr {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -6704,13 +6766,13 @@ macro_rules! __pgrx_c_args_InvokeObjectPostCreateHookStr {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeObjectPostCreateHookStr!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeObjectPostCreateHookStr!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -6722,7 +6784,7 @@ macro_rules! __pgrx_c_args_InvokeObjectPostCreateHookStr {
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeObjectPostCreateHookStr!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -6749,25 +6811,25 @@ macro_rules! __pgrx_c_args_InvokeObjectPostCreateHookStr {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeObjectPostCreateHookStr!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeObjectPostCreateHookStr!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeObjectPostCreateHookStr!(
-            @p2 $mode [$($done)* (@literal [- $argument]),];
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeObjectPostCreateHookStr!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -6779,7 +6841,7 @@ macro_rules! __pgrx_c_args_InvokeObjectPostCreateHookStr {
     };
     (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeObjectPostCreateHookStr!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -6806,35 +6868,35 @@ macro_rules! __pgrx_c_args_InvokeObjectPostCreateHookStr {
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeObjectPostCreateHookStr!(
-            @p2 $mode [$($done)* (@literal [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeObjectPostCreateHookStr!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
     (@p2 $mode:ident [$($done:tt)*]; - $argument:literal) => {
         $crate::__pgrx_c_args_InvokeObjectPostCreateHookStr!(
-            @p3 $mode [$($done)* (@literal [- $argument]),];
+            @p3 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
         )
     };
     (@negative2 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_InvokeObjectPostCreateHookStr!(
-            @p3 $mode [$($done)* (@native [$argument]),];
+            @p3 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p2 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeObjectPostCreateHookStr!(
-            @p3 $mode [$($done)* (@literal [- $argument]),];
+            @p3 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative2 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeObjectPostCreateHookStr!(
-            @p3 $mode [$($done)* (@native [$argument]),];
+            @p3 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -6846,7 +6908,7 @@ macro_rules! __pgrx_c_args_InvokeObjectPostCreateHookStr {
     };
     (@p2 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
         $crate::__pgrx_c_args_InvokeObjectPostCreateHookStr!(
-            @p3 $mode [$($done)* (@native [$argument]),];
+            @p3 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p2 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
@@ -6872,17 +6934,17 @@ macro_rules! __pgrx_c_args_InvokeObjectPostCreateHookStr {
     };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_InvokeObjectPostCreateHookStr!(
-            @p3 $mode [$($done)* (@literal [$argument]),];
+            @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
         )
     };
     (@p2 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_InvokeObjectPostCreateHookStr!(
-            @p3 $mode [$($done)* (@native [$argument]),];
+            @p3 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p2 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeObjectPostCreateHookStr!(
-            @p3 $mode [$($done)* (@native [$argument]),];
+            @p3 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -6909,13 +6971,13 @@ macro_rules! __pgrx_c_args_InvokeObjectPostCreateHookStr {
     };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeObjectPostCreateHookStr!(
-            @p3 $mode [$($done)* (@literal [$argument]),];
+            @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p2 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeObjectPostCreateHookStr!(
-            @p3 $mode [$($done)* (@native [$argument]),];
+            @p3 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -6968,25 +7030,29 @@ macro_rules! InvokeObjectPostCreateHookStr {
                         $crate::__pgrx_c_macros::expression::load(
                             $crate::__pgrx_c_macros::expression::place::<
                                 $crate::__pgrx_c_macros::expression::CFunction<
-                                    $crate::__pgrx_c_generated::Signature_533260ae4b5599aa10b2f947a4bbab7a
-                                >>(::core::ptr::addr_of_mut!($crate::object_access_hook_str))
+                                    $crate::__pgrx_c_generated::Signature_6b09b7fb6fe6562acf1f1edec1ca76e3
+                                >>(
+                                ::core::ptr::addr_of_mut!(
+                                    $crate::__pgrx_c_bindings::object_access_hook_str
+                                )
+                            )
                         )
                     )
                 )
             ) {
                 {
                     let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                        $crate::RunObjectPostCreateHookStr(
+                        $crate::__pgrx_c_bindings::RunObjectPostCreateHookStr(
                             <
                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                     $crate::__pgrx_c_macros::CUnsignedInt,
-                                    $crate::Oid
+                                    $crate::__pgrx_c_bindings::Oid
                                 > as $crate::__pgrx_c_macros::expression::CType
                             >::into_storage(
                                 $crate::__pgrx_c_macros::expression::implicit::<
                                     $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                         $crate::__pgrx_c_macros::CUnsignedInt,
-                                        $crate::Oid
+                                        $crate::__pgrx_c_bindings::Oid
                                     >,
                                     _
                                 >(
@@ -7095,8 +7161,8 @@ macro_rules! InvokeObjectPostCreateHookStr {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -7127,23 +7193,23 @@ macro_rules! __pgrx_c_args_InvokeObjectTruncateHook {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
         $crate::__pgrx_c_args_InvokeObjectTruncateHook!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_InvokeObjectTruncateHook!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeObjectTruncateHook!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeObjectTruncateHook!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -7152,7 +7218,7 @@ macro_rules! __pgrx_c_args_InvokeObjectTruncateHook {
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
         $crate::__pgrx_c_args_InvokeObjectTruncateHook!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
@@ -7178,17 +7244,17 @@ macro_rules! __pgrx_c_args_InvokeObjectTruncateHook {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_InvokeObjectTruncateHook!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_InvokeObjectTruncateHook!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeObjectTruncateHook!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -7215,13 +7281,13 @@ macro_rules! __pgrx_c_args_InvokeObjectTruncateHook {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeObjectTruncateHook!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeObjectTruncateHook!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -7271,25 +7337,29 @@ macro_rules! InvokeObjectTruncateHook {
                         $crate::__pgrx_c_macros::expression::load(
                             $crate::__pgrx_c_macros::expression::place::<
                                 $crate::__pgrx_c_macros::expression::CFunction<
-                                    $crate::__pgrx_c_generated::Signature_4cceafdee9ba53046d128725fb9f4554
-                                >>(::core::ptr::addr_of_mut!($crate::object_access_hook))
+                                    $crate::__pgrx_c_generated::Signature_3cab36baaf9f7af106d045154630e449
+                                >>(
+                                ::core::ptr::addr_of_mut!(
+                                    $crate::__pgrx_c_bindings::object_access_hook
+                                )
+                            )
                         )
                     )
                 )
             ) {
                 {
                     let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                        $crate::RunObjectTruncateHook(
+                        $crate::__pgrx_c_bindings::RunObjectTruncateHook(
                             <
                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                     $crate::__pgrx_c_macros::CUnsignedInt,
-                                    $crate::Oid
+                                    $crate::__pgrx_c_bindings::Oid
                                 > as $crate::__pgrx_c_macros::expression::CType
                             >::into_storage(
                                 $crate::__pgrx_c_macros::expression::implicit::<
                                     $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                         $crate::__pgrx_c_macros::CUnsignedInt,
-                                        $crate::Oid
+                                        $crate::__pgrx_c_bindings::Oid
                                     >,
                                     _
                                 >(
@@ -7319,8 +7389,8 @@ macro_rules! InvokeObjectTruncateHook {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -7351,23 +7421,23 @@ macro_rules! __pgrx_c_args_InvokeObjectTruncateHookStr {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
         $crate::__pgrx_c_args_InvokeObjectTruncateHookStr!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_InvokeObjectTruncateHookStr!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeObjectTruncateHookStr!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeObjectTruncateHookStr!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -7376,7 +7446,7 @@ macro_rules! __pgrx_c_args_InvokeObjectTruncateHookStr {
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
         $crate::__pgrx_c_args_InvokeObjectTruncateHookStr!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
@@ -7402,17 +7472,17 @@ macro_rules! __pgrx_c_args_InvokeObjectTruncateHookStr {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_InvokeObjectTruncateHookStr!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_InvokeObjectTruncateHookStr!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeObjectTruncateHookStr!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -7439,13 +7509,13 @@ macro_rules! __pgrx_c_args_InvokeObjectTruncateHookStr {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeObjectTruncateHookStr!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_InvokeObjectTruncateHookStr!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -7495,15 +7565,19 @@ macro_rules! InvokeObjectTruncateHookStr {
                         $crate::__pgrx_c_macros::expression::load(
                             $crate::__pgrx_c_macros::expression::place::<
                                 $crate::__pgrx_c_macros::expression::CFunction<
-                                    $crate::__pgrx_c_generated::Signature_533260ae4b5599aa10b2f947a4bbab7a
-                                >>(::core::ptr::addr_of_mut!($crate::object_access_hook_str))
+                                    $crate::__pgrx_c_generated::Signature_6b09b7fb6fe6562acf1f1edec1ca76e3
+                                >>(
+                                ::core::ptr::addr_of_mut!(
+                                    $crate::__pgrx_c_bindings::object_access_hook_str
+                                )
+                            )
                         )
                     )
                 )
             ) {
                 {
                     let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                        $crate::RunObjectTruncateHookStr(
+                        $crate::__pgrx_c_bindings::RunObjectTruncateHookStr(
                             <
                                 $crate::__pgrx_c_macros::expression::CPointer<
                                     $crate::__pgrx_c_macros::expression::CIntegerStorage<

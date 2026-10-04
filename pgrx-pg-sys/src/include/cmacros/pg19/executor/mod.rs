@@ -2,6 +2,10 @@
 
 This code is generated for documentation purposes, so that it is easy to reference on docs.rs. C macros and their support code are regenerated for your build of pgrx, and your Postgres configuration may differ.
 */
+#[path = "execScan.rs"]
+mod execScan;
+#[allow(unused_imports)]
+pub use execScan::*;
 #[path = "execdebug.rs"]
 mod execdebug;
 #[allow(unused_imports)]
@@ -14,6 +18,10 @@ pub use executor::*;
 mod hashjoin;
 #[allow(unused_imports)]
 pub use hashjoin::*;
+#[path = "instrument_node.rs"]
+mod instrument_node;
+#[allow(unused_imports)]
+pub use instrument_node::*;
 #[path = "tuptable.rs"]
 mod tuptable;
 #[allow(unused_imports)]

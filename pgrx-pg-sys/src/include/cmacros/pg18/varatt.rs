@@ -5,8 +5,8 @@ This code is generated for documentation purposes, so that it is easy to referen
 // C macros from varatt.h.
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -34,18 +34,24 @@ macro_rules! __pgrx_c_args_SET_VARSIZE {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_VARSIZE!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_SET_VARSIZE!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_SET_VARSIZE!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $($raw:tt)*) => {
         $crate::__pgrx_c_args_SET_VARSIZE!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
-        $crate::__pgrx_c_args_SET_VARSIZE!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_SET_VARSIZE!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
         $crate::__pgrx_c_classify!(
@@ -67,31 +73,46 @@ macro_rules! __pgrx_c_args_SET_VARSIZE {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_SET_VARSIZE!(@p1 $mode [$($done)* (@literal [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_SET_VARSIZE!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+            $($rest)*
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_SET_VARSIZE!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_SET_VARSIZE!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_SET_VARSIZE!(@p2 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_SET_VARSIZE!(
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative1 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_SET_VARSIZE!(@p2 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_SET_VARSIZE!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_VARSIZE!(
-            @p2 $mode [$($done)* (@literal [- $argument]),];
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_SET_VARSIZE!(@p2 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_SET_VARSIZE!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $($raw:tt)*) => {
         $crate::__pgrx_c_args_SET_VARSIZE!(@negative1 $mode [$($done)*]; - $($raw)*)
     };
     (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_SET_VARSIZE!(@p2 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_SET_VARSIZE!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -113,13 +134,20 @@ macro_rules! __pgrx_c_args_SET_VARSIZE {
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_SET_VARSIZE!(@p2 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_SET_VARSIZE!(
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_SET_VARSIZE!(@p2 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_SET_VARSIZE!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
-        $crate::__pgrx_c_args_SET_VARSIZE!(@p2 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_SET_VARSIZE!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
         $crate::__pgrx_c_classify!(
@@ -141,10 +169,16 @@ macro_rules! __pgrx_c_args_SET_VARSIZE {
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_SET_VARSIZE!(@p2 $mode [$($done)* (@literal [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_SET_VARSIZE!(
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+            $($rest)*
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_SET_VARSIZE!(@p2 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_SET_VARSIZE!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p2 $mode:ident [$($done:tt)*];) => {
         $crate::SET_VARSIZE!(@$mode; $($done)*)
@@ -204,10 +238,10 @@ macro_rules! SET_VARSIZE {
                                 (
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::expression::cast_as::<
-                                            *mut $crate::varattrib_4b,
+                                            *mut $crate::__pgrx_c_bindings::varattrib_4b,
                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                    $crate::varattrib_4b
+                                                    $crate::__pgrx_c_bindings::varattrib_4b
                                                 >,
                                                 $crate::__pgrx_c_macros::expression::ReadWrite
                                             >,
@@ -235,7 +269,7 @@ macro_rules! SET_VARSIZE {
                                 (
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::expression::cast_as::<
-                                            $crate::uint32,
+                                            $crate::__pgrx_c_bindings::uint32,
                                             $crate::__pgrx_c_macros::CUnsignedInt,
                                             _
                                         >(
@@ -306,10 +340,10 @@ macro_rules! SET_VARSIZE {
                                                     _
                                                 >(
                                                     $crate::__pgrx_c_macros::expression::cast_as::<
-                                                        *mut $crate::varattrib_4b,
+                                                        *mut $crate::__pgrx_c_bindings::varattrib_4b,
                                                         $crate::__pgrx_c_macros::expression::CPointer<
                                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                                $crate::varattrib_4b
+                                                                $crate::__pgrx_c_bindings::varattrib_4b
                                                             >,
                                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                                         >,
@@ -345,7 +379,7 @@ macro_rules! SET_VARSIZE {
                                                     _
                                                 >(
                                                     $crate::__pgrx_c_macros::expression::cast_as::<
-                                                        $crate::uint32,
+                                                        $crate::__pgrx_c_bindings::uint32,
                                                         $crate::__pgrx_c_macros::CUnsignedInt,
                                                         _
                                                     >(
@@ -405,10 +439,10 @@ macro_rules! SET_VARSIZE {
                                 (
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::expression::cast_as::<
-                                            *mut $crate::varattrib_4b,
+                                            *mut $crate::__pgrx_c_bindings::varattrib_4b,
                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                    $crate::varattrib_4b
+                                                    $crate::__pgrx_c_bindings::varattrib_4b
                                                 >,
                                                 $crate::__pgrx_c_macros::expression::ReadWrite
                                             >,
@@ -436,7 +470,7 @@ macro_rules! SET_VARSIZE {
                                 (
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::expression::cast_as::<
-                                            $crate::uint32,
+                                            $crate::__pgrx_c_bindings::uint32,
                                             $crate::__pgrx_c_macros::CUnsignedInt,
                                             _
                                         >(
@@ -470,8 +504,8 @@ macro_rules! SET_VARSIZE {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -499,13 +533,13 @@ macro_rules! __pgrx_c_args_SET_VARSIZE_1B {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_VARSIZE_1B!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_VARSIZE_1B!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -514,7 +548,7 @@ macro_rules! __pgrx_c_args_SET_VARSIZE_1B {
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_VARSIZE_1B!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -541,31 +575,35 @@ macro_rules! __pgrx_c_args_SET_VARSIZE_1B {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_VARSIZE_1B!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_VARSIZE_1B!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_SET_VARSIZE_1B!(@p2 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_SET_VARSIZE_1B!(
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative1 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_SET_VARSIZE_1B!(@p2 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_SET_VARSIZE_1B!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_VARSIZE_1B!(
-            @p2 $mode [$($done)* (@literal [- $argument]),];
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_VARSIZE_1B!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -573,7 +611,9 @@ macro_rules! __pgrx_c_args_SET_VARSIZE_1B {
         $crate::__pgrx_c_args_SET_VARSIZE_1B!(@negative1 $mode [$($done)*]; - $($raw)*)
     };
     (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_SET_VARSIZE_1B!(@p2 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_SET_VARSIZE_1B!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -595,14 +635,18 @@ macro_rules! __pgrx_c_args_SET_VARSIZE_1B {
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_SET_VARSIZE_1B!(@p2 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_SET_VARSIZE_1B!(
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_SET_VARSIZE_1B!(@p2 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_SET_VARSIZE_1B!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_VARSIZE_1B!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -629,13 +673,13 @@ macro_rules! __pgrx_c_args_SET_VARSIZE_1B {
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_VARSIZE_1B!(
-            @p2 $mode [$($done)* (@literal [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_VARSIZE_1B!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -691,10 +735,10 @@ macro_rules! SET_VARSIZE_1B {
                             (
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::cast_as::<
-                                        *mut $crate::varattrib_1b,
+                                        *mut $crate::__pgrx_c_bindings::varattrib_1b,
                                         $crate::__pgrx_c_macros::expression::CPointer<
                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                $crate::varattrib_1b
+                                                $crate::__pgrx_c_bindings::varattrib_1b
                                             >,
                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                         >,
@@ -726,7 +770,7 @@ macro_rules! SET_VARSIZE_1B {
                                                 _
                                             >(
                                                 $crate::__pgrx_c_macros::expression::cast_as::<
-                                                    $crate::uint8,
+                                                    $crate::__pgrx_c_bindings::uint8,
                                                     $crate::__pgrx_c_macros::CUnsignedChar,
                                                     _
                                                 >(
@@ -806,10 +850,10 @@ macro_rules! SET_VARSIZE_1B {
                                                 _
                                             >(
                                                 $crate::__pgrx_c_macros::expression::cast_as::<
-                                                    *mut $crate::varattrib_1b,
+                                                    *mut $crate::__pgrx_c_bindings::varattrib_1b,
                                                     $crate::__pgrx_c_macros::expression::CPointer<
                                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                                            $crate::varattrib_1b
+                                                            $crate::__pgrx_c_bindings::varattrib_1b
                                                         >,
                                                         $crate::__pgrx_c_macros::expression::ReadWrite
                                                     >,
@@ -849,7 +893,7 @@ macro_rules! SET_VARSIZE_1B {
                                                             _
                                                         >(
                                                             $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                $crate::uint8,
+                                                                $crate::__pgrx_c_bindings::uint8,
                                                                 $crate::__pgrx_c_macros::CUnsignedChar,
                                                                 _
                                                             >(
@@ -913,10 +957,10 @@ macro_rules! SET_VARSIZE_1B {
                             (
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::cast_as::<
-                                        *mut $crate::varattrib_1b,
+                                        *mut $crate::__pgrx_c_bindings::varattrib_1b,
                                         $crate::__pgrx_c_macros::expression::CPointer<
                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                $crate::varattrib_1b
+                                                $crate::__pgrx_c_bindings::varattrib_1b
                                             >,
                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                         >,
@@ -948,7 +992,7 @@ macro_rules! SET_VARSIZE_1B {
                                                 _
                                             >(
                                                 $crate::__pgrx_c_macros::expression::cast_as::<
-                                                    $crate::uint8,
+                                                    $crate::__pgrx_c_bindings::uint8,
                                                     $crate::__pgrx_c_macros::CUnsignedChar,
                                                     _
                                                 >(
@@ -997,8 +1041,8 @@ macro_rules! SET_VARSIZE_1B {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -1026,13 +1070,13 @@ macro_rules! __pgrx_c_args_SET_VARSIZE_4B {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_VARSIZE_4B!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_VARSIZE_4B!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -1041,7 +1085,7 @@ macro_rules! __pgrx_c_args_SET_VARSIZE_4B {
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_VARSIZE_4B!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -1068,31 +1112,35 @@ macro_rules! __pgrx_c_args_SET_VARSIZE_4B {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_VARSIZE_4B!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_VARSIZE_4B!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_SET_VARSIZE_4B!(@p2 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_SET_VARSIZE_4B!(
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative1 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_SET_VARSIZE_4B!(@p2 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_SET_VARSIZE_4B!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_VARSIZE_4B!(
-            @p2 $mode [$($done)* (@literal [- $argument]),];
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_VARSIZE_4B!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -1100,7 +1148,9 @@ macro_rules! __pgrx_c_args_SET_VARSIZE_4B {
         $crate::__pgrx_c_args_SET_VARSIZE_4B!(@negative1 $mode [$($done)*]; - $($raw)*)
     };
     (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_SET_VARSIZE_4B!(@p2 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_SET_VARSIZE_4B!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -1122,14 +1172,18 @@ macro_rules! __pgrx_c_args_SET_VARSIZE_4B {
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_SET_VARSIZE_4B!(@p2 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_SET_VARSIZE_4B!(
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_SET_VARSIZE_4B!(@p2 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_SET_VARSIZE_4B!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_VARSIZE_4B!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -1156,13 +1210,13 @@ macro_rules! __pgrx_c_args_SET_VARSIZE_4B {
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_VARSIZE_4B!(
-            @p2 $mode [$($done)* (@literal [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_VARSIZE_4B!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -1223,10 +1277,10 @@ macro_rules! SET_VARSIZE_4B {
                                 (
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::expression::cast_as::<
-                                            *mut $crate::varattrib_4b,
+                                            *mut $crate::__pgrx_c_bindings::varattrib_4b,
                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                    $crate::varattrib_4b
+                                                    $crate::__pgrx_c_bindings::varattrib_4b
                                                 >,
                                                 $crate::__pgrx_c_macros::expression::ReadWrite
                                             >,
@@ -1254,7 +1308,7 @@ macro_rules! SET_VARSIZE_4B {
                                 (
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::expression::cast_as::<
-                                            $crate::uint32,
+                                            $crate::__pgrx_c_bindings::uint32,
                                             $crate::__pgrx_c_macros::CUnsignedInt,
                                             _
                                         >(
@@ -1324,10 +1378,10 @@ macro_rules! SET_VARSIZE_4B {
                                                     _
                                                 >(
                                                     $crate::__pgrx_c_macros::expression::cast_as::<
-                                                        *mut $crate::varattrib_4b,
+                                                        *mut $crate::__pgrx_c_bindings::varattrib_4b,
                                                         $crate::__pgrx_c_macros::expression::CPointer<
                                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                                $crate::varattrib_4b
+                                                                $crate::__pgrx_c_bindings::varattrib_4b
                                                             >,
                                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                                         >,
@@ -1363,7 +1417,7 @@ macro_rules! SET_VARSIZE_4B {
                                                     _
                                                 >(
                                                     $crate::__pgrx_c_macros::expression::cast_as::<
-                                                        $crate::uint32,
+                                                        $crate::__pgrx_c_bindings::uint32,
                                                         $crate::__pgrx_c_macros::CUnsignedInt,
                                                         _
                                                     >(
@@ -1422,10 +1476,10 @@ macro_rules! SET_VARSIZE_4B {
                                 (
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::expression::cast_as::<
-                                            *mut $crate::varattrib_4b,
+                                            *mut $crate::__pgrx_c_bindings::varattrib_4b,
                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                    $crate::varattrib_4b
+                                                    $crate::__pgrx_c_bindings::varattrib_4b
                                                 >,
                                                 $crate::__pgrx_c_macros::expression::ReadWrite
                                             >,
@@ -1453,7 +1507,7 @@ macro_rules! SET_VARSIZE_4B {
                                 (
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::expression::cast_as::<
-                                            $crate::uint32,
+                                            $crate::__pgrx_c_bindings::uint32,
                                             $crate::__pgrx_c_macros::CUnsignedInt,
                                             _
                                         >(
@@ -1487,8 +1541,8 @@ macro_rules! SET_VARSIZE_4B {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -1516,13 +1570,13 @@ macro_rules! __pgrx_c_args_SET_VARSIZE_4B_C {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_VARSIZE_4B_C!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_VARSIZE_4B_C!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -1531,7 +1585,7 @@ macro_rules! __pgrx_c_args_SET_VARSIZE_4B_C {
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_VARSIZE_4B_C!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -1558,31 +1612,35 @@ macro_rules! __pgrx_c_args_SET_VARSIZE_4B_C {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_VARSIZE_4B_C!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_VARSIZE_4B_C!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_SET_VARSIZE_4B_C!(@p2 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_SET_VARSIZE_4B_C!(
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative1 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_SET_VARSIZE_4B_C!(@p2 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_SET_VARSIZE_4B_C!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_VARSIZE_4B_C!(
-            @p2 $mode [$($done)* (@literal [- $argument]),];
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_VARSIZE_4B_C!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -1590,7 +1648,9 @@ macro_rules! __pgrx_c_args_SET_VARSIZE_4B_C {
         $crate::__pgrx_c_args_SET_VARSIZE_4B_C!(@negative1 $mode [$($done)*]; - $($raw)*)
     };
     (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_SET_VARSIZE_4B_C!(@p2 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_SET_VARSIZE_4B_C!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -1612,14 +1672,18 @@ macro_rules! __pgrx_c_args_SET_VARSIZE_4B_C {
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_SET_VARSIZE_4B_C!(@p2 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_SET_VARSIZE_4B_C!(
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_SET_VARSIZE_4B_C!(@p2 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_SET_VARSIZE_4B_C!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_VARSIZE_4B_C!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -1646,13 +1710,13 @@ macro_rules! __pgrx_c_args_SET_VARSIZE_4B_C {
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_VARSIZE_4B_C!(
-            @p2 $mode [$($done)* (@literal [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_VARSIZE_4B_C!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -1713,10 +1777,10 @@ macro_rules! SET_VARSIZE_4B_C {
                                 (
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::expression::cast_as::<
-                                            *mut $crate::varattrib_4b,
+                                            *mut $crate::__pgrx_c_bindings::varattrib_4b,
                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                    $crate::varattrib_4b
+                                                    $crate::__pgrx_c_bindings::varattrib_4b
                                                 >,
                                                 $crate::__pgrx_c_macros::expression::ReadWrite
                                             >,
@@ -1749,7 +1813,7 @@ macro_rules! SET_VARSIZE_4B_C {
                                                 _
                                             >(
                                                 $crate::__pgrx_c_macros::expression::cast_as::<
-                                                    $crate::uint32,
+                                                    $crate::__pgrx_c_bindings::uint32,
                                                     $crate::__pgrx_c_macros::CUnsignedInt,
                                                     _
                                                 >(
@@ -1834,10 +1898,10 @@ macro_rules! SET_VARSIZE_4B_C {
                                                     _
                                                 >(
                                                     $crate::__pgrx_c_macros::expression::cast_as::<
-                                                        *mut $crate::varattrib_4b,
+                                                        *mut $crate::__pgrx_c_bindings::varattrib_4b,
                                                         $crate::__pgrx_c_macros::expression::CPointer<
                                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                                $crate::varattrib_4b
+                                                                $crate::__pgrx_c_bindings::varattrib_4b
                                                             >,
                                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                                         >,
@@ -1878,7 +1942,7 @@ macro_rules! SET_VARSIZE_4B_C {
                                                             _
                                                         >(
                                                             $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                $crate::uint32,
+                                                                $crate::__pgrx_c_bindings::uint32,
                                                                 $crate::__pgrx_c_macros::CUnsignedInt,
                                                                 _
                                                             >(
@@ -1947,10 +2011,10 @@ macro_rules! SET_VARSIZE_4B_C {
                                 (
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::expression::cast_as::<
-                                            *mut $crate::varattrib_4b,
+                                            *mut $crate::__pgrx_c_bindings::varattrib_4b,
                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                    $crate::varattrib_4b
+                                                    $crate::__pgrx_c_bindings::varattrib_4b
                                                 >,
                                                 $crate::__pgrx_c_macros::expression::ReadWrite
                                             >,
@@ -1983,7 +2047,7 @@ macro_rules! SET_VARSIZE_4B_C {
                                                 _
                                             >(
                                                 $crate::__pgrx_c_macros::expression::cast_as::<
-                                                    $crate::uint32,
+                                                    $crate::__pgrx_c_bindings::uint32,
                                                     $crate::__pgrx_c_macros::CUnsignedInt,
                                                     _
                                                 >(
@@ -2032,8 +2096,8 @@ macro_rules! SET_VARSIZE_4B_C {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -2064,13 +2128,13 @@ macro_rules! __pgrx_c_args_SET_VARSIZE_COMPRESSED {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_VARSIZE_COMPRESSED!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_VARSIZE_COMPRESSED!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -2079,7 +2143,7 @@ macro_rules! __pgrx_c_args_SET_VARSIZE_COMPRESSED {
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_VARSIZE_COMPRESSED!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -2106,33 +2170,35 @@ macro_rules! __pgrx_c_args_SET_VARSIZE_COMPRESSED {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_VARSIZE_COMPRESSED!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_VARSIZE_COMPRESSED!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $argument:literal) => {
         $crate::__pgrx_c_args_SET_VARSIZE_COMPRESSED!(
-            @p2 $mode [$($done)* (@literal [- $argument]),];
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
         )
     };
     (@negative1 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_SET_VARSIZE_COMPRESSED!(@p2 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_SET_VARSIZE_COMPRESSED!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_VARSIZE_COMPRESSED!(
-            @p2 $mode [$($done)* (@literal [- $argument]),];
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_VARSIZE_COMPRESSED!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -2140,7 +2206,9 @@ macro_rules! __pgrx_c_args_SET_VARSIZE_COMPRESSED {
         $crate::__pgrx_c_args_SET_VARSIZE_COMPRESSED!(@negative1 $mode [$($done)*]; - $($raw)*)
     };
     (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_SET_VARSIZE_COMPRESSED!(@p2 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_SET_VARSIZE_COMPRESSED!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -2165,15 +2233,17 @@ macro_rules! __pgrx_c_args_SET_VARSIZE_COMPRESSED {
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_SET_VARSIZE_COMPRESSED!(
-            @p2 $mode [$($done)* (@literal [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_SET_VARSIZE_COMPRESSED!(@p2 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_SET_VARSIZE_COMPRESSED!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_VARSIZE_COMPRESSED!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -2200,13 +2270,13 @@ macro_rules! __pgrx_c_args_SET_VARSIZE_COMPRESSED {
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_VARSIZE_COMPRESSED!(
-            @p2 $mode [$($done)* (@literal [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_VARSIZE_COMPRESSED!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -2271,10 +2341,10 @@ macro_rules! SET_VARSIZE_COMPRESSED {
                                 (
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::expression::cast_as::<
-                                            *mut $crate::varattrib_4b,
+                                            *mut $crate::__pgrx_c_bindings::varattrib_4b,
                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                    $crate::varattrib_4b
+                                                    $crate::__pgrx_c_bindings::varattrib_4b
                                                 >,
                                                 $crate::__pgrx_c_macros::expression::ReadWrite
                                             >,
@@ -2307,7 +2377,7 @@ macro_rules! SET_VARSIZE_COMPRESSED {
                                                 _
                                             >(
                                                 $crate::__pgrx_c_macros::expression::cast_as::<
-                                                    $crate::uint32,
+                                                    $crate::__pgrx_c_bindings::uint32,
                                                     $crate::__pgrx_c_macros::CUnsignedInt,
                                                     _
                                                 >(
@@ -2393,10 +2463,10 @@ macro_rules! SET_VARSIZE_COMPRESSED {
                                                     _
                                                 >(
                                                     $crate::__pgrx_c_macros::expression::cast_as::<
-                                                        *mut $crate::varattrib_4b,
+                                                        *mut $crate::__pgrx_c_bindings::varattrib_4b,
                                                         $crate::__pgrx_c_macros::expression::CPointer<
                                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                                $crate::varattrib_4b
+                                                                $crate::__pgrx_c_bindings::varattrib_4b
                                                             >,
                                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                                         >,
@@ -2437,7 +2507,7 @@ macro_rules! SET_VARSIZE_COMPRESSED {
                                                             _
                                                         >(
                                                             $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                $crate::uint32,
+                                                                $crate::__pgrx_c_bindings::uint32,
                                                                 $crate::__pgrx_c_macros::CUnsignedInt,
                                                                 _
                                                             >(
@@ -2507,10 +2577,10 @@ macro_rules! SET_VARSIZE_COMPRESSED {
                                 (
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::expression::cast_as::<
-                                            *mut $crate::varattrib_4b,
+                                            *mut $crate::__pgrx_c_bindings::varattrib_4b,
                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                    $crate::varattrib_4b
+                                                    $crate::__pgrx_c_bindings::varattrib_4b
                                                 >,
                                                 $crate::__pgrx_c_macros::expression::ReadWrite
                                             >,
@@ -2543,7 +2613,7 @@ macro_rules! SET_VARSIZE_COMPRESSED {
                                                 _
                                             >(
                                                 $crate::__pgrx_c_macros::expression::cast_as::<
-                                                    $crate::uint32,
+                                                    $crate::__pgrx_c_bindings::uint32,
                                                     $crate::__pgrx_c_macros::CUnsignedInt,
                                                     _
                                                 >(
@@ -2592,8 +2662,8 @@ macro_rules! SET_VARSIZE_COMPRESSED {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -2621,13 +2691,13 @@ macro_rules! __pgrx_c_args_SET_VARSIZE_SHORT {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_VARSIZE_SHORT!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_VARSIZE_SHORT!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -2636,7 +2706,7 @@ macro_rules! __pgrx_c_args_SET_VARSIZE_SHORT {
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_VARSIZE_SHORT!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -2663,31 +2733,35 @@ macro_rules! __pgrx_c_args_SET_VARSIZE_SHORT {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_VARSIZE_SHORT!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_VARSIZE_SHORT!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_SET_VARSIZE_SHORT!(@p2 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_SET_VARSIZE_SHORT!(
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative1 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_SET_VARSIZE_SHORT!(@p2 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_SET_VARSIZE_SHORT!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_VARSIZE_SHORT!(
-            @p2 $mode [$($done)* (@literal [- $argument]),];
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_VARSIZE_SHORT!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -2695,7 +2769,9 @@ macro_rules! __pgrx_c_args_SET_VARSIZE_SHORT {
         $crate::__pgrx_c_args_SET_VARSIZE_SHORT!(@negative1 $mode [$($done)*]; - $($raw)*)
     };
     (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_SET_VARSIZE_SHORT!(@p2 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_SET_VARSIZE_SHORT!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -2717,14 +2793,18 @@ macro_rules! __pgrx_c_args_SET_VARSIZE_SHORT {
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_SET_VARSIZE_SHORT!(@p2 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_SET_VARSIZE_SHORT!(
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_SET_VARSIZE_SHORT!(@p2 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_SET_VARSIZE_SHORT!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_VARSIZE_SHORT!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -2751,13 +2831,13 @@ macro_rules! __pgrx_c_args_SET_VARSIZE_SHORT {
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_VARSIZE_SHORT!(
-            @p2 $mode [$($done)* (@literal [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_VARSIZE_SHORT!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -2814,10 +2894,10 @@ macro_rules! SET_VARSIZE_SHORT {
                             (
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::cast_as::<
-                                        *mut $crate::varattrib_1b,
+                                        *mut $crate::__pgrx_c_bindings::varattrib_1b,
                                         $crate::__pgrx_c_macros::expression::CPointer<
                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                $crate::varattrib_1b
+                                                $crate::__pgrx_c_bindings::varattrib_1b
                                             >,
                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                         >,
@@ -2849,7 +2929,7 @@ macro_rules! SET_VARSIZE_SHORT {
                                                 _
                                             >(
                                                 $crate::__pgrx_c_macros::expression::cast_as::<
-                                                    $crate::uint8,
+                                                    $crate::__pgrx_c_bindings::uint8,
                                                     $crate::__pgrx_c_macros::CUnsignedChar,
                                                     _
                                                 >(
@@ -2930,10 +3010,10 @@ macro_rules! SET_VARSIZE_SHORT {
                                                 _
                                             >(
                                                 $crate::__pgrx_c_macros::expression::cast_as::<
-                                                    *mut $crate::varattrib_1b,
+                                                    *mut $crate::__pgrx_c_bindings::varattrib_1b,
                                                     $crate::__pgrx_c_macros::expression::CPointer<
                                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                                            $crate::varattrib_1b
+                                                            $crate::__pgrx_c_bindings::varattrib_1b
                                                         >,
                                                         $crate::__pgrx_c_macros::expression::ReadWrite
                                                     >,
@@ -2973,7 +3053,7 @@ macro_rules! SET_VARSIZE_SHORT {
                                                             _
                                                         >(
                                                             $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                $crate::uint8,
+                                                                $crate::__pgrx_c_bindings::uint8,
                                                                 $crate::__pgrx_c_macros::CUnsignedChar,
                                                                 _
                                                             >(
@@ -3038,10 +3118,10 @@ macro_rules! SET_VARSIZE_SHORT {
                             (
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::cast_as::<
-                                        *mut $crate::varattrib_1b,
+                                        *mut $crate::__pgrx_c_bindings::varattrib_1b,
                                         $crate::__pgrx_c_macros::expression::CPointer<
                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                $crate::varattrib_1b
+                                                $crate::__pgrx_c_bindings::varattrib_1b
                                             >,
                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                         >,
@@ -3073,7 +3153,7 @@ macro_rules! SET_VARSIZE_SHORT {
                                                 _
                                             >(
                                                 $crate::__pgrx_c_macros::expression::cast_as::<
-                                                    $crate::uint8,
+                                                    $crate::__pgrx_c_bindings::uint8,
                                                     $crate::__pgrx_c_macros::CUnsignedChar,
                                                     _
                                                 >(
@@ -3122,8 +3202,8 @@ macro_rules! SET_VARSIZE_SHORT {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -3151,13 +3231,13 @@ macro_rules! __pgrx_c_args_SET_VARTAG_1B_E {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_VARTAG_1B_E!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_VARTAG_1B_E!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -3166,7 +3246,7 @@ macro_rules! __pgrx_c_args_SET_VARTAG_1B_E {
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_VARTAG_1B_E!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -3193,31 +3273,35 @@ macro_rules! __pgrx_c_args_SET_VARTAG_1B_E {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_VARTAG_1B_E!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_VARTAG_1B_E!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_SET_VARTAG_1B_E!(@p2 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_SET_VARTAG_1B_E!(
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative1 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_SET_VARTAG_1B_E!(@p2 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_SET_VARTAG_1B_E!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_VARTAG_1B_E!(
-            @p2 $mode [$($done)* (@literal [- $argument]),];
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_VARTAG_1B_E!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -3225,7 +3309,9 @@ macro_rules! __pgrx_c_args_SET_VARTAG_1B_E {
         $crate::__pgrx_c_args_SET_VARTAG_1B_E!(@negative1 $mode [$($done)*]; - $($raw)*)
     };
     (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_SET_VARTAG_1B_E!(@p2 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_SET_VARTAG_1B_E!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -3247,14 +3333,18 @@ macro_rules! __pgrx_c_args_SET_VARTAG_1B_E {
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_SET_VARTAG_1B_E!(@p2 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_SET_VARTAG_1B_E!(
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_SET_VARTAG_1B_E!(@p2 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_SET_VARTAG_1B_E!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_VARTAG_1B_E!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -3281,13 +3371,13 @@ macro_rules! __pgrx_c_args_SET_VARTAG_1B_E {
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_VARTAG_1B_E!(
-            @p2 $mode [$($done)* (@literal [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_VARTAG_1B_E!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -3349,10 +3439,10 @@ macro_rules! SET_VARTAG_1B_E {
                                                 _
                                             >(
                                                 $crate::__pgrx_c_macros::expression::cast_as::<
-                                                    *mut $crate::varattrib_1b_e,
+                                                    *mut $crate::__pgrx_c_bindings::varattrib_1b_e,
                                                     $crate::__pgrx_c_macros::expression::CPointer<
                                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                                            $crate::varattrib_1b_e
+                                                            $crate::__pgrx_c_bindings::varattrib_1b_e
                                                         >,
                                                         $crate::__pgrx_c_macros::expression::ReadWrite
                                                     >,
@@ -3396,10 +3486,10 @@ macro_rules! SET_VARTAG_1B_E {
                                             _
                                         >(
                                             $crate::__pgrx_c_macros::expression::cast_as::<
-                                                *mut $crate::varattrib_1b_e,
+                                                *mut $crate::__pgrx_c_bindings::varattrib_1b_e,
                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                        $crate::varattrib_1b_e
+                                                        $crate::__pgrx_c_bindings::varattrib_1b_e
                                                     >,
                                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                                 >,
@@ -3478,10 +3568,10 @@ macro_rules! SET_VARTAG_1B_E {
                                                             _
                                                         >(
                                                             $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                *mut $crate::varattrib_1b_e,
+                                                                *mut $crate::__pgrx_c_bindings::varattrib_1b_e,
                                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                                        $crate::varattrib_1b_e
+                                                                        $crate::__pgrx_c_bindings::varattrib_1b_e
                                                                     >,
                                                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                                                 >,
@@ -3528,10 +3618,10 @@ macro_rules! SET_VARTAG_1B_E {
                                                         _
                                                     >(
                                                         $crate::__pgrx_c_macros::expression::cast_as::<
-                                                            *mut $crate::varattrib_1b_e,
+                                                            *mut $crate::__pgrx_c_bindings::varattrib_1b_e,
                                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                                    $crate::varattrib_1b_e
+                                                                    $crate::__pgrx_c_bindings::varattrib_1b_e
                                                                 >,
                                                                 $crate::__pgrx_c_macros::expression::ReadWrite
                                                             >,
@@ -3592,10 +3682,10 @@ macro_rules! SET_VARTAG_1B_E {
                                                 _
                                             >(
                                                 $crate::__pgrx_c_macros::expression::cast_as::<
-                                                    *mut $crate::varattrib_1b_e,
+                                                    *mut $crate::__pgrx_c_bindings::varattrib_1b_e,
                                                     $crate::__pgrx_c_macros::expression::CPointer<
                                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                                            $crate::varattrib_1b_e
+                                                            $crate::__pgrx_c_bindings::varattrib_1b_e
                                                         >,
                                                         $crate::__pgrx_c_macros::expression::ReadWrite
                                                     >,
@@ -3639,10 +3729,10 @@ macro_rules! SET_VARTAG_1B_E {
                                             _
                                         >(
                                             $crate::__pgrx_c_macros::expression::cast_as::<
-                                                *mut $crate::varattrib_1b_e,
+                                                *mut $crate::__pgrx_c_bindings::varattrib_1b_e,
                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                        $crate::varattrib_1b_e
+                                                        $crate::__pgrx_c_bindings::varattrib_1b_e
                                                     >,
                                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                                 >,
@@ -3684,8 +3774,8 @@ macro_rules! SET_VARTAG_1B_E {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -3713,13 +3803,13 @@ macro_rules! __pgrx_c_args_SET_VARTAG_EXTERNAL {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_VARTAG_EXTERNAL!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_VARTAG_EXTERNAL!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -3728,7 +3818,7 @@ macro_rules! __pgrx_c_args_SET_VARTAG_EXTERNAL {
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_VARTAG_EXTERNAL!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -3755,31 +3845,35 @@ macro_rules! __pgrx_c_args_SET_VARTAG_EXTERNAL {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_VARTAG_EXTERNAL!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_VARTAG_EXTERNAL!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_SET_VARTAG_EXTERNAL!(@p2 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_SET_VARTAG_EXTERNAL!(
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative1 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_SET_VARTAG_EXTERNAL!(@p2 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_SET_VARTAG_EXTERNAL!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_VARTAG_EXTERNAL!(
-            @p2 $mode [$($done)* (@literal [- $argument]),];
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_VARTAG_EXTERNAL!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -3787,7 +3881,9 @@ macro_rules! __pgrx_c_args_SET_VARTAG_EXTERNAL {
         $crate::__pgrx_c_args_SET_VARTAG_EXTERNAL!(@negative1 $mode [$($done)*]; - $($raw)*)
     };
     (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_SET_VARTAG_EXTERNAL!(@p2 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_SET_VARTAG_EXTERNAL!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -3809,14 +3905,18 @@ macro_rules! __pgrx_c_args_SET_VARTAG_EXTERNAL {
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_SET_VARTAG_EXTERNAL!(@p2 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_SET_VARTAG_EXTERNAL!(
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_SET_VARTAG_EXTERNAL!(@p2 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_SET_VARTAG_EXTERNAL!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_VARTAG_EXTERNAL!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -3843,13 +3943,13 @@ macro_rules! __pgrx_c_args_SET_VARTAG_EXTERNAL {
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_VARTAG_EXTERNAL!(
-            @p2 $mode [$($done)* (@literal [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_VARTAG_EXTERNAL!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -3912,10 +4012,10 @@ macro_rules! SET_VARTAG_EXTERNAL {
                                                 _
                                             >(
                                                 $crate::__pgrx_c_macros::expression::cast_as::<
-                                                    *mut $crate::varattrib_1b_e,
+                                                    *mut $crate::__pgrx_c_bindings::varattrib_1b_e,
                                                     $crate::__pgrx_c_macros::expression::CPointer<
                                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                                            $crate::varattrib_1b_e
+                                                            $crate::__pgrx_c_bindings::varattrib_1b_e
                                                         >,
                                                         $crate::__pgrx_c_macros::expression::ReadWrite
                                                     >,
@@ -3959,10 +4059,10 @@ macro_rules! SET_VARTAG_EXTERNAL {
                                             _
                                         >(
                                             $crate::__pgrx_c_macros::expression::cast_as::<
-                                                *mut $crate::varattrib_1b_e,
+                                                *mut $crate::__pgrx_c_bindings::varattrib_1b_e,
                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                        $crate::varattrib_1b_e
+                                                        $crate::__pgrx_c_bindings::varattrib_1b_e
                                                     >,
                                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                                 >,
@@ -4042,10 +4142,10 @@ macro_rules! SET_VARTAG_EXTERNAL {
                                                             _
                                                         >(
                                                             $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                *mut $crate::varattrib_1b_e,
+                                                                *mut $crate::__pgrx_c_bindings::varattrib_1b_e,
                                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                                        $crate::varattrib_1b_e
+                                                                        $crate::__pgrx_c_bindings::varattrib_1b_e
                                                                     >,
                                                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                                                 >,
@@ -4092,10 +4192,10 @@ macro_rules! SET_VARTAG_EXTERNAL {
                                                         _
                                                     >(
                                                         $crate::__pgrx_c_macros::expression::cast_as::<
-                                                            *mut $crate::varattrib_1b_e,
+                                                            *mut $crate::__pgrx_c_bindings::varattrib_1b_e,
                                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                                    $crate::varattrib_1b_e
+                                                                    $crate::__pgrx_c_bindings::varattrib_1b_e
                                                                 >,
                                                                 $crate::__pgrx_c_macros::expression::ReadWrite
                                                             >,
@@ -4157,10 +4257,10 @@ macro_rules! SET_VARTAG_EXTERNAL {
                                                 _
                                             >(
                                                 $crate::__pgrx_c_macros::expression::cast_as::<
-                                                    *mut $crate::varattrib_1b_e,
+                                                    *mut $crate::__pgrx_c_bindings::varattrib_1b_e,
                                                     $crate::__pgrx_c_macros::expression::CPointer<
                                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                                            $crate::varattrib_1b_e
+                                                            $crate::__pgrx_c_bindings::varattrib_1b_e
                                                         >,
                                                         $crate::__pgrx_c_macros::expression::ReadWrite
                                                     >,
@@ -4204,10 +4304,10 @@ macro_rules! SET_VARTAG_EXTERNAL {
                                             _
                                         >(
                                             $crate::__pgrx_c_macros::expression::cast_as::<
-                                                *mut $crate::varattrib_1b_e,
+                                                *mut $crate::__pgrx_c_bindings::varattrib_1b_e,
                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                        $crate::varattrib_1b_e
+                                                        $crate::__pgrx_c_bindings::varattrib_1b_e
                                                     >,
                                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                                 >,
@@ -4249,8 +4349,8 @@ macro_rules! SET_VARTAG_EXTERNAL {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -4281,21 +4381,23 @@ macro_rules! __pgrx_c_args_VARATT_CAN_MAKE_SHORT {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
         $crate::__pgrx_c_args_VARATT_CAN_MAKE_SHORT!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_VARATT_CAN_MAKE_SHORT!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_VARATT_CAN_MAKE_SHORT!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_VARATT_CAN_MAKE_SHORT!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_VARATT_CAN_MAKE_SHORT!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -4303,7 +4405,9 @@ macro_rules! __pgrx_c_args_VARATT_CAN_MAKE_SHORT {
         $crate::__pgrx_c_args_VARATT_CAN_MAKE_SHORT!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_VARATT_CAN_MAKE_SHORT!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_VARATT_CAN_MAKE_SHORT!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -4325,14 +4429,18 @@ macro_rules! __pgrx_c_args_VARATT_CAN_MAKE_SHORT {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_VARATT_CAN_MAKE_SHORT!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_VARATT_CAN_MAKE_SHORT!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_VARATT_CAN_MAKE_SHORT!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_VARATT_CAN_MAKE_SHORT!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_VARATT_CAN_MAKE_SHORT!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -4359,13 +4467,13 @@ macro_rules! __pgrx_c_args_VARATT_CAN_MAKE_SHORT {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_VARATT_CAN_MAKE_SHORT!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_VARATT_CAN_MAKE_SHORT!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -4439,10 +4547,10 @@ macro_rules! VARATT_CAN_MAKE_SHORT {
                                                                         _
                                                                     >(
                                                                         $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                            *mut $crate::varattrib_1b,
+                                                                            *mut $crate::__pgrx_c_bindings::varattrib_1b,
                                                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                    $crate::varattrib_1b
+                                                                                    $crate::__pgrx_c_bindings::varattrib_1b
                                                                                 >,
                                                                                 $crate::__pgrx_c_macros::expression::ReadWrite
                                                                             >,
@@ -4542,10 +4650,10 @@ macro_rules! VARATT_CAN_MAKE_SHORT {
                                                                                                         _
                                                                                                     >(
                                                                                                         $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                                                            *mut $crate::varattrib_4b,
+                                                                                                            *mut $crate::__pgrx_c_bindings::varattrib_4b,
                                                                                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                                                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                                    $crate::varattrib_4b
+                                                                                                                    $crate::__pgrx_c_bindings::varattrib_4b
                                                                                                                 >,
                                                                                                                 $crate::__pgrx_c_macros::expression::ReadWrite
                                                                                                             >,
@@ -4600,7 +4708,7 @@ macro_rules! VARATT_CAN_MAKE_SHORT {
                                                             _
                                                         >(
                                                             $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                $crate::int32,
+                                                                $crate::__pgrx_c_bindings::int32,
                                                                 $crate::__pgrx_c_macros::CInt,
                                                                 _
                                                             >(
@@ -4623,7 +4731,7 @@ macro_rules! VARATT_CAN_MAKE_SHORT {
                                             >(
                                                 $crate::__pgrx_c_macros::expression::offset_of::<
                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                        $crate::varattrib_1b
+                                                        $crate::__pgrx_c_bindings::varattrib_1b
                                                     >,
                                                     $crate::__pgrx_c_field_marker!(@path; va_data)
                                                 >()
@@ -4633,7 +4741,7 @@ macro_rules! VARATT_CAN_MAKE_SHORT {
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                        $crate::VARATT_SHORT_MAX as i32
+                                        $crate::__pgrx_c_bindings::VARATT_SHORT_MAX as i32
                                     )
                                 )
                             )
@@ -4705,10 +4813,10 @@ macro_rules! VARATT_CAN_MAKE_SHORT {
                                                                                     _
                                                                                 >(
                                                                                     $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                                        *mut $crate::varattrib_1b,
+                                                                                        *mut $crate::__pgrx_c_bindings::varattrib_1b,
                                                                                         $crate::__pgrx_c_macros::expression::CPointer<
                                                                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                $crate::varattrib_1b
+                                                                                                $crate::__pgrx_c_bindings::varattrib_1b
                                                                                             >,
                                                                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                                                                         >,
@@ -4814,10 +4922,10 @@ macro_rules! VARATT_CAN_MAKE_SHORT {
                                                                                                                     _
                                                                                                                 >(
                                                                                                                     $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                                                                        *mut $crate::varattrib_4b,
+                                                                                                                        *mut $crate::__pgrx_c_bindings::varattrib_4b,
                                                                                                                         $crate::__pgrx_c_macros::expression::CPointer<
                                                                                                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                                                $crate::varattrib_4b
+                                                                                                                                $crate::__pgrx_c_bindings::varattrib_4b
                                                                                                                             >,
                                                                                                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                                                                                                         >,
@@ -4876,7 +4984,7 @@ macro_rules! VARATT_CAN_MAKE_SHORT {
                                                                         _
                                                                     >(
                                                                         $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                            $crate::int32,
+                                                                            $crate::__pgrx_c_bindings::int32,
                                                                             $crate::__pgrx_c_macros::CInt,
                                                                             _
                                                                         >(
@@ -4899,7 +5007,7 @@ macro_rules! VARATT_CAN_MAKE_SHORT {
                                                         >(
                                                             $crate::__pgrx_c_macros::expression::offset_of::<
                                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                                    $crate::varattrib_1b
+                                                                    $crate::__pgrx_c_bindings::varattrib_1b
                                                                 >,
                                                                 $crate::__pgrx_c_field_marker!(
                                                                     @path;
@@ -4916,7 +5024,9 @@ macro_rules! VARATT_CAN_MAKE_SHORT {
                                             >(
                                                 $crate::__pgrx_c_macros::CValue::<
                                                     $crate::__pgrx_c_macros::CInt
-                                                >::new($crate::VARATT_SHORT_MAX as i32)
+                                                >::new(
+                                                    $crate::__pgrx_c_bindings::VARATT_SHORT_MAX as i32
+                                                )
                                             )
                                         )
                                     )
@@ -4969,10 +5079,10 @@ macro_rules! VARATT_CAN_MAKE_SHORT {
                                                                         _
                                                                     >(
                                                                         $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                            *mut $crate::varattrib_1b,
+                                                                            *mut $crate::__pgrx_c_bindings::varattrib_1b,
                                                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                    $crate::varattrib_1b
+                                                                                    $crate::__pgrx_c_bindings::varattrib_1b
                                                                                 >,
                                                                                 $crate::__pgrx_c_macros::expression::ReadWrite
                                                                             >,
@@ -5072,10 +5182,10 @@ macro_rules! VARATT_CAN_MAKE_SHORT {
                                                                                                         _
                                                                                                     >(
                                                                                                         $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                                                            *mut $crate::varattrib_4b,
+                                                                                                            *mut $crate::__pgrx_c_bindings::varattrib_4b,
                                                                                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                                                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                                    $crate::varattrib_4b
+                                                                                                                    $crate::__pgrx_c_bindings::varattrib_4b
                                                                                                                 >,
                                                                                                                 $crate::__pgrx_c_macros::expression::ReadWrite
                                                                                                             >,
@@ -5130,7 +5240,7 @@ macro_rules! VARATT_CAN_MAKE_SHORT {
                                                             _
                                                         >(
                                                             $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                $crate::int32,
+                                                                $crate::__pgrx_c_bindings::int32,
                                                                 $crate::__pgrx_c_macros::CInt,
                                                                 _
                                                             >(
@@ -5153,7 +5263,7 @@ macro_rules! VARATT_CAN_MAKE_SHORT {
                                             >(
                                                 $crate::__pgrx_c_macros::expression::offset_of::<
                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                        $crate::varattrib_1b
+                                                        $crate::__pgrx_c_bindings::varattrib_1b
                                                     >,
                                                     $crate::__pgrx_c_field_marker!(@path; va_data)
                                                 >()
@@ -5163,7 +5273,7 @@ macro_rules! VARATT_CAN_MAKE_SHORT {
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                        $crate::VARATT_SHORT_MAX as i32
+                                        $crate::__pgrx_c_bindings::VARATT_SHORT_MAX as i32
                                     )
                                 )
                             )
@@ -5186,8 +5296,8 @@ macro_rules! VARATT_CAN_MAKE_SHORT {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -5218,23 +5328,23 @@ macro_rules! __pgrx_c_args_VARATT_CONVERTED_SHORT_SIZE {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
         $crate::__pgrx_c_args_VARATT_CONVERTED_SHORT_SIZE!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_VARATT_CONVERTED_SHORT_SIZE!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_VARATT_CONVERTED_SHORT_SIZE!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_VARATT_CONVERTED_SHORT_SIZE!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -5243,7 +5353,7 @@ macro_rules! __pgrx_c_args_VARATT_CONVERTED_SHORT_SIZE {
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
         $crate::__pgrx_c_args_VARATT_CONVERTED_SHORT_SIZE!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
@@ -5269,17 +5379,17 @@ macro_rules! __pgrx_c_args_VARATT_CONVERTED_SHORT_SIZE {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_VARATT_CONVERTED_SHORT_SIZE!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_VARATT_CONVERTED_SHORT_SIZE!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_VARATT_CONVERTED_SHORT_SIZE!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -5306,13 +5416,13 @@ macro_rules! __pgrx_c_args_VARATT_CONVERTED_SHORT_SIZE {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_VARATT_CONVERTED_SHORT_SIZE!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_VARATT_CONVERTED_SHORT_SIZE!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -5399,10 +5509,10 @@ macro_rules! VARATT_CONVERTED_SHORT_SIZE {
                                                                                 _
                                                                             >(
                                                                                 $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                                    *mut $crate::varattrib_4b,
+                                                                                    *mut $crate::__pgrx_c_bindings::varattrib_4b,
                                                                                     $crate::__pgrx_c_macros::expression::CPointer<
                                                                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                            $crate::varattrib_4b
+                                                                                            $crate::__pgrx_c_bindings::varattrib_4b
                                                                                         >,
                                                                                         $crate::__pgrx_c_macros::expression::ReadWrite
                                                                                     >,
@@ -5454,7 +5564,7 @@ macro_rules! VARATT_CONVERTED_SHORT_SIZE {
                             (
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::cast_as::<
-                                        $crate::int32,
+                                        $crate::__pgrx_c_bindings::int32,
                                         $crate::__pgrx_c_macros::CInt,
                                         _
                                     >(
@@ -5473,7 +5583,9 @@ macro_rules! VARATT_CONVERTED_SHORT_SIZE {
                     ),
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::expression::offset_of::<
-                            $crate::__pgrx_c_macros::expression::CRecord<$crate::varattrib_1b>,
+                            $crate::__pgrx_c_macros::expression::CRecord<
+                                $crate::__pgrx_c_bindings::varattrib_1b
+                            >,
                             $crate::__pgrx_c_field_marker!(@path; va_data)
                         >()
                     )
@@ -5556,10 +5668,10 @@ macro_rules! VARATT_CONVERTED_SHORT_SIZE {
                                                                                             _
                                                                                         >(
                                                                                             $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                                                *mut $crate::varattrib_4b,
+                                                                                                *mut $crate::__pgrx_c_bindings::varattrib_4b,
                                                                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                        $crate::varattrib_4b
+                                                                                                        $crate::__pgrx_c_bindings::varattrib_4b
                                                                                                     >,
                                                                                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                                                                                 >,
@@ -5614,7 +5726,7 @@ macro_rules! VARATT_CONVERTED_SHORT_SIZE {
                                                 _
                                             >(
                                                 $crate::__pgrx_c_macros::expression::cast_as::<
-                                                    $crate::int32,
+                                                    $crate::__pgrx_c_bindings::int32,
                                                     $crate::__pgrx_c_macros::CInt,
                                                     _
                                                 >(
@@ -5634,7 +5746,7 @@ macro_rules! VARATT_CONVERTED_SHORT_SIZE {
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::offset_of::<
                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                            $crate::varattrib_1b
+                                            $crate::__pgrx_c_bindings::varattrib_1b
                                         >,
                                         $crate::__pgrx_c_field_marker!(@path; va_data)
                                     >()
@@ -5693,10 +5805,10 @@ macro_rules! VARATT_CONVERTED_SHORT_SIZE {
                                                                                 _
                                                                             >(
                                                                                 $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                                    *mut $crate::varattrib_4b,
+                                                                                    *mut $crate::__pgrx_c_bindings::varattrib_4b,
                                                                                     $crate::__pgrx_c_macros::expression::CPointer<
                                                                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                            $crate::varattrib_4b
+                                                                                            $crate::__pgrx_c_bindings::varattrib_4b
                                                                                         >,
                                                                                         $crate::__pgrx_c_macros::expression::ReadWrite
                                                                                     >,
@@ -5748,7 +5860,7 @@ macro_rules! VARATT_CONVERTED_SHORT_SIZE {
                             (
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::cast_as::<
-                                        $crate::int32,
+                                        $crate::__pgrx_c_bindings::int32,
                                         $crate::__pgrx_c_macros::CInt,
                                         _
                                     >(
@@ -5767,7 +5879,9 @@ macro_rules! VARATT_CONVERTED_SHORT_SIZE {
                     ),
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::expression::offset_of::<
-                            $crate::__pgrx_c_macros::expression::CRecord<$crate::varattrib_1b>,
+                            $crate::__pgrx_c_macros::expression::CRecord<
+                                $crate::__pgrx_c_bindings::varattrib_1b
+                            >,
                             $crate::__pgrx_c_field_marker!(@path; va_data)
                         >()
                     )
@@ -5787,8 +5901,8 @@ macro_rules! VARATT_CONVERTED_SHORT_SIZE {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -5819,23 +5933,23 @@ macro_rules! __pgrx_c_args_VARATT_EXTERNAL_GET_COMPRESS_METHOD {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
         $crate::__pgrx_c_args_VARATT_EXTERNAL_GET_COMPRESS_METHOD!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_VARATT_EXTERNAL_GET_COMPRESS_METHOD!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_VARATT_EXTERNAL_GET_COMPRESS_METHOD!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_VARATT_EXTERNAL_GET_COMPRESS_METHOD!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -5847,7 +5961,7 @@ macro_rules! __pgrx_c_args_VARATT_EXTERNAL_GET_COMPRESS_METHOD {
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
         $crate::__pgrx_c_args_VARATT_EXTERNAL_GET_COMPRESS_METHOD!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
@@ -5873,17 +5987,17 @@ macro_rules! __pgrx_c_args_VARATT_EXTERNAL_GET_COMPRESS_METHOD {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_VARATT_EXTERNAL_GET_COMPRESS_METHOD!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_VARATT_EXTERNAL_GET_COMPRESS_METHOD!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_VARATT_EXTERNAL_GET_COMPRESS_METHOD!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -5910,13 +6024,13 @@ macro_rules! __pgrx_c_args_VARATT_EXTERNAL_GET_COMPRESS_METHOD {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_VARATT_EXTERNAL_GET_COMPRESS_METHOD!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_VARATT_EXTERNAL_GET_COMPRESS_METHOD!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -5976,7 +6090,7 @@ macro_rules! VARATT_EXTERNAL_GET_COMPRESS_METHOD {
                     ),
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                            $crate::VARLENA_EXTSIZE_BITS as i32
+                            $crate::__pgrx_c_bindings::VARLENA_EXTSIZE_BITS as i32
                         )
                     )
                 )
@@ -6030,7 +6144,7 @@ macro_rules! VARATT_EXTERNAL_GET_COMPRESS_METHOD {
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                        $crate::VARLENA_EXTSIZE_BITS as i32
+                                        $crate::__pgrx_c_bindings::VARLENA_EXTSIZE_BITS as i32
                                     )
                                 )
                             )
@@ -6063,7 +6177,7 @@ macro_rules! VARATT_EXTERNAL_GET_COMPRESS_METHOD {
                     ),
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                            $crate::VARLENA_EXTSIZE_BITS as i32
+                            $crate::__pgrx_c_bindings::VARLENA_EXTSIZE_BITS as i32
                         )
                     )
                 )
@@ -6085,8 +6199,8 @@ macro_rules! VARATT_EXTERNAL_GET_COMPRESS_METHOD {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -6117,23 +6231,23 @@ macro_rules! __pgrx_c_args_VARATT_EXTERNAL_GET_EXTSIZE {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
         $crate::__pgrx_c_args_VARATT_EXTERNAL_GET_EXTSIZE!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_VARATT_EXTERNAL_GET_EXTSIZE!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_VARATT_EXTERNAL_GET_EXTSIZE!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_VARATT_EXTERNAL_GET_EXTSIZE!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -6142,7 +6256,7 @@ macro_rules! __pgrx_c_args_VARATT_EXTERNAL_GET_EXTSIZE {
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
         $crate::__pgrx_c_args_VARATT_EXTERNAL_GET_EXTSIZE!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
@@ -6168,17 +6282,17 @@ macro_rules! __pgrx_c_args_VARATT_EXTERNAL_GET_EXTSIZE {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_VARATT_EXTERNAL_GET_EXTSIZE!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_VARATT_EXTERNAL_GET_EXTSIZE!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_VARATT_EXTERNAL_GET_EXTSIZE!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -6205,13 +6319,13 @@ macro_rules! __pgrx_c_args_VARATT_EXTERNAL_GET_EXTSIZE {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_VARATT_EXTERNAL_GET_EXTSIZE!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_VARATT_EXTERNAL_GET_EXTSIZE!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -6267,7 +6381,7 @@ macro_rules! VARATT_EXTERNAL_GET_EXTSIZE {
                     ),
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CUnsignedInt>::new(
-                            $crate::VARLENA_EXTSIZE_MASK as u32
+                            $crate::__pgrx_c_bindings::VARLENA_EXTSIZE_MASK as u32
                         )
                     )
                 )
@@ -6316,7 +6430,7 @@ macro_rules! VARATT_EXTERNAL_GET_EXTSIZE {
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::CValue::<
                                         $crate::__pgrx_c_macros::CUnsignedInt
-                                    >::new($crate::VARLENA_EXTSIZE_MASK as u32)
+                                    >::new($crate::__pgrx_c_bindings::VARLENA_EXTSIZE_MASK as u32)
                                 )
                             )
                         )
@@ -6345,7 +6459,7 @@ macro_rules! VARATT_EXTERNAL_GET_EXTSIZE {
                     ),
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CUnsignedInt>::new(
-                            $crate::VARLENA_EXTSIZE_MASK as u32
+                            $crate::__pgrx_c_bindings::VARLENA_EXTSIZE_MASK as u32
                         )
                     )
                 )
@@ -6364,8 +6478,8 @@ macro_rules! VARATT_EXTERNAL_GET_EXTSIZE {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -6396,23 +6510,23 @@ macro_rules! __pgrx_c_args_VARATT_EXTERNAL_IS_COMPRESSED {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
         $crate::__pgrx_c_args_VARATT_EXTERNAL_IS_COMPRESSED!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_VARATT_EXTERNAL_IS_COMPRESSED!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_VARATT_EXTERNAL_IS_COMPRESSED!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_VARATT_EXTERNAL_IS_COMPRESSED!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -6424,7 +6538,7 @@ macro_rules! __pgrx_c_args_VARATT_EXTERNAL_IS_COMPRESSED {
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
         $crate::__pgrx_c_args_VARATT_EXTERNAL_IS_COMPRESSED!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
@@ -6450,17 +6564,17 @@ macro_rules! __pgrx_c_args_VARATT_EXTERNAL_IS_COMPRESSED {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_VARATT_EXTERNAL_IS_COMPRESSED!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_VARATT_EXTERNAL_IS_COMPRESSED!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_VARATT_EXTERNAL_IS_COMPRESSED!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -6487,13 +6601,13 @@ macro_rules! __pgrx_c_args_VARATT_EXTERNAL_IS_COMPRESSED {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_VARATT_EXTERNAL_IS_COMPRESSED!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_VARATT_EXTERNAL_IS_COMPRESSED!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -6558,7 +6672,7 @@ macro_rules! VARATT_EXTERNAL_IS_COMPRESSED {
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::CValue::<
                                         $crate::__pgrx_c_macros::CUnsignedInt
-                                    >::new($crate::VARLENA_EXTSIZE_MASK as u32)
+                                    >::new($crate::__pgrx_c_bindings::VARLENA_EXTSIZE_MASK as u32)
                                 )
                             )
                         )
@@ -6581,7 +6695,7 @@ macro_rules! VARATT_EXTERNAL_IS_COMPRESSED {
                             (
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::cast_as::<
-                                        $crate::int32,
+                                        $crate::__pgrx_c_bindings::int32,
                                         $crate::__pgrx_c_macros::CInt,
                                         _
                                     >(
@@ -6667,7 +6781,9 @@ macro_rules! VARATT_EXTERNAL_IS_COMPRESSED {
                                             >(
                                                 $crate::__pgrx_c_macros::CValue::<
                                                     $crate::__pgrx_c_macros::CUnsignedInt
-                                                >::new($crate::VARLENA_EXTSIZE_MASK as u32)
+                                                >::new(
+                                                    $crate::__pgrx_c_bindings::VARLENA_EXTSIZE_MASK as u32
+                                                )
                                             )
                                         )
                                     )
@@ -6703,7 +6819,7 @@ macro_rules! VARATT_EXTERNAL_IS_COMPRESSED {
                                                 _
                                             >(
                                                 $crate::__pgrx_c_macros::expression::cast_as::<
-                                                    $crate::int32,
+                                                    $crate::__pgrx_c_bindings::int32,
                                                     $crate::__pgrx_c_macros::CInt,
                                                     _
                                                 >(
@@ -6752,7 +6868,7 @@ macro_rules! VARATT_EXTERNAL_IS_COMPRESSED {
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::CValue::<
                                         $crate::__pgrx_c_macros::CUnsignedInt
-                                    >::new($crate::VARLENA_EXTSIZE_MASK as u32)
+                                    >::new($crate::__pgrx_c_bindings::VARLENA_EXTSIZE_MASK as u32)
                                 )
                             )
                         )
@@ -6775,7 +6891,7 @@ macro_rules! VARATT_EXTERNAL_IS_COMPRESSED {
                             (
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::cast_as::<
-                                        $crate::int32,
+                                        $crate::__pgrx_c_bindings::int32,
                                         $crate::__pgrx_c_macros::CInt,
                                         _
                                     >(
@@ -6811,8 +6927,8 @@ macro_rules! VARATT_EXTERNAL_IS_COMPRESSED {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -6846,13 +6962,13 @@ macro_rules! __pgrx_c_args_VARATT_EXTERNAL_SET_SIZE_AND_COMPRESS_METHOD {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_VARATT_EXTERNAL_SET_SIZE_AND_COMPRESS_METHOD!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_VARATT_EXTERNAL_SET_SIZE_AND_COMPRESS_METHOD!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -6864,7 +6980,7 @@ macro_rules! __pgrx_c_args_VARATT_EXTERNAL_SET_SIZE_AND_COMPRESS_METHOD {
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_VARATT_EXTERNAL_SET_SIZE_AND_COMPRESS_METHOD!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -6891,25 +7007,25 @@ macro_rules! __pgrx_c_args_VARATT_EXTERNAL_SET_SIZE_AND_COMPRESS_METHOD {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_VARATT_EXTERNAL_SET_SIZE_AND_COMPRESS_METHOD!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_VARATT_EXTERNAL_SET_SIZE_AND_COMPRESS_METHOD!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_VARATT_EXTERNAL_SET_SIZE_AND_COMPRESS_METHOD!(
-            @p2 $mode [$($done)* (@literal [- $argument]),];
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_VARATT_EXTERNAL_SET_SIZE_AND_COMPRESS_METHOD!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -6921,7 +7037,7 @@ macro_rules! __pgrx_c_args_VARATT_EXTERNAL_SET_SIZE_AND_COMPRESS_METHOD {
     };
     (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_VARATT_EXTERNAL_SET_SIZE_AND_COMPRESS_METHOD!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -6948,35 +7064,35 @@ macro_rules! __pgrx_c_args_VARATT_EXTERNAL_SET_SIZE_AND_COMPRESS_METHOD {
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_VARATT_EXTERNAL_SET_SIZE_AND_COMPRESS_METHOD!(
-            @p2 $mode [$($done)* (@literal [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_VARATT_EXTERNAL_SET_SIZE_AND_COMPRESS_METHOD!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
     (@p2 $mode:ident [$($done:tt)*]; - $argument:literal) => {
         $crate::__pgrx_c_args_VARATT_EXTERNAL_SET_SIZE_AND_COMPRESS_METHOD!(
-            @p3 $mode [$($done)* (@literal [- $argument]),];
+            @p3 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
         )
     };
     (@negative2 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_VARATT_EXTERNAL_SET_SIZE_AND_COMPRESS_METHOD!(
-            @p3 $mode [$($done)* (@native [$argument]),];
+            @p3 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p2 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_VARATT_EXTERNAL_SET_SIZE_AND_COMPRESS_METHOD!(
-            @p3 $mode [$($done)* (@literal [- $argument]),];
+            @p3 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative2 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_VARATT_EXTERNAL_SET_SIZE_AND_COMPRESS_METHOD!(
-            @p3 $mode [$($done)* (@native [$argument]),];
+            @p3 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -6988,7 +7104,7 @@ macro_rules! __pgrx_c_args_VARATT_EXTERNAL_SET_SIZE_AND_COMPRESS_METHOD {
     };
     (@p2 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
         $crate::__pgrx_c_args_VARATT_EXTERNAL_SET_SIZE_AND_COMPRESS_METHOD!(
-            @p3 $mode [$($done)* (@native [$argument]),];
+            @p3 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p2 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
@@ -7014,17 +7130,17 @@ macro_rules! __pgrx_c_args_VARATT_EXTERNAL_SET_SIZE_AND_COMPRESS_METHOD {
     };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_VARATT_EXTERNAL_SET_SIZE_AND_COMPRESS_METHOD!(
-            @p3 $mode [$($done)* (@literal [$argument]),];
+            @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
         )
     };
     (@p2 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_VARATT_EXTERNAL_SET_SIZE_AND_COMPRESS_METHOD!(
-            @p3 $mode [$($done)* (@native [$argument]),];
+            @p3 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p2 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_VARATT_EXTERNAL_SET_SIZE_AND_COMPRESS_METHOD!(
-            @p3 $mode [$($done)* (@native [$argument]),];
+            @p3 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -7051,13 +7167,13 @@ macro_rules! __pgrx_c_args_VARATT_EXTERNAL_SET_SIZE_AND_COMPRESS_METHOD {
     };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_VARATT_EXTERNAL_SET_SIZE_AND_COMPRESS_METHOD!(
-            @p3 $mode [$($done)* (@literal [$argument]),];
+            @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p2 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_VARATT_EXTERNAL_SET_SIZE_AND_COMPRESS_METHOD!(
-            @p3 $mode [$($done)* (@native [$argument]),];
+            @p3 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -7145,7 +7261,7 @@ macro_rules! VARATT_EXTERNAL_SET_SIZE_AND_COMPRESS_METHOD {
                                                 _
                                             >(
                                                 $crate::__pgrx_c_macros::expression::cast_as::<
-                                                    $crate::uint32,
+                                                    $crate::__pgrx_c_bindings::uint32,
                                                     $crate::__pgrx_c_macros::CUnsignedInt,
                                                     _
                                                 >(
@@ -7168,7 +7284,9 @@ macro_rules! VARATT_EXTERNAL_SET_SIZE_AND_COMPRESS_METHOD {
                                             >(
                                                 $crate::__pgrx_c_macros::CValue::<
                                                     $crate::__pgrx_c_macros::CInt
-                                                >::new($crate::VARLENA_EXTSIZE_BITS as i32)
+                                                >::new(
+                                                    $crate::__pgrx_c_bindings::VARLENA_EXTSIZE_BITS as i32
+                                                )
                                             )
                                         )
                                     )
@@ -7206,8 +7324,8 @@ macro_rules! VARATT_EXTERNAL_SET_SIZE_AND_COMPRESS_METHOD {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -7234,25 +7352,34 @@ macro_rules! __pgrx_c_args_VARATT_IS_1B {
         $crate::__pgrx_c_args_VARATT_IS_1B!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_VARATT_IS_1B!(@p1 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_VARATT_IS_1B!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_VARATT_IS_1B!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_VARATT_IS_1B!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_VARATT_IS_1B!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_VARATT_IS_1B!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_VARATT_IS_1B!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $($raw:tt)*) => {
         $crate::__pgrx_c_args_VARATT_IS_1B!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_VARATT_IS_1B!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_VARATT_IS_1B!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -7274,13 +7401,20 @@ macro_rules! __pgrx_c_args_VARATT_IS_1B {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_VARATT_IS_1B!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_VARATT_IS_1B!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_VARATT_IS_1B!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_VARATT_IS_1B!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
-        $crate::__pgrx_c_args_VARATT_IS_1B!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_VARATT_IS_1B!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
         $crate::__pgrx_c_classify!(
@@ -7303,12 +7437,15 @@ macro_rules! __pgrx_c_args_VARATT_IS_1B {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_VARATT_IS_1B!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_VARATT_IS_1B!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_VARATT_IS_1B!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p1 $mode:ident [$($done:tt)*];) => {
         $crate::VARATT_IS_1B!(@$mode; $($done)*)
@@ -7369,10 +7506,10 @@ macro_rules! VARATT_IS_1B {
                                                         _
                                                     >(
                                                         $crate::__pgrx_c_macros::expression::cast_as::<
-                                                            *mut $crate::varattrib_1b,
+                                                            *mut $crate::__pgrx_c_bindings::varattrib_1b,
                                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                                    $crate::varattrib_1b
+                                                                    $crate::__pgrx_c_bindings::varattrib_1b
                                                                 >,
                                                                 $crate::__pgrx_c_macros::expression::ReadWrite
                                                             >,
@@ -7460,10 +7597,10 @@ macro_rules! VARATT_IS_1B {
                                                                     _
                                                                 >(
                                                                     $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                        *mut $crate::varattrib_1b,
+                                                                        *mut $crate::__pgrx_c_bindings::varattrib_1b,
                                                                         $crate::__pgrx_c_macros::expression::CPointer<
                                                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                $crate::varattrib_1b
+                                                                                $crate::__pgrx_c_bindings::varattrib_1b
                                                                             >,
                                                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                                                         >,
@@ -7536,10 +7673,10 @@ macro_rules! VARATT_IS_1B {
                                                         _
                                                     >(
                                                         $crate::__pgrx_c_macros::expression::cast_as::<
-                                                            *mut $crate::varattrib_1b,
+                                                            *mut $crate::__pgrx_c_bindings::varattrib_1b,
                                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                                    $crate::varattrib_1b
+                                                                    $crate::__pgrx_c_bindings::varattrib_1b
                                                                 >,
                                                                 $crate::__pgrx_c_macros::expression::ReadWrite
                                                             >,
@@ -7589,8 +7726,8 @@ macro_rules! VARATT_IS_1B {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -7617,20 +7754,24 @@ macro_rules! __pgrx_c_args_VARATT_IS_1B_E {
         $crate::__pgrx_c_args_VARATT_IS_1B_E!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_VARATT_IS_1B_E!(@p1 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_VARATT_IS_1B_E!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_VARATT_IS_1B_E!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_VARATT_IS_1B_E!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_VARATT_IS_1B_E!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_VARATT_IS_1B_E!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -7638,7 +7779,9 @@ macro_rules! __pgrx_c_args_VARATT_IS_1B_E {
         $crate::__pgrx_c_args_VARATT_IS_1B_E!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_VARATT_IS_1B_E!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_VARATT_IS_1B_E!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -7660,14 +7803,18 @@ macro_rules! __pgrx_c_args_VARATT_IS_1B_E {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_VARATT_IS_1B_E!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_VARATT_IS_1B_E!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_VARATT_IS_1B_E!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_VARATT_IS_1B_E!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_VARATT_IS_1B_E!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -7694,13 +7841,13 @@ macro_rules! __pgrx_c_args_VARATT_IS_1B_E {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_VARATT_IS_1B_E!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_VARATT_IS_1B_E!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -7761,10 +7908,10 @@ macro_rules! VARATT_IS_1B_E {
                                                 _
                                             >(
                                                 $crate::__pgrx_c_macros::expression::cast_as::<
-                                                    *mut $crate::varattrib_1b,
+                                                    *mut $crate::__pgrx_c_bindings::varattrib_1b,
                                                     $crate::__pgrx_c_macros::expression::CPointer<
                                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                                            $crate::varattrib_1b
+                                                            $crate::__pgrx_c_bindings::varattrib_1b
                                                         >,
                                                         $crate::__pgrx_c_macros::expression::ReadWrite
                                                     >,
@@ -7840,10 +7987,10 @@ macro_rules! VARATT_IS_1B_E {
                                                             _
                                                         >(
                                                             $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                *mut $crate::varattrib_1b,
+                                                                *mut $crate::__pgrx_c_bindings::varattrib_1b,
                                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                                        $crate::varattrib_1b
+                                                                        $crate::__pgrx_c_bindings::varattrib_1b
                                                                     >,
                                                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                                                 >,
@@ -7904,10 +8051,10 @@ macro_rules! VARATT_IS_1B_E {
                                                 _
                                             >(
                                                 $crate::__pgrx_c_macros::expression::cast_as::<
-                                                    *mut $crate::varattrib_1b,
+                                                    *mut $crate::__pgrx_c_bindings::varattrib_1b,
                                                     $crate::__pgrx_c_macros::expression::CPointer<
                                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                                            $crate::varattrib_1b
+                                                            $crate::__pgrx_c_bindings::varattrib_1b
                                                         >,
                                                         $crate::__pgrx_c_macros::expression::ReadWrite
                                                     >,
@@ -7950,8 +8097,8 @@ macro_rules! VARATT_IS_1B_E {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -7978,25 +8125,34 @@ macro_rules! __pgrx_c_args_VARATT_IS_4B {
         $crate::__pgrx_c_args_VARATT_IS_4B!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_VARATT_IS_4B!(@p1 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_VARATT_IS_4B!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_VARATT_IS_4B!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_VARATT_IS_4B!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_VARATT_IS_4B!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_VARATT_IS_4B!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_VARATT_IS_4B!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $($raw:tt)*) => {
         $crate::__pgrx_c_args_VARATT_IS_4B!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_VARATT_IS_4B!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_VARATT_IS_4B!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -8018,13 +8174,20 @@ macro_rules! __pgrx_c_args_VARATT_IS_4B {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_VARATT_IS_4B!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_VARATT_IS_4B!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_VARATT_IS_4B!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_VARATT_IS_4B!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
-        $crate::__pgrx_c_args_VARATT_IS_4B!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_VARATT_IS_4B!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
         $crate::__pgrx_c_classify!(
@@ -8047,12 +8210,15 @@ macro_rules! __pgrx_c_args_VARATT_IS_4B {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_VARATT_IS_4B!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_VARATT_IS_4B!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_VARATT_IS_4B!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p1 $mode:ident [$($done:tt)*];) => {
         $crate::VARATT_IS_4B!(@$mode; $($done)*)
@@ -8113,10 +8279,10 @@ macro_rules! VARATT_IS_4B {
                                                         _
                                                     >(
                                                         $crate::__pgrx_c_macros::expression::cast_as::<
-                                                            *mut $crate::varattrib_1b,
+                                                            *mut $crate::__pgrx_c_bindings::varattrib_1b,
                                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                                    $crate::varattrib_1b
+                                                                    $crate::__pgrx_c_bindings::varattrib_1b
                                                                 >,
                                                                 $crate::__pgrx_c_macros::expression::ReadWrite
                                                             >,
@@ -8206,10 +8372,10 @@ macro_rules! VARATT_IS_4B {
                                                                     _
                                                                 >(
                                                                     $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                        *mut $crate::varattrib_1b,
+                                                                        *mut $crate::__pgrx_c_bindings::varattrib_1b,
                                                                         $crate::__pgrx_c_macros::expression::CPointer<
                                                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                $crate::varattrib_1b
+                                                                                $crate::__pgrx_c_bindings::varattrib_1b
                                                                             >,
                                                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                                                         >,
@@ -8284,10 +8450,10 @@ macro_rules! VARATT_IS_4B {
                                                         _
                                                     >(
                                                         $crate::__pgrx_c_macros::expression::cast_as::<
-                                                            *mut $crate::varattrib_1b,
+                                                            *mut $crate::__pgrx_c_bindings::varattrib_1b,
                                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                                    $crate::varattrib_1b
+                                                                    $crate::__pgrx_c_bindings::varattrib_1b
                                                                 >,
                                                                 $crate::__pgrx_c_macros::expression::ReadWrite
                                                             >,
@@ -8339,8 +8505,8 @@ macro_rules! VARATT_IS_4B {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -8367,20 +8533,24 @@ macro_rules! __pgrx_c_args_VARATT_IS_4B_C {
         $crate::__pgrx_c_args_VARATT_IS_4B_C!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_VARATT_IS_4B_C!(@p1 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_VARATT_IS_4B_C!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_VARATT_IS_4B_C!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_VARATT_IS_4B_C!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_VARATT_IS_4B_C!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_VARATT_IS_4B_C!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -8388,7 +8558,9 @@ macro_rules! __pgrx_c_args_VARATT_IS_4B_C {
         $crate::__pgrx_c_args_VARATT_IS_4B_C!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_VARATT_IS_4B_C!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_VARATT_IS_4B_C!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -8410,14 +8582,18 @@ macro_rules! __pgrx_c_args_VARATT_IS_4B_C {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_VARATT_IS_4B_C!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_VARATT_IS_4B_C!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_VARATT_IS_4B_C!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_VARATT_IS_4B_C!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_VARATT_IS_4B_C!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -8444,13 +8620,13 @@ macro_rules! __pgrx_c_args_VARATT_IS_4B_C {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_VARATT_IS_4B_C!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_VARATT_IS_4B_C!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -8513,10 +8689,10 @@ macro_rules! VARATT_IS_4B_C {
                                                         _
                                                     >(
                                                         $crate::__pgrx_c_macros::expression::cast_as::<
-                                                            *mut $crate::varattrib_1b,
+                                                            *mut $crate::__pgrx_c_bindings::varattrib_1b,
                                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                                    $crate::varattrib_1b
+                                                                    $crate::__pgrx_c_bindings::varattrib_1b
                                                                 >,
                                                                 $crate::__pgrx_c_macros::expression::ReadWrite
                                                             >,
@@ -8604,10 +8780,10 @@ macro_rules! VARATT_IS_4B_C {
                                                                     _
                                                                 >(
                                                                     $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                        *mut $crate::varattrib_1b,
+                                                                        *mut $crate::__pgrx_c_bindings::varattrib_1b,
                                                                         $crate::__pgrx_c_macros::expression::CPointer<
                                                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                $crate::varattrib_1b
+                                                                                $crate::__pgrx_c_bindings::varattrib_1b
                                                                             >,
                                                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                                                         >,
@@ -8680,10 +8856,10 @@ macro_rules! VARATT_IS_4B_C {
                                                         _
                                                     >(
                                                         $crate::__pgrx_c_macros::expression::cast_as::<
-                                                            *mut $crate::varattrib_1b,
+                                                            *mut $crate::__pgrx_c_bindings::varattrib_1b,
                                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                                    $crate::varattrib_1b
+                                                                    $crate::__pgrx_c_bindings::varattrib_1b
                                                                 >,
                                                                 $crate::__pgrx_c_macros::expression::ReadWrite
                                                             >,
@@ -8733,8 +8909,8 @@ macro_rules! VARATT_IS_4B_C {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -8761,20 +8937,24 @@ macro_rules! __pgrx_c_args_VARATT_IS_4B_U {
         $crate::__pgrx_c_args_VARATT_IS_4B_U!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_VARATT_IS_4B_U!(@p1 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_VARATT_IS_4B_U!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_VARATT_IS_4B_U!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_VARATT_IS_4B_U!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_VARATT_IS_4B_U!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_VARATT_IS_4B_U!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -8782,7 +8962,9 @@ macro_rules! __pgrx_c_args_VARATT_IS_4B_U {
         $crate::__pgrx_c_args_VARATT_IS_4B_U!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_VARATT_IS_4B_U!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_VARATT_IS_4B_U!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -8804,14 +8986,18 @@ macro_rules! __pgrx_c_args_VARATT_IS_4B_U {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_VARATT_IS_4B_U!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_VARATT_IS_4B_U!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_VARATT_IS_4B_U!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_VARATT_IS_4B_U!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_VARATT_IS_4B_U!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -8838,13 +9024,13 @@ macro_rules! __pgrx_c_args_VARATT_IS_4B_U {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_VARATT_IS_4B_U!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_VARATT_IS_4B_U!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -8907,10 +9093,10 @@ macro_rules! VARATT_IS_4B_U {
                                                         _
                                                     >(
                                                         $crate::__pgrx_c_macros::expression::cast_as::<
-                                                            *mut $crate::varattrib_1b,
+                                                            *mut $crate::__pgrx_c_bindings::varattrib_1b,
                                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                                    $crate::varattrib_1b
+                                                                    $crate::__pgrx_c_bindings::varattrib_1b
                                                                 >,
                                                                 $crate::__pgrx_c_macros::expression::ReadWrite
                                                             >,
@@ -9000,10 +9186,10 @@ macro_rules! VARATT_IS_4B_U {
                                                                     _
                                                                 >(
                                                                     $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                        *mut $crate::varattrib_1b,
+                                                                        *mut $crate::__pgrx_c_bindings::varattrib_1b,
                                                                         $crate::__pgrx_c_macros::expression::CPointer<
                                                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                $crate::varattrib_1b
+                                                                                $crate::__pgrx_c_bindings::varattrib_1b
                                                                             >,
                                                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                                                         >,
@@ -9078,10 +9264,10 @@ macro_rules! VARATT_IS_4B_U {
                                                         _
                                                     >(
                                                         $crate::__pgrx_c_macros::expression::cast_as::<
-                                                            *mut $crate::varattrib_1b,
+                                                            *mut $crate::__pgrx_c_bindings::varattrib_1b,
                                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                                    $crate::varattrib_1b
+                                                                    $crate::__pgrx_c_bindings::varattrib_1b
                                                                 >,
                                                                 $crate::__pgrx_c_macros::expression::ReadWrite
                                                             >,
@@ -9133,8 +9319,8 @@ macro_rules! VARATT_IS_4B_U {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -9165,21 +9351,23 @@ macro_rules! __pgrx_c_args_VARATT_IS_COMPRESSED {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
         $crate::__pgrx_c_args_VARATT_IS_COMPRESSED!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_VARATT_IS_COMPRESSED!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_VARATT_IS_COMPRESSED!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_VARATT_IS_COMPRESSED!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_VARATT_IS_COMPRESSED!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -9187,7 +9375,9 @@ macro_rules! __pgrx_c_args_VARATT_IS_COMPRESSED {
         $crate::__pgrx_c_args_VARATT_IS_COMPRESSED!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_VARATT_IS_COMPRESSED!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_VARATT_IS_COMPRESSED!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -9209,14 +9399,18 @@ macro_rules! __pgrx_c_args_VARATT_IS_COMPRESSED {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_VARATT_IS_COMPRESSED!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_VARATT_IS_COMPRESSED!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_VARATT_IS_COMPRESSED!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_VARATT_IS_COMPRESSED!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_VARATT_IS_COMPRESSED!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -9243,13 +9437,13 @@ macro_rules! __pgrx_c_args_VARATT_IS_COMPRESSED {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_VARATT_IS_COMPRESSED!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_VARATT_IS_COMPRESSED!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -9313,10 +9507,10 @@ macro_rules! VARATT_IS_COMPRESSED {
                                                         _
                                                     >(
                                                         $crate::__pgrx_c_macros::expression::cast_as::<
-                                                            *mut $crate::varattrib_1b,
+                                                            *mut $crate::__pgrx_c_bindings::varattrib_1b,
                                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                                    $crate::varattrib_1b
+                                                                    $crate::__pgrx_c_bindings::varattrib_1b
                                                                 >,
                                                                 $crate::__pgrx_c_macros::expression::ReadWrite
                                                             >,
@@ -9405,10 +9599,10 @@ macro_rules! VARATT_IS_COMPRESSED {
                                                                     _
                                                                 >(
                                                                     $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                        *mut $crate::varattrib_1b,
+                                                                        *mut $crate::__pgrx_c_bindings::varattrib_1b,
                                                                         $crate::__pgrx_c_macros::expression::CPointer<
                                                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                $crate::varattrib_1b
+                                                                                $crate::__pgrx_c_bindings::varattrib_1b
                                                                             >,
                                                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                                                         >,
@@ -9482,10 +9676,10 @@ macro_rules! VARATT_IS_COMPRESSED {
                                                         _
                                                     >(
                                                         $crate::__pgrx_c_macros::expression::cast_as::<
-                                                            *mut $crate::varattrib_1b,
+                                                            *mut $crate::__pgrx_c_bindings::varattrib_1b,
                                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                                    $crate::varattrib_1b
+                                                                    $crate::__pgrx_c_bindings::varattrib_1b
                                                                 >,
                                                                 $crate::__pgrx_c_macros::expression::ReadWrite
                                                             >,
@@ -9535,8 +9729,8 @@ macro_rules! VARATT_IS_COMPRESSED {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -9563,20 +9757,24 @@ macro_rules! __pgrx_c_args_VARATT_IS_EXTENDED {
         $crate::__pgrx_c_args_VARATT_IS_EXTENDED!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_VARATT_IS_EXTENDED!(@p1 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_VARATT_IS_EXTENDED!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_VARATT_IS_EXTENDED!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_VARATT_IS_EXTENDED!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_VARATT_IS_EXTENDED!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_VARATT_IS_EXTENDED!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -9584,7 +9782,9 @@ macro_rules! __pgrx_c_args_VARATT_IS_EXTENDED {
         $crate::__pgrx_c_args_VARATT_IS_EXTENDED!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_VARATT_IS_EXTENDED!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_VARATT_IS_EXTENDED!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -9606,14 +9806,18 @@ macro_rules! __pgrx_c_args_VARATT_IS_EXTENDED {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_VARATT_IS_EXTENDED!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_VARATT_IS_EXTENDED!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_VARATT_IS_EXTENDED!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_VARATT_IS_EXTENDED!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_VARATT_IS_EXTENDED!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -9640,13 +9844,13 @@ macro_rules! __pgrx_c_args_VARATT_IS_EXTENDED {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_VARATT_IS_EXTENDED!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_VARATT_IS_EXTENDED!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -9716,10 +9920,10 @@ macro_rules! VARATT_IS_EXTENDED {
                                                                     _
                                                                 >(
                                                                     $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                        *mut $crate::varattrib_1b,
+                                                                        *mut $crate::__pgrx_c_bindings::varattrib_1b,
                                                                         $crate::__pgrx_c_macros::expression::CPointer<
                                                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                $crate::varattrib_1b
+                                                                                $crate::__pgrx_c_bindings::varattrib_1b
                                                                             >,
                                                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                                                         >,
@@ -9822,10 +10026,10 @@ macro_rules! VARATT_IS_EXTENDED {
                                                                                 _
                                                                             >(
                                                                                 $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                                    *mut $crate::varattrib_1b,
+                                                                                    *mut $crate::__pgrx_c_bindings::varattrib_1b,
                                                                                     $crate::__pgrx_c_macros::expression::CPointer<
                                                                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                            $crate::varattrib_1b
+                                                                                            $crate::__pgrx_c_bindings::varattrib_1b
                                                                                         >,
                                                                                         $crate::__pgrx_c_macros::expression::ReadWrite
                                                                                     >,
@@ -9915,10 +10119,10 @@ macro_rules! VARATT_IS_EXTENDED {
                                                                     _
                                                                 >(
                                                                     $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                        *mut $crate::varattrib_1b,
+                                                                        *mut $crate::__pgrx_c_bindings::varattrib_1b,
                                                                         $crate::__pgrx_c_macros::expression::CPointer<
                                                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                $crate::varattrib_1b
+                                                                                $crate::__pgrx_c_bindings::varattrib_1b
                                                                             >,
                                                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                                                         >,
@@ -9976,8 +10180,8 @@ macro_rules! VARATT_IS_EXTENDED {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -10004,20 +10208,24 @@ macro_rules! __pgrx_c_args_VARATT_IS_EXTERNAL {
         $crate::__pgrx_c_args_VARATT_IS_EXTERNAL!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_VARATT_IS_EXTERNAL!(@p1 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_VARATT_IS_EXTERNAL!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_VARATT_IS_EXTERNAL!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_VARATT_IS_EXTERNAL!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_VARATT_IS_EXTERNAL!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_VARATT_IS_EXTERNAL!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -10025,7 +10233,9 @@ macro_rules! __pgrx_c_args_VARATT_IS_EXTERNAL {
         $crate::__pgrx_c_args_VARATT_IS_EXTERNAL!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_VARATT_IS_EXTERNAL!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_VARATT_IS_EXTERNAL!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -10047,14 +10257,18 @@ macro_rules! __pgrx_c_args_VARATT_IS_EXTERNAL {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_VARATT_IS_EXTERNAL!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_VARATT_IS_EXTERNAL!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_VARATT_IS_EXTERNAL!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_VARATT_IS_EXTERNAL!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_VARATT_IS_EXTERNAL!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -10081,13 +10295,13 @@ macro_rules! __pgrx_c_args_VARATT_IS_EXTERNAL {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_VARATT_IS_EXTERNAL!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_VARATT_IS_EXTERNAL!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -10149,10 +10363,10 @@ macro_rules! VARATT_IS_EXTERNAL {
                                                 _
                                             >(
                                                 $crate::__pgrx_c_macros::expression::cast_as::<
-                                                    *mut $crate::varattrib_1b,
+                                                    *mut $crate::__pgrx_c_bindings::varattrib_1b,
                                                     $crate::__pgrx_c_macros::expression::CPointer<
                                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                                            $crate::varattrib_1b
+                                                            $crate::__pgrx_c_bindings::varattrib_1b
                                                         >,
                                                         $crate::__pgrx_c_macros::expression::ReadWrite
                                                     >,
@@ -10229,10 +10443,10 @@ macro_rules! VARATT_IS_EXTERNAL {
                                                             _
                                                         >(
                                                             $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                *mut $crate::varattrib_1b,
+                                                                *mut $crate::__pgrx_c_bindings::varattrib_1b,
                                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                                        $crate::varattrib_1b
+                                                                        $crate::__pgrx_c_bindings::varattrib_1b
                                                                     >,
                                                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                                                 >,
@@ -10294,10 +10508,10 @@ macro_rules! VARATT_IS_EXTERNAL {
                                                 _
                                             >(
                                                 $crate::__pgrx_c_macros::expression::cast_as::<
-                                                    *mut $crate::varattrib_1b,
+                                                    *mut $crate::__pgrx_c_bindings::varattrib_1b,
                                                     $crate::__pgrx_c_macros::expression::CPointer<
                                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                                            $crate::varattrib_1b
+                                                            $crate::__pgrx_c_bindings::varattrib_1b
                                                         >,
                                                         $crate::__pgrx_c_macros::expression::ReadWrite
                                                     >,
@@ -10340,8 +10554,8 @@ macro_rules! VARATT_IS_EXTERNAL {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -10372,23 +10586,23 @@ macro_rules! __pgrx_c_args_VARATT_IS_EXTERNAL_EXPANDED {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
         $crate::__pgrx_c_args_VARATT_IS_EXTERNAL_EXPANDED!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_VARATT_IS_EXTERNAL_EXPANDED!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_VARATT_IS_EXTERNAL_EXPANDED!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_VARATT_IS_EXTERNAL_EXPANDED!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -10397,7 +10611,7 @@ macro_rules! __pgrx_c_args_VARATT_IS_EXTERNAL_EXPANDED {
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
         $crate::__pgrx_c_args_VARATT_IS_EXTERNAL_EXPANDED!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
@@ -10423,17 +10637,17 @@ macro_rules! __pgrx_c_args_VARATT_IS_EXTERNAL_EXPANDED {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_VARATT_IS_EXTERNAL_EXPANDED!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_VARATT_IS_EXTERNAL_EXPANDED!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_VARATT_IS_EXTERNAL_EXPANDED!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -10460,13 +10674,13 @@ macro_rules! __pgrx_c_args_VARATT_IS_EXTERNAL_EXPANDED {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_VARATT_IS_EXTERNAL_EXPANDED!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_VARATT_IS_EXTERNAL_EXPANDED!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -10538,10 +10752,10 @@ macro_rules! VARATT_IS_EXTERNAL_EXPANDED {
                                                                 _
                                                             >(
                                                                 $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                    *mut $crate::varattrib_1b,
+                                                                    *mut $crate::__pgrx_c_bindings::varattrib_1b,
                                                                     $crate::__pgrx_c_macros::expression::CPointer<
                                                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                                                            $crate::varattrib_1b
+                                                                            $crate::__pgrx_c_bindings::varattrib_1b
                                                                         >,
                                                                         $crate::__pgrx_c_macros::expression::ReadWrite
                                                                     >,
@@ -10603,10 +10817,10 @@ macro_rules! VARATT_IS_EXTERNAL_EXPANDED {
                                                                                 _
                                                                             >(
                                                                                 $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                                    *mut $crate::varattrib_1b_e,
+                                                                                    *mut $crate::__pgrx_c_bindings::varattrib_1b_e,
                                                                                     $crate::__pgrx_c_macros::expression::CPointer<
                                                                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                            $crate::varattrib_1b_e
+                                                                                            $crate::__pgrx_c_bindings::varattrib_1b_e
                                                                                         >,
                                                                                         $crate::__pgrx_c_macros::expression::ReadWrite
                                                                                     >,
@@ -10655,7 +10869,9 @@ macro_rules! VARATT_IS_EXTERNAL_EXPANDED {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::CValue::<
                                             $crate::__pgrx_c_macros::CInt
-                                        >::new($crate::vartag_external::VARTAG_EXPANDED_RO as i32)
+                                        >::new(
+                                            $crate::__pgrx_c_bindings::vartag_external::VARTAG_EXPANDED_RO as i32
+                                        )
                                     )
                                 )
                             )
@@ -10725,10 +10941,10 @@ macro_rules! VARATT_IS_EXTERNAL_EXPANDED {
                                                                             _
                                                                         >(
                                                                             $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                                *mut $crate::varattrib_1b,
+                                                                                *mut $crate::__pgrx_c_bindings::varattrib_1b,
                                                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                        $crate::varattrib_1b
+                                                                                        $crate::__pgrx_c_bindings::varattrib_1b
                                                                                     >,
                                                                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                                                                 >,
@@ -10798,10 +11014,10 @@ macro_rules! VARATT_IS_EXTERNAL_EXPANDED {
                                                                                             _
                                                                                         >(
                                                                                             $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                                                *mut $crate::varattrib_1b_e,
+                                                                                                *mut $crate::__pgrx_c_bindings::varattrib_1b_e,
                                                                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                        $crate::varattrib_1b_e
+                                                                                                        $crate::__pgrx_c_bindings::varattrib_1b_e
                                                                                                     >,
                                                                                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                                                                                 >,
@@ -10854,7 +11070,7 @@ macro_rules! VARATT_IS_EXTERNAL_EXPANDED {
                                                     $crate::__pgrx_c_macros::CValue::<
                                                         $crate::__pgrx_c_macros::CInt
                                                     >::new(
-                                                        $crate::vartag_external::VARTAG_EXPANDED_RO as i32
+                                                        $crate::__pgrx_c_bindings::vartag_external::VARTAG_EXPANDED_RO as i32
                                                     )
                                                 )
                                             )
@@ -10904,10 +11120,10 @@ macro_rules! VARATT_IS_EXTERNAL_EXPANDED {
                                                                 _
                                                             >(
                                                                 $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                    *mut $crate::varattrib_1b,
+                                                                    *mut $crate::__pgrx_c_bindings::varattrib_1b,
                                                                     $crate::__pgrx_c_macros::expression::CPointer<
                                                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                                                            $crate::varattrib_1b
+                                                                            $crate::__pgrx_c_bindings::varattrib_1b
                                                                         >,
                                                                         $crate::__pgrx_c_macros::expression::ReadWrite
                                                                     >,
@@ -10969,10 +11185,10 @@ macro_rules! VARATT_IS_EXTERNAL_EXPANDED {
                                                                                 _
                                                                             >(
                                                                                 $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                                    *mut $crate::varattrib_1b_e,
+                                                                                    *mut $crate::__pgrx_c_bindings::varattrib_1b_e,
                                                                                     $crate::__pgrx_c_macros::expression::CPointer<
                                                                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                            $crate::varattrib_1b_e
+                                                                                            $crate::__pgrx_c_bindings::varattrib_1b_e
                                                                                         >,
                                                                                         $crate::__pgrx_c_macros::expression::ReadWrite
                                                                                     >,
@@ -11021,7 +11237,9 @@ macro_rules! VARATT_IS_EXTERNAL_EXPANDED {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::CValue::<
                                             $crate::__pgrx_c_macros::CInt
-                                        >::new($crate::vartag_external::VARTAG_EXPANDED_RO as i32)
+                                        >::new(
+                                            $crate::__pgrx_c_bindings::vartag_external::VARTAG_EXPANDED_RO as i32
+                                        )
                                     )
                                 )
                             )
@@ -11047,8 +11265,8 @@ macro_rules! VARATT_IS_EXTERNAL_EXPANDED {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -11079,23 +11297,23 @@ macro_rules! __pgrx_c_args_VARATT_IS_EXTERNAL_EXPANDED_RO {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
         $crate::__pgrx_c_args_VARATT_IS_EXTERNAL_EXPANDED_RO!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_VARATT_IS_EXTERNAL_EXPANDED_RO!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_VARATT_IS_EXTERNAL_EXPANDED_RO!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_VARATT_IS_EXTERNAL_EXPANDED_RO!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -11107,7 +11325,7 @@ macro_rules! __pgrx_c_args_VARATT_IS_EXTERNAL_EXPANDED_RO {
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
         $crate::__pgrx_c_args_VARATT_IS_EXTERNAL_EXPANDED_RO!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
@@ -11133,17 +11351,17 @@ macro_rules! __pgrx_c_args_VARATT_IS_EXTERNAL_EXPANDED_RO {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_VARATT_IS_EXTERNAL_EXPANDED_RO!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_VARATT_IS_EXTERNAL_EXPANDED_RO!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_VARATT_IS_EXTERNAL_EXPANDED_RO!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -11170,13 +11388,13 @@ macro_rules! __pgrx_c_args_VARATT_IS_EXTERNAL_EXPANDED_RO {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_VARATT_IS_EXTERNAL_EXPANDED_RO!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_VARATT_IS_EXTERNAL_EXPANDED_RO!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -11248,10 +11466,10 @@ macro_rules! VARATT_IS_EXTERNAL_EXPANDED_RO {
                                                                 _
                                                             >(
                                                                 $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                    *mut $crate::varattrib_1b,
+                                                                    *mut $crate::__pgrx_c_bindings::varattrib_1b,
                                                                     $crate::__pgrx_c_macros::expression::CPointer<
                                                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                                                            $crate::varattrib_1b
+                                                                            $crate::__pgrx_c_bindings::varattrib_1b
                                                                         >,
                                                                         $crate::__pgrx_c_macros::expression::ReadWrite
                                                                     >,
@@ -11302,10 +11520,10 @@ macro_rules! VARATT_IS_EXTERNAL_EXPANDED_RO {
                                                             _
                                                         >(
                                                             $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                *mut $crate::varattrib_1b_e,
+                                                                *mut $crate::__pgrx_c_bindings::varattrib_1b_e,
                                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                                        $crate::varattrib_1b_e
+                                                                        $crate::__pgrx_c_bindings::varattrib_1b_e
                                                                     >,
                                                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                                                 >,
@@ -11332,7 +11550,7 @@ macro_rules! VARATT_IS_EXTERNAL_EXPANDED_RO {
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                        $crate::vartag_external::VARTAG_EXPANDED_RO as i32
+                                        $crate::__pgrx_c_bindings::vartag_external::VARTAG_EXPANDED_RO as i32
                                     )
                                 )
                             )
@@ -11408,10 +11626,10 @@ macro_rules! VARATT_IS_EXTERNAL_EXPANDED_RO {
                                                                             _
                                                                         >(
                                                                             $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                                *mut $crate::varattrib_1b,
+                                                                                *mut $crate::__pgrx_c_bindings::varattrib_1b,
                                                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                        $crate::varattrib_1b
+                                                                                        $crate::__pgrx_c_bindings::varattrib_1b
                                                                                     >,
                                                                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                                                                 >,
@@ -11470,10 +11688,10 @@ macro_rules! VARATT_IS_EXTERNAL_EXPANDED_RO {
                                                                         _
                                                                     >(
                                                                         $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                            *mut $crate::varattrib_1b_e,
+                                                                            *mut $crate::__pgrx_c_bindings::varattrib_1b_e,
                                                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                    $crate::varattrib_1b_e
+                                                                                    $crate::__pgrx_c_bindings::varattrib_1b_e
                                                                                 >,
                                                                                 $crate::__pgrx_c_macros::expression::ReadWrite
                                                                             >,
@@ -11507,7 +11725,7 @@ macro_rules! VARATT_IS_EXTERNAL_EXPANDED_RO {
                                                 $crate::__pgrx_c_macros::CValue::<
                                                     $crate::__pgrx_c_macros::CInt
                                                 >::new(
-                                                    $crate::vartag_external::VARTAG_EXPANDED_RO as i32
+                                                    $crate::__pgrx_c_bindings::vartag_external::VARTAG_EXPANDED_RO as i32
                                                 )
                                             )
                                         )
@@ -11559,10 +11777,10 @@ macro_rules! VARATT_IS_EXTERNAL_EXPANDED_RO {
                                                                 _
                                                             >(
                                                                 $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                    *mut $crate::varattrib_1b,
+                                                                    *mut $crate::__pgrx_c_bindings::varattrib_1b,
                                                                     $crate::__pgrx_c_macros::expression::CPointer<
                                                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                                                            $crate::varattrib_1b
+                                                                            $crate::__pgrx_c_bindings::varattrib_1b
                                                                         >,
                                                                         $crate::__pgrx_c_macros::expression::ReadWrite
                                                                     >,
@@ -11613,10 +11831,10 @@ macro_rules! VARATT_IS_EXTERNAL_EXPANDED_RO {
                                                             _
                                                         >(
                                                             $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                *mut $crate::varattrib_1b_e,
+                                                                *mut $crate::__pgrx_c_bindings::varattrib_1b_e,
                                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                                        $crate::varattrib_1b_e
+                                                                        $crate::__pgrx_c_bindings::varattrib_1b_e
                                                                     >,
                                                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                                                 >,
@@ -11643,7 +11861,7 @@ macro_rules! VARATT_IS_EXTERNAL_EXPANDED_RO {
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                        $crate::vartag_external::VARTAG_EXPANDED_RO as i32
+                                        $crate::__pgrx_c_bindings::vartag_external::VARTAG_EXPANDED_RO as i32
                                     )
                                 )
                             )
@@ -11672,8 +11890,8 @@ macro_rules! VARATT_IS_EXTERNAL_EXPANDED_RO {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -11704,23 +11922,23 @@ macro_rules! __pgrx_c_args_VARATT_IS_EXTERNAL_EXPANDED_RW {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
         $crate::__pgrx_c_args_VARATT_IS_EXTERNAL_EXPANDED_RW!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_VARATT_IS_EXTERNAL_EXPANDED_RW!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_VARATT_IS_EXTERNAL_EXPANDED_RW!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_VARATT_IS_EXTERNAL_EXPANDED_RW!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -11732,7 +11950,7 @@ macro_rules! __pgrx_c_args_VARATT_IS_EXTERNAL_EXPANDED_RW {
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
         $crate::__pgrx_c_args_VARATT_IS_EXTERNAL_EXPANDED_RW!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
@@ -11758,17 +11976,17 @@ macro_rules! __pgrx_c_args_VARATT_IS_EXTERNAL_EXPANDED_RW {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_VARATT_IS_EXTERNAL_EXPANDED_RW!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_VARATT_IS_EXTERNAL_EXPANDED_RW!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_VARATT_IS_EXTERNAL_EXPANDED_RW!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -11795,13 +12013,13 @@ macro_rules! __pgrx_c_args_VARATT_IS_EXTERNAL_EXPANDED_RW {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_VARATT_IS_EXTERNAL_EXPANDED_RW!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_VARATT_IS_EXTERNAL_EXPANDED_RW!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -11873,10 +12091,10 @@ macro_rules! VARATT_IS_EXTERNAL_EXPANDED_RW {
                                                                 _
                                                             >(
                                                                 $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                    *mut $crate::varattrib_1b,
+                                                                    *mut $crate::__pgrx_c_bindings::varattrib_1b,
                                                                     $crate::__pgrx_c_macros::expression::CPointer<
                                                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                                                            $crate::varattrib_1b
+                                                                            $crate::__pgrx_c_bindings::varattrib_1b
                                                                         >,
                                                                         $crate::__pgrx_c_macros::expression::ReadWrite
                                                                     >,
@@ -11927,10 +12145,10 @@ macro_rules! VARATT_IS_EXTERNAL_EXPANDED_RW {
                                                             _
                                                         >(
                                                             $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                *mut $crate::varattrib_1b_e,
+                                                                *mut $crate::__pgrx_c_bindings::varattrib_1b_e,
                                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                                        $crate::varattrib_1b_e
+                                                                        $crate::__pgrx_c_bindings::varattrib_1b_e
                                                                     >,
                                                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                                                 >,
@@ -11957,7 +12175,7 @@ macro_rules! VARATT_IS_EXTERNAL_EXPANDED_RW {
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                        $crate::vartag_external::VARTAG_EXPANDED_RW as i32
+                                        $crate::__pgrx_c_bindings::vartag_external::VARTAG_EXPANDED_RW as i32
                                     )
                                 )
                             )
@@ -12033,10 +12251,10 @@ macro_rules! VARATT_IS_EXTERNAL_EXPANDED_RW {
                                                                             _
                                                                         >(
                                                                             $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                                *mut $crate::varattrib_1b,
+                                                                                *mut $crate::__pgrx_c_bindings::varattrib_1b,
                                                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                        $crate::varattrib_1b
+                                                                                        $crate::__pgrx_c_bindings::varattrib_1b
                                                                                     >,
                                                                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                                                                 >,
@@ -12095,10 +12313,10 @@ macro_rules! VARATT_IS_EXTERNAL_EXPANDED_RW {
                                                                         _
                                                                     >(
                                                                         $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                            *mut $crate::varattrib_1b_e,
+                                                                            *mut $crate::__pgrx_c_bindings::varattrib_1b_e,
                                                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                    $crate::varattrib_1b_e
+                                                                                    $crate::__pgrx_c_bindings::varattrib_1b_e
                                                                                 >,
                                                                                 $crate::__pgrx_c_macros::expression::ReadWrite
                                                                             >,
@@ -12132,7 +12350,7 @@ macro_rules! VARATT_IS_EXTERNAL_EXPANDED_RW {
                                                 $crate::__pgrx_c_macros::CValue::<
                                                     $crate::__pgrx_c_macros::CInt
                                                 >::new(
-                                                    $crate::vartag_external::VARTAG_EXPANDED_RW as i32
+                                                    $crate::__pgrx_c_bindings::vartag_external::VARTAG_EXPANDED_RW as i32
                                                 )
                                             )
                                         )
@@ -12184,10 +12402,10 @@ macro_rules! VARATT_IS_EXTERNAL_EXPANDED_RW {
                                                                 _
                                                             >(
                                                                 $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                    *mut $crate::varattrib_1b,
+                                                                    *mut $crate::__pgrx_c_bindings::varattrib_1b,
                                                                     $crate::__pgrx_c_macros::expression::CPointer<
                                                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                                                            $crate::varattrib_1b
+                                                                            $crate::__pgrx_c_bindings::varattrib_1b
                                                                         >,
                                                                         $crate::__pgrx_c_macros::expression::ReadWrite
                                                                     >,
@@ -12238,10 +12456,10 @@ macro_rules! VARATT_IS_EXTERNAL_EXPANDED_RW {
                                                             _
                                                         >(
                                                             $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                *mut $crate::varattrib_1b_e,
+                                                                *mut $crate::__pgrx_c_bindings::varattrib_1b_e,
                                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                                        $crate::varattrib_1b_e
+                                                                        $crate::__pgrx_c_bindings::varattrib_1b_e
                                                                     >,
                                                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                                                 >,
@@ -12268,7 +12486,7 @@ macro_rules! VARATT_IS_EXTERNAL_EXPANDED_RW {
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                        $crate::vartag_external::VARTAG_EXPANDED_RW as i32
+                                        $crate::__pgrx_c_bindings::vartag_external::VARTAG_EXPANDED_RW as i32
                                     )
                                 )
                             )
@@ -12297,8 +12515,8 @@ macro_rules! VARATT_IS_EXTERNAL_EXPANDED_RW {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -12329,23 +12547,23 @@ macro_rules! __pgrx_c_args_VARATT_IS_EXTERNAL_INDIRECT {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
         $crate::__pgrx_c_args_VARATT_IS_EXTERNAL_INDIRECT!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_VARATT_IS_EXTERNAL_INDIRECT!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_VARATT_IS_EXTERNAL_INDIRECT!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_VARATT_IS_EXTERNAL_INDIRECT!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -12354,7 +12572,7 @@ macro_rules! __pgrx_c_args_VARATT_IS_EXTERNAL_INDIRECT {
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
         $crate::__pgrx_c_args_VARATT_IS_EXTERNAL_INDIRECT!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
@@ -12380,17 +12598,17 @@ macro_rules! __pgrx_c_args_VARATT_IS_EXTERNAL_INDIRECT {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_VARATT_IS_EXTERNAL_INDIRECT!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_VARATT_IS_EXTERNAL_INDIRECT!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_VARATT_IS_EXTERNAL_INDIRECT!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -12417,13 +12635,13 @@ macro_rules! __pgrx_c_args_VARATT_IS_EXTERNAL_INDIRECT {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_VARATT_IS_EXTERNAL_INDIRECT!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_VARATT_IS_EXTERNAL_INDIRECT!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -12495,10 +12713,10 @@ macro_rules! VARATT_IS_EXTERNAL_INDIRECT {
                                                                 _
                                                             >(
                                                                 $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                    *mut $crate::varattrib_1b,
+                                                                    *mut $crate::__pgrx_c_bindings::varattrib_1b,
                                                                     $crate::__pgrx_c_macros::expression::CPointer<
                                                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                                                            $crate::varattrib_1b
+                                                                            $crate::__pgrx_c_bindings::varattrib_1b
                                                                         >,
                                                                         $crate::__pgrx_c_macros::expression::ReadWrite
                                                                     >,
@@ -12549,10 +12767,10 @@ macro_rules! VARATT_IS_EXTERNAL_INDIRECT {
                                                             _
                                                         >(
                                                             $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                *mut $crate::varattrib_1b_e,
+                                                                *mut $crate::__pgrx_c_bindings::varattrib_1b_e,
                                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                                        $crate::varattrib_1b_e
+                                                                        $crate::__pgrx_c_bindings::varattrib_1b_e
                                                                     >,
                                                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                                                 >,
@@ -12579,7 +12797,7 @@ macro_rules! VARATT_IS_EXTERNAL_INDIRECT {
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                        $crate::vartag_external::VARTAG_INDIRECT as i32
+                                        $crate::__pgrx_c_bindings::vartag_external::VARTAG_INDIRECT as i32
                                     )
                                 )
                             )
@@ -12649,10 +12867,10 @@ macro_rules! VARATT_IS_EXTERNAL_INDIRECT {
                                                                             _
                                                                         >(
                                                                             $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                                *mut $crate::varattrib_1b,
+                                                                                *mut $crate::__pgrx_c_bindings::varattrib_1b,
                                                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                        $crate::varattrib_1b
+                                                                                        $crate::__pgrx_c_bindings::varattrib_1b
                                                                                     >,
                                                                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                                                                 >,
@@ -12711,10 +12929,10 @@ macro_rules! VARATT_IS_EXTERNAL_INDIRECT {
                                                                         _
                                                                     >(
                                                                         $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                            *mut $crate::varattrib_1b_e,
+                                                                            *mut $crate::__pgrx_c_bindings::varattrib_1b_e,
                                                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                    $crate::varattrib_1b_e
+                                                                                    $crate::__pgrx_c_bindings::varattrib_1b_e
                                                                                 >,
                                                                                 $crate::__pgrx_c_macros::expression::ReadWrite
                                                                             >,
@@ -12748,7 +12966,7 @@ macro_rules! VARATT_IS_EXTERNAL_INDIRECT {
                                                 $crate::__pgrx_c_macros::CValue::<
                                                     $crate::__pgrx_c_macros::CInt
                                                 >::new(
-                                                    $crate::vartag_external::VARTAG_INDIRECT as i32
+                                                    $crate::__pgrx_c_bindings::vartag_external::VARTAG_INDIRECT as i32
                                                 )
                                             )
                                         )
@@ -12797,10 +13015,10 @@ macro_rules! VARATT_IS_EXTERNAL_INDIRECT {
                                                                 _
                                                             >(
                                                                 $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                    *mut $crate::varattrib_1b,
+                                                                    *mut $crate::__pgrx_c_bindings::varattrib_1b,
                                                                     $crate::__pgrx_c_macros::expression::CPointer<
                                                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                                                            $crate::varattrib_1b
+                                                                            $crate::__pgrx_c_bindings::varattrib_1b
                                                                         >,
                                                                         $crate::__pgrx_c_macros::expression::ReadWrite
                                                                     >,
@@ -12851,10 +13069,10 @@ macro_rules! VARATT_IS_EXTERNAL_INDIRECT {
                                                             _
                                                         >(
                                                             $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                *mut $crate::varattrib_1b_e,
+                                                                *mut $crate::__pgrx_c_bindings::varattrib_1b_e,
                                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                                        $crate::varattrib_1b_e
+                                                                        $crate::__pgrx_c_bindings::varattrib_1b_e
                                                                     >,
                                                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                                                 >,
@@ -12881,7 +13099,7 @@ macro_rules! VARATT_IS_EXTERNAL_INDIRECT {
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                        $crate::vartag_external::VARTAG_INDIRECT as i32
+                                        $crate::__pgrx_c_bindings::vartag_external::VARTAG_INDIRECT as i32
                                     )
                                 )
                             )
@@ -12907,8 +13125,8 @@ macro_rules! VARATT_IS_EXTERNAL_INDIRECT {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -12939,23 +13157,23 @@ macro_rules! __pgrx_c_args_VARATT_IS_EXTERNAL_NON_EXPANDED {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
         $crate::__pgrx_c_args_VARATT_IS_EXTERNAL_NON_EXPANDED!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_VARATT_IS_EXTERNAL_NON_EXPANDED!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_VARATT_IS_EXTERNAL_NON_EXPANDED!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_VARATT_IS_EXTERNAL_NON_EXPANDED!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -12967,7 +13185,7 @@ macro_rules! __pgrx_c_args_VARATT_IS_EXTERNAL_NON_EXPANDED {
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
         $crate::__pgrx_c_args_VARATT_IS_EXTERNAL_NON_EXPANDED!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
@@ -12993,17 +13211,17 @@ macro_rules! __pgrx_c_args_VARATT_IS_EXTERNAL_NON_EXPANDED {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_VARATT_IS_EXTERNAL_NON_EXPANDED!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_VARATT_IS_EXTERNAL_NON_EXPANDED!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_VARATT_IS_EXTERNAL_NON_EXPANDED!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -13030,13 +13248,13 @@ macro_rules! __pgrx_c_args_VARATT_IS_EXTERNAL_NON_EXPANDED {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_VARATT_IS_EXTERNAL_NON_EXPANDED!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_VARATT_IS_EXTERNAL_NON_EXPANDED!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -13108,10 +13326,10 @@ macro_rules! VARATT_IS_EXTERNAL_NON_EXPANDED {
                                                                 _
                                                             >(
                                                                 $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                    *mut $crate::varattrib_1b,
+                                                                    *mut $crate::__pgrx_c_bindings::varattrib_1b,
                                                                     $crate::__pgrx_c_macros::expression::CPointer<
                                                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                                                            $crate::varattrib_1b
+                                                                            $crate::__pgrx_c_bindings::varattrib_1b
                                                                         >,
                                                                         $crate::__pgrx_c_macros::expression::ReadWrite
                                                                     >,
@@ -13175,10 +13393,10 @@ macro_rules! VARATT_IS_EXTERNAL_NON_EXPANDED {
                                                                                         _
                                                                                     >(
                                                                                         $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                                            *mut $crate::varattrib_1b_e,
+                                                                                            *mut $crate::__pgrx_c_bindings::varattrib_1b_e,
                                                                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                    $crate::varattrib_1b_e
+                                                                                                    $crate::__pgrx_c_bindings::varattrib_1b_e
                                                                                                 >,
                                                                                                 $crate::__pgrx_c_macros::expression::ReadWrite
                                                                                             >,
@@ -13231,7 +13449,7 @@ macro_rules! VARATT_IS_EXTERNAL_NON_EXPANDED {
                                                 $crate::__pgrx_c_macros::CValue::<
                                                     $crate::__pgrx_c_macros::CInt
                                                 >::new(
-                                                    $crate::vartag_external::VARTAG_EXPANDED_RO as i32
+                                                    $crate::__pgrx_c_bindings::vartag_external::VARTAG_EXPANDED_RO as i32
                                                 )
                                             )
                                         )
@@ -13310,10 +13528,10 @@ macro_rules! VARATT_IS_EXTERNAL_NON_EXPANDED {
                                                                             _
                                                                         >(
                                                                             $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                                *mut $crate::varattrib_1b,
+                                                                                *mut $crate::__pgrx_c_bindings::varattrib_1b,
                                                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                        $crate::varattrib_1b
+                                                                                        $crate::__pgrx_c_bindings::varattrib_1b
                                                                                     >,
                                                                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                                                                 >,
@@ -13385,10 +13603,10 @@ macro_rules! VARATT_IS_EXTERNAL_NON_EXPANDED {
                                                                                                     _
                                                                                                 >(
                                                                                                     $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                                                        *mut $crate::varattrib_1b_e,
+                                                                                                        *mut $crate::__pgrx_c_bindings::varattrib_1b_e,
                                                                                                         $crate::__pgrx_c_macros::expression::CPointer<
                                                                                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                                $crate::varattrib_1b_e
+                                                                                                                $crate::__pgrx_c_bindings::varattrib_1b_e
                                                                                                             >,
                                                                                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                                                                                         >,
@@ -13441,7 +13659,7 @@ macro_rules! VARATT_IS_EXTERNAL_NON_EXPANDED {
                                                             $crate::__pgrx_c_macros::CValue::<
                                                                 $crate::__pgrx_c_macros::CInt
                                                             >::new(
-                                                                $crate::vartag_external::VARTAG_EXPANDED_RO as i32
+                                                                $crate::__pgrx_c_bindings::vartag_external::VARTAG_EXPANDED_RO as i32
                                                             )
                                                         )
                                                     )
@@ -13496,10 +13714,10 @@ macro_rules! VARATT_IS_EXTERNAL_NON_EXPANDED {
                                                                 _
                                                             >(
                                                                 $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                    *mut $crate::varattrib_1b,
+                                                                    *mut $crate::__pgrx_c_bindings::varattrib_1b,
                                                                     $crate::__pgrx_c_macros::expression::CPointer<
                                                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                                                            $crate::varattrib_1b
+                                                                            $crate::__pgrx_c_bindings::varattrib_1b
                                                                         >,
                                                                         $crate::__pgrx_c_macros::expression::ReadWrite
                                                                     >,
@@ -13563,10 +13781,10 @@ macro_rules! VARATT_IS_EXTERNAL_NON_EXPANDED {
                                                                                         _
                                                                                     >(
                                                                                         $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                                            *mut $crate::varattrib_1b_e,
+                                                                                            *mut $crate::__pgrx_c_bindings::varattrib_1b_e,
                                                                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                    $crate::varattrib_1b_e
+                                                                                                    $crate::__pgrx_c_bindings::varattrib_1b_e
                                                                                                 >,
                                                                                                 $crate::__pgrx_c_macros::expression::ReadWrite
                                                                                             >,
@@ -13619,7 +13837,7 @@ macro_rules! VARATT_IS_EXTERNAL_NON_EXPANDED {
                                                 $crate::__pgrx_c_macros::CValue::<
                                                     $crate::__pgrx_c_macros::CInt
                                                 >::new(
-                                                    $crate::vartag_external::VARTAG_EXPANDED_RO as i32
+                                                    $crate::__pgrx_c_bindings::vartag_external::VARTAG_EXPANDED_RO as i32
                                                 )
                                             )
                                         )
@@ -13651,8 +13869,8 @@ macro_rules! VARATT_IS_EXTERNAL_NON_EXPANDED {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -13683,23 +13901,23 @@ macro_rules! __pgrx_c_args_VARATT_IS_EXTERNAL_ONDISK {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
         $crate::__pgrx_c_args_VARATT_IS_EXTERNAL_ONDISK!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_VARATT_IS_EXTERNAL_ONDISK!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_VARATT_IS_EXTERNAL_ONDISK!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_VARATT_IS_EXTERNAL_ONDISK!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -13708,7 +13926,7 @@ macro_rules! __pgrx_c_args_VARATT_IS_EXTERNAL_ONDISK {
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
         $crate::__pgrx_c_args_VARATT_IS_EXTERNAL_ONDISK!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
@@ -13734,17 +13952,17 @@ macro_rules! __pgrx_c_args_VARATT_IS_EXTERNAL_ONDISK {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_VARATT_IS_EXTERNAL_ONDISK!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_VARATT_IS_EXTERNAL_ONDISK!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_VARATT_IS_EXTERNAL_ONDISK!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -13771,13 +13989,13 @@ macro_rules! __pgrx_c_args_VARATT_IS_EXTERNAL_ONDISK {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_VARATT_IS_EXTERNAL_ONDISK!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_VARATT_IS_EXTERNAL_ONDISK!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -13849,10 +14067,10 @@ macro_rules! VARATT_IS_EXTERNAL_ONDISK {
                                                                 _
                                                             >(
                                                                 $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                    *mut $crate::varattrib_1b,
+                                                                    *mut $crate::__pgrx_c_bindings::varattrib_1b,
                                                                     $crate::__pgrx_c_macros::expression::CPointer<
                                                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                                                            $crate::varattrib_1b
+                                                                            $crate::__pgrx_c_bindings::varattrib_1b
                                                                         >,
                                                                         $crate::__pgrx_c_macros::expression::ReadWrite
                                                                     >,
@@ -13903,10 +14121,10 @@ macro_rules! VARATT_IS_EXTERNAL_ONDISK {
                                                             _
                                                         >(
                                                             $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                *mut $crate::varattrib_1b_e,
+                                                                *mut $crate::__pgrx_c_bindings::varattrib_1b_e,
                                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                                        $crate::varattrib_1b_e
+                                                                        $crate::__pgrx_c_bindings::varattrib_1b_e
                                                                     >,
                                                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                                                 >,
@@ -13933,7 +14151,7 @@ macro_rules! VARATT_IS_EXTERNAL_ONDISK {
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                        $crate::vartag_external::VARTAG_ONDISK as i32
+                                        $crate::__pgrx_c_bindings::vartag_external::VARTAG_ONDISK as i32
                                     )
                                 )
                             )
@@ -14003,10 +14221,10 @@ macro_rules! VARATT_IS_EXTERNAL_ONDISK {
                                                                             _
                                                                         >(
                                                                             $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                                *mut $crate::varattrib_1b,
+                                                                                *mut $crate::__pgrx_c_bindings::varattrib_1b,
                                                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                        $crate::varattrib_1b
+                                                                                        $crate::__pgrx_c_bindings::varattrib_1b
                                                                                     >,
                                                                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                                                                 >,
@@ -14065,10 +14283,10 @@ macro_rules! VARATT_IS_EXTERNAL_ONDISK {
                                                                         _
                                                                     >(
                                                                         $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                            *mut $crate::varattrib_1b_e,
+                                                                            *mut $crate::__pgrx_c_bindings::varattrib_1b_e,
                                                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                    $crate::varattrib_1b_e
+                                                                                    $crate::__pgrx_c_bindings::varattrib_1b_e
                                                                                 >,
                                                                                 $crate::__pgrx_c_macros::expression::ReadWrite
                                                                             >,
@@ -14102,7 +14320,7 @@ macro_rules! VARATT_IS_EXTERNAL_ONDISK {
                                                 $crate::__pgrx_c_macros::CValue::<
                                                     $crate::__pgrx_c_macros::CInt
                                                 >::new(
-                                                    $crate::vartag_external::VARTAG_ONDISK as i32
+                                                    $crate::__pgrx_c_bindings::vartag_external::VARTAG_ONDISK as i32
                                                 )
                                             )
                                         )
@@ -14151,10 +14369,10 @@ macro_rules! VARATT_IS_EXTERNAL_ONDISK {
                                                                 _
                                                             >(
                                                                 $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                    *mut $crate::varattrib_1b,
+                                                                    *mut $crate::__pgrx_c_bindings::varattrib_1b,
                                                                     $crate::__pgrx_c_macros::expression::CPointer<
                                                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                                                            $crate::varattrib_1b
+                                                                            $crate::__pgrx_c_bindings::varattrib_1b
                                                                         >,
                                                                         $crate::__pgrx_c_macros::expression::ReadWrite
                                                                     >,
@@ -14205,10 +14423,10 @@ macro_rules! VARATT_IS_EXTERNAL_ONDISK {
                                                             _
                                                         >(
                                                             $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                *mut $crate::varattrib_1b_e,
+                                                                *mut $crate::__pgrx_c_bindings::varattrib_1b_e,
                                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                                        $crate::varattrib_1b_e
+                                                                        $crate::__pgrx_c_bindings::varattrib_1b_e
                                                                     >,
                                                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                                                 >,
@@ -14235,7 +14453,7 @@ macro_rules! VARATT_IS_EXTERNAL_ONDISK {
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                        $crate::vartag_external::VARTAG_ONDISK as i32
+                                        $crate::__pgrx_c_bindings::vartag_external::VARTAG_ONDISK as i32
                                     )
                                 )
                             )
@@ -14258,8 +14476,8 @@ macro_rules! VARATT_IS_EXTERNAL_ONDISK {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -14286,20 +14504,24 @@ macro_rules! __pgrx_c_args_VARATT_IS_SHORT {
         $crate::__pgrx_c_args_VARATT_IS_SHORT!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_VARATT_IS_SHORT!(@p1 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_VARATT_IS_SHORT!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_VARATT_IS_SHORT!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_VARATT_IS_SHORT!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_VARATT_IS_SHORT!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_VARATT_IS_SHORT!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -14307,7 +14529,9 @@ macro_rules! __pgrx_c_args_VARATT_IS_SHORT {
         $crate::__pgrx_c_args_VARATT_IS_SHORT!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_VARATT_IS_SHORT!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_VARATT_IS_SHORT!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -14329,14 +14553,18 @@ macro_rules! __pgrx_c_args_VARATT_IS_SHORT {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_VARATT_IS_SHORT!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_VARATT_IS_SHORT!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_VARATT_IS_SHORT!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_VARATT_IS_SHORT!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_VARATT_IS_SHORT!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -14363,13 +14591,13 @@ macro_rules! __pgrx_c_args_VARATT_IS_SHORT {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_VARATT_IS_SHORT!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_VARATT_IS_SHORT!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -14433,10 +14661,10 @@ macro_rules! VARATT_IS_SHORT {
                                                         _
                                                     >(
                                                         $crate::__pgrx_c_macros::expression::cast_as::<
-                                                            *mut $crate::varattrib_1b,
+                                                            *mut $crate::__pgrx_c_bindings::varattrib_1b,
                                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                                    $crate::varattrib_1b
+                                                                    $crate::__pgrx_c_bindings::varattrib_1b
                                                                 >,
                                                                 $crate::__pgrx_c_macros::expression::ReadWrite
                                                             >,
@@ -14525,10 +14753,10 @@ macro_rules! VARATT_IS_SHORT {
                                                                     _
                                                                 >(
                                                                     $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                        *mut $crate::varattrib_1b,
+                                                                        *mut $crate::__pgrx_c_bindings::varattrib_1b,
                                                                         $crate::__pgrx_c_macros::expression::CPointer<
                                                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                $crate::varattrib_1b
+                                                                                $crate::__pgrx_c_bindings::varattrib_1b
                                                                             >,
                                                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                                                         >,
@@ -14602,10 +14830,10 @@ macro_rules! VARATT_IS_SHORT {
                                                         _
                                                     >(
                                                         $crate::__pgrx_c_macros::expression::cast_as::<
-                                                            *mut $crate::varattrib_1b,
+                                                            *mut $crate::__pgrx_c_bindings::varattrib_1b,
                                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                                    $crate::varattrib_1b
+                                                                    $crate::__pgrx_c_bindings::varattrib_1b
                                                                 >,
                                                                 $crate::__pgrx_c_macros::expression::ReadWrite
                                                             >,
@@ -14655,8 +14883,8 @@ macro_rules! VARATT_IS_SHORT {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -14683,20 +14911,24 @@ macro_rules! __pgrx_c_args_VARATT_NOT_PAD_BYTE {
         $crate::__pgrx_c_args_VARATT_NOT_PAD_BYTE!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_VARATT_NOT_PAD_BYTE!(@p1 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_VARATT_NOT_PAD_BYTE!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_VARATT_NOT_PAD_BYTE!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_VARATT_NOT_PAD_BYTE!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_VARATT_NOT_PAD_BYTE!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_VARATT_NOT_PAD_BYTE!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -14704,7 +14936,9 @@ macro_rules! __pgrx_c_args_VARATT_NOT_PAD_BYTE {
         $crate::__pgrx_c_args_VARATT_NOT_PAD_BYTE!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_VARATT_NOT_PAD_BYTE!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_VARATT_NOT_PAD_BYTE!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -14726,14 +14960,18 @@ macro_rules! __pgrx_c_args_VARATT_NOT_PAD_BYTE {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_VARATT_NOT_PAD_BYTE!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_VARATT_NOT_PAD_BYTE!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_VARATT_NOT_PAD_BYTE!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_VARATT_NOT_PAD_BYTE!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_VARATT_NOT_PAD_BYTE!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -14760,13 +14998,13 @@ macro_rules! __pgrx_c_args_VARATT_NOT_PAD_BYTE {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_VARATT_NOT_PAD_BYTE!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_VARATT_NOT_PAD_BYTE!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -14817,7 +15055,7 @@ macro_rules! VARATT_NOT_PAD_BYTE {
                             (
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::cast_as::<
-                                        *mut $crate::uint8,
+                                        *mut $crate::__pgrx_c_bindings::uint8,
                                         $crate::__pgrx_c_macros::expression::CPointer<
                                             $crate::__pgrx_c_macros::CUnsignedChar,
                                             $crate::__pgrx_c_macros::expression::ReadWrite
@@ -14881,7 +15119,7 @@ macro_rules! VARATT_NOT_PAD_BYTE {
                                                 _
                                             >(
                                                 $crate::__pgrx_c_macros::expression::cast_as::<
-                                                    *mut $crate::uint8,
+                                                    *mut $crate::__pgrx_c_bindings::uint8,
                                                     $crate::__pgrx_c_macros::expression::CPointer<
                                                         $crate::__pgrx_c_macros::CUnsignedChar,
                                                         $crate::__pgrx_c_macros::expression::ReadWrite
@@ -14932,7 +15170,7 @@ macro_rules! VARATT_NOT_PAD_BYTE {
                             (
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::cast_as::<
-                                        *mut $crate::uint8,
+                                        *mut $crate::__pgrx_c_bindings::uint8,
                                         $crate::__pgrx_c_macros::expression::CPointer<
                                             $crate::__pgrx_c_macros::CUnsignedChar,
                                             $crate::__pgrx_c_macros::expression::ReadWrite
@@ -14970,8 +15208,8 @@ macro_rules! VARATT_NOT_PAD_BYTE {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -14998,22 +15236,34 @@ macro_rules! __pgrx_c_args_VARDATA {
         $crate::__pgrx_c_args_VARDATA!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_VARDATA!(@p1 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_VARDATA!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_VARDATA!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_VARDATA!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_VARDATA!(@p1 $mode [$($done)* (@literal [- $argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_VARDATA!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+            $($rest)*
+        )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_VARDATA!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_VARDATA!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $($raw:tt)*) => {
         $crate::__pgrx_c_args_VARDATA!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_VARDATA!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_VARDATA!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -15033,13 +15283,20 @@ macro_rules! __pgrx_c_args_VARDATA {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_VARDATA!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_VARDATA!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_VARDATA!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_VARDATA!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
-        $crate::__pgrx_c_args_VARDATA!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_VARDATA!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
         $crate::__pgrx_c_classify!(
@@ -15061,10 +15318,16 @@ macro_rules! __pgrx_c_args_VARDATA {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_VARDATA!(@p1 $mode [$($done)* (@literal [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_VARDATA!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+            $($rest)*
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_VARDATA!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_VARDATA!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p1 $mode:ident [$($done:tt)*];) => {
         $crate::VARDATA!(@$mode; $($done)*)
@@ -15123,10 +15386,10 @@ macro_rules! VARDATA {
                                 (
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::expression::cast_as::<
-                                            *mut $crate::varattrib_4b,
+                                            *mut $crate::__pgrx_c_bindings::varattrib_4b,
                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                    $crate::varattrib_4b
+                                                    $crate::__pgrx_c_bindings::varattrib_4b
                                                 >,
                                                 $crate::__pgrx_c_macros::expression::ReadWrite
                                             >,
@@ -15168,10 +15431,10 @@ macro_rules! VARDATA {
                         (
                             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                 $crate::__pgrx_c_macros::expression::cast_as::<
-                                    *mut $crate::varattrib_4b,
+                                    *mut $crate::__pgrx_c_bindings::varattrib_4b,
                                     $crate::__pgrx_c_macros::expression::CPointer<
                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                            $crate::varattrib_4b
+                                            $crate::__pgrx_c_bindings::varattrib_4b
                                         >,
                                         $crate::__pgrx_c_macros::expression::ReadWrite
                                     >,
@@ -15211,10 +15474,10 @@ macro_rules! VARDATA {
                         (
                             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                 $crate::__pgrx_c_macros::expression::cast_as::<
-                                    *mut $crate::varattrib_4b,
+                                    *mut $crate::__pgrx_c_bindings::varattrib_4b,
                                     $crate::__pgrx_c_macros::expression::CPointer<
                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                            $crate::varattrib_4b
+                                            $crate::__pgrx_c_bindings::varattrib_4b
                                         >,
                                         $crate::__pgrx_c_macros::expression::ReadWrite
                                     >,
@@ -15265,10 +15528,10 @@ macro_rules! VARDATA {
                                             _
                                         >(
                                             $crate::__pgrx_c_macros::expression::cast_as::<
-                                                *mut $crate::varattrib_4b,
+                                                *mut $crate::__pgrx_c_bindings::varattrib_4b,
                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                        $crate::varattrib_4b
+                                                        $crate::__pgrx_c_bindings::varattrib_4b
                                                     >,
                                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                                 >,
@@ -15320,10 +15583,10 @@ macro_rules! VARDATA {
                                 (
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::expression::cast_as::<
-                                            *mut $crate::varattrib_4b,
+                                            *mut $crate::__pgrx_c_bindings::varattrib_4b,
                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                    $crate::varattrib_4b
+                                                    $crate::__pgrx_c_bindings::varattrib_4b
                                                 >,
                                                 $crate::__pgrx_c_macros::expression::ReadWrite
                                             >,
@@ -15354,8 +15617,8 @@ macro_rules! VARDATA {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -15382,25 +15645,34 @@ macro_rules! __pgrx_c_args_VARDATA_1B {
         $crate::__pgrx_c_args_VARDATA_1B!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_VARDATA_1B!(@p1 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_VARDATA_1B!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_VARDATA_1B!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_VARDATA_1B!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_VARDATA_1B!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_VARDATA_1B!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_VARDATA_1B!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $($raw:tt)*) => {
         $crate::__pgrx_c_args_VARDATA_1B!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_VARDATA_1B!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_VARDATA_1B!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -15422,13 +15694,20 @@ macro_rules! __pgrx_c_args_VARDATA_1B {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_VARDATA_1B!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_VARDATA_1B!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_VARDATA_1B!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_VARDATA_1B!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
-        $crate::__pgrx_c_args_VARDATA_1B!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_VARDATA_1B!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
         $crate::__pgrx_c_classify!(
@@ -15450,10 +15729,16 @@ macro_rules! __pgrx_c_args_VARDATA_1B {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_VARDATA_1B!(@p1 $mode [$($done)* (@literal [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_VARDATA_1B!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+            $($rest)*
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_VARDATA_1B!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_VARDATA_1B!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p1 $mode:ident [$($done:tt)*];) => {
         $crate::VARDATA_1B!(@$mode; $($done)*)
@@ -15506,10 +15791,10 @@ macro_rules! VARDATA_1B {
                             (
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::cast_as::<
-                                        *mut $crate::varattrib_1b,
+                                        *mut $crate::__pgrx_c_bindings::varattrib_1b,
                                         $crate::__pgrx_c_macros::expression::CPointer<
                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                $crate::varattrib_1b
+                                                $crate::__pgrx_c_bindings::varattrib_1b
                                             >,
                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                         >,
@@ -15544,10 +15829,10 @@ macro_rules! VARDATA_1B {
                     (
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::cast_as::<
-                                *mut $crate::varattrib_1b,
+                                *mut $crate::__pgrx_c_bindings::varattrib_1b,
                                 $crate::__pgrx_c_macros::expression::CPointer<
                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                        $crate::varattrib_1b
+                                        $crate::__pgrx_c_bindings::varattrib_1b
                                     >,
                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                 >,
@@ -15579,10 +15864,10 @@ macro_rules! VARDATA_1B {
                     (
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::cast_as::<
-                                *mut $crate::varattrib_1b,
+                                *mut $crate::__pgrx_c_bindings::varattrib_1b,
                                 $crate::__pgrx_c_macros::expression::CPointer<
                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                        $crate::varattrib_1b
+                                        $crate::__pgrx_c_bindings::varattrib_1b
                                     >,
                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                 >,
@@ -15622,10 +15907,10 @@ macro_rules! VARDATA_1B {
                                 (
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::expression::cast_as::<
-                                            *mut $crate::varattrib_1b,
+                                            *mut $crate::__pgrx_c_bindings::varattrib_1b,
                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                    $crate::varattrib_1b
+                                                    $crate::__pgrx_c_bindings::varattrib_1b
                                                 >,
                                                 $crate::__pgrx_c_macros::expression::ReadWrite
                                             >,
@@ -15665,10 +15950,10 @@ macro_rules! VARDATA_1B {
                             (
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::cast_as::<
-                                        *mut $crate::varattrib_1b,
+                                        *mut $crate::__pgrx_c_bindings::varattrib_1b,
                                         $crate::__pgrx_c_macros::expression::CPointer<
                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                $crate::varattrib_1b
+                                                $crate::__pgrx_c_bindings::varattrib_1b
                                             >,
                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                         >,
@@ -15698,8 +15983,8 @@ macro_rules! VARDATA_1B {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -15726,25 +16011,34 @@ macro_rules! __pgrx_c_args_VARDATA_1B_E {
         $crate::__pgrx_c_args_VARDATA_1B_E!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_VARDATA_1B_E!(@p1 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_VARDATA_1B_E!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_VARDATA_1B_E!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_VARDATA_1B_E!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_VARDATA_1B_E!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_VARDATA_1B_E!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_VARDATA_1B_E!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $($raw:tt)*) => {
         $crate::__pgrx_c_args_VARDATA_1B_E!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_VARDATA_1B_E!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_VARDATA_1B_E!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -15766,13 +16060,20 @@ macro_rules! __pgrx_c_args_VARDATA_1B_E {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_VARDATA_1B_E!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_VARDATA_1B_E!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_VARDATA_1B_E!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_VARDATA_1B_E!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
-        $crate::__pgrx_c_args_VARDATA_1B_E!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_VARDATA_1B_E!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
         $crate::__pgrx_c_classify!(
@@ -15795,12 +16096,15 @@ macro_rules! __pgrx_c_args_VARDATA_1B_E {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_VARDATA_1B_E!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_VARDATA_1B_E!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_VARDATA_1B_E!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p1 $mode:ident [$($done:tt)*];) => {
         $crate::VARDATA_1B_E!(@$mode; $($done)*)
@@ -15853,10 +16157,10 @@ macro_rules! VARDATA_1B_E {
                             (
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::cast_as::<
-                                        *mut $crate::varattrib_1b_e,
+                                        *mut $crate::__pgrx_c_bindings::varattrib_1b_e,
                                         $crate::__pgrx_c_macros::expression::CPointer<
                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                $crate::varattrib_1b_e
+                                                $crate::__pgrx_c_bindings::varattrib_1b_e
                                             >,
                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                         >,
@@ -15891,10 +16195,10 @@ macro_rules! VARDATA_1B_E {
                     (
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::cast_as::<
-                                *mut $crate::varattrib_1b_e,
+                                *mut $crate::__pgrx_c_bindings::varattrib_1b_e,
                                 $crate::__pgrx_c_macros::expression::CPointer<
                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                        $crate::varattrib_1b_e
+                                        $crate::__pgrx_c_bindings::varattrib_1b_e
                                     >,
                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                 >,
@@ -15926,10 +16230,10 @@ macro_rules! VARDATA_1B_E {
                     (
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::cast_as::<
-                                *mut $crate::varattrib_1b_e,
+                                *mut $crate::__pgrx_c_bindings::varattrib_1b_e,
                                 $crate::__pgrx_c_macros::expression::CPointer<
                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                        $crate::varattrib_1b_e
+                                        $crate::__pgrx_c_bindings::varattrib_1b_e
                                     >,
                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                 >,
@@ -15969,10 +16273,10 @@ macro_rules! VARDATA_1B_E {
                                 (
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::expression::cast_as::<
-                                            *mut $crate::varattrib_1b_e,
+                                            *mut $crate::__pgrx_c_bindings::varattrib_1b_e,
                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                    $crate::varattrib_1b_e
+                                                    $crate::__pgrx_c_bindings::varattrib_1b_e
                                                 >,
                                                 $crate::__pgrx_c_macros::expression::ReadWrite
                                             >,
@@ -16012,10 +16316,10 @@ macro_rules! VARDATA_1B_E {
                             (
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::cast_as::<
-                                        *mut $crate::varattrib_1b_e,
+                                        *mut $crate::__pgrx_c_bindings::varattrib_1b_e,
                                         $crate::__pgrx_c_macros::expression::CPointer<
                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                $crate::varattrib_1b_e
+                                                $crate::__pgrx_c_bindings::varattrib_1b_e
                                             >,
                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                         >,
@@ -16045,8 +16349,8 @@ macro_rules! VARDATA_1B_E {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -16073,25 +16377,34 @@ macro_rules! __pgrx_c_args_VARDATA_4B {
         $crate::__pgrx_c_args_VARDATA_4B!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_VARDATA_4B!(@p1 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_VARDATA_4B!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_VARDATA_4B!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_VARDATA_4B!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_VARDATA_4B!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_VARDATA_4B!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_VARDATA_4B!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $($raw:tt)*) => {
         $crate::__pgrx_c_args_VARDATA_4B!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_VARDATA_4B!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_VARDATA_4B!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -16113,13 +16426,20 @@ macro_rules! __pgrx_c_args_VARDATA_4B {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_VARDATA_4B!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_VARDATA_4B!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_VARDATA_4B!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_VARDATA_4B!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
-        $crate::__pgrx_c_args_VARDATA_4B!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_VARDATA_4B!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
         $crate::__pgrx_c_classify!(
@@ -16141,10 +16461,16 @@ macro_rules! __pgrx_c_args_VARDATA_4B {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_VARDATA_4B!(@p1 $mode [$($done)* (@literal [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_VARDATA_4B!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+            $($rest)*
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_VARDATA_4B!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_VARDATA_4B!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p1 $mode:ident [$($done:tt)*];) => {
         $crate::VARDATA_4B!(@$mode; $($done)*)
@@ -16202,10 +16528,10 @@ macro_rules! VARDATA_4B {
                                 (
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::expression::cast_as::<
-                                            *mut $crate::varattrib_4b,
+                                            *mut $crate::__pgrx_c_bindings::varattrib_4b,
                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                    $crate::varattrib_4b
+                                                    $crate::__pgrx_c_bindings::varattrib_4b
                                                 >,
                                                 $crate::__pgrx_c_macros::expression::ReadWrite
                                             >,
@@ -16246,10 +16572,10 @@ macro_rules! VARDATA_4B {
                         (
                             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                 $crate::__pgrx_c_macros::expression::cast_as::<
-                                    *mut $crate::varattrib_4b,
+                                    *mut $crate::__pgrx_c_bindings::varattrib_4b,
                                     $crate::__pgrx_c_macros::expression::CPointer<
                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                            $crate::varattrib_4b
+                                            $crate::__pgrx_c_bindings::varattrib_4b
                                         >,
                                         $crate::__pgrx_c_macros::expression::ReadWrite
                                     >,
@@ -16288,10 +16614,10 @@ macro_rules! VARDATA_4B {
                         (
                             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                 $crate::__pgrx_c_macros::expression::cast_as::<
-                                    *mut $crate::varattrib_4b,
+                                    *mut $crate::__pgrx_c_bindings::varattrib_4b,
                                     $crate::__pgrx_c_macros::expression::CPointer<
                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                            $crate::varattrib_4b
+                                            $crate::__pgrx_c_bindings::varattrib_4b
                                         >,
                                         $crate::__pgrx_c_macros::expression::ReadWrite
                                     >,
@@ -16341,10 +16667,10 @@ macro_rules! VARDATA_4B {
                                             _
                                         >(
                                             $crate::__pgrx_c_macros::expression::cast_as::<
-                                                *mut $crate::varattrib_4b,
+                                                *mut $crate::__pgrx_c_bindings::varattrib_4b,
                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                        $crate::varattrib_4b
+                                                        $crate::__pgrx_c_bindings::varattrib_4b
                                                     >,
                                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                                 >,
@@ -16395,10 +16721,10 @@ macro_rules! VARDATA_4B {
                                 (
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::expression::cast_as::<
-                                            *mut $crate::varattrib_4b,
+                                            *mut $crate::__pgrx_c_bindings::varattrib_4b,
                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                    $crate::varattrib_4b
+                                                    $crate::__pgrx_c_bindings::varattrib_4b
                                                 >,
                                                 $crate::__pgrx_c_macros::expression::ReadWrite
                                             >,
@@ -16429,8 +16755,8 @@ macro_rules! VARDATA_4B {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -16457,25 +16783,34 @@ macro_rules! __pgrx_c_args_VARDATA_4B_C {
         $crate::__pgrx_c_args_VARDATA_4B_C!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_VARDATA_4B_C!(@p1 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_VARDATA_4B_C!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_VARDATA_4B_C!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_VARDATA_4B_C!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_VARDATA_4B_C!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_VARDATA_4B_C!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_VARDATA_4B_C!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $($raw:tt)*) => {
         $crate::__pgrx_c_args_VARDATA_4B_C!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_VARDATA_4B_C!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_VARDATA_4B_C!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -16497,13 +16832,20 @@ macro_rules! __pgrx_c_args_VARDATA_4B_C {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_VARDATA_4B_C!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_VARDATA_4B_C!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_VARDATA_4B_C!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_VARDATA_4B_C!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
-        $crate::__pgrx_c_args_VARDATA_4B_C!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_VARDATA_4B_C!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
         $crate::__pgrx_c_classify!(
@@ -16526,12 +16868,15 @@ macro_rules! __pgrx_c_args_VARDATA_4B_C {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_VARDATA_4B_C!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_VARDATA_4B_C!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_VARDATA_4B_C!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p1 $mode:ident [$($done:tt)*];) => {
         $crate::VARDATA_4B_C!(@$mode; $($done)*)
@@ -16589,10 +16934,10 @@ macro_rules! VARDATA_4B_C {
                                 (
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::expression::cast_as::<
-                                            *mut $crate::varattrib_4b,
+                                            *mut $crate::__pgrx_c_bindings::varattrib_4b,
                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                    $crate::varattrib_4b
+                                                    $crate::__pgrx_c_bindings::varattrib_4b
                                                 >,
                                                 $crate::__pgrx_c_macros::expression::ReadWrite
                                             >,
@@ -16633,10 +16978,10 @@ macro_rules! VARDATA_4B_C {
                         (
                             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                 $crate::__pgrx_c_macros::expression::cast_as::<
-                                    *mut $crate::varattrib_4b,
+                                    *mut $crate::__pgrx_c_bindings::varattrib_4b,
                                     $crate::__pgrx_c_macros::expression::CPointer<
                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                            $crate::varattrib_4b
+                                            $crate::__pgrx_c_bindings::varattrib_4b
                                         >,
                                         $crate::__pgrx_c_macros::expression::ReadWrite
                                     >,
@@ -16675,10 +17020,10 @@ macro_rules! VARDATA_4B_C {
                         (
                             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                 $crate::__pgrx_c_macros::expression::cast_as::<
-                                    *mut $crate::varattrib_4b,
+                                    *mut $crate::__pgrx_c_bindings::varattrib_4b,
                                     $crate::__pgrx_c_macros::expression::CPointer<
                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                            $crate::varattrib_4b
+                                            $crate::__pgrx_c_bindings::varattrib_4b
                                         >,
                                         $crate::__pgrx_c_macros::expression::ReadWrite
                                     >,
@@ -16728,10 +17073,10 @@ macro_rules! VARDATA_4B_C {
                                             _
                                         >(
                                             $crate::__pgrx_c_macros::expression::cast_as::<
-                                                *mut $crate::varattrib_4b,
+                                                *mut $crate::__pgrx_c_bindings::varattrib_4b,
                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                        $crate::varattrib_4b
+                                                        $crate::__pgrx_c_bindings::varattrib_4b
                                                     >,
                                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                                 >,
@@ -16782,10 +17127,10 @@ macro_rules! VARDATA_4B_C {
                                 (
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::expression::cast_as::<
-                                            *mut $crate::varattrib_4b,
+                                            *mut $crate::__pgrx_c_bindings::varattrib_4b,
                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                    $crate::varattrib_4b
+                                                    $crate::__pgrx_c_bindings::varattrib_4b
                                                 >,
                                                 $crate::__pgrx_c_macros::expression::ReadWrite
                                             >,
@@ -16816,8 +17161,8 @@ macro_rules! VARDATA_4B_C {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -16844,25 +17189,34 @@ macro_rules! __pgrx_c_args_VARDATA_ANY {
         $crate::__pgrx_c_args_VARDATA_ANY!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_VARDATA_ANY!(@p1 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_VARDATA_ANY!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_VARDATA_ANY!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_VARDATA_ANY!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_VARDATA_ANY!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_VARDATA_ANY!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_VARDATA_ANY!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $($raw:tt)*) => {
         $crate::__pgrx_c_args_VARDATA_ANY!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_VARDATA_ANY!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_VARDATA_ANY!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -16884,13 +17238,20 @@ macro_rules! __pgrx_c_args_VARDATA_ANY {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_VARDATA_ANY!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_VARDATA_ANY!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_VARDATA_ANY!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_VARDATA_ANY!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
-        $crate::__pgrx_c_args_VARDATA_ANY!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_VARDATA_ANY!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
         $crate::__pgrx_c_classify!(
@@ -16912,10 +17273,16 @@ macro_rules! __pgrx_c_args_VARDATA_ANY {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_VARDATA_ANY!(@p1 $mode [$($done)* (@literal [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_VARDATA_ANY!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+            $($rest)*
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_VARDATA_ANY!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_VARDATA_ANY!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p1 $mode:ident [$($done:tt)*];) => {
         $crate::VARDATA_ANY!(@$mode; $($done)*)
@@ -16987,10 +17354,10 @@ macro_rules! VARDATA_ANY {
                                                                         _
                                                                     >(
                                                                         $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                            *mut $crate::varattrib_1b,
+                                                                            *mut $crate::__pgrx_c_bindings::varattrib_1b,
                                                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                    $crate::varattrib_1b
+                                                                                    $crate::__pgrx_c_bindings::varattrib_1b
                                                                                 >,
                                                                                 $crate::__pgrx_c_macros::expression::ReadWrite
                                                                             >,
@@ -17052,10 +17419,10 @@ macro_rules! VARDATA_ANY {
                                                         _
                                                     >(
                                                         $crate::__pgrx_c_macros::expression::cast_as::<
-                                                            *mut $crate::varattrib_1b,
+                                                            *mut $crate::__pgrx_c_bindings::varattrib_1b,
                                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                                    $crate::varattrib_1b
+                                                                    $crate::__pgrx_c_bindings::varattrib_1b
                                                                 >,
                                                                 $crate::__pgrx_c_macros::expression::ReadWrite
                                                             >,
@@ -17103,10 +17470,10 @@ macro_rules! VARDATA_ANY {
                                                             _
                                                         >(
                                                             $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                *mut $crate::varattrib_4b,
+                                                                *mut $crate::__pgrx_c_bindings::varattrib_4b,
                                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                                        $crate::varattrib_4b
+                                                                        $crate::__pgrx_c_bindings::varattrib_4b
                                                                     >,
                                                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                                                 >,
@@ -17196,10 +17563,10 @@ macro_rules! VARDATA_ANY {
                                                                                     _
                                                                                 >(
                                                                                     $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                                        *mut $crate::varattrib_1b,
+                                                                                        *mut $crate::__pgrx_c_bindings::varattrib_1b,
                                                                                         $crate::__pgrx_c_macros::expression::CPointer<
                                                                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                $crate::varattrib_1b
+                                                                                                $crate::__pgrx_c_bindings::varattrib_1b
                                                                                             >,
                                                                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                                                                         >,
@@ -17267,10 +17634,10 @@ macro_rules! VARDATA_ANY {
                                                                     _
                                                                 >(
                                                                     $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                        *mut $crate::varattrib_1b,
+                                                                        *mut $crate::__pgrx_c_bindings::varattrib_1b,
                                                                         $crate::__pgrx_c_macros::expression::CPointer<
                                                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                $crate::varattrib_1b
+                                                                                $crate::__pgrx_c_bindings::varattrib_1b
                                                                             >,
                                                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                                                         >,
@@ -17321,10 +17688,10 @@ macro_rules! VARDATA_ANY {
                                                                         _
                                                                     >(
                                                                         $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                            *mut $crate::varattrib_4b,
+                                                                            *mut $crate::__pgrx_c_bindings::varattrib_4b,
                                                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                    $crate::varattrib_4b
+                                                                                    $crate::__pgrx_c_bindings::varattrib_4b
                                                                                 >,
                                                                                 $crate::__pgrx_c_macros::expression::ReadWrite
                                                                             >,
@@ -17398,10 +17765,10 @@ macro_rules! VARDATA_ANY {
                                                                         _
                                                                     >(
                                                                         $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                            *mut $crate::varattrib_1b,
+                                                                            *mut $crate::__pgrx_c_bindings::varattrib_1b,
                                                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                    $crate::varattrib_1b
+                                                                                    $crate::__pgrx_c_bindings::varattrib_1b
                                                                                 >,
                                                                                 $crate::__pgrx_c_macros::expression::ReadWrite
                                                                             >,
@@ -17463,10 +17830,10 @@ macro_rules! VARDATA_ANY {
                                                         _
                                                     >(
                                                         $crate::__pgrx_c_macros::expression::cast_as::<
-                                                            *mut $crate::varattrib_1b,
+                                                            *mut $crate::__pgrx_c_bindings::varattrib_1b,
                                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                                    $crate::varattrib_1b
+                                                                    $crate::__pgrx_c_bindings::varattrib_1b
                                                                 >,
                                                                 $crate::__pgrx_c_macros::expression::ReadWrite
                                                             >,
@@ -17514,10 +17881,10 @@ macro_rules! VARDATA_ANY {
                                                             _
                                                         >(
                                                             $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                *mut $crate::varattrib_4b,
+                                                                *mut $crate::__pgrx_c_bindings::varattrib_4b,
                                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                                        $crate::varattrib_4b
+                                                                        $crate::__pgrx_c_bindings::varattrib_4b
                                                                     >,
                                                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                                                 >,
@@ -17558,8 +17925,8 @@ macro_rules! VARDATA_ANY {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -17593,23 +17960,23 @@ macro_rules! __pgrx_c_args_VARDATA_COMPRESSED_GET_COMPRESS_METHOD {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
         $crate::__pgrx_c_args_VARDATA_COMPRESSED_GET_COMPRESS_METHOD!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_VARDATA_COMPRESSED_GET_COMPRESS_METHOD!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_VARDATA_COMPRESSED_GET_COMPRESS_METHOD!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_VARDATA_COMPRESSED_GET_COMPRESS_METHOD!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -17621,7 +17988,7 @@ macro_rules! __pgrx_c_args_VARDATA_COMPRESSED_GET_COMPRESS_METHOD {
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
         $crate::__pgrx_c_args_VARDATA_COMPRESSED_GET_COMPRESS_METHOD!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
@@ -17647,17 +18014,17 @@ macro_rules! __pgrx_c_args_VARDATA_COMPRESSED_GET_COMPRESS_METHOD {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_VARDATA_COMPRESSED_GET_COMPRESS_METHOD!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_VARDATA_COMPRESSED_GET_COMPRESS_METHOD!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_VARDATA_COMPRESSED_GET_COMPRESS_METHOD!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -17684,13 +18051,13 @@ macro_rules! __pgrx_c_args_VARDATA_COMPRESSED_GET_COMPRESS_METHOD {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_VARDATA_COMPRESSED_GET_COMPRESS_METHOD!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_VARDATA_COMPRESSED_GET_COMPRESS_METHOD!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -17758,10 +18125,10 @@ macro_rules! VARDATA_COMPRESSED_GET_COMPRESS_METHOD {
                                                 _
                                             >(
                                                 $crate::__pgrx_c_macros::expression::cast_as::<
-                                                    *mut $crate::varattrib_4b,
+                                                    *mut $crate::__pgrx_c_bindings::varattrib_4b,
                                                     $crate::__pgrx_c_macros::expression::CPointer<
                                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                                            $crate::varattrib_4b
+                                                            $crate::__pgrx_c_bindings::varattrib_4b
                                                         >,
                                                         $crate::__pgrx_c_macros::expression::ReadWrite
                                                     >,
@@ -17788,7 +18155,7 @@ macro_rules! VARDATA_COMPRESSED_GET_COMPRESS_METHOD {
                     ),
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                            $crate::VARLENA_EXTSIZE_BITS as i32
+                            $crate::__pgrx_c_bindings::VARLENA_EXTSIZE_BITS as i32
                         )
                     )
                 )
@@ -17850,10 +18217,10 @@ macro_rules! VARDATA_COMPRESSED_GET_COMPRESS_METHOD {
                                                             _
                                                         >(
                                                             $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                *mut $crate::varattrib_4b,
+                                                                *mut $crate::__pgrx_c_bindings::varattrib_4b,
                                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                                        $crate::varattrib_4b
+                                                                        $crate::__pgrx_c_bindings::varattrib_4b
                                                                     >,
                                                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                                                 >,
@@ -17880,7 +18247,7 @@ macro_rules! VARDATA_COMPRESSED_GET_COMPRESS_METHOD {
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                        $crate::VARLENA_EXTSIZE_BITS as i32
+                                        $crate::__pgrx_c_bindings::VARLENA_EXTSIZE_BITS as i32
                                     )
                                 )
                             )
@@ -17921,10 +18288,10 @@ macro_rules! VARDATA_COMPRESSED_GET_COMPRESS_METHOD {
                                                 _
                                             >(
                                                 $crate::__pgrx_c_macros::expression::cast_as::<
-                                                    *mut $crate::varattrib_4b,
+                                                    *mut $crate::__pgrx_c_bindings::varattrib_4b,
                                                     $crate::__pgrx_c_macros::expression::CPointer<
                                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                                            $crate::varattrib_4b
+                                                            $crate::__pgrx_c_bindings::varattrib_4b
                                                         >,
                                                         $crate::__pgrx_c_macros::expression::ReadWrite
                                                     >,
@@ -17951,7 +18318,7 @@ macro_rules! VARDATA_COMPRESSED_GET_COMPRESS_METHOD {
                     ),
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                            $crate::VARLENA_EXTSIZE_BITS as i32
+                            $crate::__pgrx_c_bindings::VARLENA_EXTSIZE_BITS as i32
                         )
                     )
                 )
@@ -17973,8 +18340,8 @@ macro_rules! VARDATA_COMPRESSED_GET_COMPRESS_METHOD {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -18005,23 +18372,23 @@ macro_rules! __pgrx_c_args_VARDATA_COMPRESSED_GET_EXTSIZE {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
         $crate::__pgrx_c_args_VARDATA_COMPRESSED_GET_EXTSIZE!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_VARDATA_COMPRESSED_GET_EXTSIZE!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_VARDATA_COMPRESSED_GET_EXTSIZE!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_VARDATA_COMPRESSED_GET_EXTSIZE!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -18033,7 +18400,7 @@ macro_rules! __pgrx_c_args_VARDATA_COMPRESSED_GET_EXTSIZE {
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
         $crate::__pgrx_c_args_VARDATA_COMPRESSED_GET_EXTSIZE!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
@@ -18059,17 +18426,17 @@ macro_rules! __pgrx_c_args_VARDATA_COMPRESSED_GET_EXTSIZE {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_VARDATA_COMPRESSED_GET_EXTSIZE!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_VARDATA_COMPRESSED_GET_EXTSIZE!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_VARDATA_COMPRESSED_GET_EXTSIZE!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -18096,13 +18463,13 @@ macro_rules! __pgrx_c_args_VARDATA_COMPRESSED_GET_EXTSIZE {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_VARDATA_COMPRESSED_GET_EXTSIZE!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_VARDATA_COMPRESSED_GET_EXTSIZE!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -18170,10 +18537,10 @@ macro_rules! VARDATA_COMPRESSED_GET_EXTSIZE {
                                                 _
                                             >(
                                                 $crate::__pgrx_c_macros::expression::cast_as::<
-                                                    *mut $crate::varattrib_4b,
+                                                    *mut $crate::__pgrx_c_bindings::varattrib_4b,
                                                     $crate::__pgrx_c_macros::expression::CPointer<
                                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                                            $crate::varattrib_4b
+                                                            $crate::__pgrx_c_bindings::varattrib_4b
                                                         >,
                                                         $crate::__pgrx_c_macros::expression::ReadWrite
                                                     >,
@@ -18200,7 +18567,7 @@ macro_rules! VARDATA_COMPRESSED_GET_EXTSIZE {
                     ),
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CUnsignedInt>::new(
-                            $crate::VARLENA_EXTSIZE_MASK as u32
+                            $crate::__pgrx_c_bindings::VARLENA_EXTSIZE_MASK as u32
                         )
                     )
                 )
@@ -18262,10 +18629,10 @@ macro_rules! VARDATA_COMPRESSED_GET_EXTSIZE {
                                                             _
                                                         >(
                                                             $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                *mut $crate::varattrib_4b,
+                                                                *mut $crate::__pgrx_c_bindings::varattrib_4b,
                                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                                        $crate::varattrib_4b
+                                                                        $crate::__pgrx_c_bindings::varattrib_4b
                                                                     >,
                                                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                                                 >,
@@ -18293,7 +18660,7 @@ macro_rules! VARDATA_COMPRESSED_GET_EXTSIZE {
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::CValue::<
                                         $crate::__pgrx_c_macros::CUnsignedInt
-                                    >::new($crate::VARLENA_EXTSIZE_MASK as u32)
+                                    >::new($crate::__pgrx_c_bindings::VARLENA_EXTSIZE_MASK as u32)
                                 )
                             )
                         )
@@ -18333,10 +18700,10 @@ macro_rules! VARDATA_COMPRESSED_GET_EXTSIZE {
                                                 _
                                             >(
                                                 $crate::__pgrx_c_macros::expression::cast_as::<
-                                                    *mut $crate::varattrib_4b,
+                                                    *mut $crate::__pgrx_c_bindings::varattrib_4b,
                                                     $crate::__pgrx_c_macros::expression::CPointer<
                                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                                            $crate::varattrib_4b
+                                                            $crate::__pgrx_c_bindings::varattrib_4b
                                                         >,
                                                         $crate::__pgrx_c_macros::expression::ReadWrite
                                                     >,
@@ -18363,7 +18730,7 @@ macro_rules! VARDATA_COMPRESSED_GET_EXTSIZE {
                     ),
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CUnsignedInt>::new(
-                            $crate::VARLENA_EXTSIZE_MASK as u32
+                            $crate::__pgrx_c_bindings::VARLENA_EXTSIZE_MASK as u32
                         )
                     )
                 )
@@ -18385,8 +18752,8 @@ macro_rules! VARDATA_COMPRESSED_GET_EXTSIZE {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -18413,20 +18780,24 @@ macro_rules! __pgrx_c_args_VARDATA_EXTERNAL {
         $crate::__pgrx_c_args_VARDATA_EXTERNAL!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_VARDATA_EXTERNAL!(@p1 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_VARDATA_EXTERNAL!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_VARDATA_EXTERNAL!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_VARDATA_EXTERNAL!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_VARDATA_EXTERNAL!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_VARDATA_EXTERNAL!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -18434,7 +18805,9 @@ macro_rules! __pgrx_c_args_VARDATA_EXTERNAL {
         $crate::__pgrx_c_args_VARDATA_EXTERNAL!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_VARDATA_EXTERNAL!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_VARDATA_EXTERNAL!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -18456,14 +18829,18 @@ macro_rules! __pgrx_c_args_VARDATA_EXTERNAL {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_VARDATA_EXTERNAL!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_VARDATA_EXTERNAL!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_VARDATA_EXTERNAL!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_VARDATA_EXTERNAL!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_VARDATA_EXTERNAL!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -18490,13 +18867,13 @@ macro_rules! __pgrx_c_args_VARDATA_EXTERNAL {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_VARDATA_EXTERNAL!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_VARDATA_EXTERNAL!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -18552,10 +18929,10 @@ macro_rules! VARDATA_EXTERNAL {
                             (
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::cast_as::<
-                                        *mut $crate::varattrib_1b_e,
+                                        *mut $crate::__pgrx_c_bindings::varattrib_1b_e,
                                         $crate::__pgrx_c_macros::expression::CPointer<
                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                $crate::varattrib_1b_e
+                                                $crate::__pgrx_c_bindings::varattrib_1b_e
                                             >,
                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                         >,
@@ -18591,10 +18968,10 @@ macro_rules! VARDATA_EXTERNAL {
                     (
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::cast_as::<
-                                *mut $crate::varattrib_1b_e,
+                                *mut $crate::__pgrx_c_bindings::varattrib_1b_e,
                                 $crate::__pgrx_c_macros::expression::CPointer<
                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                        $crate::varattrib_1b_e
+                                        $crate::__pgrx_c_bindings::varattrib_1b_e
                                     >,
                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                 >,
@@ -18627,10 +19004,10 @@ macro_rules! VARDATA_EXTERNAL {
                     (
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::cast_as::<
-                                *mut $crate::varattrib_1b_e,
+                                *mut $crate::__pgrx_c_bindings::varattrib_1b_e,
                                 $crate::__pgrx_c_macros::expression::CPointer<
                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                        $crate::varattrib_1b_e
+                                        $crate::__pgrx_c_bindings::varattrib_1b_e
                                     >,
                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                 >,
@@ -18671,10 +19048,10 @@ macro_rules! VARDATA_EXTERNAL {
                                 (
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::expression::cast_as::<
-                                            *mut $crate::varattrib_1b_e,
+                                            *mut $crate::__pgrx_c_bindings::varattrib_1b_e,
                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                    $crate::varattrib_1b_e
+                                                    $crate::__pgrx_c_bindings::varattrib_1b_e
                                                 >,
                                                 $crate::__pgrx_c_macros::expression::ReadWrite
                                             >,
@@ -18715,10 +19092,10 @@ macro_rules! VARDATA_EXTERNAL {
                             (
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::cast_as::<
-                                        *mut $crate::varattrib_1b_e,
+                                        *mut $crate::__pgrx_c_bindings::varattrib_1b_e,
                                         $crate::__pgrx_c_macros::expression::CPointer<
                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                $crate::varattrib_1b_e
+                                                $crate::__pgrx_c_bindings::varattrib_1b_e
                                             >,
                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                         >,
@@ -18748,8 +19125,8 @@ macro_rules! VARDATA_EXTERNAL {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -18776,20 +19153,24 @@ macro_rules! __pgrx_c_args_VARDATA_SHORT {
         $crate::__pgrx_c_args_VARDATA_SHORT!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_VARDATA_SHORT!(@p1 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_VARDATA_SHORT!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_VARDATA_SHORT!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_VARDATA_SHORT!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_VARDATA_SHORT!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_VARDATA_SHORT!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -18797,7 +19178,9 @@ macro_rules! __pgrx_c_args_VARDATA_SHORT {
         $crate::__pgrx_c_args_VARDATA_SHORT!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_VARDATA_SHORT!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_VARDATA_SHORT!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -18819,14 +19202,18 @@ macro_rules! __pgrx_c_args_VARDATA_SHORT {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_VARDATA_SHORT!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_VARDATA_SHORT!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_VARDATA_SHORT!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_VARDATA_SHORT!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_VARDATA_SHORT!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -18853,13 +19240,13 @@ macro_rules! __pgrx_c_args_VARDATA_SHORT {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_VARDATA_SHORT!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_VARDATA_SHORT!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -18915,10 +19302,10 @@ macro_rules! VARDATA_SHORT {
                             (
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::cast_as::<
-                                        *mut $crate::varattrib_1b,
+                                        *mut $crate::__pgrx_c_bindings::varattrib_1b,
                                         $crate::__pgrx_c_macros::expression::CPointer<
                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                $crate::varattrib_1b
+                                                $crate::__pgrx_c_bindings::varattrib_1b
                                             >,
                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                         >,
@@ -18954,10 +19341,10 @@ macro_rules! VARDATA_SHORT {
                     (
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::cast_as::<
-                                *mut $crate::varattrib_1b,
+                                *mut $crate::__pgrx_c_bindings::varattrib_1b,
                                 $crate::__pgrx_c_macros::expression::CPointer<
                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                        $crate::varattrib_1b
+                                        $crate::__pgrx_c_bindings::varattrib_1b
                                     >,
                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                 >,
@@ -18990,10 +19377,10 @@ macro_rules! VARDATA_SHORT {
                     (
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::cast_as::<
-                                *mut $crate::varattrib_1b,
+                                *mut $crate::__pgrx_c_bindings::varattrib_1b,
                                 $crate::__pgrx_c_macros::expression::CPointer<
                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                        $crate::varattrib_1b
+                                        $crate::__pgrx_c_bindings::varattrib_1b
                                     >,
                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                 >,
@@ -19034,10 +19421,10 @@ macro_rules! VARDATA_SHORT {
                                 (
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::expression::cast_as::<
-                                            *mut $crate::varattrib_1b,
+                                            *mut $crate::__pgrx_c_bindings::varattrib_1b,
                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                    $crate::varattrib_1b
+                                                    $crate::__pgrx_c_bindings::varattrib_1b
                                                 >,
                                                 $crate::__pgrx_c_macros::expression::ReadWrite
                                             >,
@@ -19078,10 +19465,10 @@ macro_rules! VARDATA_SHORT {
                             (
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::cast_as::<
-                                        *mut $crate::varattrib_1b,
+                                        *mut $crate::__pgrx_c_bindings::varattrib_1b,
                                         $crate::__pgrx_c_macros::expression::CPointer<
                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                $crate::varattrib_1b
+                                                $crate::__pgrx_c_bindings::varattrib_1b
                                             >,
                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                         >,
@@ -19111,8 +19498,8 @@ macro_rules! VARDATA_SHORT {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -19139,22 +19526,34 @@ macro_rules! __pgrx_c_args_VARSIZE {
         $crate::__pgrx_c_args_VARSIZE!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_VARSIZE!(@p1 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_VARSIZE!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_VARSIZE!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_VARSIZE!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_VARSIZE!(@p1 $mode [$($done)* (@literal [- $argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_VARSIZE!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+            $($rest)*
+        )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_VARSIZE!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_VARSIZE!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $($raw:tt)*) => {
         $crate::__pgrx_c_args_VARSIZE!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_VARSIZE!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_VARSIZE!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -19174,13 +19573,20 @@ macro_rules! __pgrx_c_args_VARSIZE {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_VARSIZE!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_VARSIZE!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_VARSIZE!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_VARSIZE!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
-        $crate::__pgrx_c_args_VARSIZE!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_VARSIZE!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
         $crate::__pgrx_c_classify!(
@@ -19202,10 +19608,16 @@ macro_rules! __pgrx_c_args_VARSIZE {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_VARSIZE!(@p1 $mode [$($done)* (@literal [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_VARSIZE!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+            $($rest)*
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_VARSIZE!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_VARSIZE!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p1 $mode:ident [$($done:tt)*];) => {
         $crate::VARSIZE!(@$mode; $($done)*)
@@ -19272,10 +19684,10 @@ macro_rules! VARSIZE {
                                                             _
                                                         >(
                                                             $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                *mut $crate::varattrib_4b,
+                                                                *mut $crate::__pgrx_c_bindings::varattrib_4b,
                                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                                        $crate::varattrib_4b
+                                                                        $crate::__pgrx_c_bindings::varattrib_4b
                                                                     >,
                                                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                                                 >,
@@ -19370,10 +19782,10 @@ macro_rules! VARSIZE {
                                                                         _
                                                                     >(
                                                                         $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                            *mut $crate::varattrib_4b,
+                                                                            *mut $crate::__pgrx_c_bindings::varattrib_4b,
                                                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                    $crate::varattrib_4b
+                                                                                    $crate::__pgrx_c_bindings::varattrib_4b
                                                                                 >,
                                                                                 $crate::__pgrx_c_macros::expression::ReadWrite
                                                                             >,
@@ -19455,10 +19867,10 @@ macro_rules! VARSIZE {
                                                             _
                                                         >(
                                                             $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                *mut $crate::varattrib_4b,
+                                                                *mut $crate::__pgrx_c_bindings::varattrib_4b,
                                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                                        $crate::varattrib_4b
+                                                                        $crate::__pgrx_c_bindings::varattrib_4b
                                                                     >,
                                                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                                                 >,
@@ -19509,8 +19921,8 @@ macro_rules! VARSIZE {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -19537,25 +19949,34 @@ macro_rules! __pgrx_c_args_VARSIZE_1B {
         $crate::__pgrx_c_args_VARSIZE_1B!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_VARSIZE_1B!(@p1 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_VARSIZE_1B!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_VARSIZE_1B!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_VARSIZE_1B!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_VARSIZE_1B!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_VARSIZE_1B!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_VARSIZE_1B!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $($raw:tt)*) => {
         $crate::__pgrx_c_args_VARSIZE_1B!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_VARSIZE_1B!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_VARSIZE_1B!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -19577,13 +19998,20 @@ macro_rules! __pgrx_c_args_VARSIZE_1B {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_VARSIZE_1B!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_VARSIZE_1B!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_VARSIZE_1B!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_VARSIZE_1B!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
-        $crate::__pgrx_c_args_VARSIZE_1B!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_VARSIZE_1B!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
         $crate::__pgrx_c_classify!(
@@ -19605,10 +20033,16 @@ macro_rules! __pgrx_c_args_VARSIZE_1B {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_VARSIZE_1B!(@p1 $mode [$($done)* (@literal [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_VARSIZE_1B!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+            $($rest)*
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_VARSIZE_1B!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_VARSIZE_1B!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p1 $mode:ident [$($done:tt)*];) => {
         $crate::VARSIZE_1B!(@$mode; $($done)*)
@@ -19669,10 +20103,10 @@ macro_rules! VARSIZE_1B {
                                                         _
                                                     >(
                                                         $crate::__pgrx_c_macros::expression::cast_as::<
-                                                            *mut $crate::varattrib_1b,
+                                                            *mut $crate::__pgrx_c_bindings::varattrib_1b,
                                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                                    $crate::varattrib_1b
+                                                                    $crate::__pgrx_c_bindings::varattrib_1b
                                                                 >,
                                                                 $crate::__pgrx_c_macros::expression::ReadWrite
                                                             >,
@@ -19760,10 +20194,10 @@ macro_rules! VARSIZE_1B {
                                                                     _
                                                                 >(
                                                                     $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                        *mut $crate::varattrib_1b,
+                                                                        *mut $crate::__pgrx_c_bindings::varattrib_1b,
                                                                         $crate::__pgrx_c_macros::expression::CPointer<
                                                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                $crate::varattrib_1b
+                                                                                $crate::__pgrx_c_bindings::varattrib_1b
                                                                             >,
                                                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                                                         >,
@@ -19836,10 +20270,10 @@ macro_rules! VARSIZE_1B {
                                                         _
                                                     >(
                                                         $crate::__pgrx_c_macros::expression::cast_as::<
-                                                            *mut $crate::varattrib_1b,
+                                                            *mut $crate::__pgrx_c_bindings::varattrib_1b,
                                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                                    $crate::varattrib_1b
+                                                                    $crate::__pgrx_c_bindings::varattrib_1b
                                                                 >,
                                                                 $crate::__pgrx_c_macros::expression::ReadWrite
                                                             >,
@@ -19889,8 +20323,8 @@ macro_rules! VARSIZE_1B {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -19917,25 +20351,34 @@ macro_rules! __pgrx_c_args_VARSIZE_4B {
         $crate::__pgrx_c_args_VARSIZE_4B!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_VARSIZE_4B!(@p1 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_VARSIZE_4B!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_VARSIZE_4B!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_VARSIZE_4B!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_VARSIZE_4B!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_VARSIZE_4B!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_VARSIZE_4B!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $($raw:tt)*) => {
         $crate::__pgrx_c_args_VARSIZE_4B!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_VARSIZE_4B!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_VARSIZE_4B!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -19957,13 +20400,20 @@ macro_rules! __pgrx_c_args_VARSIZE_4B {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_VARSIZE_4B!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_VARSIZE_4B!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_VARSIZE_4B!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_VARSIZE_4B!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
-        $crate::__pgrx_c_args_VARSIZE_4B!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_VARSIZE_4B!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
         $crate::__pgrx_c_classify!(
@@ -19985,10 +20435,16 @@ macro_rules! __pgrx_c_args_VARSIZE_4B {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_VARSIZE_4B!(@p1 $mode [$($done)* (@literal [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_VARSIZE_4B!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+            $($rest)*
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_VARSIZE_4B!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_VARSIZE_4B!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p1 $mode:ident [$($done:tt)*];) => {
         $crate::VARSIZE_4B!(@$mode; $($done)*)
@@ -20054,10 +20510,10 @@ macro_rules! VARSIZE_4B {
                                                             _
                                                         >(
                                                             $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                *mut $crate::varattrib_4b,
+                                                                *mut $crate::__pgrx_c_bindings::varattrib_4b,
                                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                                        $crate::varattrib_4b
+                                                                        $crate::__pgrx_c_bindings::varattrib_4b
                                                                     >,
                                                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                                                 >,
@@ -20151,10 +20607,10 @@ macro_rules! VARSIZE_4B {
                                                                         _
                                                                     >(
                                                                         $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                            *mut $crate::varattrib_4b,
+                                                                            *mut $crate::__pgrx_c_bindings::varattrib_4b,
                                                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                    $crate::varattrib_4b
+                                                                                    $crate::__pgrx_c_bindings::varattrib_4b
                                                                                 >,
                                                                                 $crate::__pgrx_c_macros::expression::ReadWrite
                                                                             >,
@@ -20235,10 +20691,10 @@ macro_rules! VARSIZE_4B {
                                                             _
                                                         >(
                                                             $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                *mut $crate::varattrib_4b,
+                                                                *mut $crate::__pgrx_c_bindings::varattrib_4b,
                                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                                        $crate::varattrib_4b
+                                                                        $crate::__pgrx_c_bindings::varattrib_4b
                                                                     >,
                                                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                                                 >,
@@ -20289,8 +20745,8 @@ macro_rules! VARSIZE_4B {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -20317,25 +20773,34 @@ macro_rules! __pgrx_c_args_VARSIZE_ANY {
         $crate::__pgrx_c_args_VARSIZE_ANY!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_VARSIZE_ANY!(@p1 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_VARSIZE_ANY!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_VARSIZE_ANY!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_VARSIZE_ANY!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_VARSIZE_ANY!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_VARSIZE_ANY!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_VARSIZE_ANY!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $($raw:tt)*) => {
         $crate::__pgrx_c_args_VARSIZE_ANY!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_VARSIZE_ANY!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_VARSIZE_ANY!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -20357,13 +20822,20 @@ macro_rules! __pgrx_c_args_VARSIZE_ANY {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_VARSIZE_ANY!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_VARSIZE_ANY!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_VARSIZE_ANY!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_VARSIZE_ANY!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
-        $crate::__pgrx_c_args_VARSIZE_ANY!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_VARSIZE_ANY!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
         $crate::__pgrx_c_classify!(
@@ -20385,10 +20857,16 @@ macro_rules! __pgrx_c_args_VARSIZE_ANY {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_VARSIZE_ANY!(@p1 $mode [$($done)* (@literal [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_VARSIZE_ANY!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+            $($rest)*
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_VARSIZE_ANY!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_VARSIZE_ANY!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p1 $mode:ident [$($done:tt)*];) => {
         $crate::VARSIZE_ANY!(@$mode; $($done)*)
@@ -20455,10 +20933,10 @@ macro_rules! VARSIZE_ANY {
                                                                 _
                                                             >(
                                                                 $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                    *mut $crate::varattrib_1b,
+                                                                    *mut $crate::__pgrx_c_bindings::varattrib_1b,
                                                                     $crate::__pgrx_c_macros::expression::CPointer<
                                                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                                                            $crate::varattrib_1b
+                                                                            $crate::__pgrx_c_bindings::varattrib_1b
                                                                         >,
                                                                         $crate::__pgrx_c_macros::expression::ReadWrite
                                                                     >,
@@ -20506,7 +20984,7 @@ macro_rules! VARSIZE_ANY {
                                         >(
                                             $crate::__pgrx_c_macros::expression::offset_of::<
                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                    $crate::varattrib_1b_e
+                                                    $crate::__pgrx_c_bindings::varattrib_1b_e
                                                 >,
                                                 $crate::__pgrx_c_field_marker!(@path; va_data)
                                             >()
@@ -20542,10 +21020,10 @@ macro_rules! VARSIZE_ANY {
                                                                                                 _
                                                                                             >(
                                                                                                 $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                                                    *mut $crate::varattrib_1b_e,
+                                                                                                    *mut $crate::__pgrx_c_bindings::varattrib_1b_e,
                                                                                                     $crate::__pgrx_c_macros::expression::CPointer<
                                                                                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                            $crate::varattrib_1b_e
+                                                                                                            $crate::__pgrx_c_bindings::varattrib_1b_e
                                                                                                         >,
                                                                                                         $crate::__pgrx_c_macros::expression::ReadWrite
                                                                                                     >,
@@ -20580,7 +21058,7 @@ macro_rules! VARSIZE_ANY {
                                                                     $crate::__pgrx_c_macros::CValue::<
                                                                         $crate::__pgrx_c_macros::CInt
                                                                     >::new(
-                                                                        $crate::vartag_external::VARTAG_INDIRECT as i32
+                                                                        $crate::__pgrx_c_bindings::vartag_external::VARTAG_INDIRECT as i32
                                                                     )
                                                                 )
                                                             )
@@ -20593,7 +21071,7 @@ macro_rules! VARSIZE_ANY {
                                                             >(
                                                                 $crate::__pgrx_c_macros::expression::size_of::<
                                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                                        $crate::varatt_indirect
+                                                                        $crate::__pgrx_c_bindings::varatt_indirect
                                                                     >>()
                                                             )
                                                         )
@@ -20636,10 +21114,10 @@ macro_rules! VARSIZE_ANY {
                                                                                                                                 _
                                                                                                                             >(
                                                                                                                                 $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                                                                                    *mut $crate::varattrib_1b_e,
+                                                                                                                                    *mut $crate::__pgrx_c_bindings::varattrib_1b_e,
                                                                                                                                     $crate::__pgrx_c_macros::expression::CPointer<
                                                                                                                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                                                            $crate::varattrib_1b_e
+                                                                                                                                            $crate::__pgrx_c_bindings::varattrib_1b_e
                                                                                                                                         >,
                                                                                                                                         $crate::__pgrx_c_macros::expression::ReadWrite
                                                                                                                                     >,
@@ -20694,7 +21172,7 @@ macro_rules! VARSIZE_ANY {
                                                                                         $crate::__pgrx_c_macros::CValue::<
                                                                                             $crate::__pgrx_c_macros::CInt
                                                                                         >::new(
-                                                                                            $crate::vartag_external::VARTAG_EXPANDED_RO as i32
+                                                                                            $crate::__pgrx_c_bindings::vartag_external::VARTAG_EXPANDED_RO as i32
                                                                                         )
                                                                                     )
                                                                                 )
@@ -20708,7 +21186,7 @@ macro_rules! VARSIZE_ANY {
                                                                             >(
                                                                                 $crate::__pgrx_c_macros::expression::size_of::<
                                                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                        $crate::varatt_expanded
+                                                                                        $crate::__pgrx_c_bindings::varatt_expanded
                                                                                     >>()
                                                                             )
                                                                         )
@@ -20744,10 +21222,10 @@ macro_rules! VARSIZE_ANY {
                                                                                                                                 _
                                                                                                                             >(
                                                                                                                                 $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                                                                                    *mut $crate::varattrib_1b_e,
+                                                                                                                                    *mut $crate::__pgrx_c_bindings::varattrib_1b_e,
                                                                                                                                     $crate::__pgrx_c_macros::expression::CPointer<
                                                                                                                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                                                            $crate::varattrib_1b_e
+                                                                                                                                            $crate::__pgrx_c_bindings::varattrib_1b_e
                                                                                                                                         >,
                                                                                                                                         $crate::__pgrx_c_macros::expression::ReadWrite
                                                                                                                                     >,
@@ -20782,7 +21260,7 @@ macro_rules! VARSIZE_ANY {
                                                                                                     $crate::__pgrx_c_macros::CValue::<
                                                                                                         $crate::__pgrx_c_macros::CInt
                                                                                                     >::new(
-                                                                                                        $crate::vartag_external::VARTAG_ONDISK as i32
+                                                                                                        $crate::__pgrx_c_bindings::vartag_external::VARTAG_ONDISK as i32
                                                                                                     )
                                                                                                 )
                                                                                             )
@@ -20795,7 +21273,7 @@ macro_rules! VARSIZE_ANY {
                                                                                             >(
                                                                                                 $crate::__pgrx_c_macros::expression::size_of::<
                                                                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                        $crate::varatt_external
+                                                                                                        $crate::__pgrx_c_bindings::varatt_external
                                                                                                     >>()
                                                                                             )
                                                                                         )
@@ -20896,10 +21374,10 @@ macro_rules! VARSIZE_ANY {
                                                                                             _
                                                                                         >(
                                                                                             $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                                                *mut $crate::varattrib_1b,
+                                                                                                *mut $crate::__pgrx_c_bindings::varattrib_1b,
                                                                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                        $crate::varattrib_1b
+                                                                                                        $crate::__pgrx_c_bindings::varattrib_1b
                                                                                                     >,
                                                                                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                                                                                 >,
@@ -20978,10 +21456,10 @@ macro_rules! VARSIZE_ANY {
                                                                                                 _
                                                                                             >(
                                                                                                 $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                                                    *mut $crate::varattrib_1b,
+                                                                                                    *mut $crate::__pgrx_c_bindings::varattrib_1b,
                                                                                                     $crate::__pgrx_c_macros::expression::CPointer<
                                                                                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                            $crate::varattrib_1b
+                                                                                                            $crate::__pgrx_c_bindings::varattrib_1b
                                                                                                         >,
                                                                                                         $crate::__pgrx_c_macros::expression::ReadWrite
                                                                                                     >,
@@ -21066,10 +21544,10 @@ macro_rules! VARSIZE_ANY {
                                                                                                     _
                                                                                                 >(
                                                                                                     $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                                                        *mut $crate::varattrib_4b,
+                                                                                                        *mut $crate::__pgrx_c_bindings::varattrib_4b,
                                                                                                         $crate::__pgrx_c_macros::expression::CPointer<
                                                                                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                                $crate::varattrib_4b
+                                                                                                                $crate::__pgrx_c_bindings::varattrib_4b
                                                                                                             >,
                                                                                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                                                                                         >,
@@ -21182,10 +21660,10 @@ macro_rules! VARSIZE_ANY {
                                                                             _
                                                                         >(
                                                                             $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                                *mut $crate::varattrib_1b,
+                                                                                *mut $crate::__pgrx_c_bindings::varattrib_1b,
                                                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                        $crate::varattrib_1b
+                                                                                        $crate::__pgrx_c_bindings::varattrib_1b
                                                                                     >,
                                                                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                                                                 >,
@@ -21241,7 +21719,7 @@ macro_rules! VARSIZE_ANY {
                                                     >(
                                                         $crate::__pgrx_c_macros::expression::offset_of::<
                                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                                $crate::varattrib_1b_e
+                                                                $crate::__pgrx_c_bindings::varattrib_1b_e
                                                             >,
                                                             $crate::__pgrx_c_field_marker!(
                                                                 @path;
@@ -21280,10 +21758,10 @@ macro_rules! VARSIZE_ANY {
                                                                                                             _
                                                                                                         >(
                                                                                                             $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                                                                *mut $crate::varattrib_1b_e,
+                                                                                                                *mut $crate::__pgrx_c_bindings::varattrib_1b_e,
                                                                                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                                                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                                        $crate::varattrib_1b_e
+                                                                                                                        $crate::__pgrx_c_bindings::varattrib_1b_e
                                                                                                                     >,
                                                                                                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                                                                                                 >,
@@ -21318,7 +21796,7 @@ macro_rules! VARSIZE_ANY {
                                                                                 $crate::__pgrx_c_macros::CValue::<
                                                                                     $crate::__pgrx_c_macros::CInt
                                                                                 >::new(
-                                                                                    $crate::vartag_external::VARTAG_INDIRECT as i32
+                                                                                    $crate::__pgrx_c_bindings::vartag_external::VARTAG_INDIRECT as i32
                                                                                 )
                                                                             )
                                                                         )
@@ -21331,7 +21809,7 @@ macro_rules! VARSIZE_ANY {
                                                                         >(
                                                                             $crate::__pgrx_c_macros::expression::size_of::<
                                                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                    $crate::varatt_indirect
+                                                                                    $crate::__pgrx_c_bindings::varatt_indirect
                                                                                 >>()
                                                                         )
                                                                     )
@@ -21374,10 +21852,10 @@ macro_rules! VARSIZE_ANY {
                                                                                                                                             _
                                                                                                                                         >(
                                                                                                                                             $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                                                                                                *mut $crate::varattrib_1b_e,
+                                                                                                                                                *mut $crate::__pgrx_c_bindings::varattrib_1b_e,
                                                                                                                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                                                                                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                                                                        $crate::varattrib_1b_e
+                                                                                                                                                        $crate::__pgrx_c_bindings::varattrib_1b_e
                                                                                                                                                     >,
                                                                                                                                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                                                                                                                                 >,
@@ -21432,7 +21910,7 @@ macro_rules! VARSIZE_ANY {
                                                                                                     $crate::__pgrx_c_macros::CValue::<
                                                                                                         $crate::__pgrx_c_macros::CInt
                                                                                                     >::new(
-                                                                                                        $crate::vartag_external::VARTAG_EXPANDED_RO as i32
+                                                                                                        $crate::__pgrx_c_bindings::vartag_external::VARTAG_EXPANDED_RO as i32
                                                                                                     )
                                                                                                 )
                                                                                             )
@@ -21446,7 +21924,7 @@ macro_rules! VARSIZE_ANY {
                                                                                         >(
                                                                                             $crate::__pgrx_c_macros::expression::size_of::<
                                                                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                    $crate::varatt_expanded
+                                                                                                    $crate::__pgrx_c_bindings::varatt_expanded
                                                                                                 >>()
                                                                                         )
                                                                                     )
@@ -21482,10 +21960,10 @@ macro_rules! VARSIZE_ANY {
                                                                                                                                             _
                                                                                                                                         >(
                                                                                                                                             $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                                                                                                *mut $crate::varattrib_1b_e,
+                                                                                                                                                *mut $crate::__pgrx_c_bindings::varattrib_1b_e,
                                                                                                                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                                                                                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                                                                        $crate::varattrib_1b_e
+                                                                                                                                                        $crate::__pgrx_c_bindings::varattrib_1b_e
                                                                                                                                                     >,
                                                                                                                                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                                                                                                                                 >,
@@ -21520,7 +21998,7 @@ macro_rules! VARSIZE_ANY {
                                                                                                                 $crate::__pgrx_c_macros::CValue::<
                                                                                                                     $crate::__pgrx_c_macros::CInt
                                                                                                                 >::new(
-                                                                                                                    $crate::vartag_external::VARTAG_ONDISK as i32
+                                                                                                                    $crate::__pgrx_c_bindings::vartag_external::VARTAG_ONDISK as i32
                                                                                                                 )
                                                                                                             )
                                                                                                         )
@@ -21533,7 +22011,7 @@ macro_rules! VARSIZE_ANY {
                                                                                                         >(
                                                                                                             $crate::__pgrx_c_macros::expression::size_of::<
                                                                                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                                    $crate::varatt_external
+                                                                                                                    $crate::__pgrx_c_bindings::varatt_external
                                                                                                                 >>()
                                                                                                         )
                                                                                                     )
@@ -21637,10 +22115,10 @@ macro_rules! VARSIZE_ANY {
                                                                                                         _
                                                                                                     >(
                                                                                                         $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                                                            *mut $crate::varattrib_1b,
+                                                                                                            *mut $crate::__pgrx_c_bindings::varattrib_1b,
                                                                                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                                                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                                    $crate::varattrib_1b
+                                                                                                                    $crate::__pgrx_c_bindings::varattrib_1b
                                                                                                                 >,
                                                                                                                 $crate::__pgrx_c_macros::expression::ReadWrite
                                                                                                             >,
@@ -21719,10 +22197,10 @@ macro_rules! VARSIZE_ANY {
                                                                                                             _
                                                                                                         >(
                                                                                                             $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                                                                *mut $crate::varattrib_1b,
+                                                                                                                *mut $crate::__pgrx_c_bindings::varattrib_1b,
                                                                                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                                                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                                        $crate::varattrib_1b
+                                                                                                                        $crate::__pgrx_c_bindings::varattrib_1b
                                                                                                                     >,
                                                                                                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                                                                                                 >,
@@ -21807,10 +22285,10 @@ macro_rules! VARSIZE_ANY {
                                                                                                                 _
                                                                                                             >(
                                                                                                                 $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                                                                    *mut $crate::varattrib_4b,
+                                                                                                                    *mut $crate::__pgrx_c_bindings::varattrib_4b,
                                                                                                                     $crate::__pgrx_c_macros::expression::CPointer<
                                                                                                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                                            $crate::varattrib_4b
+                                                                                                                            $crate::__pgrx_c_bindings::varattrib_4b
                                                                                                                         >,
                                                                                                                         $crate::__pgrx_c_macros::expression::ReadWrite
                                                                                                                     >,
@@ -21905,10 +22383,10 @@ macro_rules! VARSIZE_ANY {
                                                                 _
                                                             >(
                                                                 $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                    *mut $crate::varattrib_1b,
+                                                                    *mut $crate::__pgrx_c_bindings::varattrib_1b,
                                                                     $crate::__pgrx_c_macros::expression::CPointer<
                                                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                                                            $crate::varattrib_1b
+                                                                            $crate::__pgrx_c_bindings::varattrib_1b
                                                                         >,
                                                                         $crate::__pgrx_c_macros::expression::ReadWrite
                                                                     >,
@@ -21956,7 +22434,7 @@ macro_rules! VARSIZE_ANY {
                                         >(
                                             $crate::__pgrx_c_macros::expression::offset_of::<
                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                    $crate::varattrib_1b_e
+                                                    $crate::__pgrx_c_bindings::varattrib_1b_e
                                                 >,
                                                 $crate::__pgrx_c_field_marker!(@path; va_data)
                                             >()
@@ -21992,10 +22470,10 @@ macro_rules! VARSIZE_ANY {
                                                                                                 _
                                                                                             >(
                                                                                                 $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                                                    *mut $crate::varattrib_1b_e,
+                                                                                                    *mut $crate::__pgrx_c_bindings::varattrib_1b_e,
                                                                                                     $crate::__pgrx_c_macros::expression::CPointer<
                                                                                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                            $crate::varattrib_1b_e
+                                                                                                            $crate::__pgrx_c_bindings::varattrib_1b_e
                                                                                                         >,
                                                                                                         $crate::__pgrx_c_macros::expression::ReadWrite
                                                                                                     >,
@@ -22030,7 +22508,7 @@ macro_rules! VARSIZE_ANY {
                                                                     $crate::__pgrx_c_macros::CValue::<
                                                                         $crate::__pgrx_c_macros::CInt
                                                                     >::new(
-                                                                        $crate::vartag_external::VARTAG_INDIRECT as i32
+                                                                        $crate::__pgrx_c_bindings::vartag_external::VARTAG_INDIRECT as i32
                                                                     )
                                                                 )
                                                             )
@@ -22043,7 +22521,7 @@ macro_rules! VARSIZE_ANY {
                                                             >(
                                                                 $crate::__pgrx_c_macros::expression::size_of::<
                                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                                        $crate::varatt_indirect
+                                                                        $crate::__pgrx_c_bindings::varatt_indirect
                                                                     >>()
                                                             )
                                                         )
@@ -22086,10 +22564,10 @@ macro_rules! VARSIZE_ANY {
                                                                                                                                 _
                                                                                                                             >(
                                                                                                                                 $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                                                                                    *mut $crate::varattrib_1b_e,
+                                                                                                                                    *mut $crate::__pgrx_c_bindings::varattrib_1b_e,
                                                                                                                                     $crate::__pgrx_c_macros::expression::CPointer<
                                                                                                                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                                                            $crate::varattrib_1b_e
+                                                                                                                                            $crate::__pgrx_c_bindings::varattrib_1b_e
                                                                                                                                         >,
                                                                                                                                         $crate::__pgrx_c_macros::expression::ReadWrite
                                                                                                                                     >,
@@ -22144,7 +22622,7 @@ macro_rules! VARSIZE_ANY {
                                                                                         $crate::__pgrx_c_macros::CValue::<
                                                                                             $crate::__pgrx_c_macros::CInt
                                                                                         >::new(
-                                                                                            $crate::vartag_external::VARTAG_EXPANDED_RO as i32
+                                                                                            $crate::__pgrx_c_bindings::vartag_external::VARTAG_EXPANDED_RO as i32
                                                                                         )
                                                                                     )
                                                                                 )
@@ -22158,7 +22636,7 @@ macro_rules! VARSIZE_ANY {
                                                                             >(
                                                                                 $crate::__pgrx_c_macros::expression::size_of::<
                                                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                        $crate::varatt_expanded
+                                                                                        $crate::__pgrx_c_bindings::varatt_expanded
                                                                                     >>()
                                                                             )
                                                                         )
@@ -22194,10 +22672,10 @@ macro_rules! VARSIZE_ANY {
                                                                                                                                 _
                                                                                                                             >(
                                                                                                                                 $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                                                                                    *mut $crate::varattrib_1b_e,
+                                                                                                                                    *mut $crate::__pgrx_c_bindings::varattrib_1b_e,
                                                                                                                                     $crate::__pgrx_c_macros::expression::CPointer<
                                                                                                                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                                                            $crate::varattrib_1b_e
+                                                                                                                                            $crate::__pgrx_c_bindings::varattrib_1b_e
                                                                                                                                         >,
                                                                                                                                         $crate::__pgrx_c_macros::expression::ReadWrite
                                                                                                                                     >,
@@ -22232,7 +22710,7 @@ macro_rules! VARSIZE_ANY {
                                                                                                     $crate::__pgrx_c_macros::CValue::<
                                                                                                         $crate::__pgrx_c_macros::CInt
                                                                                                     >::new(
-                                                                                                        $crate::vartag_external::VARTAG_ONDISK as i32
+                                                                                                        $crate::__pgrx_c_bindings::vartag_external::VARTAG_ONDISK as i32
                                                                                                     )
                                                                                                 )
                                                                                             )
@@ -22245,7 +22723,7 @@ macro_rules! VARSIZE_ANY {
                                                                                             >(
                                                                                                 $crate::__pgrx_c_macros::expression::size_of::<
                                                                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                        $crate::varatt_external
+                                                                                                        $crate::__pgrx_c_bindings::varatt_external
                                                                                                     >>()
                                                                                             )
                                                                                         )
@@ -22346,10 +22824,10 @@ macro_rules! VARSIZE_ANY {
                                                                                             _
                                                                                         >(
                                                                                             $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                                                *mut $crate::varattrib_1b,
+                                                                                                *mut $crate::__pgrx_c_bindings::varattrib_1b,
                                                                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                        $crate::varattrib_1b
+                                                                                                        $crate::__pgrx_c_bindings::varattrib_1b
                                                                                                     >,
                                                                                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                                                                                 >,
@@ -22428,10 +22906,10 @@ macro_rules! VARSIZE_ANY {
                                                                                                 _
                                                                                             >(
                                                                                                 $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                                                    *mut $crate::varattrib_1b,
+                                                                                                    *mut $crate::__pgrx_c_bindings::varattrib_1b,
                                                                                                     $crate::__pgrx_c_macros::expression::CPointer<
                                                                                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                            $crate::varattrib_1b
+                                                                                                            $crate::__pgrx_c_bindings::varattrib_1b
                                                                                                         >,
                                                                                                         $crate::__pgrx_c_macros::expression::ReadWrite
                                                                                                     >,
@@ -22516,10 +22994,10 @@ macro_rules! VARSIZE_ANY {
                                                                                                     _
                                                                                                 >(
                                                                                                     $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                                                        *mut $crate::varattrib_4b,
+                                                                                                        *mut $crate::__pgrx_c_bindings::varattrib_4b,
                                                                                                         $crate::__pgrx_c_macros::expression::CPointer<
                                                                                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                                $crate::varattrib_4b
+                                                                                                                $crate::__pgrx_c_bindings::varattrib_4b
                                                                                                             >,
                                                                                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                                                                                         >,
@@ -22588,8 +23066,8 @@ macro_rules! VARSIZE_ANY {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -22616,20 +23094,24 @@ macro_rules! __pgrx_c_args_VARSIZE_ANY_EXHDR {
         $crate::__pgrx_c_args_VARSIZE_ANY_EXHDR!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_VARSIZE_ANY_EXHDR!(@p1 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_VARSIZE_ANY_EXHDR!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_VARSIZE_ANY_EXHDR!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_VARSIZE_ANY_EXHDR!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_VARSIZE_ANY_EXHDR!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_VARSIZE_ANY_EXHDR!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -22637,7 +23119,9 @@ macro_rules! __pgrx_c_args_VARSIZE_ANY_EXHDR {
         $crate::__pgrx_c_args_VARSIZE_ANY_EXHDR!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_VARSIZE_ANY_EXHDR!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_VARSIZE_ANY_EXHDR!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -22659,14 +23143,18 @@ macro_rules! __pgrx_c_args_VARSIZE_ANY_EXHDR {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_VARSIZE_ANY_EXHDR!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_VARSIZE_ANY_EXHDR!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_VARSIZE_ANY_EXHDR!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_VARSIZE_ANY_EXHDR!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_VARSIZE_ANY_EXHDR!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -22693,13 +23181,13 @@ macro_rules! __pgrx_c_args_VARSIZE_ANY_EXHDR {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_VARSIZE_ANY_EXHDR!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_VARSIZE_ANY_EXHDR!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -22768,10 +23256,10 @@ macro_rules! VARSIZE_ANY_EXHDR {
                                                                 _
                                                             >(
                                                                 $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                    *mut $crate::varattrib_1b,
+                                                                    *mut $crate::__pgrx_c_bindings::varattrib_1b,
                                                                     $crate::__pgrx_c_macros::expression::CPointer<
                                                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                                                            $crate::varattrib_1b
+                                                                            $crate::__pgrx_c_bindings::varattrib_1b
                                                                         >,
                                                                         $crate::__pgrx_c_macros::expression::ReadWrite
                                                                     >,
@@ -22828,7 +23316,7 @@ macro_rules! VARSIZE_ANY_EXHDR {
                                                 >(
                                                     $crate::__pgrx_c_macros::expression::offset_of::<
                                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                                            $crate::varattrib_1b_e
+                                                            $crate::__pgrx_c_bindings::varattrib_1b_e
                                                         >,
                                                         $crate::__pgrx_c_field_marker!(
                                                             @path;
@@ -22867,10 +23355,10 @@ macro_rules! VARSIZE_ANY_EXHDR {
                                                                                                         _
                                                                                                     >(
                                                                                                         $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                                                            *mut $crate::varattrib_1b_e,
+                                                                                                            *mut $crate::__pgrx_c_bindings::varattrib_1b_e,
                                                                                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                                                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                                    $crate::varattrib_1b_e
+                                                                                                                    $crate::__pgrx_c_bindings::varattrib_1b_e
                                                                                                                 >,
                                                                                                                 $crate::__pgrx_c_macros::expression::ReadWrite
                                                                                                             >,
@@ -22905,7 +23393,7 @@ macro_rules! VARSIZE_ANY_EXHDR {
                                                                             $crate::__pgrx_c_macros::CValue::<
                                                                                 $crate::__pgrx_c_macros::CInt
                                                                             >::new(
-                                                                                $crate::vartag_external::VARTAG_INDIRECT as i32
+                                                                                $crate::__pgrx_c_bindings::vartag_external::VARTAG_INDIRECT as i32
                                                                             )
                                                                         )
                                                                     )
@@ -22918,7 +23406,7 @@ macro_rules! VARSIZE_ANY_EXHDR {
                                                                     >(
                                                                         $crate::__pgrx_c_macros::expression::size_of::<
                                                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                $crate::varatt_indirect
+                                                                                $crate::__pgrx_c_bindings::varatt_indirect
                                                                             >>()
                                                                     )
                                                                 )
@@ -22961,10 +23449,10 @@ macro_rules! VARSIZE_ANY_EXHDR {
                                                                                                                                         _
                                                                                                                                     >(
                                                                                                                                         $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                                                                                            *mut $crate::varattrib_1b_e,
+                                                                                                                                            *mut $crate::__pgrx_c_bindings::varattrib_1b_e,
                                                                                                                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                                                                                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                                                                    $crate::varattrib_1b_e
+                                                                                                                                                    $crate::__pgrx_c_bindings::varattrib_1b_e
                                                                                                                                                 >,
                                                                                                                                                 $crate::__pgrx_c_macros::expression::ReadWrite
                                                                                                                                             >,
@@ -23019,7 +23507,7 @@ macro_rules! VARSIZE_ANY_EXHDR {
                                                                                                 $crate::__pgrx_c_macros::CValue::<
                                                                                                     $crate::__pgrx_c_macros::CInt
                                                                                                 >::new(
-                                                                                                    $crate::vartag_external::VARTAG_EXPANDED_RO as i32
+                                                                                                    $crate::__pgrx_c_bindings::vartag_external::VARTAG_EXPANDED_RO as i32
                                                                                                 )
                                                                                             )
                                                                                         )
@@ -23033,7 +23521,7 @@ macro_rules! VARSIZE_ANY_EXHDR {
                                                                                     >(
                                                                                         $crate::__pgrx_c_macros::expression::size_of::<
                                                                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                $crate::varatt_expanded
+                                                                                                $crate::__pgrx_c_bindings::varatt_expanded
                                                                                             >>()
                                                                                     )
                                                                                 )
@@ -23069,10 +23557,10 @@ macro_rules! VARSIZE_ANY_EXHDR {
                                                                                                                                         _
                                                                                                                                     >(
                                                                                                                                         $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                                                                                            *mut $crate::varattrib_1b_e,
+                                                                                                                                            *mut $crate::__pgrx_c_bindings::varattrib_1b_e,
                                                                                                                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                                                                                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                                                                    $crate::varattrib_1b_e
+                                                                                                                                                    $crate::__pgrx_c_bindings::varattrib_1b_e
                                                                                                                                                 >,
                                                                                                                                                 $crate::__pgrx_c_macros::expression::ReadWrite
                                                                                                                                             >,
@@ -23107,7 +23595,7 @@ macro_rules! VARSIZE_ANY_EXHDR {
                                                                                                             $crate::__pgrx_c_macros::CValue::<
                                                                                                                 $crate::__pgrx_c_macros::CInt
                                                                                                             >::new(
-                                                                                                                $crate::vartag_external::VARTAG_ONDISK as i32
+                                                                                                                $crate::__pgrx_c_bindings::vartag_external::VARTAG_ONDISK as i32
                                                                                                             )
                                                                                                         )
                                                                                                     )
@@ -23120,7 +23608,7 @@ macro_rules! VARSIZE_ANY_EXHDR {
                                                                                                     >(
                                                                                                         $crate::__pgrx_c_macros::expression::size_of::<
                                                                                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                                $crate::varatt_external
+                                                                                                                $crate::__pgrx_c_bindings::varatt_external
                                                                                                             >>()
                                                                                                     )
                                                                                                 )
@@ -23188,7 +23676,7 @@ macro_rules! VARSIZE_ANY_EXHDR {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::expression::offset_of::<
                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                $crate::varattrib_1b_e
+                                                $crate::__pgrx_c_bindings::varattrib_1b_e
                                             >,
                                             $crate::__pgrx_c_field_marker!(@path; va_data)
                                         >()
@@ -23231,10 +23719,10 @@ macro_rules! VARSIZE_ANY_EXHDR {
                                                                                             _
                                                                                         >(
                                                                                             $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                                                *mut $crate::varattrib_1b,
+                                                                                                *mut $crate::__pgrx_c_bindings::varattrib_1b,
                                                                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                        $crate::varattrib_1b
+                                                                                                        $crate::__pgrx_c_bindings::varattrib_1b
                                                                                                     >,
                                                                                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                                                                                 >,
@@ -23322,10 +23810,10 @@ macro_rules! VARSIZE_ANY_EXHDR {
                                                                                                         _
                                                                                                     >(
                                                                                                         $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                                                            *mut $crate::varattrib_1b,
+                                                                                                            *mut $crate::__pgrx_c_bindings::varattrib_1b,
                                                                                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                                                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                                    $crate::varattrib_1b
+                                                                                                                    $crate::__pgrx_c_bindings::varattrib_1b
                                                                                                                 >,
                                                                                                                 $crate::__pgrx_c_macros::expression::ReadWrite
                                                                                                             >,
@@ -23379,7 +23867,7 @@ macro_rules! VARSIZE_ANY_EXHDR {
                                                         >(
                                                             $crate::__pgrx_c_macros::expression::offset_of::<
                                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                                    $crate::varattrib_1b
+                                                                    $crate::__pgrx_c_bindings::varattrib_1b
                                                                 >,
                                                                 $crate::__pgrx_c_field_marker!(
                                                                     @path;
@@ -23435,10 +23923,10 @@ macro_rules! VARSIZE_ANY_EXHDR {
                                                                                                             _
                                                                                                         >(
                                                                                                             $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                                                                *mut $crate::varattrib_4b,
+                                                                                                                *mut $crate::__pgrx_c_bindings::varattrib_4b,
                                                                                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                                                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                                        $crate::varattrib_4b
+                                                                                                                        $crate::__pgrx_c_bindings::varattrib_4b
                                                                                                                     >,
                                                                                                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                                                                                                 >,
@@ -23493,7 +23981,7 @@ macro_rules! VARSIZE_ANY_EXHDR {
                                                                 _
                                                             >(
                                                                 $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                    $crate::int32,
+                                                                    $crate::__pgrx_c_bindings::int32,
                                                                     $crate::__pgrx_c_macros::CInt,
                                                                     _
                                                                 >(
@@ -23574,10 +24062,10 @@ macro_rules! VARSIZE_ANY_EXHDR {
                                                                             _
                                                                         >(
                                                                             $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                                *mut $crate::varattrib_1b,
+                                                                                *mut $crate::__pgrx_c_bindings::varattrib_1b,
                                                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                        $crate::varattrib_1b
+                                                                                        $crate::__pgrx_c_bindings::varattrib_1b
                                                                                     >,
                                                                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                                                                 >,
@@ -23642,7 +24130,7 @@ macro_rules! VARSIZE_ANY_EXHDR {
                                                             >(
                                                                 $crate::__pgrx_c_macros::expression::offset_of::<
                                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                                        $crate::varattrib_1b_e
+                                                                        $crate::__pgrx_c_bindings::varattrib_1b_e
                                                                     >,
                                                                     $crate::__pgrx_c_field_marker!(
                                                                         @path;
@@ -23681,10 +24169,10 @@ macro_rules! VARSIZE_ANY_EXHDR {
                                                                                                                     _
                                                                                                                 >(
                                                                                                                     $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                                                                        *mut $crate::varattrib_1b_e,
+                                                                                                                        *mut $crate::__pgrx_c_bindings::varattrib_1b_e,
                                                                                                                         $crate::__pgrx_c_macros::expression::CPointer<
                                                                                                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                                                $crate::varattrib_1b_e
+                                                                                                                                $crate::__pgrx_c_bindings::varattrib_1b_e
                                                                                                                             >,
                                                                                                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                                                                                                         >,
@@ -23719,7 +24207,7 @@ macro_rules! VARSIZE_ANY_EXHDR {
                                                                                         $crate::__pgrx_c_macros::CValue::<
                                                                                             $crate::__pgrx_c_macros::CInt
                                                                                         >::new(
-                                                                                            $crate::vartag_external::VARTAG_INDIRECT as i32
+                                                                                            $crate::__pgrx_c_bindings::vartag_external::VARTAG_INDIRECT as i32
                                                                                         )
                                                                                     )
                                                                                 )
@@ -23732,7 +24220,7 @@ macro_rules! VARSIZE_ANY_EXHDR {
                                                                                 >(
                                                                                     $crate::__pgrx_c_macros::expression::size_of::<
                                                                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                            $crate::varatt_indirect
+                                                                                            $crate::__pgrx_c_bindings::varatt_indirect
                                                                                         >>()
                                                                                 )
                                                                             )
@@ -23775,10 +24263,10 @@ macro_rules! VARSIZE_ANY_EXHDR {
                                                                                                                                                     _
                                                                                                                                                 >(
                                                                                                                                                     $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                                                                                                        *mut $crate::varattrib_1b_e,
+                                                                                                                                                        *mut $crate::__pgrx_c_bindings::varattrib_1b_e,
                                                                                                                                                         $crate::__pgrx_c_macros::expression::CPointer<
                                                                                                                                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                                                                                $crate::varattrib_1b_e
+                                                                                                                                                                $crate::__pgrx_c_bindings::varattrib_1b_e
                                                                                                                                                             >,
                                                                                                                                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                                                                                                                                         >,
@@ -23833,7 +24321,7 @@ macro_rules! VARSIZE_ANY_EXHDR {
                                                                                                             $crate::__pgrx_c_macros::CValue::<
                                                                                                                 $crate::__pgrx_c_macros::CInt
                                                                                                             >::new(
-                                                                                                                $crate::vartag_external::VARTAG_EXPANDED_RO as i32
+                                                                                                                $crate::__pgrx_c_bindings::vartag_external::VARTAG_EXPANDED_RO as i32
                                                                                                             )
                                                                                                         )
                                                                                                     )
@@ -23847,7 +24335,7 @@ macro_rules! VARSIZE_ANY_EXHDR {
                                                                                                 >(
                                                                                                     $crate::__pgrx_c_macros::expression::size_of::<
                                                                                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                            $crate::varatt_expanded
+                                                                                                            $crate::__pgrx_c_bindings::varatt_expanded
                                                                                                         >>()
                                                                                                 )
                                                                                             )
@@ -23883,10 +24371,10 @@ macro_rules! VARSIZE_ANY_EXHDR {
                                                                                                                                                     _
                                                                                                                                                 >(
                                                                                                                                                     $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                                                                                                        *mut $crate::varattrib_1b_e,
+                                                                                                                                                        *mut $crate::__pgrx_c_bindings::varattrib_1b_e,
                                                                                                                                                         $crate::__pgrx_c_macros::expression::CPointer<
                                                                                                                                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                                                                                $crate::varattrib_1b_e
+                                                                                                                                                                $crate::__pgrx_c_bindings::varattrib_1b_e
                                                                                                                                                             >,
                                                                                                                                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                                                                                                                                         >,
@@ -23921,7 +24409,7 @@ macro_rules! VARSIZE_ANY_EXHDR {
                                                                                                                         $crate::__pgrx_c_macros::CValue::<
                                                                                                                             $crate::__pgrx_c_macros::CInt
                                                                                                                         >::new(
-                                                                                                                            $crate::vartag_external::VARTAG_ONDISK as i32
+                                                                                                                            $crate::__pgrx_c_bindings::vartag_external::VARTAG_ONDISK as i32
                                                                                                                         )
                                                                                                                     )
                                                                                                                 )
@@ -23934,7 +24422,7 @@ macro_rules! VARSIZE_ANY_EXHDR {
                                                                                                                 >(
                                                                                                                     $crate::__pgrx_c_macros::expression::size_of::<
                                                                                                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                                            $crate::varatt_external
+                                                                                                                            $crate::__pgrx_c_bindings::varatt_external
                                                                                                                         >>()
                                                                                                                 )
                                                                                                             )
@@ -24005,7 +24493,7 @@ macro_rules! VARSIZE_ANY_EXHDR {
                                                 >(
                                                     $crate::__pgrx_c_macros::expression::offset_of::<
                                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                                            $crate::varattrib_1b_e
+                                                            $crate::__pgrx_c_bindings::varattrib_1b_e
                                                         >,
                                                         $crate::__pgrx_c_field_marker!(
                                                             @path;
@@ -24054,10 +24542,10 @@ macro_rules! VARSIZE_ANY_EXHDR {
                                                                                                         _
                                                                                                     >(
                                                                                                         $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                                                            *mut $crate::varattrib_1b,
+                                                                                                            *mut $crate::__pgrx_c_bindings::varattrib_1b,
                                                                                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                                                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                                    $crate::varattrib_1b
+                                                                                                                    $crate::__pgrx_c_bindings::varattrib_1b
                                                                                                                 >,
                                                                                                                 $crate::__pgrx_c_macros::expression::ReadWrite
                                                                                                             >,
@@ -24145,10 +24633,10 @@ macro_rules! VARSIZE_ANY_EXHDR {
                                                                                                                     _
                                                                                                                 >(
                                                                                                                     $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                                                                        *mut $crate::varattrib_1b,
+                                                                                                                        *mut $crate::__pgrx_c_bindings::varattrib_1b,
                                                                                                                         $crate::__pgrx_c_macros::expression::CPointer<
                                                                                                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                                                $crate::varattrib_1b
+                                                                                                                                $crate::__pgrx_c_bindings::varattrib_1b
                                                                                                                             >,
                                                                                                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                                                                                                         >,
@@ -24204,7 +24692,7 @@ macro_rules! VARSIZE_ANY_EXHDR {
                                                                     >(
                                                                         $crate::__pgrx_c_macros::expression::offset_of::<
                                                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                $crate::varattrib_1b
+                                                                                $crate::__pgrx_c_bindings::varattrib_1b
                                                                             >,
                                                                             $crate::__pgrx_c_field_marker!(
                                                                                 @path;
@@ -24260,10 +24748,10 @@ macro_rules! VARSIZE_ANY_EXHDR {
                                                                                                                         _
                                                                                                                     >(
                                                                                                                         $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                                                                            *mut $crate::varattrib_4b,
+                                                                                                                            *mut $crate::__pgrx_c_bindings::varattrib_4b,
                                                                                                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                                                                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                                                    $crate::varattrib_4b
+                                                                                                                                    $crate::__pgrx_c_bindings::varattrib_4b
                                                                                                                                 >,
                                                                                                                                 $crate::__pgrx_c_macros::expression::ReadWrite
                                                                                                                             >,
@@ -24322,7 +24810,7 @@ macro_rules! VARSIZE_ANY_EXHDR {
                                                                             _
                                                                         >(
                                                                             $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                                $crate::int32,
+                                                                                $crate::__pgrx_c_bindings::int32,
                                                                                 $crate::__pgrx_c_macros::CInt,
                                                                                 _
                                                                             >(
@@ -24385,10 +24873,10 @@ macro_rules! VARSIZE_ANY_EXHDR {
                                                                 _
                                                             >(
                                                                 $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                    *mut $crate::varattrib_1b,
+                                                                    *mut $crate::__pgrx_c_bindings::varattrib_1b,
                                                                     $crate::__pgrx_c_macros::expression::CPointer<
                                                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                                                            $crate::varattrib_1b
+                                                                            $crate::__pgrx_c_bindings::varattrib_1b
                                                                         >,
                                                                         $crate::__pgrx_c_macros::expression::ReadWrite
                                                                     >,
@@ -24445,7 +24933,7 @@ macro_rules! VARSIZE_ANY_EXHDR {
                                                 >(
                                                     $crate::__pgrx_c_macros::expression::offset_of::<
                                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                                            $crate::varattrib_1b_e
+                                                            $crate::__pgrx_c_bindings::varattrib_1b_e
                                                         >,
                                                         $crate::__pgrx_c_field_marker!(
                                                             @path;
@@ -24484,10 +24972,10 @@ macro_rules! VARSIZE_ANY_EXHDR {
                                                                                                         _
                                                                                                     >(
                                                                                                         $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                                                            *mut $crate::varattrib_1b_e,
+                                                                                                            *mut $crate::__pgrx_c_bindings::varattrib_1b_e,
                                                                                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                                                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                                    $crate::varattrib_1b_e
+                                                                                                                    $crate::__pgrx_c_bindings::varattrib_1b_e
                                                                                                                 >,
                                                                                                                 $crate::__pgrx_c_macros::expression::ReadWrite
                                                                                                             >,
@@ -24522,7 +25010,7 @@ macro_rules! VARSIZE_ANY_EXHDR {
                                                                             $crate::__pgrx_c_macros::CValue::<
                                                                                 $crate::__pgrx_c_macros::CInt
                                                                             >::new(
-                                                                                $crate::vartag_external::VARTAG_INDIRECT as i32
+                                                                                $crate::__pgrx_c_bindings::vartag_external::VARTAG_INDIRECT as i32
                                                                             )
                                                                         )
                                                                     )
@@ -24535,7 +25023,7 @@ macro_rules! VARSIZE_ANY_EXHDR {
                                                                     >(
                                                                         $crate::__pgrx_c_macros::expression::size_of::<
                                                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                $crate::varatt_indirect
+                                                                                $crate::__pgrx_c_bindings::varatt_indirect
                                                                             >>()
                                                                     )
                                                                 )
@@ -24578,10 +25066,10 @@ macro_rules! VARSIZE_ANY_EXHDR {
                                                                                                                                         _
                                                                                                                                     >(
                                                                                                                                         $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                                                                                            *mut $crate::varattrib_1b_e,
+                                                                                                                                            *mut $crate::__pgrx_c_bindings::varattrib_1b_e,
                                                                                                                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                                                                                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                                                                    $crate::varattrib_1b_e
+                                                                                                                                                    $crate::__pgrx_c_bindings::varattrib_1b_e
                                                                                                                                                 >,
                                                                                                                                                 $crate::__pgrx_c_macros::expression::ReadWrite
                                                                                                                                             >,
@@ -24636,7 +25124,7 @@ macro_rules! VARSIZE_ANY_EXHDR {
                                                                                                 $crate::__pgrx_c_macros::CValue::<
                                                                                                     $crate::__pgrx_c_macros::CInt
                                                                                                 >::new(
-                                                                                                    $crate::vartag_external::VARTAG_EXPANDED_RO as i32
+                                                                                                    $crate::__pgrx_c_bindings::vartag_external::VARTAG_EXPANDED_RO as i32
                                                                                                 )
                                                                                             )
                                                                                         )
@@ -24650,7 +25138,7 @@ macro_rules! VARSIZE_ANY_EXHDR {
                                                                                     >(
                                                                                         $crate::__pgrx_c_macros::expression::size_of::<
                                                                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                $crate::varatt_expanded
+                                                                                                $crate::__pgrx_c_bindings::varatt_expanded
                                                                                             >>()
                                                                                     )
                                                                                 )
@@ -24686,10 +25174,10 @@ macro_rules! VARSIZE_ANY_EXHDR {
                                                                                                                                         _
                                                                                                                                     >(
                                                                                                                                         $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                                                                                            *mut $crate::varattrib_1b_e,
+                                                                                                                                            *mut $crate::__pgrx_c_bindings::varattrib_1b_e,
                                                                                                                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                                                                                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                                                                    $crate::varattrib_1b_e
+                                                                                                                                                    $crate::__pgrx_c_bindings::varattrib_1b_e
                                                                                                                                                 >,
                                                                                                                                                 $crate::__pgrx_c_macros::expression::ReadWrite
                                                                                                                                             >,
@@ -24724,7 +25212,7 @@ macro_rules! VARSIZE_ANY_EXHDR {
                                                                                                             $crate::__pgrx_c_macros::CValue::<
                                                                                                                 $crate::__pgrx_c_macros::CInt
                                                                                                             >::new(
-                                                                                                                $crate::vartag_external::VARTAG_ONDISK as i32
+                                                                                                                $crate::__pgrx_c_bindings::vartag_external::VARTAG_ONDISK as i32
                                                                                                             )
                                                                                                         )
                                                                                                     )
@@ -24737,7 +25225,7 @@ macro_rules! VARSIZE_ANY_EXHDR {
                                                                                                     >(
                                                                                                         $crate::__pgrx_c_macros::expression::size_of::<
                                                                                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                                $crate::varatt_external
+                                                                                                                $crate::__pgrx_c_bindings::varatt_external
                                                                                                             >>()
                                                                                                     )
                                                                                                 )
@@ -24805,7 +25293,7 @@ macro_rules! VARSIZE_ANY_EXHDR {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::expression::offset_of::<
                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                $crate::varattrib_1b_e
+                                                $crate::__pgrx_c_bindings::varattrib_1b_e
                                             >,
                                             $crate::__pgrx_c_field_marker!(@path; va_data)
                                         >()
@@ -24848,10 +25336,10 @@ macro_rules! VARSIZE_ANY_EXHDR {
                                                                                             _
                                                                                         >(
                                                                                             $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                                                *mut $crate::varattrib_1b,
+                                                                                                *mut $crate::__pgrx_c_bindings::varattrib_1b,
                                                                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                        $crate::varattrib_1b
+                                                                                                        $crate::__pgrx_c_bindings::varattrib_1b
                                                                                                     >,
                                                                                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                                                                                 >,
@@ -24939,10 +25427,10 @@ macro_rules! VARSIZE_ANY_EXHDR {
                                                                                                         _
                                                                                                     >(
                                                                                                         $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                                                            *mut $crate::varattrib_1b,
+                                                                                                            *mut $crate::__pgrx_c_bindings::varattrib_1b,
                                                                                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                                                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                                    $crate::varattrib_1b
+                                                                                                                    $crate::__pgrx_c_bindings::varattrib_1b
                                                                                                                 >,
                                                                                                                 $crate::__pgrx_c_macros::expression::ReadWrite
                                                                                                             >,
@@ -24996,7 +25484,7 @@ macro_rules! VARSIZE_ANY_EXHDR {
                                                         >(
                                                             $crate::__pgrx_c_macros::expression::offset_of::<
                                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                                    $crate::varattrib_1b
+                                                                    $crate::__pgrx_c_bindings::varattrib_1b
                                                                 >,
                                                                 $crate::__pgrx_c_field_marker!(
                                                                     @path;
@@ -25052,10 +25540,10 @@ macro_rules! VARSIZE_ANY_EXHDR {
                                                                                                             _
                                                                                                         >(
                                                                                                             $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                                                                *mut $crate::varattrib_4b,
+                                                                                                                *mut $crate::__pgrx_c_bindings::varattrib_4b,
                                                                                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                                                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                                        $crate::varattrib_4b
+                                                                                                                        $crate::__pgrx_c_bindings::varattrib_4b
                                                                                                                     >,
                                                                                                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                                                                                                 >,
@@ -25110,7 +25598,7 @@ macro_rules! VARSIZE_ANY_EXHDR {
                                                                 _
                                                             >(
                                                                 $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                    $crate::int32,
+                                                                    $crate::__pgrx_c_bindings::int32,
                                                                     $crate::__pgrx_c_macros::CInt,
                                                                     _
                                                                 >(
@@ -25147,8 +25635,8 @@ macro_rules! VARSIZE_ANY_EXHDR {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -25175,20 +25663,24 @@ macro_rules! __pgrx_c_args_VARSIZE_EXTERNAL {
         $crate::__pgrx_c_args_VARSIZE_EXTERNAL!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_VARSIZE_EXTERNAL!(@p1 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_VARSIZE_EXTERNAL!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_VARSIZE_EXTERNAL!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_VARSIZE_EXTERNAL!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_VARSIZE_EXTERNAL!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_VARSIZE_EXTERNAL!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -25196,7 +25688,9 @@ macro_rules! __pgrx_c_args_VARSIZE_EXTERNAL {
         $crate::__pgrx_c_args_VARSIZE_EXTERNAL!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_VARSIZE_EXTERNAL!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_VARSIZE_EXTERNAL!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -25218,14 +25712,18 @@ macro_rules! __pgrx_c_args_VARSIZE_EXTERNAL {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_VARSIZE_EXTERNAL!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_VARSIZE_EXTERNAL!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_VARSIZE_EXTERNAL!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_VARSIZE_EXTERNAL!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_VARSIZE_EXTERNAL!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -25252,13 +25750,13 @@ macro_rules! __pgrx_c_args_VARSIZE_EXTERNAL {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_VARSIZE_EXTERNAL!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_VARSIZE_EXTERNAL!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -25307,7 +25805,9 @@ macro_rules! VARSIZE_EXTERNAL {
                 $crate::__pgrx_c_macros::expression::add::<$crate::__pgrx_c_macros::Wrapping, _, _>(
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::expression::offset_of::<
-                            $crate::__pgrx_c_macros::expression::CRecord<$crate::varattrib_1b_e>,
+                            $crate::__pgrx_c_macros::expression::CRecord<
+                                $crate::__pgrx_c_bindings::varattrib_1b_e
+                            >,
                             $crate::__pgrx_c_field_marker!(@path; va_data)
                         >()
                     ),
@@ -25336,10 +25836,10 @@ macro_rules! VARSIZE_EXTERNAL {
                                                                             _
                                                                         >(
                                                                             $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                                *mut $crate::varattrib_1b_e,
+                                                                                *mut $crate::__pgrx_c_bindings::varattrib_1b_e,
                                                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                        $crate::varattrib_1b_e
+                                                                                        $crate::__pgrx_c_bindings::varattrib_1b_e
                                                                                     >,
                                                                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                                                                 >,
@@ -25374,7 +25874,7 @@ macro_rules! VARSIZE_EXTERNAL {
                                                 $crate::__pgrx_c_macros::CValue::<
                                                     $crate::__pgrx_c_macros::CInt
                                                 >::new(
-                                                    $crate::vartag_external::VARTAG_INDIRECT as i32
+                                                    $crate::__pgrx_c_bindings::vartag_external::VARTAG_INDIRECT as i32
                                                 )
                                             )
                                         )
@@ -25387,7 +25887,7 @@ macro_rules! VARSIZE_EXTERNAL {
                                         >(
                                             $crate::__pgrx_c_macros::expression::size_of::<
                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                    $crate::varatt_indirect
+                                                    $crate::__pgrx_c_bindings::varatt_indirect
                                                 >>()
                                         )
                                     )
@@ -25430,10 +25930,10 @@ macro_rules! VARSIZE_EXTERNAL {
                                                                                                             _
                                                                                                         >(
                                                                                                             $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                                                                *mut $crate::varattrib_1b_e,
+                                                                                                                *mut $crate::__pgrx_c_bindings::varattrib_1b_e,
                                                                                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                                                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                                        $crate::varattrib_1b_e
+                                                                                                                        $crate::__pgrx_c_bindings::varattrib_1b_e
                                                                                                                     >,
                                                                                                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                                                                                                 >,
@@ -25486,7 +25986,7 @@ macro_rules! VARSIZE_EXTERNAL {
                                                                     $crate::__pgrx_c_macros::CValue::<
                                                                         $crate::__pgrx_c_macros::CInt
                                                                     >::new(
-                                                                        $crate::vartag_external::VARTAG_EXPANDED_RO as i32
+                                                                        $crate::__pgrx_c_bindings::vartag_external::VARTAG_EXPANDED_RO as i32
                                                                     )
                                                                 )
                                                             )
@@ -25500,7 +26000,7 @@ macro_rules! VARSIZE_EXTERNAL {
                                                         >(
                                                             $crate::__pgrx_c_macros::expression::size_of::<
                                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                                    $crate::varatt_expanded
+                                                                    $crate::__pgrx_c_bindings::varatt_expanded
                                                                 >>()
                                                         )
                                                     )
@@ -25536,10 +26036,10 @@ macro_rules! VARSIZE_EXTERNAL {
                                                                                                             _
                                                                                                         >(
                                                                                                             $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                                                                *mut $crate::varattrib_1b_e,
+                                                                                                                *mut $crate::__pgrx_c_bindings::varattrib_1b_e,
                                                                                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                                                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                                        $crate::varattrib_1b_e
+                                                                                                                        $crate::__pgrx_c_bindings::varattrib_1b_e
                                                                                                                     >,
                                                                                                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                                                                                                 >,
@@ -25574,7 +26074,7 @@ macro_rules! VARSIZE_EXTERNAL {
                                                                                 $crate::__pgrx_c_macros::CValue::<
                                                                                     $crate::__pgrx_c_macros::CInt
                                                                                 >::new(
-                                                                                    $crate::vartag_external::VARTAG_ONDISK as i32
+                                                                                    $crate::__pgrx_c_bindings::vartag_external::VARTAG_ONDISK as i32
                                                                                 )
                                                                             )
                                                                         )
@@ -25587,7 +26087,7 @@ macro_rules! VARSIZE_EXTERNAL {
                                                                         >(
                                                                             $crate::__pgrx_c_macros::expression::size_of::<
                                                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                    $crate::varatt_external
+                                                                                    $crate::__pgrx_c_bindings::varatt_external
                                                                                 >>()
                                                                         )
                                                                     )
@@ -25688,7 +26188,7 @@ macro_rules! VARSIZE_EXTERNAL {
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::offset_of::<
                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                            $crate::varattrib_1b_e
+                                            $crate::__pgrx_c_bindings::varattrib_1b_e
                                         >,
                                         $crate::__pgrx_c_field_marker!(@path; va_data)
                                     >()
@@ -25721,10 +26221,10 @@ macro_rules! VARSIZE_EXTERNAL {
                                                                                         _
                                                                                     >(
                                                                                         $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                                            *mut $crate::varattrib_1b_e,
+                                                                                            *mut $crate::__pgrx_c_bindings::varattrib_1b_e,
                                                                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                    $crate::varattrib_1b_e
+                                                                                                    $crate::__pgrx_c_bindings::varattrib_1b_e
                                                                                                 >,
                                                                                                 $crate::__pgrx_c_macros::expression::ReadWrite
                                                                                             >,
@@ -25759,7 +26259,7 @@ macro_rules! VARSIZE_EXTERNAL {
                                                             $crate::__pgrx_c_macros::CValue::<
                                                                 $crate::__pgrx_c_macros::CInt
                                                             >::new(
-                                                                $crate::vartag_external::VARTAG_INDIRECT as i32
+                                                                $crate::__pgrx_c_bindings::vartag_external::VARTAG_INDIRECT as i32
                                                             )
                                                         )
                                                     )
@@ -25772,7 +26272,7 @@ macro_rules! VARSIZE_EXTERNAL {
                                                     >(
                                                         $crate::__pgrx_c_macros::expression::size_of::<
                                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                                $crate::varatt_indirect
+                                                                $crate::__pgrx_c_bindings::varatt_indirect
                                                             >>()
                                                     )
                                                 )
@@ -25815,10 +26315,10 @@ macro_rules! VARSIZE_EXTERNAL {
                                                                                                                         _
                                                                                                                     >(
                                                                                                                         $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                                                                            *mut $crate::varattrib_1b_e,
+                                                                                                                            *mut $crate::__pgrx_c_bindings::varattrib_1b_e,
                                                                                                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                                                                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                                                    $crate::varattrib_1b_e
+                                                                                                                                    $crate::__pgrx_c_bindings::varattrib_1b_e
                                                                                                                                 >,
                                                                                                                                 $crate::__pgrx_c_macros::expression::ReadWrite
                                                                                                                             >,
@@ -25873,7 +26373,7 @@ macro_rules! VARSIZE_EXTERNAL {
                                                                                 $crate::__pgrx_c_macros::CValue::<
                                                                                     $crate::__pgrx_c_macros::CInt
                                                                                 >::new(
-                                                                                    $crate::vartag_external::VARTAG_EXPANDED_RO as i32
+                                                                                    $crate::__pgrx_c_bindings::vartag_external::VARTAG_EXPANDED_RO as i32
                                                                                 )
                                                                             )
                                                                         )
@@ -25887,7 +26387,7 @@ macro_rules! VARSIZE_EXTERNAL {
                                                                     >(
                                                                         $crate::__pgrx_c_macros::expression::size_of::<
                                                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                $crate::varatt_expanded
+                                                                                $crate::__pgrx_c_bindings::varatt_expanded
                                                                             >>()
                                                                     )
                                                                 )
@@ -25923,10 +26423,10 @@ macro_rules! VARSIZE_EXTERNAL {
                                                                                                                         _
                                                                                                                     >(
                                                                                                                         $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                                                                            *mut $crate::varattrib_1b_e,
+                                                                                                                            *mut $crate::__pgrx_c_bindings::varattrib_1b_e,
                                                                                                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                                                                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                                                    $crate::varattrib_1b_e
+                                                                                                                                    $crate::__pgrx_c_bindings::varattrib_1b_e
                                                                                                                                 >,
                                                                                                                                 $crate::__pgrx_c_macros::expression::ReadWrite
                                                                                                                             >,
@@ -25961,7 +26461,7 @@ macro_rules! VARSIZE_EXTERNAL {
                                                                                             $crate::__pgrx_c_macros::CValue::<
                                                                                                 $crate::__pgrx_c_macros::CInt
                                                                                             >::new(
-                                                                                                $crate::vartag_external::VARTAG_ONDISK as i32
+                                                                                                $crate::__pgrx_c_bindings::vartag_external::VARTAG_ONDISK as i32
                                                                                             )
                                                                                         )
                                                                                     )
@@ -25974,7 +26474,7 @@ macro_rules! VARSIZE_EXTERNAL {
                                                                                     >(
                                                                                         $crate::__pgrx_c_macros::expression::size_of::<
                                                                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                $crate::varatt_external
+                                                                                                $crate::__pgrx_c_bindings::varatt_external
                                                                                             >>()
                                                                                     )
                                                                                 )
@@ -26055,7 +26555,9 @@ macro_rules! VARSIZE_EXTERNAL {
                 $crate::__pgrx_c_macros::expression::add::<$crate::__pgrx_c_macros::Wrapping, _, _>(
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::expression::offset_of::<
-                            $crate::__pgrx_c_macros::expression::CRecord<$crate::varattrib_1b_e>,
+                            $crate::__pgrx_c_macros::expression::CRecord<
+                                $crate::__pgrx_c_bindings::varattrib_1b_e
+                            >,
                             $crate::__pgrx_c_field_marker!(@path; va_data)
                         >()
                     ),
@@ -26084,10 +26586,10 @@ macro_rules! VARSIZE_EXTERNAL {
                                                                             _
                                                                         >(
                                                                             $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                                *mut $crate::varattrib_1b_e,
+                                                                                *mut $crate::__pgrx_c_bindings::varattrib_1b_e,
                                                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                        $crate::varattrib_1b_e
+                                                                                        $crate::__pgrx_c_bindings::varattrib_1b_e
                                                                                     >,
                                                                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                                                                 >,
@@ -26122,7 +26624,7 @@ macro_rules! VARSIZE_EXTERNAL {
                                                 $crate::__pgrx_c_macros::CValue::<
                                                     $crate::__pgrx_c_macros::CInt
                                                 >::new(
-                                                    $crate::vartag_external::VARTAG_INDIRECT as i32
+                                                    $crate::__pgrx_c_bindings::vartag_external::VARTAG_INDIRECT as i32
                                                 )
                                             )
                                         )
@@ -26135,7 +26637,7 @@ macro_rules! VARSIZE_EXTERNAL {
                                         >(
                                             $crate::__pgrx_c_macros::expression::size_of::<
                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                    $crate::varatt_indirect
+                                                    $crate::__pgrx_c_bindings::varatt_indirect
                                                 >>()
                                         )
                                     )
@@ -26178,10 +26680,10 @@ macro_rules! VARSIZE_EXTERNAL {
                                                                                                             _
                                                                                                         >(
                                                                                                             $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                                                                *mut $crate::varattrib_1b_e,
+                                                                                                                *mut $crate::__pgrx_c_bindings::varattrib_1b_e,
                                                                                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                                                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                                        $crate::varattrib_1b_e
+                                                                                                                        $crate::__pgrx_c_bindings::varattrib_1b_e
                                                                                                                     >,
                                                                                                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                                                                                                 >,
@@ -26234,7 +26736,7 @@ macro_rules! VARSIZE_EXTERNAL {
                                                                     $crate::__pgrx_c_macros::CValue::<
                                                                         $crate::__pgrx_c_macros::CInt
                                                                     >::new(
-                                                                        $crate::vartag_external::VARTAG_EXPANDED_RO as i32
+                                                                        $crate::__pgrx_c_bindings::vartag_external::VARTAG_EXPANDED_RO as i32
                                                                     )
                                                                 )
                                                             )
@@ -26248,7 +26750,7 @@ macro_rules! VARSIZE_EXTERNAL {
                                                         >(
                                                             $crate::__pgrx_c_macros::expression::size_of::<
                                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                                    $crate::varatt_expanded
+                                                                    $crate::__pgrx_c_bindings::varatt_expanded
                                                                 >>()
                                                         )
                                                     )
@@ -26284,10 +26786,10 @@ macro_rules! VARSIZE_EXTERNAL {
                                                                                                             _
                                                                                                         >(
                                                                                                             $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                                                                *mut $crate::varattrib_1b_e,
+                                                                                                                *mut $crate::__pgrx_c_bindings::varattrib_1b_e,
                                                                                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                                                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                                        $crate::varattrib_1b_e
+                                                                                                                        $crate::__pgrx_c_bindings::varattrib_1b_e
                                                                                                                     >,
                                                                                                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                                                                                                 >,
@@ -26322,7 +26824,7 @@ macro_rules! VARSIZE_EXTERNAL {
                                                                                 $crate::__pgrx_c_macros::CValue::<
                                                                                     $crate::__pgrx_c_macros::CInt
                                                                                 >::new(
-                                                                                    $crate::vartag_external::VARTAG_ONDISK as i32
+                                                                                    $crate::__pgrx_c_bindings::vartag_external::VARTAG_ONDISK as i32
                                                                                 )
                                                                             )
                                                                         )
@@ -26335,7 +26837,7 @@ macro_rules! VARSIZE_EXTERNAL {
                                                                         >(
                                                                             $crate::__pgrx_c_macros::expression::size_of::<
                                                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                    $crate::varatt_external
+                                                                                    $crate::__pgrx_c_bindings::varatt_external
                                                                                 >>()
                                                                         )
                                                                     )
@@ -26410,8 +26912,8 @@ macro_rules! VARSIZE_EXTERNAL {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -26438,20 +26940,24 @@ macro_rules! __pgrx_c_args_VARSIZE_SHORT {
         $crate::__pgrx_c_args_VARSIZE_SHORT!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_VARSIZE_SHORT!(@p1 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_VARSIZE_SHORT!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_VARSIZE_SHORT!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_VARSIZE_SHORT!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_VARSIZE_SHORT!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_VARSIZE_SHORT!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -26459,7 +26965,9 @@ macro_rules! __pgrx_c_args_VARSIZE_SHORT {
         $crate::__pgrx_c_args_VARSIZE_SHORT!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_VARSIZE_SHORT!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_VARSIZE_SHORT!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -26481,14 +26989,18 @@ macro_rules! __pgrx_c_args_VARSIZE_SHORT {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_VARSIZE_SHORT!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_VARSIZE_SHORT!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_VARSIZE_SHORT!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_VARSIZE_SHORT!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_VARSIZE_SHORT!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -26515,13 +27027,13 @@ macro_rules! __pgrx_c_args_VARSIZE_SHORT {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_VARSIZE_SHORT!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_VARSIZE_SHORT!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -26585,10 +27097,10 @@ macro_rules! VARSIZE_SHORT {
                                                         _
                                                     >(
                                                         $crate::__pgrx_c_macros::expression::cast_as::<
-                                                            *mut $crate::varattrib_1b,
+                                                            *mut $crate::__pgrx_c_bindings::varattrib_1b,
                                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                                    $crate::varattrib_1b
+                                                                    $crate::__pgrx_c_bindings::varattrib_1b
                                                                 >,
                                                                 $crate::__pgrx_c_macros::expression::ReadWrite
                                                             >,
@@ -26677,10 +27189,10 @@ macro_rules! VARSIZE_SHORT {
                                                                     _
                                                                 >(
                                                                     $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                        *mut $crate::varattrib_1b,
+                                                                        *mut $crate::__pgrx_c_bindings::varattrib_1b,
                                                                         $crate::__pgrx_c_macros::expression::CPointer<
                                                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                $crate::varattrib_1b
+                                                                                $crate::__pgrx_c_bindings::varattrib_1b
                                                                             >,
                                                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                                                         >,
@@ -26754,10 +27266,10 @@ macro_rules! VARSIZE_SHORT {
                                                         _
                                                     >(
                                                         $crate::__pgrx_c_macros::expression::cast_as::<
-                                                            *mut $crate::varattrib_1b,
+                                                            *mut $crate::__pgrx_c_bindings::varattrib_1b,
                                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                                    $crate::varattrib_1b
+                                                                    $crate::__pgrx_c_bindings::varattrib_1b
                                                                 >,
                                                                 $crate::__pgrx_c_macros::expression::ReadWrite
                                                             >,
@@ -26807,8 +27319,8 @@ macro_rules! VARSIZE_SHORT {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -26835,25 +27347,34 @@ macro_rules! __pgrx_c_args_VARTAG_1B_E {
         $crate::__pgrx_c_args_VARTAG_1B_E!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_VARTAG_1B_E!(@p1 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_VARTAG_1B_E!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_VARTAG_1B_E!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_VARTAG_1B_E!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_VARTAG_1B_E!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_VARTAG_1B_E!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_VARTAG_1B_E!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $($raw:tt)*) => {
         $crate::__pgrx_c_args_VARTAG_1B_E!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_VARTAG_1B_E!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_VARTAG_1B_E!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -26875,13 +27396,20 @@ macro_rules! __pgrx_c_args_VARTAG_1B_E {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_VARTAG_1B_E!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_VARTAG_1B_E!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_VARTAG_1B_E!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_VARTAG_1B_E!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
-        $crate::__pgrx_c_args_VARTAG_1B_E!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_VARTAG_1B_E!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
         $crate::__pgrx_c_classify!(
@@ -26903,10 +27431,16 @@ macro_rules! __pgrx_c_args_VARTAG_1B_E {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_VARTAG_1B_E!(@p1 $mode [$($done)* (@literal [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_VARTAG_1B_E!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+            $($rest)*
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_VARTAG_1B_E!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_VARTAG_1B_E!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p1 $mode:ident [$($done:tt)*];) => {
         $crate::VARTAG_1B_E!(@$mode; $($done)*)
@@ -26959,10 +27493,10 @@ macro_rules! VARTAG_1B_E {
                             (
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::cast_as::<
-                                        *mut $crate::varattrib_1b_e,
+                                        *mut $crate::__pgrx_c_bindings::varattrib_1b_e,
                                         $crate::__pgrx_c_macros::expression::CPointer<
                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                $crate::varattrib_1b_e
+                                                $crate::__pgrx_c_bindings::varattrib_1b_e
                                             >,
                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                         >,
@@ -26997,10 +27531,10 @@ macro_rules! VARTAG_1B_E {
                     (
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::cast_as::<
-                                *mut $crate::varattrib_1b_e,
+                                *mut $crate::__pgrx_c_bindings::varattrib_1b_e,
                                 $crate::__pgrx_c_macros::expression::CPointer<
                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                        $crate::varattrib_1b_e
+                                        $crate::__pgrx_c_bindings::varattrib_1b_e
                                     >,
                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                 >,
@@ -27032,10 +27566,10 @@ macro_rules! VARTAG_1B_E {
                     (
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::cast_as::<
-                                *mut $crate::varattrib_1b_e,
+                                *mut $crate::__pgrx_c_bindings::varattrib_1b_e,
                                 $crate::__pgrx_c_macros::expression::CPointer<
                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                        $crate::varattrib_1b_e
+                                        $crate::__pgrx_c_bindings::varattrib_1b_e
                                     >,
                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                 >,
@@ -27075,10 +27609,10 @@ macro_rules! VARTAG_1B_E {
                                 (
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::expression::cast_as::<
-                                            *mut $crate::varattrib_1b_e,
+                                            *mut $crate::__pgrx_c_bindings::varattrib_1b_e,
                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                    $crate::varattrib_1b_e
+                                                    $crate::__pgrx_c_bindings::varattrib_1b_e
                                                 >,
                                                 $crate::__pgrx_c_macros::expression::ReadWrite
                                             >,
@@ -27118,10 +27652,10 @@ macro_rules! VARTAG_1B_E {
                             (
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::cast_as::<
-                                        *mut $crate::varattrib_1b_e,
+                                        *mut $crate::__pgrx_c_bindings::varattrib_1b_e,
                                         $crate::__pgrx_c_macros::expression::CPointer<
                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                $crate::varattrib_1b_e
+                                                $crate::__pgrx_c_bindings::varattrib_1b_e
                                             >,
                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                         >,
@@ -27151,8 +27685,8 @@ macro_rules! VARTAG_1B_E {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -27179,20 +27713,24 @@ macro_rules! __pgrx_c_args_VARTAG_EXTERNAL {
         $crate::__pgrx_c_args_VARTAG_EXTERNAL!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_VARTAG_EXTERNAL!(@p1 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_VARTAG_EXTERNAL!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_VARTAG_EXTERNAL!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_VARTAG_EXTERNAL!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_VARTAG_EXTERNAL!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_VARTAG_EXTERNAL!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -27200,7 +27738,9 @@ macro_rules! __pgrx_c_args_VARTAG_EXTERNAL {
         $crate::__pgrx_c_args_VARTAG_EXTERNAL!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_VARTAG_EXTERNAL!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_VARTAG_EXTERNAL!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -27222,14 +27762,18 @@ macro_rules! __pgrx_c_args_VARTAG_EXTERNAL {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_VARTAG_EXTERNAL!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_VARTAG_EXTERNAL!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_VARTAG_EXTERNAL!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_VARTAG_EXTERNAL!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_VARTAG_EXTERNAL!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -27256,13 +27800,13 @@ macro_rules! __pgrx_c_args_VARTAG_EXTERNAL {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_VARTAG_EXTERNAL!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_VARTAG_EXTERNAL!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -27318,10 +27862,10 @@ macro_rules! VARTAG_EXTERNAL {
                             (
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::cast_as::<
-                                        *mut $crate::varattrib_1b_e,
+                                        *mut $crate::__pgrx_c_bindings::varattrib_1b_e,
                                         $crate::__pgrx_c_macros::expression::CPointer<
                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                $crate::varattrib_1b_e
+                                                $crate::__pgrx_c_bindings::varattrib_1b_e
                                             >,
                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                         >,
@@ -27357,10 +27901,10 @@ macro_rules! VARTAG_EXTERNAL {
                     (
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::cast_as::<
-                                *mut $crate::varattrib_1b_e,
+                                *mut $crate::__pgrx_c_bindings::varattrib_1b_e,
                                 $crate::__pgrx_c_macros::expression::CPointer<
                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                        $crate::varattrib_1b_e
+                                        $crate::__pgrx_c_bindings::varattrib_1b_e
                                     >,
                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                 >,
@@ -27393,10 +27937,10 @@ macro_rules! VARTAG_EXTERNAL {
                     (
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::cast_as::<
-                                *mut $crate::varattrib_1b_e,
+                                *mut $crate::__pgrx_c_bindings::varattrib_1b_e,
                                 $crate::__pgrx_c_macros::expression::CPointer<
                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                        $crate::varattrib_1b_e
+                                        $crate::__pgrx_c_bindings::varattrib_1b_e
                                     >,
                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                 >,
@@ -27437,10 +27981,10 @@ macro_rules! VARTAG_EXTERNAL {
                                 (
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::expression::cast_as::<
-                                            *mut $crate::varattrib_1b_e,
+                                            *mut $crate::__pgrx_c_bindings::varattrib_1b_e,
                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                    $crate::varattrib_1b_e
+                                                    $crate::__pgrx_c_bindings::varattrib_1b_e
                                                 >,
                                                 $crate::__pgrx_c_macros::expression::ReadWrite
                                             >,
@@ -27481,10 +28025,10 @@ macro_rules! VARTAG_EXTERNAL {
                             (
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::cast_as::<
-                                        *mut $crate::varattrib_1b_e,
+                                        *mut $crate::__pgrx_c_bindings::varattrib_1b_e,
                                         $crate::__pgrx_c_macros::expression::CPointer<
                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                $crate::varattrib_1b_e
+                                                $crate::__pgrx_c_bindings::varattrib_1b_e
                                             >,
                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                         >,
@@ -27514,8 +28058,8 @@ macro_rules! VARTAG_EXTERNAL {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -27542,20 +28086,24 @@ macro_rules! __pgrx_c_args_VARTAG_IS_EXPANDED {
         $crate::__pgrx_c_args_VARTAG_IS_EXPANDED!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_VARTAG_IS_EXPANDED!(@p1 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_VARTAG_IS_EXPANDED!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_VARTAG_IS_EXPANDED!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_VARTAG_IS_EXPANDED!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_VARTAG_IS_EXPANDED!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_VARTAG_IS_EXPANDED!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -27563,7 +28111,9 @@ macro_rules! __pgrx_c_args_VARTAG_IS_EXPANDED {
         $crate::__pgrx_c_args_VARTAG_IS_EXPANDED!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_VARTAG_IS_EXPANDED!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_VARTAG_IS_EXPANDED!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -27585,14 +28135,18 @@ macro_rules! __pgrx_c_args_VARTAG_IS_EXPANDED {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_VARTAG_IS_EXPANDED!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_VARTAG_IS_EXPANDED!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_VARTAG_IS_EXPANDED!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_VARTAG_IS_EXPANDED!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_VARTAG_IS_EXPANDED!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -27619,13 +28173,13 @@ macro_rules! __pgrx_c_args_VARTAG_IS_EXPANDED {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_VARTAG_IS_EXPANDED!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_VARTAG_IS_EXPANDED!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -27692,7 +28246,7 @@ macro_rules! VARTAG_IS_EXPANDED {
                     ),
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                            $crate::vartag_external::VARTAG_EXPANDED_RO as i32
+                            $crate::__pgrx_c_bindings::vartag_external::VARTAG_EXPANDED_RO as i32
                         )
                     )
                 )
@@ -27755,7 +28309,7 @@ macro_rules! VARTAG_IS_EXPANDED {
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                        $crate::vartag_external::VARTAG_EXPANDED_RO as i32
+                                        $crate::__pgrx_c_bindings::vartag_external::VARTAG_EXPANDED_RO as i32
                                     )
                                 )
                             )
@@ -27799,7 +28353,7 @@ macro_rules! VARTAG_IS_EXPANDED {
                     ),
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                            $crate::vartag_external::VARTAG_EXPANDED_RO as i32
+                            $crate::__pgrx_c_bindings::vartag_external::VARTAG_EXPANDED_RO as i32
                         )
                     )
                 )
@@ -27815,8 +28369,8 @@ macro_rules! VARTAG_IS_EXPANDED {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -27843,25 +28397,34 @@ macro_rules! __pgrx_c_args_VARTAG_SIZE {
         $crate::__pgrx_c_args_VARTAG_SIZE!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_VARTAG_SIZE!(@p1 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_VARTAG_SIZE!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_VARTAG_SIZE!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_VARTAG_SIZE!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_VARTAG_SIZE!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_VARTAG_SIZE!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_VARTAG_SIZE!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $($raw:tt)*) => {
         $crate::__pgrx_c_args_VARTAG_SIZE!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_VARTAG_SIZE!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_VARTAG_SIZE!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -27883,13 +28446,20 @@ macro_rules! __pgrx_c_args_VARTAG_SIZE {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_VARTAG_SIZE!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_VARTAG_SIZE!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_VARTAG_SIZE!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_VARTAG_SIZE!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
-        $crate::__pgrx_c_args_VARTAG_SIZE!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_VARTAG_SIZE!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
         $crate::__pgrx_c_classify!(
@@ -27911,10 +28481,16 @@ macro_rules! __pgrx_c_args_VARTAG_SIZE {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_VARTAG_SIZE!(@p1 $mode [$($done)* (@literal [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_VARTAG_SIZE!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+            $($rest)*
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_VARTAG_SIZE!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_VARTAG_SIZE!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p1 $mode:ident [$($done:tt)*];) => {
         $crate::VARTAG_SIZE!(@$mode; $($done)*)
@@ -27969,7 +28545,7 @@ macro_rules! VARTAG_SIZE {
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                        $crate::vartag_external::VARTAG_INDIRECT as i32
+                                        $crate::__pgrx_c_bindings::vartag_external::VARTAG_INDIRECT as i32
                                     )
                                 )
                             )
@@ -27979,7 +28555,7 @@ macro_rules! VARTAG_SIZE {
                             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                 $crate::__pgrx_c_macros::expression::size_of::<
                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                        $crate::varatt_indirect
+                                        $crate::__pgrx_c_bindings::varatt_indirect
                                     >>()
                             )
                         )
@@ -28036,7 +28612,7 @@ macro_rules! VARTAG_SIZE {
                                                         $crate::__pgrx_c_macros::CValue::<
                                                             $crate::__pgrx_c_macros::CInt
                                                         >::new(
-                                                            $crate::vartag_external::VARTAG_EXPANDED_RO as i32
+                                                            $crate::__pgrx_c_bindings::vartag_external::VARTAG_EXPANDED_RO as i32
                                                         )
                                                     )
                                                 )
@@ -28050,7 +28626,7 @@ macro_rules! VARTAG_SIZE {
                                             >(
                                                 $crate::__pgrx_c_macros::expression::size_of::<
                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                        $crate::varatt_expanded
+                                                        $crate::__pgrx_c_bindings::varatt_expanded
                                                     >>()
                                             )
                                         )
@@ -28085,7 +28661,7 @@ macro_rules! VARTAG_SIZE {
                                                                     $crate::__pgrx_c_macros::CValue::<
                                                                         $crate::__pgrx_c_macros::CInt
                                                                     >::new(
-                                                                        $crate::vartag_external::VARTAG_ONDISK as i32
+                                                                        $crate::__pgrx_c_bindings::vartag_external::VARTAG_ONDISK as i32
                                                                     )
                                                                 )
                                                             )
@@ -28098,7 +28674,7 @@ macro_rules! VARTAG_SIZE {
                                                             >(
                                                                 $crate::__pgrx_c_macros::expression::size_of::<
                                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                                        $crate::varatt_external
+                                                                        $crate::__pgrx_c_bindings::varatt_external
                                                                     >>()
                                                             )
                                                         )
@@ -28203,7 +28779,7 @@ macro_rules! VARTAG_SIZE {
                                                 $crate::__pgrx_c_macros::CValue::<
                                                     $crate::__pgrx_c_macros::CInt
                                                 >::new(
-                                                    $crate::vartag_external::VARTAG_INDIRECT as i32
+                                                    $crate::__pgrx_c_bindings::vartag_external::VARTAG_INDIRECT as i32
                                                 )
                                             )
                                         )
@@ -28216,7 +28792,7 @@ macro_rules! VARTAG_SIZE {
                                         >(
                                             $crate::__pgrx_c_macros::expression::size_of::<
                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                    $crate::varatt_indirect
+                                                    $crate::__pgrx_c_bindings::varatt_indirect
                                                 >>()
                                         )
                                     )
@@ -28278,7 +28854,7 @@ macro_rules! VARTAG_SIZE {
                                                                     $crate::__pgrx_c_macros::CValue::<
                                                                         $crate::__pgrx_c_macros::CInt
                                                                     >::new(
-                                                                        $crate::vartag_external::VARTAG_EXPANDED_RO as i32
+                                                                        $crate::__pgrx_c_bindings::vartag_external::VARTAG_EXPANDED_RO as i32
                                                                     )
                                                                 )
                                                             )
@@ -28292,7 +28868,7 @@ macro_rules! VARTAG_SIZE {
                                                         >(
                                                             $crate::__pgrx_c_macros::expression::size_of::<
                                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                                    $crate::varatt_expanded
+                                                                    $crate::__pgrx_c_bindings::varatt_expanded
                                                                 >>()
                                                         )
                                                     )
@@ -28329,7 +28905,7 @@ macro_rules! VARTAG_SIZE {
                                                                                 $crate::__pgrx_c_macros::CValue::<
                                                                                     $crate::__pgrx_c_macros::CInt
                                                                                 >::new(
-                                                                                    $crate::vartag_external::VARTAG_ONDISK as i32
+                                                                                    $crate::__pgrx_c_bindings::vartag_external::VARTAG_ONDISK as i32
                                                                                 )
                                                                             )
                                                                         )
@@ -28342,7 +28918,7 @@ macro_rules! VARTAG_SIZE {
                                                                         >(
                                                                             $crate::__pgrx_c_macros::expression::size_of::<
                                                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                    $crate::varatt_external
+                                                                                    $crate::__pgrx_c_bindings::varatt_external
                                                                                 >>()
                                                                         )
                                                                     )
@@ -28428,7 +29004,7 @@ macro_rules! VARTAG_SIZE {
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                        $crate::vartag_external::VARTAG_INDIRECT as i32
+                                        $crate::__pgrx_c_bindings::vartag_external::VARTAG_INDIRECT as i32
                                     )
                                 )
                             )
@@ -28438,7 +29014,7 @@ macro_rules! VARTAG_SIZE {
                             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                 $crate::__pgrx_c_macros::expression::size_of::<
                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                        $crate::varatt_indirect
+                                        $crate::__pgrx_c_bindings::varatt_indirect
                                     >>()
                             )
                         )
@@ -28495,7 +29071,7 @@ macro_rules! VARTAG_SIZE {
                                                         $crate::__pgrx_c_macros::CValue::<
                                                             $crate::__pgrx_c_macros::CInt
                                                         >::new(
-                                                            $crate::vartag_external::VARTAG_EXPANDED_RO as i32
+                                                            $crate::__pgrx_c_bindings::vartag_external::VARTAG_EXPANDED_RO as i32
                                                         )
                                                     )
                                                 )
@@ -28509,7 +29085,7 @@ macro_rules! VARTAG_SIZE {
                                             >(
                                                 $crate::__pgrx_c_macros::expression::size_of::<
                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                        $crate::varatt_expanded
+                                                        $crate::__pgrx_c_bindings::varatt_expanded
                                                     >>()
                                             )
                                         )
@@ -28544,7 +29120,7 @@ macro_rules! VARTAG_SIZE {
                                                                     $crate::__pgrx_c_macros::CValue::<
                                                                         $crate::__pgrx_c_macros::CInt
                                                                     >::new(
-                                                                        $crate::vartag_external::VARTAG_ONDISK as i32
+                                                                        $crate::__pgrx_c_bindings::vartag_external::VARTAG_ONDISK as i32
                                                                     )
                                                                 )
                                                             )
@@ -28557,7 +29133,7 @@ macro_rules! VARTAG_SIZE {
                                                             >(
                                                                 $crate::__pgrx_c_macros::expression::size_of::<
                                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                                        $crate::varatt_external
+                                                                        $crate::__pgrx_c_bindings::varatt_external
                                                                     >>()
                                                             )
                                                         )

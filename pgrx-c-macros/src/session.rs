@@ -16,6 +16,9 @@ use crate::{
 };
 use std::collections::{BTreeMap, BTreeSet};
 
+/// Derive private native-call roots without modifying the compiler's macro environment.
+mod inline;
+
 /// An inspected C environment and compiler-expanded symbolic invocations resolved together.
 ///
 /// Preparation uses bounded compiler passes for the whole batch. The input files and
@@ -34,6 +37,8 @@ pub struct AnalysisSession<'a> {
     integer_constants: BTreeMap<String, IntegerConstant>,
     /// Per-macro source node IDs proved to be zero-valued C integer constant expressions.
     integer_zero_constants: BTreeMap<String, BTreeSet<crate::NodeId>>,
+    /// Explicit compiler-owned static-inline calls prepared independently of real macro roots.
+    inline_roots: BTreeMap<String, inline::InlineRoot<'a>>,
 }
 
 /// Prepare and analyze a batch only within the borrowed coherent frontend environment.
@@ -56,11 +61,97 @@ impl<'a> AnalysisSession<'a> {
         names: &[impl AsRef<str>],
         limits: ExpansionLimits,
     ) -> Result<Self, FrontendError> {
+        Self::prepare_selected(scanner, frontend, names, &BTreeSet::new(), limits)
+    }
+
+    /// Prepare explicitly selected object-like expression roots as Rust macro invocations.
+    ///
+    /// Original object provenance and C expansion remain authoritative. Ordinary
+    /// discovery and `prepare` continue to select function-style roots only.
+    pub fn prepare_objects(
+        scanner: &MacroScanner,
+        frontend: &'a FrontendOutput,
+        names: &[impl AsRef<str>],
+    ) -> Result<Self, FrontendError> {
+        let objects = names.iter().map(|name| name.as_ref().to_owned()).collect();
+        Self::prepare_selected(scanner, frontend, names, &objects, ExpansionLimits::default())
+    }
+
+    /// Prepare explicit object-expression and function-style roots in one coherent artifact batch.
+    ///
+    /// Separate lists keep ordinary function discovery unchanged while sharing
+    /// dependency proofs and native adapters across both kinds of selected root.
+    pub fn prepare_with_objects(
+        scanner: &MacroScanner,
+        frontend: &'a FrontendOutput,
+        functions: &[impl AsRef<str>],
+        objects: &[impl AsRef<str>],
+    ) -> Result<Self, FrontendError> {
+        let objects = objects.iter().map(|name| name.as_ref().to_owned()).collect::<BTreeSet<_>>();
+        let names = functions
+            .iter()
+            .map(|name| name.as_ref().to_owned())
+            .chain(objects.iter().cloned())
+            .collect::<Vec<_>>();
+        Self::prepare_selected(scanner, frontend, &names, &objects, ExpansionLimits::default())
+    }
+
+    /// Prepare real macros and explicitly selected compiler-owned static inline functions together.
+    ///
+    /// Active C macros take precedence over inline adapters. Native calls derive from verified
+    /// original definitions and prototypes; neither inventory nor preprocessing state is changed.
+    pub fn prepare_with_inline_functions(
+        scanner: &MacroScanner,
+        frontend: &'a FrontendOutput,
+        functions: &[impl AsRef<str>],
+        objects: &[impl AsRef<str>],
+        inline_functions: &[impl AsRef<str>],
+    ) -> Result<Self, FrontendError> {
+        let inlines = inline_functions
+            .iter()
+            .map(|name| name.as_ref().to_owned())
+            .collect::<BTreeSet<_>>()
+            .into_iter()
+            .collect::<Vec<_>>();
+        let mut functions =
+            functions.iter().map(|name| name.as_ref().to_owned()).collect::<BTreeSet<_>>();
+        functions.extend(
+            inlines
+                .iter()
+                .filter(|name| frontend.environment().active.contains_key(*name))
+                .cloned(),
+        );
+        let functions = functions.into_iter().collect::<Vec<_>>();
+        let mut session = Self::prepare_with_objects(scanner, frontend, &functions, objects)?;
+        session.inline_roots = inline::prepare(
+            frontend,
+            &inlines,
+            ExpansionLimits::default(),
+            session.expansions.results.len(),
+        );
+        session.verify_inputs()?;
+        Ok(session)
+    }
+
+    /// Return original C definition source for an explicitly prepared inline invocation root.
+    pub(crate) fn inline_definition(&self, name: &str) -> Option<&crate::InlineFunctionDefinition> {
+        self.inline_roots.get(name).and_then(inline::InlineRoot::source)
+    }
+
+    /// Run shared bounded compiler phases for the explicitly selected root kinds.
+    fn prepare_selected(
+        scanner: &MacroScanner,
+        frontend: &'a FrontendOutput,
+        names: &[impl AsRef<str>],
+        objects: &BTreeSet<String>,
+        limits: ExpansionLimits,
+    ) -> Result<Self, FrontendError> {
         crate::expansion::verify_environment(frontend)?;
         crate::frontend::verify_input_files(&frontend.profile().inputs)?;
         // Adjacent compiler phases share a boundary check. Check failed passes too,
         // so a changed snapshot takes precedence over their compiler diagnostics.
-        let expansions = crate::expansion::prepare_inner(scanner, frontend, names, limits);
+        let expansions =
+            crate::expansion::prepare_inner_with_objects(scanner, frontend, names, objects, limits);
         crate::frontend::verify_input_files(&frontend.profile().inputs)?;
         crate::expansion::verify_environment(frontend)?;
         let mut expansions = expansions?;
@@ -79,6 +170,7 @@ impl<'a> AnalysisSession<'a> {
             expansions,
             dependencies,
             integer_constants,
+            inline_roots: BTreeMap::new(),
             integer_zero_constants: BTreeMap::new(),
         };
         session.integer_zero_constants = crate::frontend::zero_constants::probe(scanner, &session)?;
@@ -125,6 +217,9 @@ impl<'a> AnalysisSession<'a> {
     /// Analyze a prepared invocation, restore original formal names, and translate preprocessing
     /// failures into structured analysis skips.
     pub fn analyze(&self, name: &str) -> MacroAnalysis {
+        if let Some(root) = self.inline_roots.get(name) {
+            return root.analyze(self.frontend, name, &self.integer_constants);
+        }
         match self.expansions.results.get(name) {
             Some(ExpansionResult::Expanded { expansion }) => {
                 // Marker names stay distinct from captured identifiers introduced by
@@ -171,6 +266,7 @@ impl<'a> AnalysisSession<'a> {
                         code: match reason.code {
                             ExpansionSkipCode::NotActive => SkipReasonCode::NotActive,
                             ExpansionSkipCode::NotFunctionLike => SkipReasonCode::NotFunctionLike,
+                            ExpansionSkipCode::NotObjectLike => SkipReasonCode::NotObjectLike,
                             ExpansionSkipCode::MalformedParameters => {
                                 SkipReasonCode::MalformedParameters
                             }

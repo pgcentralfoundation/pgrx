@@ -10,6 +10,10 @@ pub use atomics::*;
 mod __pgrx_c_header_61746f6d6963732e68;
 #[allow(unused_imports)]
 pub use __pgrx_c_header_61746f6d6963732e68::*;
+#[path = "pg_bitutils.rs"]
+mod pg_bitutils;
+#[allow(unused_imports)]
+pub use pg_bitutils::*;
 #[path = "pg_bswap.rs"]
 mod pg_bswap;
 #[allow(unused_imports)]
@@ -18,3 +22,7 @@ pub use pg_bswap::*;
 mod pg_crc32c;
 #[allow(unused_imports)]
 pub use pg_crc32c::*;
+#[path = "pg_iovec.rs"]
+mod pg_iovec;
+#[allow(unused_imports)]
+pub use pg_iovec::*;

@@ -2,6 +2,18 @@
 
 This code is generated for documentation purposes, so that it is easy to reference on docs.rs. C macros and their support code are regenerated for your build of pgrx, and your Postgres configuration may differ.
 */
+#[path = "extendplan.rs"]
+mod extendplan;
+#[allow(unused_imports)]
+pub use extendplan::*;
+#[path = "geqo.rs"]
+mod geqo;
+#[allow(unused_imports)]
+pub use geqo::*;
+#[path = "geqo_gene.rs"]
+mod geqo_gene;
+#[allow(unused_imports)]
+pub use geqo_gene::*;
 #[path = "restrictinfo.rs"]
 mod restrictinfo;
 #[allow(unused_imports)]

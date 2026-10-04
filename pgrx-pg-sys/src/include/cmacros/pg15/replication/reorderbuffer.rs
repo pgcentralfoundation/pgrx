@@ -5,8 +5,8 @@ This code is generated for documentation purposes, so that it is easy to referen
 // C macros from reorderbuffer.h.
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -40,7 +40,7 @@ macro_rules! __pgrx_c_args_ReorderBufferTupleBufData {
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_ReorderBufferTupleBufData!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
@@ -48,7 +48,7 @@ macro_rules! __pgrx_c_args_ReorderBufferTupleBufData {
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_ReorderBufferTupleBufData!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -57,7 +57,7 @@ macro_rules! __pgrx_c_args_ReorderBufferTupleBufData {
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
         $crate::__pgrx_c_args_ReorderBufferTupleBufData!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
@@ -83,17 +83,17 @@ macro_rules! __pgrx_c_args_ReorderBufferTupleBufData {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_ReorderBufferTupleBufData!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:tt) => {
         $crate::__pgrx_c_args_ReorderBufferTupleBufData!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_ReorderBufferTupleBufData!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -120,13 +120,13 @@ macro_rules! __pgrx_c_args_ReorderBufferTupleBufData {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_ReorderBufferTupleBufData!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:tt, $($rest:tt)*) => {
         $crate::__pgrx_c_args_ReorderBufferTupleBufData!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -176,9 +176,11 @@ macro_rules! ReorderBufferTupleBufData {
         (
             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::cast_as::<
-                    $crate::HeapTupleHeader,
+                    $crate::__pgrx_c_bindings::HeapTupleHeader,
                     $crate::__pgrx_c_macros::expression::CPointer<
-                        $crate::__pgrx_c_macros::expression::CRecord<$crate::HeapTupleHeaderData>,
+                        $crate::__pgrx_c_macros::expression::CRecord<
+                            $crate::__pgrx_c_bindings::HeapTupleHeaderData
+                        >,
                         $crate::__pgrx_c_macros::expression::ReadWrite
                     >,
                     _
@@ -245,7 +247,7 @@ macro_rules! ReorderBufferTupleBufData {
                                                                     >(
                                                                         $crate::__pgrx_c_macros::expression::size_of::<
                                                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                $crate::ReorderBufferTupleBuf
+                                                                                $crate::__pgrx_c_bindings::ReorderBufferTupleBuf
                                                                             >>()
                                                                     )
                                                                 )
@@ -272,7 +274,7 @@ macro_rules! ReorderBufferTupleBufData {
                                                                 $crate::__pgrx_c_macros::CValue::<
                                                                     $crate::__pgrx_c_macros::CInt
                                                                 >::new(
-                                                                    $crate::MAXIMUM_ALIGNOF as i32
+                                                                    $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                 )
                                                             )
                                                         ),
@@ -320,7 +322,7 @@ macro_rules! ReorderBufferTupleBufData {
                                                                         $crate::__pgrx_c_macros::CValue::<
                                                                             $crate::__pgrx_c_macros::CInt
                                                                         >::new(
-                                                                            $crate::MAXIMUM_ALIGNOF as i32
+                                                                            $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                         )
                                                                     )
                                                                 ),
@@ -378,10 +380,10 @@ macro_rules! ReorderBufferTupleBufData {
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::cast_as::<
-                                $crate::HeapTupleHeader,
+                                $crate::__pgrx_c_bindings::HeapTupleHeader,
                                 $crate::__pgrx_c_macros::expression::CPointer<
                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                        $crate::HeapTupleHeaderData
+                                        $crate::__pgrx_c_bindings::HeapTupleHeaderData
                                     >,
                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                 >,
@@ -452,7 +454,7 @@ macro_rules! ReorderBufferTupleBufData {
                                                                                 >(
                                                                                     $crate::__pgrx_c_macros::expression::size_of::<
                                                                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                            $crate::ReorderBufferTupleBuf
+                                                                                            $crate::__pgrx_c_bindings::ReorderBufferTupleBuf
                                                                                         >>()
                                                                                 )
                                                                             )
@@ -479,7 +481,7 @@ macro_rules! ReorderBufferTupleBufData {
                                                                             $crate::__pgrx_c_macros::CValue::<
                                                                                 $crate::__pgrx_c_macros::CInt
                                                                             >::new(
-                                                                                $crate::MAXIMUM_ALIGNOF as i32
+                                                                                $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                             )
                                                                         )
                                                                     ),
@@ -530,7 +532,7 @@ macro_rules! ReorderBufferTupleBufData {
                                                                                     $crate::__pgrx_c_macros::CValue::<
                                                                                         $crate::__pgrx_c_macros::CInt
                                                                                     >::new(
-                                                                                        $crate::MAXIMUM_ALIGNOF as i32
+                                                                                        $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                                     )
                                                                                 )
                                                                             ),
@@ -570,9 +572,11 @@ macro_rules! ReorderBufferTupleBufData {
         {
             let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::cast_as::<
-                    $crate::HeapTupleHeader,
+                    $crate::__pgrx_c_bindings::HeapTupleHeader,
                     $crate::__pgrx_c_macros::expression::CPointer<
-                        $crate::__pgrx_c_macros::expression::CRecord<$crate::HeapTupleHeaderData>,
+                        $crate::__pgrx_c_macros::expression::CRecord<
+                            $crate::__pgrx_c_bindings::HeapTupleHeaderData
+                        >,
                         $crate::__pgrx_c_macros::expression::ReadWrite
                     >,
                     _
@@ -639,7 +643,7 @@ macro_rules! ReorderBufferTupleBufData {
                                                                     >(
                                                                         $crate::__pgrx_c_macros::expression::size_of::<
                                                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                $crate::ReorderBufferTupleBuf
+                                                                                $crate::__pgrx_c_bindings::ReorderBufferTupleBuf
                                                                             >>()
                                                                     )
                                                                 )
@@ -666,7 +670,7 @@ macro_rules! ReorderBufferTupleBufData {
                                                                 $crate::__pgrx_c_macros::CValue::<
                                                                     $crate::__pgrx_c_macros::CInt
                                                                 >::new(
-                                                                    $crate::MAXIMUM_ALIGNOF as i32
+                                                                    $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                 )
                                                             )
                                                         ),
@@ -714,7 +718,7 @@ macro_rules! ReorderBufferTupleBufData {
                                                                         $crate::__pgrx_c_macros::CValue::<
                                                                             $crate::__pgrx_c_macros::CInt
                                                                         >::new(
-                                                                            $crate::MAXIMUM_ALIGNOF as i32
+                                                                            $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                         )
                                                                     )
                                                                 ),
@@ -750,8 +754,8 @@ macro_rules! ReorderBufferTupleBufData {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -782,23 +786,23 @@ macro_rules! __pgrx_c_args_rbtxn_distr_inval_overflowed {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
         $crate::__pgrx_c_args_rbtxn_distr_inval_overflowed!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_rbtxn_distr_inval_overflowed!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_rbtxn_distr_inval_overflowed!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_rbtxn_distr_inval_overflowed!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -810,7 +814,7 @@ macro_rules! __pgrx_c_args_rbtxn_distr_inval_overflowed {
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
         $crate::__pgrx_c_args_rbtxn_distr_inval_overflowed!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
@@ -836,17 +840,17 @@ macro_rules! __pgrx_c_args_rbtxn_distr_inval_overflowed {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_rbtxn_distr_inval_overflowed!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_rbtxn_distr_inval_overflowed!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_rbtxn_distr_inval_overflowed!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -873,13 +877,13 @@ macro_rules! __pgrx_c_args_rbtxn_distr_inval_overflowed {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_rbtxn_distr_inval_overflowed!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_rbtxn_distr_inval_overflowed!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -952,7 +956,7 @@ macro_rules! rbtxn_distr_inval_overflowed {
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                        $crate::RBTXN_DISTR_INVAL_OVERFLOWED as i32
+                                        $crate::__pgrx_c_bindings::RBTXN_DISTR_INVAL_OVERFLOWED as i32
                                     )
                                 )
                             )
@@ -1034,7 +1038,9 @@ macro_rules! rbtxn_distr_inval_overflowed {
                                             >(
                                                 $crate::__pgrx_c_macros::CValue::<
                                                     $crate::__pgrx_c_macros::CInt
-                                                >::new($crate::RBTXN_DISTR_INVAL_OVERFLOWED as i32)
+                                                >::new(
+                                                    $crate::__pgrx_c_bindings::RBTXN_DISTR_INVAL_OVERFLOWED as i32
+                                                )
                                             )
                                         )
                                     )
@@ -1090,7 +1096,7 @@ macro_rules! rbtxn_distr_inval_overflowed {
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                        $crate::RBTXN_DISTR_INVAL_OVERFLOWED as i32
+                                        $crate::__pgrx_c_bindings::RBTXN_DISTR_INVAL_OVERFLOWED as i32
                                     )
                                 )
                             )
@@ -1122,8 +1128,8 @@ macro_rules! rbtxn_distr_inval_overflowed {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -1154,23 +1160,23 @@ macro_rules! __pgrx_c_args_rbtxn_has_catalog_changes {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
         $crate::__pgrx_c_args_rbtxn_has_catalog_changes!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_rbtxn_has_catalog_changes!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_rbtxn_has_catalog_changes!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_rbtxn_has_catalog_changes!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -1179,7 +1185,7 @@ macro_rules! __pgrx_c_args_rbtxn_has_catalog_changes {
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
         $crate::__pgrx_c_args_rbtxn_has_catalog_changes!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
@@ -1205,17 +1211,17 @@ macro_rules! __pgrx_c_args_rbtxn_has_catalog_changes {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_rbtxn_has_catalog_changes!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_rbtxn_has_catalog_changes!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_rbtxn_has_catalog_changes!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -1242,13 +1248,13 @@ macro_rules! __pgrx_c_args_rbtxn_has_catalog_changes {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_rbtxn_has_catalog_changes!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_rbtxn_has_catalog_changes!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -1321,7 +1327,7 @@ macro_rules! rbtxn_has_catalog_changes {
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                        $crate::RBTXN_HAS_CATALOG_CHANGES as i32
+                                        $crate::__pgrx_c_bindings::RBTXN_HAS_CATALOG_CHANGES as i32
                                     )
                                 )
                             )
@@ -1403,7 +1409,9 @@ macro_rules! rbtxn_has_catalog_changes {
                                             >(
                                                 $crate::__pgrx_c_macros::CValue::<
                                                     $crate::__pgrx_c_macros::CInt
-                                                >::new($crate::RBTXN_HAS_CATALOG_CHANGES as i32)
+                                                >::new(
+                                                    $crate::__pgrx_c_bindings::RBTXN_HAS_CATALOG_CHANGES as i32
+                                                )
                                             )
                                         )
                                     )
@@ -1459,7 +1467,7 @@ macro_rules! rbtxn_has_catalog_changes {
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                        $crate::RBTXN_HAS_CATALOG_CHANGES as i32
+                                        $crate::__pgrx_c_bindings::RBTXN_HAS_CATALOG_CHANGES as i32
                                     )
                                 )
                             )
@@ -1485,8 +1493,8 @@ macro_rules! rbtxn_has_catalog_changes {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -1517,23 +1525,23 @@ macro_rules! __pgrx_c_args_rbtxn_has_partial_change {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
         $crate::__pgrx_c_args_rbtxn_has_partial_change!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_rbtxn_has_partial_change!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_rbtxn_has_partial_change!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_rbtxn_has_partial_change!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -1542,7 +1550,7 @@ macro_rules! __pgrx_c_args_rbtxn_has_partial_change {
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
         $crate::__pgrx_c_args_rbtxn_has_partial_change!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
@@ -1568,17 +1576,17 @@ macro_rules! __pgrx_c_args_rbtxn_has_partial_change {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_rbtxn_has_partial_change!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_rbtxn_has_partial_change!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_rbtxn_has_partial_change!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -1605,13 +1613,13 @@ macro_rules! __pgrx_c_args_rbtxn_has_partial_change {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_rbtxn_has_partial_change!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_rbtxn_has_partial_change!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -1684,7 +1692,7 @@ macro_rules! rbtxn_has_partial_change {
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                        $crate::RBTXN_HAS_PARTIAL_CHANGE as i32
+                                        $crate::__pgrx_c_bindings::RBTXN_HAS_PARTIAL_CHANGE as i32
                                     )
                                 )
                             )
@@ -1766,7 +1774,9 @@ macro_rules! rbtxn_has_partial_change {
                                             >(
                                                 $crate::__pgrx_c_macros::CValue::<
                                                     $crate::__pgrx_c_macros::CInt
-                                                >::new($crate::RBTXN_HAS_PARTIAL_CHANGE as i32)
+                                                >::new(
+                                                    $crate::__pgrx_c_bindings::RBTXN_HAS_PARTIAL_CHANGE as i32
+                                                )
                                             )
                                         )
                                     )
@@ -1822,7 +1832,7 @@ macro_rules! rbtxn_has_partial_change {
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                        $crate::RBTXN_HAS_PARTIAL_CHANGE as i32
+                                        $crate::__pgrx_c_bindings::RBTXN_HAS_PARTIAL_CHANGE as i32
                                     )
                                 )
                             )
@@ -1848,8 +1858,8 @@ macro_rules! rbtxn_has_partial_change {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -1880,21 +1890,23 @@ macro_rules! __pgrx_c_args_rbtxn_is_known_subxact {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
         $crate::__pgrx_c_args_rbtxn_is_known_subxact!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_rbtxn_is_known_subxact!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_rbtxn_is_known_subxact!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_rbtxn_is_known_subxact!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_rbtxn_is_known_subxact!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -1902,7 +1914,9 @@ macro_rules! __pgrx_c_args_rbtxn_is_known_subxact {
         $crate::__pgrx_c_args_rbtxn_is_known_subxact!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_rbtxn_is_known_subxact!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_rbtxn_is_known_subxact!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -1927,15 +1941,17 @@ macro_rules! __pgrx_c_args_rbtxn_is_known_subxact {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_rbtxn_is_known_subxact!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_rbtxn_is_known_subxact!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_rbtxn_is_known_subxact!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_rbtxn_is_known_subxact!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -1962,13 +1978,13 @@ macro_rules! __pgrx_c_args_rbtxn_is_known_subxact {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_rbtxn_is_known_subxact!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_rbtxn_is_known_subxact!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -2041,7 +2057,7 @@ macro_rules! rbtxn_is_known_subxact {
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                        $crate::RBTXN_IS_SUBXACT as i32
+                                        $crate::__pgrx_c_bindings::RBTXN_IS_SUBXACT as i32
                                     )
                                 )
                             )
@@ -2120,7 +2136,9 @@ macro_rules! rbtxn_is_known_subxact {
                                             >(
                                                 $crate::__pgrx_c_macros::CValue::<
                                                     $crate::__pgrx_c_macros::CInt
-                                                >::new($crate::RBTXN_IS_SUBXACT as i32)
+                                                >::new(
+                                                    $crate::__pgrx_c_bindings::RBTXN_IS_SUBXACT as i32
+                                                )
                                             )
                                         )
                                     )
@@ -2176,7 +2194,7 @@ macro_rules! rbtxn_is_known_subxact {
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                        $crate::RBTXN_IS_SUBXACT as i32
+                                        $crate::__pgrx_c_bindings::RBTXN_IS_SUBXACT as i32
                                     )
                                 )
                             )
@@ -2202,8 +2220,8 @@ macro_rules! rbtxn_is_known_subxact {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -2230,20 +2248,24 @@ macro_rules! __pgrx_c_args_rbtxn_is_serialized {
         $crate::__pgrx_c_args_rbtxn_is_serialized!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_rbtxn_is_serialized!(@p1 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_rbtxn_is_serialized!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_rbtxn_is_serialized!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_rbtxn_is_serialized!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_rbtxn_is_serialized!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_rbtxn_is_serialized!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -2251,7 +2273,9 @@ macro_rules! __pgrx_c_args_rbtxn_is_serialized {
         $crate::__pgrx_c_args_rbtxn_is_serialized!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_rbtxn_is_serialized!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_rbtxn_is_serialized!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -2273,14 +2297,18 @@ macro_rules! __pgrx_c_args_rbtxn_is_serialized {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_rbtxn_is_serialized!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_rbtxn_is_serialized!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_rbtxn_is_serialized!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_rbtxn_is_serialized!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_rbtxn_is_serialized!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -2307,13 +2335,13 @@ macro_rules! __pgrx_c_args_rbtxn_is_serialized {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_rbtxn_is_serialized!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_rbtxn_is_serialized!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -2383,7 +2411,7 @@ macro_rules! rbtxn_is_serialized {
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                        $crate::RBTXN_IS_SERIALIZED as i32
+                                        $crate::__pgrx_c_bindings::RBTXN_IS_SERIALIZED as i32
                                     )
                                 )
                             )
@@ -2462,7 +2490,9 @@ macro_rules! rbtxn_is_serialized {
                                             >(
                                                 $crate::__pgrx_c_macros::CValue::<
                                                     $crate::__pgrx_c_macros::CInt
-                                                >::new($crate::RBTXN_IS_SERIALIZED as i32)
+                                                >::new(
+                                                    $crate::__pgrx_c_bindings::RBTXN_IS_SERIALIZED as i32
+                                                )
                                             )
                                         )
                                     )
@@ -2518,7 +2548,7 @@ macro_rules! rbtxn_is_serialized {
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                        $crate::RBTXN_IS_SERIALIZED as i32
+                                        $crate::__pgrx_c_bindings::RBTXN_IS_SERIALIZED as i32
                                     )
                                 )
                             )
@@ -2544,8 +2574,8 @@ macro_rules! rbtxn_is_serialized {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -2576,23 +2606,23 @@ macro_rules! __pgrx_c_args_rbtxn_is_serialized_clear {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
         $crate::__pgrx_c_args_rbtxn_is_serialized_clear!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_rbtxn_is_serialized_clear!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_rbtxn_is_serialized_clear!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_rbtxn_is_serialized_clear!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -2601,7 +2631,7 @@ macro_rules! __pgrx_c_args_rbtxn_is_serialized_clear {
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
         $crate::__pgrx_c_args_rbtxn_is_serialized_clear!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
@@ -2627,17 +2657,17 @@ macro_rules! __pgrx_c_args_rbtxn_is_serialized_clear {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_rbtxn_is_serialized_clear!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_rbtxn_is_serialized_clear!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_rbtxn_is_serialized_clear!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -2664,13 +2694,13 @@ macro_rules! __pgrx_c_args_rbtxn_is_serialized_clear {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_rbtxn_is_serialized_clear!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_rbtxn_is_serialized_clear!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -2743,7 +2773,7 @@ macro_rules! rbtxn_is_serialized_clear {
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                        $crate::RBTXN_IS_SERIALIZED_CLEAR as i32
+                                        $crate::__pgrx_c_bindings::RBTXN_IS_SERIALIZED_CLEAR as i32
                                     )
                                 )
                             )
@@ -2825,7 +2855,9 @@ macro_rules! rbtxn_is_serialized_clear {
                                             >(
                                                 $crate::__pgrx_c_macros::CValue::<
                                                     $crate::__pgrx_c_macros::CInt
-                                                >::new($crate::RBTXN_IS_SERIALIZED_CLEAR as i32)
+                                                >::new(
+                                                    $crate::__pgrx_c_bindings::RBTXN_IS_SERIALIZED_CLEAR as i32
+                                                )
                                             )
                                         )
                                     )
@@ -2881,7 +2913,7 @@ macro_rules! rbtxn_is_serialized_clear {
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                        $crate::RBTXN_IS_SERIALIZED_CLEAR as i32
+                                        $crate::__pgrx_c_bindings::RBTXN_IS_SERIALIZED_CLEAR as i32
                                     )
                                 )
                             )
@@ -2907,8 +2939,8 @@ macro_rules! rbtxn_is_serialized_clear {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -2935,20 +2967,24 @@ macro_rules! __pgrx_c_args_rbtxn_is_streamed {
         $crate::__pgrx_c_args_rbtxn_is_streamed!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_rbtxn_is_streamed!(@p1 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_rbtxn_is_streamed!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_rbtxn_is_streamed!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_rbtxn_is_streamed!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_rbtxn_is_streamed!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_rbtxn_is_streamed!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -2956,7 +2992,9 @@ macro_rules! __pgrx_c_args_rbtxn_is_streamed {
         $crate::__pgrx_c_args_rbtxn_is_streamed!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_rbtxn_is_streamed!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_rbtxn_is_streamed!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -2978,14 +3016,18 @@ macro_rules! __pgrx_c_args_rbtxn_is_streamed {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_rbtxn_is_streamed!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_rbtxn_is_streamed!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_rbtxn_is_streamed!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_rbtxn_is_streamed!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_rbtxn_is_streamed!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -3012,13 +3054,13 @@ macro_rules! __pgrx_c_args_rbtxn_is_streamed {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_rbtxn_is_streamed!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_rbtxn_is_streamed!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -3088,7 +3130,7 @@ macro_rules! rbtxn_is_streamed {
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                        $crate::RBTXN_IS_STREAMED as i32
+                                        $crate::__pgrx_c_bindings::RBTXN_IS_STREAMED as i32
                                     )
                                 )
                             )
@@ -3167,7 +3209,9 @@ macro_rules! rbtxn_is_streamed {
                                             >(
                                                 $crate::__pgrx_c_macros::CValue::<
                                                     $crate::__pgrx_c_macros::CInt
-                                                >::new($crate::RBTXN_IS_STREAMED as i32)
+                                                >::new(
+                                                    $crate::__pgrx_c_bindings::RBTXN_IS_STREAMED as i32
+                                                )
                                             )
                                         )
                                     )
@@ -3223,7 +3267,7 @@ macro_rules! rbtxn_is_streamed {
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                        $crate::RBTXN_IS_STREAMED as i32
+                                        $crate::__pgrx_c_bindings::RBTXN_IS_STREAMED as i32
                                     )
                                 )
                             )
@@ -3249,8 +3293,8 @@ macro_rules! rbtxn_is_streamed {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -3277,20 +3321,24 @@ macro_rules! __pgrx_c_args_rbtxn_prepared {
         $crate::__pgrx_c_args_rbtxn_prepared!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_rbtxn_prepared!(@p1 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_rbtxn_prepared!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_rbtxn_prepared!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_rbtxn_prepared!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_rbtxn_prepared!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_rbtxn_prepared!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -3298,7 +3346,9 @@ macro_rules! __pgrx_c_args_rbtxn_prepared {
         $crate::__pgrx_c_args_rbtxn_prepared!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_rbtxn_prepared!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_rbtxn_prepared!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -3320,14 +3370,18 @@ macro_rules! __pgrx_c_args_rbtxn_prepared {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_rbtxn_prepared!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_rbtxn_prepared!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_rbtxn_prepared!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_rbtxn_prepared!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_rbtxn_prepared!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -3354,13 +3408,13 @@ macro_rules! __pgrx_c_args_rbtxn_prepared {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_rbtxn_prepared!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_rbtxn_prepared!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -3430,7 +3484,7 @@ macro_rules! rbtxn_prepared {
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                        $crate::RBTXN_PREPARE as i32
+                                        $crate::__pgrx_c_bindings::RBTXN_PREPARE as i32
                                     )
                                 )
                             )
@@ -3509,7 +3563,9 @@ macro_rules! rbtxn_prepared {
                                             >(
                                                 $crate::__pgrx_c_macros::CValue::<
                                                     $crate::__pgrx_c_macros::CInt
-                                                >::new($crate::RBTXN_PREPARE as i32)
+                                                >::new(
+                                                    $crate::__pgrx_c_bindings::RBTXN_PREPARE as i32
+                                                )
                                             )
                                         )
                                     )
@@ -3565,7 +3621,7 @@ macro_rules! rbtxn_prepared {
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                        $crate::RBTXN_PREPARE as i32
+                                        $crate::__pgrx_c_bindings::RBTXN_PREPARE as i32
                                     )
                                 )
                             )
@@ -3591,8 +3647,8 @@ macro_rules! rbtxn_prepared {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -3619,20 +3675,24 @@ macro_rules! __pgrx_c_args_rbtxn_skip_prepared {
         $crate::__pgrx_c_args_rbtxn_skip_prepared!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_rbtxn_skip_prepared!(@p1 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_rbtxn_skip_prepared!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_rbtxn_skip_prepared!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_rbtxn_skip_prepared!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_rbtxn_skip_prepared!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_rbtxn_skip_prepared!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -3640,7 +3700,9 @@ macro_rules! __pgrx_c_args_rbtxn_skip_prepared {
         $crate::__pgrx_c_args_rbtxn_skip_prepared!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_rbtxn_skip_prepared!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_rbtxn_skip_prepared!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -3662,14 +3724,18 @@ macro_rules! __pgrx_c_args_rbtxn_skip_prepared {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_rbtxn_skip_prepared!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_rbtxn_skip_prepared!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_rbtxn_skip_prepared!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_rbtxn_skip_prepared!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_rbtxn_skip_prepared!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -3696,13 +3762,13 @@ macro_rules! __pgrx_c_args_rbtxn_skip_prepared {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_rbtxn_skip_prepared!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_rbtxn_skip_prepared!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -3772,7 +3838,7 @@ macro_rules! rbtxn_skip_prepared {
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                        $crate::RBTXN_SKIPPED_PREPARE as i32
+                                        $crate::__pgrx_c_bindings::RBTXN_SKIPPED_PREPARE as i32
                                     )
                                 )
                             )
@@ -3851,7 +3917,9 @@ macro_rules! rbtxn_skip_prepared {
                                             >(
                                                 $crate::__pgrx_c_macros::CValue::<
                                                     $crate::__pgrx_c_macros::CInt
-                                                >::new($crate::RBTXN_SKIPPED_PREPARE as i32)
+                                                >::new(
+                                                    $crate::__pgrx_c_bindings::RBTXN_SKIPPED_PREPARE as i32
+                                                )
                                             )
                                         )
                                     )
@@ -3907,7 +3975,7 @@ macro_rules! rbtxn_skip_prepared {
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                        $crate::RBTXN_SKIPPED_PREPARE as i32
+                                        $crate::__pgrx_c_bindings::RBTXN_SKIPPED_PREPARE as i32
                                     )
                                 )
                             )

@@ -24,7 +24,10 @@ use crate::model::{IntegerKind, IntegerType, IntegerValue, SignedOverflow};
 use crate::syntax::{
     BinaryOperator, ExpressionKind, IntegerLiteral, NodeId, TokenRange, UnaryOperator,
 };
-use crate::{AnalysisSession, MacroDefinition, support_generation::support_abi_assertions};
+use crate::{
+    AnalysisSession, InlineFunctionDefinition, MacroDefinition,
+    support_generation::support_abi_assertions,
+};
 use serde::Serialize;
 use std::collections::{BTreeMap, BTreeSet};
 use std::fmt::Write;
@@ -33,6 +36,14 @@ use std::fmt::Write;
 const SUPPORT: &str = "$crate::__pgrx_c_macros";
 /// Bound one macro’s emitted source, including diagnostics and original-definition docs.
 const MAX_EMISSION_BYTES: usize = 1024 * 1024;
+
+/// Original source for one invocation root, kept separate from its internal call syntax.
+enum InvocationSource<'a> {
+    /// An actual active preprocessor definition.
+    Macro(&'a MacroDefinition),
+    /// An actual compiler-proven function definition called through a typed adapter.
+    Inline(&'a InlineFunctionDefinition),
+}
 
 /// Original-function address adapters that bypass callable thunks and Rust guard wrappers.
 mod addresses;
@@ -65,6 +76,9 @@ mod types;
 /// Paths are relative to `$crate`; `macros` contains macros actually emitted there.
 #[derive(Clone, Debug, Default, Serialize)]
 pub struct BindingCatalog {
+    /// Crate-relative module containing generated declarations; C typedef names
+    /// remain relative to this root while emitted Rust paths retain the full prefix.
+    pub namespace: Vec<String>,
     /// Binding values and paths used to preserve symbols after checking agreement with Clang.
     pub integer_constants: BTreeMap<String, IntegerBinding>,
     /// Definitions available for preserved cross-macro calls in this defining crate.
@@ -110,6 +124,50 @@ pub struct BindingCatalog {
     /// Getters for the original C function addresses, distinct from Rust call wrappers.
     #[serde(skip)]
     pub function_addresses: BTreeMap<String, crate::FunctionAddressBinding>,
+}
+
+impl BindingCatalog {
+    /// Resolve an original C typedef through its qualified Rust declaration without
+    /// confusing a crate-root compatibility item with the generated alias.
+    pub fn type_alias(&self, name: &str) -> Option<&crate::AliasBinding> {
+        if self.namespace.is_empty() {
+            return self.types.get(name);
+        }
+        let key = self
+            .namespace
+            .iter()
+            .map(|part| part.trim_start_matches("r#"))
+            .chain([name])
+            .collect::<Vec<_>>()
+            .join("::");
+        self.types.get(&key)
+    }
+
+    /// Recover the declaration-relative C name from a qualified alias map key.
+    /// A key outside this catalog's namespace cannot establish a C typedef identity.
+    pub fn relative_type_name<'a>(&self, mut key: &'a str) -> Option<&'a str> {
+        for part in &self.namespace {
+            key = key.strip_prefix(part.trim_start_matches("r#"))?.strip_prefix("::")?;
+        }
+        Some(key)
+    }
+
+    /// Remove only the exact generated root from a binding path; explicit crate-owned
+    /// and standard-library types keep their canonical paths instead.
+    pub fn relative_path<'a>(&self, path: &'a [String]) -> Option<&'a [String]> {
+        path.strip_prefix(self.namespace.as_slice())
+    }
+
+    /// Match a proved integer bridge using either its explicit crate-owned path or
+    /// the same type reexported through the generated namespace.
+    pub fn integer_kind(&self, path: &[String]) -> Option<IntegerKind> {
+        let key = |parts: &[String]| {
+            parts.iter().map(|part| part.trim_start_matches("r#")).collect::<Vec<_>>().join("::")
+        };
+        self.integer_storage.get(&key(path)).copied().or_else(|| {
+            self.relative_path(path).and_then(|path| self.integer_storage.get(&key(path)).copied())
+        })
+    }
 }
 
 /// A symbol reference and its independently comparable binding value.
@@ -198,13 +256,14 @@ fn emit_with_lowering<'a>(
     } else if let AnalysisStatus::Skipped { reason } = &analysis.status {
         Err(reason.clone())
     } else {
-        let original = &session
-            .frontend()
-            .environment()
-            .active
-            .get(name)
-            .expect("analyzed candidates come from the immutable final active macro map")
-            .definition;
+        let original = match session.frontend().environment().active.get(name) {
+            Some(active) => InvocationSource::Macro(&active.definition),
+            None => InvocationSource::Inline(
+                session
+                    .inline_definition(name)
+                    .expect("analyzed native roots retain their compiler-proven definition"),
+            ),
+        };
         support_abi_assertions(session.frontend().profile())
             .map_err(|error| {
                 skip(&analysis, SkipReasonCode::UnsupportedProfile, error.to_string(), None)
@@ -521,6 +580,7 @@ fn render_adapters(
     adapters: GeneratedAdapters,
     macros: &[MacroEmission],
 ) -> Result<MacroSupportArtifact, String> {
+    let callback_typedefs = adapters.callbacks.has_typedefs;
     let body = format!(
         "{}\n{}\n{}\n{}\n{}",
         adapters.callbacks.rust,
@@ -536,6 +596,12 @@ fn render_adapters(
             "#[doc(hidden)]\n#[allow(non_snake_case, non_camel_case_types)]\npub mod __pgrx_c_generated {{\nuse crate::__pgrx_c_macros as c;\n{body}\n}}\n"
         )
     };
+    if callback_typedefs {
+        rust.push_str(
+            "/// Explicit callback typedef identities validated against the current C profile.\n\
+             #[doc(hidden)]\npub use self::__pgrx_c_generated::__pgrx_c_callbacks;\n",
+        );
+    }
     let exports = macros
         .iter()
         .filter(|emission| matches!(emission.status, EmissionStatus::Emitted { .. }))
@@ -543,11 +609,10 @@ fn render_adapters(
         .collect::<BTreeSet<_>>();
     let operands = macros.iter().any(|emission| {
         matches!(emission.status, EmissionStatus::Emitted { .. })
-            && emission
-                .analysis
-                .parameters
-                .iter()
-                .any(|parameter| parameter.roles.contains(&crate::ParameterRole::Value))
+            && emission.analysis.parameters.iter().any(|parameter| {
+                parameter.roles.contains(&crate::ParameterRole::Value)
+                    || parameter.roles.contains(&crate::ParameterRole::Spelling)
+            })
     });
     rust.push_str(&crate::format_rust_macros(&arguments::shared(&exports, operands)?)?);
     if !adapters.fields.markers.is_empty() {
@@ -811,7 +876,7 @@ fn skip(
 fn render(
     session: &AnalysisSession<'_>,
     analysis: &MacroAnalysis,
-    original: &MacroDefinition,
+    original: InvocationSource<'_>,
     assertions: &str,
     bindings: &BindingCatalog,
     lowering: &types::Lowering<'_>,
@@ -867,21 +932,53 @@ fn render(
     if let Some(arguments) = &arguments {
         rust.push_str(&arguments.rust);
     }
-    let mut comment = format!("C macro {}", analysis.name);
+    let mut comment = match original {
+        InvocationSource::Macro(_) => format!("C macro {}", analysis.name),
+        InvocationSource::Inline(_) => {
+            format!("Typed call adapter for C inline function {}", analysis.name)
+        }
+    };
     if let Some(span) = &analysis.provenance
         && let Some(file) = span.file.file_name()
     {
         write!(&mut comment, " from {}:{}", file.to_string_lossy(), span.start_line)
             .expect("String output");
     }
-    comment.push_str(&definition_comment(original).ok_or_else(|| {
+    let definition = match original {
+        InvocationSource::Macro(definition) => definition_comment(definition),
+        InvocationSource::Inline(definition) => {
+            definition.source.as_deref().and_then(|source| source_comment(source, "c"))
+        }
+    };
+    comment.push_str(&definition.ok_or_else(|| {
         skip(
             analysis,
             SkipReasonCode::BudgetExceeded,
-            "original C macro source comment exceeds the bounded output size",
+            "original C invocation source is unavailable or exceeds the bounded output size",
             None,
         )
     })?);
+    if matches!(original, InvocationSource::Inline(_)) {
+        comment.push_str("\n\nCalls the original function through its inspected C prototype. Each operand is evaluated once and converted using C parameter assignment rules. The result retains the function's original C type; `.get()` extracts its native storage, including `()` for a void result. Native calls retain the backend thread, PostgreSQL error, and caller safety contracts of the generated guarded binding.");
+    }
+    if expression.syntax.nodes.iter().any(|node| {
+        matches!(node.kind, ExpressionKind::InvocationFile | ExpressionKind::InvocationLine)
+    }) {
+        comment.push_str("\n\nInvocation diagnostics use Rust `file!()` and `line!()` at the outer Rust source invocation. The filename is a static UTF-8 byte array with a final zero; the line must fit the inspected C int. Source-line-dependent C preprocessing and integer-constant-expression identity are outside this diagnostic contract.");
+    }
+    if expression
+        .syntax
+        .nodes
+        .iter()
+        .any(|node| matches!(node.kind, ExpressionKind::Stringification { .. }))
+    {
+        comment.push_str("\n\nDependency stringification retains the compiler-expanded C diagnostic template and uses Rust `stringify!` on the original outer Rust operand tokens. It never evaluates those tokens. Operand spelling follows Rust whitespace and token rendering, requires ASCII, and preserves all groups and punctuation; it does not promise C preprocessor stringification for Rust-specific syntax. Such strings are static zero-terminated native const-char arguments only. Their C array extent, address, integer-constant-expression identity and return as a string value are unsupported. Root macros containing # remain explicit skips.");
+    }
+    if expression.syntax.nodes.iter().any(|node| {
+        matches!(node.kind, ExpressionKind::StringLiteral { .. } | ExpressionKind::InvocationFile)
+    }) {
+        comment.push_str(" String arrays retain their complete char-array extent for size and address operations, and decay to read-only pointers for values. Literal mutation is rejected because C string-literal writes are undefined.");
+    }
     if returning {
         comment.push_str("\n\nC return statements in this macro exit the enclosing Rust function or closure. Call it directly, without an outer `return`. The enclosing result must have an unambiguous C identity; otherwise use `@__pgrx_c_return_as [CMarker];` before the arguments to specify the original C function's return type. Return conversion uses C assignment rules, including truncation and pointer qualification. Rust caller cleanup follows normal Rust return behavior. Pointer access and native calls keep their usual caller safety obligations.");
     } else if statement_body.is_some() {
@@ -1136,6 +1233,17 @@ fn render_body(
     }
     match crate::delegation::direct_delegation(session, analysis) {
         Ok(Some(delegation)) if bindings.macros.contains(&delegation.callee) => {
+            if expression.syntax.nodes.iter().any(|node| {
+                matches!(node.kind, crate::syntax::ExpressionKind::Stringification { .. })
+            }) {
+                write_fallback(
+                    &mut rust,
+                    &delegation.callee,
+                    "preserving its call would replace diagnostic operand spelling with compiled operand descriptors",
+                );
+                renderer.render(expression.syntax.root, context, &mut rust)?;
+                return Ok(rust);
+            }
             if !renderer.preserves_expectations(|| session.analyze(&delegation.callee)) {
                 write_fallback(
                     &mut rust,
@@ -1253,6 +1361,17 @@ fn render_expression(
                         if literal.value == 0 {
                             rust.push(')');
                         }
+                    }
+                    ExpressionKind::StringLiteral { .. }
+                    | ExpressionKind::Stringification { .. }
+                    | ExpressionKind::InvocationFile
+                    | ExpressionKind::InvocationLine => {
+                        return Err(skip(
+                            analysis,
+                            SkipReasonCode::UnsupportedLiteral,
+                            "string and invocation diagnostics require contextual typed lowering",
+                            Some(node.tokens),
+                        ));
                     }
                     ExpressionKind::Identifier { .. } => {
                         let Some(constant) = constants[index] else {
@@ -1522,7 +1641,11 @@ fn definition_comment(definition: &MacroDefinition) -> Option<String> {
     if bytes > MAX_EMISSION_BYTES {
         return None;
     }
-    let definition = definition.to_string();
+    source_comment(&definition.to_string(), "text")
+}
+
+/// Fence bounded original source without letting embedded backticks terminate its documentation.
+fn source_comment(definition: &str, language: &str) -> Option<String> {
     let fence_length = definition.split(|character| character != '`').map(str::len).max()?;
     let fence_length = fence_length.saturating_add(1).max(3);
     if definition.len().saturating_add(fence_length.saturating_mul(2)).saturating_add(9)
@@ -1531,7 +1654,7 @@ fn definition_comment(definition: &MacroDefinition) -> Option<String> {
         return None;
     }
     let fence = "`".repeat(fence_length);
-    Some(format!("\n\n{fence}text\n{definition}\n{fence}\n"))
+    Some(format!("\n\n{fence}{language}\n{definition}\n{fence}\n"))
 }
 
 /// Pending work for iterative integer-expression rendering without recursive source copies.

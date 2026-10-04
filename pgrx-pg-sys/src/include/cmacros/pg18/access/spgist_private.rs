@@ -5,8 +5,8 @@ This code is generated for documentation purposes, so that it is easy to referen
 // C macros from spgist_private.h.
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -33,20 +33,24 @@ macro_rules! __pgrx_c_args_GBUF_INNER_PARITY {
         $crate::__pgrx_c_args_GBUF_INNER_PARITY!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_GBUF_INNER_PARITY!(@p1 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_GBUF_INNER_PARITY!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_GBUF_INNER_PARITY!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_GBUF_INNER_PARITY!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GBUF_INNER_PARITY!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GBUF_INNER_PARITY!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -54,7 +58,9 @@ macro_rules! __pgrx_c_args_GBUF_INNER_PARITY {
         $crate::__pgrx_c_args_GBUF_INNER_PARITY!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_GBUF_INNER_PARITY!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_GBUF_INNER_PARITY!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -76,14 +82,18 @@ macro_rules! __pgrx_c_args_GBUF_INNER_PARITY {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_GBUF_INNER_PARITY!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_GBUF_INNER_PARITY!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_GBUF_INNER_PARITY!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_GBUF_INNER_PARITY!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_GBUF_INNER_PARITY!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -110,13 +120,13 @@ macro_rules! __pgrx_c_args_GBUF_INNER_PARITY {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GBUF_INNER_PARITY!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GBUF_INNER_PARITY!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -248,8 +258,8 @@ macro_rules! GBUF_INNER_PARITY {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -276,20 +286,24 @@ macro_rules! __pgrx_c_args_GBUF_REQ_LEAF {
         $crate::__pgrx_c_args_GBUF_REQ_LEAF!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_GBUF_REQ_LEAF!(@p1 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_GBUF_REQ_LEAF!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_GBUF_REQ_LEAF!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_GBUF_REQ_LEAF!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GBUF_REQ_LEAF!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GBUF_REQ_LEAF!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -297,7 +311,9 @@ macro_rules! __pgrx_c_args_GBUF_REQ_LEAF {
         $crate::__pgrx_c_args_GBUF_REQ_LEAF!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_GBUF_REQ_LEAF!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_GBUF_REQ_LEAF!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -319,14 +335,18 @@ macro_rules! __pgrx_c_args_GBUF_REQ_LEAF {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_GBUF_REQ_LEAF!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_GBUF_REQ_LEAF!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_GBUF_REQ_LEAF!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_GBUF_REQ_LEAF!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_GBUF_REQ_LEAF!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -353,13 +373,13 @@ macro_rules! __pgrx_c_args_GBUF_REQ_LEAF {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GBUF_REQ_LEAF!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GBUF_REQ_LEAF!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -411,7 +431,7 @@ macro_rules! GBUF_REQ_LEAF {
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                        $crate::GBUF_PARITY_MASK as i32
+                                        $crate::__pgrx_c_bindings::GBUF_PARITY_MASK as i32
                                     )
                                 )
                             )
@@ -419,7 +439,7 @@ macro_rules! GBUF_REQ_LEAF {
                     ),
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                            $crate::GBUF_LEAF as i32
+                            $crate::__pgrx_c_bindings::GBUF_LEAF as i32
                         )
                     )
                 )
@@ -468,14 +488,16 @@ macro_rules! GBUF_REQ_LEAF {
                                             >(
                                                 $crate::__pgrx_c_macros::CValue::<
                                                     $crate::__pgrx_c_macros::CInt
-                                                >::new($crate::GBUF_PARITY_MASK as i32)
+                                                >::new(
+                                                    $crate::__pgrx_c_bindings::GBUF_PARITY_MASK as i32
+                                                )
                                             )
                                         )
                                     )
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                        $crate::GBUF_LEAF as i32
+                                        $crate::__pgrx_c_bindings::GBUF_LEAF as i32
                                     )
                                 )
                             )
@@ -504,7 +526,7 @@ macro_rules! GBUF_REQ_LEAF {
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                        $crate::GBUF_PARITY_MASK as i32
+                                        $crate::__pgrx_c_bindings::GBUF_PARITY_MASK as i32
                                     )
                                 )
                             )
@@ -512,7 +534,7 @@ macro_rules! GBUF_REQ_LEAF {
                     ),
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                            $crate::GBUF_LEAF as i32
+                            $crate::__pgrx_c_bindings::GBUF_LEAF as i32
                         )
                     )
                 )
@@ -528,8 +550,8 @@ macro_rules! GBUF_REQ_LEAF {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -556,20 +578,24 @@ macro_rules! __pgrx_c_args_GBUF_REQ_NULLS {
         $crate::__pgrx_c_args_GBUF_REQ_NULLS!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_GBUF_REQ_NULLS!(@p1 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_GBUF_REQ_NULLS!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_GBUF_REQ_NULLS!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_GBUF_REQ_NULLS!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GBUF_REQ_NULLS!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GBUF_REQ_NULLS!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -577,7 +603,9 @@ macro_rules! __pgrx_c_args_GBUF_REQ_NULLS {
         $crate::__pgrx_c_args_GBUF_REQ_NULLS!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_GBUF_REQ_NULLS!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_GBUF_REQ_NULLS!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -599,14 +627,18 @@ macro_rules! __pgrx_c_args_GBUF_REQ_NULLS {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_GBUF_REQ_NULLS!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_GBUF_REQ_NULLS!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_GBUF_REQ_NULLS!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_GBUF_REQ_NULLS!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_GBUF_REQ_NULLS!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -633,13 +665,13 @@ macro_rules! __pgrx_c_args_GBUF_REQ_NULLS {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GBUF_REQ_NULLS!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GBUF_REQ_NULLS!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -688,7 +720,7 @@ macro_rules! GBUF_REQ_NULLS {
                     ),
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                            $crate::GBUF_NULLS as i32
+                            $crate::__pgrx_c_bindings::GBUF_NULLS as i32
                         )
                     )
                 )
@@ -729,7 +761,7 @@ macro_rules! GBUF_REQ_NULLS {
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                        $crate::GBUF_NULLS as i32
+                                        $crate::__pgrx_c_bindings::GBUF_NULLS as i32
                                     )
                                 )
                             )
@@ -755,7 +787,7 @@ macro_rules! GBUF_REQ_NULLS {
                     ),
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                            $crate::GBUF_NULLS as i32
+                            $crate::__pgrx_c_bindings::GBUF_NULLS as i32
                         )
                     )
                 )
@@ -771,8 +803,8 @@ macro_rules! GBUF_REQ_NULLS {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -799,25 +831,34 @@ macro_rules! __pgrx_c_args_SGITDATAPTR {
         $crate::__pgrx_c_args_SGITDATAPTR!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_SGITDATAPTR!(@p1 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_SGITDATAPTR!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_SGITDATAPTR!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_SGITDATAPTR!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SGITDATAPTR!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_SGITDATAPTR!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_SGITDATAPTR!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $($raw:tt)*) => {
         $crate::__pgrx_c_args_SGITDATAPTR!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_SGITDATAPTR!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_SGITDATAPTR!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -839,13 +880,20 @@ macro_rules! __pgrx_c_args_SGITDATAPTR {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_SGITDATAPTR!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_SGITDATAPTR!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_SGITDATAPTR!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_SGITDATAPTR!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
-        $crate::__pgrx_c_args_SGITDATAPTR!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_SGITDATAPTR!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
         $crate::__pgrx_c_classify!(
@@ -867,10 +915,16 @@ macro_rules! __pgrx_c_args_SGITDATAPTR {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_SGITDATAPTR!(@p1 $mode [$($done)* (@literal [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_SGITDATAPTR!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+            $($rest)*
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_SGITDATAPTR!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_SGITDATAPTR!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p1 $mode:ident [$($done:tt)*];) => {
         $crate::SGITDATAPTR!(@$mode; $($done)*)
@@ -1002,7 +1056,7 @@ macro_rules! SGITDATAPTR {
                                                                                 >(
                                                                                     $crate::__pgrx_c_macros::expression::size_of::<
                                                                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                            $crate::SpGistInnerTupleData
+                                                                                            $crate::__pgrx_c_bindings::SpGistInnerTupleData
                                                                                         >>()
                                                                                 )
                                                                             )
@@ -1027,7 +1081,7 @@ macro_rules! SGITDATAPTR {
                                                                                     $crate::__pgrx_c_macros::CValue::<
                                                                                         $crate::__pgrx_c_macros::CInt
                                                                                     >::new(
-                                                                                        $crate::MAXIMUM_ALIGNOF as i32
+                                                                                        $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                                     )
                                                                                 )
                                                                             ),
@@ -1078,7 +1132,7 @@ macro_rules! SGITDATAPTR {
                                                                                             $crate::__pgrx_c_macros::CValue::<
                                                                                                 $crate::__pgrx_c_macros::CInt
                                                                                             >::new(
-                                                                                                $crate::MAXIMUM_ALIGNOF as i32
+                                                                                                $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                                             )
                                                                                         )
                                                                                     ),
@@ -1260,7 +1314,7 @@ macro_rules! SGITDATAPTR {
                                                                                             >(
                                                                                                 $crate::__pgrx_c_macros::expression::size_of::<
                                                                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                        $crate::SpGistInnerTupleData
+                                                                                                        $crate::__pgrx_c_bindings::SpGistInnerTupleData
                                                                                                     >>()
                                                                                             )
                                                                                         )
@@ -1285,7 +1339,7 @@ macro_rules! SGITDATAPTR {
                                                                                                 $crate::__pgrx_c_macros::CValue::<
                                                                                                     $crate::__pgrx_c_macros::CInt
                                                                                                 >::new(
-                                                                                                    $crate::MAXIMUM_ALIGNOF as i32
+                                                                                                    $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                                                 )
                                                                                             )
                                                                                         ),
@@ -1338,7 +1392,7 @@ macro_rules! SGITDATAPTR {
                                                                                                         $crate::__pgrx_c_macros::CValue::<
                                                                                                             $crate::__pgrx_c_macros::CInt
                                                                                                         >::new(
-                                                                                                            $crate::MAXIMUM_ALIGNOF as i32
+                                                                                                            $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                                                         )
                                                                                                     )
                                                                                                 ),
@@ -1502,7 +1556,7 @@ macro_rules! SGITDATAPTR {
                                                                                 >(
                                                                                     $crate::__pgrx_c_macros::expression::size_of::<
                                                                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                            $crate::SpGistInnerTupleData
+                                                                                            $crate::__pgrx_c_bindings::SpGistInnerTupleData
                                                                                         >>()
                                                                                 )
                                                                             )
@@ -1527,7 +1581,7 @@ macro_rules! SGITDATAPTR {
                                                                                     $crate::__pgrx_c_macros::CValue::<
                                                                                         $crate::__pgrx_c_macros::CInt
                                                                                     >::new(
-                                                                                        $crate::MAXIMUM_ALIGNOF as i32
+                                                                                        $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                                     )
                                                                                 )
                                                                             ),
@@ -1578,7 +1632,7 @@ macro_rules! SGITDATAPTR {
                                                                                             $crate::__pgrx_c_macros::CValue::<
                                                                                                 $crate::__pgrx_c_macros::CInt
                                                                                             >::new(
-                                                                                                $crate::MAXIMUM_ALIGNOF as i32
+                                                                                                $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                                             )
                                                                                         )
                                                                                     ),
@@ -1646,8 +1700,8 @@ macro_rules! SGITDATAPTR {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -1674,16 +1728,25 @@ macro_rules! __pgrx_c_args_SGITDATUM {
         $crate::__pgrx_c_args_SGITDATUM!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_SGITDATUM!(@p1 $mode [$($done)* (@literal [- $argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_SGITDATUM!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+            $($rest)*
+        )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_SGITDATUM!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_SGITDATUM!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $($raw:tt)*) => {
         $crate::__pgrx_c_args_SGITDATUM!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
-        $crate::__pgrx_c_args_SGITDATUM!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_SGITDATUM!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
         $crate::__pgrx_c_classify!(
@@ -1705,28 +1768,46 @@ macro_rules! __pgrx_c_args_SGITDATUM {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_SGITDATUM!(@p1 $mode [$($done)* (@literal [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_SGITDATUM!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+            $($rest)*
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_SGITDATUM!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_SGITDATUM!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_SGITDATUM!(@p2 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_SGITDATUM!(
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative1 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_SGITDATUM!(@p2 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_SGITDATUM!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_SGITDATUM!(@p2 $mode [$($done)* (@literal [- $argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_SGITDATUM!(
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+            $($rest)*
+        )
     };
     (@negative1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_SGITDATUM!(@p2 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_SGITDATUM!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $($raw:tt)*) => {
         $crate::__pgrx_c_args_SGITDATUM!(@negative1 $mode [$($done)*]; - $($raw)*)
     };
     (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_SGITDATUM!(@p2 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_SGITDATUM!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -1748,13 +1829,20 @@ macro_rules! __pgrx_c_args_SGITDATUM {
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_SGITDATUM!(@p2 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_SGITDATUM!(
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_SGITDATUM!(@p2 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_SGITDATUM!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
-        $crate::__pgrx_c_args_SGITDATUM!(@p2 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_SGITDATUM!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
         $crate::__pgrx_c_classify!(
@@ -1776,10 +1864,16 @@ macro_rules! __pgrx_c_args_SGITDATUM {
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_SGITDATUM!(@p2 $mode [$($done)* (@literal [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_SGITDATUM!(
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+            $($rest)*
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_SGITDATUM!(@p2 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_SGITDATUM!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p2 $mode:ident [$($done:tt)*];) => {
         $crate::SGITDATUM!(@$mode; $($done)*)
@@ -1975,7 +2069,7 @@ macro_rules! SGITDATUM {
                                                                                                                     >(
                                                                                                                         $crate::__pgrx_c_macros::expression::size_of::<
                                                                                                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                                                $crate::SpGistInnerTupleData
+                                                                                                                                $crate::__pgrx_c_bindings::SpGistInnerTupleData
                                                                                                                             >>()
                                                                                                                     )
                                                                                                                 )
@@ -2000,7 +2094,7 @@ macro_rules! SGITDATUM {
                                                                                                                         $crate::__pgrx_c_macros::CValue::<
                                                                                                                             $crate::__pgrx_c_macros::CInt
                                                                                                                         >::new(
-                                                                                                                            $crate::MAXIMUM_ALIGNOF as i32
+                                                                                                                            $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                                                                         )
                                                                                                                     )
                                                                                                                 ),
@@ -2053,7 +2147,7 @@ macro_rules! SGITDATUM {
                                                                                                                                 $crate::__pgrx_c_macros::CValue::<
                                                                                                                                     $crate::__pgrx_c_macros::CInt
                                                                                                                                 >::new(
-                                                                                                                                    $crate::MAXIMUM_ALIGNOF as i32
+                                                                                                                                    $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                                                                                 )
                                                                                                                             )
                                                                                                                         ),
@@ -2095,10 +2189,10 @@ macro_rules! SGITDATUM {
                                                     <
                                                         $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                             $crate::__pgrx_c_macros::CUnsignedLong,
-                                                            $crate::Datum
+                                                            $crate::__pgrx_c_bindings::Datum
                                                         > as $crate::__pgrx_c_macros::expression::CType
                                                     >::from_storage(
-                                                        $crate::PointerGetDatum(
+                                                        $crate::__pgrx_c_bindings::PointerGetDatum(
                                                             <
                                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                                     $crate::__pgrx_c_macros::expression::CVoid,
@@ -2183,7 +2277,7 @@ macro_rules! SGITDATUM {
                                                                                                                         >(
                                                                                                                             $crate::__pgrx_c_macros::expression::size_of::<
                                                                                                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                                                    $crate::SpGistInnerTupleData
+                                                                                                                                    $crate::__pgrx_c_bindings::SpGistInnerTupleData
                                                                                                                                 >>()
                                                                                                                         )
                                                                                                                     )
@@ -2208,7 +2302,7 @@ macro_rules! SGITDATUM {
                                                                                                                             $crate::__pgrx_c_macros::CValue::<
                                                                                                                                 $crate::__pgrx_c_macros::CInt
                                                                                                                             >::new(
-                                                                                                                                $crate::MAXIMUM_ALIGNOF as i32
+                                                                                                                                $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                                                                             )
                                                                                                                         )
                                                                                                                     ),
@@ -2261,7 +2355,7 @@ macro_rules! SGITDATUM {
                                                                                                                                     $crate::__pgrx_c_macros::CValue::<
                                                                                                                                         $crate::__pgrx_c_macros::CInt
                                                                                                                                     >::new(
-                                                                                                                                        $crate::MAXIMUM_ALIGNOF as i32
+                                                                                                                                        $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                                                                                     )
                                                                                                                                 )
                                                                                                                             ),
@@ -2520,7 +2614,7 @@ macro_rules! SGITDATUM {
                                                                                                                                 >(
                                                                                                                                     $crate::__pgrx_c_macros::expression::size_of::<
                                                                                                                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                                                            $crate::SpGistInnerTupleData
+                                                                                                                                            $crate::__pgrx_c_bindings::SpGistInnerTupleData
                                                                                                                                         >>()
                                                                                                                                 )
                                                                                                                             )
@@ -2545,7 +2639,7 @@ macro_rules! SGITDATUM {
                                                                                                                                     $crate::__pgrx_c_macros::CValue::<
                                                                                                                                         $crate::__pgrx_c_macros::CInt
                                                                                                                                     >::new(
-                                                                                                                                        $crate::MAXIMUM_ALIGNOF as i32
+                                                                                                                                        $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                                                                                     )
                                                                                                                                 )
                                                                                                                             ),
@@ -2598,7 +2692,7 @@ macro_rules! SGITDATUM {
                                                                                                                                             $crate::__pgrx_c_macros::CValue::<
                                                                                                                                                 $crate::__pgrx_c_macros::CInt
                                                                                                                                             >::new(
-                                                                                                                                                $crate::MAXIMUM_ALIGNOF as i32
+                                                                                                                                                $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                                                                                             )
                                                                                                                                         )
                                                                                                                                     ),
@@ -2640,10 +2734,10 @@ macro_rules! SGITDATUM {
                                                                 <
                                                                     $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                                         $crate::__pgrx_c_macros::CUnsignedLong,
-                                                                        $crate::Datum
+                                                                        $crate::__pgrx_c_bindings::Datum
                                                                     > as $crate::__pgrx_c_macros::expression::CType
                                                                 >::from_storage(
-                                                                    $crate::PointerGetDatum(
+                                                                    $crate::__pgrx_c_bindings::PointerGetDatum(
                                                                         <
                                                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                                                 $crate::__pgrx_c_macros::expression::CVoid,
@@ -2728,7 +2822,7 @@ macro_rules! SGITDATUM {
                                                                                                                                     >(
                                                                                                                                         $crate::__pgrx_c_macros::expression::size_of::<
                                                                                                                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                                                                $crate::SpGistInnerTupleData
+                                                                                                                                                $crate::__pgrx_c_bindings::SpGistInnerTupleData
                                                                                                                                             >>()
                                                                                                                                     )
                                                                                                                                 )
@@ -2753,7 +2847,7 @@ macro_rules! SGITDATUM {
                                                                                                                                         $crate::__pgrx_c_macros::CValue::<
                                                                                                                                             $crate::__pgrx_c_macros::CInt
                                                                                                                                         >::new(
-                                                                                                                                            $crate::MAXIMUM_ALIGNOF as i32
+                                                                                                                                            $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                                                                                         )
                                                                                                                                     )
                                                                                                                                 ),
@@ -2806,7 +2900,7 @@ macro_rules! SGITDATUM {
                                                                                                                                                 $crate::__pgrx_c_macros::CValue::<
                                                                                                                                                     $crate::__pgrx_c_macros::CInt
                                                                                                                                                 >::new(
-                                                                                                                                                    $crate::MAXIMUM_ALIGNOF as i32
+                                                                                                                                                    $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                                                                                                 )
                                                                                                                                             )
                                                                                                                                         ),
@@ -3042,7 +3136,7 @@ macro_rules! SGITDATUM {
                                                                                                                     >(
                                                                                                                         $crate::__pgrx_c_macros::expression::size_of::<
                                                                                                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                                                $crate::SpGistInnerTupleData
+                                                                                                                                $crate::__pgrx_c_bindings::SpGistInnerTupleData
                                                                                                                             >>()
                                                                                                                     )
                                                                                                                 )
@@ -3067,7 +3161,7 @@ macro_rules! SGITDATUM {
                                                                                                                         $crate::__pgrx_c_macros::CValue::<
                                                                                                                             $crate::__pgrx_c_macros::CInt
                                                                                                                         >::new(
-                                                                                                                            $crate::MAXIMUM_ALIGNOF as i32
+                                                                                                                            $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                                                                         )
                                                                                                                     )
                                                                                                                 ),
@@ -3120,7 +3214,7 @@ macro_rules! SGITDATUM {
                                                                                                                                 $crate::__pgrx_c_macros::CValue::<
                                                                                                                                     $crate::__pgrx_c_macros::CInt
                                                                                                                                 >::new(
-                                                                                                                                    $crate::MAXIMUM_ALIGNOF as i32
+                                                                                                                                    $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                                                                                 )
                                                                                                                             )
                                                                                                                         ),
@@ -3162,10 +3256,10 @@ macro_rules! SGITDATUM {
                                                     <
                                                         $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                             $crate::__pgrx_c_macros::CUnsignedLong,
-                                                            $crate::Datum
+                                                            $crate::__pgrx_c_bindings::Datum
                                                         > as $crate::__pgrx_c_macros::expression::CType
                                                     >::from_storage(
-                                                        $crate::PointerGetDatum(
+                                                        $crate::__pgrx_c_bindings::PointerGetDatum(
                                                             <
                                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                                     $crate::__pgrx_c_macros::expression::CVoid,
@@ -3250,7 +3344,7 @@ macro_rules! SGITDATUM {
                                                                                                                         >(
                                                                                                                             $crate::__pgrx_c_macros::expression::size_of::<
                                                                                                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                                                    $crate::SpGistInnerTupleData
+                                                                                                                                    $crate::__pgrx_c_bindings::SpGistInnerTupleData
                                                                                                                                 >>()
                                                                                                                         )
                                                                                                                     )
@@ -3275,7 +3369,7 @@ macro_rules! SGITDATUM {
                                                                                                                             $crate::__pgrx_c_macros::CValue::<
                                                                                                                                 $crate::__pgrx_c_macros::CInt
                                                                                                                             >::new(
-                                                                                                                                $crate::MAXIMUM_ALIGNOF as i32
+                                                                                                                                $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                                                                             )
                                                                                                                         )
                                                                                                                     ),
@@ -3328,7 +3422,7 @@ macro_rules! SGITDATUM {
                                                                                                                                     $crate::__pgrx_c_macros::CValue::<
                                                                                                                                         $crate::__pgrx_c_macros::CInt
                                                                                                                                     >::new(
-                                                                                                                                        $crate::MAXIMUM_ALIGNOF as i32
+                                                                                                                                        $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                                                                                     )
                                                                                                                                 )
                                                                                                                             ),
@@ -3407,8 +3501,8 @@ macro_rules! SGITDATUM {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -3435,25 +3529,34 @@ macro_rules! __pgrx_c_args_SGITNODEPTR {
         $crate::__pgrx_c_args_SGITNODEPTR!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_SGITNODEPTR!(@p1 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_SGITNODEPTR!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_SGITNODEPTR!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_SGITNODEPTR!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SGITNODEPTR!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_SGITNODEPTR!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_SGITNODEPTR!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $($raw:tt)*) => {
         $crate::__pgrx_c_args_SGITNODEPTR!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_SGITNODEPTR!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_SGITNODEPTR!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -3475,13 +3578,20 @@ macro_rules! __pgrx_c_args_SGITNODEPTR {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_SGITNODEPTR!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_SGITNODEPTR!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_SGITNODEPTR!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_SGITNODEPTR!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
-        $crate::__pgrx_c_args_SGITNODEPTR!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_SGITNODEPTR!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
         $crate::__pgrx_c_classify!(
@@ -3503,10 +3613,16 @@ macro_rules! __pgrx_c_args_SGITNODEPTR {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_SGITNODEPTR!(@p1 $mode [$($done)* (@literal [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_SGITNODEPTR!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+            $($rest)*
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_SGITNODEPTR!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_SGITNODEPTR!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p1 $mode:ident [$($done:tt)*];) => {
         $crate::SGITNODEPTR!(@$mode; $($done)*)
@@ -3551,9 +3667,11 @@ macro_rules! SGITNODEPTR {
         (
             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::cast_as::<
-                    $crate::SpGistNodeTuple,
+                    $crate::__pgrx_c_bindings::SpGistNodeTuple,
                     $crate::__pgrx_c_macros::expression::CPointer<
-                        $crate::__pgrx_c_macros::expression::CRecord<$crate::IndexTupleData>,
+                        $crate::__pgrx_c_macros::expression::CRecord<
+                            $crate::__pgrx_c_bindings::IndexTupleData
+                        >,
                         $crate::__pgrx_c_macros::expression::ReadWrite
                     >,
                     _
@@ -3631,7 +3749,7 @@ macro_rules! SGITNODEPTR {
                                                                                     >(
                                                                                         $crate::__pgrx_c_macros::expression::size_of::<
                                                                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                $crate::SpGistInnerTupleData
+                                                                                                $crate::__pgrx_c_bindings::SpGistInnerTupleData
                                                                                             >>()
                                                                                     )
                                                                                 )
@@ -3656,7 +3774,7 @@ macro_rules! SGITNODEPTR {
                                                                                         $crate::__pgrx_c_macros::CValue::<
                                                                                             $crate::__pgrx_c_macros::CInt
                                                                                         >::new(
-                                                                                            $crate::MAXIMUM_ALIGNOF as i32
+                                                                                            $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                                         )
                                                                                     )
                                                                                 ),
@@ -3707,7 +3825,7 @@ macro_rules! SGITNODEPTR {
                                                                                                 $crate::__pgrx_c_macros::CValue::<
                                                                                                     $crate::__pgrx_c_macros::CInt
                                                                                                 >::new(
-                                                                                                    $crate::MAXIMUM_ALIGNOF as i32
+                                                                                                    $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                                                 )
                                                                                             )
                                                                                         ),
@@ -3788,10 +3906,10 @@ macro_rules! SGITNODEPTR {
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::cast_as::<
-                                $crate::SpGistNodeTuple,
+                                $crate::__pgrx_c_bindings::SpGistNodeTuple,
                                 $crate::__pgrx_c_macros::expression::CPointer<
                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                        $crate::IndexTupleData
+                                        $crate::__pgrx_c_bindings::IndexTupleData
                                     >,
                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                 >,
@@ -3873,7 +3991,7 @@ macro_rules! SGITNODEPTR {
                                                                                                 >(
                                                                                                     $crate::__pgrx_c_macros::expression::size_of::<
                                                                                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                            $crate::SpGistInnerTupleData
+                                                                                                            $crate::__pgrx_c_bindings::SpGistInnerTupleData
                                                                                                         >>()
                                                                                                 )
                                                                                             )
@@ -3898,7 +4016,7 @@ macro_rules! SGITNODEPTR {
                                                                                                     $crate::__pgrx_c_macros::CValue::<
                                                                                                         $crate::__pgrx_c_macros::CInt
                                                                                                     >::new(
-                                                                                                        $crate::MAXIMUM_ALIGNOF as i32
+                                                                                                        $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                                                     )
                                                                                                 )
                                                                                             ),
@@ -3951,7 +4069,7 @@ macro_rules! SGITNODEPTR {
                                                                                                             $crate::__pgrx_c_macros::CValue::<
                                                                                                                 $crate::__pgrx_c_macros::CInt
                                                                                                             >::new(
-                                                                                                                $crate::MAXIMUM_ALIGNOF as i32
+                                                                                                                $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                                                             )
                                                                                                         )
                                                                                                     ),
@@ -4025,9 +4143,11 @@ macro_rules! SGITNODEPTR {
         {
             let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::cast_as::<
-                    $crate::SpGistNodeTuple,
+                    $crate::__pgrx_c_bindings::SpGistNodeTuple,
                     $crate::__pgrx_c_macros::expression::CPointer<
-                        $crate::__pgrx_c_macros::expression::CRecord<$crate::IndexTupleData>,
+                        $crate::__pgrx_c_macros::expression::CRecord<
+                            $crate::__pgrx_c_bindings::IndexTupleData
+                        >,
                         $crate::__pgrx_c_macros::expression::ReadWrite
                     >,
                     _
@@ -4105,7 +4225,7 @@ macro_rules! SGITNODEPTR {
                                                                                     >(
                                                                                         $crate::__pgrx_c_macros::expression::size_of::<
                                                                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                $crate::SpGistInnerTupleData
+                                                                                                $crate::__pgrx_c_bindings::SpGistInnerTupleData
                                                                                             >>()
                                                                                     )
                                                                                 )
@@ -4130,7 +4250,7 @@ macro_rules! SGITNODEPTR {
                                                                                         $crate::__pgrx_c_macros::CValue::<
                                                                                             $crate::__pgrx_c_macros::CInt
                                                                                         >::new(
-                                                                                            $crate::MAXIMUM_ALIGNOF as i32
+                                                                                            $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                                         )
                                                                                     )
                                                                                 ),
@@ -4181,7 +4301,7 @@ macro_rules! SGITNODEPTR {
                                                                                                 $crate::__pgrx_c_macros::CValue::<
                                                                                                     $crate::__pgrx_c_macros::CInt
                                                                                                 >::new(
-                                                                                                    $crate::MAXIMUM_ALIGNOF as i32
+                                                                                                    $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                                                 )
                                                                                             )
                                                                                         ),
@@ -4243,8 +4363,8 @@ macro_rules! SGITNODEPTR {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -4271,25 +4391,34 @@ macro_rules! __pgrx_c_args_SGLTDATAPTR {
         $crate::__pgrx_c_args_SGLTDATAPTR!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_SGLTDATAPTR!(@p1 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_SGLTDATAPTR!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_SGLTDATAPTR!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_SGLTDATAPTR!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SGLTDATAPTR!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_SGLTDATAPTR!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_SGLTDATAPTR!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $($raw:tt)*) => {
         $crate::__pgrx_c_args_SGLTDATAPTR!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_SGLTDATAPTR!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_SGLTDATAPTR!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -4311,13 +4440,20 @@ macro_rules! __pgrx_c_args_SGLTDATAPTR {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_SGLTDATAPTR!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_SGLTDATAPTR!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_SGLTDATAPTR!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_SGLTDATAPTR!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
-        $crate::__pgrx_c_args_SGLTDATAPTR!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_SGLTDATAPTR!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
         $crate::__pgrx_c_classify!(
@@ -4339,10 +4475,16 @@ macro_rules! __pgrx_c_args_SGLTDATAPTR {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_SGLTDATAPTR!(@p1 $mode [$($done)* (@literal [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_SGLTDATAPTR!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+            $($rest)*
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_SGLTDATAPTR!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_SGLTDATAPTR!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p1 $mode:ident [$($done:tt)*];) => {
         $crate::SGLTDATAPTR!(@$mode; $($done)*)
@@ -4536,7 +4678,7 @@ macro_rules! SGLTDATAPTR {
                                                                                         >(
                                                                                             $crate::__pgrx_c_macros::expression::size_of::<
                                                                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                    $crate::SpGistLeafTupleData
+                                                                                                    $crate::__pgrx_c_bindings::SpGistLeafTupleData
                                                                                                 >>()
                                                                                         ),
                                                                                         $crate::__pgrx_c_macros::expression::profile_value::<
@@ -4545,7 +4687,7 @@ macro_rules! SGLTDATAPTR {
                                                                                         >(
                                                                                             $crate::__pgrx_c_macros::expression::size_of::<
                                                                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                    $crate::IndexAttributeBitMapData
+                                                                                                    $crate::__pgrx_c_bindings::IndexAttributeBitMapData
                                                                                                 >>()
                                                                                         )
                                                                                     )
@@ -4572,7 +4714,7 @@ macro_rules! SGLTDATAPTR {
                                                                                     $crate::__pgrx_c_macros::CValue::<
                                                                                         $crate::__pgrx_c_macros::CInt
                                                                                     >::new(
-                                                                                        $crate::MAXIMUM_ALIGNOF as i32
+                                                                                        $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                                     )
                                                                                 )
                                                                             ),
@@ -4623,7 +4765,7 @@ macro_rules! SGLTDATAPTR {
                                                                                             $crate::__pgrx_c_macros::CValue::<
                                                                                                 $crate::__pgrx_c_macros::CInt
                                                                                             >::new(
-                                                                                                $crate::MAXIMUM_ALIGNOF as i32
+                                                                                                $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                                             )
                                                                                         )
                                                                                     ),
@@ -4682,7 +4824,7 @@ macro_rules! SGLTDATAPTR {
                                                                                 >(
                                                                                     $crate::__pgrx_c_macros::expression::size_of::<
                                                                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                            $crate::SpGistLeafTupleData
+                                                                                            $crate::__pgrx_c_bindings::SpGistLeafTupleData
                                                                                         >>()
                                                                                 )
                                                                             )
@@ -4707,7 +4849,7 @@ macro_rules! SGLTDATAPTR {
                                                                                     $crate::__pgrx_c_macros::CValue::<
                                                                                         $crate::__pgrx_c_macros::CInt
                                                                                     >::new(
-                                                                                        $crate::MAXIMUM_ALIGNOF as i32
+                                                                                        $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                                     )
                                                                                 )
                                                                             ),
@@ -4758,7 +4900,7 @@ macro_rules! SGLTDATAPTR {
                                                                                             $crate::__pgrx_c_macros::CValue::<
                                                                                                 $crate::__pgrx_c_macros::CInt
                                                                                             >::new(
-                                                                                                $crate::MAXIMUM_ALIGNOF as i32
+                                                                                                $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                                             )
                                                                                         )
                                                                                     ),
@@ -4974,7 +5116,7 @@ macro_rules! SGLTDATAPTR {
                                                                                                     >(
                                                                                                         $crate::__pgrx_c_macros::expression::size_of::<
                                                                                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                                $crate::SpGistLeafTupleData
+                                                                                                                $crate::__pgrx_c_bindings::SpGistLeafTupleData
                                                                                                             >>()
                                                                                                     ),
                                                                                                     $crate::__pgrx_c_macros::expression::profile_value::<
@@ -4983,7 +5125,7 @@ macro_rules! SGLTDATAPTR {
                                                                                                     >(
                                                                                                         $crate::__pgrx_c_macros::expression::size_of::<
                                                                                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                                $crate::IndexAttributeBitMapData
+                                                                                                                $crate::__pgrx_c_bindings::IndexAttributeBitMapData
                                                                                                             >>()
                                                                                                     )
                                                                                                 )
@@ -5010,7 +5152,7 @@ macro_rules! SGLTDATAPTR {
                                                                                                 $crate::__pgrx_c_macros::CValue::<
                                                                                                     $crate::__pgrx_c_macros::CInt
                                                                                                 >::new(
-                                                                                                    $crate::MAXIMUM_ALIGNOF as i32
+                                                                                                    $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                                                 )
                                                                                             )
                                                                                         ),
@@ -5063,7 +5205,7 @@ macro_rules! SGLTDATAPTR {
                                                                                                         $crate::__pgrx_c_macros::CValue::<
                                                                                                             $crate::__pgrx_c_macros::CInt
                                                                                                         >::new(
-                                                                                                            $crate::MAXIMUM_ALIGNOF as i32
+                                                                                                            $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                                                         )
                                                                                                     )
                                                                                                 ),
@@ -5124,7 +5266,7 @@ macro_rules! SGLTDATAPTR {
                                                                                             >(
                                                                                                 $crate::__pgrx_c_macros::expression::size_of::<
                                                                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                        $crate::SpGistLeafTupleData
+                                                                                                        $crate::__pgrx_c_bindings::SpGistLeafTupleData
                                                                                                     >>()
                                                                                             )
                                                                                         )
@@ -5149,7 +5291,7 @@ macro_rules! SGLTDATAPTR {
                                                                                                 $crate::__pgrx_c_macros::CValue::<
                                                                                                     $crate::__pgrx_c_macros::CInt
                                                                                                 >::new(
-                                                                                                    $crate::MAXIMUM_ALIGNOF as i32
+                                                                                                    $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                                                 )
                                                                                             )
                                                                                         ),
@@ -5202,7 +5344,7 @@ macro_rules! SGLTDATAPTR {
                                                                                                         $crate::__pgrx_c_macros::CValue::<
                                                                                                             $crate::__pgrx_c_macros::CInt
                                                                                                         >::new(
-                                                                                                            $crate::MAXIMUM_ALIGNOF as i32
+                                                                                                            $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                                                         )
                                                                                                     )
                                                                                                 ),
@@ -5398,7 +5540,7 @@ macro_rules! SGLTDATAPTR {
                                                                                         >(
                                                                                             $crate::__pgrx_c_macros::expression::size_of::<
                                                                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                    $crate::SpGistLeafTupleData
+                                                                                                    $crate::__pgrx_c_bindings::SpGistLeafTupleData
                                                                                                 >>()
                                                                                         ),
                                                                                         $crate::__pgrx_c_macros::expression::profile_value::<
@@ -5407,7 +5549,7 @@ macro_rules! SGLTDATAPTR {
                                                                                         >(
                                                                                             $crate::__pgrx_c_macros::expression::size_of::<
                                                                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                    $crate::IndexAttributeBitMapData
+                                                                                                    $crate::__pgrx_c_bindings::IndexAttributeBitMapData
                                                                                                 >>()
                                                                                         )
                                                                                     )
@@ -5434,7 +5576,7 @@ macro_rules! SGLTDATAPTR {
                                                                                     $crate::__pgrx_c_macros::CValue::<
                                                                                         $crate::__pgrx_c_macros::CInt
                                                                                     >::new(
-                                                                                        $crate::MAXIMUM_ALIGNOF as i32
+                                                                                        $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                                     )
                                                                                 )
                                                                             ),
@@ -5485,7 +5627,7 @@ macro_rules! SGLTDATAPTR {
                                                                                             $crate::__pgrx_c_macros::CValue::<
                                                                                                 $crate::__pgrx_c_macros::CInt
                                                                                             >::new(
-                                                                                                $crate::MAXIMUM_ALIGNOF as i32
+                                                                                                $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                                             )
                                                                                         )
                                                                                     ),
@@ -5544,7 +5686,7 @@ macro_rules! SGLTDATAPTR {
                                                                                 >(
                                                                                     $crate::__pgrx_c_macros::expression::size_of::<
                                                                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                            $crate::SpGistLeafTupleData
+                                                                                            $crate::__pgrx_c_bindings::SpGistLeafTupleData
                                                                                         >>()
                                                                                 )
                                                                             )
@@ -5569,7 +5711,7 @@ macro_rules! SGLTDATAPTR {
                                                                                     $crate::__pgrx_c_macros::CValue::<
                                                                                         $crate::__pgrx_c_macros::CInt
                                                                                     >::new(
-                                                                                        $crate::MAXIMUM_ALIGNOF as i32
+                                                                                        $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                                     )
                                                                                 )
                                                                             ),
@@ -5620,7 +5762,7 @@ macro_rules! SGLTDATAPTR {
                                                                                             $crate::__pgrx_c_macros::CValue::<
                                                                                                 $crate::__pgrx_c_macros::CInt
                                                                                             >::new(
-                                                                                                $crate::MAXIMUM_ALIGNOF as i32
+                                                                                                $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                                             )
                                                                                         )
                                                                                     ),
@@ -5661,8 +5803,8 @@ macro_rules! SGLTDATAPTR {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -5689,16 +5831,25 @@ macro_rules! __pgrx_c_args_SGLTDATUM {
         $crate::__pgrx_c_args_SGLTDATUM!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_SGLTDATUM!(@p1 $mode [$($done)* (@literal [- $argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_SGLTDATUM!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+            $($rest)*
+        )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_SGLTDATUM!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_SGLTDATUM!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $($raw:tt)*) => {
         $crate::__pgrx_c_args_SGLTDATUM!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
-        $crate::__pgrx_c_args_SGLTDATUM!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_SGLTDATUM!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
         $crate::__pgrx_c_classify!(
@@ -5720,28 +5871,46 @@ macro_rules! __pgrx_c_args_SGLTDATUM {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_SGLTDATUM!(@p1 $mode [$($done)* (@literal [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_SGLTDATUM!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+            $($rest)*
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_SGLTDATUM!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_SGLTDATUM!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_SGLTDATUM!(@p2 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_SGLTDATUM!(
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative1 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_SGLTDATUM!(@p2 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_SGLTDATUM!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_SGLTDATUM!(@p2 $mode [$($done)* (@literal [- $argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_SGLTDATUM!(
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+            $($rest)*
+        )
     };
     (@negative1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_SGLTDATUM!(@p2 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_SGLTDATUM!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $($raw:tt)*) => {
         $crate::__pgrx_c_args_SGLTDATUM!(@negative1 $mode [$($done)*]; - $($raw)*)
     };
     (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_SGLTDATUM!(@p2 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_SGLTDATUM!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -5763,13 +5932,20 @@ macro_rules! __pgrx_c_args_SGLTDATUM {
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_SGLTDATUM!(@p2 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_SGLTDATUM!(
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_SGLTDATUM!(@p2 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_SGLTDATUM!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
-        $crate::__pgrx_c_args_SGLTDATUM!(@p2 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_SGLTDATUM!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
         $crate::__pgrx_c_classify!(
@@ -5791,10 +5967,16 @@ macro_rules! __pgrx_c_args_SGLTDATUM {
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_SGLTDATUM!(@p2 $mode [$($done)* (@literal [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_SGLTDATUM!(
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+            $($rest)*
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_SGLTDATUM!(@p2 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_SGLTDATUM!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p2 $mode:ident [$($done:tt)*];) => {
         $crate::SGLTDATUM!(@$mode; $($done)*)
@@ -5841,10 +6023,10 @@ macro_rules! SGLTDATUM {
             <
                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
                     $crate::__pgrx_c_macros::CUnsignedLong,
-                    $crate::Datum
+                    $crate::__pgrx_c_bindings::Datum
                 > as $crate::__pgrx_c_macros::expression::CType
             >::from_storage(
-                $crate::fetch_att(
+                $crate::__pgrx_c_bindings::fetch_att(
                     <
                         $crate::__pgrx_c_macros::expression::CPointer<
                             $crate::__pgrx_c_macros::expression::CVoid,
@@ -6028,7 +6210,7 @@ macro_rules! SGLTDATUM {
                                                                                                             >(
                                                                                                                 $crate::__pgrx_c_macros::expression::size_of::<
                                                                                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                                        $crate::SpGistLeafTupleData
+                                                                                                                        $crate::__pgrx_c_bindings::SpGistLeafTupleData
                                                                                                                     >>()
                                                                                                             ),
                                                                                                             $crate::__pgrx_c_macros::expression::profile_value::<
@@ -6037,7 +6219,7 @@ macro_rules! SGLTDATUM {
                                                                                                             >(
                                                                                                                 $crate::__pgrx_c_macros::expression::size_of::<
                                                                                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                                        $crate::IndexAttributeBitMapData
+                                                                                                                        $crate::__pgrx_c_bindings::IndexAttributeBitMapData
                                                                                                                     >>()
                                                                                                             )
                                                                                                         )
@@ -6064,7 +6246,7 @@ macro_rules! SGLTDATUM {
                                                                                                         $crate::__pgrx_c_macros::CValue::<
                                                                                                             $crate::__pgrx_c_macros::CInt
                                                                                                         >::new(
-                                                                                                            $crate::MAXIMUM_ALIGNOF as i32
+                                                                                                            $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                                                         )
                                                                                                     )
                                                                                                 ),
@@ -6117,7 +6299,7 @@ macro_rules! SGLTDATUM {
                                                                                                                 $crate::__pgrx_c_macros::CValue::<
                                                                                                                     $crate::__pgrx_c_macros::CInt
                                                                                                                 >::new(
-                                                                                                                    $crate::MAXIMUM_ALIGNOF as i32
+                                                                                                                    $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                                                                 )
                                                                                                             )
                                                                                                         ),
@@ -6178,7 +6360,7 @@ macro_rules! SGLTDATUM {
                                                                                                     >(
                                                                                                         $crate::__pgrx_c_macros::expression::size_of::<
                                                                                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                                $crate::SpGistLeafTupleData
+                                                                                                                $crate::__pgrx_c_bindings::SpGistLeafTupleData
                                                                                                             >>()
                                                                                                     )
                                                                                                 )
@@ -6203,7 +6385,7 @@ macro_rules! SGLTDATUM {
                                                                                                         $crate::__pgrx_c_macros::CValue::<
                                                                                                             $crate::__pgrx_c_macros::CInt
                                                                                                         >::new(
-                                                                                                            $crate::MAXIMUM_ALIGNOF as i32
+                                                                                                            $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                                                         )
                                                                                                     )
                                                                                                 ),
@@ -6256,7 +6438,7 @@ macro_rules! SGLTDATUM {
                                                                                                                 $crate::__pgrx_c_macros::CValue::<
                                                                                                                     $crate::__pgrx_c_macros::CInt
                                                                                                                 >::new(
-                                                                                                                    $crate::MAXIMUM_ALIGNOF as i32
+                                                                                                                    $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                                                                 )
                                                                                                             )
                                                                                                         ),
@@ -6388,10 +6570,10 @@ macro_rules! SGLTDATUM {
                             <
                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                     $crate::__pgrx_c_macros::CUnsignedLong,
-                                    $crate::Datum
+                                    $crate::__pgrx_c_bindings::Datum
                                 > as $crate::__pgrx_c_macros::expression::CType
                             >::from_storage(
-                                $crate::fetch_att(
+                                $crate::__pgrx_c_bindings::fetch_att(
                                     <
                                         $crate::__pgrx_c_macros::expression::CPointer<
                                             $crate::__pgrx_c_macros::expression::CVoid,
@@ -6582,7 +6764,7 @@ macro_rules! SGLTDATUM {
                                                                                                                             >(
                                                                                                                                 $crate::__pgrx_c_macros::expression::size_of::<
                                                                                                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                                                        $crate::SpGistLeafTupleData
+                                                                                                                                        $crate::__pgrx_c_bindings::SpGistLeafTupleData
                                                                                                                                     >>()
                                                                                                                             ),
                                                                                                                             $crate::__pgrx_c_macros::expression::profile_value::<
@@ -6591,7 +6773,7 @@ macro_rules! SGLTDATUM {
                                                                                                                             >(
                                                                                                                                 $crate::__pgrx_c_macros::expression::size_of::<
                                                                                                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                                                        $crate::IndexAttributeBitMapData
+                                                                                                                                        $crate::__pgrx_c_bindings::IndexAttributeBitMapData
                                                                                                                                     >>()
                                                                                                                             )
                                                                                                                         )
@@ -6618,7 +6800,7 @@ macro_rules! SGLTDATUM {
                                                                                                                         $crate::__pgrx_c_macros::CValue::<
                                                                                                                             $crate::__pgrx_c_macros::CInt
                                                                                                                         >::new(
-                                                                                                                            $crate::MAXIMUM_ALIGNOF as i32
+                                                                                                                            $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                                                                         )
                                                                                                                     )
                                                                                                                 ),
@@ -6671,7 +6853,7 @@ macro_rules! SGLTDATUM {
                                                                                                                                 $crate::__pgrx_c_macros::CValue::<
                                                                                                                                     $crate::__pgrx_c_macros::CInt
                                                                                                                                 >::new(
-                                                                                                                                    $crate::MAXIMUM_ALIGNOF as i32
+                                                                                                                                    $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                                                                                 )
                                                                                                                             )
                                                                                                                         ),
@@ -6732,7 +6914,7 @@ macro_rules! SGLTDATUM {
                                                                                                                     >(
                                                                                                                         $crate::__pgrx_c_macros::expression::size_of::<
                                                                                                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                                                $crate::SpGistLeafTupleData
+                                                                                                                                $crate::__pgrx_c_bindings::SpGistLeafTupleData
                                                                                                                             >>()
                                                                                                                     )
                                                                                                                 )
@@ -6757,7 +6939,7 @@ macro_rules! SGLTDATUM {
                                                                                                                         $crate::__pgrx_c_macros::CValue::<
                                                                                                                             $crate::__pgrx_c_macros::CInt
                                                                                                                         >::new(
-                                                                                                                            $crate::MAXIMUM_ALIGNOF as i32
+                                                                                                                            $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                                                                         )
                                                                                                                     )
                                                                                                                 ),
@@ -6810,7 +6992,7 @@ macro_rules! SGLTDATUM {
                                                                                                                                 $crate::__pgrx_c_macros::CValue::<
                                                                                                                                     $crate::__pgrx_c_macros::CInt
                                                                                                                                 >::new(
-                                                                                                                                    $crate::MAXIMUM_ALIGNOF as i32
+                                                                                                                                    $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                                                                                 )
                                                                                                                             )
                                                                                                                         ),
@@ -6947,10 +7129,10 @@ macro_rules! SGLTDATUM {
                 <
                     $crate::__pgrx_c_macros::expression::CIntegerStorage<
                         $crate::__pgrx_c_macros::CUnsignedLong,
-                        $crate::Datum
+                        $crate::__pgrx_c_bindings::Datum
                     > as $crate::__pgrx_c_macros::expression::CType
                 >::from_storage(
-                    $crate::fetch_att(
+                    $crate::__pgrx_c_bindings::fetch_att(
                         <
                             $crate::__pgrx_c_macros::expression::CPointer<
                                 $crate::__pgrx_c_macros::expression::CVoid,
@@ -7136,7 +7318,7 @@ macro_rules! SGLTDATUM {
                                                                                                                 >(
                                                                                                                     $crate::__pgrx_c_macros::expression::size_of::<
                                                                                                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                                            $crate::SpGistLeafTupleData
+                                                                                                                            $crate::__pgrx_c_bindings::SpGistLeafTupleData
                                                                                                                         >>()
                                                                                                                 ),
                                                                                                                 $crate::__pgrx_c_macros::expression::profile_value::<
@@ -7145,7 +7327,7 @@ macro_rules! SGLTDATUM {
                                                                                                                 >(
                                                                                                                     $crate::__pgrx_c_macros::expression::size_of::<
                                                                                                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                                            $crate::IndexAttributeBitMapData
+                                                                                                                            $crate::__pgrx_c_bindings::IndexAttributeBitMapData
                                                                                                                         >>()
                                                                                                                 )
                                                                                                             )
@@ -7172,7 +7354,7 @@ macro_rules! SGLTDATUM {
                                                                                                             $crate::__pgrx_c_macros::CValue::<
                                                                                                                 $crate::__pgrx_c_macros::CInt
                                                                                                             >::new(
-                                                                                                                $crate::MAXIMUM_ALIGNOF as i32
+                                                                                                                $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                                                             )
                                                                                                         )
                                                                                                     ),
@@ -7225,7 +7407,7 @@ macro_rules! SGLTDATUM {
                                                                                                                     $crate::__pgrx_c_macros::CValue::<
                                                                                                                         $crate::__pgrx_c_macros::CInt
                                                                                                                     >::new(
-                                                                                                                        $crate::MAXIMUM_ALIGNOF as i32
+                                                                                                                        $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                                                                     )
                                                                                                                 )
                                                                                                             ),
@@ -7286,7 +7468,7 @@ macro_rules! SGLTDATUM {
                                                                                                         >(
                                                                                                             $crate::__pgrx_c_macros::expression::size_of::<
                                                                                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                                    $crate::SpGistLeafTupleData
+                                                                                                                    $crate::__pgrx_c_bindings::SpGistLeafTupleData
                                                                                                                 >>()
                                                                                                         )
                                                                                                     )
@@ -7311,7 +7493,7 @@ macro_rules! SGLTDATUM {
                                                                                                             $crate::__pgrx_c_macros::CValue::<
                                                                                                                 $crate::__pgrx_c_macros::CInt
                                                                                                             >::new(
-                                                                                                                $crate::MAXIMUM_ALIGNOF as i32
+                                                                                                                $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                                                             )
                                                                                                         )
                                                                                                     ),
@@ -7364,7 +7546,7 @@ macro_rules! SGLTDATUM {
                                                                                                                     $crate::__pgrx_c_macros::CValue::<
                                                                                                                         $crate::__pgrx_c_macros::CInt
                                                                                                                     >::new(
-                                                                                                                        $crate::MAXIMUM_ALIGNOF as i32
+                                                                                                                        $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                                                                     )
                                                                                                                 )
                                                                                                             ),
@@ -7489,8 +7671,8 @@ macro_rules! SGLTDATUM {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -7517,22 +7699,34 @@ macro_rules! __pgrx_c_args_SGLTHDRSZ {
         $crate::__pgrx_c_args_SGLTHDRSZ!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_SGLTHDRSZ!(@p1 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_SGLTHDRSZ!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_SGLTHDRSZ!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_SGLTHDRSZ!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_SGLTHDRSZ!(@p1 $mode [$($done)* (@literal [- $argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_SGLTHDRSZ!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+            $($rest)*
+        )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_SGLTHDRSZ!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_SGLTHDRSZ!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $($raw:tt)*) => {
         $crate::__pgrx_c_args_SGLTHDRSZ!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_SGLTHDRSZ!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_SGLTHDRSZ!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -7554,13 +7748,20 @@ macro_rules! __pgrx_c_args_SGLTHDRSZ {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_SGLTHDRSZ!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_SGLTHDRSZ!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_SGLTHDRSZ!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_SGLTHDRSZ!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
-        $crate::__pgrx_c_args_SGLTHDRSZ!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_SGLTHDRSZ!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
         $crate::__pgrx_c_classify!(
@@ -7582,10 +7783,16 @@ macro_rules! __pgrx_c_args_SGLTHDRSZ {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_SGLTHDRSZ!(@p1 $mode [$($done)* (@literal [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_SGLTHDRSZ!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+            $($rest)*
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_SGLTHDRSZ!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_SGLTHDRSZ!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p1 $mode:ident [$($done:tt)*];) => {
         $crate::SGLTHDRSZ!(@$mode; $($done)*)
@@ -7677,7 +7884,7 @@ macro_rules! SGLTHDRSZ {
                                                                             >(
                                                                                 $crate::__pgrx_c_macros::expression::size_of::<
                                                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                        $crate::SpGistLeafTupleData
+                                                                                        $crate::__pgrx_c_bindings::SpGistLeafTupleData
                                                                                     >>()
                                                                             ),
                                                                             $crate::__pgrx_c_macros::expression::profile_value::<
@@ -7686,7 +7893,7 @@ macro_rules! SGLTHDRSZ {
                                                                             >(
                                                                                 $crate::__pgrx_c_macros::expression::size_of::<
                                                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                        $crate::IndexAttributeBitMapData
+                                                                                        $crate::__pgrx_c_bindings::IndexAttributeBitMapData
                                                                                     >>()
                                                                             )
                                                                         )
@@ -7713,7 +7920,7 @@ macro_rules! SGLTHDRSZ {
                                                                         $crate::__pgrx_c_macros::CValue::<
                                                                             $crate::__pgrx_c_macros::CInt
                                                                         >::new(
-                                                                            $crate::MAXIMUM_ALIGNOF as i32
+                                                                            $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                         )
                                                                     )
                                                                 ),
@@ -7764,7 +7971,7 @@ macro_rules! SGLTHDRSZ {
                                                                                 $crate::__pgrx_c_macros::CValue::<
                                                                                     $crate::__pgrx_c_macros::CInt
                                                                                 >::new(
-                                                                                    $crate::MAXIMUM_ALIGNOF as i32
+                                                                                    $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                                 )
                                                                             )
                                                                         ),
@@ -7820,7 +8027,7 @@ macro_rules! SGLTHDRSZ {
                                                                     >(
                                                                         $crate::__pgrx_c_macros::expression::size_of::<
                                                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                $crate::SpGistLeafTupleData
+                                                                                $crate::__pgrx_c_bindings::SpGistLeafTupleData
                                                                             >>()
                                                                     )
                                                                 )
@@ -7845,7 +8052,7 @@ macro_rules! SGLTHDRSZ {
                                                                         $crate::__pgrx_c_macros::CValue::<
                                                                             $crate::__pgrx_c_macros::CInt
                                                                         >::new(
-                                                                            $crate::MAXIMUM_ALIGNOF as i32
+                                                                            $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                         )
                                                                     )
                                                                 ),
@@ -7896,7 +8103,7 @@ macro_rules! SGLTHDRSZ {
                                                                                 $crate::__pgrx_c_macros::CValue::<
                                                                                     $crate::__pgrx_c_macros::CInt
                                                                                 >::new(
-                                                                                    $crate::MAXIMUM_ALIGNOF as i32
+                                                                                    $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                                 )
                                                                             )
                                                                         ),
@@ -8004,7 +8211,7 @@ macro_rules! SGLTHDRSZ {
                                                                                         >(
                                                                                             $crate::__pgrx_c_macros::expression::size_of::<
                                                                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                    $crate::SpGistLeafTupleData
+                                                                                                    $crate::__pgrx_c_bindings::SpGistLeafTupleData
                                                                                                 >>()
                                                                                         ),
                                                                                         $crate::__pgrx_c_macros::expression::profile_value::<
@@ -8013,7 +8220,7 @@ macro_rules! SGLTHDRSZ {
                                                                                         >(
                                                                                             $crate::__pgrx_c_macros::expression::size_of::<
                                                                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                    $crate::IndexAttributeBitMapData
+                                                                                                    $crate::__pgrx_c_bindings::IndexAttributeBitMapData
                                                                                                 >>()
                                                                                         )
                                                                                     )
@@ -8040,7 +8247,7 @@ macro_rules! SGLTHDRSZ {
                                                                                     $crate::__pgrx_c_macros::CValue::<
                                                                                         $crate::__pgrx_c_macros::CInt
                                                                                     >::new(
-                                                                                        $crate::MAXIMUM_ALIGNOF as i32
+                                                                                        $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                                     )
                                                                                 )
                                                                             ),
@@ -8091,7 +8298,7 @@ macro_rules! SGLTHDRSZ {
                                                                                             $crate::__pgrx_c_macros::CValue::<
                                                                                                 $crate::__pgrx_c_macros::CInt
                                                                                             >::new(
-                                                                                                $crate::MAXIMUM_ALIGNOF as i32
+                                                                                                $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                                             )
                                                                                         )
                                                                                     ),
@@ -8150,7 +8357,7 @@ macro_rules! SGLTHDRSZ {
                                                                                 >(
                                                                                     $crate::__pgrx_c_macros::expression::size_of::<
                                                                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                            $crate::SpGistLeafTupleData
+                                                                                            $crate::__pgrx_c_bindings::SpGistLeafTupleData
                                                                                         >>()
                                                                                 )
                                                                             )
@@ -8175,7 +8382,7 @@ macro_rules! SGLTHDRSZ {
                                                                                     $crate::__pgrx_c_macros::CValue::<
                                                                                         $crate::__pgrx_c_macros::CInt
                                                                                     >::new(
-                                                                                        $crate::MAXIMUM_ALIGNOF as i32
+                                                                                        $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                                     )
                                                                                 )
                                                                             ),
@@ -8226,7 +8433,7 @@ macro_rules! SGLTHDRSZ {
                                                                                             $crate::__pgrx_c_macros::CValue::<
                                                                                                 $crate::__pgrx_c_macros::CInt
                                                                                             >::new(
-                                                                                                $crate::MAXIMUM_ALIGNOF as i32
+                                                                                                $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                                             )
                                                                                         )
                                                                                     ),
@@ -8315,7 +8522,7 @@ macro_rules! SGLTHDRSZ {
                                                                             >(
                                                                                 $crate::__pgrx_c_macros::expression::size_of::<
                                                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                        $crate::SpGistLeafTupleData
+                                                                                        $crate::__pgrx_c_bindings::SpGistLeafTupleData
                                                                                     >>()
                                                                             ),
                                                                             $crate::__pgrx_c_macros::expression::profile_value::<
@@ -8324,7 +8531,7 @@ macro_rules! SGLTHDRSZ {
                                                                             >(
                                                                                 $crate::__pgrx_c_macros::expression::size_of::<
                                                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                        $crate::IndexAttributeBitMapData
+                                                                                        $crate::__pgrx_c_bindings::IndexAttributeBitMapData
                                                                                     >>()
                                                                             )
                                                                         )
@@ -8351,7 +8558,7 @@ macro_rules! SGLTHDRSZ {
                                                                         $crate::__pgrx_c_macros::CValue::<
                                                                             $crate::__pgrx_c_macros::CInt
                                                                         >::new(
-                                                                            $crate::MAXIMUM_ALIGNOF as i32
+                                                                            $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                         )
                                                                     )
                                                                 ),
@@ -8402,7 +8609,7 @@ macro_rules! SGLTHDRSZ {
                                                                                 $crate::__pgrx_c_macros::CValue::<
                                                                                     $crate::__pgrx_c_macros::CInt
                                                                                 >::new(
-                                                                                    $crate::MAXIMUM_ALIGNOF as i32
+                                                                                    $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                                 )
                                                                             )
                                                                         ),
@@ -8458,7 +8665,7 @@ macro_rules! SGLTHDRSZ {
                                                                     >(
                                                                         $crate::__pgrx_c_macros::expression::size_of::<
                                                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                $crate::SpGistLeafTupleData
+                                                                                $crate::__pgrx_c_bindings::SpGistLeafTupleData
                                                                             >>()
                                                                     )
                                                                 )
@@ -8483,7 +8690,7 @@ macro_rules! SGLTHDRSZ {
                                                                         $crate::__pgrx_c_macros::CValue::<
                                                                             $crate::__pgrx_c_macros::CInt
                                                                         >::new(
-                                                                            $crate::MAXIMUM_ALIGNOF as i32
+                                                                            $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                         )
                                                                     )
                                                                 ),
@@ -8534,7 +8741,7 @@ macro_rules! SGLTHDRSZ {
                                                                                 $crate::__pgrx_c_macros::CValue::<
                                                                                     $crate::__pgrx_c_macros::CInt
                                                                                 >::new(
-                                                                                    $crate::MAXIMUM_ALIGNOF as i32
+                                                                                    $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                                 )
                                                                             )
                                                                         ),
@@ -8572,8 +8779,8 @@ macro_rules! SGLTHDRSZ {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -8604,21 +8811,23 @@ macro_rules! __pgrx_c_args_SGLT_GET_HASNULLMASK {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
         $crate::__pgrx_c_args_SGLT_GET_HASNULLMASK!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_SGLT_GET_HASNULLMASK!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_SGLT_GET_HASNULLMASK!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SGLT_GET_HASNULLMASK!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SGLT_GET_HASNULLMASK!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -8626,7 +8835,9 @@ macro_rules! __pgrx_c_args_SGLT_GET_HASNULLMASK {
         $crate::__pgrx_c_args_SGLT_GET_HASNULLMASK!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_SGLT_GET_HASNULLMASK!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_SGLT_GET_HASNULLMASK!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -8648,14 +8859,18 @@ macro_rules! __pgrx_c_args_SGLT_GET_HASNULLMASK {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_SGLT_GET_HASNULLMASK!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_SGLT_GET_HASNULLMASK!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_SGLT_GET_HASNULLMASK!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_SGLT_GET_HASNULLMASK!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_SGLT_GET_HASNULLMASK!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -8682,13 +8897,13 @@ macro_rules! __pgrx_c_args_SGLT_GET_HASNULLMASK {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SGLT_GET_HASNULLMASK!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SGLT_GET_HASNULLMASK!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -8973,8 +9188,8 @@ macro_rules! SGLT_GET_HASNULLMASK {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -9001,20 +9216,24 @@ macro_rules! __pgrx_c_args_SGLT_GET_NEXTOFFSET {
         $crate::__pgrx_c_args_SGLT_GET_NEXTOFFSET!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_SGLT_GET_NEXTOFFSET!(@p1 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_SGLT_GET_NEXTOFFSET!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_SGLT_GET_NEXTOFFSET!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_SGLT_GET_NEXTOFFSET!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SGLT_GET_NEXTOFFSET!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SGLT_GET_NEXTOFFSET!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -9022,7 +9241,9 @@ macro_rules! __pgrx_c_args_SGLT_GET_NEXTOFFSET {
         $crate::__pgrx_c_args_SGLT_GET_NEXTOFFSET!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_SGLT_GET_NEXTOFFSET!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_SGLT_GET_NEXTOFFSET!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -9044,14 +9265,18 @@ macro_rules! __pgrx_c_args_SGLT_GET_NEXTOFFSET {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_SGLT_GET_NEXTOFFSET!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_SGLT_GET_NEXTOFFSET!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_SGLT_GET_NEXTOFFSET!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_SGLT_GET_NEXTOFFSET!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_SGLT_GET_NEXTOFFSET!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -9078,13 +9303,13 @@ macro_rules! __pgrx_c_args_SGLT_GET_NEXTOFFSET {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SGLT_GET_NEXTOFFSET!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SGLT_GET_NEXTOFFSET!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -9260,8 +9485,8 @@ macro_rules! SGLT_GET_NEXTOFFSET {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -9292,13 +9517,13 @@ macro_rules! __pgrx_c_args_SGLT_SET_HASNULLMASK {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SGLT_SET_HASNULLMASK!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SGLT_SET_HASNULLMASK!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -9307,7 +9532,7 @@ macro_rules! __pgrx_c_args_SGLT_SET_HASNULLMASK {
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_SGLT_SET_HASNULLMASK!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -9334,33 +9559,35 @@ macro_rules! __pgrx_c_args_SGLT_SET_HASNULLMASK {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SGLT_SET_HASNULLMASK!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SGLT_SET_HASNULLMASK!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $argument:literal) => {
         $crate::__pgrx_c_args_SGLT_SET_HASNULLMASK!(
-            @p2 $mode [$($done)* (@literal [- $argument]),];
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
         )
     };
     (@negative1 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_SGLT_SET_HASNULLMASK!(@p2 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_SGLT_SET_HASNULLMASK!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SGLT_SET_HASNULLMASK!(
-            @p2 $mode [$($done)* (@literal [- $argument]),];
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SGLT_SET_HASNULLMASK!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -9368,7 +9595,9 @@ macro_rules! __pgrx_c_args_SGLT_SET_HASNULLMASK {
         $crate::__pgrx_c_args_SGLT_SET_HASNULLMASK!(@negative1 $mode [$($done)*]; - $($raw)*)
     };
     (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_SGLT_SET_HASNULLMASK!(@p2 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_SGLT_SET_HASNULLMASK!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -9390,14 +9619,18 @@ macro_rules! __pgrx_c_args_SGLT_SET_HASNULLMASK {
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_SGLT_SET_HASNULLMASK!(@p2 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_SGLT_SET_HASNULLMASK!(
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_SGLT_SET_HASNULLMASK!(@p2 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_SGLT_SET_HASNULLMASK!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_SGLT_SET_HASNULLMASK!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -9424,13 +9657,13 @@ macro_rules! __pgrx_c_args_SGLT_SET_HASNULLMASK {
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SGLT_SET_HASNULLMASK!(
-            @p2 $mode [$($done)* (@literal [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SGLT_SET_HASNULLMASK!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -9846,8 +10079,8 @@ macro_rules! SGLT_SET_HASNULLMASK {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -9875,13 +10108,13 @@ macro_rules! __pgrx_c_args_SGLT_SET_NEXTOFFSET {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SGLT_SET_NEXTOFFSET!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SGLT_SET_NEXTOFFSET!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -9890,7 +10123,7 @@ macro_rules! __pgrx_c_args_SGLT_SET_NEXTOFFSET {
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_SGLT_SET_NEXTOFFSET!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -9917,31 +10150,35 @@ macro_rules! __pgrx_c_args_SGLT_SET_NEXTOFFSET {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SGLT_SET_NEXTOFFSET!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SGLT_SET_NEXTOFFSET!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_SGLT_SET_NEXTOFFSET!(@p2 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_SGLT_SET_NEXTOFFSET!(
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative1 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_SGLT_SET_NEXTOFFSET!(@p2 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_SGLT_SET_NEXTOFFSET!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SGLT_SET_NEXTOFFSET!(
-            @p2 $mode [$($done)* (@literal [- $argument]),];
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SGLT_SET_NEXTOFFSET!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -9949,7 +10186,9 @@ macro_rules! __pgrx_c_args_SGLT_SET_NEXTOFFSET {
         $crate::__pgrx_c_args_SGLT_SET_NEXTOFFSET!(@negative1 $mode [$($done)*]; - $($raw)*)
     };
     (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_SGLT_SET_NEXTOFFSET!(@p2 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_SGLT_SET_NEXTOFFSET!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -9971,14 +10210,18 @@ macro_rules! __pgrx_c_args_SGLT_SET_NEXTOFFSET {
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_SGLT_SET_NEXTOFFSET!(@p2 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_SGLT_SET_NEXTOFFSET!(
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_SGLT_SET_NEXTOFFSET!(@p2 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_SGLT_SET_NEXTOFFSET!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_SGLT_SET_NEXTOFFSET!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -10005,13 +10248,13 @@ macro_rules! __pgrx_c_args_SGLT_SET_NEXTOFFSET {
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SGLT_SET_NEXTOFFSET!(
-            @p2 $mode [$($done)* (@literal [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SGLT_SET_NEXTOFFSET!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -10373,8 +10616,8 @@ macro_rules! SGLT_SET_NEXTOFFSET {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -10401,25 +10644,34 @@ macro_rules! __pgrx_c_args_SGNTDATAPTR {
         $crate::__pgrx_c_args_SGNTDATAPTR!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_SGNTDATAPTR!(@p1 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_SGNTDATAPTR!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_SGNTDATAPTR!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_SGNTDATAPTR!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SGNTDATAPTR!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_SGNTDATAPTR!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_SGNTDATAPTR!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $($raw:tt)*) => {
         $crate::__pgrx_c_args_SGNTDATAPTR!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_SGNTDATAPTR!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_SGNTDATAPTR!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -10441,13 +10693,20 @@ macro_rules! __pgrx_c_args_SGNTDATAPTR {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_SGNTDATAPTR!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_SGNTDATAPTR!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_SGNTDATAPTR!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_SGNTDATAPTR!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
-        $crate::__pgrx_c_args_SGNTDATAPTR!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_SGNTDATAPTR!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
         $crate::__pgrx_c_classify!(
@@ -10469,10 +10728,16 @@ macro_rules! __pgrx_c_args_SGNTDATAPTR {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_SGNTDATAPTR!(@p1 $mode [$($done)* (@literal [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_SGNTDATAPTR!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+            $($rest)*
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_SGNTDATAPTR!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_SGNTDATAPTR!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p1 $mode:ident [$($done:tt)*];) => {
         $crate::SGNTDATAPTR!(@$mode; $($done)*)
@@ -10561,7 +10826,7 @@ macro_rules! SGNTDATAPTR {
                                                             >(
                                                                 $crate::__pgrx_c_macros::expression::size_of::<
                                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                                        $crate::IndexTupleData
+                                                                        $crate::__pgrx_c_bindings::IndexTupleData
                                                                     >>()
                                                             )
                                                         )
@@ -10586,7 +10851,7 @@ macro_rules! SGNTDATAPTR {
                                                                 $crate::__pgrx_c_macros::CValue::<
                                                                     $crate::__pgrx_c_macros::CInt
                                                                 >::new(
-                                                                    $crate::MAXIMUM_ALIGNOF as i32
+                                                                    $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                 )
                                                             )
                                                         ),
@@ -10634,7 +10899,7 @@ macro_rules! SGNTDATAPTR {
                                                                         $crate::__pgrx_c_macros::CValue::<
                                                                             $crate::__pgrx_c_macros::CInt
                                                                         >::new(
-                                                                            $crate::MAXIMUM_ALIGNOF as i32
+                                                                            $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                         )
                                                                     )
                                                                 ),
@@ -10741,7 +11006,7 @@ macro_rules! SGNTDATAPTR {
                                                                         >(
                                                                             $crate::__pgrx_c_macros::expression::size_of::<
                                                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                    $crate::IndexTupleData
+                                                                                    $crate::__pgrx_c_bindings::IndexTupleData
                                                                                 >>()
                                                                         )
                                                                     )
@@ -10766,7 +11031,7 @@ macro_rules! SGNTDATAPTR {
                                                                             $crate::__pgrx_c_macros::CValue::<
                                                                                 $crate::__pgrx_c_macros::CInt
                                                                             >::new(
-                                                                                $crate::MAXIMUM_ALIGNOF as i32
+                                                                                $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                             )
                                                                         )
                                                                     ),
@@ -10817,7 +11082,7 @@ macro_rules! SGNTDATAPTR {
                                                                                     $crate::__pgrx_c_macros::CValue::<
                                                                                         $crate::__pgrx_c_macros::CInt
                                                                                     >::new(
-                                                                                        $crate::MAXIMUM_ALIGNOF as i32
+                                                                                        $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                                     )
                                                                                 )
                                                                             ),
@@ -10901,7 +11166,7 @@ macro_rules! SGNTDATAPTR {
                                                             >(
                                                                 $crate::__pgrx_c_macros::expression::size_of::<
                                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                                        $crate::IndexTupleData
+                                                                        $crate::__pgrx_c_bindings::IndexTupleData
                                                                     >>()
                                                             )
                                                         )
@@ -10926,7 +11191,7 @@ macro_rules! SGNTDATAPTR {
                                                                 $crate::__pgrx_c_macros::CValue::<
                                                                     $crate::__pgrx_c_macros::CInt
                                                                 >::new(
-                                                                    $crate::MAXIMUM_ALIGNOF as i32
+                                                                    $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                 )
                                                             )
                                                         ),
@@ -10974,7 +11239,7 @@ macro_rules! SGNTDATAPTR {
                                                                         $crate::__pgrx_c_macros::CValue::<
                                                                             $crate::__pgrx_c_macros::CInt
                                                                         >::new(
-                                                                            $crate::MAXIMUM_ALIGNOF as i32
+                                                                            $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                         )
                                                                     )
                                                                 ),
@@ -11010,8 +11275,8 @@ macro_rules! SGNTDATAPTR {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -11038,16 +11303,25 @@ macro_rules! __pgrx_c_args_SGNTDATUM {
         $crate::__pgrx_c_args_SGNTDATUM!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_SGNTDATUM!(@p1 $mode [$($done)* (@literal [- $argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_SGNTDATUM!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+            $($rest)*
+        )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_SGNTDATUM!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_SGNTDATUM!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $($raw:tt)*) => {
         $crate::__pgrx_c_args_SGNTDATUM!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
-        $crate::__pgrx_c_args_SGNTDATUM!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_SGNTDATUM!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
         $crate::__pgrx_c_classify!(
@@ -11069,28 +11343,46 @@ macro_rules! __pgrx_c_args_SGNTDATUM {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_SGNTDATUM!(@p1 $mode [$($done)* (@literal [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_SGNTDATUM!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+            $($rest)*
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_SGNTDATUM!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_SGNTDATUM!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_SGNTDATUM!(@p2 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_SGNTDATUM!(
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative1 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_SGNTDATUM!(@p2 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_SGNTDATUM!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_SGNTDATUM!(@p2 $mode [$($done)* (@literal [- $argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_SGNTDATUM!(
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+            $($rest)*
+        )
     };
     (@negative1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_SGNTDATUM!(@p2 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_SGNTDATUM!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $($raw:tt)*) => {
         $crate::__pgrx_c_args_SGNTDATUM!(@negative1 $mode [$($done)*]; - $($raw)*)
     };
     (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_SGNTDATUM!(@p2 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_SGNTDATUM!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -11112,13 +11404,20 @@ macro_rules! __pgrx_c_args_SGNTDATUM {
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_SGNTDATUM!(@p2 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_SGNTDATUM!(
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_SGNTDATUM!(@p2 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_SGNTDATUM!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
-        $crate::__pgrx_c_args_SGNTDATUM!(@p2 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_SGNTDATUM!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
         $crate::__pgrx_c_classify!(
@@ -11140,10 +11439,16 @@ macro_rules! __pgrx_c_args_SGNTDATUM {
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_SGNTDATUM!(@p2 $mode [$($done)* (@literal [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_SGNTDATUM!(
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+            $($rest)*
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_SGNTDATUM!(@p2 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_SGNTDATUM!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p2 $mode:ident [$($done:tt)*];) => {
         $crate::SGNTDATUM!(@$mode; $($done)*)
@@ -11299,7 +11604,7 @@ macro_rules! SGNTDATUM {
                                                                                                 >(
                                                                                                     $crate::__pgrx_c_macros::expression::size_of::<
                                                                                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                            $crate::IndexTupleData
+                                                                                                            $crate::__pgrx_c_bindings::IndexTupleData
                                                                                                         >>()
                                                                                                 )
                                                                                             )
@@ -11324,7 +11629,7 @@ macro_rules! SGNTDATUM {
                                                                                                     $crate::__pgrx_c_macros::CValue::<
                                                                                                         $crate::__pgrx_c_macros::CInt
                                                                                                     >::new(
-                                                                                                        $crate::MAXIMUM_ALIGNOF as i32
+                                                                                                        $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                                                     )
                                                                                                 )
                                                                                             ),
@@ -11377,7 +11682,7 @@ macro_rules! SGNTDATUM {
                                                                                                             $crate::__pgrx_c_macros::CValue::<
                                                                                                                 $crate::__pgrx_c_macros::CInt
                                                                                                             >::new(
-                                                                                                                $crate::MAXIMUM_ALIGNOF as i32
+                                                                                                                $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                                                             )
                                                                                                         )
                                                                                                     ),
@@ -11416,10 +11721,10 @@ macro_rules! SGNTDATUM {
                                 <
                                     $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                         $crate::__pgrx_c_macros::CUnsignedLong,
-                                        $crate::Datum
+                                        $crate::__pgrx_c_bindings::Datum
                                     > as $crate::__pgrx_c_macros::expression::CType
                                 >::from_storage(
-                                    $crate::PointerGetDatum(
+                                    $crate::__pgrx_c_bindings::PointerGetDatum(
                                         <
                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                 $crate::__pgrx_c_macros::expression::CVoid,
@@ -11502,7 +11807,7 @@ macro_rules! SGNTDATUM {
                                                                                                     >(
                                                                                                         $crate::__pgrx_c_macros::expression::size_of::<
                                                                                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                                $crate::IndexTupleData
+                                                                                                                $crate::__pgrx_c_bindings::IndexTupleData
                                                                                                             >>()
                                                                                                     )
                                                                                                 )
@@ -11527,7 +11832,7 @@ macro_rules! SGNTDATUM {
                                                                                                         $crate::__pgrx_c_macros::CValue::<
                                                                                                             $crate::__pgrx_c_macros::CInt
                                                                                                         >::new(
-                                                                                                            $crate::MAXIMUM_ALIGNOF as i32
+                                                                                                            $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                                                         )
                                                                                                     )
                                                                                                 ),
@@ -11580,7 +11885,7 @@ macro_rules! SGNTDATUM {
                                                                                                                 $crate::__pgrx_c_macros::CValue::<
                                                                                                                     $crate::__pgrx_c_macros::CInt
                                                                                                                 >::new(
-                                                                                                                    $crate::MAXIMUM_ALIGNOF as i32
+                                                                                                                    $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                                                                 )
                                                                                                             )
                                                                                                         ),
@@ -11771,7 +12076,7 @@ macro_rules! SGNTDATUM {
                                                                                                             >(
                                                                                                                 $crate::__pgrx_c_macros::expression::size_of::<
                                                                                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                                        $crate::IndexTupleData
+                                                                                                                        $crate::__pgrx_c_bindings::IndexTupleData
                                                                                                                     >>()
                                                                                                             )
                                                                                                         )
@@ -11796,7 +12101,7 @@ macro_rules! SGNTDATUM {
                                                                                                                 $crate::__pgrx_c_macros::CValue::<
                                                                                                                     $crate::__pgrx_c_macros::CInt
                                                                                                                 >::new(
-                                                                                                                    $crate::MAXIMUM_ALIGNOF as i32
+                                                                                                                    $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                                                                 )
                                                                                                             )
                                                                                                         ),
@@ -11849,7 +12154,7 @@ macro_rules! SGNTDATUM {
                                                                                                                         $crate::__pgrx_c_macros::CValue::<
                                                                                                                             $crate::__pgrx_c_macros::CInt
                                                                                                                         >::new(
-                                                                                                                            $crate::MAXIMUM_ALIGNOF as i32
+                                                                                                                            $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                                                                         )
                                                                                                                     )
                                                                                                                 ),
@@ -11891,10 +12196,10 @@ macro_rules! SGNTDATUM {
                                             <
                                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                     $crate::__pgrx_c_macros::CUnsignedLong,
-                                                    $crate::Datum
+                                                    $crate::__pgrx_c_bindings::Datum
                                                 > as $crate::__pgrx_c_macros::expression::CType
                                             >::from_storage(
-                                                $crate::PointerGetDatum(
+                                                $crate::__pgrx_c_bindings::PointerGetDatum(
                                                     <
                                                         $crate::__pgrx_c_macros::expression::CPointer<
                                                             $crate::__pgrx_c_macros::expression::CVoid,
@@ -11979,7 +12284,7 @@ macro_rules! SGNTDATUM {
                                                                                                                 >(
                                                                                                                     $crate::__pgrx_c_macros::expression::size_of::<
                                                                                                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                                            $crate::IndexTupleData
+                                                                                                                            $crate::__pgrx_c_bindings::IndexTupleData
                                                                                                                         >>()
                                                                                                                 )
                                                                                                             )
@@ -12004,7 +12309,7 @@ macro_rules! SGNTDATUM {
                                                                                                                     $crate::__pgrx_c_macros::CValue::<
                                                                                                                         $crate::__pgrx_c_macros::CInt
                                                                                                                     >::new(
-                                                                                                                        $crate::MAXIMUM_ALIGNOF as i32
+                                                                                                                        $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                                                                     )
                                                                                                                 )
                                                                                                             ),
@@ -12057,7 +12362,7 @@ macro_rules! SGNTDATUM {
                                                                                                                             $crate::__pgrx_c_macros::CValue::<
                                                                                                                                 $crate::__pgrx_c_macros::CInt
                                                                                                                             >::new(
-                                                                                                                                $crate::MAXIMUM_ALIGNOF as i32
+                                                                                                                                $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                                                                             )
                                                                                                                         )
                                                                                                                     ),
@@ -12219,7 +12524,7 @@ macro_rules! SGNTDATUM {
                                                                                                 >(
                                                                                                     $crate::__pgrx_c_macros::expression::size_of::<
                                                                                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                            $crate::IndexTupleData
+                                                                                                            $crate::__pgrx_c_bindings::IndexTupleData
                                                                                                         >>()
                                                                                                 )
                                                                                             )
@@ -12244,7 +12549,7 @@ macro_rules! SGNTDATUM {
                                                                                                     $crate::__pgrx_c_macros::CValue::<
                                                                                                         $crate::__pgrx_c_macros::CInt
                                                                                                     >::new(
-                                                                                                        $crate::MAXIMUM_ALIGNOF as i32
+                                                                                                        $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                                                     )
                                                                                                 )
                                                                                             ),
@@ -12297,7 +12602,7 @@ macro_rules! SGNTDATUM {
                                                                                                             $crate::__pgrx_c_macros::CValue::<
                                                                                                                 $crate::__pgrx_c_macros::CInt
                                                                                                             >::new(
-                                                                                                                $crate::MAXIMUM_ALIGNOF as i32
+                                                                                                                $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                                                             )
                                                                                                         )
                                                                                                     ),
@@ -12336,10 +12641,10 @@ macro_rules! SGNTDATUM {
                                 <
                                     $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                         $crate::__pgrx_c_macros::CUnsignedLong,
-                                        $crate::Datum
+                                        $crate::__pgrx_c_bindings::Datum
                                     > as $crate::__pgrx_c_macros::expression::CType
                                 >::from_storage(
-                                    $crate::PointerGetDatum(
+                                    $crate::__pgrx_c_bindings::PointerGetDatum(
                                         <
                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                 $crate::__pgrx_c_macros::expression::CVoid,
@@ -12422,7 +12727,7 @@ macro_rules! SGNTDATUM {
                                                                                                     >(
                                                                                                         $crate::__pgrx_c_macros::expression::size_of::<
                                                                                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                                $crate::IndexTupleData
+                                                                                                                $crate::__pgrx_c_bindings::IndexTupleData
                                                                                                             >>()
                                                                                                     )
                                                                                                 )
@@ -12447,7 +12752,7 @@ macro_rules! SGNTDATUM {
                                                                                                         $crate::__pgrx_c_macros::CValue::<
                                                                                                             $crate::__pgrx_c_macros::CInt
                                                                                                         >::new(
-                                                                                                            $crate::MAXIMUM_ALIGNOF as i32
+                                                                                                            $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                                                         )
                                                                                                     )
                                                                                                 ),
@@ -12500,7 +12805,7 @@ macro_rules! SGNTDATUM {
                                                                                                                 $crate::__pgrx_c_macros::CValue::<
                                                                                                                     $crate::__pgrx_c_macros::CInt
                                                                                                                 >::new(
-                                                                                                                    $crate::MAXIMUM_ALIGNOF as i32
+                                                                                                                    $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                                                                 )
                                                                                                             )
                                                                                                         ),
@@ -12548,8 +12853,8 @@ macro_rules! SGNTDATUM {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -12577,18 +12882,24 @@ macro_rules! __pgrx_c_args_STORE_STATE {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_STORE_STATE!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_STORE_STATE!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_STORE_STATE!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $($raw:tt)*) => {
         $crate::__pgrx_c_args_STORE_STATE!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
-        $crate::__pgrx_c_args_STORE_STATE!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_STORE_STATE!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
         $crate::__pgrx_c_classify!(
@@ -12610,31 +12921,46 @@ macro_rules! __pgrx_c_args_STORE_STATE {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_STORE_STATE!(@p1 $mode [$($done)* (@literal [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_STORE_STATE!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+            $($rest)*
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_STORE_STATE!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_STORE_STATE!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_STORE_STATE!(@p2 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_STORE_STATE!(
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative1 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_STORE_STATE!(@p2 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_STORE_STATE!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_STORE_STATE!(
-            @p2 $mode [$($done)* (@literal [- $argument]),];
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_STORE_STATE!(@p2 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_STORE_STATE!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $($raw:tt)*) => {
         $crate::__pgrx_c_args_STORE_STATE!(@negative1 $mode [$($done)*]; - $($raw)*)
     };
     (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_STORE_STATE!(@p2 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_STORE_STATE!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -12656,13 +12982,20 @@ macro_rules! __pgrx_c_args_STORE_STATE {
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_STORE_STATE!(@p2 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_STORE_STATE!(
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_STORE_STATE!(@p2 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_STORE_STATE!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
-        $crate::__pgrx_c_args_STORE_STATE!(@p2 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_STORE_STATE!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
         $crate::__pgrx_c_classify!(
@@ -12684,10 +13017,16 @@ macro_rules! __pgrx_c_args_STORE_STATE {
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_STORE_STATE!(@p2 $mode [$($done)* (@literal [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_STORE_STATE!(
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+            $($rest)*
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_STORE_STATE!(@p2 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_STORE_STATE!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p2 $mode:ident [$($done:tt)*];) => {
         $crate::STORE_STATE!(@$mode; $($done)*)
@@ -12798,8 +13137,8 @@ macro_rules! STORE_STATE {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -12830,21 +13169,23 @@ macro_rules! __pgrx_c_args_SizeOfSpGistSearchItem {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
         $crate::__pgrx_c_args_SizeOfSpGistSearchItem!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_SizeOfSpGistSearchItem!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_SizeOfSpGistSearchItem!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SizeOfSpGistSearchItem!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SizeOfSpGistSearchItem!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -12852,7 +13193,9 @@ macro_rules! __pgrx_c_args_SizeOfSpGistSearchItem {
         $crate::__pgrx_c_args_SizeOfSpGistSearchItem!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_SizeOfSpGistSearchItem!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_SizeOfSpGistSearchItem!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -12877,15 +13220,17 @@ macro_rules! __pgrx_c_args_SizeOfSpGistSearchItem {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_SizeOfSpGistSearchItem!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_SizeOfSpGistSearchItem!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_SizeOfSpGistSearchItem!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_SizeOfSpGistSearchItem!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -12912,13 +13257,13 @@ macro_rules! __pgrx_c_args_SizeOfSpGistSearchItem {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SizeOfSpGistSearchItem!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SizeOfSpGistSearchItem!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -12970,7 +13315,9 @@ macro_rules! SizeOfSpGistSearchItem {
                 $crate::__pgrx_c_macros::expression::add::<$crate::__pgrx_c_macros::Wrapping, _, _>(
                     $crate::__pgrx_c_macros::expression::profile_value::<false, _>(
                         $crate::__pgrx_c_macros::expression::offset_of::<
-                            $crate::__pgrx_c_macros::expression::CRecord<$crate::SpGistSearchItem>,
+                            $crate::__pgrx_c_macros::expression::CRecord<
+                                $crate::__pgrx_c_bindings::SpGistSearchItem
+                            >,
                             $crate::__pgrx_c_field_marker!(@path; distances)
                         >()
                     ),
@@ -13031,7 +13378,7 @@ macro_rules! SizeOfSpGistSearchItem {
                                 $crate::__pgrx_c_macros::expression::profile_value::<false, _>(
                                     $crate::__pgrx_c_macros::expression::offset_of::<
                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                            $crate::SpGistSearchItem
+                                            $crate::__pgrx_c_bindings::SpGistSearchItem
                                         >,
                                         $crate::__pgrx_c_field_marker!(@path; distances)
                                     >()
@@ -13082,7 +13429,9 @@ macro_rules! SizeOfSpGistSearchItem {
                 $crate::__pgrx_c_macros::expression::add::<$crate::__pgrx_c_macros::Wrapping, _, _>(
                     $crate::__pgrx_c_macros::expression::profile_value::<false, _>(
                         $crate::__pgrx_c_macros::expression::offset_of::<
-                            $crate::__pgrx_c_macros::expression::CRecord<$crate::SpGistSearchItem>,
+                            $crate::__pgrx_c_macros::expression::CRecord<
+                                $crate::__pgrx_c_bindings::SpGistSearchItem
+                            >,
                             $crate::__pgrx_c_field_marker!(@path; distances)
                         >()
                     ),
@@ -13117,8 +13466,8 @@ macro_rules! SizeOfSpGistSearchItem {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -13145,20 +13494,24 @@ macro_rules! __pgrx_c_args_SpGistBlockIsFixed {
         $crate::__pgrx_c_args_SpGistBlockIsFixed!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_SpGistBlockIsFixed!(@p1 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_SpGistBlockIsFixed!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_SpGistBlockIsFixed!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_SpGistBlockIsFixed!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SpGistBlockIsFixed!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SpGistBlockIsFixed!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -13166,7 +13519,9 @@ macro_rules! __pgrx_c_args_SpGistBlockIsFixed {
         $crate::__pgrx_c_args_SpGistBlockIsFixed!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_SpGistBlockIsFixed!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_SpGistBlockIsFixed!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -13188,14 +13543,18 @@ macro_rules! __pgrx_c_args_SpGistBlockIsFixed {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_SpGistBlockIsFixed!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_SpGistBlockIsFixed!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_SpGistBlockIsFixed!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_SpGistBlockIsFixed!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_SpGistBlockIsFixed!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -13222,13 +13581,13 @@ macro_rules! __pgrx_c_args_SpGistBlockIsFixed {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SpGistBlockIsFixed!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SpGistBlockIsFixed!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -13276,7 +13635,7 @@ macro_rules! SpGistBlockIsFixed {
                 $crate::__pgrx_c_macros::expression::le(
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::expression::cast_as::<
-                            $crate::BlockNumber,
+                            $crate::__pgrx_c_bindings::BlockNumber,
                             $crate::__pgrx_c_macros::CUnsignedInt,
                             _
                         >(
@@ -13289,13 +13648,13 @@ macro_rules! SpGistBlockIsFixed {
                     ),
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::expression::cast_as::<
-                            $crate::BlockNumber,
+                            $crate::__pgrx_c_bindings::BlockNumber,
                             $crate::__pgrx_c_macros::CUnsignedInt,
                             _
                         >(
                             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                 $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                    $crate::SPGIST_LAST_FIXED_BLKNO as i32
+                                    $crate::__pgrx_c_bindings::SPGIST_LAST_FIXED_BLKNO as i32
                                 )
                             )
                         )
@@ -13333,7 +13692,7 @@ macro_rules! SpGistBlockIsFixed {
                             $crate::__pgrx_c_macros::expression::le(
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::cast_as::<
-                                        $crate::BlockNumber,
+                                        $crate::__pgrx_c_bindings::BlockNumber,
                                         $crate::__pgrx_c_macros::CUnsignedInt,
                                         _
                                     >(
@@ -13347,7 +13706,7 @@ macro_rules! SpGistBlockIsFixed {
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::cast_as::<
-                                        $crate::BlockNumber,
+                                        $crate::__pgrx_c_bindings::BlockNumber,
                                         $crate::__pgrx_c_macros::CUnsignedInt,
                                         _
                                     >(
@@ -13357,7 +13716,9 @@ macro_rules! SpGistBlockIsFixed {
                                         >(
                                             $crate::__pgrx_c_macros::CValue::<
                                                 $crate::__pgrx_c_macros::CInt
-                                            >::new($crate::SPGIST_LAST_FIXED_BLKNO as i32)
+                                            >::new(
+                                                $crate::__pgrx_c_bindings::SPGIST_LAST_FIXED_BLKNO as i32
+                                            )
                                         )
                                     )
                                 )
@@ -13379,7 +13740,7 @@ macro_rules! SpGistBlockIsFixed {
                 $crate::__pgrx_c_macros::expression::le(
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::expression::cast_as::<
-                            $crate::BlockNumber,
+                            $crate::__pgrx_c_bindings::BlockNumber,
                             $crate::__pgrx_c_macros::CUnsignedInt,
                             _
                         >(
@@ -13392,13 +13753,13 @@ macro_rules! SpGistBlockIsFixed {
                     ),
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::expression::cast_as::<
-                            $crate::BlockNumber,
+                            $crate::__pgrx_c_bindings::BlockNumber,
                             $crate::__pgrx_c_macros::CUnsignedInt,
                             _
                         >(
                             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                 $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                    $crate::SPGIST_LAST_FIXED_BLKNO as i32
+                                    $crate::__pgrx_c_bindings::SPGIST_LAST_FIXED_BLKNO as i32
                                 )
                             )
                         )
@@ -13416,8 +13777,8 @@ macro_rules! SpGistBlockIsFixed {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -13444,20 +13805,24 @@ macro_rules! __pgrx_c_args_SpGistBlockIsRoot {
         $crate::__pgrx_c_args_SpGistBlockIsRoot!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_SpGistBlockIsRoot!(@p1 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_SpGistBlockIsRoot!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_SpGistBlockIsRoot!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_SpGistBlockIsRoot!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SpGistBlockIsRoot!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SpGistBlockIsRoot!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -13465,7 +13830,9 @@ macro_rules! __pgrx_c_args_SpGistBlockIsRoot {
         $crate::__pgrx_c_args_SpGistBlockIsRoot!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_SpGistBlockIsRoot!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_SpGistBlockIsRoot!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -13487,14 +13854,18 @@ macro_rules! __pgrx_c_args_SpGistBlockIsRoot {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_SpGistBlockIsRoot!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_SpGistBlockIsRoot!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_SpGistBlockIsRoot!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_SpGistBlockIsRoot!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_SpGistBlockIsRoot!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -13521,13 +13892,13 @@ macro_rules! __pgrx_c_args_SpGistBlockIsRoot {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SpGistBlockIsRoot!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SpGistBlockIsRoot!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -13579,7 +13950,7 @@ macro_rules! SpGistBlockIsRoot {
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                        $crate::SPGIST_ROOT_BLKNO as i32
+                                        $crate::__pgrx_c_bindings::SPGIST_ROOT_BLKNO as i32
                                     )
                                 )
                             )
@@ -13594,7 +13965,7 @@ macro_rules! SpGistBlockIsRoot {
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                        $crate::SPGIST_NULL_BLKNO as i32
+                                        $crate::__pgrx_c_bindings::SPGIST_NULL_BLKNO as i32
                                     )
                                 )
                             )
@@ -13650,7 +14021,9 @@ macro_rules! SpGistBlockIsRoot {
                                             >(
                                                 $crate::__pgrx_c_macros::CValue::<
                                                     $crate::__pgrx_c_macros::CInt
-                                                >::new($crate::SPGIST_ROOT_BLKNO as i32)
+                                                >::new(
+                                                    $crate::__pgrx_c_bindings::SPGIST_ROOT_BLKNO as i32
+                                                )
                                             )
                                         )
                                     )
@@ -13669,7 +14042,9 @@ macro_rules! SpGistBlockIsRoot {
                                             >(
                                                 $crate::__pgrx_c_macros::CValue::<
                                                     $crate::__pgrx_c_macros::CInt
-                                                >::new($crate::SPGIST_NULL_BLKNO as i32)
+                                                >::new(
+                                                    $crate::__pgrx_c_bindings::SPGIST_NULL_BLKNO as i32
+                                                )
                                             )
                                         )
                                     )
@@ -13704,7 +14079,7 @@ macro_rules! SpGistBlockIsRoot {
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                        $crate::SPGIST_ROOT_BLKNO as i32
+                                        $crate::__pgrx_c_bindings::SPGIST_ROOT_BLKNO as i32
                                     )
                                 )
                             )
@@ -13719,7 +14094,7 @@ macro_rules! SpGistBlockIsRoot {
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                        $crate::SPGIST_NULL_BLKNO as i32
+                                        $crate::__pgrx_c_bindings::SPGIST_NULL_BLKNO as i32
                                     )
                                 )
                             )
@@ -13742,8 +14117,8 @@ macro_rules! SpGistBlockIsRoot {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -13770,20 +14145,24 @@ macro_rules! __pgrx_c_args_SpGistGetFillFactor {
         $crate::__pgrx_c_args_SpGistGetFillFactor!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_SpGistGetFillFactor!(@p1 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_SpGistGetFillFactor!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_SpGistGetFillFactor!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_SpGistGetFillFactor!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SpGistGetFillFactor!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SpGistGetFillFactor!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -13791,7 +14170,9 @@ macro_rules! __pgrx_c_args_SpGistGetFillFactor {
         $crate::__pgrx_c_args_SpGistGetFillFactor!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_SpGistGetFillFactor!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_SpGistGetFillFactor!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -13813,14 +14194,18 @@ macro_rules! __pgrx_c_args_SpGistGetFillFactor {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_SpGistGetFillFactor!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_SpGistGetFillFactor!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_SpGistGetFillFactor!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_SpGistGetFillFactor!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_SpGistGetFillFactor!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -13847,13 +14232,13 @@ macro_rules! __pgrx_c_args_SpGistGetFillFactor {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SpGistGetFillFactor!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SpGistGetFillFactor!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -13959,10 +14344,10 @@ macro_rules! SpGistGetFillFactor {
                                                             _
                                                         >(
                                                             $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                *mut $crate::SpGistOptions,
+                                                                *mut $crate::__pgrx_c_bindings::SpGistOptions,
                                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                                        $crate::SpGistOptions
+                                                                        $crate::__pgrx_c_bindings::SpGistOptions
                                                                     >,
                                                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                                                 >,
@@ -14009,7 +14394,9 @@ macro_rules! SpGistGetFillFactor {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::CValue::<
                                             $crate::__pgrx_c_macros::CInt
-                                        >::new($crate::SPGIST_DEFAULT_FILLFACTOR as i32)
+                                        >::new(
+                                            $crate::__pgrx_c_bindings::SPGIST_DEFAULT_FILLFACTOR as i32
+                                        )
                                     )
                                 )
                             }
@@ -14115,10 +14502,10 @@ macro_rules! SpGistGetFillFactor {
                                                                         _
                                                                     >(
                                                                         $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                            *mut $crate::SpGistOptions,
+                                                                            *mut $crate::__pgrx_c_bindings::SpGistOptions,
                                                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                    $crate::SpGistOptions
+                                                                                    $crate::__pgrx_c_bindings::SpGistOptions
                                                                                 >,
                                                                                 $crate::__pgrx_c_macros::expression::ReadWrite
                                                                             >,
@@ -14168,7 +14555,9 @@ macro_rules! SpGistGetFillFactor {
                                                 >(
                                                     $crate::__pgrx_c_macros::CValue::<
                                                         $crate::__pgrx_c_macros::CInt
-                                                    >::new($crate::SPGIST_DEFAULT_FILLFACTOR as i32)
+                                                    >::new(
+                                                        $crate::__pgrx_c_bindings::SPGIST_DEFAULT_FILLFACTOR as i32
+                                                    )
                                                 )
                                             )
                                         }
@@ -14250,10 +14639,10 @@ macro_rules! SpGistGetFillFactor {
                                                             _
                                                         >(
                                                             $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                *mut $crate::SpGistOptions,
+                                                                *mut $crate::__pgrx_c_bindings::SpGistOptions,
                                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                                        $crate::SpGistOptions
+                                                                        $crate::__pgrx_c_bindings::SpGistOptions
                                                                     >,
                                                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                                                 >,
@@ -14300,7 +14689,9 @@ macro_rules! SpGistGetFillFactor {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::CValue::<
                                             $crate::__pgrx_c_macros::CInt
-                                        >::new($crate::SPGIST_DEFAULT_FILLFACTOR as i32)
+                                        >::new(
+                                            $crate::__pgrx_c_bindings::SPGIST_DEFAULT_FILLFACTOR as i32
+                                        )
                                     )
                                 )
                             }
@@ -14319,8 +14710,8 @@ macro_rules! SpGistGetFillFactor {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -14351,23 +14742,23 @@ macro_rules! __pgrx_c_args_SpGistGetTargetPageFreeSpace {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
         $crate::__pgrx_c_args_SpGistGetTargetPageFreeSpace!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_SpGistGetTargetPageFreeSpace!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SpGistGetTargetPageFreeSpace!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SpGistGetTargetPageFreeSpace!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -14379,7 +14770,7 @@ macro_rules! __pgrx_c_args_SpGistGetTargetPageFreeSpace {
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
         $crate::__pgrx_c_args_SpGistGetTargetPageFreeSpace!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
@@ -14405,17 +14796,17 @@ macro_rules! __pgrx_c_args_SpGistGetTargetPageFreeSpace {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_SpGistGetTargetPageFreeSpace!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_SpGistGetTargetPageFreeSpace!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_SpGistGetTargetPageFreeSpace!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -14442,13 +14833,13 @@ macro_rules! __pgrx_c_args_SpGistGetTargetPageFreeSpace {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SpGistGetTargetPageFreeSpace!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SpGistGetTargetPageFreeSpace!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -14506,7 +14897,7 @@ macro_rules! SpGistGetTargetPageFreeSpace {
                         >(
                             $crate::__pgrx_c_macros::expression::profile_value::<false, _>(
                                 $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                    $crate::BLCKSZ as i32
+                                    $crate::__pgrx_c_bindings::BLCKSZ as i32
                                 )
                             ),
                             (
@@ -14603,10 +14994,10 @@ macro_rules! SpGistGetTargetPageFreeSpace {
                                                                                             _
                                                                                         >(
                                                                                             $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                                                *mut $crate::SpGistOptions,
+                                                                                                *mut $crate::__pgrx_c_bindings::SpGistOptions,
                                                                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                        $crate::SpGistOptions
+                                                                                                        $crate::__pgrx_c_bindings::SpGistOptions
                                                                                                     >,
                                                                                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                                                                                 >,
@@ -14657,7 +15048,7 @@ macro_rules! SpGistGetTargetPageFreeSpace {
                                                                         $crate::__pgrx_c_macros::CValue::<
                                                                             $crate::__pgrx_c_macros::CInt
                                                                         >::new(
-                                                                            $crate::SPGIST_DEFAULT_FILLFACTOR as i32
+                                                                            $crate::__pgrx_c_bindings::SPGIST_DEFAULT_FILLFACTOR as i32
                                                                         )
                                                                     )
                                                                 )
@@ -14724,7 +15115,7 @@ macro_rules! SpGistGetTargetPageFreeSpace {
                                         >(
                                             $crate::__pgrx_c_macros::CValue::<
                                                 $crate::__pgrx_c_macros::CInt
-                                            >::new($crate::BLCKSZ as i32)
+                                            >::new($crate::__pgrx_c_bindings::BLCKSZ as i32)
                                         ),
                                         (
                                             $crate::__pgrx_c_macros::expression::profile_value::<
@@ -14823,10 +15214,10 @@ macro_rules! SpGistGetTargetPageFreeSpace {
                                                                                                         _
                                                                                                     >(
                                                                                                         $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                                                            *mut $crate::SpGistOptions,
+                                                                                                            *mut $crate::__pgrx_c_bindings::SpGistOptions,
                                                                                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                                                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                                    $crate::SpGistOptions
+                                                                                                                    $crate::__pgrx_c_bindings::SpGistOptions
                                                                                                                 >,
                                                                                                                 $crate::__pgrx_c_macros::expression::ReadWrite
                                                                                                             >,
@@ -14877,7 +15268,7 @@ macro_rules! SpGistGetTargetPageFreeSpace {
                                                                                     $crate::__pgrx_c_macros::CValue::<
                                                                                         $crate::__pgrx_c_macros::CInt
                                                                                     >::new(
-                                                                                        $crate::SPGIST_DEFAULT_FILLFACTOR as i32
+                                                                                        $crate::__pgrx_c_bindings::SPGIST_DEFAULT_FILLFACTOR as i32
                                                                                     )
                                                                                 )
                                                                             )
@@ -14922,7 +15313,7 @@ macro_rules! SpGistGetTargetPageFreeSpace {
                         >(
                             $crate::__pgrx_c_macros::expression::profile_value::<false, _>(
                                 $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                    $crate::BLCKSZ as i32
+                                    $crate::__pgrx_c_bindings::BLCKSZ as i32
                                 )
                             ),
                             (
@@ -15019,10 +15410,10 @@ macro_rules! SpGistGetTargetPageFreeSpace {
                                                                                             _
                                                                                         >(
                                                                                             $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                                                *mut $crate::SpGistOptions,
+                                                                                                *mut $crate::__pgrx_c_bindings::SpGistOptions,
                                                                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                        $crate::SpGistOptions
+                                                                                                        $crate::__pgrx_c_bindings::SpGistOptions
                                                                                                     >,
                                                                                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                                                                                 >,
@@ -15073,7 +15464,7 @@ macro_rules! SpGistGetTargetPageFreeSpace {
                                                                         $crate::__pgrx_c_macros::CValue::<
                                                                             $crate::__pgrx_c_macros::CInt
                                                                         >::new(
-                                                                            $crate::SPGIST_DEFAULT_FILLFACTOR as i32
+                                                                            $crate::__pgrx_c_bindings::SPGIST_DEFAULT_FILLFACTOR as i32
                                                                         )
                                                                     )
                                                                 )
@@ -15112,8 +15503,8 @@ macro_rules! SpGistGetTargetPageFreeSpace {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -15144,13 +15535,13 @@ macro_rules! __pgrx_c_args_SpGistPageGetFreeSpace {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SpGistPageGetFreeSpace!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SpGistPageGetFreeSpace!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -15159,7 +15550,7 @@ macro_rules! __pgrx_c_args_SpGistPageGetFreeSpace {
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_SpGistPageGetFreeSpace!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -15186,33 +15577,35 @@ macro_rules! __pgrx_c_args_SpGistPageGetFreeSpace {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SpGistPageGetFreeSpace!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SpGistPageGetFreeSpace!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $argument:literal) => {
         $crate::__pgrx_c_args_SpGistPageGetFreeSpace!(
-            @p2 $mode [$($done)* (@literal [- $argument]),];
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
         )
     };
     (@negative1 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_SpGistPageGetFreeSpace!(@p2 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_SpGistPageGetFreeSpace!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SpGistPageGetFreeSpace!(
-            @p2 $mode [$($done)* (@literal [- $argument]),];
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SpGistPageGetFreeSpace!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -15220,7 +15613,9 @@ macro_rules! __pgrx_c_args_SpGistPageGetFreeSpace {
         $crate::__pgrx_c_args_SpGistPageGetFreeSpace!(@negative1 $mode [$($done)*]; - $($raw)*)
     };
     (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_SpGistPageGetFreeSpace!(@p2 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_SpGistPageGetFreeSpace!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -15245,15 +15640,17 @@ macro_rules! __pgrx_c_args_SpGistPageGetFreeSpace {
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_SpGistPageGetFreeSpace!(
-            @p2 $mode [$($done)* (@literal [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_SpGistPageGetFreeSpace!(@p2 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_SpGistPageGetFreeSpace!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_SpGistPageGetFreeSpace!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -15280,13 +15677,13 @@ macro_rules! __pgrx_c_args_SpGistPageGetFreeSpace {
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SpGistPageGetFreeSpace!(
-            @p2 $mode [$($done)* (@literal [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SpGistPageGetFreeSpace!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -15344,7 +15741,7 @@ macro_rules! SpGistPageGetFreeSpace {
                                 usize
                             > as $crate::__pgrx_c_macros::expression::CType
                         >::from_storage(
-                            $crate::PageGetExactFreeSpace(
+                            $crate::__pgrx_c_bindings::PageGetExactFreeSpace(
                                 <
                                     $crate::__pgrx_c_macros::expression::CPointer<
                                         $crate::__pgrx_c_macros::expression::CIntegerStorage<
@@ -15406,10 +15803,10 @@ macro_rules! SpGistPageGetFreeSpace {
                                                                                 _
                                                                             >(
                                                                                 $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                                    $crate::SpGistPageOpaque,
+                                                                                    $crate::__pgrx_c_bindings::SpGistPageOpaque,
                                                                                     $crate::__pgrx_c_macros::expression::CPointer<
                                                                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                            $crate::SpGistPageOpaqueData
+                                                                                            $crate::__pgrx_c_bindings::SpGistPageOpaqueData
                                                                                         >,
                                                                                         $crate::__pgrx_c_macros::expression::ReadWrite
                                                                                     >,
@@ -15426,16 +15823,22 @@ macro_rules! SpGistPageGetFreeSpace {
                                                                                                         false,
                                                                                                         _
                                                                                                     >(
-                                                                                                        $crate::__pgrx_c_generated::Inline_b8f78b3d355748e0e88ee8a394364f11(
+                                                                                                        $crate::__pgrx_c_bindings::PageValidateSpecialPointer(
                                                                                                             <
                                                                                                                 $crate::__pgrx_c_macros::expression::CPointer<
-                                                                                                                    $crate::__pgrx_c_macros::CChar,
+                                                                                                                    $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                                                                        $crate::__pgrx_c_macros::CChar,
+                                                                                                                        ::core::ffi::c_char
+                                                                                                                    >,
                                                                                                                     $crate::__pgrx_c_macros::expression::ReadOnly
                                                                                                                 > as $crate::__pgrx_c_macros::expression::CType
                                                                                                             >::into_storage(
                                                                                                                 $crate::__pgrx_c_macros::expression::implicit::<
                                                                                                                     $crate::__pgrx_c_macros::expression::CPointer<
-                                                                                                                        $crate::__pgrx_c_macros::CChar,
+                                                                                                                        $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                                                                            $crate::__pgrx_c_macros::CChar,
+                                                                                                                            ::core::ffi::c_char
+                                                                                                                        >,
                                                                                                                         $crate::__pgrx_c_macros::expression::ReadOnly
                                                                                                                     >,
                                                                                                                     _
@@ -15496,10 +15899,10 @@ macro_rules! SpGistPageGetFreeSpace {
                                                                                                                                     _
                                                                                                                                 >(
                                                                                                                                     $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                                                                                        $crate::PageHeader,
+                                                                                                                                        $crate::__pgrx_c_bindings::PageHeader,
                                                                                                                                         $crate::__pgrx_c_macros::expression::CPointer<
                                                                                                                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                                                                $crate::PageHeaderData
+                                                                                                                                                $crate::__pgrx_c_bindings::PageHeaderData
                                                                                                                                             >,
                                                                                                                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                                                                                                                         >,
@@ -15572,10 +15975,10 @@ macro_rules! SpGistPageGetFreeSpace {
                                                                             _
                                                                         >(
                                                                             $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                                $crate::SpGistPageOpaque,
+                                                                                $crate::__pgrx_c_bindings::SpGistPageOpaque,
                                                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                        $crate::SpGistPageOpaqueData
+                                                                                        $crate::__pgrx_c_bindings::SpGistPageOpaqueData
                                                                                     >,
                                                                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                                                                 >,
@@ -15592,16 +15995,22 @@ macro_rules! SpGistPageGetFreeSpace {
                                                                                                     false,
                                                                                                     _
                                                                                                 >(
-                                                                                                    $crate::__pgrx_c_generated::Inline_b8f78b3d355748e0e88ee8a394364f11(
+                                                                                                    $crate::__pgrx_c_bindings::PageValidateSpecialPointer(
                                                                                                         <
                                                                                                             $crate::__pgrx_c_macros::expression::CPointer<
-                                                                                                                $crate::__pgrx_c_macros::CChar,
+                                                                                                                $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                                                                    $crate::__pgrx_c_macros::CChar,
+                                                                                                                    ::core::ffi::c_char
+                                                                                                                >,
                                                                                                                 $crate::__pgrx_c_macros::expression::ReadOnly
                                                                                                             > as $crate::__pgrx_c_macros::expression::CType
                                                                                                         >::into_storage(
                                                                                                             $crate::__pgrx_c_macros::expression::implicit::<
                                                                                                                 $crate::__pgrx_c_macros::expression::CPointer<
-                                                                                                                    $crate::__pgrx_c_macros::CChar,
+                                                                                                                    $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                                                                        $crate::__pgrx_c_macros::CChar,
+                                                                                                                        ::core::ffi::c_char
+                                                                                                                    >,
                                                                                                                     $crate::__pgrx_c_macros::expression::ReadOnly
                                                                                                                 >,
                                                                                                                 _
@@ -15662,10 +16071,10 @@ macro_rules! SpGistPageGetFreeSpace {
                                                                                                                                 _
                                                                                                                             >(
                                                                                                                                 $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                                                                                    $crate::PageHeader,
+                                                                                                                                    $crate::__pgrx_c_bindings::PageHeader,
                                                                                                                                     $crate::__pgrx_c_macros::expression::CPointer<
                                                                                                                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                                                            $crate::PageHeaderData
+                                                                                                                                            $crate::__pgrx_c_bindings::PageHeaderData
                                                                                                                                         >,
                                                                                                                                         $crate::__pgrx_c_macros::expression::ReadWrite
                                                                                                                                     >,
@@ -15759,7 +16168,7 @@ macro_rules! SpGistPageGetFreeSpace {
                                                                                 >(
                                                                                     $crate::__pgrx_c_macros::expression::size_of::<
                                                                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                            $crate::SpGistDeadTupleData
+                                                                                            $crate::__pgrx_c_bindings::SpGistDeadTupleData
                                                                                         >>()
                                                                                 )
                                                                             )
@@ -15784,7 +16193,7 @@ macro_rules! SpGistPageGetFreeSpace {
                                                                                     $crate::__pgrx_c_macros::CValue::<
                                                                                         $crate::__pgrx_c_macros::CInt
                                                                                     >::new(
-                                                                                        $crate::MAXIMUM_ALIGNOF as i32
+                                                                                        $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                                     )
                                                                                 )
                                                                             ),
@@ -15835,7 +16244,7 @@ macro_rules! SpGistPageGetFreeSpace {
                                                                                             $crate::__pgrx_c_macros::CValue::<
                                                                                                 $crate::__pgrx_c_macros::CInt
                                                                                             >::new(
-                                                                                                $crate::MAXIMUM_ALIGNOF as i32
+                                                                                                $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                                             )
                                                                                         )
                                                                                     ),
@@ -15864,7 +16273,7 @@ macro_rules! SpGistPageGetFreeSpace {
                                         >(
                                             $crate::__pgrx_c_macros::expression::size_of::<
                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                    $crate::ItemIdData
+                                                    $crate::__pgrx_c_bindings::ItemIdData
                                                 >>()
                                         )
                                     )
@@ -15916,7 +16325,7 @@ macro_rules! SpGistPageGetFreeSpace {
                                             usize
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::from_storage(
-                                        $crate::PageGetExactFreeSpace(
+                                        $crate::__pgrx_c_bindings::PageGetExactFreeSpace(
                                             <
                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                     $crate::__pgrx_c_macros::expression::CIntegerStorage<
@@ -15981,10 +16390,10 @@ macro_rules! SpGistPageGetFreeSpace {
                                                                                             _
                                                                                         >(
                                                                                             $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                                                $crate::SpGistPageOpaque,
+                                                                                                $crate::__pgrx_c_bindings::SpGistPageOpaque,
                                                                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                        $crate::SpGistPageOpaqueData
+                                                                                                        $crate::__pgrx_c_bindings::SpGistPageOpaqueData
                                                                                                     >,
                                                                                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                                                                                 >,
@@ -16001,16 +16410,22 @@ macro_rules! SpGistPageGetFreeSpace {
                                                                                                                     false,
                                                                                                                     _
                                                                                                                 >(
-                                                                                                                    $crate::__pgrx_c_generated::Inline_b8f78b3d355748e0e88ee8a394364f11(
+                                                                                                                    $crate::__pgrx_c_bindings::PageValidateSpecialPointer(
                                                                                                                         <
                                                                                                                             $crate::__pgrx_c_macros::expression::CPointer<
-                                                                                                                                $crate::__pgrx_c_macros::CChar,
+                                                                                                                                $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                                                                                    $crate::__pgrx_c_macros::CChar,
+                                                                                                                                    ::core::ffi::c_char
+                                                                                                                                >,
                                                                                                                                 $crate::__pgrx_c_macros::expression::ReadOnly
                                                                                                                             > as $crate::__pgrx_c_macros::expression::CType
                                                                                                                         >::into_storage(
                                                                                                                             $crate::__pgrx_c_macros::expression::implicit::<
                                                                                                                                 $crate::__pgrx_c_macros::expression::CPointer<
-                                                                                                                                    $crate::__pgrx_c_macros::CChar,
+                                                                                                                                    $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                                                                                        $crate::__pgrx_c_macros::CChar,
+                                                                                                                                        ::core::ffi::c_char
+                                                                                                                                    >,
                                                                                                                                     $crate::__pgrx_c_macros::expression::ReadOnly
                                                                                                                                 >,
                                                                                                                                 _
@@ -16071,10 +16486,10 @@ macro_rules! SpGistPageGetFreeSpace {
                                                                                                                                                 _
                                                                                                                                             >(
                                                                                                                                                 $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                                                                                                    $crate::PageHeader,
+                                                                                                                                                    $crate::__pgrx_c_bindings::PageHeader,
                                                                                                                                                     $crate::__pgrx_c_macros::expression::CPointer<
                                                                                                                                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                                                                            $crate::PageHeaderData
+                                                                                                                                                            $crate::__pgrx_c_bindings::PageHeaderData
                                                                                                                                                         >,
                                                                                                                                                         $crate::__pgrx_c_macros::expression::ReadWrite
                                                                                                                                                     >,
@@ -16147,10 +16562,10 @@ macro_rules! SpGistPageGetFreeSpace {
                                                                                         _
                                                                                     >(
                                                                                         $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                                            $crate::SpGistPageOpaque,
+                                                                                            $crate::__pgrx_c_bindings::SpGistPageOpaque,
                                                                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                    $crate::SpGistPageOpaqueData
+                                                                                                    $crate::__pgrx_c_bindings::SpGistPageOpaqueData
                                                                                                 >,
                                                                                                 $crate::__pgrx_c_macros::expression::ReadWrite
                                                                                             >,
@@ -16167,16 +16582,22 @@ macro_rules! SpGistPageGetFreeSpace {
                                                                                                                 false,
                                                                                                                 _
                                                                                                             >(
-                                                                                                                $crate::__pgrx_c_generated::Inline_b8f78b3d355748e0e88ee8a394364f11(
+                                                                                                                $crate::__pgrx_c_bindings::PageValidateSpecialPointer(
                                                                                                                     <
                                                                                                                         $crate::__pgrx_c_macros::expression::CPointer<
-                                                                                                                            $crate::__pgrx_c_macros::CChar,
+                                                                                                                            $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                                                                                $crate::__pgrx_c_macros::CChar,
+                                                                                                                                ::core::ffi::c_char
+                                                                                                                            >,
                                                                                                                             $crate::__pgrx_c_macros::expression::ReadOnly
                                                                                                                         > as $crate::__pgrx_c_macros::expression::CType
                                                                                                                     >::into_storage(
                                                                                                                         $crate::__pgrx_c_macros::expression::implicit::<
                                                                                                                             $crate::__pgrx_c_macros::expression::CPointer<
-                                                                                                                                $crate::__pgrx_c_macros::CChar,
+                                                                                                                                $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                                                                                    $crate::__pgrx_c_macros::CChar,
+                                                                                                                                    ::core::ffi::c_char
+                                                                                                                                >,
                                                                                                                                 $crate::__pgrx_c_macros::expression::ReadOnly
                                                                                                                             >,
                                                                                                                             _
@@ -16237,10 +16658,10 @@ macro_rules! SpGistPageGetFreeSpace {
                                                                                                                                             _
                                                                                                                                         >(
                                                                                                                                             $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                                                                                                $crate::PageHeader,
+                                                                                                                                                $crate::__pgrx_c_bindings::PageHeader,
                                                                                                                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                                                                                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                                                                        $crate::PageHeaderData
+                                                                                                                                                        $crate::__pgrx_c_bindings::PageHeaderData
                                                                                                                                                     >,
                                                                                                                                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                                                                                                                                 >,
@@ -16342,7 +16763,7 @@ macro_rules! SpGistPageGetFreeSpace {
                                                                                             >(
                                                                                                 $crate::__pgrx_c_macros::expression::size_of::<
                                                                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                        $crate::SpGistDeadTupleData
+                                                                                                        $crate::__pgrx_c_bindings::SpGistDeadTupleData
                                                                                                     >>()
                                                                                             )
                                                                                         )
@@ -16367,7 +16788,7 @@ macro_rules! SpGistPageGetFreeSpace {
                                                                                                 $crate::__pgrx_c_macros::CValue::<
                                                                                                     $crate::__pgrx_c_macros::CInt
                                                                                                 >::new(
-                                                                                                    $crate::MAXIMUM_ALIGNOF as i32
+                                                                                                    $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                                                 )
                                                                                             )
                                                                                         ),
@@ -16420,7 +16841,7 @@ macro_rules! SpGistPageGetFreeSpace {
                                                                                                         $crate::__pgrx_c_macros::CValue::<
                                                                                                             $crate::__pgrx_c_macros::CInt
                                                                                                         >::new(
-                                                                                                            $crate::MAXIMUM_ALIGNOF as i32
+                                                                                                            $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                                                         )
                                                                                                     )
                                                                                                 ),
@@ -16451,7 +16872,7 @@ macro_rules! SpGistPageGetFreeSpace {
                                                     >(
                                                         $crate::__pgrx_c_macros::expression::size_of::<
                                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                                $crate::ItemIdData
+                                                                $crate::__pgrx_c_bindings::ItemIdData
                                                             >>()
                                                     )
                                                 )
@@ -16483,7 +16904,7 @@ macro_rules! SpGistPageGetFreeSpace {
                                 usize
                             > as $crate::__pgrx_c_macros::expression::CType
                         >::from_storage(
-                            $crate::PageGetExactFreeSpace(
+                            $crate::__pgrx_c_bindings::PageGetExactFreeSpace(
                                 <
                                     $crate::__pgrx_c_macros::expression::CPointer<
                                         $crate::__pgrx_c_macros::expression::CIntegerStorage<
@@ -16545,10 +16966,10 @@ macro_rules! SpGistPageGetFreeSpace {
                                                                                 _
                                                                             >(
                                                                                 $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                                    $crate::SpGistPageOpaque,
+                                                                                    $crate::__pgrx_c_bindings::SpGistPageOpaque,
                                                                                     $crate::__pgrx_c_macros::expression::CPointer<
                                                                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                            $crate::SpGistPageOpaqueData
+                                                                                            $crate::__pgrx_c_bindings::SpGistPageOpaqueData
                                                                                         >,
                                                                                         $crate::__pgrx_c_macros::expression::ReadWrite
                                                                                     >,
@@ -16565,16 +16986,22 @@ macro_rules! SpGistPageGetFreeSpace {
                                                                                                         false,
                                                                                                         _
                                                                                                     >(
-                                                                                                        $crate::__pgrx_c_generated::Inline_b8f78b3d355748e0e88ee8a394364f11(
+                                                                                                        $crate::__pgrx_c_bindings::PageValidateSpecialPointer(
                                                                                                             <
                                                                                                                 $crate::__pgrx_c_macros::expression::CPointer<
-                                                                                                                    $crate::__pgrx_c_macros::CChar,
+                                                                                                                    $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                                                                        $crate::__pgrx_c_macros::CChar,
+                                                                                                                        ::core::ffi::c_char
+                                                                                                                    >,
                                                                                                                     $crate::__pgrx_c_macros::expression::ReadOnly
                                                                                                                 > as $crate::__pgrx_c_macros::expression::CType
                                                                                                             >::into_storage(
                                                                                                                 $crate::__pgrx_c_macros::expression::implicit::<
                                                                                                                     $crate::__pgrx_c_macros::expression::CPointer<
-                                                                                                                        $crate::__pgrx_c_macros::CChar,
+                                                                                                                        $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                                                                            $crate::__pgrx_c_macros::CChar,
+                                                                                                                            ::core::ffi::c_char
+                                                                                                                        >,
                                                                                                                         $crate::__pgrx_c_macros::expression::ReadOnly
                                                                                                                     >,
                                                                                                                     _
@@ -16635,10 +17062,10 @@ macro_rules! SpGistPageGetFreeSpace {
                                                                                                                                     _
                                                                                                                                 >(
                                                                                                                                     $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                                                                                        $crate::PageHeader,
+                                                                                                                                        $crate::__pgrx_c_bindings::PageHeader,
                                                                                                                                         $crate::__pgrx_c_macros::expression::CPointer<
                                                                                                                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                                                                $crate::PageHeaderData
+                                                                                                                                                $crate::__pgrx_c_bindings::PageHeaderData
                                                                                                                                             >,
                                                                                                                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                                                                                                                         >,
@@ -16711,10 +17138,10 @@ macro_rules! SpGistPageGetFreeSpace {
                                                                             _
                                                                         >(
                                                                             $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                                $crate::SpGistPageOpaque,
+                                                                                $crate::__pgrx_c_bindings::SpGistPageOpaque,
                                                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                        $crate::SpGistPageOpaqueData
+                                                                                        $crate::__pgrx_c_bindings::SpGistPageOpaqueData
                                                                                     >,
                                                                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                                                                 >,
@@ -16731,16 +17158,22 @@ macro_rules! SpGistPageGetFreeSpace {
                                                                                                     false,
                                                                                                     _
                                                                                                 >(
-                                                                                                    $crate::__pgrx_c_generated::Inline_b8f78b3d355748e0e88ee8a394364f11(
+                                                                                                    $crate::__pgrx_c_bindings::PageValidateSpecialPointer(
                                                                                                         <
                                                                                                             $crate::__pgrx_c_macros::expression::CPointer<
-                                                                                                                $crate::__pgrx_c_macros::CChar,
+                                                                                                                $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                                                                    $crate::__pgrx_c_macros::CChar,
+                                                                                                                    ::core::ffi::c_char
+                                                                                                                >,
                                                                                                                 $crate::__pgrx_c_macros::expression::ReadOnly
                                                                                                             > as $crate::__pgrx_c_macros::expression::CType
                                                                                                         >::into_storage(
                                                                                                             $crate::__pgrx_c_macros::expression::implicit::<
                                                                                                                 $crate::__pgrx_c_macros::expression::CPointer<
-                                                                                                                    $crate::__pgrx_c_macros::CChar,
+                                                                                                                    $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                                                                        $crate::__pgrx_c_macros::CChar,
+                                                                                                                        ::core::ffi::c_char
+                                                                                                                    >,
                                                                                                                     $crate::__pgrx_c_macros::expression::ReadOnly
                                                                                                                 >,
                                                                                                                 _
@@ -16801,10 +17234,10 @@ macro_rules! SpGistPageGetFreeSpace {
                                                                                                                                 _
                                                                                                                             >(
                                                                                                                                 $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                                                                                    $crate::PageHeader,
+                                                                                                                                    $crate::__pgrx_c_bindings::PageHeader,
                                                                                                                                     $crate::__pgrx_c_macros::expression::CPointer<
                                                                                                                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                                                            $crate::PageHeaderData
+                                                                                                                                            $crate::__pgrx_c_bindings::PageHeaderData
                                                                                                                                         >,
                                                                                                                                         $crate::__pgrx_c_macros::expression::ReadWrite
                                                                                                                                     >,
@@ -16898,7 +17331,7 @@ macro_rules! SpGistPageGetFreeSpace {
                                                                                 >(
                                                                                     $crate::__pgrx_c_macros::expression::size_of::<
                                                                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                            $crate::SpGistDeadTupleData
+                                                                                            $crate::__pgrx_c_bindings::SpGistDeadTupleData
                                                                                         >>()
                                                                                 )
                                                                             )
@@ -16923,7 +17356,7 @@ macro_rules! SpGistPageGetFreeSpace {
                                                                                     $crate::__pgrx_c_macros::CValue::<
                                                                                         $crate::__pgrx_c_macros::CInt
                                                                                     >::new(
-                                                                                        $crate::MAXIMUM_ALIGNOF as i32
+                                                                                        $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                                     )
                                                                                 )
                                                                             ),
@@ -16974,7 +17407,7 @@ macro_rules! SpGistPageGetFreeSpace {
                                                                                             $crate::__pgrx_c_macros::CValue::<
                                                                                                 $crate::__pgrx_c_macros::CInt
                                                                                             >::new(
-                                                                                                $crate::MAXIMUM_ALIGNOF as i32
+                                                                                                $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                                             )
                                                                                         )
                                                                                     ),
@@ -17003,7 +17436,7 @@ macro_rules! SpGistPageGetFreeSpace {
                                         >(
                                             $crate::__pgrx_c_macros::expression::size_of::<
                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                    $crate::ItemIdData
+                                                    $crate::__pgrx_c_bindings::ItemIdData
                                                 >>()
                                         )
                                     )
@@ -17024,8 +17457,8 @@ macro_rules! SpGistPageGetFreeSpace {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -17052,20 +17485,24 @@ macro_rules! __pgrx_c_args_SpGistPageGetMeta {
         $crate::__pgrx_c_args_SpGistPageGetMeta!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_SpGistPageGetMeta!(@p1 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_SpGistPageGetMeta!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_SpGistPageGetMeta!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_SpGistPageGetMeta!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SpGistPageGetMeta!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SpGistPageGetMeta!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -17073,7 +17510,9 @@ macro_rules! __pgrx_c_args_SpGistPageGetMeta {
         $crate::__pgrx_c_args_SpGistPageGetMeta!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_SpGistPageGetMeta!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_SpGistPageGetMeta!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -17095,14 +17534,18 @@ macro_rules! __pgrx_c_args_SpGistPageGetMeta {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_SpGistPageGetMeta!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_SpGistPageGetMeta!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_SpGistPageGetMeta!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_SpGistPageGetMeta!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_SpGistPageGetMeta!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -17129,13 +17572,13 @@ macro_rules! __pgrx_c_args_SpGistPageGetMeta {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SpGistPageGetMeta!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SpGistPageGetMeta!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -17181,9 +17624,11 @@ macro_rules! SpGistPageGetMeta {
         (
             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::cast_as::<
-                    *mut $crate::SpGistMetaPageData,
+                    *mut $crate::__pgrx_c_bindings::SpGistMetaPageData,
                     $crate::__pgrx_c_macros::expression::CPointer<
-                        $crate::__pgrx_c_macros::expression::CRecord<$crate::SpGistMetaPageData>,
+                        $crate::__pgrx_c_macros::expression::CRecord<
+                            $crate::__pgrx_c_bindings::SpGistMetaPageData
+                        >,
                         $crate::__pgrx_c_macros::expression::ReadWrite
                     >,
                     _
@@ -17198,7 +17643,7 @@ macro_rules! SpGistPageGetMeta {
                                 $crate::__pgrx_c_macros::expression::ReadWrite
                             > as $crate::__pgrx_c_macros::expression::CType
                         >::from_storage(
-                            $crate::PageGetContents(
+                            $crate::__pgrx_c_bindings::PageGetContents(
                                 <
                                     $crate::__pgrx_c_macros::expression::CPointer<
                                         $crate::__pgrx_c_macros::expression::CIntegerStorage<
@@ -17258,10 +17703,10 @@ macro_rules! SpGistPageGetMeta {
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::cast_as::<
-                                *mut $crate::SpGistMetaPageData,
+                                *mut $crate::__pgrx_c_bindings::SpGistMetaPageData,
                                 $crate::__pgrx_c_macros::expression::CPointer<
                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                        $crate::SpGistMetaPageData
+                                        $crate::__pgrx_c_bindings::SpGistMetaPageData
                                     >,
                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                 >,
@@ -17277,7 +17722,7 @@ macro_rules! SpGistPageGetMeta {
                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::from_storage(
-                                        $crate::PageGetContents(
+                                        $crate::__pgrx_c_bindings::PageGetContents(
                                             <
                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                     $crate::__pgrx_c_macros::expression::CIntegerStorage<
@@ -17322,9 +17767,11 @@ macro_rules! SpGistPageGetMeta {
         {
             let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::cast_as::<
-                    *mut $crate::SpGistMetaPageData,
+                    *mut $crate::__pgrx_c_bindings::SpGistMetaPageData,
                     $crate::__pgrx_c_macros::expression::CPointer<
-                        $crate::__pgrx_c_macros::expression::CRecord<$crate::SpGistMetaPageData>,
+                        $crate::__pgrx_c_macros::expression::CRecord<
+                            $crate::__pgrx_c_bindings::SpGistMetaPageData
+                        >,
                         $crate::__pgrx_c_macros::expression::ReadWrite
                     >,
                     _
@@ -17339,7 +17786,7 @@ macro_rules! SpGistPageGetMeta {
                                 $crate::__pgrx_c_macros::expression::ReadWrite
                             > as $crate::__pgrx_c_macros::expression::CType
                         >::from_storage(
-                            $crate::PageGetContents(
+                            $crate::__pgrx_c_bindings::PageGetContents(
                                 <
                                     $crate::__pgrx_c_macros::expression::CPointer<
                                         $crate::__pgrx_c_macros::expression::CIntegerStorage<
@@ -17381,8 +17828,8 @@ macro_rules! SpGistPageGetMeta {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -17409,20 +17856,24 @@ macro_rules! __pgrx_c_args_SpGistPageGetOpaque {
         $crate::__pgrx_c_args_SpGistPageGetOpaque!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_SpGistPageGetOpaque!(@p1 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_SpGistPageGetOpaque!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_SpGistPageGetOpaque!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_SpGistPageGetOpaque!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SpGistPageGetOpaque!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SpGistPageGetOpaque!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -17430,7 +17881,9 @@ macro_rules! __pgrx_c_args_SpGistPageGetOpaque {
         $crate::__pgrx_c_args_SpGistPageGetOpaque!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_SpGistPageGetOpaque!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_SpGistPageGetOpaque!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -17452,14 +17905,18 @@ macro_rules! __pgrx_c_args_SpGistPageGetOpaque {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_SpGistPageGetOpaque!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_SpGistPageGetOpaque!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_SpGistPageGetOpaque!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_SpGistPageGetOpaque!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_SpGistPageGetOpaque!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -17486,13 +17943,13 @@ macro_rules! __pgrx_c_args_SpGistPageGetOpaque {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SpGistPageGetOpaque!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SpGistPageGetOpaque!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -17539,9 +17996,11 @@ macro_rules! SpGistPageGetOpaque {
         (
             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::cast_as::<
-                    $crate::SpGistPageOpaque,
+                    $crate::__pgrx_c_bindings::SpGistPageOpaque,
                     $crate::__pgrx_c_macros::expression::CPointer<
-                        $crate::__pgrx_c_macros::expression::CRecord<$crate::SpGistPageOpaqueData>,
+                        $crate::__pgrx_c_macros::expression::CRecord<
+                            $crate::__pgrx_c_bindings::SpGistPageOpaqueData
+                        >,
                         $crate::__pgrx_c_macros::expression::ReadWrite
                     >,
                     _
@@ -17554,16 +18013,22 @@ macro_rules! SpGistPageGetOpaque {
                                         true,
                                         _
                                     >(
-                                        $crate::__pgrx_c_generated::Inline_b8f78b3d355748e0e88ee8a394364f11(
+                                        $crate::__pgrx_c_bindings::PageValidateSpecialPointer(
                                             <
                                                 $crate::__pgrx_c_macros::expression::CPointer<
-                                                    $crate::__pgrx_c_macros::CChar,
+                                                    $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                        $crate::__pgrx_c_macros::CChar,
+                                                        ::core::ffi::c_char
+                                                    >,
                                                     $crate::__pgrx_c_macros::expression::ReadOnly
                                                 > as $crate::__pgrx_c_macros::expression::CType
                                             >::into_storage(
                                                 $crate::__pgrx_c_macros::expression::implicit::<
                                                     $crate::__pgrx_c_macros::expression::CPointer<
-                                                        $crate::__pgrx_c_macros::CChar,
+                                                        $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                            $crate::__pgrx_c_macros::CChar,
+                                                            ::core::ffi::c_char
+                                                        >,
                                                         $crate::__pgrx_c_macros::expression::ReadOnly
                                                     >,
                                                     _
@@ -17612,10 +18077,10 @@ macro_rules! SpGistPageGetOpaque {
                                                                     _
                                                                 >(
                                                                     $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                        $crate::PageHeader,
+                                                                        $crate::__pgrx_c_bindings::PageHeader,
                                                                         $crate::__pgrx_c_macros::expression::CPointer<
                                                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                $crate::PageHeaderData
+                                                                                $crate::__pgrx_c_bindings::PageHeaderData
                                                                             >,
                                                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                                                         >,
@@ -17677,10 +18142,10 @@ macro_rules! SpGistPageGetOpaque {
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::cast_as::<
-                                $crate::SpGistPageOpaque,
+                                $crate::__pgrx_c_bindings::SpGistPageOpaque,
                                 $crate::__pgrx_c_macros::expression::CPointer<
                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                        $crate::SpGistPageOpaqueData
+                                        $crate::__pgrx_c_bindings::SpGistPageOpaqueData
                                     >,
                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                 >,
@@ -17694,16 +18159,22 @@ macro_rules! SpGistPageGetOpaque {
                                                     true,
                                                     _
                                                 >(
-                                                    $crate::__pgrx_c_generated::Inline_b8f78b3d355748e0e88ee8a394364f11(
+                                                    $crate::__pgrx_c_bindings::PageValidateSpecialPointer(
                                                         <
                                                             $crate::__pgrx_c_macros::expression::CPointer<
-                                                                $crate::__pgrx_c_macros::CChar,
+                                                                $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                    $crate::__pgrx_c_macros::CChar,
+                                                                    ::core::ffi::c_char
+                                                                >,
                                                                 $crate::__pgrx_c_macros::expression::ReadOnly
                                                             > as $crate::__pgrx_c_macros::expression::CType
                                                         >::into_storage(
                                                             $crate::__pgrx_c_macros::expression::implicit::<
                                                                 $crate::__pgrx_c_macros::expression::CPointer<
-                                                                    $crate::__pgrx_c_macros::CChar,
+                                                                    $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                        $crate::__pgrx_c_macros::CChar,
+                                                                        ::core::ffi::c_char
+                                                                    >,
                                                                     $crate::__pgrx_c_macros::expression::ReadOnly
                                                                 >,
                                                                 _
@@ -17760,10 +18231,10 @@ macro_rules! SpGistPageGetOpaque {
                                                                                 _
                                                                             >(
                                                                                 $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                                    $crate::PageHeader,
+                                                                                    $crate::__pgrx_c_bindings::PageHeader,
                                                                                     $crate::__pgrx_c_macros::expression::CPointer<
                                                                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                            $crate::PageHeaderData
+                                                                                            $crate::__pgrx_c_bindings::PageHeaderData
                                                                                         >,
                                                                                         $crate::__pgrx_c_macros::expression::ReadWrite
                                                                                     >,
@@ -17812,9 +18283,11 @@ macro_rules! SpGistPageGetOpaque {
         {
             let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::cast_as::<
-                    $crate::SpGistPageOpaque,
+                    $crate::__pgrx_c_bindings::SpGistPageOpaque,
                     $crate::__pgrx_c_macros::expression::CPointer<
-                        $crate::__pgrx_c_macros::expression::CRecord<$crate::SpGistPageOpaqueData>,
+                        $crate::__pgrx_c_macros::expression::CRecord<
+                            $crate::__pgrx_c_bindings::SpGistPageOpaqueData
+                        >,
                         $crate::__pgrx_c_macros::expression::ReadWrite
                     >,
                     _
@@ -17827,16 +18300,22 @@ macro_rules! SpGistPageGetOpaque {
                                         true,
                                         _
                                     >(
-                                        $crate::__pgrx_c_generated::Inline_b8f78b3d355748e0e88ee8a394364f11(
+                                        $crate::__pgrx_c_bindings::PageValidateSpecialPointer(
                                             <
                                                 $crate::__pgrx_c_macros::expression::CPointer<
-                                                    $crate::__pgrx_c_macros::CChar,
+                                                    $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                        $crate::__pgrx_c_macros::CChar,
+                                                        ::core::ffi::c_char
+                                                    >,
                                                     $crate::__pgrx_c_macros::expression::ReadOnly
                                                 > as $crate::__pgrx_c_macros::expression::CType
                                             >::into_storage(
                                                 $crate::__pgrx_c_macros::expression::implicit::<
                                                     $crate::__pgrx_c_macros::expression::CPointer<
-                                                        $crate::__pgrx_c_macros::CChar,
+                                                        $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                            $crate::__pgrx_c_macros::CChar,
+                                                            ::core::ffi::c_char
+                                                        >,
                                                         $crate::__pgrx_c_macros::expression::ReadOnly
                                                     >,
                                                     _
@@ -17885,10 +18364,10 @@ macro_rules! SpGistPageGetOpaque {
                                                                     _
                                                                 >(
                                                                     $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                        $crate::PageHeader,
+                                                                        $crate::__pgrx_c_bindings::PageHeader,
                                                                         $crate::__pgrx_c_macros::expression::CPointer<
                                                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                $crate::PageHeaderData
+                                                                                $crate::__pgrx_c_bindings::PageHeaderData
                                                                             >,
                                                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                                                         >,
@@ -17931,8 +18410,8 @@ macro_rules! SpGistPageGetOpaque {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -17959,20 +18438,24 @@ macro_rules! __pgrx_c_args_SpGistPageIsDeleted {
         $crate::__pgrx_c_args_SpGistPageIsDeleted!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_SpGistPageIsDeleted!(@p1 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_SpGistPageIsDeleted!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_SpGistPageIsDeleted!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_SpGistPageIsDeleted!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SpGistPageIsDeleted!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SpGistPageIsDeleted!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -17980,7 +18463,9 @@ macro_rules! __pgrx_c_args_SpGistPageIsDeleted {
         $crate::__pgrx_c_args_SpGistPageIsDeleted!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_SpGistPageIsDeleted!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_SpGistPageIsDeleted!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -18002,14 +18487,18 @@ macro_rules! __pgrx_c_args_SpGistPageIsDeleted {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_SpGistPageIsDeleted!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_SpGistPageIsDeleted!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_SpGistPageIsDeleted!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_SpGistPageIsDeleted!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_SpGistPageIsDeleted!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -18036,13 +18525,13 @@ macro_rules! __pgrx_c_args_SpGistPageIsDeleted {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SpGistPageIsDeleted!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SpGistPageIsDeleted!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -18103,10 +18592,10 @@ macro_rules! SpGistPageIsDeleted {
                                             _
                                         >(
                                             $crate::__pgrx_c_macros::expression::cast_as::<
-                                                $crate::SpGistPageOpaque,
+                                                $crate::__pgrx_c_bindings::SpGistPageOpaque,
                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                        $crate::SpGistPageOpaqueData
+                                                        $crate::__pgrx_c_bindings::SpGistPageOpaqueData
                                                     >,
                                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                                 >,
@@ -18123,16 +18612,22 @@ macro_rules! SpGistPageIsDeleted {
                                                                     true,
                                                                     _
                                                                 >(
-                                                                    $crate::__pgrx_c_generated::Inline_b8f78b3d355748e0e88ee8a394364f11(
+                                                                    $crate::__pgrx_c_bindings::PageValidateSpecialPointer(
                                                                         <
                                                                             $crate::__pgrx_c_macros::expression::CPointer<
-                                                                                $crate::__pgrx_c_macros::CChar,
+                                                                                $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                                    $crate::__pgrx_c_macros::CChar,
+                                                                                    ::core::ffi::c_char
+                                                                                >,
                                                                                 $crate::__pgrx_c_macros::expression::ReadOnly
                                                                             > as $crate::__pgrx_c_macros::expression::CType
                                                                         >::into_storage(
                                                                             $crate::__pgrx_c_macros::expression::implicit::<
                                                                                 $crate::__pgrx_c_macros::expression::CPointer<
-                                                                                    $crate::__pgrx_c_macros::CChar,
+                                                                                    $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                                        $crate::__pgrx_c_macros::CChar,
+                                                                                        ::core::ffi::c_char
+                                                                                    >,
                                                                                     $crate::__pgrx_c_macros::expression::ReadOnly
                                                                                 >,
                                                                                 _
@@ -18191,10 +18686,10 @@ macro_rules! SpGistPageIsDeleted {
                                                                                                 _
                                                                                             >(
                                                                                                 $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                                                    $crate::PageHeader,
+                                                                                                    $crate::__pgrx_c_bindings::PageHeader,
                                                                                                     $crate::__pgrx_c_macros::expression::CPointer<
                                                                                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                            $crate::PageHeaderData
+                                                                                                            $crate::__pgrx_c_bindings::PageHeaderData
                                                                                                         >,
                                                                                                         $crate::__pgrx_c_macros::expression::ReadWrite
                                                                                                     >,
@@ -18235,7 +18730,7 @@ macro_rules! SpGistPageIsDeleted {
                     ),
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                            $crate::SPGIST_DELETED as i32
+                            $crate::__pgrx_c_bindings::SPGIST_DELETED as i32
                         )
                     )
                 )
@@ -18284,10 +18779,10 @@ macro_rules! SpGistPageIsDeleted {
                                                         _
                                                     >(
                                                         $crate::__pgrx_c_macros::expression::cast_as::<
-                                                            $crate::SpGistPageOpaque,
+                                                            $crate::__pgrx_c_bindings::SpGistPageOpaque,
                                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                                    $crate::SpGistPageOpaqueData
+                                                                    $crate::__pgrx_c_bindings::SpGistPageOpaqueData
                                                                 >,
                                                                 $crate::__pgrx_c_macros::expression::ReadWrite
                                                             >,
@@ -18304,16 +18799,22 @@ macro_rules! SpGistPageIsDeleted {
                                                                                 true,
                                                                                 _
                                                                             >(
-                                                                                $crate::__pgrx_c_generated::Inline_b8f78b3d355748e0e88ee8a394364f11(
+                                                                                $crate::__pgrx_c_bindings::PageValidateSpecialPointer(
                                                                                     <
                                                                                         $crate::__pgrx_c_macros::expression::CPointer<
-                                                                                            $crate::__pgrx_c_macros::CChar,
+                                                                                            $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                                                $crate::__pgrx_c_macros::CChar,
+                                                                                                ::core::ffi::c_char
+                                                                                            >,
                                                                                             $crate::__pgrx_c_macros::expression::ReadOnly
                                                                                         > as $crate::__pgrx_c_macros::expression::CType
                                                                                     >::into_storage(
                                                                                         $crate::__pgrx_c_macros::expression::implicit::<
                                                                                             $crate::__pgrx_c_macros::expression::CPointer<
-                                                                                                $crate::__pgrx_c_macros::CChar,
+                                                                                                $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                                                    $crate::__pgrx_c_macros::CChar,
+                                                                                                    ::core::ffi::c_char
+                                                                                                >,
                                                                                                 $crate::__pgrx_c_macros::expression::ReadOnly
                                                                                             >,
                                                                                             _
@@ -18374,10 +18875,10 @@ macro_rules! SpGistPageIsDeleted {
                                                                                                             _
                                                                                                         >(
                                                                                                             $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                                                                $crate::PageHeader,
+                                                                                                                $crate::__pgrx_c_bindings::PageHeader,
                                                                                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                                                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                                        $crate::PageHeaderData
+                                                                                                                        $crate::__pgrx_c_bindings::PageHeaderData
                                                                                                                     >,
                                                                                                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                                                                                                 >,
@@ -18418,7 +18919,7 @@ macro_rules! SpGistPageIsDeleted {
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                        $crate::SPGIST_DELETED as i32
+                                        $crate::__pgrx_c_bindings::SPGIST_DELETED as i32
                                     )
                                 )
                             )
@@ -18452,10 +18953,10 @@ macro_rules! SpGistPageIsDeleted {
                                             _
                                         >(
                                             $crate::__pgrx_c_macros::expression::cast_as::<
-                                                $crate::SpGistPageOpaque,
+                                                $crate::__pgrx_c_bindings::SpGistPageOpaque,
                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                        $crate::SpGistPageOpaqueData
+                                                        $crate::__pgrx_c_bindings::SpGistPageOpaqueData
                                                     >,
                                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                                 >,
@@ -18472,16 +18973,22 @@ macro_rules! SpGistPageIsDeleted {
                                                                     true,
                                                                     _
                                                                 >(
-                                                                    $crate::__pgrx_c_generated::Inline_b8f78b3d355748e0e88ee8a394364f11(
+                                                                    $crate::__pgrx_c_bindings::PageValidateSpecialPointer(
                                                                         <
                                                                             $crate::__pgrx_c_macros::expression::CPointer<
-                                                                                $crate::__pgrx_c_macros::CChar,
+                                                                                $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                                    $crate::__pgrx_c_macros::CChar,
+                                                                                    ::core::ffi::c_char
+                                                                                >,
                                                                                 $crate::__pgrx_c_macros::expression::ReadOnly
                                                                             > as $crate::__pgrx_c_macros::expression::CType
                                                                         >::into_storage(
                                                                             $crate::__pgrx_c_macros::expression::implicit::<
                                                                                 $crate::__pgrx_c_macros::expression::CPointer<
-                                                                                    $crate::__pgrx_c_macros::CChar,
+                                                                                    $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                                        $crate::__pgrx_c_macros::CChar,
+                                                                                        ::core::ffi::c_char
+                                                                                    >,
                                                                                     $crate::__pgrx_c_macros::expression::ReadOnly
                                                                                 >,
                                                                                 _
@@ -18540,10 +19047,10 @@ macro_rules! SpGistPageIsDeleted {
                                                                                                 _
                                                                                             >(
                                                                                                 $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                                                    $crate::PageHeader,
+                                                                                                    $crate::__pgrx_c_bindings::PageHeader,
                                                                                                     $crate::__pgrx_c_macros::expression::CPointer<
                                                                                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                            $crate::PageHeaderData
+                                                                                                            $crate::__pgrx_c_bindings::PageHeaderData
                                                                                                         >,
                                                                                                         $crate::__pgrx_c_macros::expression::ReadWrite
                                                                                                     >,
@@ -18584,7 +19091,7 @@ macro_rules! SpGistPageIsDeleted {
                     ),
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                            $crate::SPGIST_DELETED as i32
+                            $crate::__pgrx_c_bindings::SPGIST_DELETED as i32
                         )
                     )
                 )
@@ -18600,8 +19107,8 @@ macro_rules! SpGistPageIsDeleted {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -18628,20 +19135,24 @@ macro_rules! __pgrx_c_args_SpGistPageIsLeaf {
         $crate::__pgrx_c_args_SpGistPageIsLeaf!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_SpGistPageIsLeaf!(@p1 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_SpGistPageIsLeaf!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_SpGistPageIsLeaf!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_SpGistPageIsLeaf!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SpGistPageIsLeaf!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SpGistPageIsLeaf!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -18649,7 +19160,9 @@ macro_rules! __pgrx_c_args_SpGistPageIsLeaf {
         $crate::__pgrx_c_args_SpGistPageIsLeaf!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_SpGistPageIsLeaf!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_SpGistPageIsLeaf!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -18671,14 +19184,18 @@ macro_rules! __pgrx_c_args_SpGistPageIsLeaf {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_SpGistPageIsLeaf!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_SpGistPageIsLeaf!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_SpGistPageIsLeaf!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_SpGistPageIsLeaf!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_SpGistPageIsLeaf!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -18705,13 +19222,13 @@ macro_rules! __pgrx_c_args_SpGistPageIsLeaf {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SpGistPageIsLeaf!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SpGistPageIsLeaf!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -18772,10 +19289,10 @@ macro_rules! SpGistPageIsLeaf {
                                             _
                                         >(
                                             $crate::__pgrx_c_macros::expression::cast_as::<
-                                                $crate::SpGistPageOpaque,
+                                                $crate::__pgrx_c_bindings::SpGistPageOpaque,
                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                        $crate::SpGistPageOpaqueData
+                                                        $crate::__pgrx_c_bindings::SpGistPageOpaqueData
                                                     >,
                                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                                 >,
@@ -18792,16 +19309,22 @@ macro_rules! SpGistPageIsLeaf {
                                                                     true,
                                                                     _
                                                                 >(
-                                                                    $crate::__pgrx_c_generated::Inline_b8f78b3d355748e0e88ee8a394364f11(
+                                                                    $crate::__pgrx_c_bindings::PageValidateSpecialPointer(
                                                                         <
                                                                             $crate::__pgrx_c_macros::expression::CPointer<
-                                                                                $crate::__pgrx_c_macros::CChar,
+                                                                                $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                                    $crate::__pgrx_c_macros::CChar,
+                                                                                    ::core::ffi::c_char
+                                                                                >,
                                                                                 $crate::__pgrx_c_macros::expression::ReadOnly
                                                                             > as $crate::__pgrx_c_macros::expression::CType
                                                                         >::into_storage(
                                                                             $crate::__pgrx_c_macros::expression::implicit::<
                                                                                 $crate::__pgrx_c_macros::expression::CPointer<
-                                                                                    $crate::__pgrx_c_macros::CChar,
+                                                                                    $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                                        $crate::__pgrx_c_macros::CChar,
+                                                                                        ::core::ffi::c_char
+                                                                                    >,
                                                                                     $crate::__pgrx_c_macros::expression::ReadOnly
                                                                                 >,
                                                                                 _
@@ -18860,10 +19383,10 @@ macro_rules! SpGistPageIsLeaf {
                                                                                                 _
                                                                                             >(
                                                                                                 $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                                                    $crate::PageHeader,
+                                                                                                    $crate::__pgrx_c_bindings::PageHeader,
                                                                                                     $crate::__pgrx_c_macros::expression::CPointer<
                                                                                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                            $crate::PageHeaderData
+                                                                                                            $crate::__pgrx_c_bindings::PageHeaderData
                                                                                                         >,
                                                                                                         $crate::__pgrx_c_macros::expression::ReadWrite
                                                                                                     >,
@@ -18904,7 +19427,7 @@ macro_rules! SpGistPageIsLeaf {
                     ),
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                            $crate::SPGIST_LEAF as i32
+                            $crate::__pgrx_c_bindings::SPGIST_LEAF as i32
                         )
                     )
                 )
@@ -18953,10 +19476,10 @@ macro_rules! SpGistPageIsLeaf {
                                                         _
                                                     >(
                                                         $crate::__pgrx_c_macros::expression::cast_as::<
-                                                            $crate::SpGistPageOpaque,
+                                                            $crate::__pgrx_c_bindings::SpGistPageOpaque,
                                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                                    $crate::SpGistPageOpaqueData
+                                                                    $crate::__pgrx_c_bindings::SpGistPageOpaqueData
                                                                 >,
                                                                 $crate::__pgrx_c_macros::expression::ReadWrite
                                                             >,
@@ -18973,16 +19496,22 @@ macro_rules! SpGistPageIsLeaf {
                                                                                 true,
                                                                                 _
                                                                             >(
-                                                                                $crate::__pgrx_c_generated::Inline_b8f78b3d355748e0e88ee8a394364f11(
+                                                                                $crate::__pgrx_c_bindings::PageValidateSpecialPointer(
                                                                                     <
                                                                                         $crate::__pgrx_c_macros::expression::CPointer<
-                                                                                            $crate::__pgrx_c_macros::CChar,
+                                                                                            $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                                                $crate::__pgrx_c_macros::CChar,
+                                                                                                ::core::ffi::c_char
+                                                                                            >,
                                                                                             $crate::__pgrx_c_macros::expression::ReadOnly
                                                                                         > as $crate::__pgrx_c_macros::expression::CType
                                                                                     >::into_storage(
                                                                                         $crate::__pgrx_c_macros::expression::implicit::<
                                                                                             $crate::__pgrx_c_macros::expression::CPointer<
-                                                                                                $crate::__pgrx_c_macros::CChar,
+                                                                                                $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                                                    $crate::__pgrx_c_macros::CChar,
+                                                                                                    ::core::ffi::c_char
+                                                                                                >,
                                                                                                 $crate::__pgrx_c_macros::expression::ReadOnly
                                                                                             >,
                                                                                             _
@@ -19043,10 +19572,10 @@ macro_rules! SpGistPageIsLeaf {
                                                                                                             _
                                                                                                         >(
                                                                                                             $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                                                                $crate::PageHeader,
+                                                                                                                $crate::__pgrx_c_bindings::PageHeader,
                                                                                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                                                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                                        $crate::PageHeaderData
+                                                                                                                        $crate::__pgrx_c_bindings::PageHeaderData
                                                                                                                     >,
                                                                                                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                                                                                                 >,
@@ -19087,7 +19616,7 @@ macro_rules! SpGistPageIsLeaf {
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                        $crate::SPGIST_LEAF as i32
+                                        $crate::__pgrx_c_bindings::SPGIST_LEAF as i32
                                     )
                                 )
                             )
@@ -19121,10 +19650,10 @@ macro_rules! SpGistPageIsLeaf {
                                             _
                                         >(
                                             $crate::__pgrx_c_macros::expression::cast_as::<
-                                                $crate::SpGistPageOpaque,
+                                                $crate::__pgrx_c_bindings::SpGistPageOpaque,
                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                        $crate::SpGistPageOpaqueData
+                                                        $crate::__pgrx_c_bindings::SpGistPageOpaqueData
                                                     >,
                                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                                 >,
@@ -19141,16 +19670,22 @@ macro_rules! SpGistPageIsLeaf {
                                                                     true,
                                                                     _
                                                                 >(
-                                                                    $crate::__pgrx_c_generated::Inline_b8f78b3d355748e0e88ee8a394364f11(
+                                                                    $crate::__pgrx_c_bindings::PageValidateSpecialPointer(
                                                                         <
                                                                             $crate::__pgrx_c_macros::expression::CPointer<
-                                                                                $crate::__pgrx_c_macros::CChar,
+                                                                                $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                                    $crate::__pgrx_c_macros::CChar,
+                                                                                    ::core::ffi::c_char
+                                                                                >,
                                                                                 $crate::__pgrx_c_macros::expression::ReadOnly
                                                                             > as $crate::__pgrx_c_macros::expression::CType
                                                                         >::into_storage(
                                                                             $crate::__pgrx_c_macros::expression::implicit::<
                                                                                 $crate::__pgrx_c_macros::expression::CPointer<
-                                                                                    $crate::__pgrx_c_macros::CChar,
+                                                                                    $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                                        $crate::__pgrx_c_macros::CChar,
+                                                                                        ::core::ffi::c_char
+                                                                                    >,
                                                                                     $crate::__pgrx_c_macros::expression::ReadOnly
                                                                                 >,
                                                                                 _
@@ -19209,10 +19744,10 @@ macro_rules! SpGistPageIsLeaf {
                                                                                                 _
                                                                                             >(
                                                                                                 $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                                                    $crate::PageHeader,
+                                                                                                    $crate::__pgrx_c_bindings::PageHeader,
                                                                                                     $crate::__pgrx_c_macros::expression::CPointer<
                                                                                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                            $crate::PageHeaderData
+                                                                                                            $crate::__pgrx_c_bindings::PageHeaderData
                                                                                                         >,
                                                                                                         $crate::__pgrx_c_macros::expression::ReadWrite
                                                                                                     >,
@@ -19253,7 +19788,7 @@ macro_rules! SpGistPageIsLeaf {
                     ),
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                            $crate::SPGIST_LEAF as i32
+                            $crate::__pgrx_c_bindings::SPGIST_LEAF as i32
                         )
                     )
                 )
@@ -19269,8 +19804,8 @@ macro_rules! SpGistPageIsLeaf {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -19297,20 +19832,24 @@ macro_rules! __pgrx_c_args_SpGistPageIsMeta {
         $crate::__pgrx_c_args_SpGistPageIsMeta!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_SpGistPageIsMeta!(@p1 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_SpGistPageIsMeta!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_SpGistPageIsMeta!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_SpGistPageIsMeta!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SpGistPageIsMeta!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SpGistPageIsMeta!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -19318,7 +19857,9 @@ macro_rules! __pgrx_c_args_SpGistPageIsMeta {
         $crate::__pgrx_c_args_SpGistPageIsMeta!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_SpGistPageIsMeta!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_SpGistPageIsMeta!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -19340,14 +19881,18 @@ macro_rules! __pgrx_c_args_SpGistPageIsMeta {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_SpGistPageIsMeta!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_SpGistPageIsMeta!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_SpGistPageIsMeta!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_SpGistPageIsMeta!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_SpGistPageIsMeta!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -19374,13 +19919,13 @@ macro_rules! __pgrx_c_args_SpGistPageIsMeta {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SpGistPageIsMeta!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SpGistPageIsMeta!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -19441,10 +19986,10 @@ macro_rules! SpGistPageIsMeta {
                                             _
                                         >(
                                             $crate::__pgrx_c_macros::expression::cast_as::<
-                                                $crate::SpGistPageOpaque,
+                                                $crate::__pgrx_c_bindings::SpGistPageOpaque,
                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                        $crate::SpGistPageOpaqueData
+                                                        $crate::__pgrx_c_bindings::SpGistPageOpaqueData
                                                     >,
                                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                                 >,
@@ -19461,16 +20006,22 @@ macro_rules! SpGistPageIsMeta {
                                                                     true,
                                                                     _
                                                                 >(
-                                                                    $crate::__pgrx_c_generated::Inline_b8f78b3d355748e0e88ee8a394364f11(
+                                                                    $crate::__pgrx_c_bindings::PageValidateSpecialPointer(
                                                                         <
                                                                             $crate::__pgrx_c_macros::expression::CPointer<
-                                                                                $crate::__pgrx_c_macros::CChar,
+                                                                                $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                                    $crate::__pgrx_c_macros::CChar,
+                                                                                    ::core::ffi::c_char
+                                                                                >,
                                                                                 $crate::__pgrx_c_macros::expression::ReadOnly
                                                                             > as $crate::__pgrx_c_macros::expression::CType
                                                                         >::into_storage(
                                                                             $crate::__pgrx_c_macros::expression::implicit::<
                                                                                 $crate::__pgrx_c_macros::expression::CPointer<
-                                                                                    $crate::__pgrx_c_macros::CChar,
+                                                                                    $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                                        $crate::__pgrx_c_macros::CChar,
+                                                                                        ::core::ffi::c_char
+                                                                                    >,
                                                                                     $crate::__pgrx_c_macros::expression::ReadOnly
                                                                                 >,
                                                                                 _
@@ -19529,10 +20080,10 @@ macro_rules! SpGistPageIsMeta {
                                                                                                 _
                                                                                             >(
                                                                                                 $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                                                    $crate::PageHeader,
+                                                                                                    $crate::__pgrx_c_bindings::PageHeader,
                                                                                                     $crate::__pgrx_c_macros::expression::CPointer<
                                                                                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                            $crate::PageHeaderData
+                                                                                                            $crate::__pgrx_c_bindings::PageHeaderData
                                                                                                         >,
                                                                                                         $crate::__pgrx_c_macros::expression::ReadWrite
                                                                                                     >,
@@ -19573,7 +20124,7 @@ macro_rules! SpGistPageIsMeta {
                     ),
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                            $crate::SPGIST_META as i32
+                            $crate::__pgrx_c_bindings::SPGIST_META as i32
                         )
                     )
                 )
@@ -19622,10 +20173,10 @@ macro_rules! SpGistPageIsMeta {
                                                         _
                                                     >(
                                                         $crate::__pgrx_c_macros::expression::cast_as::<
-                                                            $crate::SpGistPageOpaque,
+                                                            $crate::__pgrx_c_bindings::SpGistPageOpaque,
                                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                                    $crate::SpGistPageOpaqueData
+                                                                    $crate::__pgrx_c_bindings::SpGistPageOpaqueData
                                                                 >,
                                                                 $crate::__pgrx_c_macros::expression::ReadWrite
                                                             >,
@@ -19642,16 +20193,22 @@ macro_rules! SpGistPageIsMeta {
                                                                                 true,
                                                                                 _
                                                                             >(
-                                                                                $crate::__pgrx_c_generated::Inline_b8f78b3d355748e0e88ee8a394364f11(
+                                                                                $crate::__pgrx_c_bindings::PageValidateSpecialPointer(
                                                                                     <
                                                                                         $crate::__pgrx_c_macros::expression::CPointer<
-                                                                                            $crate::__pgrx_c_macros::CChar,
+                                                                                            $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                                                $crate::__pgrx_c_macros::CChar,
+                                                                                                ::core::ffi::c_char
+                                                                                            >,
                                                                                             $crate::__pgrx_c_macros::expression::ReadOnly
                                                                                         > as $crate::__pgrx_c_macros::expression::CType
                                                                                     >::into_storage(
                                                                                         $crate::__pgrx_c_macros::expression::implicit::<
                                                                                             $crate::__pgrx_c_macros::expression::CPointer<
-                                                                                                $crate::__pgrx_c_macros::CChar,
+                                                                                                $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                                                    $crate::__pgrx_c_macros::CChar,
+                                                                                                    ::core::ffi::c_char
+                                                                                                >,
                                                                                                 $crate::__pgrx_c_macros::expression::ReadOnly
                                                                                             >,
                                                                                             _
@@ -19712,10 +20269,10 @@ macro_rules! SpGistPageIsMeta {
                                                                                                             _
                                                                                                         >(
                                                                                                             $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                                                                $crate::PageHeader,
+                                                                                                                $crate::__pgrx_c_bindings::PageHeader,
                                                                                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                                                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                                        $crate::PageHeaderData
+                                                                                                                        $crate::__pgrx_c_bindings::PageHeaderData
                                                                                                                     >,
                                                                                                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                                                                                                 >,
@@ -19756,7 +20313,7 @@ macro_rules! SpGistPageIsMeta {
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                        $crate::SPGIST_META as i32
+                                        $crate::__pgrx_c_bindings::SPGIST_META as i32
                                     )
                                 )
                             )
@@ -19790,10 +20347,10 @@ macro_rules! SpGistPageIsMeta {
                                             _
                                         >(
                                             $crate::__pgrx_c_macros::expression::cast_as::<
-                                                $crate::SpGistPageOpaque,
+                                                $crate::__pgrx_c_bindings::SpGistPageOpaque,
                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                        $crate::SpGistPageOpaqueData
+                                                        $crate::__pgrx_c_bindings::SpGistPageOpaqueData
                                                     >,
                                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                                 >,
@@ -19810,16 +20367,22 @@ macro_rules! SpGistPageIsMeta {
                                                                     true,
                                                                     _
                                                                 >(
-                                                                    $crate::__pgrx_c_generated::Inline_b8f78b3d355748e0e88ee8a394364f11(
+                                                                    $crate::__pgrx_c_bindings::PageValidateSpecialPointer(
                                                                         <
                                                                             $crate::__pgrx_c_macros::expression::CPointer<
-                                                                                $crate::__pgrx_c_macros::CChar,
+                                                                                $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                                    $crate::__pgrx_c_macros::CChar,
+                                                                                    ::core::ffi::c_char
+                                                                                >,
                                                                                 $crate::__pgrx_c_macros::expression::ReadOnly
                                                                             > as $crate::__pgrx_c_macros::expression::CType
                                                                         >::into_storage(
                                                                             $crate::__pgrx_c_macros::expression::implicit::<
                                                                                 $crate::__pgrx_c_macros::expression::CPointer<
-                                                                                    $crate::__pgrx_c_macros::CChar,
+                                                                                    $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                                        $crate::__pgrx_c_macros::CChar,
+                                                                                        ::core::ffi::c_char
+                                                                                    >,
                                                                                     $crate::__pgrx_c_macros::expression::ReadOnly
                                                                                 >,
                                                                                 _
@@ -19878,10 +20441,10 @@ macro_rules! SpGistPageIsMeta {
                                                                                                 _
                                                                                             >(
                                                                                                 $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                                                    $crate::PageHeader,
+                                                                                                    $crate::__pgrx_c_bindings::PageHeader,
                                                                                                     $crate::__pgrx_c_macros::expression::CPointer<
                                                                                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                            $crate::PageHeaderData
+                                                                                                            $crate::__pgrx_c_bindings::PageHeaderData
                                                                                                         >,
                                                                                                         $crate::__pgrx_c_macros::expression::ReadWrite
                                                                                                     >,
@@ -19922,7 +20485,7 @@ macro_rules! SpGistPageIsMeta {
                     ),
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                            $crate::SPGIST_META as i32
+                            $crate::__pgrx_c_bindings::SPGIST_META as i32
                         )
                     )
                 )
@@ -19938,8 +20501,8 @@ macro_rules! SpGistPageIsMeta {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -19970,21 +20533,23 @@ macro_rules! __pgrx_c_args_SpGistPageStoresNulls {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
         $crate::__pgrx_c_args_SpGistPageStoresNulls!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_SpGistPageStoresNulls!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_SpGistPageStoresNulls!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SpGistPageStoresNulls!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SpGistPageStoresNulls!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -19992,7 +20557,9 @@ macro_rules! __pgrx_c_args_SpGistPageStoresNulls {
         $crate::__pgrx_c_args_SpGistPageStoresNulls!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_SpGistPageStoresNulls!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_SpGistPageStoresNulls!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -20014,14 +20581,18 @@ macro_rules! __pgrx_c_args_SpGistPageStoresNulls {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_SpGistPageStoresNulls!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_SpGistPageStoresNulls!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_SpGistPageStoresNulls!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_SpGistPageStoresNulls!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_SpGistPageStoresNulls!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -20048,13 +20619,13 @@ macro_rules! __pgrx_c_args_SpGistPageStoresNulls {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SpGistPageStoresNulls!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SpGistPageStoresNulls!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -20115,10 +20686,10 @@ macro_rules! SpGistPageStoresNulls {
                                             _
                                         >(
                                             $crate::__pgrx_c_macros::expression::cast_as::<
-                                                $crate::SpGistPageOpaque,
+                                                $crate::__pgrx_c_bindings::SpGistPageOpaque,
                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                        $crate::SpGistPageOpaqueData
+                                                        $crate::__pgrx_c_bindings::SpGistPageOpaqueData
                                                     >,
                                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                                 >,
@@ -20135,16 +20706,22 @@ macro_rules! SpGistPageStoresNulls {
                                                                     true,
                                                                     _
                                                                 >(
-                                                                    $crate::__pgrx_c_generated::Inline_b8f78b3d355748e0e88ee8a394364f11(
+                                                                    $crate::__pgrx_c_bindings::PageValidateSpecialPointer(
                                                                         <
                                                                             $crate::__pgrx_c_macros::expression::CPointer<
-                                                                                $crate::__pgrx_c_macros::CChar,
+                                                                                $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                                    $crate::__pgrx_c_macros::CChar,
+                                                                                    ::core::ffi::c_char
+                                                                                >,
                                                                                 $crate::__pgrx_c_macros::expression::ReadOnly
                                                                             > as $crate::__pgrx_c_macros::expression::CType
                                                                         >::into_storage(
                                                                             $crate::__pgrx_c_macros::expression::implicit::<
                                                                                 $crate::__pgrx_c_macros::expression::CPointer<
-                                                                                    $crate::__pgrx_c_macros::CChar,
+                                                                                    $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                                        $crate::__pgrx_c_macros::CChar,
+                                                                                        ::core::ffi::c_char
+                                                                                    >,
                                                                                     $crate::__pgrx_c_macros::expression::ReadOnly
                                                                                 >,
                                                                                 _
@@ -20203,10 +20780,10 @@ macro_rules! SpGistPageStoresNulls {
                                                                                                 _
                                                                                             >(
                                                                                                 $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                                                    $crate::PageHeader,
+                                                                                                    $crate::__pgrx_c_bindings::PageHeader,
                                                                                                     $crate::__pgrx_c_macros::expression::CPointer<
                                                                                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                            $crate::PageHeaderData
+                                                                                                            $crate::__pgrx_c_bindings::PageHeaderData
                                                                                                         >,
                                                                                                         $crate::__pgrx_c_macros::expression::ReadWrite
                                                                                                     >,
@@ -20247,7 +20824,7 @@ macro_rules! SpGistPageStoresNulls {
                     ),
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                            $crate::SPGIST_NULLS as i32
+                            $crate::__pgrx_c_bindings::SPGIST_NULLS as i32
                         )
                     )
                 )
@@ -20296,10 +20873,10 @@ macro_rules! SpGistPageStoresNulls {
                                                         _
                                                     >(
                                                         $crate::__pgrx_c_macros::expression::cast_as::<
-                                                            $crate::SpGistPageOpaque,
+                                                            $crate::__pgrx_c_bindings::SpGistPageOpaque,
                                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                                    $crate::SpGistPageOpaqueData
+                                                                    $crate::__pgrx_c_bindings::SpGistPageOpaqueData
                                                                 >,
                                                                 $crate::__pgrx_c_macros::expression::ReadWrite
                                                             >,
@@ -20316,16 +20893,22 @@ macro_rules! SpGistPageStoresNulls {
                                                                                 true,
                                                                                 _
                                                                             >(
-                                                                                $crate::__pgrx_c_generated::Inline_b8f78b3d355748e0e88ee8a394364f11(
+                                                                                $crate::__pgrx_c_bindings::PageValidateSpecialPointer(
                                                                                     <
                                                                                         $crate::__pgrx_c_macros::expression::CPointer<
-                                                                                            $crate::__pgrx_c_macros::CChar,
+                                                                                            $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                                                $crate::__pgrx_c_macros::CChar,
+                                                                                                ::core::ffi::c_char
+                                                                                            >,
                                                                                             $crate::__pgrx_c_macros::expression::ReadOnly
                                                                                         > as $crate::__pgrx_c_macros::expression::CType
                                                                                     >::into_storage(
                                                                                         $crate::__pgrx_c_macros::expression::implicit::<
                                                                                             $crate::__pgrx_c_macros::expression::CPointer<
-                                                                                                $crate::__pgrx_c_macros::CChar,
+                                                                                                $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                                                    $crate::__pgrx_c_macros::CChar,
+                                                                                                    ::core::ffi::c_char
+                                                                                                >,
                                                                                                 $crate::__pgrx_c_macros::expression::ReadOnly
                                                                                             >,
                                                                                             _
@@ -20386,10 +20969,10 @@ macro_rules! SpGistPageStoresNulls {
                                                                                                             _
                                                                                                         >(
                                                                                                             $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                                                                $crate::PageHeader,
+                                                                                                                $crate::__pgrx_c_bindings::PageHeader,
                                                                                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                                                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                                        $crate::PageHeaderData
+                                                                                                                        $crate::__pgrx_c_bindings::PageHeaderData
                                                                                                                     >,
                                                                                                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                                                                                                 >,
@@ -20430,7 +21013,7 @@ macro_rules! SpGistPageStoresNulls {
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                        $crate::SPGIST_NULLS as i32
+                                        $crate::__pgrx_c_bindings::SPGIST_NULLS as i32
                                     )
                                 )
                             )
@@ -20464,10 +21047,10 @@ macro_rules! SpGistPageStoresNulls {
                                             _
                                         >(
                                             $crate::__pgrx_c_macros::expression::cast_as::<
-                                                $crate::SpGistPageOpaque,
+                                                $crate::__pgrx_c_bindings::SpGistPageOpaque,
                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                        $crate::SpGistPageOpaqueData
+                                                        $crate::__pgrx_c_bindings::SpGistPageOpaqueData
                                                     >,
                                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                                 >,
@@ -20484,16 +21067,22 @@ macro_rules! SpGistPageStoresNulls {
                                                                     true,
                                                                     _
                                                                 >(
-                                                                    $crate::__pgrx_c_generated::Inline_b8f78b3d355748e0e88ee8a394364f11(
+                                                                    $crate::__pgrx_c_bindings::PageValidateSpecialPointer(
                                                                         <
                                                                             $crate::__pgrx_c_macros::expression::CPointer<
-                                                                                $crate::__pgrx_c_macros::CChar,
+                                                                                $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                                    $crate::__pgrx_c_macros::CChar,
+                                                                                    ::core::ffi::c_char
+                                                                                >,
                                                                                 $crate::__pgrx_c_macros::expression::ReadOnly
                                                                             > as $crate::__pgrx_c_macros::expression::CType
                                                                         >::into_storage(
                                                                             $crate::__pgrx_c_macros::expression::implicit::<
                                                                                 $crate::__pgrx_c_macros::expression::CPointer<
-                                                                                    $crate::__pgrx_c_macros::CChar,
+                                                                                    $crate::__pgrx_c_macros::expression::CIntegerStorage<
+                                                                                        $crate::__pgrx_c_macros::CChar,
+                                                                                        ::core::ffi::c_char
+                                                                                    >,
                                                                                     $crate::__pgrx_c_macros::expression::ReadOnly
                                                                                 >,
                                                                                 _
@@ -20552,10 +21141,10 @@ macro_rules! SpGistPageStoresNulls {
                                                                                                 _
                                                                                             >(
                                                                                                 $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                                                    $crate::PageHeader,
+                                                                                                    $crate::__pgrx_c_bindings::PageHeader,
                                                                                                     $crate::__pgrx_c_macros::expression::CPointer<
                                                                                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                            $crate::PageHeaderData
+                                                                                                            $crate::__pgrx_c_bindings::PageHeaderData
                                                                                                         >,
                                                                                                         $crate::__pgrx_c_macros::expression::ReadWrite
                                                                                                     >,
@@ -20596,7 +21185,7 @@ macro_rules! SpGistPageStoresNulls {
                     ),
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                            $crate::SPGIST_NULLS as i32
+                            $crate::__pgrx_c_bindings::SPGIST_NULLS as i32
                         )
                     )
                 )
@@ -20612,8 +21201,8 @@ macro_rules! SpGistPageStoresNulls {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -20640,22 +21229,34 @@ macro_rules! __pgrx_c_args__SGITDATA {
         $crate::__pgrx_c_args__SGITDATA!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args__SGITDATA!(@p1 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args__SGITDATA!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args__SGITDATA!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args__SGITDATA!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
-        $crate::__pgrx_c_args__SGITDATA!(@p1 $mode [$($done)* (@literal [- $argument]),]; $($rest)*)
+        $crate::__pgrx_c_args__SGITDATA!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+            $($rest)*
+        )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
-        $crate::__pgrx_c_args__SGITDATA!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args__SGITDATA!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $($raw:tt)*) => {
         $crate::__pgrx_c_args__SGITDATA!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args__SGITDATA!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args__SGITDATA!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -20677,13 +21278,20 @@ macro_rules! __pgrx_c_args__SGITDATA {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args__SGITDATA!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args__SGITDATA!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args__SGITDATA!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args__SGITDATA!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
-        $crate::__pgrx_c_args__SGITDATA!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args__SGITDATA!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
         $crate::__pgrx_c_classify!(
@@ -20705,10 +21313,16 @@ macro_rules! __pgrx_c_args__SGITDATA {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
-        $crate::__pgrx_c_args__SGITDATA!(@p1 $mode [$($done)* (@literal [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args__SGITDATA!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+            $($rest)*
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
-        $crate::__pgrx_c_args__SGITDATA!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args__SGITDATA!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p1 $mode:ident [$($done:tt)*];) => {
         $crate::_SGITDATA!(@$mode; $($done)*)
@@ -20797,7 +21411,7 @@ macro_rules! _SGITDATA {
                                                             >(
                                                                 $crate::__pgrx_c_macros::expression::size_of::<
                                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                                        $crate::SpGistInnerTupleData
+                                                                        $crate::__pgrx_c_bindings::SpGistInnerTupleData
                                                                     >>()
                                                             )
                                                         )
@@ -20822,7 +21436,7 @@ macro_rules! _SGITDATA {
                                                                 $crate::__pgrx_c_macros::CValue::<
                                                                     $crate::__pgrx_c_macros::CInt
                                                                 >::new(
-                                                                    $crate::MAXIMUM_ALIGNOF as i32
+                                                                    $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                 )
                                                             )
                                                         ),
@@ -20870,7 +21484,7 @@ macro_rules! _SGITDATA {
                                                                         $crate::__pgrx_c_macros::CValue::<
                                                                             $crate::__pgrx_c_macros::CInt
                                                                         >::new(
-                                                                            $crate::MAXIMUM_ALIGNOF as i32
+                                                                            $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                         )
                                                                     )
                                                                 ),
@@ -20977,7 +21591,7 @@ macro_rules! _SGITDATA {
                                                                         >(
                                                                             $crate::__pgrx_c_macros::expression::size_of::<
                                                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                    $crate::SpGistInnerTupleData
+                                                                                    $crate::__pgrx_c_bindings::SpGistInnerTupleData
                                                                                 >>()
                                                                         )
                                                                     )
@@ -21002,7 +21616,7 @@ macro_rules! _SGITDATA {
                                                                             $crate::__pgrx_c_macros::CValue::<
                                                                                 $crate::__pgrx_c_macros::CInt
                                                                             >::new(
-                                                                                $crate::MAXIMUM_ALIGNOF as i32
+                                                                                $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                             )
                                                                         )
                                                                     ),
@@ -21053,7 +21667,7 @@ macro_rules! _SGITDATA {
                                                                                     $crate::__pgrx_c_macros::CValue::<
                                                                                         $crate::__pgrx_c_macros::CInt
                                                                                     >::new(
-                                                                                        $crate::MAXIMUM_ALIGNOF as i32
+                                                                                        $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                                     )
                                                                                 )
                                                                             ),
@@ -21137,7 +21751,7 @@ macro_rules! _SGITDATA {
                                                             >(
                                                                 $crate::__pgrx_c_macros::expression::size_of::<
                                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                                        $crate::SpGistInnerTupleData
+                                                                        $crate::__pgrx_c_bindings::SpGistInnerTupleData
                                                                     >>()
                                                             )
                                                         )
@@ -21162,7 +21776,7 @@ macro_rules! _SGITDATA {
                                                                 $crate::__pgrx_c_macros::CValue::<
                                                                     $crate::__pgrx_c_macros::CInt
                                                                 >::new(
-                                                                    $crate::MAXIMUM_ALIGNOF as i32
+                                                                    $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                 )
                                                             )
                                                         ),
@@ -21210,7 +21824,7 @@ macro_rules! _SGITDATA {
                                                                         $crate::__pgrx_c_macros::CValue::<
                                                                             $crate::__pgrx_c_macros::CInt
                                                                         >::new(
-                                                                            $crate::MAXIMUM_ALIGNOF as i32
+                                                                            $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                         )
                                                                     )
                                                                 ),

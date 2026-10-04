@@ -228,7 +228,18 @@ fn adapter(
     let mut hash = Sha256::new();
     hash.update(profile_hash);
     hash.update(name);
-    hash.update(serde_json::to_vec(function).map_err(|error| error.to_string())?);
+    // Input fingerprints already identify the original definition once per
+    // profile. Adapter identity needs its prototype and linkage, not another
+    // serialized copy of the retained function body for every demand.
+    hash.update(
+        serde_json::to_vec(&(
+            &function.signature,
+            &function.linkage,
+            function.is_static,
+            function.is_inline,
+        ))
+        .map_err(|error| error.to_string())?,
+    );
     hash.update(serde_json::to_vec(&parameter_storage).map_err(|error| error.to_string())?);
     hash.update(serde_json::to_vec(&result_storage).map_err(|error| error.to_string())?);
     let hash = hash.finalize();
@@ -414,15 +425,9 @@ fn abi_storage(
             .join(" ");
         if c_identifier(&spelling) {
             let path = bindings
-                .types
-                .get(&spelling)
+                .type_alias(&spelling)
                 .map_or_else(|| vec![spelling.clone()], |alias| alias.path.clone());
-            let key = path
-                .iter()
-                .map(|part| part.strip_prefix("r#").unwrap_or(part))
-                .collect::<Vec<_>>()
-                .join("::");
-            if bindings.integer_storage.get(&key) == Some(&kind) {
+            if bindings.integer_kind(&path) == Some(kind) {
                 let declared = declarations.types.get(&spelling).ok_or(
                     "registered inline integer storage has no compiler typedef declaration",
                 )?;

@@ -5,8 +5,8 @@ This code is generated for documentation purposes, so that it is easy to referen
 // C macros from locktag.h.
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -37,13 +37,13 @@ macro_rules! __pgrx_c_args_SET_LOCKTAG_ADVISORY {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_LOCKTAG_ADVISORY!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_LOCKTAG_ADVISORY!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -52,7 +52,7 @@ macro_rules! __pgrx_c_args_SET_LOCKTAG_ADVISORY {
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_LOCKTAG_ADVISORY!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -79,25 +79,25 @@ macro_rules! __pgrx_c_args_SET_LOCKTAG_ADVISORY {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_LOCKTAG_ADVISORY!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_LOCKTAG_ADVISORY!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_LOCKTAG_ADVISORY!(
-            @p2 $mode [$($done)* (@literal [- $argument]),];
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_LOCKTAG_ADVISORY!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -106,7 +106,7 @@ macro_rules! __pgrx_c_args_SET_LOCKTAG_ADVISORY {
     };
     (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_LOCKTAG_ADVISORY!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -133,25 +133,25 @@ macro_rules! __pgrx_c_args_SET_LOCKTAG_ADVISORY {
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_LOCKTAG_ADVISORY!(
-            @p2 $mode [$($done)* (@literal [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_LOCKTAG_ADVISORY!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
     (@p2 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_LOCKTAG_ADVISORY!(
-            @p3 $mode [$($done)* (@literal [- $argument]),];
+            @p3 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative2 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_LOCKTAG_ADVISORY!(
-            @p3 $mode [$($done)* (@native [$argument]),];
+            @p3 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -160,7 +160,7 @@ macro_rules! __pgrx_c_args_SET_LOCKTAG_ADVISORY {
     };
     (@p2 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_LOCKTAG_ADVISORY!(
-            @p3 $mode [$($done)* (@native [$argument]),];
+            @p3 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -187,25 +187,25 @@ macro_rules! __pgrx_c_args_SET_LOCKTAG_ADVISORY {
     };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_LOCKTAG_ADVISORY!(
-            @p3 $mode [$($done)* (@literal [$argument]),];
+            @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p2 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_LOCKTAG_ADVISORY!(
-            @p3 $mode [$($done)* (@native [$argument]),];
+            @p3 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
     (@p3 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_LOCKTAG_ADVISORY!(
-            @p4 $mode [$($done)* (@literal [- $argument]),];
+            @p4 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative3 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_LOCKTAG_ADVISORY!(
-            @p4 $mode [$($done)* (@native [$argument]),];
+            @p4 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -214,7 +214,7 @@ macro_rules! __pgrx_c_args_SET_LOCKTAG_ADVISORY {
     };
     (@p3 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_LOCKTAG_ADVISORY!(
-            @p4 $mode [$($done)* (@native [$argument]),];
+            @p4 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -241,33 +241,35 @@ macro_rules! __pgrx_c_args_SET_LOCKTAG_ADVISORY {
     };
     (@p3 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_LOCKTAG_ADVISORY!(
-            @p4 $mode [$($done)* (@literal [$argument]),];
+            @p4 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p3 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_LOCKTAG_ADVISORY!(
-            @p4 $mode [$($done)* (@native [$argument]),];
+            @p4 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
     (@p4 $mode:ident [$($done:tt)*]; - $argument:literal) => {
         $crate::__pgrx_c_args_SET_LOCKTAG_ADVISORY!(
-            @p5 $mode [$($done)* (@literal [- $argument]),];
+            @p5 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
         )
     };
     (@negative4 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_SET_LOCKTAG_ADVISORY!(@p5 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_SET_LOCKTAG_ADVISORY!(
+            @p5 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p4 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_LOCKTAG_ADVISORY!(
-            @p5 $mode [$($done)* (@literal [- $argument]),];
+            @p5 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative4 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_LOCKTAG_ADVISORY!(
-            @p5 $mode [$($done)* (@native [$argument]),];
+            @p5 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -275,7 +277,9 @@ macro_rules! __pgrx_c_args_SET_LOCKTAG_ADVISORY {
         $crate::__pgrx_c_args_SET_LOCKTAG_ADVISORY!(@negative4 $mode [$($done)*]; - $($raw)*)
     };
     (@p4 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_SET_LOCKTAG_ADVISORY!(@p5 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_SET_LOCKTAG_ADVISORY!(
+            @p5 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p4 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -297,14 +301,18 @@ macro_rules! __pgrx_c_args_SET_LOCKTAG_ADVISORY {
         )
     };
     (@p4 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_SET_LOCKTAG_ADVISORY!(@p5 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_SET_LOCKTAG_ADVISORY!(
+            @p5 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p4 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_SET_LOCKTAG_ADVISORY!(@p5 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_SET_LOCKTAG_ADVISORY!(
+            @p5 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p4 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_LOCKTAG_ADVISORY!(
-            @p5 $mode [$($done)* (@native [$argument]),];
+            @p5 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -331,13 +339,13 @@ macro_rules! __pgrx_c_args_SET_LOCKTAG_ADVISORY {
     };
     (@p4 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_LOCKTAG_ADVISORY!(
-            @p5 $mode [$($done)* (@literal [$argument]),];
+            @p5 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p4 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_LOCKTAG_ADVISORY!(
-            @p5 $mode [$($done)* (@native [$argument]),];
+            @p5 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -545,7 +553,9 @@ macro_rules! SET_LOCKTAG_ADVISORY {
                                         >(
                                             $crate::__pgrx_c_macros::CValue::<
                                                 $crate::__pgrx_c_macros::CInt
-                                            >::new($crate::LockTagType::LOCKTAG_ADVISORY as i32)
+                                            >::new(
+                                                $crate::__pgrx_c_bindings::LockTagType::LOCKTAG_ADVISORY as i32
+                                            )
                                         )
                                     )
                                 )
@@ -561,7 +571,7 @@ macro_rules! SET_LOCKTAG_ADVISORY {
                             >(($crate::__pgrx_c_operand!(@place; $locktag))),
                             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                 $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                    $crate::USER_LOCKMETHOD as i32
+                                    $crate::__pgrx_c_bindings::USER_LOCKMETHOD as i32
                                 )
                             )
                         )
@@ -779,7 +789,7 @@ macro_rules! SET_LOCKTAG_ADVISORY {
                                                         $crate::__pgrx_c_macros::CValue::<
                                                             $crate::__pgrx_c_macros::CInt
                                                         >::new(
-                                                            $crate::LockTagType::LOCKTAG_ADVISORY as i32
+                                                            $crate::__pgrx_c_bindings::LockTagType::LOCKTAG_ADVISORY as i32
                                                         )
                                                     )
                                                 )
@@ -800,7 +810,9 @@ macro_rules! SET_LOCKTAG_ADVISORY {
                                         >(
                                             $crate::__pgrx_c_macros::CValue::<
                                                 $crate::__pgrx_c_macros::CInt
-                                            >::new($crate::USER_LOCKMETHOD as i32)
+                                            >::new(
+                                                $crate::__pgrx_c_bindings::USER_LOCKMETHOD as i32
+                                            )
                                         )
                                     )
                                 )
@@ -982,7 +994,9 @@ macro_rules! SET_LOCKTAG_ADVISORY {
                                         >(
                                             $crate::__pgrx_c_macros::CValue::<
                                                 $crate::__pgrx_c_macros::CInt
-                                            >::new($crate::LockTagType::LOCKTAG_ADVISORY as i32)
+                                            >::new(
+                                                $crate::__pgrx_c_bindings::LockTagType::LOCKTAG_ADVISORY as i32
+                                            )
                                         )
                                     )
                                 )
@@ -998,7 +1012,7 @@ macro_rules! SET_LOCKTAG_ADVISORY {
                             >(($crate::__pgrx_c_operand!(@place; $locktag))),
                             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                 $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                    $crate::USER_LOCKMETHOD as i32
+                                    $crate::__pgrx_c_bindings::USER_LOCKMETHOD as i32
                                 )
                             )
                         )
@@ -1016,8 +1030,8 @@ macro_rules! SET_LOCKTAG_ADVISORY {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -1048,13 +1062,13 @@ macro_rules! __pgrx_c_args_SET_LOCKTAG_APPLY_TRANSACTION {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_LOCKTAG_APPLY_TRANSACTION!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_LOCKTAG_APPLY_TRANSACTION!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -1066,7 +1080,7 @@ macro_rules! __pgrx_c_args_SET_LOCKTAG_APPLY_TRANSACTION {
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_LOCKTAG_APPLY_TRANSACTION!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -1093,25 +1107,25 @@ macro_rules! __pgrx_c_args_SET_LOCKTAG_APPLY_TRANSACTION {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_LOCKTAG_APPLY_TRANSACTION!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_LOCKTAG_APPLY_TRANSACTION!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_LOCKTAG_APPLY_TRANSACTION!(
-            @p2 $mode [$($done)* (@literal [- $argument]),];
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_LOCKTAG_APPLY_TRANSACTION!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -1123,7 +1137,7 @@ macro_rules! __pgrx_c_args_SET_LOCKTAG_APPLY_TRANSACTION {
     };
     (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_LOCKTAG_APPLY_TRANSACTION!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -1150,25 +1164,25 @@ macro_rules! __pgrx_c_args_SET_LOCKTAG_APPLY_TRANSACTION {
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_LOCKTAG_APPLY_TRANSACTION!(
-            @p2 $mode [$($done)* (@literal [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_LOCKTAG_APPLY_TRANSACTION!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
     (@p2 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_LOCKTAG_APPLY_TRANSACTION!(
-            @p3 $mode [$($done)* (@literal [- $argument]),];
+            @p3 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative2 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_LOCKTAG_APPLY_TRANSACTION!(
-            @p3 $mode [$($done)* (@native [$argument]),];
+            @p3 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -1180,7 +1194,7 @@ macro_rules! __pgrx_c_args_SET_LOCKTAG_APPLY_TRANSACTION {
     };
     (@p2 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_LOCKTAG_APPLY_TRANSACTION!(
-            @p3 $mode [$($done)* (@native [$argument]),];
+            @p3 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -1207,25 +1221,25 @@ macro_rules! __pgrx_c_args_SET_LOCKTAG_APPLY_TRANSACTION {
     };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_LOCKTAG_APPLY_TRANSACTION!(
-            @p3 $mode [$($done)* (@literal [$argument]),];
+            @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p2 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_LOCKTAG_APPLY_TRANSACTION!(
-            @p3 $mode [$($done)* (@native [$argument]),];
+            @p3 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
     (@p3 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_LOCKTAG_APPLY_TRANSACTION!(
-            @p4 $mode [$($done)* (@literal [- $argument]),];
+            @p4 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative3 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_LOCKTAG_APPLY_TRANSACTION!(
-            @p4 $mode [$($done)* (@native [$argument]),];
+            @p4 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -1237,7 +1251,7 @@ macro_rules! __pgrx_c_args_SET_LOCKTAG_APPLY_TRANSACTION {
     };
     (@p3 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_LOCKTAG_APPLY_TRANSACTION!(
-            @p4 $mode [$($done)* (@native [$argument]),];
+            @p4 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -1264,35 +1278,35 @@ macro_rules! __pgrx_c_args_SET_LOCKTAG_APPLY_TRANSACTION {
     };
     (@p3 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_LOCKTAG_APPLY_TRANSACTION!(
-            @p4 $mode [$($done)* (@literal [$argument]),];
+            @p4 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p3 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_LOCKTAG_APPLY_TRANSACTION!(
-            @p4 $mode [$($done)* (@native [$argument]),];
+            @p4 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
     (@p4 $mode:ident [$($done:tt)*]; - $argument:literal) => {
         $crate::__pgrx_c_args_SET_LOCKTAG_APPLY_TRANSACTION!(
-            @p5 $mode [$($done)* (@literal [- $argument]),];
+            @p5 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
         )
     };
     (@negative4 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_SET_LOCKTAG_APPLY_TRANSACTION!(
-            @p5 $mode [$($done)* (@native [$argument]),];
+            @p5 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p4 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_LOCKTAG_APPLY_TRANSACTION!(
-            @p5 $mode [$($done)* (@literal [- $argument]),];
+            @p5 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative4 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_LOCKTAG_APPLY_TRANSACTION!(
-            @p5 $mode [$($done)* (@native [$argument]),];
+            @p5 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -1304,7 +1318,7 @@ macro_rules! __pgrx_c_args_SET_LOCKTAG_APPLY_TRANSACTION {
     };
     (@p4 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
         $crate::__pgrx_c_args_SET_LOCKTAG_APPLY_TRANSACTION!(
-            @p5 $mode [$($done)* (@native [$argument]),];
+            @p5 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p4 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
@@ -1330,17 +1344,17 @@ macro_rules! __pgrx_c_args_SET_LOCKTAG_APPLY_TRANSACTION {
     };
     (@p4 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_SET_LOCKTAG_APPLY_TRANSACTION!(
-            @p5 $mode [$($done)* (@literal [$argument]),];
+            @p5 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
         )
     };
     (@p4 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_SET_LOCKTAG_APPLY_TRANSACTION!(
-            @p5 $mode [$($done)* (@native [$argument]),];
+            @p5 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p4 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_LOCKTAG_APPLY_TRANSACTION!(
-            @p5 $mode [$($done)* (@native [$argument]),];
+            @p5 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -1367,13 +1381,13 @@ macro_rules! __pgrx_c_args_SET_LOCKTAG_APPLY_TRANSACTION {
     };
     (@p4 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_LOCKTAG_APPLY_TRANSACTION!(
-            @p5 $mode [$($done)* (@literal [$argument]),];
+            @p5 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p4 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_LOCKTAG_APPLY_TRANSACTION!(
-            @p5 $mode [$($done)* (@native [$argument]),];
+            @p5 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -1592,7 +1606,7 @@ macro_rules! SET_LOCKTAG_APPLY_TRANSACTION {
                                             $crate::__pgrx_c_macros::CValue::<
                                                 $crate::__pgrx_c_macros::CInt
                                             >::new(
-                                                $crate::LockTagType::LOCKTAG_APPLY_TRANSACTION as i32
+                                                $crate::__pgrx_c_bindings::LockTagType::LOCKTAG_APPLY_TRANSACTION as i32
                                             )
                                         )
                                     )
@@ -1609,7 +1623,7 @@ macro_rules! SET_LOCKTAG_APPLY_TRANSACTION {
                             >(($crate::__pgrx_c_operand!(@place; $locktag))),
                             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                 $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                    $crate::DEFAULT_LOCKMETHOD as i32
+                                    $crate::__pgrx_c_bindings::DEFAULT_LOCKMETHOD as i32
                                 )
                             )
                         )
@@ -1836,7 +1850,7 @@ macro_rules! SET_LOCKTAG_APPLY_TRANSACTION {
                                                         $crate::__pgrx_c_macros::CValue::<
                                                             $crate::__pgrx_c_macros::CInt
                                                         >::new(
-                                                            $crate::LockTagType::LOCKTAG_APPLY_TRANSACTION as i32
+                                                            $crate::__pgrx_c_bindings::LockTagType::LOCKTAG_APPLY_TRANSACTION as i32
                                                         )
                                                     )
                                                 )
@@ -1857,7 +1871,9 @@ macro_rules! SET_LOCKTAG_APPLY_TRANSACTION {
                                         >(
                                             $crate::__pgrx_c_macros::CValue::<
                                                 $crate::__pgrx_c_macros::CInt
-                                            >::new($crate::DEFAULT_LOCKMETHOD as i32)
+                                            >::new(
+                                                $crate::__pgrx_c_bindings::DEFAULT_LOCKMETHOD as i32
+                                            )
                                         )
                                     )
                                 )
@@ -2040,7 +2056,7 @@ macro_rules! SET_LOCKTAG_APPLY_TRANSACTION {
                                             $crate::__pgrx_c_macros::CValue::<
                                                 $crate::__pgrx_c_macros::CInt
                                             >::new(
-                                                $crate::LockTagType::LOCKTAG_APPLY_TRANSACTION as i32
+                                                $crate::__pgrx_c_bindings::LockTagType::LOCKTAG_APPLY_TRANSACTION as i32
                                             )
                                         )
                                     )
@@ -2057,7 +2073,7 @@ macro_rules! SET_LOCKTAG_APPLY_TRANSACTION {
                             >(($crate::__pgrx_c_operand!(@place; $locktag))),
                             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                 $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                    $crate::DEFAULT_LOCKMETHOD as i32
+                                    $crate::__pgrx_c_bindings::DEFAULT_LOCKMETHOD as i32
                                 )
                             )
                         )
@@ -2081,8 +2097,8 @@ macro_rules! SET_LOCKTAG_APPLY_TRANSACTION {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -2113,13 +2129,13 @@ macro_rules! __pgrx_c_args_SET_LOCKTAG_DATABASE_FROZEN_IDS {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_LOCKTAG_DATABASE_FROZEN_IDS!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_LOCKTAG_DATABASE_FROZEN_IDS!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -2131,7 +2147,7 @@ macro_rules! __pgrx_c_args_SET_LOCKTAG_DATABASE_FROZEN_IDS {
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_LOCKTAG_DATABASE_FROZEN_IDS!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -2158,35 +2174,35 @@ macro_rules! __pgrx_c_args_SET_LOCKTAG_DATABASE_FROZEN_IDS {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_LOCKTAG_DATABASE_FROZEN_IDS!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_LOCKTAG_DATABASE_FROZEN_IDS!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $argument:literal) => {
         $crate::__pgrx_c_args_SET_LOCKTAG_DATABASE_FROZEN_IDS!(
-            @p2 $mode [$($done)* (@literal [- $argument]),];
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
         )
     };
     (@negative1 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_SET_LOCKTAG_DATABASE_FROZEN_IDS!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_LOCKTAG_DATABASE_FROZEN_IDS!(
-            @p2 $mode [$($done)* (@literal [- $argument]),];
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_LOCKTAG_DATABASE_FROZEN_IDS!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -2198,7 +2214,7 @@ macro_rules! __pgrx_c_args_SET_LOCKTAG_DATABASE_FROZEN_IDS {
     };
     (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
         $crate::__pgrx_c_args_SET_LOCKTAG_DATABASE_FROZEN_IDS!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
@@ -2224,17 +2240,17 @@ macro_rules! __pgrx_c_args_SET_LOCKTAG_DATABASE_FROZEN_IDS {
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_SET_LOCKTAG_DATABASE_FROZEN_IDS!(
-            @p2 $mode [$($done)* (@literal [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_SET_LOCKTAG_DATABASE_FROZEN_IDS!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_LOCKTAG_DATABASE_FROZEN_IDS!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -2261,13 +2277,13 @@ macro_rules! __pgrx_c_args_SET_LOCKTAG_DATABASE_FROZEN_IDS {
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_LOCKTAG_DATABASE_FROZEN_IDS!(
-            @p2 $mode [$($done)* (@literal [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_LOCKTAG_DATABASE_FROZEN_IDS!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -2471,7 +2487,7 @@ macro_rules! SET_LOCKTAG_DATABASE_FROZEN_IDS {
                                             $crate::__pgrx_c_macros::CValue::<
                                                 $crate::__pgrx_c_macros::CInt
                                             >::new(
-                                                $crate::LockTagType::LOCKTAG_DATABASE_FROZEN_IDS as i32
+                                                $crate::__pgrx_c_bindings::LockTagType::LOCKTAG_DATABASE_FROZEN_IDS as i32
                                             )
                                         )
                                     )
@@ -2488,7 +2504,7 @@ macro_rules! SET_LOCKTAG_DATABASE_FROZEN_IDS {
                             >(($crate::__pgrx_c_operand!(@place; $locktag))),
                             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                 $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                    $crate::DEFAULT_LOCKMETHOD as i32
+                                    $crate::__pgrx_c_bindings::DEFAULT_LOCKMETHOD as i32
                                 )
                             )
                         )
@@ -2707,7 +2723,7 @@ macro_rules! SET_LOCKTAG_DATABASE_FROZEN_IDS {
                                                         $crate::__pgrx_c_macros::CValue::<
                                                             $crate::__pgrx_c_macros::CInt
                                                         >::new(
-                                                            $crate::LockTagType::LOCKTAG_DATABASE_FROZEN_IDS as i32
+                                                            $crate::__pgrx_c_bindings::LockTagType::LOCKTAG_DATABASE_FROZEN_IDS as i32
                                                         )
                                                     )
                                                 )
@@ -2728,7 +2744,9 @@ macro_rules! SET_LOCKTAG_DATABASE_FROZEN_IDS {
                                         >(
                                             $crate::__pgrx_c_macros::CValue::<
                                                 $crate::__pgrx_c_macros::CInt
-                                            >::new($crate::DEFAULT_LOCKMETHOD as i32)
+                                            >::new(
+                                                $crate::__pgrx_c_bindings::DEFAULT_LOCKMETHOD as i32
+                                            )
                                         )
                                     )
                                 )
@@ -2909,7 +2927,7 @@ macro_rules! SET_LOCKTAG_DATABASE_FROZEN_IDS {
                                             $crate::__pgrx_c_macros::CValue::<
                                                 $crate::__pgrx_c_macros::CInt
                                             >::new(
-                                                $crate::LockTagType::LOCKTAG_DATABASE_FROZEN_IDS as i32
+                                                $crate::__pgrx_c_bindings::LockTagType::LOCKTAG_DATABASE_FROZEN_IDS as i32
                                             )
                                         )
                                     )
@@ -2926,7 +2944,7 @@ macro_rules! SET_LOCKTAG_DATABASE_FROZEN_IDS {
                             >(($crate::__pgrx_c_operand!(@place; $locktag))),
                             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                 $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                    $crate::DEFAULT_LOCKMETHOD as i32
+                                    $crate::__pgrx_c_bindings::DEFAULT_LOCKMETHOD as i32
                                 )
                             )
                         )
@@ -2950,8 +2968,8 @@ macro_rules! SET_LOCKTAG_DATABASE_FROZEN_IDS {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -2979,13 +2997,13 @@ macro_rules! __pgrx_c_args_SET_LOCKTAG_OBJECT {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_LOCKTAG_OBJECT!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_LOCKTAG_OBJECT!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -2994,7 +3012,7 @@ macro_rules! __pgrx_c_args_SET_LOCKTAG_OBJECT {
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_LOCKTAG_OBJECT!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -3021,25 +3039,25 @@ macro_rules! __pgrx_c_args_SET_LOCKTAG_OBJECT {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_LOCKTAG_OBJECT!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_LOCKTAG_OBJECT!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_LOCKTAG_OBJECT!(
-            @p2 $mode [$($done)* (@literal [- $argument]),];
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_LOCKTAG_OBJECT!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -3048,7 +3066,7 @@ macro_rules! __pgrx_c_args_SET_LOCKTAG_OBJECT {
     };
     (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_LOCKTAG_OBJECT!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -3075,25 +3093,25 @@ macro_rules! __pgrx_c_args_SET_LOCKTAG_OBJECT {
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_LOCKTAG_OBJECT!(
-            @p2 $mode [$($done)* (@literal [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_LOCKTAG_OBJECT!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
     (@p2 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_LOCKTAG_OBJECT!(
-            @p3 $mode [$($done)* (@literal [- $argument]),];
+            @p3 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative2 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_LOCKTAG_OBJECT!(
-            @p3 $mode [$($done)* (@native [$argument]),];
+            @p3 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -3102,7 +3120,7 @@ macro_rules! __pgrx_c_args_SET_LOCKTAG_OBJECT {
     };
     (@p2 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_LOCKTAG_OBJECT!(
-            @p3 $mode [$($done)* (@native [$argument]),];
+            @p3 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -3129,25 +3147,25 @@ macro_rules! __pgrx_c_args_SET_LOCKTAG_OBJECT {
     };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_LOCKTAG_OBJECT!(
-            @p3 $mode [$($done)* (@literal [$argument]),];
+            @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p2 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_LOCKTAG_OBJECT!(
-            @p3 $mode [$($done)* (@native [$argument]),];
+            @p3 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
     (@p3 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_LOCKTAG_OBJECT!(
-            @p4 $mode [$($done)* (@literal [- $argument]),];
+            @p4 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative3 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_LOCKTAG_OBJECT!(
-            @p4 $mode [$($done)* (@native [$argument]),];
+            @p4 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -3156,7 +3174,7 @@ macro_rules! __pgrx_c_args_SET_LOCKTAG_OBJECT {
     };
     (@p3 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_LOCKTAG_OBJECT!(
-            @p4 $mode [$($done)* (@native [$argument]),];
+            @p4 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -3183,31 +3201,35 @@ macro_rules! __pgrx_c_args_SET_LOCKTAG_OBJECT {
     };
     (@p3 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_LOCKTAG_OBJECT!(
-            @p4 $mode [$($done)* (@literal [$argument]),];
+            @p4 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p3 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_LOCKTAG_OBJECT!(
-            @p4 $mode [$($done)* (@native [$argument]),];
+            @p4 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
     (@p4 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_SET_LOCKTAG_OBJECT!(@p5 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_SET_LOCKTAG_OBJECT!(
+            @p5 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative4 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_SET_LOCKTAG_OBJECT!(@p5 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_SET_LOCKTAG_OBJECT!(
+            @p5 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p4 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_LOCKTAG_OBJECT!(
-            @p5 $mode [$($done)* (@literal [- $argument]),];
+            @p5 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative4 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_LOCKTAG_OBJECT!(
-            @p5 $mode [$($done)* (@native [$argument]),];
+            @p5 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -3215,7 +3237,9 @@ macro_rules! __pgrx_c_args_SET_LOCKTAG_OBJECT {
         $crate::__pgrx_c_args_SET_LOCKTAG_OBJECT!(@negative4 $mode [$($done)*]; - $($raw)*)
     };
     (@p4 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_SET_LOCKTAG_OBJECT!(@p5 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_SET_LOCKTAG_OBJECT!(
+            @p5 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p4 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -3237,14 +3261,18 @@ macro_rules! __pgrx_c_args_SET_LOCKTAG_OBJECT {
         )
     };
     (@p4 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_SET_LOCKTAG_OBJECT!(@p5 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_SET_LOCKTAG_OBJECT!(
+            @p5 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p4 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_SET_LOCKTAG_OBJECT!(@p5 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_SET_LOCKTAG_OBJECT!(
+            @p5 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p4 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_LOCKTAG_OBJECT!(
-            @p5 $mode [$($done)* (@native [$argument]),];
+            @p5 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -3271,13 +3299,13 @@ macro_rules! __pgrx_c_args_SET_LOCKTAG_OBJECT {
     };
     (@p4 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_LOCKTAG_OBJECT!(
-            @p5 $mode [$($done)* (@literal [$argument]),];
+            @p5 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p4 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_LOCKTAG_OBJECT!(
-            @p5 $mode [$($done)* (@native [$argument]),];
+            @p5 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -3499,7 +3527,9 @@ macro_rules! SET_LOCKTAG_OBJECT {
                                         >(
                                             $crate::__pgrx_c_macros::CValue::<
                                                 $crate::__pgrx_c_macros::CInt
-                                            >::new($crate::LockTagType::LOCKTAG_OBJECT as i32)
+                                            >::new(
+                                                $crate::__pgrx_c_bindings::LockTagType::LOCKTAG_OBJECT as i32
+                                            )
                                         )
                                     )
                                 )
@@ -3515,7 +3545,7 @@ macro_rules! SET_LOCKTAG_OBJECT {
                             >(($crate::__pgrx_c_operand!(@place; $locktag))),
                             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                 $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                    $crate::DEFAULT_LOCKMETHOD as i32
+                                    $crate::__pgrx_c_bindings::DEFAULT_LOCKMETHOD as i32
                                 )
                             )
                         )
@@ -3733,7 +3763,7 @@ macro_rules! SET_LOCKTAG_OBJECT {
                                                         $crate::__pgrx_c_macros::CValue::<
                                                             $crate::__pgrx_c_macros::CInt
                                                         >::new(
-                                                            $crate::LockTagType::LOCKTAG_OBJECT as i32
+                                                            $crate::__pgrx_c_bindings::LockTagType::LOCKTAG_OBJECT as i32
                                                         )
                                                     )
                                                 )
@@ -3754,7 +3784,9 @@ macro_rules! SET_LOCKTAG_OBJECT {
                                         >(
                                             $crate::__pgrx_c_macros::CValue::<
                                                 $crate::__pgrx_c_macros::CInt
-                                            >::new($crate::DEFAULT_LOCKMETHOD as i32)
+                                            >::new(
+                                                $crate::__pgrx_c_bindings::DEFAULT_LOCKMETHOD as i32
+                                            )
                                         )
                                     )
                                 )
@@ -3936,7 +3968,9 @@ macro_rules! SET_LOCKTAG_OBJECT {
                                         >(
                                             $crate::__pgrx_c_macros::CValue::<
                                                 $crate::__pgrx_c_macros::CInt
-                                            >::new($crate::LockTagType::LOCKTAG_OBJECT as i32)
+                                            >::new(
+                                                $crate::__pgrx_c_bindings::LockTagType::LOCKTAG_OBJECT as i32
+                                            )
                                         )
                                     )
                                 )
@@ -3952,7 +3986,7 @@ macro_rules! SET_LOCKTAG_OBJECT {
                             >(($crate::__pgrx_c_operand!(@place; $locktag))),
                             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                 $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                    $crate::DEFAULT_LOCKMETHOD as i32
+                                    $crate::__pgrx_c_bindings::DEFAULT_LOCKMETHOD as i32
                                 )
                             )
                         )
@@ -3970,8 +4004,8 @@ macro_rules! SET_LOCKTAG_OBJECT {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -3999,13 +4033,13 @@ macro_rules! __pgrx_c_args_SET_LOCKTAG_PAGE {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_LOCKTAG_PAGE!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_LOCKTAG_PAGE!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -4014,7 +4048,7 @@ macro_rules! __pgrx_c_args_SET_LOCKTAG_PAGE {
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_LOCKTAG_PAGE!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -4041,25 +4075,25 @@ macro_rules! __pgrx_c_args_SET_LOCKTAG_PAGE {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_LOCKTAG_PAGE!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_LOCKTAG_PAGE!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_LOCKTAG_PAGE!(
-            @p2 $mode [$($done)* (@literal [- $argument]),];
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_LOCKTAG_PAGE!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -4068,7 +4102,7 @@ macro_rules! __pgrx_c_args_SET_LOCKTAG_PAGE {
     };
     (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_LOCKTAG_PAGE!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -4095,25 +4129,25 @@ macro_rules! __pgrx_c_args_SET_LOCKTAG_PAGE {
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_LOCKTAG_PAGE!(
-            @p2 $mode [$($done)* (@literal [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_LOCKTAG_PAGE!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
     (@p2 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_LOCKTAG_PAGE!(
-            @p3 $mode [$($done)* (@literal [- $argument]),];
+            @p3 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative2 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_LOCKTAG_PAGE!(
-            @p3 $mode [$($done)* (@native [$argument]),];
+            @p3 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -4122,7 +4156,7 @@ macro_rules! __pgrx_c_args_SET_LOCKTAG_PAGE {
     };
     (@p2 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_LOCKTAG_PAGE!(
-            @p3 $mode [$($done)* (@native [$argument]),];
+            @p3 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -4149,31 +4183,35 @@ macro_rules! __pgrx_c_args_SET_LOCKTAG_PAGE {
     };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_LOCKTAG_PAGE!(
-            @p3 $mode [$($done)* (@literal [$argument]),];
+            @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p2 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_LOCKTAG_PAGE!(
-            @p3 $mode [$($done)* (@native [$argument]),];
+            @p3 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
     (@p3 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_SET_LOCKTAG_PAGE!(@p4 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_SET_LOCKTAG_PAGE!(
+            @p4 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative3 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_SET_LOCKTAG_PAGE!(@p4 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_SET_LOCKTAG_PAGE!(
+            @p4 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p3 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_LOCKTAG_PAGE!(
-            @p4 $mode [$($done)* (@literal [- $argument]),];
+            @p4 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative3 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_LOCKTAG_PAGE!(
-            @p4 $mode [$($done)* (@native [$argument]),];
+            @p4 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -4181,7 +4219,9 @@ macro_rules! __pgrx_c_args_SET_LOCKTAG_PAGE {
         $crate::__pgrx_c_args_SET_LOCKTAG_PAGE!(@negative3 $mode [$($done)*]; - $($raw)*)
     };
     (@p3 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_SET_LOCKTAG_PAGE!(@p4 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_SET_LOCKTAG_PAGE!(
+            @p4 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p3 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -4203,14 +4243,18 @@ macro_rules! __pgrx_c_args_SET_LOCKTAG_PAGE {
         )
     };
     (@p3 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_SET_LOCKTAG_PAGE!(@p4 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_SET_LOCKTAG_PAGE!(
+            @p4 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p3 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_SET_LOCKTAG_PAGE!(@p4 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_SET_LOCKTAG_PAGE!(
+            @p4 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p3 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_LOCKTAG_PAGE!(
-            @p4 $mode [$($done)* (@native [$argument]),];
+            @p4 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -4237,13 +4281,13 @@ macro_rules! __pgrx_c_args_SET_LOCKTAG_PAGE {
     };
     (@p3 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_LOCKTAG_PAGE!(
-            @p4 $mode [$($done)* (@literal [$argument]),];
+            @p4 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p3 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_LOCKTAG_PAGE!(
-            @p4 $mode [$($done)* (@native [$argument]),];
+            @p4 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -4449,7 +4493,9 @@ macro_rules! SET_LOCKTAG_PAGE {
                                         >(
                                             $crate::__pgrx_c_macros::CValue::<
                                                 $crate::__pgrx_c_macros::CInt
-                                            >::new($crate::LockTagType::LOCKTAG_PAGE as i32)
+                                            >::new(
+                                                $crate::__pgrx_c_bindings::LockTagType::LOCKTAG_PAGE as i32
+                                            )
                                         )
                                     )
                                 )
@@ -4465,7 +4511,7 @@ macro_rules! SET_LOCKTAG_PAGE {
                             >(($crate::__pgrx_c_operand!(@place; $locktag))),
                             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                 $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                    $crate::DEFAULT_LOCKMETHOD as i32
+                                    $crate::__pgrx_c_bindings::DEFAULT_LOCKMETHOD as i32
                                 )
                             )
                         )
@@ -4681,7 +4727,7 @@ macro_rules! SET_LOCKTAG_PAGE {
                                                         $crate::__pgrx_c_macros::CValue::<
                                                             $crate::__pgrx_c_macros::CInt
                                                         >::new(
-                                                            $crate::LockTagType::LOCKTAG_PAGE as i32
+                                                            $crate::__pgrx_c_bindings::LockTagType::LOCKTAG_PAGE as i32
                                                         )
                                                     )
                                                 )
@@ -4702,7 +4748,9 @@ macro_rules! SET_LOCKTAG_PAGE {
                                         >(
                                             $crate::__pgrx_c_macros::CValue::<
                                                 $crate::__pgrx_c_macros::CInt
-                                            >::new($crate::DEFAULT_LOCKMETHOD as i32)
+                                            >::new(
+                                                $crate::__pgrx_c_bindings::DEFAULT_LOCKMETHOD as i32
+                                            )
                                         )
                                     )
                                 )
@@ -4883,7 +4931,9 @@ macro_rules! SET_LOCKTAG_PAGE {
                                         >(
                                             $crate::__pgrx_c_macros::CValue::<
                                                 $crate::__pgrx_c_macros::CInt
-                                            >::new($crate::LockTagType::LOCKTAG_PAGE as i32)
+                                            >::new(
+                                                $crate::__pgrx_c_bindings::LockTagType::LOCKTAG_PAGE as i32
+                                            )
                                         )
                                     )
                                 )
@@ -4899,7 +4949,7 @@ macro_rules! SET_LOCKTAG_PAGE {
                             >(($crate::__pgrx_c_operand!(@place; $locktag))),
                             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                 $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                    $crate::DEFAULT_LOCKMETHOD as i32
+                                    $crate::__pgrx_c_bindings::DEFAULT_LOCKMETHOD as i32
                                 )
                             )
                         )
@@ -4917,8 +4967,8 @@ macro_rules! SET_LOCKTAG_PAGE {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -4949,13 +4999,13 @@ macro_rules! __pgrx_c_args_SET_LOCKTAG_RELATION {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_LOCKTAG_RELATION!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_LOCKTAG_RELATION!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -4964,7 +5014,7 @@ macro_rules! __pgrx_c_args_SET_LOCKTAG_RELATION {
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_LOCKTAG_RELATION!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -4991,25 +5041,25 @@ macro_rules! __pgrx_c_args_SET_LOCKTAG_RELATION {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_LOCKTAG_RELATION!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_LOCKTAG_RELATION!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_LOCKTAG_RELATION!(
-            @p2 $mode [$($done)* (@literal [- $argument]),];
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_LOCKTAG_RELATION!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -5018,7 +5068,7 @@ macro_rules! __pgrx_c_args_SET_LOCKTAG_RELATION {
     };
     (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_LOCKTAG_RELATION!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -5045,33 +5095,35 @@ macro_rules! __pgrx_c_args_SET_LOCKTAG_RELATION {
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_LOCKTAG_RELATION!(
-            @p2 $mode [$($done)* (@literal [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_LOCKTAG_RELATION!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
     (@p2 $mode:ident [$($done:tt)*]; - $argument:literal) => {
         $crate::__pgrx_c_args_SET_LOCKTAG_RELATION!(
-            @p3 $mode [$($done)* (@literal [- $argument]),];
+            @p3 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
         )
     };
     (@negative2 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_SET_LOCKTAG_RELATION!(@p3 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_SET_LOCKTAG_RELATION!(
+            @p3 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p2 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_LOCKTAG_RELATION!(
-            @p3 $mode [$($done)* (@literal [- $argument]),];
+            @p3 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative2 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_LOCKTAG_RELATION!(
-            @p3 $mode [$($done)* (@native [$argument]),];
+            @p3 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -5079,7 +5131,9 @@ macro_rules! __pgrx_c_args_SET_LOCKTAG_RELATION {
         $crate::__pgrx_c_args_SET_LOCKTAG_RELATION!(@negative2 $mode [$($done)*]; - $($raw)*)
     };
     (@p2 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_SET_LOCKTAG_RELATION!(@p3 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_SET_LOCKTAG_RELATION!(
+            @p3 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p2 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -5101,14 +5155,18 @@ macro_rules! __pgrx_c_args_SET_LOCKTAG_RELATION {
         )
     };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_SET_LOCKTAG_RELATION!(@p3 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_SET_LOCKTAG_RELATION!(
+            @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p2 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_SET_LOCKTAG_RELATION!(@p3 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_SET_LOCKTAG_RELATION!(
+            @p3 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p2 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_LOCKTAG_RELATION!(
-            @p3 $mode [$($done)* (@native [$argument]),];
+            @p3 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -5135,13 +5193,13 @@ macro_rules! __pgrx_c_args_SET_LOCKTAG_RELATION {
     };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_LOCKTAG_RELATION!(
-            @p3 $mode [$($done)* (@literal [$argument]),];
+            @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p2 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_LOCKTAG_RELATION!(
-            @p3 $mode [$($done)* (@native [$argument]),];
+            @p3 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -5346,7 +5404,9 @@ macro_rules! SET_LOCKTAG_RELATION {
                                             $crate::__pgrx_c_macros::expression::null_constant(
                                                 $crate::__pgrx_c_macros::CValue::<
                                                     $crate::__pgrx_c_macros::CInt
-                                                >::new($crate::LockTagType::LOCKTAG_RELATION as i32)
+                                                >::new(
+                                                    $crate::__pgrx_c_bindings::LockTagType::LOCKTAG_RELATION as i32
+                                                )
                                             )
                                         )
                                     )
@@ -5363,7 +5423,7 @@ macro_rules! SET_LOCKTAG_RELATION {
                             >(($crate::__pgrx_c_operand!(@place; $locktag))),
                             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                 $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                    $crate::DEFAULT_LOCKMETHOD as i32
+                                    $crate::__pgrx_c_bindings::DEFAULT_LOCKMETHOD as i32
                                 )
                             )
                         )
@@ -5576,7 +5636,7 @@ macro_rules! SET_LOCKTAG_RELATION {
                                                             $crate::__pgrx_c_macros::CValue::<
                                                                 $crate::__pgrx_c_macros::CInt
                                                             >::new(
-                                                                $crate::LockTagType::LOCKTAG_RELATION as i32
+                                                                $crate::__pgrx_c_bindings::LockTagType::LOCKTAG_RELATION as i32
                                                             )
                                                         )
                                                     )
@@ -5598,7 +5658,9 @@ macro_rules! SET_LOCKTAG_RELATION {
                                         >(
                                             $crate::__pgrx_c_macros::CValue::<
                                                 $crate::__pgrx_c_macros::CInt
-                                            >::new($crate::DEFAULT_LOCKMETHOD as i32)
+                                            >::new(
+                                                $crate::__pgrx_c_bindings::DEFAULT_LOCKMETHOD as i32
+                                            )
                                         )
                                     )
                                 )
@@ -5779,7 +5841,9 @@ macro_rules! SET_LOCKTAG_RELATION {
                                             $crate::__pgrx_c_macros::expression::null_constant(
                                                 $crate::__pgrx_c_macros::CValue::<
                                                     $crate::__pgrx_c_macros::CInt
-                                                >::new($crate::LockTagType::LOCKTAG_RELATION as i32)
+                                                >::new(
+                                                    $crate::__pgrx_c_bindings::LockTagType::LOCKTAG_RELATION as i32
+                                                )
                                             )
                                         )
                                     )
@@ -5796,7 +5860,7 @@ macro_rules! SET_LOCKTAG_RELATION {
                             >(($crate::__pgrx_c_operand!(@place; $locktag))),
                             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                 $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                    $crate::DEFAULT_LOCKMETHOD as i32
+                                    $crate::__pgrx_c_bindings::DEFAULT_LOCKMETHOD as i32
                                 )
                             )
                         )
@@ -5814,8 +5878,8 @@ macro_rules! SET_LOCKTAG_RELATION {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -5846,13 +5910,13 @@ macro_rules! __pgrx_c_args_SET_LOCKTAG_RELATION_EXTEND {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_LOCKTAG_RELATION_EXTEND!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_LOCKTAG_RELATION_EXTEND!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -5861,7 +5925,7 @@ macro_rules! __pgrx_c_args_SET_LOCKTAG_RELATION_EXTEND {
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_LOCKTAG_RELATION_EXTEND!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -5888,25 +5952,25 @@ macro_rules! __pgrx_c_args_SET_LOCKTAG_RELATION_EXTEND {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_LOCKTAG_RELATION_EXTEND!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_LOCKTAG_RELATION_EXTEND!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_LOCKTAG_RELATION_EXTEND!(
-            @p2 $mode [$($done)* (@literal [- $argument]),];
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_LOCKTAG_RELATION_EXTEND!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -5915,7 +5979,7 @@ macro_rules! __pgrx_c_args_SET_LOCKTAG_RELATION_EXTEND {
     };
     (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_LOCKTAG_RELATION_EXTEND!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -5942,35 +6006,35 @@ macro_rules! __pgrx_c_args_SET_LOCKTAG_RELATION_EXTEND {
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_LOCKTAG_RELATION_EXTEND!(
-            @p2 $mode [$($done)* (@literal [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_LOCKTAG_RELATION_EXTEND!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
     (@p2 $mode:ident [$($done:tt)*]; - $argument:literal) => {
         $crate::__pgrx_c_args_SET_LOCKTAG_RELATION_EXTEND!(
-            @p3 $mode [$($done)* (@literal [- $argument]),];
+            @p3 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
         )
     };
     (@negative2 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_SET_LOCKTAG_RELATION_EXTEND!(
-            @p3 $mode [$($done)* (@native [$argument]),];
+            @p3 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p2 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_LOCKTAG_RELATION_EXTEND!(
-            @p3 $mode [$($done)* (@literal [- $argument]),];
+            @p3 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative2 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_LOCKTAG_RELATION_EXTEND!(
-            @p3 $mode [$($done)* (@native [$argument]),];
+            @p3 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -5979,7 +6043,7 @@ macro_rules! __pgrx_c_args_SET_LOCKTAG_RELATION_EXTEND {
     };
     (@p2 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
         $crate::__pgrx_c_args_SET_LOCKTAG_RELATION_EXTEND!(
-            @p3 $mode [$($done)* (@native [$argument]),];
+            @p3 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p2 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
@@ -6005,17 +6069,17 @@ macro_rules! __pgrx_c_args_SET_LOCKTAG_RELATION_EXTEND {
     };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_SET_LOCKTAG_RELATION_EXTEND!(
-            @p3 $mode [$($done)* (@literal [$argument]),];
+            @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
         )
     };
     (@p2 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_SET_LOCKTAG_RELATION_EXTEND!(
-            @p3 $mode [$($done)* (@native [$argument]),];
+            @p3 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p2 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_LOCKTAG_RELATION_EXTEND!(
-            @p3 $mode [$($done)* (@native [$argument]),];
+            @p3 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -6042,13 +6106,13 @@ macro_rules! __pgrx_c_args_SET_LOCKTAG_RELATION_EXTEND {
     };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_LOCKTAG_RELATION_EXTEND!(
-            @p3 $mode [$($done)* (@literal [$argument]),];
+            @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p2 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_LOCKTAG_RELATION_EXTEND!(
-            @p3 $mode [$($done)* (@native [$argument]),];
+            @p3 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -6256,7 +6320,7 @@ macro_rules! SET_LOCKTAG_RELATION_EXTEND {
                                             $crate::__pgrx_c_macros::CValue::<
                                                 $crate::__pgrx_c_macros::CInt
                                             >::new(
-                                                $crate::LockTagType::LOCKTAG_RELATION_EXTEND as i32
+                                                $crate::__pgrx_c_bindings::LockTagType::LOCKTAG_RELATION_EXTEND as i32
                                             )
                                         )
                                     )
@@ -6273,7 +6337,7 @@ macro_rules! SET_LOCKTAG_RELATION_EXTEND {
                             >(($crate::__pgrx_c_operand!(@place; $locktag))),
                             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                 $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                    $crate::DEFAULT_LOCKMETHOD as i32
+                                    $crate::__pgrx_c_bindings::DEFAULT_LOCKMETHOD as i32
                                 )
                             )
                         )
@@ -6488,7 +6552,7 @@ macro_rules! SET_LOCKTAG_RELATION_EXTEND {
                                                         $crate::__pgrx_c_macros::CValue::<
                                                             $crate::__pgrx_c_macros::CInt
                                                         >::new(
-                                                            $crate::LockTagType::LOCKTAG_RELATION_EXTEND as i32
+                                                            $crate::__pgrx_c_bindings::LockTagType::LOCKTAG_RELATION_EXTEND as i32
                                                         )
                                                     )
                                                 )
@@ -6509,7 +6573,9 @@ macro_rules! SET_LOCKTAG_RELATION_EXTEND {
                                         >(
                                             $crate::__pgrx_c_macros::CValue::<
                                                 $crate::__pgrx_c_macros::CInt
-                                            >::new($crate::DEFAULT_LOCKMETHOD as i32)
+                                            >::new(
+                                                $crate::__pgrx_c_bindings::DEFAULT_LOCKMETHOD as i32
+                                            )
                                         )
                                     )
                                 )
@@ -6690,7 +6756,7 @@ macro_rules! SET_LOCKTAG_RELATION_EXTEND {
                                             $crate::__pgrx_c_macros::CValue::<
                                                 $crate::__pgrx_c_macros::CInt
                                             >::new(
-                                                $crate::LockTagType::LOCKTAG_RELATION_EXTEND as i32
+                                                $crate::__pgrx_c_bindings::LockTagType::LOCKTAG_RELATION_EXTEND as i32
                                             )
                                         )
                                     )
@@ -6707,7 +6773,7 @@ macro_rules! SET_LOCKTAG_RELATION_EXTEND {
                             >(($crate::__pgrx_c_operand!(@place; $locktag))),
                             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                 $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                    $crate::DEFAULT_LOCKMETHOD as i32
+                                    $crate::__pgrx_c_bindings::DEFAULT_LOCKMETHOD as i32
                                 )
                             )
                         )
@@ -6728,8 +6794,8 @@ macro_rules! SET_LOCKTAG_RELATION_EXTEND {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -6760,13 +6826,13 @@ macro_rules! __pgrx_c_args_SET_LOCKTAG_SPECULATIVE_INSERTION {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_LOCKTAG_SPECULATIVE_INSERTION!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_LOCKTAG_SPECULATIVE_INSERTION!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -6778,7 +6844,7 @@ macro_rules! __pgrx_c_args_SET_LOCKTAG_SPECULATIVE_INSERTION {
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_LOCKTAG_SPECULATIVE_INSERTION!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -6805,25 +6871,25 @@ macro_rules! __pgrx_c_args_SET_LOCKTAG_SPECULATIVE_INSERTION {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_LOCKTAG_SPECULATIVE_INSERTION!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_LOCKTAG_SPECULATIVE_INSERTION!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_LOCKTAG_SPECULATIVE_INSERTION!(
-            @p2 $mode [$($done)* (@literal [- $argument]),];
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_LOCKTAG_SPECULATIVE_INSERTION!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -6835,7 +6901,7 @@ macro_rules! __pgrx_c_args_SET_LOCKTAG_SPECULATIVE_INSERTION {
     };
     (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_LOCKTAG_SPECULATIVE_INSERTION!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -6862,35 +6928,35 @@ macro_rules! __pgrx_c_args_SET_LOCKTAG_SPECULATIVE_INSERTION {
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_LOCKTAG_SPECULATIVE_INSERTION!(
-            @p2 $mode [$($done)* (@literal [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_LOCKTAG_SPECULATIVE_INSERTION!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
     (@p2 $mode:ident [$($done:tt)*]; - $argument:literal) => {
         $crate::__pgrx_c_args_SET_LOCKTAG_SPECULATIVE_INSERTION!(
-            @p3 $mode [$($done)* (@literal [- $argument]),];
+            @p3 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
         )
     };
     (@negative2 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_SET_LOCKTAG_SPECULATIVE_INSERTION!(
-            @p3 $mode [$($done)* (@native [$argument]),];
+            @p3 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p2 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_LOCKTAG_SPECULATIVE_INSERTION!(
-            @p3 $mode [$($done)* (@literal [- $argument]),];
+            @p3 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative2 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_LOCKTAG_SPECULATIVE_INSERTION!(
-            @p3 $mode [$($done)* (@native [$argument]),];
+            @p3 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -6902,7 +6968,7 @@ macro_rules! __pgrx_c_args_SET_LOCKTAG_SPECULATIVE_INSERTION {
     };
     (@p2 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
         $crate::__pgrx_c_args_SET_LOCKTAG_SPECULATIVE_INSERTION!(
-            @p3 $mode [$($done)* (@native [$argument]),];
+            @p3 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p2 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
@@ -6928,17 +6994,17 @@ macro_rules! __pgrx_c_args_SET_LOCKTAG_SPECULATIVE_INSERTION {
     };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_SET_LOCKTAG_SPECULATIVE_INSERTION!(
-            @p3 $mode [$($done)* (@literal [$argument]),];
+            @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
         )
     };
     (@p2 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_SET_LOCKTAG_SPECULATIVE_INSERTION!(
-            @p3 $mode [$($done)* (@native [$argument]),];
+            @p3 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p2 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_LOCKTAG_SPECULATIVE_INSERTION!(
-            @p3 $mode [$($done)* (@native [$argument]),];
+            @p3 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -6965,13 +7031,13 @@ macro_rules! __pgrx_c_args_SET_LOCKTAG_SPECULATIVE_INSERTION {
     };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_LOCKTAG_SPECULATIVE_INSERTION!(
-            @p3 $mode [$($done)* (@literal [$argument]),];
+            @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p2 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_LOCKTAG_SPECULATIVE_INSERTION!(
-            @p3 $mode [$($done)* (@native [$argument]),];
+            @p3 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -7179,7 +7245,7 @@ macro_rules! SET_LOCKTAG_SPECULATIVE_INSERTION {
                                             $crate::__pgrx_c_macros::CValue::<
                                                 $crate::__pgrx_c_macros::CInt
                                             >::new(
-                                                $crate::LockTagType::LOCKTAG_SPECULATIVE_TOKEN as i32
+                                                $crate::__pgrx_c_bindings::LockTagType::LOCKTAG_SPECULATIVE_TOKEN as i32
                                             )
                                         )
                                     )
@@ -7196,7 +7262,7 @@ macro_rules! SET_LOCKTAG_SPECULATIVE_INSERTION {
                             >(($crate::__pgrx_c_operand!(@place; $locktag))),
                             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                 $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                    $crate::DEFAULT_LOCKMETHOD as i32
+                                    $crate::__pgrx_c_bindings::DEFAULT_LOCKMETHOD as i32
                                 )
                             )
                         )
@@ -7417,7 +7483,7 @@ macro_rules! SET_LOCKTAG_SPECULATIVE_INSERTION {
                                                         $crate::__pgrx_c_macros::CValue::<
                                                             $crate::__pgrx_c_macros::CInt
                                                         >::new(
-                                                            $crate::LockTagType::LOCKTAG_SPECULATIVE_TOKEN as i32
+                                                            $crate::__pgrx_c_bindings::LockTagType::LOCKTAG_SPECULATIVE_TOKEN as i32
                                                         )
                                                     )
                                                 )
@@ -7438,7 +7504,9 @@ macro_rules! SET_LOCKTAG_SPECULATIVE_INSERTION {
                                         >(
                                             $crate::__pgrx_c_macros::CValue::<
                                                 $crate::__pgrx_c_macros::CInt
-                                            >::new($crate::DEFAULT_LOCKMETHOD as i32)
+                                            >::new(
+                                                $crate::__pgrx_c_bindings::DEFAULT_LOCKMETHOD as i32
+                                            )
                                         )
                                     )
                                 )
@@ -7622,7 +7690,7 @@ macro_rules! SET_LOCKTAG_SPECULATIVE_INSERTION {
                                             $crate::__pgrx_c_macros::CValue::<
                                                 $crate::__pgrx_c_macros::CInt
                                             >::new(
-                                                $crate::LockTagType::LOCKTAG_SPECULATIVE_TOKEN as i32
+                                                $crate::__pgrx_c_bindings::LockTagType::LOCKTAG_SPECULATIVE_TOKEN as i32
                                             )
                                         )
                                     )
@@ -7639,7 +7707,7 @@ macro_rules! SET_LOCKTAG_SPECULATIVE_INSERTION {
                             >(($crate::__pgrx_c_operand!(@place; $locktag))),
                             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                 $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                    $crate::DEFAULT_LOCKMETHOD as i32
+                                    $crate::__pgrx_c_bindings::DEFAULT_LOCKMETHOD as i32
                                 )
                             )
                         )
@@ -7663,8 +7731,8 @@ macro_rules! SET_LOCKTAG_SPECULATIVE_INSERTION {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -7695,13 +7763,13 @@ macro_rules! __pgrx_c_args_SET_LOCKTAG_TRANSACTION {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_LOCKTAG_TRANSACTION!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_LOCKTAG_TRANSACTION!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -7710,7 +7778,7 @@ macro_rules! __pgrx_c_args_SET_LOCKTAG_TRANSACTION {
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_LOCKTAG_TRANSACTION!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -7737,35 +7805,35 @@ macro_rules! __pgrx_c_args_SET_LOCKTAG_TRANSACTION {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_LOCKTAG_TRANSACTION!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_LOCKTAG_TRANSACTION!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $argument:literal) => {
         $crate::__pgrx_c_args_SET_LOCKTAG_TRANSACTION!(
-            @p2 $mode [$($done)* (@literal [- $argument]),];
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
         )
     };
     (@negative1 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_SET_LOCKTAG_TRANSACTION!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_LOCKTAG_TRANSACTION!(
-            @p2 $mode [$($done)* (@literal [- $argument]),];
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_LOCKTAG_TRANSACTION!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -7774,7 +7842,7 @@ macro_rules! __pgrx_c_args_SET_LOCKTAG_TRANSACTION {
     };
     (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
         $crate::__pgrx_c_args_SET_LOCKTAG_TRANSACTION!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
@@ -7800,17 +7868,17 @@ macro_rules! __pgrx_c_args_SET_LOCKTAG_TRANSACTION {
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_SET_LOCKTAG_TRANSACTION!(
-            @p2 $mode [$($done)* (@literal [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_SET_LOCKTAG_TRANSACTION!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_LOCKTAG_TRANSACTION!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -7837,13 +7905,13 @@ macro_rules! __pgrx_c_args_SET_LOCKTAG_TRANSACTION {
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_LOCKTAG_TRANSACTION!(
-            @p2 $mode [$($done)* (@literal [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_LOCKTAG_TRANSACTION!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -8046,7 +8114,9 @@ macro_rules! SET_LOCKTAG_TRANSACTION {
                                         >(
                                             $crate::__pgrx_c_macros::CValue::<
                                                 $crate::__pgrx_c_macros::CInt
-                                            >::new($crate::LockTagType::LOCKTAG_TRANSACTION as i32)
+                                            >::new(
+                                                $crate::__pgrx_c_bindings::LockTagType::LOCKTAG_TRANSACTION as i32
+                                            )
                                         )
                                     )
                                 )
@@ -8062,7 +8132,7 @@ macro_rules! SET_LOCKTAG_TRANSACTION {
                             >(($crate::__pgrx_c_operand!(@place; $locktag))),
                             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                 $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                    $crate::DEFAULT_LOCKMETHOD as i32
+                                    $crate::__pgrx_c_bindings::DEFAULT_LOCKMETHOD as i32
                                 )
                             )
                         )
@@ -8272,7 +8342,7 @@ macro_rules! SET_LOCKTAG_TRANSACTION {
                                                         $crate::__pgrx_c_macros::CValue::<
                                                             $crate::__pgrx_c_macros::CInt
                                                         >::new(
-                                                            $crate::LockTagType::LOCKTAG_TRANSACTION as i32
+                                                            $crate::__pgrx_c_bindings::LockTagType::LOCKTAG_TRANSACTION as i32
                                                         )
                                                     )
                                                 )
@@ -8293,7 +8363,9 @@ macro_rules! SET_LOCKTAG_TRANSACTION {
                                         >(
                                             $crate::__pgrx_c_macros::CValue::<
                                                 $crate::__pgrx_c_macros::CInt
-                                            >::new($crate::DEFAULT_LOCKMETHOD as i32)
+                                            >::new(
+                                                $crate::__pgrx_c_bindings::DEFAULT_LOCKMETHOD as i32
+                                            )
                                         )
                                     )
                                 )
@@ -8470,7 +8542,9 @@ macro_rules! SET_LOCKTAG_TRANSACTION {
                                         >(
                                             $crate::__pgrx_c_macros::CValue::<
                                                 $crate::__pgrx_c_macros::CInt
-                                            >::new($crate::LockTagType::LOCKTAG_TRANSACTION as i32)
+                                            >::new(
+                                                $crate::__pgrx_c_bindings::LockTagType::LOCKTAG_TRANSACTION as i32
+                                            )
                                         )
                                     )
                                 )
@@ -8486,7 +8560,7 @@ macro_rules! SET_LOCKTAG_TRANSACTION {
                             >(($crate::__pgrx_c_operand!(@place; $locktag))),
                             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                 $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                    $crate::DEFAULT_LOCKMETHOD as i32
+                                    $crate::__pgrx_c_bindings::DEFAULT_LOCKMETHOD as i32
                                 )
                             )
                         )
@@ -8504,8 +8578,8 @@ macro_rules! SET_LOCKTAG_TRANSACTION {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -8533,13 +8607,13 @@ macro_rules! __pgrx_c_args_SET_LOCKTAG_TUPLE {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_LOCKTAG_TUPLE!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_LOCKTAG_TUPLE!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -8548,7 +8622,7 @@ macro_rules! __pgrx_c_args_SET_LOCKTAG_TUPLE {
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_LOCKTAG_TUPLE!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -8575,25 +8649,25 @@ macro_rules! __pgrx_c_args_SET_LOCKTAG_TUPLE {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_LOCKTAG_TUPLE!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_LOCKTAG_TUPLE!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_LOCKTAG_TUPLE!(
-            @p2 $mode [$($done)* (@literal [- $argument]),];
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_LOCKTAG_TUPLE!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -8602,7 +8676,7 @@ macro_rules! __pgrx_c_args_SET_LOCKTAG_TUPLE {
     };
     (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_LOCKTAG_TUPLE!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -8629,25 +8703,25 @@ macro_rules! __pgrx_c_args_SET_LOCKTAG_TUPLE {
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_LOCKTAG_TUPLE!(
-            @p2 $mode [$($done)* (@literal [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_LOCKTAG_TUPLE!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
     (@p2 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_LOCKTAG_TUPLE!(
-            @p3 $mode [$($done)* (@literal [- $argument]),];
+            @p3 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative2 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_LOCKTAG_TUPLE!(
-            @p3 $mode [$($done)* (@native [$argument]),];
+            @p3 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -8656,7 +8730,7 @@ macro_rules! __pgrx_c_args_SET_LOCKTAG_TUPLE {
     };
     (@p2 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_LOCKTAG_TUPLE!(
-            @p3 $mode [$($done)* (@native [$argument]),];
+            @p3 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -8683,25 +8757,25 @@ macro_rules! __pgrx_c_args_SET_LOCKTAG_TUPLE {
     };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_LOCKTAG_TUPLE!(
-            @p3 $mode [$($done)* (@literal [$argument]),];
+            @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p2 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_LOCKTAG_TUPLE!(
-            @p3 $mode [$($done)* (@native [$argument]),];
+            @p3 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
     (@p3 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_LOCKTAG_TUPLE!(
-            @p4 $mode [$($done)* (@literal [- $argument]),];
+            @p4 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative3 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_LOCKTAG_TUPLE!(
-            @p4 $mode [$($done)* (@native [$argument]),];
+            @p4 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -8710,7 +8784,7 @@ macro_rules! __pgrx_c_args_SET_LOCKTAG_TUPLE {
     };
     (@p3 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_LOCKTAG_TUPLE!(
-            @p4 $mode [$($done)* (@native [$argument]),];
+            @p4 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -8737,31 +8811,35 @@ macro_rules! __pgrx_c_args_SET_LOCKTAG_TUPLE {
     };
     (@p3 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_LOCKTAG_TUPLE!(
-            @p4 $mode [$($done)* (@literal [$argument]),];
+            @p4 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p3 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_LOCKTAG_TUPLE!(
-            @p4 $mode [$($done)* (@native [$argument]),];
+            @p4 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
     (@p4 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_SET_LOCKTAG_TUPLE!(@p5 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_SET_LOCKTAG_TUPLE!(
+            @p5 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative4 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_SET_LOCKTAG_TUPLE!(@p5 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_SET_LOCKTAG_TUPLE!(
+            @p5 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p4 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_LOCKTAG_TUPLE!(
-            @p5 $mode [$($done)* (@literal [- $argument]),];
+            @p5 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative4 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_LOCKTAG_TUPLE!(
-            @p5 $mode [$($done)* (@native [$argument]),];
+            @p5 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -8769,7 +8847,9 @@ macro_rules! __pgrx_c_args_SET_LOCKTAG_TUPLE {
         $crate::__pgrx_c_args_SET_LOCKTAG_TUPLE!(@negative4 $mode [$($done)*]; - $($raw)*)
     };
     (@p4 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_SET_LOCKTAG_TUPLE!(@p5 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_SET_LOCKTAG_TUPLE!(
+            @p5 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p4 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -8791,14 +8871,18 @@ macro_rules! __pgrx_c_args_SET_LOCKTAG_TUPLE {
         )
     };
     (@p4 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_SET_LOCKTAG_TUPLE!(@p5 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_SET_LOCKTAG_TUPLE!(
+            @p5 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p4 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_SET_LOCKTAG_TUPLE!(@p5 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_SET_LOCKTAG_TUPLE!(
+            @p5 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p4 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_LOCKTAG_TUPLE!(
-            @p5 $mode [$($done)* (@native [$argument]),];
+            @p5 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -8825,13 +8909,13 @@ macro_rules! __pgrx_c_args_SET_LOCKTAG_TUPLE {
     };
     (@p4 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_LOCKTAG_TUPLE!(
-            @p5 $mode [$($done)* (@literal [$argument]),];
+            @p5 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p4 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_LOCKTAG_TUPLE!(
-            @p5 $mode [$($done)* (@native [$argument]),];
+            @p5 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -9046,7 +9130,9 @@ macro_rules! SET_LOCKTAG_TUPLE {
                                         >(
                                             $crate::__pgrx_c_macros::CValue::<
                                                 $crate::__pgrx_c_macros::CInt
-                                            >::new($crate::LockTagType::LOCKTAG_TUPLE as i32)
+                                            >::new(
+                                                $crate::__pgrx_c_bindings::LockTagType::LOCKTAG_TUPLE as i32
+                                            )
                                         )
                                     )
                                 )
@@ -9062,7 +9148,7 @@ macro_rules! SET_LOCKTAG_TUPLE {
                             >(($crate::__pgrx_c_operand!(@place; $locktag))),
                             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                 $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                    $crate::DEFAULT_LOCKMETHOD as i32
+                                    $crate::__pgrx_c_bindings::DEFAULT_LOCKMETHOD as i32
                                 )
                             )
                         )
@@ -9280,7 +9366,7 @@ macro_rules! SET_LOCKTAG_TUPLE {
                                                         $crate::__pgrx_c_macros::CValue::<
                                                             $crate::__pgrx_c_macros::CInt
                                                         >::new(
-                                                            $crate::LockTagType::LOCKTAG_TUPLE as i32
+                                                            $crate::__pgrx_c_bindings::LockTagType::LOCKTAG_TUPLE as i32
                                                         )
                                                     )
                                                 )
@@ -9301,7 +9387,9 @@ macro_rules! SET_LOCKTAG_TUPLE {
                                         >(
                                             $crate::__pgrx_c_macros::CValue::<
                                                 $crate::__pgrx_c_macros::CInt
-                                            >::new($crate::DEFAULT_LOCKMETHOD as i32)
+                                            >::new(
+                                                $crate::__pgrx_c_bindings::DEFAULT_LOCKMETHOD as i32
+                                            )
                                         )
                                     )
                                 )
@@ -9483,7 +9571,9 @@ macro_rules! SET_LOCKTAG_TUPLE {
                                         >(
                                             $crate::__pgrx_c_macros::CValue::<
                                                 $crate::__pgrx_c_macros::CInt
-                                            >::new($crate::LockTagType::LOCKTAG_TUPLE as i32)
+                                            >::new(
+                                                $crate::__pgrx_c_bindings::LockTagType::LOCKTAG_TUPLE as i32
+                                            )
                                         )
                                     )
                                 )
@@ -9499,7 +9589,7 @@ macro_rules! SET_LOCKTAG_TUPLE {
                             >(($crate::__pgrx_c_operand!(@place; $locktag))),
                             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                 $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                    $crate::DEFAULT_LOCKMETHOD as i32
+                                    $crate::__pgrx_c_bindings::DEFAULT_LOCKMETHOD as i32
                                 )
                             )
                         )
@@ -9517,8 +9607,8 @@ macro_rules! SET_LOCKTAG_TUPLE {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -9549,13 +9639,13 @@ macro_rules! __pgrx_c_args_SET_LOCKTAG_VIRTUALTRANSACTION {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_LOCKTAG_VIRTUALTRANSACTION!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_LOCKTAG_VIRTUALTRANSACTION!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -9567,7 +9657,7 @@ macro_rules! __pgrx_c_args_SET_LOCKTAG_VIRTUALTRANSACTION {
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_LOCKTAG_VIRTUALTRANSACTION!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -9594,35 +9684,35 @@ macro_rules! __pgrx_c_args_SET_LOCKTAG_VIRTUALTRANSACTION {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_LOCKTAG_VIRTUALTRANSACTION!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_LOCKTAG_VIRTUALTRANSACTION!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $argument:literal) => {
         $crate::__pgrx_c_args_SET_LOCKTAG_VIRTUALTRANSACTION!(
-            @p2 $mode [$($done)* (@literal [- $argument]),];
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
         )
     };
     (@negative1 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_SET_LOCKTAG_VIRTUALTRANSACTION!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_LOCKTAG_VIRTUALTRANSACTION!(
-            @p2 $mode [$($done)* (@literal [- $argument]),];
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_LOCKTAG_VIRTUALTRANSACTION!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -9634,7 +9724,7 @@ macro_rules! __pgrx_c_args_SET_LOCKTAG_VIRTUALTRANSACTION {
     };
     (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
         $crate::__pgrx_c_args_SET_LOCKTAG_VIRTUALTRANSACTION!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
@@ -9660,17 +9750,17 @@ macro_rules! __pgrx_c_args_SET_LOCKTAG_VIRTUALTRANSACTION {
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_SET_LOCKTAG_VIRTUALTRANSACTION!(
-            @p2 $mode [$($done)* (@literal [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_SET_LOCKTAG_VIRTUALTRANSACTION!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_LOCKTAG_VIRTUALTRANSACTION!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -9697,13 +9787,13 @@ macro_rules! __pgrx_c_args_SET_LOCKTAG_VIRTUALTRANSACTION {
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_LOCKTAG_VIRTUALTRANSACTION!(
-            @p2 $mode [$($done)* (@literal [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SET_LOCKTAG_VIRTUALTRANSACTION!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -9922,7 +10012,7 @@ macro_rules! SET_LOCKTAG_VIRTUALTRANSACTION {
                                             $crate::__pgrx_c_macros::CValue::<
                                                 $crate::__pgrx_c_macros::CInt
                                             >::new(
-                                                $crate::LockTagType::LOCKTAG_VIRTUALTRANSACTION as i32
+                                                $crate::__pgrx_c_bindings::LockTagType::LOCKTAG_VIRTUALTRANSACTION as i32
                                             )
                                         )
                                     )
@@ -9939,7 +10029,7 @@ macro_rules! SET_LOCKTAG_VIRTUALTRANSACTION {
                             >(($crate::__pgrx_c_operand!(@place; $locktag))),
                             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                 $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                    $crate::DEFAULT_LOCKMETHOD as i32
+                                    $crate::__pgrx_c_bindings::DEFAULT_LOCKMETHOD as i32
                                 )
                             )
                         )
@@ -10171,7 +10261,7 @@ macro_rules! SET_LOCKTAG_VIRTUALTRANSACTION {
                                                         $crate::__pgrx_c_macros::CValue::<
                                                             $crate::__pgrx_c_macros::CInt
                                                         >::new(
-                                                            $crate::LockTagType::LOCKTAG_VIRTUALTRANSACTION as i32
+                                                            $crate::__pgrx_c_bindings::LockTagType::LOCKTAG_VIRTUALTRANSACTION as i32
                                                         )
                                                     )
                                                 )
@@ -10192,7 +10282,9 @@ macro_rules! SET_LOCKTAG_VIRTUALTRANSACTION {
                                         >(
                                             $crate::__pgrx_c_macros::CValue::<
                                                 $crate::__pgrx_c_macros::CInt
-                                            >::new($crate::DEFAULT_LOCKMETHOD as i32)
+                                            >::new(
+                                                $crate::__pgrx_c_bindings::DEFAULT_LOCKMETHOD as i32
+                                            )
                                         )
                                     )
                                 )
@@ -10388,7 +10480,7 @@ macro_rules! SET_LOCKTAG_VIRTUALTRANSACTION {
                                             $crate::__pgrx_c_macros::CValue::<
                                                 $crate::__pgrx_c_macros::CInt
                                             >::new(
-                                                $crate::LockTagType::LOCKTAG_VIRTUALTRANSACTION as i32
+                                                $crate::__pgrx_c_bindings::LockTagType::LOCKTAG_VIRTUALTRANSACTION as i32
                                             )
                                         )
                                     )
@@ -10405,7 +10497,7 @@ macro_rules! SET_LOCKTAG_VIRTUALTRANSACTION {
                             >(($crate::__pgrx_c_operand!(@place; $locktag))),
                             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                 $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                    $crate::DEFAULT_LOCKMETHOD as i32
+                                    $crate::__pgrx_c_bindings::DEFAULT_LOCKMETHOD as i32
                                 )
                             )
                         )

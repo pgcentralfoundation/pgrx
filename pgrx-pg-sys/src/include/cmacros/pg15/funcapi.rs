@@ -5,8 +5,8 @@ This code is generated for documentation purposes, so that it is easy to referen
 // C macros from funcapi.h.
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -33,20 +33,24 @@ macro_rules! __pgrx_c_args_HeapTupleGetDatum {
         $crate::__pgrx_c_args_HeapTupleGetDatum!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_HeapTupleGetDatum!(@p1 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_HeapTupleGetDatum!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_HeapTupleGetDatum!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_HeapTupleGetDatum!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleGetDatum!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleGetDatum!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -54,7 +58,9 @@ macro_rules! __pgrx_c_args_HeapTupleGetDatum {
         $crate::__pgrx_c_args_HeapTupleGetDatum!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_HeapTupleGetDatum!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_HeapTupleGetDatum!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -76,14 +82,18 @@ macro_rules! __pgrx_c_args_HeapTupleGetDatum {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_HeapTupleGetDatum!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_HeapTupleGetDatum!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_HeapTupleGetDatum!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_HeapTupleGetDatum!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleGetDatum!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -110,13 +120,13 @@ macro_rules! __pgrx_c_args_HeapTupleGetDatum {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleGetDatum!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_HeapTupleGetDatum!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -164,14 +174,14 @@ macro_rules! HeapTupleGetDatum {
             <
                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
                     $crate::__pgrx_c_macros::CUnsignedLong,
-                    $crate::Datum
+                    $crate::__pgrx_c_bindings::Datum
                 > as $crate::__pgrx_c_macros::expression::CType
             >::from_storage(
-                $crate::HeapTupleHeaderGetDatum(
+                $crate::__pgrx_c_bindings::HeapTupleHeaderGetDatum(
                     <
                         $crate::__pgrx_c_macros::expression::CPointer<
                             $crate::__pgrx_c_macros::expression::CRecord<
-                                $crate::HeapTupleHeaderData
+                                $crate::__pgrx_c_bindings::HeapTupleHeaderData
                             >,
                             $crate::__pgrx_c_macros::expression::ReadWrite
                         > as $crate::__pgrx_c_macros::expression::CType
@@ -179,7 +189,7 @@ macro_rules! HeapTupleGetDatum {
                         $crate::__pgrx_c_macros::expression::implicit::<
                             $crate::__pgrx_c_macros::expression::CPointer<
                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                    $crate::HeapTupleHeaderData
+                                    $crate::__pgrx_c_bindings::HeapTupleHeaderData
                                 >,
                                 $crate::__pgrx_c_macros::expression::ReadWrite
                             >,
@@ -239,14 +249,14 @@ macro_rules! HeapTupleGetDatum {
                             <
                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                     $crate::__pgrx_c_macros::CUnsignedLong,
-                                    $crate::Datum
+                                    $crate::__pgrx_c_bindings::Datum
                                 > as $crate::__pgrx_c_macros::expression::CType
                             >::from_storage(
-                                $crate::HeapTupleHeaderGetDatum(
+                                $crate::__pgrx_c_bindings::HeapTupleHeaderGetDatum(
                                     <
                                         $crate::__pgrx_c_macros::expression::CPointer<
                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                $crate::HeapTupleHeaderData
+                                                $crate::__pgrx_c_bindings::HeapTupleHeaderData
                                             >,
                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                         > as $crate::__pgrx_c_macros::expression::CType
@@ -254,7 +264,7 @@ macro_rules! HeapTupleGetDatum {
                                         $crate::__pgrx_c_macros::expression::implicit::<
                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                    $crate::HeapTupleHeaderData
+                                                    $crate::__pgrx_c_bindings::HeapTupleHeaderData
                                                 >,
                                                 $crate::__pgrx_c_macros::expression::ReadWrite
                                             >,
@@ -308,14 +318,14 @@ macro_rules! HeapTupleGetDatum {
                 <
                     $crate::__pgrx_c_macros::expression::CIntegerStorage<
                         $crate::__pgrx_c_macros::CUnsignedLong,
-                        $crate::Datum
+                        $crate::__pgrx_c_bindings::Datum
                     > as $crate::__pgrx_c_macros::expression::CType
                 >::from_storage(
-                    $crate::HeapTupleHeaderGetDatum(
+                    $crate::__pgrx_c_bindings::HeapTupleHeaderGetDatum(
                         <
                             $crate::__pgrx_c_macros::expression::CPointer<
                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                    $crate::HeapTupleHeaderData
+                                    $crate::__pgrx_c_bindings::HeapTupleHeaderData
                                 >,
                                 $crate::__pgrx_c_macros::expression::ReadWrite
                             > as $crate::__pgrx_c_macros::expression::CType
@@ -323,7 +333,7 @@ macro_rules! HeapTupleGetDatum {
                             $crate::__pgrx_c_macros::expression::implicit::<
                                 $crate::__pgrx_c_macros::expression::CPointer<
                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                        $crate::HeapTupleHeaderData
+                                        $crate::__pgrx_c_bindings::HeapTupleHeaderData
                                     >,
                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                 >,
@@ -368,8 +378,8 @@ macro_rules! HeapTupleGetDatum {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -396,20 +406,24 @@ macro_rules! __pgrx_c_args_SRF_FIRSTCALL_INIT {
         $crate::__pgrx_c_args_SRF_FIRSTCALL_INIT!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_SRF_FIRSTCALL_INIT!(@p1 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_SRF_FIRSTCALL_INIT!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_SRF_FIRSTCALL_INIT!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_SRF_FIRSTCALL_INIT!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SRF_FIRSTCALL_INIT!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SRF_FIRSTCALL_INIT!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -417,7 +431,9 @@ macro_rules! __pgrx_c_args_SRF_FIRSTCALL_INIT {
         $crate::__pgrx_c_args_SRF_FIRSTCALL_INIT!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_SRF_FIRSTCALL_INIT!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_SRF_FIRSTCALL_INIT!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -439,14 +455,18 @@ macro_rules! __pgrx_c_args_SRF_FIRSTCALL_INIT {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_SRF_FIRSTCALL_INIT!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_SRF_FIRSTCALL_INIT!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_SRF_FIRSTCALL_INIT!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_SRF_FIRSTCALL_INIT!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_SRF_FIRSTCALL_INIT!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -473,13 +493,13 @@ macro_rules! __pgrx_c_args_SRF_FIRSTCALL_INIT {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SRF_FIRSTCALL_INIT!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SRF_FIRSTCALL_INIT!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -528,15 +548,17 @@ macro_rules! SRF_FIRSTCALL_INIT {
         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
             <
                 $crate::__pgrx_c_macros::expression::CPointer<
-                    $crate::__pgrx_c_macros::expression::CRecord<$crate::FuncCallContext>,
+                    $crate::__pgrx_c_macros::expression::CRecord<
+                        $crate::__pgrx_c_bindings::FuncCallContext
+                    >,
                     $crate::__pgrx_c_macros::expression::ReadWrite
                 > as $crate::__pgrx_c_macros::expression::CType
             >::from_storage(
-                $crate::init_MultiFuncCall(
+                $crate::__pgrx_c_bindings::init_MultiFuncCall(
                     <
                         $crate::__pgrx_c_macros::expression::CPointer<
                             $crate::__pgrx_c_macros::expression::CRecord<
-                                $crate::FunctionCallInfoBaseData
+                                $crate::__pgrx_c_bindings::FunctionCallInfoBaseData
                             >,
                             $crate::__pgrx_c_macros::expression::ReadWrite
                         > as $crate::__pgrx_c_macros::expression::CType
@@ -544,7 +566,7 @@ macro_rules! SRF_FIRSTCALL_INIT {
                         $crate::__pgrx_c_macros::expression::implicit::<
                             $crate::__pgrx_c_macros::expression::CPointer<
                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                    $crate::FunctionCallInfoBaseData
+                                    $crate::__pgrx_c_bindings::FunctionCallInfoBaseData
                                 >,
                                 $crate::__pgrx_c_macros::expression::ReadWrite
                             >,
@@ -589,16 +611,16 @@ macro_rules! SRF_FIRSTCALL_INIT {
                             <
                                 $crate::__pgrx_c_macros::expression::CPointer<
                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                        $crate::FuncCallContext
+                                        $crate::__pgrx_c_bindings::FuncCallContext
                                     >,
                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                 > as $crate::__pgrx_c_macros::expression::CType
                             >::from_storage(
-                                $crate::init_MultiFuncCall(
+                                $crate::__pgrx_c_bindings::init_MultiFuncCall(
                                     <
                                         $crate::__pgrx_c_macros::expression::CPointer<
                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                $crate::FunctionCallInfoBaseData
+                                                $crate::__pgrx_c_bindings::FunctionCallInfoBaseData
                                             >,
                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                         > as $crate::__pgrx_c_macros::expression::CType
@@ -606,7 +628,7 @@ macro_rules! SRF_FIRSTCALL_INIT {
                                         $crate::__pgrx_c_macros::expression::implicit::<
                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                    $crate::FunctionCallInfoBaseData
+                                                    $crate::__pgrx_c_bindings::FunctionCallInfoBaseData
                                                 >,
                                                 $crate::__pgrx_c_macros::expression::ReadWrite
                                             >,
@@ -637,15 +659,17 @@ macro_rules! SRF_FIRSTCALL_INIT {
             let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 <
                     $crate::__pgrx_c_macros::expression::CPointer<
-                        $crate::__pgrx_c_macros::expression::CRecord<$crate::FuncCallContext>,
+                        $crate::__pgrx_c_macros::expression::CRecord<
+                            $crate::__pgrx_c_bindings::FuncCallContext
+                        >,
                         $crate::__pgrx_c_macros::expression::ReadWrite
                     > as $crate::__pgrx_c_macros::expression::CType
                 >::from_storage(
-                    $crate::init_MultiFuncCall(
+                    $crate::__pgrx_c_bindings::init_MultiFuncCall(
                         <
                             $crate::__pgrx_c_macros::expression::CPointer<
                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                    $crate::FunctionCallInfoBaseData
+                                    $crate::__pgrx_c_bindings::FunctionCallInfoBaseData
                                 >,
                                 $crate::__pgrx_c_macros::expression::ReadWrite
                             > as $crate::__pgrx_c_macros::expression::CType
@@ -653,7 +677,7 @@ macro_rules! SRF_FIRSTCALL_INIT {
                             $crate::__pgrx_c_macros::expression::implicit::<
                                 $crate::__pgrx_c_macros::expression::CPointer<
                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                        $crate::FunctionCallInfoBaseData
+                                        $crate::__pgrx_c_bindings::FunctionCallInfoBaseData
                                     >,
                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                 >,
@@ -678,8 +702,8 @@ macro_rules! SRF_FIRSTCALL_INIT {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -706,20 +730,24 @@ macro_rules! __pgrx_c_args_SRF_IS_FIRSTCALL {
         $crate::__pgrx_c_args_SRF_IS_FIRSTCALL!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_SRF_IS_FIRSTCALL!(@p1 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_SRF_IS_FIRSTCALL!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_SRF_IS_FIRSTCALL!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_SRF_IS_FIRSTCALL!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SRF_IS_FIRSTCALL!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SRF_IS_FIRSTCALL!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -727,7 +755,9 @@ macro_rules! __pgrx_c_args_SRF_IS_FIRSTCALL {
         $crate::__pgrx_c_args_SRF_IS_FIRSTCALL!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_SRF_IS_FIRSTCALL!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_SRF_IS_FIRSTCALL!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -749,14 +779,18 @@ macro_rules! __pgrx_c_args_SRF_IS_FIRSTCALL {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_SRF_IS_FIRSTCALL!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_SRF_IS_FIRSTCALL!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_SRF_IS_FIRSTCALL!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_SRF_IS_FIRSTCALL!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_SRF_IS_FIRSTCALL!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -783,13 +817,13 @@ macro_rules! __pgrx_c_args_SRF_IS_FIRSTCALL {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SRF_IS_FIRSTCALL!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SRF_IS_FIRSTCALL!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -1068,8 +1102,8 @@ macro_rules! SRF_IS_FIRSTCALL {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -1096,20 +1130,24 @@ macro_rules! __pgrx_c_args_SRF_PERCALL_SETUP {
         $crate::__pgrx_c_args_SRF_PERCALL_SETUP!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_SRF_PERCALL_SETUP!(@p1 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_SRF_PERCALL_SETUP!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_SRF_PERCALL_SETUP!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_SRF_PERCALL_SETUP!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SRF_PERCALL_SETUP!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SRF_PERCALL_SETUP!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -1117,7 +1155,9 @@ macro_rules! __pgrx_c_args_SRF_PERCALL_SETUP {
         $crate::__pgrx_c_args_SRF_PERCALL_SETUP!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_SRF_PERCALL_SETUP!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_SRF_PERCALL_SETUP!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -1139,14 +1179,18 @@ macro_rules! __pgrx_c_args_SRF_PERCALL_SETUP {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_SRF_PERCALL_SETUP!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_SRF_PERCALL_SETUP!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_SRF_PERCALL_SETUP!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_SRF_PERCALL_SETUP!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_SRF_PERCALL_SETUP!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -1173,13 +1217,13 @@ macro_rules! __pgrx_c_args_SRF_PERCALL_SETUP {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SRF_PERCALL_SETUP!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SRF_PERCALL_SETUP!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -1228,15 +1272,17 @@ macro_rules! SRF_PERCALL_SETUP {
         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
             <
                 $crate::__pgrx_c_macros::expression::CPointer<
-                    $crate::__pgrx_c_macros::expression::CRecord<$crate::FuncCallContext>,
+                    $crate::__pgrx_c_macros::expression::CRecord<
+                        $crate::__pgrx_c_bindings::FuncCallContext
+                    >,
                     $crate::__pgrx_c_macros::expression::ReadWrite
                 > as $crate::__pgrx_c_macros::expression::CType
             >::from_storage(
-                $crate::per_MultiFuncCall(
+                $crate::__pgrx_c_bindings::per_MultiFuncCall(
                     <
                         $crate::__pgrx_c_macros::expression::CPointer<
                             $crate::__pgrx_c_macros::expression::CRecord<
-                                $crate::FunctionCallInfoBaseData
+                                $crate::__pgrx_c_bindings::FunctionCallInfoBaseData
                             >,
                             $crate::__pgrx_c_macros::expression::ReadWrite
                         > as $crate::__pgrx_c_macros::expression::CType
@@ -1244,7 +1290,7 @@ macro_rules! SRF_PERCALL_SETUP {
                         $crate::__pgrx_c_macros::expression::implicit::<
                             $crate::__pgrx_c_macros::expression::CPointer<
                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                    $crate::FunctionCallInfoBaseData
+                                    $crate::__pgrx_c_bindings::FunctionCallInfoBaseData
                                 >,
                                 $crate::__pgrx_c_macros::expression::ReadWrite
                             >,
@@ -1289,16 +1335,16 @@ macro_rules! SRF_PERCALL_SETUP {
                             <
                                 $crate::__pgrx_c_macros::expression::CPointer<
                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                        $crate::FuncCallContext
+                                        $crate::__pgrx_c_bindings::FuncCallContext
                                     >,
                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                 > as $crate::__pgrx_c_macros::expression::CType
                             >::from_storage(
-                                $crate::per_MultiFuncCall(
+                                $crate::__pgrx_c_bindings::per_MultiFuncCall(
                                     <
                                         $crate::__pgrx_c_macros::expression::CPointer<
                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                $crate::FunctionCallInfoBaseData
+                                                $crate::__pgrx_c_bindings::FunctionCallInfoBaseData
                                             >,
                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                         > as $crate::__pgrx_c_macros::expression::CType
@@ -1306,7 +1352,7 @@ macro_rules! SRF_PERCALL_SETUP {
                                         $crate::__pgrx_c_macros::expression::implicit::<
                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                    $crate::FunctionCallInfoBaseData
+                                                    $crate::__pgrx_c_bindings::FunctionCallInfoBaseData
                                                 >,
                                                 $crate::__pgrx_c_macros::expression::ReadWrite
                                             >,
@@ -1337,15 +1383,17 @@ macro_rules! SRF_PERCALL_SETUP {
             let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 <
                     $crate::__pgrx_c_macros::expression::CPointer<
-                        $crate::__pgrx_c_macros::expression::CRecord<$crate::FuncCallContext>,
+                        $crate::__pgrx_c_macros::expression::CRecord<
+                            $crate::__pgrx_c_bindings::FuncCallContext
+                        >,
                         $crate::__pgrx_c_macros::expression::ReadWrite
                     > as $crate::__pgrx_c_macros::expression::CType
                 >::from_storage(
-                    $crate::per_MultiFuncCall(
+                    $crate::__pgrx_c_bindings::per_MultiFuncCall(
                         <
                             $crate::__pgrx_c_macros::expression::CPointer<
                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                    $crate::FunctionCallInfoBaseData
+                                    $crate::__pgrx_c_bindings::FunctionCallInfoBaseData
                                 >,
                                 $crate::__pgrx_c_macros::expression::ReadWrite
                             > as $crate::__pgrx_c_macros::expression::CType
@@ -1353,7 +1401,7 @@ macro_rules! SRF_PERCALL_SETUP {
                             $crate::__pgrx_c_macros::expression::implicit::<
                                 $crate::__pgrx_c_macros::expression::CPointer<
                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                        $crate::FunctionCallInfoBaseData
+                                        $crate::__pgrx_c_bindings::FunctionCallInfoBaseData
                                     >,
                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                 >,
@@ -1378,8 +1426,8 @@ macro_rules! SRF_PERCALL_SETUP {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -1407,13 +1455,13 @@ macro_rules! __pgrx_c_args_SRF_RETURN_DONE {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SRF_RETURN_DONE!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SRF_RETURN_DONE!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -1422,7 +1470,7 @@ macro_rules! __pgrx_c_args_SRF_RETURN_DONE {
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_SRF_RETURN_DONE!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -1449,31 +1497,35 @@ macro_rules! __pgrx_c_args_SRF_RETURN_DONE {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SRF_RETURN_DONE!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SRF_RETURN_DONE!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_SRF_RETURN_DONE!(@p2 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_SRF_RETURN_DONE!(
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative1 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_SRF_RETURN_DONE!(@p2 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_SRF_RETURN_DONE!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SRF_RETURN_DONE!(
-            @p2 $mode [$($done)* (@literal [- $argument]),];
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SRF_RETURN_DONE!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -1481,7 +1533,9 @@ macro_rules! __pgrx_c_args_SRF_RETURN_DONE {
         $crate::__pgrx_c_args_SRF_RETURN_DONE!(@negative1 $mode [$($done)*]; - $($raw)*)
     };
     (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_SRF_RETURN_DONE!(@p2 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_SRF_RETURN_DONE!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -1503,14 +1557,18 @@ macro_rules! __pgrx_c_args_SRF_RETURN_DONE {
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_SRF_RETURN_DONE!(@p2 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_SRF_RETURN_DONE!(
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_SRF_RETURN_DONE!(@p2 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_SRF_RETURN_DONE!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_SRF_RETURN_DONE!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -1537,13 +1595,13 @@ macro_rules! __pgrx_c_args_SRF_RETURN_DONE {
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SRF_RETURN_DONE!(
-            @p2 $mode [$($done)* (@literal [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SRF_RETURN_DONE!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -1588,14 +1646,16 @@ macro_rules! SRF_RETURN_DONE {
     (@__pgrx_emit_public; $_funcctx:tt, $fcinfo:tt $(,)?) => {
         {
             /* PGRX: PG_RETURN_NULL remains expanded because preserving the complete statement body and its order has not been proved equivalent to C substitution. */
-            let mut __pgrx_c_local0 = ::core::mem::MaybeUninit::<*mut $crate::ReturnSetInfo>::uninit();
+            let mut __pgrx_c_local0 = ::core::mem::MaybeUninit::<
+                *mut $crate::__pgrx_c_bindings::ReturnSetInfo
+            >::uninit();
             {
                 let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                    $crate::end_MultiFuncCall(
+                    $crate::__pgrx_c_bindings::end_MultiFuncCall(
                         <
                             $crate::__pgrx_c_macros::expression::CPointer<
                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                    $crate::FunctionCallInfoBaseData
+                                    $crate::__pgrx_c_bindings::FunctionCallInfoBaseData
                                 >,
                                 $crate::__pgrx_c_macros::expression::ReadWrite
                             > as $crate::__pgrx_c_macros::expression::CType
@@ -1603,7 +1663,7 @@ macro_rules! SRF_RETURN_DONE {
                             $crate::__pgrx_c_macros::expression::implicit::<
                                 $crate::__pgrx_c_macros::expression::CPointer<
                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                        $crate::FunctionCallInfoBaseData
+                                        $crate::__pgrx_c_bindings::FunctionCallInfoBaseData
                                     >,
                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                 >,
@@ -1617,7 +1677,7 @@ macro_rules! SRF_RETURN_DONE {
                         <
                             $crate::__pgrx_c_macros::expression::CPointer<
                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                    $crate::FuncCallContext
+                                    $crate::__pgrx_c_bindings::FuncCallContext
                                 >,
                                 $crate::__pgrx_c_macros::expression::ReadWrite
                             > as $crate::__pgrx_c_macros::expression::CType
@@ -1625,7 +1685,7 @@ macro_rules! SRF_RETURN_DONE {
                             $crate::__pgrx_c_macros::expression::implicit::<
                                 $crate::__pgrx_c_macros::expression::CPointer<
                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                        $crate::FuncCallContext
+                                        $crate::__pgrx_c_bindings::FuncCallContext
                                     >,
                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                 >,
@@ -1644,19 +1704,21 @@ macro_rules! SRF_RETURN_DONE {
                     $crate::__pgrx_c_macros::expression::assign(
                         $crate::__pgrx_c_macros::expression::place::<
                             $crate::__pgrx_c_macros::expression::CPointer<
-                                $crate::__pgrx_c_macros::expression::CRecord<$crate::ReturnSetInfo>,
+                                $crate::__pgrx_c_macros::expression::CRecord<
+                                    $crate::__pgrx_c_bindings::ReturnSetInfo
+                                >,
                                 $crate::__pgrx_c_macros::expression::ReadWrite
                             >>(
                             ::core::ptr::addr_of_mut!(__pgrx_c_local0).cast::<
-                                *mut $crate::ReturnSetInfo
+                                *mut $crate::__pgrx_c_bindings::ReturnSetInfo
                             >()
                         ),
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::cast_as::<
-                                *mut $crate::ReturnSetInfo,
+                                *mut $crate::__pgrx_c_bindings::ReturnSetInfo,
                                 $crate::__pgrx_c_macros::expression::CPointer<
                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                        $crate::ReturnSetInfo
+                                        $crate::__pgrx_c_bindings::ReturnSetInfo
                                     >,
                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                 >,
@@ -1699,12 +1761,12 @@ macro_rules! SRF_RETURN_DONE {
                                             $crate::__pgrx_c_macros::expression::place::<
                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                        $crate::ReturnSetInfo
+                                                        $crate::__pgrx_c_bindings::ReturnSetInfo
                                                     >,
                                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                                 >>(
                                                 ::core::ptr::addr_of_mut!(__pgrx_c_local0).cast::<
-                                                    *mut $crate::ReturnSetInfo
+                                                    *mut $crate::__pgrx_c_bindings::ReturnSetInfo
                                                 >()
                                             )
                                         )
@@ -1714,7 +1776,7 @@ macro_rules! SRF_RETURN_DONE {
                         ),
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                $crate::ExprDoneCond::ExprEndResult as i32
+                                $crate::__pgrx_c_bindings::ExprDoneCond::ExprEndResult as i32
                             )
                         )
                     )
@@ -1772,14 +1834,16 @@ macro_rules! SRF_RETURN_DONE {
     (@__pgrx_emit_return_as; $__pgrx_c_return:ty, $_funcctx:tt, $fcinfo:tt $(,)?) => {
         {
             /* PGRX: PG_RETURN_NULL remains expanded because preserving the complete statement body and its order has not been proved equivalent to C substitution. */
-            let mut __pgrx_c_local0 = ::core::mem::MaybeUninit::<*mut $crate::ReturnSetInfo>::uninit();
+            let mut __pgrx_c_local0 = ::core::mem::MaybeUninit::<
+                *mut $crate::__pgrx_c_bindings::ReturnSetInfo
+            >::uninit();
             {
                 let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                    $crate::end_MultiFuncCall(
+                    $crate::__pgrx_c_bindings::end_MultiFuncCall(
                         <
                             $crate::__pgrx_c_macros::expression::CPointer<
                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                    $crate::FunctionCallInfoBaseData
+                                    $crate::__pgrx_c_bindings::FunctionCallInfoBaseData
                                 >,
                                 $crate::__pgrx_c_macros::expression::ReadWrite
                             > as $crate::__pgrx_c_macros::expression::CType
@@ -1787,7 +1851,7 @@ macro_rules! SRF_RETURN_DONE {
                             $crate::__pgrx_c_macros::expression::implicit::<
                                 $crate::__pgrx_c_macros::expression::CPointer<
                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                        $crate::FunctionCallInfoBaseData
+                                        $crate::__pgrx_c_bindings::FunctionCallInfoBaseData
                                     >,
                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                 >,
@@ -1801,7 +1865,7 @@ macro_rules! SRF_RETURN_DONE {
                         <
                             $crate::__pgrx_c_macros::expression::CPointer<
                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                    $crate::FuncCallContext
+                                    $crate::__pgrx_c_bindings::FuncCallContext
                                 >,
                                 $crate::__pgrx_c_macros::expression::ReadWrite
                             > as $crate::__pgrx_c_macros::expression::CType
@@ -1809,7 +1873,7 @@ macro_rules! SRF_RETURN_DONE {
                             $crate::__pgrx_c_macros::expression::implicit::<
                                 $crate::__pgrx_c_macros::expression::CPointer<
                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                        $crate::FuncCallContext
+                                        $crate::__pgrx_c_bindings::FuncCallContext
                                     >,
                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                 >,
@@ -1828,19 +1892,21 @@ macro_rules! SRF_RETURN_DONE {
                     $crate::__pgrx_c_macros::expression::assign(
                         $crate::__pgrx_c_macros::expression::place::<
                             $crate::__pgrx_c_macros::expression::CPointer<
-                                $crate::__pgrx_c_macros::expression::CRecord<$crate::ReturnSetInfo>,
+                                $crate::__pgrx_c_macros::expression::CRecord<
+                                    $crate::__pgrx_c_bindings::ReturnSetInfo
+                                >,
                                 $crate::__pgrx_c_macros::expression::ReadWrite
                             >>(
                             ::core::ptr::addr_of_mut!(__pgrx_c_local0).cast::<
-                                *mut $crate::ReturnSetInfo
+                                *mut $crate::__pgrx_c_bindings::ReturnSetInfo
                             >()
                         ),
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::cast_as::<
-                                *mut $crate::ReturnSetInfo,
+                                *mut $crate::__pgrx_c_bindings::ReturnSetInfo,
                                 $crate::__pgrx_c_macros::expression::CPointer<
                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                        $crate::ReturnSetInfo
+                                        $crate::__pgrx_c_bindings::ReturnSetInfo
                                     >,
                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                 >,
@@ -1883,12 +1949,12 @@ macro_rules! SRF_RETURN_DONE {
                                             $crate::__pgrx_c_macros::expression::place::<
                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                        $crate::ReturnSetInfo
+                                                        $crate::__pgrx_c_bindings::ReturnSetInfo
                                                     >,
                                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                                 >>(
                                                 ::core::ptr::addr_of_mut!(__pgrx_c_local0).cast::<
-                                                    *mut $crate::ReturnSetInfo
+                                                    *mut $crate::__pgrx_c_bindings::ReturnSetInfo
                                                 >()
                                             )
                                         )
@@ -1898,7 +1964,7 @@ macro_rules! SRF_RETURN_DONE {
                         ),
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                $crate::ExprDoneCond::ExprEndResult as i32
+                                $crate::__pgrx_c_bindings::ExprDoneCond::ExprEndResult as i32
                             )
                         )
                     )
@@ -1983,8 +2049,8 @@ macro_rules! SRF_RETURN_DONE {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -2012,13 +2078,13 @@ macro_rules! __pgrx_c_args_SRF_RETURN_NEXT {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SRF_RETURN_NEXT!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SRF_RETURN_NEXT!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -2027,7 +2093,7 @@ macro_rules! __pgrx_c_args_SRF_RETURN_NEXT {
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_SRF_RETURN_NEXT!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -2054,25 +2120,25 @@ macro_rules! __pgrx_c_args_SRF_RETURN_NEXT {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SRF_RETURN_NEXT!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SRF_RETURN_NEXT!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SRF_RETURN_NEXT!(
-            @p2 $mode [$($done)* (@literal [- $argument]),];
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SRF_RETURN_NEXT!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -2081,7 +2147,7 @@ macro_rules! __pgrx_c_args_SRF_RETURN_NEXT {
     };
     (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_SRF_RETURN_NEXT!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -2108,31 +2174,35 @@ macro_rules! __pgrx_c_args_SRF_RETURN_NEXT {
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SRF_RETURN_NEXT!(
-            @p2 $mode [$($done)* (@literal [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SRF_RETURN_NEXT!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
     (@p2 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_SRF_RETURN_NEXT!(@p3 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_SRF_RETURN_NEXT!(
+            @p3 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative2 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_SRF_RETURN_NEXT!(@p3 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_SRF_RETURN_NEXT!(
+            @p3 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p2 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SRF_RETURN_NEXT!(
-            @p3 $mode [$($done)* (@literal [- $argument]),];
+            @p3 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative2 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SRF_RETURN_NEXT!(
-            @p3 $mode [$($done)* (@native [$argument]),];
+            @p3 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -2140,7 +2210,9 @@ macro_rules! __pgrx_c_args_SRF_RETURN_NEXT {
         $crate::__pgrx_c_args_SRF_RETURN_NEXT!(@negative2 $mode [$($done)*]; - $($raw)*)
     };
     (@p2 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_SRF_RETURN_NEXT!(@p3 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_SRF_RETURN_NEXT!(
+            @p3 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p2 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -2162,14 +2234,18 @@ macro_rules! __pgrx_c_args_SRF_RETURN_NEXT {
         )
     };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_SRF_RETURN_NEXT!(@p3 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_SRF_RETURN_NEXT!(
+            @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p2 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_SRF_RETURN_NEXT!(@p3 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_SRF_RETURN_NEXT!(
+            @p3 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p2 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_SRF_RETURN_NEXT!(
-            @p3 $mode [$($done)* (@native [$argument]),];
+            @p3 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -2196,13 +2272,13 @@ macro_rules! __pgrx_c_args_SRF_RETURN_NEXT {
     };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SRF_RETURN_NEXT!(
-            @p3 $mode [$($done)* (@literal [$argument]),];
+            @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p2 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SRF_RETURN_NEXT!(
-            @p3 $mode [$($done)* (@native [$argument]),];
+            @p3 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -2248,7 +2324,9 @@ macro_rules! SRF_RETURN_NEXT {
     (@__pgrx_emit_public; $_funcctx:tt, $_result:tt, $fcinfo:tt $(,)?) => {
         {
             /* PGRX: PG_RETURN_DATUM remains expanded because preserving the complete statement body and its order has not been proved equivalent to C substitution. */
-            let mut __pgrx_c_local0 = ::core::mem::MaybeUninit::<*mut $crate::ReturnSetInfo>::uninit();
+            let mut __pgrx_c_local0 = ::core::mem::MaybeUninit::<
+                *mut $crate::__pgrx_c_bindings::ReturnSetInfo
+            >::uninit();
             {
                 let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                     $crate::__pgrx_c_macros::expression::post_modify(
@@ -2280,19 +2358,21 @@ macro_rules! SRF_RETURN_NEXT {
                     $crate::__pgrx_c_macros::expression::assign(
                         $crate::__pgrx_c_macros::expression::place::<
                             $crate::__pgrx_c_macros::expression::CPointer<
-                                $crate::__pgrx_c_macros::expression::CRecord<$crate::ReturnSetInfo>,
+                                $crate::__pgrx_c_macros::expression::CRecord<
+                                    $crate::__pgrx_c_bindings::ReturnSetInfo
+                                >,
                                 $crate::__pgrx_c_macros::expression::ReadWrite
                             >>(
                             ::core::ptr::addr_of_mut!(__pgrx_c_local0).cast::<
-                                *mut $crate::ReturnSetInfo
+                                *mut $crate::__pgrx_c_bindings::ReturnSetInfo
                             >()
                         ),
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::cast_as::<
-                                *mut $crate::ReturnSetInfo,
+                                *mut $crate::__pgrx_c_bindings::ReturnSetInfo,
                                 $crate::__pgrx_c_macros::expression::CPointer<
                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                        $crate::ReturnSetInfo
+                                        $crate::__pgrx_c_bindings::ReturnSetInfo
                                     >,
                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                 >,
@@ -2335,12 +2415,12 @@ macro_rules! SRF_RETURN_NEXT {
                                             $crate::__pgrx_c_macros::expression::place::<
                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                        $crate::ReturnSetInfo
+                                                        $crate::__pgrx_c_bindings::ReturnSetInfo
                                                     >,
                                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                                 >>(
                                                 ::core::ptr::addr_of_mut!(__pgrx_c_local0).cast::<
-                                                    *mut $crate::ReturnSetInfo
+                                                    *mut $crate::__pgrx_c_bindings::ReturnSetInfo
                                                 >()
                                             )
                                         )
@@ -2350,7 +2430,7 @@ macro_rules! SRF_RETURN_NEXT {
                         ),
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                $crate::ExprDoneCond::ExprMultipleResult as i32
+                                $crate::__pgrx_c_bindings::ExprDoneCond::ExprMultipleResult as i32
                             )
                         )
                     )
@@ -2368,7 +2448,9 @@ macro_rules! SRF_RETURN_NEXT {
     (@__pgrx_emit_return_as; $__pgrx_c_return:ty, $_funcctx:tt, $_result:tt, $fcinfo:tt $(,)?) => {
         {
             /* PGRX: PG_RETURN_DATUM remains expanded because preserving the complete statement body and its order has not been proved equivalent to C substitution. */
-            let mut __pgrx_c_local0 = ::core::mem::MaybeUninit::<*mut $crate::ReturnSetInfo>::uninit();
+            let mut __pgrx_c_local0 = ::core::mem::MaybeUninit::<
+                *mut $crate::__pgrx_c_bindings::ReturnSetInfo
+            >::uninit();
             {
                 let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                     $crate::__pgrx_c_macros::expression::post_modify(
@@ -2400,19 +2482,21 @@ macro_rules! SRF_RETURN_NEXT {
                     $crate::__pgrx_c_macros::expression::assign(
                         $crate::__pgrx_c_macros::expression::place::<
                             $crate::__pgrx_c_macros::expression::CPointer<
-                                $crate::__pgrx_c_macros::expression::CRecord<$crate::ReturnSetInfo>,
+                                $crate::__pgrx_c_macros::expression::CRecord<
+                                    $crate::__pgrx_c_bindings::ReturnSetInfo
+                                >,
                                 $crate::__pgrx_c_macros::expression::ReadWrite
                             >>(
                             ::core::ptr::addr_of_mut!(__pgrx_c_local0).cast::<
-                                *mut $crate::ReturnSetInfo
+                                *mut $crate::__pgrx_c_bindings::ReturnSetInfo
                             >()
                         ),
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::cast_as::<
-                                *mut $crate::ReturnSetInfo,
+                                *mut $crate::__pgrx_c_bindings::ReturnSetInfo,
                                 $crate::__pgrx_c_macros::expression::CPointer<
                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                        $crate::ReturnSetInfo
+                                        $crate::__pgrx_c_bindings::ReturnSetInfo
                                     >,
                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                 >,
@@ -2455,12 +2539,12 @@ macro_rules! SRF_RETURN_NEXT {
                                             $crate::__pgrx_c_macros::expression::place::<
                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                        $crate::ReturnSetInfo
+                                                        $crate::__pgrx_c_bindings::ReturnSetInfo
                                                     >,
                                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                                 >>(
                                                 ::core::ptr::addr_of_mut!(__pgrx_c_local0).cast::<
-                                                    *mut $crate::ReturnSetInfo
+                                                    *mut $crate::__pgrx_c_bindings::ReturnSetInfo
                                                 >()
                                             )
                                         )
@@ -2470,7 +2554,7 @@ macro_rules! SRF_RETURN_NEXT {
                         ),
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                $crate::ExprDoneCond::ExprMultipleResult as i32
+                                $crate::__pgrx_c_bindings::ExprDoneCond::ExprMultipleResult as i32
                             )
                         )
                     )
@@ -2515,8 +2599,8 @@ macro_rules! SRF_RETURN_NEXT {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -2547,13 +2631,13 @@ macro_rules! __pgrx_c_args_SRF_RETURN_NEXT_NULL {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SRF_RETURN_NEXT_NULL!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SRF_RETURN_NEXT_NULL!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -2562,7 +2646,7 @@ macro_rules! __pgrx_c_args_SRF_RETURN_NEXT_NULL {
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_SRF_RETURN_NEXT_NULL!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -2589,33 +2673,35 @@ macro_rules! __pgrx_c_args_SRF_RETURN_NEXT_NULL {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SRF_RETURN_NEXT_NULL!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SRF_RETURN_NEXT_NULL!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $argument:literal) => {
         $crate::__pgrx_c_args_SRF_RETURN_NEXT_NULL!(
-            @p2 $mode [$($done)* (@literal [- $argument]),];
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
         )
     };
     (@negative1 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_SRF_RETURN_NEXT_NULL!(@p2 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_SRF_RETURN_NEXT_NULL!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SRF_RETURN_NEXT_NULL!(
-            @p2 $mode [$($done)* (@literal [- $argument]),];
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SRF_RETURN_NEXT_NULL!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -2623,7 +2709,9 @@ macro_rules! __pgrx_c_args_SRF_RETURN_NEXT_NULL {
         $crate::__pgrx_c_args_SRF_RETURN_NEXT_NULL!(@negative1 $mode [$($done)*]; - $($raw)*)
     };
     (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_SRF_RETURN_NEXT_NULL!(@p2 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_SRF_RETURN_NEXT_NULL!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -2645,14 +2733,18 @@ macro_rules! __pgrx_c_args_SRF_RETURN_NEXT_NULL {
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_SRF_RETURN_NEXT_NULL!(@p2 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_SRF_RETURN_NEXT_NULL!(
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_SRF_RETURN_NEXT_NULL!(@p2 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_SRF_RETURN_NEXT_NULL!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_SRF_RETURN_NEXT_NULL!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -2679,13 +2771,13 @@ macro_rules! __pgrx_c_args_SRF_RETURN_NEXT_NULL {
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SRF_RETURN_NEXT_NULL!(
-            @p2 $mode [$($done)* (@literal [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SRF_RETURN_NEXT_NULL!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -2730,7 +2822,9 @@ macro_rules! SRF_RETURN_NEXT_NULL {
     (@__pgrx_emit_public; $_funcctx:tt, $fcinfo:tt $(,)?) => {
         {
             /* PGRX: PG_RETURN_NULL remains expanded because preserving the complete statement body and its order has not been proved equivalent to C substitution. */
-            let mut __pgrx_c_local0 = ::core::mem::MaybeUninit::<*mut $crate::ReturnSetInfo>::uninit();
+            let mut __pgrx_c_local0 = ::core::mem::MaybeUninit::<
+                *mut $crate::__pgrx_c_bindings::ReturnSetInfo
+            >::uninit();
             {
                 let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                     $crate::__pgrx_c_macros::expression::post_modify(
@@ -2762,19 +2856,21 @@ macro_rules! SRF_RETURN_NEXT_NULL {
                     $crate::__pgrx_c_macros::expression::assign(
                         $crate::__pgrx_c_macros::expression::place::<
                             $crate::__pgrx_c_macros::expression::CPointer<
-                                $crate::__pgrx_c_macros::expression::CRecord<$crate::ReturnSetInfo>,
+                                $crate::__pgrx_c_macros::expression::CRecord<
+                                    $crate::__pgrx_c_bindings::ReturnSetInfo
+                                >,
                                 $crate::__pgrx_c_macros::expression::ReadWrite
                             >>(
                             ::core::ptr::addr_of_mut!(__pgrx_c_local0).cast::<
-                                *mut $crate::ReturnSetInfo
+                                *mut $crate::__pgrx_c_bindings::ReturnSetInfo
                             >()
                         ),
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::cast_as::<
-                                *mut $crate::ReturnSetInfo,
+                                *mut $crate::__pgrx_c_bindings::ReturnSetInfo,
                                 $crate::__pgrx_c_macros::expression::CPointer<
                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                        $crate::ReturnSetInfo
+                                        $crate::__pgrx_c_bindings::ReturnSetInfo
                                     >,
                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                 >,
@@ -2817,12 +2913,12 @@ macro_rules! SRF_RETURN_NEXT_NULL {
                                             $crate::__pgrx_c_macros::expression::place::<
                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                        $crate::ReturnSetInfo
+                                                        $crate::__pgrx_c_bindings::ReturnSetInfo
                                                     >,
                                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                                 >>(
                                                 ::core::ptr::addr_of_mut!(__pgrx_c_local0).cast::<
-                                                    *mut $crate::ReturnSetInfo
+                                                    *mut $crate::__pgrx_c_bindings::ReturnSetInfo
                                                 >()
                                             )
                                         )
@@ -2832,7 +2928,7 @@ macro_rules! SRF_RETURN_NEXT_NULL {
                         ),
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                $crate::ExprDoneCond::ExprMultipleResult as i32
+                                $crate::__pgrx_c_bindings::ExprDoneCond::ExprMultipleResult as i32
                             )
                         )
                     )
@@ -2890,7 +2986,9 @@ macro_rules! SRF_RETURN_NEXT_NULL {
     (@__pgrx_emit_return_as; $__pgrx_c_return:ty, $_funcctx:tt, $fcinfo:tt $(,)?) => {
         {
             /* PGRX: PG_RETURN_NULL remains expanded because preserving the complete statement body and its order has not been proved equivalent to C substitution. */
-            let mut __pgrx_c_local0 = ::core::mem::MaybeUninit::<*mut $crate::ReturnSetInfo>::uninit();
+            let mut __pgrx_c_local0 = ::core::mem::MaybeUninit::<
+                *mut $crate::__pgrx_c_bindings::ReturnSetInfo
+            >::uninit();
             {
                 let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                     $crate::__pgrx_c_macros::expression::post_modify(
@@ -2922,19 +3020,21 @@ macro_rules! SRF_RETURN_NEXT_NULL {
                     $crate::__pgrx_c_macros::expression::assign(
                         $crate::__pgrx_c_macros::expression::place::<
                             $crate::__pgrx_c_macros::expression::CPointer<
-                                $crate::__pgrx_c_macros::expression::CRecord<$crate::ReturnSetInfo>,
+                                $crate::__pgrx_c_macros::expression::CRecord<
+                                    $crate::__pgrx_c_bindings::ReturnSetInfo
+                                >,
                                 $crate::__pgrx_c_macros::expression::ReadWrite
                             >>(
                             ::core::ptr::addr_of_mut!(__pgrx_c_local0).cast::<
-                                *mut $crate::ReturnSetInfo
+                                *mut $crate::__pgrx_c_bindings::ReturnSetInfo
                             >()
                         ),
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::cast_as::<
-                                *mut $crate::ReturnSetInfo,
+                                *mut $crate::__pgrx_c_bindings::ReturnSetInfo,
                                 $crate::__pgrx_c_macros::expression::CPointer<
                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                        $crate::ReturnSetInfo
+                                        $crate::__pgrx_c_bindings::ReturnSetInfo
                                     >,
                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                 >,
@@ -2977,12 +3077,12 @@ macro_rules! SRF_RETURN_NEXT_NULL {
                                             $crate::__pgrx_c_macros::expression::place::<
                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                        $crate::ReturnSetInfo
+                                                        $crate::__pgrx_c_bindings::ReturnSetInfo
                                                     >,
                                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                                 >>(
                                                 ::core::ptr::addr_of_mut!(__pgrx_c_local0).cast::<
-                                                    *mut $crate::ReturnSetInfo
+                                                    *mut $crate::__pgrx_c_bindings::ReturnSetInfo
                                                 >()
                                             )
                                         )
@@ -2992,7 +3092,7 @@ macro_rules! SRF_RETURN_NEXT_NULL {
                         ),
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                $crate::ExprDoneCond::ExprMultipleResult as i32
+                                $crate::__pgrx_c_bindings::ExprDoneCond::ExprMultipleResult as i32
                             )
                         )
                     )
@@ -3077,8 +3177,8 @@ macro_rules! SRF_RETURN_NEXT_NULL {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -3122,20 +3222,24 @@ macro_rules! __pgrx_c_args_TupleGetDatum {
         compile_error!("unused C macro argument exceeds the 64-token normalization bound")
     };
     (@p1 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_TupleGetDatum!(@p2 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_TupleGetDatum!(
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative1 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_TupleGetDatum!(@p2 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_TupleGetDatum!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_TupleGetDatum!(
-            @p2 $mode [$($done)* (@literal [- $argument]),];
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_TupleGetDatum!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -3143,7 +3247,9 @@ macro_rules! __pgrx_c_args_TupleGetDatum {
         $crate::__pgrx_c_args_TupleGetDatum!(@negative1 $mode [$($done)*]; - $($raw)*)
     };
     (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_TupleGetDatum!(@p2 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_TupleGetDatum!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -3165,14 +3271,18 @@ macro_rules! __pgrx_c_args_TupleGetDatum {
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_TupleGetDatum!(@p2 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_TupleGetDatum!(
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_TupleGetDatum!(@p2 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_TupleGetDatum!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_TupleGetDatum!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -3199,13 +3309,13 @@ macro_rules! __pgrx_c_args_TupleGetDatum {
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_TupleGetDatum!(
-            @p2 $mode [$($done)* (@literal [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_TupleGetDatum!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -3253,14 +3363,14 @@ macro_rules! TupleGetDatum {
             <
                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
                     $crate::__pgrx_c_macros::CUnsignedLong,
-                    $crate::Datum
+                    $crate::__pgrx_c_bindings::Datum
                 > as $crate::__pgrx_c_macros::expression::CType
             >::from_storage(
-                $crate::HeapTupleHeaderGetDatum(
+                $crate::__pgrx_c_bindings::HeapTupleHeaderGetDatum(
                     <
                         $crate::__pgrx_c_macros::expression::CPointer<
                             $crate::__pgrx_c_macros::expression::CRecord<
-                                $crate::HeapTupleHeaderData
+                                $crate::__pgrx_c_bindings::HeapTupleHeaderData
                             >,
                             $crate::__pgrx_c_macros::expression::ReadWrite
                         > as $crate::__pgrx_c_macros::expression::CType
@@ -3268,7 +3378,7 @@ macro_rules! TupleGetDatum {
                         $crate::__pgrx_c_macros::expression::implicit::<
                             $crate::__pgrx_c_macros::expression::CPointer<
                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                    $crate::HeapTupleHeaderData
+                                    $crate::__pgrx_c_bindings::HeapTupleHeaderData
                                 >,
                                 $crate::__pgrx_c_macros::expression::ReadWrite
                             >,
@@ -3328,14 +3438,14 @@ macro_rules! TupleGetDatum {
                             <
                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                     $crate::__pgrx_c_macros::CUnsignedLong,
-                                    $crate::Datum
+                                    $crate::__pgrx_c_bindings::Datum
                                 > as $crate::__pgrx_c_macros::expression::CType
                             >::from_storage(
-                                $crate::HeapTupleHeaderGetDatum(
+                                $crate::__pgrx_c_bindings::HeapTupleHeaderGetDatum(
                                     <
                                         $crate::__pgrx_c_macros::expression::CPointer<
                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                $crate::HeapTupleHeaderData
+                                                $crate::__pgrx_c_bindings::HeapTupleHeaderData
                                             >,
                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                         > as $crate::__pgrx_c_macros::expression::CType
@@ -3343,7 +3453,7 @@ macro_rules! TupleGetDatum {
                                         $crate::__pgrx_c_macros::expression::implicit::<
                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                    $crate::HeapTupleHeaderData
+                                                    $crate::__pgrx_c_bindings::HeapTupleHeaderData
                                                 >,
                                                 $crate::__pgrx_c_macros::expression::ReadWrite
                                             >,
@@ -3397,14 +3507,14 @@ macro_rules! TupleGetDatum {
                 <
                     $crate::__pgrx_c_macros::expression::CIntegerStorage<
                         $crate::__pgrx_c_macros::CUnsignedLong,
-                        $crate::Datum
+                        $crate::__pgrx_c_bindings::Datum
                     > as $crate::__pgrx_c_macros::expression::CType
                 >::from_storage(
-                    $crate::HeapTupleHeaderGetDatum(
+                    $crate::__pgrx_c_bindings::HeapTupleHeaderGetDatum(
                         <
                             $crate::__pgrx_c_macros::expression::CPointer<
                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                    $crate::HeapTupleHeaderData
+                                    $crate::__pgrx_c_bindings::HeapTupleHeaderData
                                 >,
                                 $crate::__pgrx_c_macros::expression::ReadWrite
                             > as $crate::__pgrx_c_macros::expression::CType
@@ -3412,7 +3522,7 @@ macro_rules! TupleGetDatum {
                             $crate::__pgrx_c_macros::expression::implicit::<
                                 $crate::__pgrx_c_macros::expression::CPointer<
                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                        $crate::HeapTupleHeaderData
+                                        $crate::__pgrx_c_bindings::HeapTupleHeaderData
                                     >,
                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                 >,

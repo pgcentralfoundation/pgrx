@@ -13,7 +13,7 @@ use pgrx_c_macros::{
     AnalysisSession, AnalysisStatus, BindingCatalog, CompilationProfile, Diagnostic,
     EmissionStatus, Error, FrontendError, FrontendOutput, MacroAnalysis, MacroEmission,
     MacroScanner, PostgresConfig, PostgresError, emit_batch_with_bindings,
-    postgres_function_macro_names,
+    postgres_function_macro_names, postgres_inline_function_names,
 };
 use serde::Serialize;
 use std::collections::HashSet;
@@ -42,7 +42,7 @@ enum Command {
         /// Installation and inventory filters for raw function-macro discovery.
         ListArgs,
     ),
-    /// Analyze final active PostgreSQL macros without claiming validated Rust support.
+    /// Analyze PostgreSQL macro and inline invocation roots without claiming validated Rust support.
     Analyze(
         /// Installation, compiler overrides, and reporting options for symbolic candidates.
         AnalyzeArgs,
@@ -313,8 +313,16 @@ fn analyze_postgres(args: AnalyzeArgs) -> Result<(), CliError> {
         print_diagnostic(diagnostic);
     }
     let root = postgres.server_include_dir().canonicalize()?;
-    let names = selected_macro_names(&inspected, &root, &args.name)?;
-    let session = AnalysisSession::prepare(&scanner, &inspected, &names)?;
+    let (mut names, inline_names) = selected_invocation_names(&inspected, &root, &args.name)?;
+    let session = AnalysisSession::prepare_with_inline_functions(
+        &scanner,
+        &inspected,
+        &names,
+        &[] as &[String],
+        &inline_names,
+    )?;
+    names.extend(inline_names);
+    names.sort();
     let macros = names.iter().map(|name| session.analyze(name)).collect();
     let report = AnalysisReport {
         postgres_version: postgres.pg_config().version().map_err(PostgresError::from)?,
@@ -383,8 +391,16 @@ fn emit_postgres(args: EmitArgs) -> Result<(), CliError> {
         print_diagnostic(diagnostic);
     }
     let root = postgres.server_include_dir().canonicalize()?;
-    let names = selected_macro_names(&inspected, &root, &args.name)?;
-    let session = AnalysisSession::prepare(&scanner, &inspected, &names)?;
+    let (mut names, inline_names) = selected_invocation_names(&inspected, &root, &args.name)?;
+    let session = AnalysisSession::prepare_with_inline_functions(
+        &scanner,
+        &inspected,
+        &names,
+        &[] as &[String],
+        &inline_names,
+    )?;
+    names.extend(inline_names);
+    names.sort();
     let report = EmissionReport {
         postgres_version: postgres.pg_config().version().map_err(PostgresError::from)?,
         profile: inspected.profile(),
@@ -422,16 +438,21 @@ fn emit_postgres(args: EmitArgs) -> Result<(), CliError> {
 }
 
 /// Apply exact CLI name filters after authoritative PostgreSQL source ownership filtering.
-fn selected_macro_names(
+fn selected_invocation_names(
     inspected: &FrontendOutput,
     root: &Path,
     selected: &[String],
-) -> Result<Vec<String>, PostgresError> {
+) -> Result<(Vec<String>, Vec<String>), PostgresError> {
     let selected: HashSet<_> = selected.iter().map(String::as_str).collect();
-    Ok(postgres_function_macro_names(inspected, root)?
+    let macros = postgres_function_macro_names(inspected, root)?
         .into_iter()
         .filter(|name| selected.is_empty() || selected.contains(name.as_str()))
-        .collect())
+        .collect();
+    let inlines = postgres_inline_function_names(inspected, root)?
+        .into_iter()
+        .filter(|name| selected.is_empty() || selected.contains(name.as_str()))
+        .collect();
+    Ok((macros, inlines))
 }
 
 /// Render owned compiler diagnostics with physical locations when available.

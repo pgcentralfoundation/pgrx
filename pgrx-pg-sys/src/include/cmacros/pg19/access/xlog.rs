@@ -5,8 +5,8 @@ This code is generated for documentation purposes, so that it is easy to referen
 // C macros from xlog.h.
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -23,10 +23,496 @@ const _: () = {
     assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
     assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
 };
-/// C macro XLogHintBitIsNeeded from xlog.h:123
+/// C macro XLogArchivingActive from xlog.h:114
 ///
 /// ```text
-/// #define XLogHintBitIsNeeded( ) ( wal_log_hints || DataChecksumsNeedWrite ( ) )
+/// #define XLogArchivingActive( ) ( AssertMacro ( XLogArchiveMode == ARCHIVE_MODE_OFF || wal_level >= WAL_LEVEL_REPLICA ) , XLogArchiveMode > ARCHIVE_MODE_OFF )
+/// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+#[macro_export]
+macro_rules! XLogArchivingActive {
+    (@__pgrx_emit_check_safety;) => {
+        {
+            if false {}
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::XLogArchivingActive!(@__pgrx_emit_check_safety; $($raw)*)
+    };
+    (@__pgrx_emit_public;) => {
+        $crate::__pgrx_c_macros::expression_result::finish(
+            $crate::XLogArchivingActive!(@__pgrx_emit_value;)
+        )
+    };
+    (@__pgrx_emit_value;) => {
+        /* PGRX: AssertMacro remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */
+        (
+            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                {
+                    {
+                        let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                            {
+                                {
+                                    let _ = $crate::__pgrx_c_macros::expression::profile_value::<
+                                        true,
+                                        _
+                                    >(
+                                        /* PGRX: true remains expanded because no integer constant binding is available in the defining Rust crate. */
+                                        $crate::__pgrx_c_macros::CValue::<
+                                            $crate::__pgrx_c_macros::CInt
+                                        >::new(1i32)
+                                    );
+                                }
+                            }
+                        );
+                    };
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::gt(
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_macros::expression::load(
+                                    $crate::__pgrx_c_macros::expression::place::<
+                                        $crate::__pgrx_c_macros::CInt
+                                    >(
+                                        ::core::ptr::addr_of_mut!(
+                                            $crate::__pgrx_c_bindings::XLogArchiveMode
+                                        )
+                                    )
+                                )
+                            ),
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_macros::expression::null_constant(
+                                    $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
+                                        $crate::__pgrx_c_bindings::ArchiveMode::ARCHIVE_MODE_OFF as i32
+                                    )
+                                )
+                            )
+                        )
+                    )
+                }
+            )
+        )
+    };
+    (@__pgrx_c_value; $($raw:tt)*) => {
+        $crate::XLogArchivingActive!(@__pgrx_emit_value; $($raw)*)
+    };
+    (@__pgrx_emit_place;) => {
+        compile_error!("C expression is not a place in this operation")
+    };
+    (@__pgrx_c_place; $($raw:tt)*) => {
+        $crate::XLogArchivingActive!(@__pgrx_emit_place; $($raw)*)
+    };
+    (@__pgrx_emit_read_place;) => {
+        compile_error!("C expression is not a place in this operation")
+    };
+    (@__pgrx_c_read_place; $($raw:tt)*) => {
+        $crate::XLogArchivingActive!(@__pgrx_emit_read_place; $($raw)*)
+    };
+    (@__pgrx_emit_size;) => {
+        /* PGRX: AssertMacro remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */
+        $crate::__pgrx_c_macros::expression::size_of_value_type(
+            if false {
+                {
+                    if false {}
+                }
+                Some(
+                    unsafe {
+                        $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                            {
+                                {
+                                    let _ = $crate::__pgrx_c_macros::expression::profile_value::<
+                                        true,
+                                        _
+                                    >(
+                                        {
+                                            {
+                                                let _ = $crate::__pgrx_c_macros::expression::profile_value::<
+                                                    true,
+                                                    _
+                                                >(
+                                                    /* PGRX: true remains expanded because no integer constant binding is available in the defining Rust crate. */
+                                                    $crate::__pgrx_c_macros::CValue::<
+                                                        $crate::__pgrx_c_macros::CInt
+                                                    >::new(1i32)
+                                                );
+                                            }
+                                        }
+                                    );
+                                };
+                                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                    $crate::__pgrx_c_macros::expression::gt(
+                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                            true,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_macros::expression::load(
+                                                $crate::__pgrx_c_macros::expression::place::<
+                                                    $crate::__pgrx_c_macros::CInt
+                                                >(
+                                                    ::core::ptr::addr_of_mut!(
+                                                        $crate::__pgrx_c_bindings::XLogArchiveMode
+                                                    )
+                                                )
+                                            )
+                                        ),
+                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                            true,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_macros::expression::null_constant(
+                                                $crate::__pgrx_c_macros::CValue::<
+                                                    $crate::__pgrx_c_macros::CInt
+                                                >::new(
+                                                    $crate::__pgrx_c_bindings::ArchiveMode::ARCHIVE_MODE_OFF as i32
+                                                )
+                                            )
+                                        )
+                                    )
+                                )
+                            }
+                        )
+                    }
+                )
+            } else {
+                None
+            }
+        )
+    };
+    (@__pgrx_c_size; $($raw:tt)*) => {
+        $crate::XLogArchivingActive!(@__pgrx_emit_size; $($raw)*)
+    };
+    (@__pgrx_emit_discard;) => {
+        /* PGRX: AssertMacro remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */
+        {
+            let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                {
+                    {
+                        let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                            {
+                                {
+                                    let _ = $crate::__pgrx_c_macros::expression::profile_value::<
+                                        true,
+                                        _
+                                    >(
+                                        /* PGRX: true remains expanded because no integer constant binding is available in the defining Rust crate. */
+                                        $crate::__pgrx_c_macros::CValue::<
+                                            $crate::__pgrx_c_macros::CInt
+                                        >::new(1i32)
+                                    );
+                                }
+                            }
+                        );
+                    };
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::gt(
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_macros::expression::load(
+                                    $crate::__pgrx_c_macros::expression::place::<
+                                        $crate::__pgrx_c_macros::CInt
+                                    >(
+                                        ::core::ptr::addr_of_mut!(
+                                            $crate::__pgrx_c_bindings::XLogArchiveMode
+                                        )
+                                    )
+                                )
+                            ),
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_macros::expression::null_constant(
+                                    $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
+                                        $crate::__pgrx_c_bindings::ArchiveMode::ARCHIVE_MODE_OFF as i32
+                                    )
+                                )
+                            )
+                        )
+                    )
+                }
+            );
+        }
+    };
+    (@__pgrx_c_discard; $($raw:tt)*) => {
+        $crate::XLogArchivingActive!(@__pgrx_emit_discard; $($raw)*)
+    };
+    (@$mode:ident; $($invalid:tt)*) => {
+        compile_error!("arguments do not satisfy this C macro's invocation contract")
+    };
+    () => {
+        $crate::XLogArchivingActive!(@__pgrx_emit_public;)
+    };
+    ($($invalid:tt)*) => {
+        compile_error!("arguments do not satisfy this C macro's invocation contract")
+    };
+}
+
+#[cfg(not(all(
+    target_arch = "x86_64",
+    target_os = "linux",
+    target_pointer_width = "64",
+    target_endian = "little"
+)))]
+#[cfg(not(docsrs))]
+compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
+/// C macro XLogArchivingAlways from xlog.h:117
+///
+/// ```text
+/// #define XLogArchivingAlways( ) ( AssertMacro ( XLogArchiveMode == ARCHIVE_MODE_OFF || wal_level >= WAL_LEVEL_REPLICA ) , XLogArchiveMode == ARCHIVE_MODE_ALWAYS )
+/// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+#[macro_export]
+macro_rules! XLogArchivingAlways {
+    (@__pgrx_emit_check_safety;) => {
+        {
+            if false {}
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::XLogArchivingAlways!(@__pgrx_emit_check_safety; $($raw)*)
+    };
+    (@__pgrx_emit_public;) => {
+        $crate::__pgrx_c_macros::expression_result::finish(
+            $crate::XLogArchivingAlways!(@__pgrx_emit_value;)
+        )
+    };
+    (@__pgrx_emit_value;) => {
+        /* PGRX: AssertMacro remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */
+        (
+            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                {
+                    {
+                        let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                            {
+                                {
+                                    let _ = $crate::__pgrx_c_macros::expression::profile_value::<
+                                        true,
+                                        _
+                                    >(
+                                        /* PGRX: true remains expanded because no integer constant binding is available in the defining Rust crate. */
+                                        $crate::__pgrx_c_macros::CValue::<
+                                            $crate::__pgrx_c_macros::CInt
+                                        >::new(1i32)
+                                    );
+                                }
+                            }
+                        );
+                    };
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::eq(
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_macros::expression::load(
+                                    $crate::__pgrx_c_macros::expression::place::<
+                                        $crate::__pgrx_c_macros::CInt
+                                    >(
+                                        ::core::ptr::addr_of_mut!(
+                                            $crate::__pgrx_c_bindings::XLogArchiveMode
+                                        )
+                                    )
+                                )
+                            ),
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
+                                    $crate::__pgrx_c_bindings::ArchiveMode::ARCHIVE_MODE_ALWAYS as i32
+                                )
+                            )
+                        )
+                    )
+                }
+            )
+        )
+    };
+    (@__pgrx_c_value; $($raw:tt)*) => {
+        $crate::XLogArchivingAlways!(@__pgrx_emit_value; $($raw)*)
+    };
+    (@__pgrx_emit_place;) => {
+        compile_error!("C expression is not a place in this operation")
+    };
+    (@__pgrx_c_place; $($raw:tt)*) => {
+        $crate::XLogArchivingAlways!(@__pgrx_emit_place; $($raw)*)
+    };
+    (@__pgrx_emit_read_place;) => {
+        compile_error!("C expression is not a place in this operation")
+    };
+    (@__pgrx_c_read_place; $($raw:tt)*) => {
+        $crate::XLogArchivingAlways!(@__pgrx_emit_read_place; $($raw)*)
+    };
+    (@__pgrx_emit_size;) => {
+        /* PGRX: AssertMacro remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */
+        $crate::__pgrx_c_macros::expression::size_of_value_type(
+            if false {
+                {
+                    if false {}
+                }
+                Some(
+                    unsafe {
+                        $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                            {
+                                {
+                                    let _ = $crate::__pgrx_c_macros::expression::profile_value::<
+                                        true,
+                                        _
+                                    >(
+                                        {
+                                            {
+                                                let _ = $crate::__pgrx_c_macros::expression::profile_value::<
+                                                    true,
+                                                    _
+                                                >(
+                                                    /* PGRX: true remains expanded because no integer constant binding is available in the defining Rust crate. */
+                                                    $crate::__pgrx_c_macros::CValue::<
+                                                        $crate::__pgrx_c_macros::CInt
+                                                    >::new(1i32)
+                                                );
+                                            }
+                                        }
+                                    );
+                                };
+                                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                    $crate::__pgrx_c_macros::expression::eq(
+                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                            true,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_macros::expression::load(
+                                                $crate::__pgrx_c_macros::expression::place::<
+                                                    $crate::__pgrx_c_macros::CInt
+                                                >(
+                                                    ::core::ptr::addr_of_mut!(
+                                                        $crate::__pgrx_c_bindings::XLogArchiveMode
+                                                    )
+                                                )
+                                            )
+                                        ),
+                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                            true,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_macros::CValue::<
+                                                $crate::__pgrx_c_macros::CInt
+                                            >::new(
+                                                $crate::__pgrx_c_bindings::ArchiveMode::ARCHIVE_MODE_ALWAYS as i32
+                                            )
+                                        )
+                                    )
+                                )
+                            }
+                        )
+                    }
+                )
+            } else {
+                None
+            }
+        )
+    };
+    (@__pgrx_c_size; $($raw:tt)*) => {
+        $crate::XLogArchivingAlways!(@__pgrx_emit_size; $($raw)*)
+    };
+    (@__pgrx_emit_discard;) => {
+        /* PGRX: AssertMacro remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */
+        {
+            let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                {
+                    {
+                        let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                            {
+                                {
+                                    let _ = $crate::__pgrx_c_macros::expression::profile_value::<
+                                        true,
+                                        _
+                                    >(
+                                        /* PGRX: true remains expanded because no integer constant binding is available in the defining Rust crate. */
+                                        $crate::__pgrx_c_macros::CValue::<
+                                            $crate::__pgrx_c_macros::CInt
+                                        >::new(1i32)
+                                    );
+                                }
+                            }
+                        );
+                    };
+                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                        $crate::__pgrx_c_macros::expression::eq(
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_macros::expression::load(
+                                    $crate::__pgrx_c_macros::expression::place::<
+                                        $crate::__pgrx_c_macros::CInt
+                                    >(
+                                        ::core::ptr::addr_of_mut!(
+                                            $crate::__pgrx_c_bindings::XLogArchiveMode
+                                        )
+                                    )
+                                )
+                            ),
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
+                                    $crate::__pgrx_c_bindings::ArchiveMode::ARCHIVE_MODE_ALWAYS as i32
+                                )
+                            )
+                        )
+                    )
+                }
+            );
+        }
+    };
+    (@__pgrx_c_discard; $($raw:tt)*) => {
+        $crate::XLogArchivingAlways!(@__pgrx_emit_discard; $($raw)*)
+    };
+    (@$mode:ident; $($invalid:tt)*) => {
+        compile_error!("arguments do not satisfy this C macro's invocation contract")
+    };
+    () => {
+        $crate::XLogArchivingAlways!(@__pgrx_emit_public;)
+    };
+    ($($invalid:tt)*) => {
+        compile_error!("arguments do not satisfy this C macro's invocation contract")
+    };
+}
+
+#[cfg(not(all(
+    target_arch = "x86_64",
+    target_os = "linux",
+    target_pointer_width = "64",
+    target_endian = "little"
+)))]
+#[cfg(not(docsrs))]
+compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
+/// C macro XLogHintBitIsNeeded from xlog.h:135
+///
+/// ```text
+/// #define XLogHintBitIsNeeded( ) ( wal_log_hints || DataChecksumsEnabled ( ) )
 /// ```
 ///
 ///
@@ -61,14 +547,18 @@ macro_rules! XLogHintBitIsNeeded {
                             $crate::__pgrx_c_macros::expression::load(
                                 $crate::__pgrx_c_macros::expression::place::<
                                     $crate::__pgrx_c_macros::CBool
-                                >(::core::ptr::addr_of_mut!($crate::wal_log_hints))
+                                >(
+                                    ::core::ptr::addr_of_mut!(
+                                        $crate::__pgrx_c_bindings::wal_log_hints
+                                    )
+                                )
                             )
                         )
                     ) || $crate::__pgrx_c_macros::expression::truth(
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
                                 $crate::__pgrx_c_macros::CBool as $crate::__pgrx_c_macros::expression::CType
-                            >::from_storage($crate::DataChecksumsNeedWrite())
+                            >::from_storage($crate::__pgrx_c_bindings::DataChecksumsEnabled())
                         )
                     ) {
                         1
@@ -109,14 +599,20 @@ macro_rules! XLogHintBitIsNeeded {
                                         $crate::__pgrx_c_macros::expression::load(
                                             $crate::__pgrx_c_macros::expression::place::<
                                                 $crate::__pgrx_c_macros::CBool
-                                            >(::core::ptr::addr_of_mut!($crate::wal_log_hints))
+                                            >(
+                                                ::core::ptr::addr_of_mut!(
+                                                    $crate::__pgrx_c_bindings::wal_log_hints
+                                                )
+                                            )
                                         )
                                     )
                                 ) || $crate::__pgrx_c_macros::expression::truth(
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         <
                                             $crate::__pgrx_c_macros::CBool as $crate::__pgrx_c_macros::expression::CType
-                                        >::from_storage($crate::DataChecksumsNeedWrite())
+                                        >::from_storage(
+                                            $crate::__pgrx_c_bindings::DataChecksumsEnabled()
+                                        )
                                     )
                                 ) {
                                     1
@@ -144,14 +640,18 @@ macro_rules! XLogHintBitIsNeeded {
                             $crate::__pgrx_c_macros::expression::load(
                                 $crate::__pgrx_c_macros::expression::place::<
                                     $crate::__pgrx_c_macros::CBool
-                                >(::core::ptr::addr_of_mut!($crate::wal_log_hints))
+                                >(
+                                    ::core::ptr::addr_of_mut!(
+                                        $crate::__pgrx_c_bindings::wal_log_hints
+                                    )
+                                )
                             )
                         )
                     ) || $crate::__pgrx_c_macros::expression::truth(
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
                                 $crate::__pgrx_c_macros::CBool as $crate::__pgrx_c_macros::expression::CType
-                            >::from_storage($crate::DataChecksumsNeedWrite())
+                            >::from_storage($crate::__pgrx_c_bindings::DataChecksumsEnabled())
                         )
                     ) {
                         1
@@ -177,8 +677,8 @@ macro_rules! XLogHintBitIsNeeded {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -195,7 +695,7 @@ const _: () = {
     assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
     assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
 };
-/// C macro XLogIsNeeded from xlog.h:112
+/// C macro XLogIsNeeded from xlog.h:124
 ///
 /// ```text
 /// #define XLogIsNeeded( ) ( wal_level >= WAL_LEVEL_REPLICA )
@@ -228,12 +728,12 @@ macro_rules! XLogIsNeeded {
                         $crate::__pgrx_c_macros::expression::load(
                             $crate::__pgrx_c_macros::expression::place::<
                                 $crate::__pgrx_c_macros::CInt
-                            >(::core::ptr::addr_of_mut!($crate::wal_level))
+                            >(::core::ptr::addr_of_mut!($crate::__pgrx_c_bindings::wal_level))
                         )
                     ),
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                            $crate::WalLevel::WAL_LEVEL_REPLICA as i32
+                            $crate::__pgrx_c_bindings::WalLevel::WAL_LEVEL_REPLICA as i32
                         )
                     )
                 )
@@ -269,12 +769,16 @@ macro_rules! XLogIsNeeded {
                                     $crate::__pgrx_c_macros::expression::load(
                                         $crate::__pgrx_c_macros::expression::place::<
                                             $crate::__pgrx_c_macros::CInt
-                                        >(::core::ptr::addr_of_mut!($crate::wal_level))
+                                        >(
+                                            ::core::ptr::addr_of_mut!(
+                                                $crate::__pgrx_c_bindings::wal_level
+                                            )
+                                        )
                                     )
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                        $crate::WalLevel::WAL_LEVEL_REPLICA as i32
+                                        $crate::__pgrx_c_bindings::WalLevel::WAL_LEVEL_REPLICA as i32
                                     )
                                 )
                             )
@@ -297,12 +801,12 @@ macro_rules! XLogIsNeeded {
                         $crate::__pgrx_c_macros::expression::load(
                             $crate::__pgrx_c_macros::expression::place::<
                                 $crate::__pgrx_c_macros::CInt
-                            >(::core::ptr::addr_of_mut!($crate::wal_level))
+                            >(::core::ptr::addr_of_mut!($crate::__pgrx_c_bindings::wal_level))
                         )
                     ),
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                            $crate::WalLevel::WAL_LEVEL_REPLICA as i32
+                            $crate::__pgrx_c_bindings::WalLevel::WAL_LEVEL_REPLICA as i32
                         )
                     )
                 )
@@ -324,8 +828,8 @@ macro_rules! XLogIsNeeded {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -342,7 +846,7 @@ const _: () = {
     assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
     assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
 };
-/// C macro XLogLogicalInfoActive from xlog.h:137
+/// C macro XLogLogicalInfoActive from xlog.h:149
 ///
 /// ```text
 /// #define XLogLogicalInfoActive( ) ( wal_level >= WAL_LEVEL_LOGICAL || XLogLogicalInfo )
@@ -378,12 +882,16 @@ macro_rules! XLogLogicalInfoActive {
                                     $crate::__pgrx_c_macros::expression::load(
                                         $crate::__pgrx_c_macros::expression::place::<
                                             $crate::__pgrx_c_macros::CInt
-                                        >(::core::ptr::addr_of_mut!($crate::wal_level))
+                                        >(
+                                            ::core::ptr::addr_of_mut!(
+                                                $crate::__pgrx_c_bindings::wal_level
+                                            )
+                                        )
                                     )
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                        $crate::WalLevel::WAL_LEVEL_LOGICAL as i32
+                                        $crate::__pgrx_c_bindings::WalLevel::WAL_LEVEL_LOGICAL as i32
                                     )
                                 )
                             )
@@ -393,7 +901,11 @@ macro_rules! XLogLogicalInfoActive {
                             $crate::__pgrx_c_macros::expression::load(
                                 $crate::__pgrx_c_macros::expression::place::<
                                     $crate::__pgrx_c_macros::CBool
-                                >(::core::ptr::addr_of_mut!($crate::XLogLogicalInfo))
+                                >(
+                                    ::core::ptr::addr_of_mut!(
+                                        $crate::__pgrx_c_bindings::XLogLogicalInfo
+                                    )
+                                )
                             )
                         )
                     ) {
@@ -440,7 +952,11 @@ macro_rules! XLogLogicalInfoActive {
                                                 $crate::__pgrx_c_macros::expression::load(
                                                     $crate::__pgrx_c_macros::expression::place::<
                                                         $crate::__pgrx_c_macros::CInt
-                                                    >(::core::ptr::addr_of_mut!($crate::wal_level))
+                                                    >(
+                                                        ::core::ptr::addr_of_mut!(
+                                                            $crate::__pgrx_c_bindings::wal_level
+                                                        )
+                                                    )
                                                 )
                                             ),
                                             $crate::__pgrx_c_macros::expression::profile_value::<
@@ -449,7 +965,9 @@ macro_rules! XLogLogicalInfoActive {
                                             >(
                                                 $crate::__pgrx_c_macros::CValue::<
                                                     $crate::__pgrx_c_macros::CInt
-                                                >::new($crate::WalLevel::WAL_LEVEL_LOGICAL as i32)
+                                                >::new(
+                                                    $crate::__pgrx_c_bindings::WalLevel::WAL_LEVEL_LOGICAL as i32
+                                                )
                                             )
                                         )
                                     )
@@ -458,7 +976,11 @@ macro_rules! XLogLogicalInfoActive {
                                         $crate::__pgrx_c_macros::expression::load(
                                             $crate::__pgrx_c_macros::expression::place::<
                                                 $crate::__pgrx_c_macros::CBool
-                                            >(::core::ptr::addr_of_mut!($crate::XLogLogicalInfo))
+                                            >(
+                                                ::core::ptr::addr_of_mut!(
+                                                    $crate::__pgrx_c_bindings::XLogLogicalInfo
+                                                )
+                                            )
                                         )
                                     )
                                 ) {
@@ -489,12 +1011,16 @@ macro_rules! XLogLogicalInfoActive {
                                     $crate::__pgrx_c_macros::expression::load(
                                         $crate::__pgrx_c_macros::expression::place::<
                                             $crate::__pgrx_c_macros::CInt
-                                        >(::core::ptr::addr_of_mut!($crate::wal_level))
+                                        >(
+                                            ::core::ptr::addr_of_mut!(
+                                                $crate::__pgrx_c_bindings::wal_level
+                                            )
+                                        )
                                     )
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                        $crate::WalLevel::WAL_LEVEL_LOGICAL as i32
+                                        $crate::__pgrx_c_bindings::WalLevel::WAL_LEVEL_LOGICAL as i32
                                     )
                                 )
                             )
@@ -504,7 +1030,11 @@ macro_rules! XLogLogicalInfoActive {
                             $crate::__pgrx_c_macros::expression::load(
                                 $crate::__pgrx_c_macros::expression::place::<
                                     $crate::__pgrx_c_macros::CBool
-                                >(::core::ptr::addr_of_mut!($crate::XLogLogicalInfo))
+                                >(
+                                    ::core::ptr::addr_of_mut!(
+                                        $crate::__pgrx_c_bindings::XLogLogicalInfo
+                                    )
+                                )
                             )
                         )
                     ) {
@@ -531,8 +1061,8 @@ macro_rules! XLogLogicalInfoActive {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -549,7 +1079,7 @@ const _: () = {
     assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
     assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
 };
-/// C macro XLogStandbyInfoActive from xlog.h:126
+/// C macro XLogStandbyInfoActive from xlog.h:138
 ///
 /// ```text
 /// #define XLogStandbyInfoActive( ) ( wal_level >= WAL_LEVEL_REPLICA )
@@ -582,12 +1112,12 @@ macro_rules! XLogStandbyInfoActive {
                         $crate::__pgrx_c_macros::expression::load(
                             $crate::__pgrx_c_macros::expression::place::<
                                 $crate::__pgrx_c_macros::CInt
-                            >(::core::ptr::addr_of_mut!($crate::wal_level))
+                            >(::core::ptr::addr_of_mut!($crate::__pgrx_c_bindings::wal_level))
                         )
                     ),
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                            $crate::WalLevel::WAL_LEVEL_REPLICA as i32
+                            $crate::__pgrx_c_bindings::WalLevel::WAL_LEVEL_REPLICA as i32
                         )
                     )
                 )
@@ -623,12 +1153,16 @@ macro_rules! XLogStandbyInfoActive {
                                     $crate::__pgrx_c_macros::expression::load(
                                         $crate::__pgrx_c_macros::expression::place::<
                                             $crate::__pgrx_c_macros::CInt
-                                        >(::core::ptr::addr_of_mut!($crate::wal_level))
+                                        >(
+                                            ::core::ptr::addr_of_mut!(
+                                                $crate::__pgrx_c_bindings::wal_level
+                                            )
+                                        )
                                     )
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                        $crate::WalLevel::WAL_LEVEL_REPLICA as i32
+                                        $crate::__pgrx_c_bindings::WalLevel::WAL_LEVEL_REPLICA as i32
                                     )
                                 )
                             )
@@ -651,12 +1185,12 @@ macro_rules! XLogStandbyInfoActive {
                         $crate::__pgrx_c_macros::expression::load(
                             $crate::__pgrx_c_macros::expression::place::<
                                 $crate::__pgrx_c_macros::CInt
-                            >(::core::ptr::addr_of_mut!($crate::wal_level))
+                            >(::core::ptr::addr_of_mut!($crate::__pgrx_c_bindings::wal_level))
                         )
                     ),
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                            $crate::WalLevel::WAL_LEVEL_REPLICA as i32
+                            $crate::__pgrx_c_bindings::WalLevel::WAL_LEVEL_REPLICA as i32
                         )
                     )
                 )
@@ -677,6 +1211,8 @@ macro_rules! XLogStandbyInfoActive {
     };
 }
 
+pub use XLogArchivingActive;
+pub use XLogArchivingAlways;
 pub use XLogHintBitIsNeeded;
 pub use XLogIsNeeded;
 pub use XLogLogicalInfoActive;

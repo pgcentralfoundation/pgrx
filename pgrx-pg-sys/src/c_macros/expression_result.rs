@@ -116,6 +116,18 @@ impl<V: NativeResult> CExpression<V> {
         self.0.native()
     }
 }
+/// Convert a scalar result to a Rust condition using C's zero/null test.
+impl<V: Truth> CExpression<V> {
+    /// Test this already evaluated scalar without repeating its operands.
+    ///
+    /// Use this for predicates whose C result changes between `int` and `bool`
+    /// across PostgreSQL versions. Integer and floating zero are false, as are
+    /// null pointers; other scalar values are true. The original C result type
+    /// remains available through `get` or `into_value` instead.
+    pub fn is_true(self) -> bool {
+        self.0.truth()
+    }
+}
 /// Keep this runtime family within crate-owned C capability registration.
 impl<V: CExprValue> sealed::Sealed for CExpression<V> {}
 /// Normalize this admitted input at the public expression boundary while retaining its C family.
@@ -166,6 +178,40 @@ pub fn return_value_as<M: CType, V: ImplicitTo<M>>(value: V) -> M::Storage {
 mod tests {
     use super::super::{CInt, Either};
     use super::*;
+
+    /// Keep Rust predicate extraction uniform for C int and bool results without
+    /// narrowing a nonzero integer or repeating the expression's evaluation.
+    #[test]
+    fn predicates_accept_integer_and_boolean_results() {
+        let evaluations = core::cell::Cell::new(0);
+        let result = finish(input({
+            evaluations.set(evaluations.get() + 1);
+            256_i32
+        }));
+        assert!(result.is_true());
+        assert_eq!(result.get(), 256);
+        assert_eq!(evaluations.get(), 1);
+        assert!(finish(input(-1_i32)).is_true());
+        assert!(!finish(input(0_i32)).is_true());
+        assert!(finish(input(true)).is_true());
+        assert!(!finish(input(false)).is_true());
+    }
+
+    /// C truth treats both signed floating zeros and null pointers as false,
+    /// while NaN, other nonzero numbers and non-null pointers are true.
+    #[test]
+    fn predicates_preserve_floating_and_pointer_truth() {
+        assert!(!finish(input(0.0_f32)).is_true());
+        assert!(!finish(input(-0.0_f64)).is_true());
+        assert!(finish(input(f32::NAN)).is_true());
+        assert!(finish(input(f64::INFINITY)).is_true());
+        assert!(finish(input(-0.5_f64)).is_true());
+        assert!(!finish(input(core::ptr::null::<i32>())).is_true());
+        assert!(!finish(input(core::ptr::null_mut::<i32>())).is_true());
+        let mut value = 7_i32;
+        assert!(finish(input(&raw const value)).is_true());
+        assert!(finish(input(&raw mut value)).is_true());
+    }
 
     /// Check the public result wrapper supports unsuffixed integer inference while preserving tagged conditional results.
     #[test]

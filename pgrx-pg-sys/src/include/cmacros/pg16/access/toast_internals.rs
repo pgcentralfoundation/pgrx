@@ -5,8 +5,8 @@ This code is generated for documentation purposes, so that it is easy to referen
 // C macros from toast_internals.h.
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -37,21 +37,23 @@ macro_rules! __pgrx_c_args_TOAST_COMPRESS_EXTSIZE {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
         $crate::__pgrx_c_args_TOAST_COMPRESS_EXTSIZE!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_TOAST_COMPRESS_EXTSIZE!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_TOAST_COMPRESS_EXTSIZE!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_TOAST_COMPRESS_EXTSIZE!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_TOAST_COMPRESS_EXTSIZE!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -59,7 +61,9 @@ macro_rules! __pgrx_c_args_TOAST_COMPRESS_EXTSIZE {
         $crate::__pgrx_c_args_TOAST_COMPRESS_EXTSIZE!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_TOAST_COMPRESS_EXTSIZE!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_TOAST_COMPRESS_EXTSIZE!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -84,15 +88,17 @@ macro_rules! __pgrx_c_args_TOAST_COMPRESS_EXTSIZE {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_TOAST_COMPRESS_EXTSIZE!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_TOAST_COMPRESS_EXTSIZE!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_TOAST_COMPRESS_EXTSIZE!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_TOAST_COMPRESS_EXTSIZE!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -119,13 +125,13 @@ macro_rules! __pgrx_c_args_TOAST_COMPRESS_EXTSIZE {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_TOAST_COMPRESS_EXTSIZE!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_TOAST_COMPRESS_EXTSIZE!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -188,10 +194,10 @@ macro_rules! TOAST_COMPRESS_EXTSIZE {
                                             _
                                         >(
                                             $crate::__pgrx_c_macros::expression::cast_as::<
-                                                *mut $crate::toast_compress_header,
+                                                *mut $crate::__pgrx_c_bindings::toast_compress_header,
                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                        $crate::toast_compress_header
+                                                        $crate::__pgrx_c_bindings::toast_compress_header
                                                     >,
                                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                                 >,
@@ -217,7 +223,7 @@ macro_rules! TOAST_COMPRESS_EXTSIZE {
                     ),
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CUnsignedInt>::new(
-                            $crate::VARLENA_EXTSIZE_MASK as u32
+                            $crate::__pgrx_c_bindings::VARLENA_EXTSIZE_MASK as u32
                         )
                     )
                 )
@@ -265,10 +271,10 @@ macro_rules! TOAST_COMPRESS_EXTSIZE {
                                                         _
                                                     >(
                                                         $crate::__pgrx_c_macros::expression::cast_as::<
-                                                            *mut $crate::toast_compress_header,
+                                                            *mut $crate::__pgrx_c_bindings::toast_compress_header,
                                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                                    $crate::toast_compress_header
+                                                                    $crate::__pgrx_c_bindings::toast_compress_header
                                                                 >,
                                                                 $crate::__pgrx_c_macros::expression::ReadWrite
                                                             >,
@@ -295,7 +301,7 @@ macro_rules! TOAST_COMPRESS_EXTSIZE {
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::CValue::<
                                         $crate::__pgrx_c_macros::CUnsignedInt
-                                    >::new($crate::VARLENA_EXTSIZE_MASK as u32)
+                                    >::new($crate::__pgrx_c_bindings::VARLENA_EXTSIZE_MASK as u32)
                                 )
                             )
                         )
@@ -327,10 +333,10 @@ macro_rules! TOAST_COMPRESS_EXTSIZE {
                                             _
                                         >(
                                             $crate::__pgrx_c_macros::expression::cast_as::<
-                                                *mut $crate::toast_compress_header,
+                                                *mut $crate::__pgrx_c_bindings::toast_compress_header,
                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                        $crate::toast_compress_header
+                                                        $crate::__pgrx_c_bindings::toast_compress_header
                                                     >,
                                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                                 >,
@@ -356,7 +362,7 @@ macro_rules! TOAST_COMPRESS_EXTSIZE {
                     ),
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CUnsignedInt>::new(
-                            $crate::VARLENA_EXTSIZE_MASK as u32
+                            $crate::__pgrx_c_bindings::VARLENA_EXTSIZE_MASK as u32
                         )
                     )
                 )
@@ -372,8 +378,8 @@ macro_rules! TOAST_COMPRESS_EXTSIZE {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -404,21 +410,23 @@ macro_rules! __pgrx_c_args_TOAST_COMPRESS_METHOD {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
         $crate::__pgrx_c_args_TOAST_COMPRESS_METHOD!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_TOAST_COMPRESS_METHOD!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_TOAST_COMPRESS_METHOD!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_TOAST_COMPRESS_METHOD!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_TOAST_COMPRESS_METHOD!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -426,7 +434,9 @@ macro_rules! __pgrx_c_args_TOAST_COMPRESS_METHOD {
         $crate::__pgrx_c_args_TOAST_COMPRESS_METHOD!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_TOAST_COMPRESS_METHOD!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_TOAST_COMPRESS_METHOD!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -448,14 +458,18 @@ macro_rules! __pgrx_c_args_TOAST_COMPRESS_METHOD {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_TOAST_COMPRESS_METHOD!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_TOAST_COMPRESS_METHOD!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_TOAST_COMPRESS_METHOD!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_TOAST_COMPRESS_METHOD!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_TOAST_COMPRESS_METHOD!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -482,13 +496,13 @@ macro_rules! __pgrx_c_args_TOAST_COMPRESS_METHOD {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_TOAST_COMPRESS_METHOD!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_TOAST_COMPRESS_METHOD!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -548,10 +562,10 @@ macro_rules! TOAST_COMPRESS_METHOD {
                                             _
                                         >(
                                             $crate::__pgrx_c_macros::expression::cast_as::<
-                                                *mut $crate::toast_compress_header,
+                                                *mut $crate::__pgrx_c_bindings::toast_compress_header,
                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                        $crate::toast_compress_header
+                                                        $crate::__pgrx_c_bindings::toast_compress_header
                                                     >,
                                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                                 >,
@@ -577,7 +591,7 @@ macro_rules! TOAST_COMPRESS_METHOD {
                     ),
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                            $crate::VARLENA_EXTSIZE_BITS as i32
+                            $crate::__pgrx_c_bindings::VARLENA_EXTSIZE_BITS as i32
                         )
                     )
                 )
@@ -625,10 +639,10 @@ macro_rules! TOAST_COMPRESS_METHOD {
                                                         _
                                                     >(
                                                         $crate::__pgrx_c_macros::expression::cast_as::<
-                                                            *mut $crate::toast_compress_header,
+                                                            *mut $crate::__pgrx_c_bindings::toast_compress_header,
                                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                                    $crate::toast_compress_header
+                                                                    $crate::__pgrx_c_bindings::toast_compress_header
                                                                 >,
                                                                 $crate::__pgrx_c_macros::expression::ReadWrite
                                                             >,
@@ -654,7 +668,7 @@ macro_rules! TOAST_COMPRESS_METHOD {
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                        $crate::VARLENA_EXTSIZE_BITS as i32
+                                        $crate::__pgrx_c_bindings::VARLENA_EXTSIZE_BITS as i32
                                     )
                                 )
                             )
@@ -687,10 +701,10 @@ macro_rules! TOAST_COMPRESS_METHOD {
                                             _
                                         >(
                                             $crate::__pgrx_c_macros::expression::cast_as::<
-                                                *mut $crate::toast_compress_header,
+                                                *mut $crate::__pgrx_c_bindings::toast_compress_header,
                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                        $crate::toast_compress_header
+                                                        $crate::__pgrx_c_bindings::toast_compress_header
                                                     >,
                                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                                 >,
@@ -716,7 +730,7 @@ macro_rules! TOAST_COMPRESS_METHOD {
                     ),
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                            $crate::VARLENA_EXTSIZE_BITS as i32
+                            $crate::__pgrx_c_bindings::VARLENA_EXTSIZE_BITS as i32
                         )
                     )
                 )
@@ -731,5 +745,441 @@ macro_rules! TOAST_COMPRESS_METHOD {
     };
 }
 
+#[cfg(not(all(
+    target_arch = "x86_64",
+    target_os = "linux",
+    target_pointer_width = "64",
+    target_endian = "little"
+)))]
+#[cfg(not(docsrs))]
+compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
+#[doc(hidden)]
+#[macro_export]
+macro_rules! __pgrx_c_args_TOAST_COMPRESS_SET_SIZE_AND_COMPRESS_METHOD {
+    (@collect $mode:ident [$($done:tt)*]; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_TOAST_COMPRESS_SET_SIZE_AND_COMPRESS_METHOD!(
+            @p0 $mode [$($done)*];
+            $($raw)*
+        )
+    };
+    (@classified [$next:ident $mode:ident [$($done:tt)*] [$($rest:tt)*]] $descriptor:tt) => {
+        $crate::__pgrx_c_args_TOAST_COMPRESS_SET_SIZE_AND_COMPRESS_METHOD!(
+            @$next $mode [$($done)* $descriptor,];
+            $($rest)*
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_TOAST_COMPRESS_SET_SIZE_AND_COMPRESS_METHOD!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+            $($rest)*
+        )
+    };
+    (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_TOAST_COMPRESS_SET_SIZE_AND_COMPRESS_METHOD!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; - $($raw:tt)*) => {
+        $crate::__pgrx_c_args_TOAST_COMPRESS_SET_SIZE_AND_COMPRESS_METHOD!(
+            @negative0 $mode [$($done)*];
+            - $($raw)*
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
+        $crate::__pgrx_c_args_TOAST_COMPRESS_SET_SIZE_AND_COMPRESS_METHOD!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_TOAST_COMPRESS_SET_SIZE_AND_COMPRESS_METHOD] [
+                p1 $mode [$($done)*] [$($rest)*]
+            ] [$head $(::$tail)* ! $group]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; ::$head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_TOAST_COMPRESS_SET_SIZE_AND_COMPRESS_METHOD] [
+                p1 $mode [$($done)*] [$($rest)*]
+            ] [::$head $(::$tail)* ! $group]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; ($($inner:tt)*), $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_TOAST_COMPRESS_SET_SIZE_AND_COMPRESS_METHOD] [
+                p1 $mode [$($done)*] [$($rest)*]
+            ] [($($inner)*)]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_TOAST_COMPRESS_SET_SIZE_AND_COMPRESS_METHOD!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_TOAST_COMPRESS_SET_SIZE_AND_COMPRESS_METHOD!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_TOAST_COMPRESS_SET_SIZE_AND_COMPRESS_METHOD!(
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+            $($rest)*
+        )
+    };
+    (@negative1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_TOAST_COMPRESS_SET_SIZE_AND_COMPRESS_METHOD!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; - $($raw:tt)*) => {
+        $crate::__pgrx_c_args_TOAST_COMPRESS_SET_SIZE_AND_COMPRESS_METHOD!(
+            @negative1 $mode [$($done)*];
+            - $($raw)*
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
+        $crate::__pgrx_c_args_TOAST_COMPRESS_SET_SIZE_AND_COMPRESS_METHOD!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_TOAST_COMPRESS_SET_SIZE_AND_COMPRESS_METHOD] [
+                p2 $mode [$($done)*] [$($rest)*]
+            ] [$head $(::$tail)* ! $group]
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; ::$head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_TOAST_COMPRESS_SET_SIZE_AND_COMPRESS_METHOD] [
+                p2 $mode [$($done)*] [$($rest)*]
+            ] [::$head $(::$tail)* ! $group]
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; ($($inner:tt)*), $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_TOAST_COMPRESS_SET_SIZE_AND_COMPRESS_METHOD] [
+                p2 $mode [$($done)*] [$($rest)*]
+            ] [($($inner)*)]
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_TOAST_COMPRESS_SET_SIZE_AND_COMPRESS_METHOD!(
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_TOAST_COMPRESS_SET_SIZE_AND_COMPRESS_METHOD!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p2 $mode:ident [$($done:tt)*]; - $argument:literal) => {
+        $crate::__pgrx_c_args_TOAST_COMPRESS_SET_SIZE_AND_COMPRESS_METHOD!(
+            @p3 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
+    };
+    (@negative2 $mode:ident [$($done:tt)*]; $argument:expr) => {
+        $crate::__pgrx_c_args_TOAST_COMPRESS_SET_SIZE_AND_COMPRESS_METHOD!(
+            @p3 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
+    };
+    (@p2 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_TOAST_COMPRESS_SET_SIZE_AND_COMPRESS_METHOD!(
+            @p3 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+            $($rest)*
+        )
+    };
+    (@negative2 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_TOAST_COMPRESS_SET_SIZE_AND_COMPRESS_METHOD!(
+            @p3 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p2 $mode:ident [$($done:tt)*]; - $($raw:tt)*) => {
+        $crate::__pgrx_c_args_TOAST_COMPRESS_SET_SIZE_AND_COMPRESS_METHOD!(
+            @negative2 $mode [$($done)*];
+            - $($raw)*
+        )
+    };
+    (@p2 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
+        $crate::__pgrx_c_args_TOAST_COMPRESS_SET_SIZE_AND_COMPRESS_METHOD!(
+            @p3 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
+    };
+    (@p2 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_TOAST_COMPRESS_SET_SIZE_AND_COMPRESS_METHOD] [
+                p3 $mode [$($done)*] []
+            ] [$head $(::$tail)* ! $group]
+        )
+    };
+    (@p2 $mode:ident [$($done:tt)*]; ::$head:ident $(::$tail:ident)* ! $group:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_TOAST_COMPRESS_SET_SIZE_AND_COMPRESS_METHOD] [
+                p3 $mode [$($done)*] []
+            ] [::$head $(::$tail)* ! $group]
+        )
+    };
+    (@p2 $mode:ident [$($done:tt)*]; ($($inner:tt)*)) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_TOAST_COMPRESS_SET_SIZE_AND_COMPRESS_METHOD] [
+                p3 $mode [$($done)*] []
+            ] [($($inner)*)]
+        )
+    };
+    (@p2 $mode:ident [$($done:tt)*]; $argument:literal) => {
+        $crate::__pgrx_c_args_TOAST_COMPRESS_SET_SIZE_AND_COMPRESS_METHOD!(
+            @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
+    };
+    (@p2 $mode:ident [$($done:tt)*]; $argument:expr) => {
+        $crate::__pgrx_c_args_TOAST_COMPRESS_SET_SIZE_AND_COMPRESS_METHOD!(
+            @p3 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
+    };
+    (@p2 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
+        $crate::__pgrx_c_args_TOAST_COMPRESS_SET_SIZE_AND_COMPRESS_METHOD!(
+            @p3 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p2 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_TOAST_COMPRESS_SET_SIZE_AND_COMPRESS_METHOD] [
+                p3 $mode [$($done)*] [$($rest)*]
+            ] [$head $(::$tail)* ! $group]
+        )
+    };
+    (@p2 $mode:ident [$($done:tt)*]; ::$head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_TOAST_COMPRESS_SET_SIZE_AND_COMPRESS_METHOD] [
+                p3 $mode [$($done)*] [$($rest)*]
+            ] [::$head $(::$tail)* ! $group]
+        )
+    };
+    (@p2 $mode:ident [$($done:tt)*]; ($($inner:tt)*), $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_TOAST_COMPRESS_SET_SIZE_AND_COMPRESS_METHOD] [
+                p3 $mode [$($done)*] [$($rest)*]
+            ] [($($inner)*)]
+        )
+    };
+    (@p2 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_TOAST_COMPRESS_SET_SIZE_AND_COMPRESS_METHOD!(
+            @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p2 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_TOAST_COMPRESS_SET_SIZE_AND_COMPRESS_METHOD!(
+            @p3 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p3 $mode:ident [$($done:tt)*];) => {
+        $crate::TOAST_COMPRESS_SET_SIZE_AND_COMPRESS_METHOD!(@$mode; $($done)*)
+    };
+    ($($invalid:tt)*) => {
+        compile_error!("arguments do not satisfy this C macro's invocation contract")
+    };
+}
+/// C macro TOAST_COMPRESS_SET_SIZE_AND_COMPRESS_METHOD from toast_internals.h:39
+///
+/// ```text
+/// #define TOAST_COMPRESS_SET_SIZE_AND_COMPRESS_METHOD( ptr , len , cm_method ) do { Assert ( ( len ) > 0 && ( len ) <= VARLENA_EXTSIZE_MASK ) ; Assert ( ( cm_method ) == TOAST_PGLZ_COMPRESSION_ID || ( cm_method ) == TOAST_LZ4_COMPRESSION_ID ) ; ( ( toast_compress_header * ) ( ptr ) ) -> tcinfo = ( len ) | ( ( uint32 ) ( cm_method ) << VARLENA_EXTSIZE_BITS ) ; } while ( 0 )
+/// ```
+///
+///
+/// This macro executes C statements in order and yields no value. Local blocks retain their C scope. Pointer access and native calls keep their usual caller safety obligations.
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. Shifts reject negative counts and counts at least the promoted left operand's width; signed left shifts also reject values outside the defined C domain. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+#[macro_export]
+macro_rules! TOAST_COMPRESS_SET_SIZE_AND_COMPRESS_METHOD {
+    (@__pgrx_emit_check_safety; $ptr:tt, $len:tt, $cm_method:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $ptr);
+                $crate::__pgrx_c_operand!(@check_safety; $len);
+                $crate::__pgrx_c_operand!(@check_safety; $cm_method);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_TOAST_COMPRESS_SET_SIZE_AND_COMPRESS_METHOD!(
+            @collect __pgrx_emit_check_safety [];
+            $($raw)*
+        )
+    };
+    (@__pgrx_emit_public; $ptr:tt, $len:tt, $cm_method:tt $(,)?) => {
+        {
+            /* PGRX: Assert remains expanded because preserving the complete statement body and its order has not been proved equivalent to C substitution. */
+            {
+                let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    {
+                        {
+                            let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                /* PGRX: true remains expanded because no integer constant binding is available in the defining Rust crate. */
+                                $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
+                                    1i32
+                                )
+                            );
+                        }
+                    }
+                );
+            };
+            {
+                let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    {
+                        {
+                            let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                /* PGRX: true remains expanded because no integer constant binding is available in the defining Rust crate. */
+                                $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
+                                    1i32
+                                )
+                            );
+                        }
+                    }
+                );
+            };
+            {
+                let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                    $crate::__pgrx_c_macros::expression::assign(
+                        $crate::__pgrx_c_macros::expression::project::<
+                            $crate::__pgrx_c_generated::Field_tcinfo,
+                            _,
+                            _
+                        >(
+                            $crate::__pgrx_c_macros::expression::pointee(
+                                (
+                                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                        $crate::__pgrx_c_macros::expression::cast_as::<
+                                            *mut $crate::__pgrx_c_bindings::toast_compress_header,
+                                            $crate::__pgrx_c_macros::expression::CPointer<
+                                                $crate::__pgrx_c_macros::expression::CRecord<
+                                                    $crate::__pgrx_c_bindings::toast_compress_header
+                                                >,
+                                                $crate::__pgrx_c_macros::expression::ReadWrite
+                                            >,
+                                            _
+                                        >(
+                                            (
+                                                $crate::__pgrx_c_macros::expression::profile_value::<
+                                                    true,
+                                                    _
+                                                >($crate::__pgrx_c_operand!(@value [true]; $ptr))
+                                            )
+                                        )
+                                    )
+                                )
+                            )
+                        ),
+                        $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                            $crate::__pgrx_c_macros::expression::bitor(
+                                (
+                                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                        $crate::__pgrx_c_operand!(@value [true]; $len)
+                                    )
+                                ),
+                                (
+                                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                        $crate::__pgrx_c_macros::expression::shl::<
+                                            $crate::__pgrx_c_macros::Wrapping,
+                                            _,
+                                            _
+                                        >(
+                                            $crate::__pgrx_c_macros::expression::profile_value::<
+                                                true,
+                                                _
+                                            >(
+                                                $crate::__pgrx_c_macros::expression::cast_as::<
+                                                    $crate::__pgrx_c_bindings::uint32,
+                                                    $crate::__pgrx_c_macros::CUnsignedInt,
+                                                    _
+                                                >(
+                                                    (
+                                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                                            true,
+                                                            _
+                                                        >(
+                                                            $crate::__pgrx_c_operand!(
+                                                                @value [true];
+                                                                $cm_method
+                                                            )
+                                                        )
+                                                    )
+                                                )
+                                            ),
+                                            $crate::__pgrx_c_macros::expression::profile_value::<
+                                                true,
+                                                _
+                                            >(
+                                                $crate::__pgrx_c_macros::CValue::<
+                                                    $crate::__pgrx_c_macros::CInt
+                                                >::new(
+                                                    $crate::__pgrx_c_bindings::VARLENA_EXTSIZE_BITS as i32
+                                                )
+                                            )
+                                        )
+                                    )
+                                )
+                            )
+                        )
+                    )
+                );
+            };
+        }
+    };
+    (@__pgrx_emit_discard; $ptr:tt, $len:tt, $cm_method:tt $(,)?) => {
+        $crate::TOAST_COMPRESS_SET_SIZE_AND_COMPRESS_METHOD!(
+            @__pgrx_emit_public;
+            $ptr,
+            $len,
+            $cm_method
+        )
+    };
+    (@__pgrx_c_discard; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_TOAST_COMPRESS_SET_SIZE_AND_COMPRESS_METHOD!(
+            @collect __pgrx_emit_discard [];
+            $($raw)*
+        )
+    };
+    (@$mode:ident; $($raw:tt)*) => {
+        compile_error!("a C statement body is not an expression operand")
+    };
+    ($($raw:tt)*) => {
+        $crate::__pgrx_c_args_TOAST_COMPRESS_SET_SIZE_AND_COMPRESS_METHOD!(
+            @collect __pgrx_emit_public [];
+            $($raw)*
+        )
+    };
+}
+
 pub use TOAST_COMPRESS_EXTSIZE;
 pub use TOAST_COMPRESS_METHOD;
+pub use TOAST_COMPRESS_SET_SIZE_AND_COMPRESS_METHOD;

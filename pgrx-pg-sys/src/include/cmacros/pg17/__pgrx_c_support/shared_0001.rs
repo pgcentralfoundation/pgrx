@@ -9,7 +9,7 @@ This code is generated for documentation purposes, so that it is easy to referen
 macro_rules! __pgrx_c_classify {
     (@argument [$callback:ident] $state:tt [$($original:tt)*]) => {
         $crate::__pgrx_c_classify!(
-            @walk [$callback] $state [$($original)*] [
+            @walk [__pgrx_c_original] [$callback $state [$($original)*]] [$($original)*] [
                 @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @
             ];
             [$($original)*]
@@ -382,6 +382,17 @@ macro_rules! __pgrx_c_classify {
     };
     (
         @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        AddinShmemInitLock
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available AddinShmemInitLock {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
         AllocSizeIsValid
     ) => {
         $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
@@ -558,6 +569,135 @@ macro_rules! __pgrx_c_classify {
     };
     (
         @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        ApplyInt32SortComparator
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available ApplyInt32SortComparator {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        ApplySignedSortComparator
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available ApplySignedSortComparator {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        ApplySortAbbrevFullComparator
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available ApplySortAbbrevFullComparator {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        ApplySortComparator
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available ApplySortComparator {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        ApplyUnsignedSortComparator
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available ApplyUnsignedSortComparator {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (@path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt; Assert) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available Assert {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        AssertCouldGetRelation
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available AssertCouldGetRelation {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        AssertMacro
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available AssertMacro {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        AssertPendingSyncs_RelationCache
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available AssertPendingSyncs_RelationCache {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        AssertPointerAlignment
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available AssertPointerAlignment {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        AssertTransactionIdInAllowableRange
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available AssertTransactionIdInAllowableRange {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        AttrNumberGetAttrOffset
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available AttrNumberGetAttrOffset {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
         AttrNumberIsForUserDefinedAttr
     ) => {
         $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
@@ -585,6 +725,39 @@ macro_rules! __pgrx_c_classify {
         $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
     };
     (@if_available AttributeNumberIsValid {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        AutoFileLock
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available AutoFileLock {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        AutovacuumLock
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available AutovacuumLock {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        AutovacuumScheduleLock
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available AutovacuumScheduleLock {
         $($items:tt)*
     }) => {
         $($items)*
@@ -749,6 +922,39 @@ macro_rules! __pgrx_c_classify {
     };
     (
         @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        BTGetDeduplicateItems
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available BTGetDeduplicateItems {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        BTGetFillFactor
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available BTGetFillFactor {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        BTGetTargetPageFreeSpace
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available BTGetTargetPageFreeSpace {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
         BTMaxItemSize
     ) => {
         $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
@@ -765,6 +971,17 @@ macro_rules! __pgrx_c_classify {
         $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
     };
     (@if_available BTMaxItemSizeNoHeapTid {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        BTPageGetDeleteXid
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available BTPageGetDeleteXid {
         $($items:tt)*
     }) => {
         $($items)*
@@ -793,11 +1010,55 @@ macro_rules! __pgrx_c_classify {
     };
     (
         @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        BTPageIsRecyclable
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available BTPageIsRecyclable {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        BTPageSetDeleted
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available BTPageSetDeleted {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
         BTScanPosInvalidate
     ) => {
         $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
     };
     (@if_available BTScanPosInvalidate {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        BTScanPosIsPinned
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available BTScanPosIsPinned {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        BTScanPosIsValid
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available BTScanPosIsValid {
         $($items:tt)*
     }) => {
         $($items)*
@@ -815,11 +1076,176 @@ macro_rules! __pgrx_c_classify {
     };
     (
         @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        BTScanPosUnpinIfPinned
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available BTScanPosUnpinIfPinned {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        BTreeTupleGetDownLink
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available BTreeTupleGetDownLink {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        BTreeTupleGetHeapTID
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available BTreeTupleGetHeapTID {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        BTreeTupleGetMaxHeapTID
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available BTreeTupleGetMaxHeapTID {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
         BTreeTupleGetNAtts
     ) => {
         $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
     };
     (@if_available BTreeTupleGetNAtts {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        BTreeTupleGetNPosting
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available BTreeTupleGetNPosting {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        BTreeTupleGetPosting
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available BTreeTupleGetPosting {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        BTreeTupleGetPostingN
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available BTreeTupleGetPostingN {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        BTreeTupleGetPostingOffset
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available BTreeTupleGetPostingOffset {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        BTreeTupleGetTopParent
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available BTreeTupleGetTopParent {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        BTreeTupleIsPivot
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available BTreeTupleIsPivot {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        BTreeTupleIsPosting
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available BTreeTupleIsPosting {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        BTreeTupleSetDownLink
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available BTreeTupleSetDownLink {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        BTreeTupleSetNAtts
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available BTreeTupleSetNAtts {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        BTreeTupleSetPosting
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available BTreeTupleSetPosting {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        BTreeTupleSetTopParent
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available BTreeTupleSetTopParent {
         $($items:tt)*
     }) => {
         $($items)*
@@ -903,11 +1329,129 @@ macro_rules! __pgrx_c_classify {
     };
     (
         @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        BackgroundWorkerLock
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available BackgroundWorkerLock {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        BackupHistoryFileName
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available BackupHistoryFileName {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        BackupHistoryFilePath
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available BackupHistoryFilePath {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        BlockIdEquals
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available BlockIdEquals {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        BlockIdGetBlockNumber
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available BlockIdGetBlockNumber {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (@path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt; BlockIdSet) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available BlockIdSet {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        BlockNumberIsValid
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available BlockNumberIsValid {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        BoolGetDatum
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available BoolGetDatum {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
         BoolIsValid
     ) => {
         $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
     };
     (@if_available BoolIsValid {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        BoxPGetDatum
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available BoxPGetDatum {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        BrinGetAutoSummarize
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available BrinGetAutoSummarize {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        BrinGetPagesPerRange
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available BrinGetPagesPerRange {
         $($items:tt)*
     }) => {
         $($items)*
@@ -980,6 +1524,171 @@ macro_rules! __pgrx_c_classify {
     };
     (
         @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        BtreeVacuumLock
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available BtreeVacuumLock {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        BufMappingPartitionLock
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available BufMappingPartitionLock {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        BufMappingPartitionLockByIndex
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available BufMappingPartitionLockByIndex {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        BufTableHashPartition
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available BufTableHashPartition {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        BufTagGetForkNum
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available BufTagGetForkNum {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        BufTagGetRelFileLocator
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available BufTagGetRelFileLocator {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        BufTagGetRelNumber
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available BufTagGetRelNumber {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        BufTagMatchesRelFileLocator
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available BufTagMatchesRelFileLocator {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        BufTagSetRelForkDetails
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available BufTagSetRelForkDetails {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        BufferDescriptorGetBuffer
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available BufferDescriptorGetBuffer {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        BufferDescriptorGetContentLock
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available BufferDescriptorGetContentLock {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        BufferDescriptorGetIOCV
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available BufferDescriptorGetIOCV {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        BufferGetBlock
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available BufferGetBlock {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        BufferGetPage
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available BufferGetPage {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        BufferGetPageSize
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available BufferGetPageSize {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
         BufferIsInvalid
     ) => {
         $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
@@ -996,6 +1705,28 @@ macro_rules! __pgrx_c_classify {
         $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
     };
     (@if_available BufferIsLocal {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        BufferIsValid
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available BufferIsValid {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        BufferTagsEqual
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available BufferTagsEqual {
         $($items:tt)*
     }) => {
         $($items)*
@@ -1109,6 +1840,17 @@ macro_rules! __pgrx_c_classify {
     };
     (
         @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        CStringGetDatum
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available CStringGetDatum {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
         CStringGetTextDatum
     ) => {
         $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
@@ -1120,11 +1862,110 @@ macro_rules! __pgrx_c_classify {
     };
     (
         @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        CharGetDatum
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available CharGetDatum {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        CheckpointerCommLock
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available CheckpointerCommLock {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        CirclePGetDatum
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available CirclePGetDatum {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        ClearBufferTag
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available ClearBufferTag {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        CommandIdGetDatum
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available CommandIdGetDatum {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        CommitTsLock
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available CommitTsLock {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
         CompressionMethodIsValid
     ) => {
         $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
     };
     (@if_available CompressionMethodIsValid {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        ControlFileLock
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available ControlFileLock {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        CopyQueryCompletion
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available CopyQueryCompletion {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        CreateCommandName
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available CreateCommandName {
         $($items:tt)*
     }) => {
         $($items)*
@@ -1247,10 +2088,32 @@ macro_rules! __pgrx_c_classify {
     }) => {
         $($items)*
     };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        DSMRegistryLock
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available DSMRegistryLock {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
     (@path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt; DTK_M) => {
         $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
     };
     (@if_available DTK_M {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        DateADTGetDatum
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available DateADTGetDatum {
         $($items:tt)*
     }) => {
         $($items)*
@@ -1317,6 +2180,28 @@ macro_rules! __pgrx_c_classify {
         $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
     };
     (@if_available DatumGetArrayTypePCopy {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        DatumGetBool
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available DatumGetBool {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        DatumGetBoxP
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available DatumGetBoxP {
         $($items:tt)*
     }) => {
         $($items)*
@@ -1411,6 +2296,94 @@ macro_rules! __pgrx_c_classify {
     };
     (
         @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        DatumGetCString
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available DatumGetCString {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        DatumGetChar
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available DatumGetChar {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        DatumGetCircleP
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available DatumGetCircleP {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        DatumGetCommandId
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available DatumGetCommandId {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        DatumGetDateADT
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available DatumGetDateADT {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        DatumGetFloat4
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available DatumGetFloat4 {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        DatumGetFloat8
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available DatumGetFloat8 {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        DatumGetGinTernaryValue
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available DatumGetGinTernaryValue {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
         DatumGetHeapTupleHeader
     ) => {
         $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
@@ -1427,6 +2400,292 @@ macro_rules! __pgrx_c_classify {
         $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
     };
     (@if_available DatumGetHeapTupleHeaderCopy {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        DatumGetInt16
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available DatumGetInt16 {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        DatumGetInt32
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available DatumGetInt32 {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        DatumGetInt64
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available DatumGetInt64 {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        DatumGetIntervalP
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available DatumGetIntervalP {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        DatumGetItemPointer
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available DatumGetItemPointer {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        DatumGetJsonbP
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available DatumGetJsonbP {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        DatumGetJsonbPCopy
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available DatumGetJsonbPCopy {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        DatumGetLineP
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available DatumGetLineP {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        DatumGetLsegP
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available DatumGetLsegP {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        DatumGetName
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available DatumGetName {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        DatumGetNumeric
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available DatumGetNumeric {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        DatumGetNumericCopy
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available DatumGetNumericCopy {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        DatumGetObjectId
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available DatumGetObjectId {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        DatumGetPathP
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available DatumGetPathP {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        DatumGetPathPCopy
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available DatumGetPathPCopy {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        DatumGetPointP
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available DatumGetPointP {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        DatumGetPointer
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available DatumGetPointer {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        DatumGetPolygonP
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available DatumGetPolygonP {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        DatumGetPolygonPCopy
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available DatumGetPolygonPCopy {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        DatumGetRangeTypeP
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available DatumGetRangeTypeP {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        DatumGetRangeTypePCopy
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available DatumGetRangeTypePCopy {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        DatumGetTSQuery
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available DatumGetTSQuery {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        DatumGetTSQueryCopy
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available DatumGetTSQueryCopy {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        DatumGetTSQuerySign
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available DatumGetTSQuerySign {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        DatumGetTSVector
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available DatumGetTSVector {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        DatumGetTSVectorCopy
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available DatumGetTSVectorCopy {
         $($items:tt)*
     }) => {
         $($items)*
@@ -1471,6 +2730,105 @@ macro_rules! __pgrx_c_classify {
         $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
     };
     (@if_available DatumGetTextPSlice {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        DatumGetTimeADT
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available DatumGetTimeADT {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        DatumGetTimeTzADTP
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available DatumGetTimeTzADTP {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        DatumGetTimestamp
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available DatumGetTimestamp {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        DatumGetTimestampTz
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available DatumGetTimestampTz {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        DatumGetTransactionId
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available DatumGetTransactionId {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        DatumGetUInt16
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available DatumGetUInt16 {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        DatumGetUInt32
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available DatumGetUInt32 {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        DatumGetUInt64
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available DatumGetUInt64 {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        DatumGetUInt8
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available DatumGetUInt8 {
         $($items:tt)*
     }) => {
         $($items)*
@@ -1642,6 +3000,17 @@ macro_rules! __pgrx_c_classify {
     };
     (
         @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        DynamicSharedMemoryControlLock
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available DynamicSharedMemoryControlLock {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
         EC_MUST_BE_REDUNDANT
     ) => {
         $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
@@ -1653,11 +3022,44 @@ macro_rules! __pgrx_c_classify {
     };
     (
         @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        END_CRIT_SECTION
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available END_CRIT_SECTION {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
         ENL1_printf
     ) => {
         $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
     };
     (@if_available ENL1_printf {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        EOHPGetRODatum
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available EOHPGetRODatum {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        EOHPGetRWDatum
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available EOHPGetRWDatum {
         $($items:tt)*
     }) => {
         $($items)*
@@ -1738,6 +3140,157 @@ macro_rules! __pgrx_c_classify {
     };
     (
         @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        ExecClearTuple
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available ExecClearTuple {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        ExecCopySlot
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available ExecCopySlot {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        ExecCopySlotHeapTuple
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available ExecCopySlotHeapTuple {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        ExecCopySlotMinimalTuple
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available ExecCopySlotMinimalTuple {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        ExecEvalExpr
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available ExecEvalExpr {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        ExecEvalExprSwitchContext
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available ExecEvalExprSwitchContext {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        ExecGetJunkAttribute
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available ExecGetJunkAttribute {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        ExecMaterializeSlot
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available ExecMaterializeSlot {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        ExecProcNode
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available ExecProcNode {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        ExecProject
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available ExecProject {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (@path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt; ExecQual) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available ExecQual {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        ExecQualAndReset
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available ExecQualAndReset {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        ExpandedRecordGetDatum
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available ExpandedRecordGetDatum {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        ExpandedRecordGetRODatum
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available ExpandedRecordGetRODatum {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
         ExpandedRecordIsDomain
     ) => {
         $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
@@ -1773,6 +3326,17 @@ macro_rules! __pgrx_c_classify {
         $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
     };
     (@if_available FIN_CRC32C {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        FIRST_PREPARED_XACT_PROC_NUMBER
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available FIRST_PREPARED_XACT_PROC_NUMBER {
         $($items:tt)*
     }) => {
         $($items)*
@@ -1851,6 +3415,92 @@ macro_rules! __pgrx_c_classify {
     }) => {
         $($items)*
     };
+    (@path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt; FPeq) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available FPeq {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (@path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt; FPge) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available FPge {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (@path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt; FPgt) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available FPgt {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (@path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt; FPle) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available FPle {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (@path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt; FPlt) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available FPlt {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (@path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt; FPne) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available FPne {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (@path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt; FileRead) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available FileRead {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (@path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt; FileWrite) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available FileWrite {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        Float4GetDatum
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available Float4GetDatum {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        Float8GetDatum
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available Float8GetDatum {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
     (
         @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
         FmgrHookIsNeeded
@@ -1858,6 +3508,17 @@ macro_rules! __pgrx_c_classify {
         $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
     };
     (@if_available FmgrHookIsNeeded {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        FullTransactionIdAdvance
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available FullTransactionIdAdvance {
         $($items:tt)*
     }) => {
         $($items)*
@@ -1897,6 +3558,39 @@ macro_rules! __pgrx_c_classify {
     };
     (
         @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        FullTransactionIdFromAllowableAt
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available FullTransactionIdFromAllowableAt {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        FullTransactionIdFromEpochAndXid
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available FullTransactionIdFromEpochAndXid {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        FullTransactionIdFromU64
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available FullTransactionIdFromU64 {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
         FullTransactionIdIsNormal
     ) => {
         $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
@@ -1919,6 +3613,17 @@ macro_rules! __pgrx_c_classify {
     };
     (
         @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        FullTransactionIdNewer
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available FullTransactionIdNewer {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
         FullTransactionIdPrecedes
     ) => {
         $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
@@ -1935,6 +3640,17 @@ macro_rules! __pgrx_c_classify {
         $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
     };
     (@if_available FullTransactionIdPrecedesOrEquals {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        FullTransactionIdRetreat
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available FullTransactionIdRetreat {
         $($items:tt)*
     }) => {
         $($items)*
@@ -2204,6 +3920,39 @@ macro_rules! __pgrx_c_classify {
     };
     (
         @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        GetBufferDescriptor
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available GetBufferDescriptor {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        GetCTETargetList
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available GetCTETargetList {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        GetLocalBufferDescriptor
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available GetLocalBufferDescriptor {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
         GetNumberFromPGProc
     ) => {
         $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
@@ -2253,6 +4002,25 @@ macro_rules! __pgrx_c_classify {
         $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
     };
     (@if_available GetProcessingMode {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (@path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt; GetRmgr) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available GetRmgr {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        GetScanKeyword
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available GetScanKeyword {
         $($items:tt)*
     }) => {
         $($items)*
@@ -2435,6 +4203,17 @@ macro_rules! __pgrx_c_classify {
     };
     (
         @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        GinDataPageSetDataSize
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available GinDataPageSetDataSize {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
         GinGetDownlink
     ) => {
         $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
@@ -2468,6 +4247,17 @@ macro_rules! __pgrx_c_classify {
     };
     (
         @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        GinGetPendingListCleanupSize
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available GinGetPendingListCleanupSize {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
         GinGetPosting
     ) => {
         $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
@@ -2495,6 +4285,17 @@ macro_rules! __pgrx_c_classify {
         $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
     };
     (@if_available GinGetPostingTree {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        GinGetUseFastUpdate
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available GinGetUseFastUpdate {
         $($items:tt)*
     }) => {
         $($items)*
@@ -2864,6 +4665,17 @@ macro_rules! __pgrx_c_classify {
     };
     (
         @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        GinTernaryValueGetDatum
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available GinTernaryValueGetDatum {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
         GistClearFollowRight
     ) => {
         $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
@@ -2941,6 +4753,17 @@ macro_rules! __pgrx_c_classify {
     };
     (
         @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        GistPageGetDeleteXid
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available GistPageGetDeleteXid {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
         GistPageGetNSN
     ) => {
         $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
@@ -2990,6 +4813,17 @@ macro_rules! __pgrx_c_classify {
         $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
     };
     (@if_available GistPageIsLeaf {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        GistPageSetDeleted
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available GistPageSetDeleted {
         $($items:tt)*
     }) => {
         $($items)*
@@ -3191,11 +5025,33 @@ macro_rules! __pgrx_c_classify {
     };
     (
         @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        HashGetFillFactor
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available HashGetFillFactor {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
         HashGetMaxBitmapSize
     ) => {
         $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
     };
     (@if_available HashGetMaxBitmapSize {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        HashGetTargetPageUsage
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available HashGetTargetPageUsage {
         $($items:tt)*
     }) => {
         $($items)*
@@ -3257,6 +5113,39 @@ macro_rules! __pgrx_c_classify {
     };
     (
         @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        HashScanPosIsPinned
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available HashScanPosIsPinned {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        HashScanPosIsValid
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available HashScanPosIsValid {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        HeapKeyTest
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available HeapKeyTest {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
         HeapScanIsValid
     ) => {
         $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
@@ -3295,6 +5184,17 @@ macro_rules! __pgrx_c_classify {
         $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
     };
     (@if_available HeapTupleClearHotUpdated {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        HeapTupleGetDatum
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available HeapTupleGetDatum {
         $($items:tt)*
     }) => {
         $($items)*
@@ -3422,6 +5322,17 @@ macro_rules! __pgrx_c_classify {
     };
     (
         @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        HeapTupleHeaderGetSpeculativeToken
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available HeapTupleHeaderGetSpeculativeToken {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
         HeapTupleHeaderGetTypMod
     ) => {
         $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
@@ -3543,6 +5454,28 @@ macro_rules! __pgrx_c_classify {
     };
     (
         @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        HeapTupleHeaderSetCmax
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available HeapTupleHeaderSetCmax {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        HeapTupleHeaderSetCmin
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available HeapTupleHeaderSetCmin {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
         HeapTupleHeaderSetDatumLength
     ) => {
         $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
@@ -3658,6 +5591,50 @@ macro_rules! __pgrx_c_classify {
         $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
     };
     (@if_available HeapTupleHeaderSetXmin {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        HeapTupleHeaderSetXminCommitted
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available HeapTupleHeaderSetXminCommitted {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        HeapTupleHeaderSetXminFrozen
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available HeapTupleHeaderSetXminFrozen {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        HeapTupleHeaderSetXminInvalid
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available HeapTupleHeaderSetXminInvalid {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        HeapTupleHeaderSetXvac
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available HeapTupleHeaderSetXvac {
         $($items:tt)*
     }) => {
         $($items)*
@@ -4357,6 +6334,28 @@ macro_rules! __pgrx_c_classify {
     };
     (
         @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        InHotStandby
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available InHotStandby {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        IndexInfoFindDataOffset
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available IndexInfoFindDataOffset {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
         IndexRelationGetNumberOfAttributes
     ) => {
         $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
@@ -4423,6 +6422,17 @@ macro_rules! __pgrx_c_classify {
     };
     (
         @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        InitBufferTag
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available InitBufferTag {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
         InitDirtySnapshot
     ) => {
         $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
@@ -4478,6 +6488,17 @@ macro_rules! __pgrx_c_classify {
     };
     (
         @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        InjectionPointLock
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available InjectionPointLock {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
         InstrCountFiltered1
     ) => {
         $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
@@ -4505,6 +6526,61 @@ macro_rules! __pgrx_c_classify {
         $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
     };
     (@if_available InstrCountTuples2 {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        Int16GetDatum
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available Int16GetDatum {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        Int32GetDatum
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available Int32GetDatum {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        Int64GetDatum
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available Int64GetDatum {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        Int8GetDatum
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available Int8GetDatum {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        IntervalPGetDatum
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available IntervalPGetDatum {
         $($items:tt)*
     }) => {
         $($items)*
@@ -4720,6 +6796,17 @@ macro_rules! __pgrx_c_classify {
     };
     (
         @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        IsBackupHistoryFileName
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available IsBackupHistoryFileName {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
         IsBootstrapProcessingMode
     ) => {
         $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
@@ -4786,6 +6873,17 @@ macro_rules! __pgrx_c_classify {
     };
     (
         @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        IsPartialXLogFileName
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available IsPartialXLogFileName {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
         IsPolymorphicType
     ) => {
         $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
@@ -4827,6 +6925,28 @@ macro_rules! __pgrx_c_classify {
     };
     (
         @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        IsQueryIdEnabled
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available IsQueryIdEnabled {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        IsTLHistoryFileName
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available IsTLHistoryFileName {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
         IsTrueArrayType
     ) => {
         $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
@@ -4843,6 +6963,17 @@ macro_rules! __pgrx_c_classify {
         $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
     };
     (@if_available IsValidWalSegSize {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        IsXLogFileName
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available IsXLogFileName {
         $($items:tt)*
     }) => {
         $($items)*
@@ -5036,6 +7167,83 @@ macro_rules! __pgrx_c_classify {
     };
     (
         @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        ItemPointerCopy
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available ItemPointerCopy {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        ItemPointerGetBlockNumber
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available ItemPointerGetBlockNumber {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        ItemPointerGetBlockNumberNoCheck
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available ItemPointerGetBlockNumberNoCheck {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        ItemPointerGetDatum
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available ItemPointerGetDatum {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        ItemPointerGetOffsetNumber
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available ItemPointerGetOffsetNumber {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        ItemPointerGetOffsetNumberNoCheck
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available ItemPointerGetOffsetNumberNoCheck {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        ItemPointerIndicatesMovedPartitions
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available ItemPointerIndicatesMovedPartitions {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
         ItemPointerIsLossyPage
     ) => {
         $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
@@ -5052,6 +7260,50 @@ macro_rules! __pgrx_c_classify {
         $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
     };
     (@if_available ItemPointerIsMin {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        ItemPointerIsValid
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available ItemPointerIsValid {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        ItemPointerSet
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available ItemPointerSet {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        ItemPointerSetBlockNumber
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available ItemPointerSetBlockNumber {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        ItemPointerSetInvalid
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available ItemPointerSetInvalid {
         $($items:tt)*
     }) => {
         $($items)*
@@ -5085,6 +7337,28 @@ macro_rules! __pgrx_c_classify {
         $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
     };
     (@if_available ItemPointerSetMin {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        ItemPointerSetMovedPartitions
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available ItemPointerSetMovedPartitions {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        ItemPointerSetOffsetNumber
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available ItemPointerSetOffsetNumber {
         $($items:tt)*
     }) => {
         $($items)*
@@ -5283,6 +7557,17 @@ macro_rules! __pgrx_c_classify {
     };
     (
         @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        JsonbPGetDatum
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available JsonbPGetDatum {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
         LEVEL_HAS_BUFFERS
     ) => {
         $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
@@ -5384,6 +7669,17 @@ macro_rules! __pgrx_c_classify {
     };
     (
         @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        LinePGetDatum
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available LinePGetDatum {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
         LocalTransactionIdIsValid
     ) => {
         $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
@@ -5433,6 +7729,28 @@ macro_rules! __pgrx_c_classify {
         $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
     };
     (@if_available LockHashPartitionLockByProc {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        LogicalRepWorkerLock
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available LogicalRepWorkerLock {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        LsegPGetDatum
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available LsegPGetDatum {
         $($items:tt)*
     }) => {
         $($items)*
@@ -5573,6 +7891,17 @@ macro_rules! __pgrx_c_classify {
     }) => {
         $($items)*
     };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        MappingUserName
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available MappingUserName {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
     (@path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt; Max) => {
         $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
     };
@@ -5614,10 +7943,43 @@ macro_rules! __pgrx_c_classify {
     }) => {
         $($items)*
     };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        MemoryContextSwitchTo
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available MemoryContextSwitchTo {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
     (@path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt; Min) => {
         $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
     };
     (@if_available Min {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        MultiXactGenLock
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available MultiXactGenLock {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        MultiXactIdGetDatum
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available MultiXactIdGetDatum {
         $($items:tt)*
     }) => {
         $($items)*
@@ -5629,6 +7991,17 @@ macro_rules! __pgrx_c_classify {
         $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
     };
     (@if_available MultiXactIdIsValid {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        MultiXactTruncationLock
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available MultiXactTruncationLock {
         $($items:tt)*
     }) => {
         $($items)*
@@ -5660,6 +8033,28 @@ macro_rules! __pgrx_c_classify {
     }) => {
         $($items)*
     };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        NULL_OR_TUPLE
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available NULL_OR_TUPLE {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        NameGetDatum
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available NameGetDatum {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
     (@path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt; NameStr) => {
         $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
     };
@@ -5678,11 +8073,77 @@ macro_rules! __pgrx_c_classify {
     };
     (
         @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        NormalTransactionIdFollows
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available NormalTransactionIdFollows {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        NormalTransactionIdOlder
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available NormalTransactionIdOlder {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        NormalTransactionIdPrecedes
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available NormalTransactionIdPrecedes {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        NotifyQueueLock
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available NotifyQueueLock {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        NotifyQueueTailLock
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available NotifyQueueTailLock {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
         NthParallelHashJoinBatch
     ) => {
         $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
     };
     (@if_available NthParallelHashJoinBatch {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        NumericGetDatum
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available NumericGetDatum {
         $($items:tt)*
     }) => {
         $($items)*
@@ -5716,6 +8177,17 @@ macro_rules! __pgrx_c_classify {
         $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
     };
     (@if_available ObjectAddressSubSet {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        ObjectIdGetDatum
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available ObjectIdGetDatum {
         $($items:tt)*
     }) => {
         $($items)*
@@ -5870,6 +8342,14 @@ macro_rules! __pgrx_c_classify {
         $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
     };
     (@if_available OidFunctionCall9 {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (@path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt; OidGenLock) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available OidGenLock {
         $($items:tt)*
     }) => {
         $($items)*
@@ -7669,6 +10149,39 @@ macro_rules! __pgrx_c_classify {
     };
     (
         @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        PageClearAllVisible
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available PageClearAllVisible {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        PageClearFull
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available PageClearFull {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        PageClearHasFreeLinePointers
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available PageClearHasFreeLinePointers {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
         PageClearPrunable
     ) => {
         $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
@@ -7680,11 +10193,241 @@ macro_rules! __pgrx_c_classify {
     };
     (
         @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        PageGetContents
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available PageGetContents {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        PageGetItem
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available PageGetItem {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        PageGetItemId
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available PageGetItemId {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (@path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt; PageGetLSN) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available PageGetLSN {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        PageGetMaxOffsetNumber
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available PageGetMaxOffsetNumber {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        PageGetPageLayoutVersion
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available PageGetPageLayoutVersion {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        PageGetPageSize
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available PageGetPageSize {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        PageGetSpecialPointer
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available PageGetSpecialPointer {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        PageGetSpecialSize
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available PageGetSpecialSize {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        PageHasFreeLinePointers
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available PageHasFreeLinePointers {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        PageIsAllVisible
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available PageIsAllVisible {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        PageIsEmpty
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available PageIsEmpty {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (@path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt; PageIsFull) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available PageIsFull {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (@path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt; PageIsNew) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available PageIsNew {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
         PageIsVerified
     ) => {
         $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
     };
     (@if_available PageIsVerified {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        PageSetAllVisible
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available PageSetAllVisible {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        PageSetFull
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available PageSetFull {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        PageSetHasFreeLinePointers
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available PageSetHasFreeLinePointers {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (@path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt; PageSetLSN) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available PageSetLSN {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        PageSetPageSizeAndVersion
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available PageSetPageSizeAndVersion {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        PageSetPrunable
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available PageSetPrunable {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        PageValidateSpecialPointer
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available PageValidateSpecialPointer {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        PageXLogRecPtrGet
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available PageXLogRecPtrGet {
         $($items:tt)*
     }) => {
         $($items)*
@@ -7724,11 +10467,44 @@ macro_rules! __pgrx_c_classify {
     };
     (
         @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        PathPGetDatum
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available PathPGetDatum {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
         PinTupleDesc
     ) => {
         $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
     };
     (@if_available PinTupleDesc {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        PointPGetDatum
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available PointPGetDatum {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        PointerGetDatum
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available PointerGetDatum {
         $($items:tt)*
     }) => {
         $($items)*
@@ -7751,6 +10527,17 @@ macro_rules! __pgrx_c_classify {
         $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
     };
     (@if_available PointerIsValid {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        PolygonPGetDatum
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available PolygonPGetDatum {
         $($items:tt)*
     }) => {
         $($items)*
@@ -7795,6 +10582,17 @@ macro_rules! __pgrx_c_classify {
         $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
     };
     (@if_available PostmasterIsAlive {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        ProcArrayLock
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available ProcArrayLock {
         $($items:tt)*
     }) => {
         $($items)*
@@ -7944,6 +10742,28 @@ macro_rules! __pgrx_c_classify {
     };
     (
         @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        RESUME_CANCEL_INTERRUPTS
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available RESUME_CANCEL_INTERRUPTS {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        RESUME_INTERRUPTS
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available RESUME_INTERRUPTS {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
         RINFO_IS_PUSHED_DOWN
     ) => {
         $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
@@ -7999,6 +10819,17 @@ macro_rules! __pgrx_c_classify {
     };
     (
         @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        RangeTypePGetDatum
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available RangeTypePGetDatum {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
         RangeVarGetRelid
     ) => {
         $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
@@ -8010,11 +10841,33 @@ macro_rules! __pgrx_c_classify {
     };
     (
         @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        ReadNextTransactionId
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available ReadNextTransactionId {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
         RegProcedureIsValid
     ) => {
         $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
     };
     (@if_available RegProcedureIsValid {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        RelCacheInitLock
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available RelCacheInitLock {
         $($items:tt)*
     }) => {
         $($items)*
@@ -8059,6 +10912,17 @@ macro_rules! __pgrx_c_classify {
         $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
     };
     (@if_available RelFileNumberIsValid {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        RelationCloseSmgr
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available RelationCloseSmgr {
         $($items:tt)*
     }) => {
         $($items)*
@@ -8164,6 +11028,17 @@ macro_rules! __pgrx_c_classify {
     };
     (
         @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        RelationGetSmgr
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available RelationGetSmgr {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
         RelationGetTargetBlock
     ) => {
         $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
@@ -8208,11 +11083,55 @@ macro_rules! __pgrx_c_classify {
     };
     (
         @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        RelationHasCascadedCheckOption
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available RelationHasCascadedCheckOption {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        RelationHasCheckOption
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available RelationHasCheckOption {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        RelationHasLocalCheckOption
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available RelationHasLocalCheckOption {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
         RelationHasReferenceCountZero
     ) => {
         $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
     };
     (@if_available RelationHasReferenceCountZero {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        RelationHasSecurityInvoker
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available RelationHasSecurityInvoker {
         $($items:tt)*
     }) => {
         $($items)*
@@ -8285,6 +11204,17 @@ macro_rules! __pgrx_c_classify {
     };
     (
         @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        RelationIsSecurityView
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available RelationIsSecurityView {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
         RelationIsUsedAsCatalogTable
     ) => {
         $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
@@ -8301,6 +11231,17 @@ macro_rules! __pgrx_c_classify {
         $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
     };
     (@if_available RelationIsValid {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        RelationMappingLock
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available RelationMappingLock {
         $($items:tt)*
     }) => {
         $($items)*
@@ -8373,6 +11314,39 @@ macro_rules! __pgrx_c_classify {
     };
     (
         @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        ReplicationOriginLock
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available ReplicationOriginLock {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        ReplicationSlotAllocationLock
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available ReplicationSlotAllocationLock {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        ReplicationSlotControlLock
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available ReplicationSlotControlLock {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
         ResetExprContext
     ) => {
         $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
@@ -8400,6 +11374,83 @@ macro_rules! __pgrx_c_classify {
         $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
     };
     (@if_available ResetTupleHashIterator {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        ResourceOwnerForgetBuffer
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available ResourceOwnerForgetBuffer {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        ResourceOwnerForgetBufferIO
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available ResourceOwnerForgetBufferIO {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        ResourceOwnerRememberBuffer
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available ResourceOwnerRememberBuffer {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        ResourceOwnerRememberBufferIO
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available ResourceOwnerRememberBufferIO {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        RmgrIdExists
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available RmgrIdExists {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        RmgrIdIsBuiltin
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available RmgrIdIsBuiltin {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        RmgrIdIsCustom
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available RmgrIdIsCustom {
         $($items:tt)*
     }) => {
         $($items)*
@@ -8815,6 +11866,28 @@ macro_rules! __pgrx_c_classify {
     }) => {
         $($items)*
     };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        SInvalReadLock
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available SInvalReadLock {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        SInvalWriteLock
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available SInvalWriteLock {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
     (@path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt; SO1_printf) => {
         $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
     };
@@ -9176,11 +12249,99 @@ macro_rules! __pgrx_c_classify {
     };
     (
         @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        SerialControlLock
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available SerialControlLock {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        SerializableFinishedListLock
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available SerializableFinishedListLock {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        SerializablePredicateListLock
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available SerializablePredicateListLock {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        SerializableXactHashLock
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available SerializableXactHashLock {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
         SetInvalidVirtualTransactionId
     ) => {
         $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
     };
     (@if_available SetInvalidVirtualTransactionId {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        SetProcessingMode
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available SetProcessingMode {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        SetQueryCompletion
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available SetQueryCompletion {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        ShmemIndexLock
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available ShmemIndexLock {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        SimpleLruGetBankLock
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available SimpleLruGetBankLock {
         $($items:tt)*
     }) => {
         $($items)*
@@ -9262,10 +12423,43 @@ macro_rules! __pgrx_c_classify {
     }) => {
         $($items)*
     };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        SlruPagePrecedesUnitTests
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available SlruPagePrecedesUnitTests {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
     (@path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt; SmgrIsTemp) => {
         $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
     };
     (@if_available SmgrIsTemp {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        SnapshotAny
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available SnapshotAny {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        SnapshotSelf
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available SnapshotSelf {
         $($items:tt)*
     }) => {
         $($items)*
@@ -9288,6 +12482,28 @@ macro_rules! __pgrx_c_classify {
         $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
     };
     (@if_available SpGistBlockIsRoot {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        SpGistGetFillFactor
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available SpGistGetFillFactor {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        SpGistGetTargetPageFreeSpace
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available SpGistGetTargetPageFreeSpace {
         $($items:tt)*
     }) => {
         $($items)*
@@ -9382,6 +12598,17 @@ macro_rules! __pgrx_c_classify {
     };
     (
         @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        StatusFilePath
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available StatusFilePath {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
         StoreInvalidTransactionId
     ) => {
         $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
@@ -9393,11 +12620,33 @@ macro_rules! __pgrx_c_classify {
     };
     (
         @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        SyncRepLock
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available SyncRepLock {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
         SyncRepRequested
     ) => {
         $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
     };
     (@if_available SyncRepRequested {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        SyncScanLock
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available SyncScanLock {
         $($items:tt)*
     }) => {
         $($items)*
@@ -9484,6 +12733,28 @@ macro_rules! __pgrx_c_classify {
     }) => {
         $($items)*
     };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        TLHistoryFileName
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available TLHistoryFileName {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        TLHistoryFilePath
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available TLHistoryFilePath {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
     (@path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt; TMODULO) => {
         $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
     };
@@ -9510,6 +12781,17 @@ macro_rules! __pgrx_c_classify {
         $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
     };
     (@if_available TOAST_COMPRESS_METHOD {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        TOAST_COMPRESS_SET_SIZE_AND_COMPRESS_METHOD
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available TOAST_COMPRESS_SET_SIZE_AND_COMPRESS_METHOD {
         $($items:tt)*
     }) => {
         $($items)*
@@ -9852,6 +13134,39 @@ macro_rules! __pgrx_c_classify {
     }) => {
         $($items)*
     };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        TSQueryGetDatum
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available TSQueryGetDatum {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        TSQuerySignGetDatum
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available TSQuerySignGetDatum {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        TSVectorGetDatum
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available TSVectorGetDatum {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
     (@path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt; TTS_EMPTY) => {
         $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
     };
@@ -9961,6 +13276,25 @@ macro_rules! __pgrx_c_classify {
     }) => {
         $($items)*
     };
+    (@path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt; T_OR_F) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available T_OR_F {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        TablespaceCreateLock
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available TablespaceCreateLock {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
     (
         @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
         TermTupleHashIterator
@@ -9979,6 +13313,50 @@ macro_rules! __pgrx_c_classify {
         $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
     };
     (@if_available TextDatumGetCString {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        TimeADTGetDatum
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available TimeADTGetDatum {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        TimeTzADTPGetDatum
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available TimeTzADTPGetDatum {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        TimestampGetDatum
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available TimestampGetDatum {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        TimestampTzGetDatum
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available TimestampTzGetDatum {
         $($items:tt)*
     }) => {
         $($items)*
@@ -10029,6 +13407,17 @@ macro_rules! __pgrx_c_classify {
     };
     (
         @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        TransactionIdGetDatum
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available TransactionIdGetDatum {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
         TransactionIdIsNormal
     ) => {
         $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
@@ -10045,6 +13434,28 @@ macro_rules! __pgrx_c_classify {
         $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
     };
     (@if_available TransactionIdIsValid {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        TransactionIdOlder
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available TransactionIdOlder {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        TransactionIdRetreatedBy
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available TransactionIdRetreatedBy {
         $($items:tt)*
     }) => {
         $($items)*
@@ -10136,6 +13547,17 @@ macro_rules! __pgrx_c_classify {
     };
     (
         @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        TwoPhaseStateLock
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available TwoPhaseStateLock {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
         TypeIsToastable
     ) => {
         $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
@@ -10152,6 +13574,61 @@ macro_rules! __pgrx_c_classify {
         $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
     };
     (@if_available U64FromFullTransactionId {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        UInt16GetDatum
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available UInt16GetDatum {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        UInt32GetDatum
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available UInt32GetDatum {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        UInt64GetDatum
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available UInt64GetDatum {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        UInt8GetDatum
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available UInt8GetDatum {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        UnlockBufHdr
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available UnlockBufHdr {
         $($items:tt)*
     }) => {
         $($items)*
@@ -10202,11 +13679,33 @@ macro_rules! __pgrx_c_classify {
     };
     (
         @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        VARATT_EXTERNAL_GET_POINTER
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available VARATT_EXTERNAL_GET_POINTER {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
         VARATT_EXTERNAL_IS_COMPRESSED
     ) => {
         $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
     };
     (@if_available VARATT_EXTERNAL_IS_COMPRESSED {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        VARATT_EXTERNAL_SET_SIZE_AND_COMPRESS_METHOD
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available VARATT_EXTERNAL_SET_SIZE_AND_COMPRESS_METHOD {
         $($items:tt)*
     }) => {
         $($items)*
@@ -10525,6 +14024,39 @@ macro_rules! __pgrx_c_classify {
     };
     (
         @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        VARSIZE_ANY
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available VARSIZE_ANY {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        VARSIZE_ANY_EXHDR
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available VARSIZE_ANY_EXHDR {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        VARSIZE_EXTERNAL
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available VARSIZE_EXTERNAL {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
         VARSIZE_SHORT
     ) => {
         $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
@@ -10563,6 +14095,17 @@ macro_rules! __pgrx_c_classify {
         $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
     };
     (@if_available VARTAG_IS_EXPANDED {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        VARTAG_SIZE
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available VARTAG_SIZE {
         $($items:tt)*
     }) => {
         $($items)*
@@ -10622,6 +14165,39 @@ macro_rules! __pgrx_c_classify {
     }) => {
         $($items)*
     };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        WALBufMappingLock
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available WALBufMappingLock {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        WALSummarizerLock
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available WALSummarizerLock {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        WALWriteLock
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available WALWriteLock {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
     (@path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt; WEP_GETPOS) => {
         $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
     };
@@ -10662,11 +14238,44 @@ macro_rules! __pgrx_c_classify {
     };
     (
         @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        WaitEventCustomLock
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available WaitEventCustomLock {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        WalSndWakeupProcessRequests
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available WalSndWakeupProcessRequests {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
         WalSndWakeupRequest
     ) => {
         $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
     };
     (@if_available WalSndWakeupRequest {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        WrapLimitsVacuumLock
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available WrapLimitsVacuumLock {
         $($items:tt)*
     }) => {
         $($items)*
@@ -10711,6 +14320,72 @@ macro_rules! __pgrx_c_classify {
         $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
     };
     (@if_available XLByteToSeg {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        XLogArchivingActive
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available XLogArchivingActive {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        XLogArchivingAlways
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available XLogArchivingAlways {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        XLogFileName
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available XLogFileName {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        XLogFileNameById
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available XLogFileNameById {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        XLogFilePath
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available XLogFilePath {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        XLogFromFileName
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available XLogFromFileName {
         $($items:tt)*
     }) => {
         $($items)*
@@ -10766,6 +14441,17 @@ macro_rules! __pgrx_c_classify {
         $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
     };
     (@if_available XLogPageHeaderSize {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        XLogReaderHasQueuedRecordOrError
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available XLogReaderHasQueuedRecordOrError {
         $($items:tt)*
     }) => {
         $($items)*
@@ -11058,11 +14744,30 @@ macro_rules! __pgrx_c_classify {
     };
     (
         @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        XactTruncationLock
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available XactTruncationLock {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
         XidFromFullTransactionId
     ) => {
         $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
     };
     (@if_available XidFromFullTransactionId {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (@path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt; XidGenLock) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available XidGenLock {
         $($items:tt)*
     }) => {
         $($items)*
@@ -11096,6 +14801,39 @@ macro_rules! __pgrx_c_classify {
     };
     (
         @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        am_leader_apply_worker
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available am_leader_apply_worker {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        am_parallel_apply_worker
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available am_parallel_apply_worker {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        am_tablesync_worker
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available am_tablesync_worker {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
         appendStringInfoCharMacro
     ) => {
         $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
@@ -11109,6 +14847,69 @@ macro_rules! __pgrx_c_classify {
         $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
     };
     (@if_available atooid {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        att_addlength_datum
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available att_addlength_datum {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        att_addlength_pointer
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available att_addlength_pointer {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        att_align_datum
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available att_align_datum {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        att_align_nominal
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available att_align_nominal {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        att_align_pointer
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available att_align_pointer {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (@path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt; att_isnull) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available att_isnull {
         $($items:tt)*
     }) => {
         $($items)*
@@ -11165,6 +14966,25 @@ macro_rules! __pgrx_c_classify {
     }) => {
         $($items)*
     };
+    (@path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt; castNode) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available castNode {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        collprovider_name
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available collprovider_name {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
     (
         @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
         create_pathtarget
@@ -11176,10 +14996,222 @@ macro_rules! __pgrx_c_classify {
     }) => {
         $($items)*
     };
-    (@path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt; dgettext) => {
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        dclist_count
+    ) => {
         $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
     };
-    (@if_available dgettext {
+    (@if_available dclist_count {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        dclist_delete_from
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available dclist_delete_from {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        dclist_delete_from_thoroughly
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available dclist_delete_from_thoroughly {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        dclist_has_next
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available dclist_has_next {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        dclist_has_prev
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available dclist_has_prev {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        dclist_head_element_off
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available dclist_head_element_off {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        dclist_head_node
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available dclist_head_node {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        dclist_init
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available dclist_init {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        dclist_insert_after
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available dclist_insert_after {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        dclist_insert_before
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available dclist_insert_before {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        dclist_is_empty
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available dclist_is_empty {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        dclist_move_head
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available dclist_move_head {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        dclist_move_tail
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available dclist_move_tail {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        dclist_next_node
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available dclist_next_node {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        dclist_pop_head_node
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available dclist_pop_head_node {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        dclist_prev_node
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available dclist_prev_node {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        dclist_push_head
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available dclist_push_head {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        dclist_push_tail
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available dclist_push_tail {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        dclist_tail_element_off
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available dclist_tail_element_off {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        dclist_tail_node
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available dclist_tail_node {
         $($items:tt)*
     }) => {
         $($items)*
@@ -11197,6 +15229,135 @@ macro_rules! __pgrx_c_classify {
     };
     (
         @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        dlist_delete
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available dlist_delete {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        dlist_delete_from
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available dlist_delete_from {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        dlist_delete_from_thoroughly
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available dlist_delete_from_thoroughly {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        dlist_delete_thoroughly
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available dlist_delete_thoroughly {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        dlist_has_next
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available dlist_has_next {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        dlist_has_prev
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available dlist_has_prev {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        dlist_head_element_off
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available dlist_head_element_off {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        dlist_head_node
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available dlist_head_node {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (@path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt; dlist_init) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available dlist_init {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        dlist_insert_after
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available dlist_insert_after {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        dlist_insert_before
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available dlist_insert_before {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        dlist_is_empty
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available dlist_is_empty {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
         dlist_member_check
     ) => {
         $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
@@ -11206,10 +15367,123 @@ macro_rules! __pgrx_c_classify {
     }) => {
         $($items)*
     };
-    (@path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt; dngettext) => {
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        dlist_move_head
+    ) => {
         $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
     };
-    (@if_available dngettext {
+    (@if_available dlist_move_head {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        dlist_move_tail
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available dlist_move_tail {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        dlist_next_node
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available dlist_next_node {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        dlist_node_init
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available dlist_node_init {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        dlist_node_is_detached
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available dlist_node_is_detached {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        dlist_pop_head_node
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available dlist_pop_head_node {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        dlist_prev_node
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available dlist_prev_node {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        dlist_push_head
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available dlist_push_head {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        dlist_push_tail
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available dlist_push_tail {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        dlist_tail_element_off
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available dlist_tail_element_off {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        dlist_tail_node
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available dlist_tail_node {
         $($items:tt)*
     }) => {
         $($items)*
@@ -11257,11 +15531,44 @@ macro_rules! __pgrx_c_classify {
     };
     (
         @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        exec_rt_fetch
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available exec_rt_fetch {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
         exec_subplan_get_plan
     ) => {
         $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
     };
     (@if_available exec_subplan_get_plan {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        expanded_record_get_field
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available expanded_record_get_field {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        expanded_record_get_tupdesc
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available expanded_record_get_tupdesc {
         $($items:tt)*
     }) => {
         $($items)*
@@ -11299,6 +15606,25 @@ macro_rules! __pgrx_c_classify {
     }) => {
         $($items)*
     };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        fastgetattr
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available fastgetattr {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (@path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt; fetch_att) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available fetch_att {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
     (@path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt; fetchatt) => {
         $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
     };
@@ -11328,6 +15654,102 @@ macro_rules! __pgrx_c_classify {
     };
     (
         @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        for_both_cell_setup
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available for_both_cell_setup {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        for_each_cell_setup
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available for_each_cell_setup {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        for_each_from_setup
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available for_each_from_setup {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        get_float4_infinity
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available get_float4_infinity {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        get_float4_nan
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available get_float4_nan {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        get_float8_infinity
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available get_float8_infinity {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        get_float8_nan
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available get_float8_nan {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (@path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt; get_leftop) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available get_leftop {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        get_notclausearg
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available get_notclausearg {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
         get_pathtarget_sortgroupref
     ) => {
         $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
@@ -11337,10 +15759,13 @@ macro_rules! __pgrx_c_classify {
     }) => {
         $($items)*
     };
-    (@path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt; gettext) => {
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        get_rightop
+    ) => {
         $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
     };
-    (@if_available gettext {
+    (@if_available get_rightop {
         $($items:tt)*
     }) => {
         $($items)*
@@ -11358,6 +15783,17 @@ macro_rules! __pgrx_c_classify {
     };
     (
         @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        ginCompareItemPointers
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available ginCompareItemPointers {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
         gistentryinit
     ) => {
         $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
@@ -11367,10 +15803,128 @@ macro_rules! __pgrx_c_classify {
     }) => {
         $($items)*
     };
+    (@path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt; hash_any) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available hash_any {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        hash_any_extended
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available hash_any_extended {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        hash_combine
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available hash_combine {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        hash_combine64
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available hash_combine64 {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        hash_uint32
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available hash_uint32 {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        hash_uint32_extended
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available hash_uint32_extended {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        heap_getattr
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available heap_getattr {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
     (@path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt; i64abs) => {
         $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
     };
     (@if_available i64abs {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        index_getattr
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available index_getattr {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        initReadOnlyStringInfo
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available initReadOnlyStringInfo {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        initStringInfoFromString
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available initStringInfoFromString {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        init_spin_delay
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available init_spin_delay {
         $($items:tt)*
     }) => {
         $($items)*
@@ -11437,11 +15991,110 @@ macro_rules! __pgrx_c_classify {
     };
     (
         @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        is_andclause
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available is_andclause {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        is_funcclause
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available is_funcclause {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
         is_nonwindows_absolute_path
     ) => {
         $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
     };
     (@if_available is_nonwindows_absolute_path {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        is_notclause
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available is_notclause {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        is_opclause
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available is_opclause {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        is_orclause
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available is_orclause {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        is_unixsock_path
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available is_unixsock_path {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        is_utf16_surrogate_first
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available is_utf16_surrogate_first {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        is_utf16_surrogate_second
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available is_utf16_surrogate_second {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        is_valid_unicode_codepoint
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available is_valid_unicode_codepoint {
         $($items:tt)*
     }) => {
         $($items)*
@@ -11461,6 +16114,28 @@ macro_rules! __pgrx_c_classify {
         $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
     };
     (@if_available isleap {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        itemptr_decode
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available itemptr_decode {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        itemptr_encode
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available itemptr_encode {
         $($items:tt)*
     }) => {
         $($items)*
@@ -11485,6 +16160,17 @@ macro_rules! __pgrx_c_classify {
         $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
     };
     (@if_available lfirst_int {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        lfirst_node
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available lfirst_node {
         $($items:tt)*
     }) => {
         $($items)*
@@ -11520,6 +16206,17 @@ macro_rules! __pgrx_c_classify {
         $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
     };
     (@if_available lfourth_int {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        lfourth_node
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available lfourth_node {
         $($items:tt)*
     }) => {
         $($items)*
@@ -11564,11 +16261,134 @@ macro_rules! __pgrx_c_classify {
     };
     (
         @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        linitial_node
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available linitial_node {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
         linitial_oid
     ) => {
         $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
     };
     (@if_available linitial_oid {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        list_cell_number
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available list_cell_number {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (@path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt; list_head) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available list_head {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        list_last_cell
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available list_last_cell {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        list_length
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available list_length {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (@path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt; list_nth) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available list_nth {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        list_nth_cell
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available list_nth_cell {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        list_nth_int
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available list_nth_int {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        list_nth_node
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available list_nth_node {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        list_nth_oid
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available list_nth_oid {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        list_second_cell
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available list_second_cell {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (@path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt; list_tail) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available list_tail {
         $($items:tt)*
     }) => {
         $($items)*
@@ -11589,6 +16409,14 @@ macro_rules! __pgrx_c_classify {
     }) => {
         $($items)*
     };
+    (@path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt; llast_node) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available llast_node {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
     (@path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt; llast_oid) => {
         $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
     };
@@ -11601,6 +16429,14 @@ macro_rules! __pgrx_c_classify {
         $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
     };
     (@if_available llast_xid {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (@path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt; lnext) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available lnext {
         $($items:tt)*
     }) => {
         $($items)*
@@ -11620,6 +16456,17 @@ macro_rules! __pgrx_c_classify {
         $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
     };
     (@if_available lsecond_int {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        lsecond_node
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available lsecond_node {
         $($items:tt)*
     }) => {
         $($items)*
@@ -11647,6 +16494,17 @@ macro_rules! __pgrx_c_classify {
         $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
     };
     (@if_available lthird_int {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        lthird_node
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available lthird_node {
         $($items:tt)*
     }) => {
         $($items)*
@@ -11681,10 +16539,32 @@ macro_rules! __pgrx_c_classify {
     }) => {
         $($items)*
     };
-    (@path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt; ngettext) => {
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        murmurhash32
+    ) => {
         $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
     };
-    (@if_available ngettext {
+    (@if_available murmurhash32 {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        murmurhash64
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available murmurhash64 {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (@path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt; newNode) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available newNode {
         $($items:tt)*
     }) => {
         $($items)*
@@ -11837,6 +16717,776 @@ macro_rules! __pgrx_c_classify {
     }) => {
         $($items)*
     };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        pg_add_s16_overflow
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available pg_add_s16_overflow {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        pg_add_s32_overflow
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available pg_add_s32_overflow {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        pg_add_s64_overflow
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available pg_add_s64_overflow {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        pg_add_size_overflow
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available pg_add_size_overflow {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        pg_add_u16_overflow
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available pg_add_u16_overflow {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        pg_add_u32_overflow
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available pg_add_u32_overflow {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        pg_add_u64_overflow
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available pg_add_u64_overflow {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        pg_atomic_add_fetch_u32
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available pg_atomic_add_fetch_u32 {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        pg_atomic_add_fetch_u32_impl
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available pg_atomic_add_fetch_u32_impl {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        pg_atomic_add_fetch_u64
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available pg_atomic_add_fetch_u64 {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        pg_atomic_add_fetch_u64_impl
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available pg_atomic_add_fetch_u64_impl {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        pg_atomic_clear_flag
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available pg_atomic_clear_flag {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        pg_atomic_clear_flag_impl
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available pg_atomic_clear_flag_impl {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        pg_atomic_compare_exchange_u32
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available pg_atomic_compare_exchange_u32 {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        pg_atomic_compare_exchange_u32_impl
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available pg_atomic_compare_exchange_u32_impl {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        pg_atomic_compare_exchange_u64
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available pg_atomic_compare_exchange_u64 {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        pg_atomic_compare_exchange_u64_impl
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available pg_atomic_compare_exchange_u64_impl {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        pg_atomic_exchange_u32
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available pg_atomic_exchange_u32 {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        pg_atomic_exchange_u32_impl
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available pg_atomic_exchange_u32_impl {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        pg_atomic_exchange_u64
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available pg_atomic_exchange_u64 {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        pg_atomic_exchange_u64_impl
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available pg_atomic_exchange_u64_impl {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        pg_atomic_fetch_add_u32
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available pg_atomic_fetch_add_u32 {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        pg_atomic_fetch_add_u32_impl
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available pg_atomic_fetch_add_u32_impl {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        pg_atomic_fetch_add_u64
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available pg_atomic_fetch_add_u64 {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        pg_atomic_fetch_add_u64_impl
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available pg_atomic_fetch_add_u64_impl {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        pg_atomic_fetch_and_u32
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available pg_atomic_fetch_and_u32 {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        pg_atomic_fetch_and_u32_impl
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available pg_atomic_fetch_and_u32_impl {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        pg_atomic_fetch_and_u64
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available pg_atomic_fetch_and_u64 {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        pg_atomic_fetch_and_u64_impl
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available pg_atomic_fetch_and_u64_impl {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        pg_atomic_fetch_or_u32
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available pg_atomic_fetch_or_u32 {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        pg_atomic_fetch_or_u32_impl
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available pg_atomic_fetch_or_u32_impl {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        pg_atomic_fetch_or_u64
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available pg_atomic_fetch_or_u64 {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        pg_atomic_fetch_or_u64_impl
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available pg_atomic_fetch_or_u64_impl {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        pg_atomic_fetch_sub_u32
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available pg_atomic_fetch_sub_u32 {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        pg_atomic_fetch_sub_u32_impl
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available pg_atomic_fetch_sub_u32_impl {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        pg_atomic_fetch_sub_u64
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available pg_atomic_fetch_sub_u64 {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        pg_atomic_fetch_sub_u64_impl
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available pg_atomic_fetch_sub_u64_impl {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        pg_atomic_init_flag
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available pg_atomic_init_flag {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        pg_atomic_init_flag_impl
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available pg_atomic_init_flag_impl {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        pg_atomic_init_u32
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available pg_atomic_init_u32 {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        pg_atomic_init_u32_impl
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available pg_atomic_init_u32_impl {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        pg_atomic_init_u64
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available pg_atomic_init_u64 {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        pg_atomic_init_u64_impl
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available pg_atomic_init_u64_impl {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        pg_atomic_monotonic_advance_u64
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available pg_atomic_monotonic_advance_u64 {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        pg_atomic_read_membarrier_u32
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available pg_atomic_read_membarrier_u32 {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        pg_atomic_read_membarrier_u32_impl
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available pg_atomic_read_membarrier_u32_impl {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        pg_atomic_read_membarrier_u64
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available pg_atomic_read_membarrier_u64 {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        pg_atomic_read_membarrier_u64_impl
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available pg_atomic_read_membarrier_u64_impl {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        pg_atomic_read_u32
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available pg_atomic_read_u32 {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        pg_atomic_read_u32_impl
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available pg_atomic_read_u32_impl {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        pg_atomic_read_u64
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available pg_atomic_read_u64 {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        pg_atomic_read_u64_impl
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available pg_atomic_read_u64_impl {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        pg_atomic_sub_fetch_u32
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available pg_atomic_sub_fetch_u32 {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        pg_atomic_sub_fetch_u32_impl
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available pg_atomic_sub_fetch_u32_impl {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        pg_atomic_sub_fetch_u64
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available pg_atomic_sub_fetch_u64 {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        pg_atomic_sub_fetch_u64_impl
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available pg_atomic_sub_fetch_u64_impl {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        pg_atomic_test_set_flag
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available pg_atomic_test_set_flag {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        pg_atomic_test_set_flag_impl
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available pg_atomic_test_set_flag_impl {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        pg_atomic_unlocked_test_flag
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available pg_atomic_unlocked_test_flag {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        pg_atomic_unlocked_test_flag_impl
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available pg_atomic_unlocked_test_flag_impl {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        pg_atomic_unlocked_write_u32
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available pg_atomic_unlocked_write_u32 {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        pg_atomic_unlocked_write_u32_impl
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available pg_atomic_unlocked_write_u32_impl {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        pg_atomic_write_membarrier_u32
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available pg_atomic_write_membarrier_u32 {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        pg_atomic_write_membarrier_u32_impl
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available pg_atomic_write_membarrier_u32_impl {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        pg_atomic_write_membarrier_u64
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available pg_atomic_write_membarrier_u64 {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        pg_atomic_write_membarrier_u64_impl
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available pg_atomic_write_membarrier_u64_impl {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        pg_atomic_write_u32
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available pg_atomic_write_u32 {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        pg_atomic_write_u32_impl
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available pg_atomic_write_u32_impl {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        pg_atomic_write_u64
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available pg_atomic_write_u64 {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        pg_atomic_write_u64_impl
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available pg_atomic_write_u64_impl {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
     (@path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt; pg_bswap16) => {
         $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
     };
@@ -11861,6 +17511,98 @@ macro_rules! __pgrx_c_classify {
     }) => {
         $($items)*
     };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        pg_ceil_log2_32
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available pg_ceil_log2_32 {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        pg_ceil_log2_64
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available pg_ceil_log2_64 {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        pg_clock_gettime_ns
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available pg_clock_gettime_ns {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (@path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt; pg_cmp_s16) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available pg_cmp_s16 {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (@path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt; pg_cmp_s32) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available pg_cmp_s32 {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (@path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt; pg_cmp_s64) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available pg_cmp_s64 {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        pg_cmp_size
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available pg_cmp_size {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (@path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt; pg_cmp_u16) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available pg_cmp_u16 {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (@path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt; pg_cmp_u32) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available pg_cmp_u32 {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (@path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt; pg_cmp_u64) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available pg_cmp_u64 {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
     (@path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt; pg_hton16) => {
         $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
     };
@@ -11881,6 +17623,127 @@ macro_rules! __pgrx_c_classify {
         $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
     };
     (@if_available pg_hton64 {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        pg_leftmost_one_pos32
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available pg_leftmost_one_pos32 {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        pg_leftmost_one_pos64
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available pg_leftmost_one_pos64 {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        pg_mul_s16_overflow
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available pg_mul_s16_overflow {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        pg_mul_s32_overflow
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available pg_mul_s32_overflow {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        pg_mul_s64_overflow
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available pg_mul_s64_overflow {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        pg_mul_size_overflow
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available pg_mul_size_overflow {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        pg_mul_u16_overflow
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available pg_mul_u16_overflow {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        pg_mul_u32_overflow
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available pg_mul_u32_overflow {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        pg_mul_u64_overflow
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available pg_mul_u64_overflow {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        pg_nextpower2_32
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available pg_nextpower2_32 {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        pg_nextpower2_64
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available pg_nextpower2_64 {
         $($items:tt)*
     }) => {
         $($items)*
@@ -11911,11 +17774,115 @@ macro_rules! __pgrx_c_classify {
     };
     (
         @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        pg_popcount
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available pg_popcount {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        pg_popcount_masked
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available pg_popcount_masked {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (@path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt; pg_preadv) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available pg_preadv {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        pg_prevpower2_32
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available pg_prevpower2_32 {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        pg_prevpower2_64
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available pg_prevpower2_64 {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
         pg_prng_strong_seed
     ) => {
         $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
     };
     (@if_available pg_prng_strong_seed {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (@path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt; pg_pwritev) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available pg_pwritev {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        pg_rightmost_one_pos32
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available pg_rightmost_one_pos32 {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        pg_rightmost_one_pos64
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available pg_rightmost_one_pos64 {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        pg_rotate_left32
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available pg_rotate_left32 {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        pg_rotate_right32
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available pg_rotate_right32 {
         $($items:tt)*
     }) => {
         $($items)*
@@ -11944,11 +17911,77 @@ macro_rules! __pgrx_c_classify {
     };
     (
         @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
-        pg_unreachable
+        pg_sub_s16_overflow
     ) => {
         $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
     };
-    (@if_available pg_unreachable {
+    (@if_available pg_sub_s16_overflow {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        pg_sub_s32_overflow
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available pg_sub_s32_overflow {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        pg_sub_s64_overflow
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available pg_sub_s64_overflow {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        pg_sub_size_overflow
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available pg_sub_size_overflow {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        pg_sub_u16_overflow
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available pg_sub_u16_overflow {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        pg_sub_u32_overflow
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available pg_sub_u32_overflow {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        pg_sub_u64_overflow
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available pg_sub_u64_overflow {
         $($items:tt)*
     }) => {
         $($items)*
@@ -12087,6 +18120,28 @@ macro_rules! __pgrx_c_classify {
     };
     (
         @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        pgstat_report_wait_end
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available pgstat_report_wait_end {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        pgstat_report_wait_start
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available pgstat_report_wait_start {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
         pgstat_should_count_relation
     ) => {
         $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
@@ -12131,11 +18186,140 @@ macro_rules! __pgrx_c_classify {
     };
     (
         @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        pq_sendbyte
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available pq_sendbyte {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (@path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt; pq_sendint) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available pq_sendint {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        pq_sendint16
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available pq_sendint16 {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        pq_sendint32
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available pq_sendint32 {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        pq_sendint64
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available pq_sendint64 {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        pq_sendint8
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available pq_sendint8 {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        pq_writeint16
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available pq_writeint16 {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        pq_writeint32
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available pq_writeint32 {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        pq_writeint64
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available pq_writeint64 {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        pq_writeint8
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available pq_writeint8 {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        pq_writestring
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available pq_writestring {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
         proclist_contains
     ) => {
         $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
     };
     (@if_available proclist_contains {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        proclist_contains_offset
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available proclist_contains_offset {
         $($items:tt)*
     }) => {
         $($items)*
@@ -12153,11 +18337,66 @@ macro_rules! __pgrx_c_classify {
     };
     (
         @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        proclist_delete_offset
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available proclist_delete_offset {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        proclist_init
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available proclist_init {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        proclist_is_empty
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available proclist_is_empty {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        proclist_node_get
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available proclist_node_get {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
         proclist_pop_head_node
     ) => {
         $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
     };
     (@if_available proclist_pop_head_node {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        proclist_pop_head_node_offset
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available proclist_pop_head_node_offset {
         $($items:tt)*
     }) => {
         $($items)*
@@ -12175,11 +18414,33 @@ macro_rules! __pgrx_c_classify {
     };
     (
         @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        proclist_push_head_offset
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available proclist_push_head_offset {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
         proclist_push_tail
     ) => {
         $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
     };
     (@if_available proclist_push_tail {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        proclist_push_tail_offset
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available proclist_push_tail_offset {
         $($items:tt)*
     }) => {
         $($items)*
@@ -12496,6 +18757,17 @@ macro_rules! __pgrx_c_classify {
     };
     (
         @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        set_ps_display
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available set_ps_display {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
         shm_toc_estimate_chunk
     ) => {
         $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
@@ -12538,6 +18810,214 @@ macro_rules! __pgrx_c_classify {
     }) => {
         $($items)*
     };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        slist_delete_current
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available slist_delete_current {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        slist_has_next
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available slist_has_next {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        slist_head_element_off
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available slist_head_element_off {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        slist_head_node
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available slist_head_node {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (@path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt; slist_init) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available slist_init {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        slist_insert_after
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available slist_insert_after {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        slist_is_empty
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available slist_is_empty {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        slist_next_node
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available slist_next_node {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        slist_pop_head_node
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available slist_pop_head_node {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        slist_push_head
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available slist_push_head {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        slot_attisnull
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available slot_attisnull {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        slot_getallattrs
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available slot_getallattrs {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        slot_getattr
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available slot_getattr {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        slot_getsomeattrs
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available slot_getsomeattrs {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        slot_getsysattr
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available slot_getsysattr {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        slot_is_current_xact_tuple
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available slot_is_current_xact_tuple {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (@path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt; smgrread) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available smgrread {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (@path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt; smgrwrite) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available smgrwrite {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (@path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt; spin_delay) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available spin_delay {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        store_att_byval
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available store_att_byval {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
     (@path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt; strVal) => {
         $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
     };
@@ -12562,10 +19042,568 @@ macro_rules! __pgrx_c_classify {
     }) => {
         $($items)*
     };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        surrogate_pair_to_codepoint
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available surrogate_pair_to_codepoint {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
     (@path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt; t_iseq) => {
         $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
     };
     (@if_available t_iseq {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        table_beginscan
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available table_beginscan {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        table_beginscan_analyze
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available table_beginscan_analyze {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        table_beginscan_bm
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available table_beginscan_bm {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        table_beginscan_sampling
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available table_beginscan_sampling {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        table_beginscan_strat
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available table_beginscan_strat {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        table_beginscan_tid
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available table_beginscan_tid {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        table_beginscan_tidrange
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available table_beginscan_tidrange {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        table_endscan
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available table_endscan {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        table_finish_bulk_insert
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available table_finish_bulk_insert {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        table_index_build_range_scan
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available table_index_build_range_scan {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        table_index_build_scan
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available table_index_build_scan {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        table_index_delete_tuples
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available table_index_delete_tuples {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        table_index_fetch_begin
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available table_index_fetch_begin {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        table_index_fetch_end
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available table_index_fetch_end {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        table_index_fetch_reset
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available table_index_fetch_reset {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        table_index_fetch_tuple
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available table_index_fetch_tuple {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        table_index_validate_scan
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available table_index_validate_scan {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        table_multi_insert
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available table_multi_insert {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        table_parallelscan_reinitialize
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available table_parallelscan_reinitialize {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        table_relation_copy_data
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available table_relation_copy_data {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        table_relation_copy_for_cluster
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available table_relation_copy_for_cluster {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        table_relation_estimate_size
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available table_relation_estimate_size {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        table_relation_fetch_toast_slice
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available table_relation_fetch_toast_slice {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        table_relation_needs_toast_table
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available table_relation_needs_toast_table {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        table_relation_nontransactional_truncate
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available table_relation_nontransactional_truncate {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        table_relation_set_new_filelocator
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available table_relation_set_new_filelocator {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        table_relation_size
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available table_relation_size {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        table_relation_toast_am
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available table_relation_toast_am {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        table_relation_vacuum
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available table_relation_vacuum {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        table_rescan
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available table_rescan {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        table_rescan_set_params
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available table_rescan_set_params {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        table_rescan_tidrange
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available table_rescan_tidrange {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        table_scan_analyze_next_block
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available table_scan_analyze_next_block {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        table_scan_analyze_next_tuple
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available table_scan_analyze_next_tuple {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        table_scan_bitmap_next_block
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available table_scan_bitmap_next_block {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        table_scan_bitmap_next_tuple
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available table_scan_bitmap_next_tuple {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        table_scan_getnextslot
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available table_scan_getnextslot {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        table_scan_getnextslot_tidrange
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available table_scan_getnextslot_tidrange {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        table_scan_sample_next_block
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available table_scan_sample_next_block {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        table_scan_sample_next_tuple
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available table_scan_sample_next_tuple {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        table_tuple_complete_speculative
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available table_tuple_complete_speculative {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        table_tuple_delete
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available table_tuple_delete {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        table_tuple_fetch_row_version
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available table_tuple_fetch_row_version {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        table_tuple_insert
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available table_tuple_insert {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        table_tuple_insert_speculative
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available table_tuple_insert_speculative {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        table_tuple_lock
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available table_tuple_lock {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        table_tuple_satisfies_snapshot
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available table_tuple_satisfies_snapshot {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        table_tuple_tid_valid
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available table_tuple_tid_valid {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        table_tuple_update
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available table_tuple_update {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (@path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt; tas) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available tas {
         $($items:tt)*
     }) => {
         $($items)*
@@ -12577,6 +19615,28 @@ macro_rules! __pgrx_c_classify {
         $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
     };
     (@if_available timestamptz_cmp_internal {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        ts_copychar_cstr
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available ts_copychar_cstr {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        ts_copychar_with_len
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available ts_copychar_with_len {
         $($items:tt)*
     }) => {
         $($items)*
@@ -12599,6 +19659,17 @@ macro_rules! __pgrx_c_classify {
         $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
     };
     (@if_available type_is_array_domain {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        unicode_utf8len
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available unicode_utf8len {
         $($items:tt)*
     }) => {
         $($items)*
@@ -12629,6 +19700,17 @@ macro_rules! __pgrx_c_classify {
         $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
     };
     (@if_available walrcv_check_conninfo {
+        $($items:tt)*
+    }) => {
+        $($items)*
+    };
+    (
+        @path [$callback:ident] $state:tt $original:tt [$($path:tt)*] $group:tt $budget:tt;
+        walrcv_clear_result
+    ) => {
+        $crate::__pgrx_c_classify!(@known [$callback] $state [$($path)*]; $group)
+    };
+    (@if_available walrcv_clear_result {
         $($items:tt)*
     }) => {
         $($items)*

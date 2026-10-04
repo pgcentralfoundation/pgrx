@@ -5,8 +5,8 @@ This code is generated for documentation purposes, so that it is easy to referen
 // C macros from autovacuum.h.
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -60,13 +60,15 @@ macro_rules! IsAnyAutoVacuumProcess {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
                                 $crate::__pgrx_c_macros::CBool as $crate::__pgrx_c_macros::expression::CType
-                            >::from_storage($crate::IsAutoVacuumLauncherProcess())
+                            >::from_storage(
+                                $crate::__pgrx_c_bindings::IsAutoVacuumLauncherProcess()
+                            )
                         )
                     ) || $crate::__pgrx_c_macros::expression::truth(
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
                                 $crate::__pgrx_c_macros::CBool as $crate::__pgrx_c_macros::expression::CType
-                            >::from_storage($crate::IsAutoVacuumWorkerProcess())
+                            >::from_storage($crate::__pgrx_c_bindings::IsAutoVacuumWorkerProcess())
                         )
                     ) {
                         1
@@ -106,13 +108,17 @@ macro_rules! IsAnyAutoVacuumProcess {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         <
                                             $crate::__pgrx_c_macros::CBool as $crate::__pgrx_c_macros::expression::CType
-                                        >::from_storage($crate::IsAutoVacuumLauncherProcess())
+                                        >::from_storage(
+                                            $crate::__pgrx_c_bindings::IsAutoVacuumLauncherProcess()
+                                        )
                                     )
                                 ) || $crate::__pgrx_c_macros::expression::truth(
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         <
                                             $crate::__pgrx_c_macros::CBool as $crate::__pgrx_c_macros::expression::CType
-                                        >::from_storage($crate::IsAutoVacuumWorkerProcess())
+                                        >::from_storage(
+                                            $crate::__pgrx_c_bindings::IsAutoVacuumWorkerProcess()
+                                        )
                                     )
                                 ) {
                                     1
@@ -139,13 +145,15 @@ macro_rules! IsAnyAutoVacuumProcess {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
                                 $crate::__pgrx_c_macros::CBool as $crate::__pgrx_c_macros::expression::CType
-                            >::from_storage($crate::IsAutoVacuumLauncherProcess())
+                            >::from_storage(
+                                $crate::__pgrx_c_bindings::IsAutoVacuumLauncherProcess()
+                            )
                         )
                     ) || $crate::__pgrx_c_macros::expression::truth(
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
                                 $crate::__pgrx_c_macros::CBool as $crate::__pgrx_c_macros::expression::CType
-                            >::from_storage($crate::IsAutoVacuumWorkerProcess())
+                            >::from_storage($crate::__pgrx_c_bindings::IsAutoVacuumWorkerProcess())
                         )
                     ) {
                         1

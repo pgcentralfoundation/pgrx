@@ -5,8 +5,8 @@ This code is generated for documentation purposes, so that it is easy to referen
 // C macros from walreceiver.h.
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -57,7 +57,11 @@ macro_rules! AllowCascadeReplication {
                             $crate::__pgrx_c_macros::expression::load(
                                 $crate::__pgrx_c_macros::expression::place::<
                                     $crate::__pgrx_c_macros::CBool
-                                >(::core::ptr::addr_of_mut!($crate::EnableHotStandby))
+                                >(
+                                    ::core::ptr::addr_of_mut!(
+                                        $crate::__pgrx_c_bindings::EnableHotStandby
+                                    )
+                                )
                             )
                         )
                     ) && $crate::__pgrx_c_macros::expression::truth(
@@ -67,7 +71,11 @@ macro_rules! AllowCascadeReplication {
                                     $crate::__pgrx_c_macros::expression::load(
                                         $crate::__pgrx_c_macros::expression::place::<
                                             $crate::__pgrx_c_macros::CInt
-                                        >(::core::ptr::addr_of_mut!($crate::max_wal_senders))
+                                        >(
+                                            ::core::ptr::addr_of_mut!(
+                                                $crate::__pgrx_c_bindings::max_wal_senders
+                                            )
+                                        )
                                     )
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -118,7 +126,11 @@ macro_rules! AllowCascadeReplication {
                                         $crate::__pgrx_c_macros::expression::load(
                                             $crate::__pgrx_c_macros::expression::place::<
                                                 $crate::__pgrx_c_macros::CBool
-                                            >(::core::ptr::addr_of_mut!($crate::EnableHotStandby))
+                                            >(
+                                                ::core::ptr::addr_of_mut!(
+                                                    $crate::__pgrx_c_bindings::EnableHotStandby
+                                                )
+                                            )
                                         )
                                     )
                                 ) && $crate::__pgrx_c_macros::expression::truth(
@@ -133,7 +145,7 @@ macro_rules! AllowCascadeReplication {
                                                         $crate::__pgrx_c_macros::CInt
                                                     >(
                                                         ::core::ptr::addr_of_mut!(
-                                                            $crate::max_wal_senders
+                                                            $crate::__pgrx_c_bindings::max_wal_senders
                                                         )
                                                     )
                                                 )
@@ -176,7 +188,11 @@ macro_rules! AllowCascadeReplication {
                             $crate::__pgrx_c_macros::expression::load(
                                 $crate::__pgrx_c_macros::expression::place::<
                                     $crate::__pgrx_c_macros::CBool
-                                >(::core::ptr::addr_of_mut!($crate::EnableHotStandby))
+                                >(
+                                    ::core::ptr::addr_of_mut!(
+                                        $crate::__pgrx_c_bindings::EnableHotStandby
+                                    )
+                                )
                             )
                         )
                     ) && $crate::__pgrx_c_macros::expression::truth(
@@ -186,7 +202,11 @@ macro_rules! AllowCascadeReplication {
                                     $crate::__pgrx_c_macros::expression::load(
                                         $crate::__pgrx_c_macros::expression::place::<
                                             $crate::__pgrx_c_macros::CInt
-                                        >(::core::ptr::addr_of_mut!($crate::max_wal_senders))
+                                        >(
+                                            ::core::ptr::addr_of_mut!(
+                                                $crate::__pgrx_c_bindings::max_wal_senders
+                                            )
+                                        )
                                     )
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -222,8 +242,8 @@ macro_rules! AllowCascadeReplication {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -251,13 +271,13 @@ macro_rules! __pgrx_c_args_walrcv_alter_slot {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_walrcv_alter_slot!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_walrcv_alter_slot!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -266,7 +286,7 @@ macro_rules! __pgrx_c_args_walrcv_alter_slot {
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_walrcv_alter_slot!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -293,25 +313,25 @@ macro_rules! __pgrx_c_args_walrcv_alter_slot {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_walrcv_alter_slot!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_walrcv_alter_slot!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_walrcv_alter_slot!(
-            @p2 $mode [$($done)* (@literal [- $argument]),];
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_walrcv_alter_slot!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -320,7 +340,7 @@ macro_rules! __pgrx_c_args_walrcv_alter_slot {
     };
     (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_walrcv_alter_slot!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -347,25 +367,25 @@ macro_rules! __pgrx_c_args_walrcv_alter_slot {
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_walrcv_alter_slot!(
-            @p2 $mode [$($done)* (@literal [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_walrcv_alter_slot!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
     (@p2 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_walrcv_alter_slot!(
-            @p3 $mode [$($done)* (@literal [- $argument]),];
+            @p3 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative2 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_walrcv_alter_slot!(
-            @p3 $mode [$($done)* (@native [$argument]),];
+            @p3 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -374,7 +394,7 @@ macro_rules! __pgrx_c_args_walrcv_alter_slot {
     };
     (@p2 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_walrcv_alter_slot!(
-            @p3 $mode [$($done)* (@native [$argument]),];
+            @p3 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -401,31 +421,35 @@ macro_rules! __pgrx_c_args_walrcv_alter_slot {
     };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_walrcv_alter_slot!(
-            @p3 $mode [$($done)* (@literal [$argument]),];
+            @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p2 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_walrcv_alter_slot!(
-            @p3 $mode [$($done)* (@native [$argument]),];
+            @p3 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
     (@p3 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_walrcv_alter_slot!(@p4 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_walrcv_alter_slot!(
+            @p4 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative3 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_walrcv_alter_slot!(@p4 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_walrcv_alter_slot!(
+            @p4 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p3 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_walrcv_alter_slot!(
-            @p4 $mode [$($done)* (@literal [- $argument]),];
+            @p4 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative3 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_walrcv_alter_slot!(
-            @p4 $mode [$($done)* (@native [$argument]),];
+            @p4 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -433,7 +457,9 @@ macro_rules! __pgrx_c_args_walrcv_alter_slot {
         $crate::__pgrx_c_args_walrcv_alter_slot!(@negative3 $mode [$($done)*]; - $($raw)*)
     };
     (@p3 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_walrcv_alter_slot!(@p4 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_walrcv_alter_slot!(
+            @p4 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p3 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -455,14 +481,18 @@ macro_rules! __pgrx_c_args_walrcv_alter_slot {
         )
     };
     (@p3 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_walrcv_alter_slot!(@p4 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_walrcv_alter_slot!(
+            @p4 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p3 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_walrcv_alter_slot!(@p4 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_walrcv_alter_slot!(
+            @p4 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p3 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_walrcv_alter_slot!(
-            @p4 $mode [$($done)* (@native [$argument]),];
+            @p4 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -489,13 +519,13 @@ macro_rules! __pgrx_c_args_walrcv_alter_slot {
     };
     (@p3 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_walrcv_alter_slot!(
-            @p4 $mode [$($done)* (@literal [$argument]),];
+            @p4 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p3 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_walrcv_alter_slot!(
-            @p4 $mode [$($done)* (@native [$argument]),];
+            @p4 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -556,11 +586,13 @@ macro_rules! walrcv_alter_slot {
                                         $crate::__pgrx_c_macros::expression::place::<
                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                    $crate::WalReceiverFunctionsType
+                                                    $crate::__pgrx_c_bindings::WalReceiverFunctionsType
                                                 >,
                                                 $crate::__pgrx_c_macros::expression::ReadWrite
                                             >>(
-                                            ::core::ptr::addr_of_mut!($crate::WalReceiverFunctions)
+                                            ::core::ptr::addr_of_mut!(
+                                                $crate::__pgrx_c_bindings::WalReceiverFunctions
+                                            )
                                         )
                                     )
                                 )
@@ -603,10 +635,14 @@ macro_rules! walrcv_alter_slot {
                                     $crate::__pgrx_c_macros::expression::place::<
                                         $crate::__pgrx_c_macros::expression::CPointer<
                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                $crate::WalReceiverFunctionsType
+                                                $crate::__pgrx_c_bindings::WalReceiverFunctionsType
                                             >,
                                             $crate::__pgrx_c_macros::expression::ReadWrite
-                                        >>(::core::ptr::addr_of_mut!($crate::WalReceiverFunctions))
+                                        >>(
+                                        ::core::ptr::addr_of_mut!(
+                                            $crate::__pgrx_c_bindings::WalReceiverFunctions
+                                        )
+                                    )
                                 )
                             )
                         )
@@ -647,10 +683,14 @@ macro_rules! walrcv_alter_slot {
                                     $crate::__pgrx_c_macros::expression::place::<
                                         $crate::__pgrx_c_macros::expression::CPointer<
                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                $crate::WalReceiverFunctionsType
+                                                $crate::__pgrx_c_bindings::WalReceiverFunctionsType
                                             >,
                                             $crate::__pgrx_c_macros::expression::ReadWrite
-                                        >>(::core::ptr::addr_of_mut!($crate::WalReceiverFunctions))
+                                        >>(
+                                        ::core::ptr::addr_of_mut!(
+                                            $crate::__pgrx_c_bindings::WalReceiverFunctions
+                                        )
+                                    )
                                 )
                             )
                         )
@@ -707,12 +747,12 @@ macro_rules! walrcv_alter_slot {
                                                         $crate::__pgrx_c_macros::expression::place::<
                                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                                    $crate::WalReceiverFunctionsType
+                                                                    $crate::__pgrx_c_bindings::WalReceiverFunctionsType
                                                                 >,
                                                                 $crate::__pgrx_c_macros::expression::ReadWrite
                                                             >>(
                                                             ::core::ptr::addr_of_mut!(
-                                                                $crate::WalReceiverFunctions
+                                                                $crate::__pgrx_c_bindings::WalReceiverFunctions
                                                             )
                                                         )
                                                     )
@@ -764,12 +804,12 @@ macro_rules! walrcv_alter_slot {
                                             $crate::__pgrx_c_macros::expression::place::<
                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                        $crate::WalReceiverFunctionsType
+                                                        $crate::__pgrx_c_bindings::WalReceiverFunctionsType
                                                     >,
                                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                                 >>(
                                                 ::core::ptr::addr_of_mut!(
-                                                    $crate::WalReceiverFunctions
+                                                    $crate::__pgrx_c_bindings::WalReceiverFunctions
                                                 )
                                             )
                                         )
@@ -805,8 +845,8 @@ macro_rules! walrcv_alter_slot {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -837,13 +877,13 @@ macro_rules! __pgrx_c_args_walrcv_check_conninfo {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_walrcv_check_conninfo!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_walrcv_check_conninfo!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -852,7 +892,7 @@ macro_rules! __pgrx_c_args_walrcv_check_conninfo {
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_walrcv_check_conninfo!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -879,33 +919,35 @@ macro_rules! __pgrx_c_args_walrcv_check_conninfo {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_walrcv_check_conninfo!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_walrcv_check_conninfo!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $argument:literal) => {
         $crate::__pgrx_c_args_walrcv_check_conninfo!(
-            @p2 $mode [$($done)* (@literal [- $argument]),];
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
         )
     };
     (@negative1 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_walrcv_check_conninfo!(@p2 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_walrcv_check_conninfo!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_walrcv_check_conninfo!(
-            @p2 $mode [$($done)* (@literal [- $argument]),];
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_walrcv_check_conninfo!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -913,7 +955,9 @@ macro_rules! __pgrx_c_args_walrcv_check_conninfo {
         $crate::__pgrx_c_args_walrcv_check_conninfo!(@negative1 $mode [$($done)*]; - $($raw)*)
     };
     (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_walrcv_check_conninfo!(@p2 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_walrcv_check_conninfo!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -935,14 +979,18 @@ macro_rules! __pgrx_c_args_walrcv_check_conninfo {
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_walrcv_check_conninfo!(@p2 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_walrcv_check_conninfo!(
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_walrcv_check_conninfo!(@p2 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_walrcv_check_conninfo!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_walrcv_check_conninfo!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -969,13 +1017,13 @@ macro_rules! __pgrx_c_args_walrcv_check_conninfo {
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_walrcv_check_conninfo!(
-            @p2 $mode [$($done)* (@literal [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_walrcv_check_conninfo!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -1034,11 +1082,13 @@ macro_rules! walrcv_check_conninfo {
                                         $crate::__pgrx_c_macros::expression::place::<
                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                    $crate::WalReceiverFunctionsType
+                                                    $crate::__pgrx_c_bindings::WalReceiverFunctionsType
                                                 >,
                                                 $crate::__pgrx_c_macros::expression::ReadWrite
                                             >>(
-                                            ::core::ptr::addr_of_mut!($crate::WalReceiverFunctions)
+                                            ::core::ptr::addr_of_mut!(
+                                                $crate::__pgrx_c_bindings::WalReceiverFunctions
+                                            )
                                         )
                                     )
                                 )
@@ -1075,10 +1125,14 @@ macro_rules! walrcv_check_conninfo {
                                     $crate::__pgrx_c_macros::expression::place::<
                                         $crate::__pgrx_c_macros::expression::CPointer<
                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                $crate::WalReceiverFunctionsType
+                                                $crate::__pgrx_c_bindings::WalReceiverFunctionsType
                                             >,
                                             $crate::__pgrx_c_macros::expression::ReadWrite
-                                        >>(::core::ptr::addr_of_mut!($crate::WalReceiverFunctions))
+                                        >>(
+                                        ::core::ptr::addr_of_mut!(
+                                            $crate::__pgrx_c_bindings::WalReceiverFunctions
+                                        )
+                                    )
                                 )
                             )
                         )
@@ -1113,10 +1167,14 @@ macro_rules! walrcv_check_conninfo {
                                     $crate::__pgrx_c_macros::expression::place::<
                                         $crate::__pgrx_c_macros::expression::CPointer<
                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                $crate::WalReceiverFunctionsType
+                                                $crate::__pgrx_c_bindings::WalReceiverFunctionsType
                                             >,
                                             $crate::__pgrx_c_macros::expression::ReadWrite
-                                        >>(::core::ptr::addr_of_mut!($crate::WalReceiverFunctions))
+                                        >>(
+                                        ::core::ptr::addr_of_mut!(
+                                            $crate::__pgrx_c_bindings::WalReceiverFunctions
+                                        )
+                                    )
                                 )
                             )
                         )
@@ -1165,12 +1223,12 @@ macro_rules! walrcv_check_conninfo {
                                                         $crate::__pgrx_c_macros::expression::place::<
                                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                                    $crate::WalReceiverFunctionsType
+                                                                    $crate::__pgrx_c_bindings::WalReceiverFunctionsType
                                                                 >,
                                                                 $crate::__pgrx_c_macros::expression::ReadWrite
                                                             >>(
                                                             ::core::ptr::addr_of_mut!(
-                                                                $crate::WalReceiverFunctions
+                                                                $crate::__pgrx_c_bindings::WalReceiverFunctions
                                                             )
                                                         )
                                                     )
@@ -1216,12 +1274,12 @@ macro_rules! walrcv_check_conninfo {
                                             $crate::__pgrx_c_macros::expression::place::<
                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                        $crate::WalReceiverFunctionsType
+                                                        $crate::__pgrx_c_bindings::WalReceiverFunctionsType
                                                     >,
                                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                                 >>(
                                                 ::core::ptr::addr_of_mut!(
-                                                    $crate::WalReceiverFunctions
+                                                    $crate::__pgrx_c_bindings::WalReceiverFunctions
                                                 )
                                             )
                                         )
@@ -1251,8 +1309,318 @@ macro_rules! walrcv_check_conninfo {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
+    target_pointer_width = "64",
+    target_endian = "little"
+)))]
+#[cfg(not(docsrs))]
+compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
+#[doc(hidden)]
+#[macro_export]
+macro_rules! __pgrx_c_args_walrcv_clear_result {
+    (@collect $mode:ident [$($done:tt)*]; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_walrcv_clear_result!(@p0 $mode [$($done)*]; $($raw)*)
+    };
+    (@classified [$next:ident $mode:ident [$($done:tt)*] [$($rest:tt)*]] $descriptor:tt) => {
+        $crate::__pgrx_c_args_walrcv_clear_result!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
+    };
+    (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
+        $crate::__pgrx_c_args_walrcv_clear_result!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
+    };
+    (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
+        $crate::__pgrx_c_args_walrcv_clear_result!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_walrcv_clear_result!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+            $($rest)*
+        )
+    };
+    (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_walrcv_clear_result!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; - $($raw:tt)*) => {
+        $crate::__pgrx_c_args_walrcv_clear_result!(@negative0 $mode [$($done)*]; - $($raw)*)
+    };
+    (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
+        $crate::__pgrx_c_args_walrcv_clear_result!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_walrcv_clear_result] [p1 $mode [$($done)*] []] [
+                $head $(::$tail)* ! $group
+            ]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; ::$head:ident $(::$tail:ident)* ! $group:tt) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_walrcv_clear_result] [p1 $mode [$($done)*] []] [
+                ::$head $(::$tail)* ! $group
+            ]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; ($($inner:tt)*)) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_walrcv_clear_result] [p1 $mode [$($done)*] []] [($($inner)*)]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
+        $crate::__pgrx_c_args_walrcv_clear_result!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
+        $crate::__pgrx_c_args_walrcv_clear_result!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
+        $crate::__pgrx_c_args_walrcv_clear_result!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_walrcv_clear_result] [p1 $mode [$($done)*] [$($rest)*]] [
+                $head $(::$tail)* ! $group
+            ]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; ::$head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_walrcv_clear_result] [p1 $mode [$($done)*] [$($rest)*]] [
+                ::$head $(::$tail)* ! $group
+            ]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; ($($inner:tt)*), $($rest:tt)*) => {
+        $crate::__pgrx_c_classify!(
+            @argument [__pgrx_c_args_walrcv_clear_result] [p1 $mode [$($done)*] [$($rest)*]] [
+                ($($inner)*)
+            ]
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_walrcv_clear_result!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
+        $crate::__pgrx_c_args_walrcv_clear_result!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
+    };
+    (@p1 $mode:ident [$($done:tt)*];) => {
+        $crate::walrcv_clear_result!(@$mode; $($done)*)
+    };
+    ($($invalid:tt)*) => {
+        compile_error!("arguments do not satisfy this C macro's invocation contract")
+    };
+}
+/// Typed call adapter for C inline function walrcv_clear_result from walreceiver.h:470
+///
+/// ```c
+/// static inline void
+/// walrcv_clear_result(WalRcvExecResult *walres)
+/// {
+/// 	if (!walres)
+/// 		return;
+///
+/// 	if (walres->err)
+/// 		pfree(walres->err);
+///
+/// 	if (walres->tuplestore)
+/// 		tuplestore_end(walres->tuplestore);
+///
+/// 	if (walres->tupledesc)
+/// 		FreeTupleDesc(walres->tupledesc);
+///
+/// 	pfree(walres);
+/// }
+/// ```
+///
+///
+/// Calls the original function through its inspected C prototype. Each operand is evaluated once and converted using C parameter assignment rules. The result retains the function's original C type; `.get()` extracts its native storage, including `()` for a void result. Native calls retain the backend thread, PostgreSQL error, and caller safety contracts of the generated guarded binding.
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+#[macro_export]
+macro_rules! walrcv_clear_result {
+    (@__pgrx_emit_check_safety; $walres:tt $(,)?) => {
+        {
+            if false {
+                $crate::__pgrx_c_operand!(@check_safety; $walres);
+            }
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_walrcv_clear_result!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
+    (@__pgrx_emit_public; $walres:tt $(,)?) => {
+        $crate::__pgrx_c_macros::expression_result::finish(
+            $crate::walrcv_clear_result!(@__pgrx_emit_value; $walres)
+        )
+    };
+    (@__pgrx_emit_value; $walres:tt $(,)?) => {
+        $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+            $crate::__pgrx_c_bindings::walrcv_clear_result(
+                <
+                    $crate::__pgrx_c_macros::expression::CPointer<
+                        $crate::__pgrx_c_macros::expression::CRecord<
+                            $crate::__pgrx_c_bindings::WalRcvExecResult
+                        >,
+                        $crate::__pgrx_c_macros::expression::ReadWrite
+                    > as $crate::__pgrx_c_macros::expression::CType
+                >::into_storage(
+                    $crate::__pgrx_c_macros::expression::implicit::<
+                        $crate::__pgrx_c_macros::expression::CPointer<
+                            $crate::__pgrx_c_macros::expression::CRecord<
+                                $crate::__pgrx_c_bindings::WalRcvExecResult
+                            >,
+                            $crate::__pgrx_c_macros::expression::ReadWrite
+                        >,
+                        _
+                    >(
+                        $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                            $crate::__pgrx_c_operand!(@value [true]; $walres)
+                        )
+                    )
+                ),
+            )
+        )
+    };
+    (@__pgrx_c_value; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_walrcv_clear_result!(@collect __pgrx_emit_value []; $($raw)*)
+    };
+    (@__pgrx_emit_place; $walres:tt $(,)?) => {
+        compile_error!("C expression is not a place in this operation")
+    };
+    (@__pgrx_c_place; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_walrcv_clear_result!(@collect __pgrx_emit_place []; $($raw)*)
+    };
+    (@__pgrx_emit_read_place; $walres:tt $(,)?) => {
+        compile_error!("C expression is not a place in this operation")
+    };
+    (@__pgrx_c_read_place; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_walrcv_clear_result!(@collect __pgrx_emit_read_place []; $($raw)*)
+    };
+    (@__pgrx_emit_size; $walres:tt $(,)?) => {
+        $crate::__pgrx_c_macros::expression::size_of_value_type(
+            if false {
+                {
+                    if false {
+                        $crate::__pgrx_c_operand!(@check_safety; $walres);
+                    }
+                }
+                Some(
+                    unsafe {
+                        $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                            $crate::__pgrx_c_bindings::walrcv_clear_result(
+                                <
+                                    $crate::__pgrx_c_macros::expression::CPointer<
+                                        $crate::__pgrx_c_macros::expression::CRecord<
+                                            $crate::__pgrx_c_bindings::WalRcvExecResult
+                                        >,
+                                        $crate::__pgrx_c_macros::expression::ReadWrite
+                                    > as $crate::__pgrx_c_macros::expression::CType
+                                >::into_storage(
+                                    $crate::__pgrx_c_macros::expression::implicit::<
+                                        $crate::__pgrx_c_macros::expression::CPointer<
+                                            $crate::__pgrx_c_macros::expression::CRecord<
+                                                $crate::__pgrx_c_bindings::WalRcvExecResult
+                                            >,
+                                            $crate::__pgrx_c_macros::expression::ReadWrite
+                                        >,
+                                        _
+                                    >(
+                                        $crate::__pgrx_c_macros::expression::profile_value::<
+                                            true,
+                                            _
+                                        >($crate::__pgrx_c_operand!(@value [true]; $walres))
+                                    )
+                                ),
+                            )
+                        )
+                    }
+                )
+            } else {
+                None
+            }
+        )
+    };
+    (@__pgrx_c_size; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_walrcv_clear_result!(@collect __pgrx_emit_size []; $($raw)*)
+    };
+    (@__pgrx_emit_discard; $walres:tt $(,)?) => {
+        {
+            let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                $crate::__pgrx_c_bindings::walrcv_clear_result(
+                    <
+                        $crate::__pgrx_c_macros::expression::CPointer<
+                            $crate::__pgrx_c_macros::expression::CRecord<
+                                $crate::__pgrx_c_bindings::WalRcvExecResult
+                            >,
+                            $crate::__pgrx_c_macros::expression::ReadWrite
+                        > as $crate::__pgrx_c_macros::expression::CType
+                    >::into_storage(
+                        $crate::__pgrx_c_macros::expression::implicit::<
+                            $crate::__pgrx_c_macros::expression::CPointer<
+                                $crate::__pgrx_c_macros::expression::CRecord<
+                                    $crate::__pgrx_c_bindings::WalRcvExecResult
+                                >,
+                                $crate::__pgrx_c_macros::expression::ReadWrite
+                            >,
+                            _
+                        >(
+                            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                                $crate::__pgrx_c_operand!(@value [true]; $walres)
+                            )
+                        )
+                    ),
+                )
+            );
+        }
+    };
+    (@__pgrx_c_discard; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_walrcv_clear_result!(@collect __pgrx_emit_discard []; $($raw)*)
+    };
+    ($($raw:tt)*) => {
+        $crate::__pgrx_c_args_walrcv_clear_result!(@collect __pgrx_emit_public []; $($raw)*)
+    };
+}
+
+#[cfg(not(all(
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -1280,13 +1648,13 @@ macro_rules! __pgrx_c_args_walrcv_connect {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_walrcv_connect!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_walrcv_connect!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -1295,7 +1663,7 @@ macro_rules! __pgrx_c_args_walrcv_connect {
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_walrcv_connect!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -1322,25 +1690,25 @@ macro_rules! __pgrx_c_args_walrcv_connect {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_walrcv_connect!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_walrcv_connect!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_walrcv_connect!(
-            @p2 $mode [$($done)* (@literal [- $argument]),];
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_walrcv_connect!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -1349,7 +1717,7 @@ macro_rules! __pgrx_c_args_walrcv_connect {
     };
     (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_walrcv_connect!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -1376,25 +1744,25 @@ macro_rules! __pgrx_c_args_walrcv_connect {
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_walrcv_connect!(
-            @p2 $mode [$($done)* (@literal [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_walrcv_connect!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
     (@p2 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_walrcv_connect!(
-            @p3 $mode [$($done)* (@literal [- $argument]),];
+            @p3 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative2 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_walrcv_connect!(
-            @p3 $mode [$($done)* (@native [$argument]),];
+            @p3 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -1403,7 +1771,7 @@ macro_rules! __pgrx_c_args_walrcv_connect {
     };
     (@p2 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_walrcv_connect!(
-            @p3 $mode [$($done)* (@native [$argument]),];
+            @p3 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -1430,25 +1798,25 @@ macro_rules! __pgrx_c_args_walrcv_connect {
     };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_walrcv_connect!(
-            @p3 $mode [$($done)* (@literal [$argument]),];
+            @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p2 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_walrcv_connect!(
-            @p3 $mode [$($done)* (@native [$argument]),];
+            @p3 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
     (@p3 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_walrcv_connect!(
-            @p4 $mode [$($done)* (@literal [- $argument]),];
+            @p4 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative3 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_walrcv_connect!(
-            @p4 $mode [$($done)* (@native [$argument]),];
+            @p4 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -1457,7 +1825,7 @@ macro_rules! __pgrx_c_args_walrcv_connect {
     };
     (@p3 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_walrcv_connect!(
-            @p4 $mode [$($done)* (@native [$argument]),];
+            @p4 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -1484,25 +1852,25 @@ macro_rules! __pgrx_c_args_walrcv_connect {
     };
     (@p3 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_walrcv_connect!(
-            @p4 $mode [$($done)* (@literal [$argument]),];
+            @p4 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p3 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_walrcv_connect!(
-            @p4 $mode [$($done)* (@native [$argument]),];
+            @p4 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
     (@p4 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_walrcv_connect!(
-            @p5 $mode [$($done)* (@literal [- $argument]),];
+            @p5 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative4 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_walrcv_connect!(
-            @p5 $mode [$($done)* (@native [$argument]),];
+            @p5 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -1511,7 +1879,7 @@ macro_rules! __pgrx_c_args_walrcv_connect {
     };
     (@p4 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_walrcv_connect!(
-            @p5 $mode [$($done)* (@native [$argument]),];
+            @p5 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -1538,31 +1906,35 @@ macro_rules! __pgrx_c_args_walrcv_connect {
     };
     (@p4 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_walrcv_connect!(
-            @p5 $mode [$($done)* (@literal [$argument]),];
+            @p5 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p4 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_walrcv_connect!(
-            @p5 $mode [$($done)* (@native [$argument]),];
+            @p5 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
     (@p5 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_walrcv_connect!(@p6 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_walrcv_connect!(
+            @p6 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative5 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_walrcv_connect!(@p6 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_walrcv_connect!(
+            @p6 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p5 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_walrcv_connect!(
-            @p6 $mode [$($done)* (@literal [- $argument]),];
+            @p6 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative5 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_walrcv_connect!(
-            @p6 $mode [$($done)* (@native [$argument]),];
+            @p6 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -1570,7 +1942,9 @@ macro_rules! __pgrx_c_args_walrcv_connect {
         $crate::__pgrx_c_args_walrcv_connect!(@negative5 $mode [$($done)*]; - $($raw)*)
     };
     (@p5 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_walrcv_connect!(@p6 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_walrcv_connect!(
+            @p6 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p5 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -1592,14 +1966,18 @@ macro_rules! __pgrx_c_args_walrcv_connect {
         )
     };
     (@p5 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_walrcv_connect!(@p6 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_walrcv_connect!(
+            @p6 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p5 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_walrcv_connect!(@p6 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_walrcv_connect!(
+            @p6 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p5 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_walrcv_connect!(
-            @p6 $mode [$($done)* (@native [$argument]),];
+            @p6 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -1626,13 +2004,13 @@ macro_rules! __pgrx_c_args_walrcv_connect {
     };
     (@p5 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_walrcv_connect!(
-            @p6 $mode [$($done)* (@literal [$argument]),];
+            @p6 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p5 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_walrcv_connect!(
-            @p6 $mode [$($done)* (@native [$argument]),];
+            @p6 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -1727,11 +2105,13 @@ macro_rules! walrcv_connect {
                                         $crate::__pgrx_c_macros::expression::place::<
                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                    $crate::WalReceiverFunctionsType
+                                                    $crate::__pgrx_c_bindings::WalReceiverFunctionsType
                                                 >,
                                                 $crate::__pgrx_c_macros::expression::ReadWrite
                                             >>(
-                                            ::core::ptr::addr_of_mut!($crate::WalReceiverFunctions)
+                                            ::core::ptr::addr_of_mut!(
+                                                $crate::__pgrx_c_bindings::WalReceiverFunctions
+                                            )
                                         )
                                     )
                                 )
@@ -1788,10 +2168,14 @@ macro_rules! walrcv_connect {
                                     $crate::__pgrx_c_macros::expression::place::<
                                         $crate::__pgrx_c_macros::expression::CPointer<
                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                $crate::WalReceiverFunctionsType
+                                                $crate::__pgrx_c_bindings::WalReceiverFunctionsType
                                             >,
                                             $crate::__pgrx_c_macros::expression::ReadWrite
-                                        >>(::core::ptr::addr_of_mut!($crate::WalReceiverFunctions))
+                                        >>(
+                                        ::core::ptr::addr_of_mut!(
+                                            $crate::__pgrx_c_bindings::WalReceiverFunctions
+                                        )
+                                    )
                                 )
                             )
                         )
@@ -1846,10 +2230,14 @@ macro_rules! walrcv_connect {
                                     $crate::__pgrx_c_macros::expression::place::<
                                         $crate::__pgrx_c_macros::expression::CPointer<
                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                $crate::WalReceiverFunctionsType
+                                                $crate::__pgrx_c_bindings::WalReceiverFunctionsType
                                             >,
                                             $crate::__pgrx_c_macros::expression::ReadWrite
-                                        >>(::core::ptr::addr_of_mut!($crate::WalReceiverFunctions))
+                                        >>(
+                                        ::core::ptr::addr_of_mut!(
+                                            $crate::__pgrx_c_bindings::WalReceiverFunctions
+                                        )
+                                    )
                                 )
                             )
                         )
@@ -1922,12 +2310,12 @@ macro_rules! walrcv_connect {
                                                         $crate::__pgrx_c_macros::expression::place::<
                                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                                    $crate::WalReceiverFunctionsType
+                                                                    $crate::__pgrx_c_bindings::WalReceiverFunctionsType
                                                                 >,
                                                                 $crate::__pgrx_c_macros::expression::ReadWrite
                                                             >>(
                                                             ::core::ptr::addr_of_mut!(
-                                                                $crate::WalReceiverFunctions
+                                                                $crate::__pgrx_c_bindings::WalReceiverFunctions
                                                             )
                                                         )
                                                     )
@@ -1993,12 +2381,12 @@ macro_rules! walrcv_connect {
                                             $crate::__pgrx_c_macros::expression::place::<
                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                        $crate::WalReceiverFunctionsType
+                                                        $crate::__pgrx_c_bindings::WalReceiverFunctionsType
                                                     >,
                                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                                 >>(
                                                 ::core::ptr::addr_of_mut!(
-                                                    $crate::WalReceiverFunctions
+                                                    $crate::__pgrx_c_bindings::WalReceiverFunctions
                                                 )
                                             )
                                         )
@@ -2040,8 +2428,8 @@ macro_rules! walrcv_connect {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -2069,13 +2457,13 @@ macro_rules! __pgrx_c_args_walrcv_create_slot {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_walrcv_create_slot!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_walrcv_create_slot!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -2084,7 +2472,7 @@ macro_rules! __pgrx_c_args_walrcv_create_slot {
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_walrcv_create_slot!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -2111,25 +2499,25 @@ macro_rules! __pgrx_c_args_walrcv_create_slot {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_walrcv_create_slot!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_walrcv_create_slot!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_walrcv_create_slot!(
-            @p2 $mode [$($done)* (@literal [- $argument]),];
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_walrcv_create_slot!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -2138,7 +2526,7 @@ macro_rules! __pgrx_c_args_walrcv_create_slot {
     };
     (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_walrcv_create_slot!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -2165,25 +2553,25 @@ macro_rules! __pgrx_c_args_walrcv_create_slot {
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_walrcv_create_slot!(
-            @p2 $mode [$($done)* (@literal [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_walrcv_create_slot!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
     (@p2 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_walrcv_create_slot!(
-            @p3 $mode [$($done)* (@literal [- $argument]),];
+            @p3 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative2 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_walrcv_create_slot!(
-            @p3 $mode [$($done)* (@native [$argument]),];
+            @p3 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -2192,7 +2580,7 @@ macro_rules! __pgrx_c_args_walrcv_create_slot {
     };
     (@p2 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_walrcv_create_slot!(
-            @p3 $mode [$($done)* (@native [$argument]),];
+            @p3 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -2219,25 +2607,25 @@ macro_rules! __pgrx_c_args_walrcv_create_slot {
     };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_walrcv_create_slot!(
-            @p3 $mode [$($done)* (@literal [$argument]),];
+            @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p2 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_walrcv_create_slot!(
-            @p3 $mode [$($done)* (@native [$argument]),];
+            @p3 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
     (@p3 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_walrcv_create_slot!(
-            @p4 $mode [$($done)* (@literal [- $argument]),];
+            @p4 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative3 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_walrcv_create_slot!(
-            @p4 $mode [$($done)* (@native [$argument]),];
+            @p4 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -2246,7 +2634,7 @@ macro_rules! __pgrx_c_args_walrcv_create_slot {
     };
     (@p3 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_walrcv_create_slot!(
-            @p4 $mode [$($done)* (@native [$argument]),];
+            @p4 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -2273,25 +2661,25 @@ macro_rules! __pgrx_c_args_walrcv_create_slot {
     };
     (@p3 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_walrcv_create_slot!(
-            @p4 $mode [$($done)* (@literal [$argument]),];
+            @p4 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p3 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_walrcv_create_slot!(
-            @p4 $mode [$($done)* (@native [$argument]),];
+            @p4 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
     (@p4 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_walrcv_create_slot!(
-            @p5 $mode [$($done)* (@literal [- $argument]),];
+            @p5 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative4 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_walrcv_create_slot!(
-            @p5 $mode [$($done)* (@native [$argument]),];
+            @p5 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -2300,7 +2688,7 @@ macro_rules! __pgrx_c_args_walrcv_create_slot {
     };
     (@p4 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_walrcv_create_slot!(
-            @p5 $mode [$($done)* (@native [$argument]),];
+            @p5 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -2327,25 +2715,25 @@ macro_rules! __pgrx_c_args_walrcv_create_slot {
     };
     (@p4 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_walrcv_create_slot!(
-            @p5 $mode [$($done)* (@literal [$argument]),];
+            @p5 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p4 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_walrcv_create_slot!(
-            @p5 $mode [$($done)* (@native [$argument]),];
+            @p5 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
     (@p5 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_walrcv_create_slot!(
-            @p6 $mode [$($done)* (@literal [- $argument]),];
+            @p6 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative5 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_walrcv_create_slot!(
-            @p6 $mode [$($done)* (@native [$argument]),];
+            @p6 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -2354,7 +2742,7 @@ macro_rules! __pgrx_c_args_walrcv_create_slot {
     };
     (@p5 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_walrcv_create_slot!(
-            @p6 $mode [$($done)* (@native [$argument]),];
+            @p6 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -2381,31 +2769,35 @@ macro_rules! __pgrx_c_args_walrcv_create_slot {
     };
     (@p5 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_walrcv_create_slot!(
-            @p6 $mode [$($done)* (@literal [$argument]),];
+            @p6 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p5 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_walrcv_create_slot!(
-            @p6 $mode [$($done)* (@native [$argument]),];
+            @p6 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
     (@p6 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_walrcv_create_slot!(@p7 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_walrcv_create_slot!(
+            @p7 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative6 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_walrcv_create_slot!(@p7 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_walrcv_create_slot!(
+            @p7 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p6 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_walrcv_create_slot!(
-            @p7 $mode [$($done)* (@literal [- $argument]),];
+            @p7 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative6 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_walrcv_create_slot!(
-            @p7 $mode [$($done)* (@native [$argument]),];
+            @p7 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -2413,7 +2805,9 @@ macro_rules! __pgrx_c_args_walrcv_create_slot {
         $crate::__pgrx_c_args_walrcv_create_slot!(@negative6 $mode [$($done)*]; - $($raw)*)
     };
     (@p6 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_walrcv_create_slot!(@p7 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_walrcv_create_slot!(
+            @p7 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p6 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -2435,14 +2829,18 @@ macro_rules! __pgrx_c_args_walrcv_create_slot {
         )
     };
     (@p6 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_walrcv_create_slot!(@p7 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_walrcv_create_slot!(
+            @p7 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p6 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_walrcv_create_slot!(@p7 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_walrcv_create_slot!(
+            @p7 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p6 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_walrcv_create_slot!(
-            @p7 $mode [$($done)* (@native [$argument]),];
+            @p7 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -2469,13 +2867,13 @@ macro_rules! __pgrx_c_args_walrcv_create_slot {
     };
     (@p6 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_walrcv_create_slot!(
-            @p7 $mode [$($done)* (@literal [$argument]),];
+            @p7 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p6 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_walrcv_create_slot!(
-            @p7 $mode [$($done)* (@native [$argument]),];
+            @p7 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -2575,11 +2973,13 @@ macro_rules! walrcv_create_slot {
                                         $crate::__pgrx_c_macros::expression::place::<
                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                    $crate::WalReceiverFunctionsType
+                                                    $crate::__pgrx_c_bindings::WalReceiverFunctionsType
                                                 >,
                                                 $crate::__pgrx_c_macros::expression::ReadWrite
                                             >>(
-                                            ::core::ptr::addr_of_mut!($crate::WalReceiverFunctions)
+                                            ::core::ptr::addr_of_mut!(
+                                                $crate::__pgrx_c_bindings::WalReceiverFunctions
+                                            )
                                         )
                                     )
                                 )
@@ -2640,10 +3040,14 @@ macro_rules! walrcv_create_slot {
                                     $crate::__pgrx_c_macros::expression::place::<
                                         $crate::__pgrx_c_macros::expression::CPointer<
                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                $crate::WalReceiverFunctionsType
+                                                $crate::__pgrx_c_bindings::WalReceiverFunctionsType
                                             >,
                                             $crate::__pgrx_c_macros::expression::ReadWrite
-                                        >>(::core::ptr::addr_of_mut!($crate::WalReceiverFunctions))
+                                        >>(
+                                        ::core::ptr::addr_of_mut!(
+                                            $crate::__pgrx_c_bindings::WalReceiverFunctions
+                                        )
+                                    )
                                 )
                             )
                         )
@@ -2702,10 +3106,14 @@ macro_rules! walrcv_create_slot {
                                     $crate::__pgrx_c_macros::expression::place::<
                                         $crate::__pgrx_c_macros::expression::CPointer<
                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                $crate::WalReceiverFunctionsType
+                                                $crate::__pgrx_c_bindings::WalReceiverFunctionsType
                                             >,
                                             $crate::__pgrx_c_macros::expression::ReadWrite
-                                        >>(::core::ptr::addr_of_mut!($crate::WalReceiverFunctions))
+                                        >>(
+                                        ::core::ptr::addr_of_mut!(
+                                            $crate::__pgrx_c_bindings::WalReceiverFunctions
+                                        )
+                                    )
                                 )
                             )
                         )
@@ -2783,12 +3191,12 @@ macro_rules! walrcv_create_slot {
                                                         $crate::__pgrx_c_macros::expression::place::<
                                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                                    $crate::WalReceiverFunctionsType
+                                                                    $crate::__pgrx_c_bindings::WalReceiverFunctionsType
                                                                 >,
                                                                 $crate::__pgrx_c_macros::expression::ReadWrite
                                                             >>(
                                                             ::core::ptr::addr_of_mut!(
-                                                                $crate::WalReceiverFunctions
+                                                                $crate::__pgrx_c_bindings::WalReceiverFunctions
                                                             )
                                                         )
                                                     )
@@ -2858,12 +3266,12 @@ macro_rules! walrcv_create_slot {
                                             $crate::__pgrx_c_macros::expression::place::<
                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                        $crate::WalReceiverFunctionsType
+                                                        $crate::__pgrx_c_bindings::WalReceiverFunctionsType
                                                     >,
                                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                                 >>(
                                                 ::core::ptr::addr_of_mut!(
-                                                    $crate::WalReceiverFunctions
+                                                    $crate::__pgrx_c_bindings::WalReceiverFunctions
                                                 )
                                             )
                                         )
@@ -2908,8 +3316,8 @@ macro_rules! walrcv_create_slot {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -2936,20 +3344,24 @@ macro_rules! __pgrx_c_args_walrcv_disconnect {
         $crate::__pgrx_c_args_walrcv_disconnect!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_walrcv_disconnect!(@p1 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_walrcv_disconnect!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_walrcv_disconnect!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_walrcv_disconnect!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_walrcv_disconnect!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_walrcv_disconnect!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -2957,7 +3369,9 @@ macro_rules! __pgrx_c_args_walrcv_disconnect {
         $crate::__pgrx_c_args_walrcv_disconnect!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_walrcv_disconnect!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_walrcv_disconnect!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -2979,14 +3393,18 @@ macro_rules! __pgrx_c_args_walrcv_disconnect {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_walrcv_disconnect!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_walrcv_disconnect!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_walrcv_disconnect!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_walrcv_disconnect!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_walrcv_disconnect!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -3013,13 +3431,13 @@ macro_rules! __pgrx_c_args_walrcv_disconnect {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_walrcv_disconnect!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_walrcv_disconnect!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -3077,11 +3495,13 @@ macro_rules! walrcv_disconnect {
                                         $crate::__pgrx_c_macros::expression::place::<
                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                    $crate::WalReceiverFunctionsType
+                                                    $crate::__pgrx_c_bindings::WalReceiverFunctionsType
                                                 >,
                                                 $crate::__pgrx_c_macros::expression::ReadWrite
                                             >>(
-                                            ::core::ptr::addr_of_mut!($crate::WalReceiverFunctions)
+                                            ::core::ptr::addr_of_mut!(
+                                                $crate::__pgrx_c_bindings::WalReceiverFunctions
+                                            )
                                         )
                                     )
                                 )
@@ -3115,10 +3535,14 @@ macro_rules! walrcv_disconnect {
                                     $crate::__pgrx_c_macros::expression::place::<
                                         $crate::__pgrx_c_macros::expression::CPointer<
                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                $crate::WalReceiverFunctionsType
+                                                $crate::__pgrx_c_bindings::WalReceiverFunctionsType
                                             >,
                                             $crate::__pgrx_c_macros::expression::ReadWrite
-                                        >>(::core::ptr::addr_of_mut!($crate::WalReceiverFunctions))
+                                        >>(
+                                        ::core::ptr::addr_of_mut!(
+                                            $crate::__pgrx_c_bindings::WalReceiverFunctions
+                                        )
+                                    )
                                 )
                             )
                         )
@@ -3150,10 +3574,14 @@ macro_rules! walrcv_disconnect {
                                     $crate::__pgrx_c_macros::expression::place::<
                                         $crate::__pgrx_c_macros::expression::CPointer<
                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                $crate::WalReceiverFunctionsType
+                                                $crate::__pgrx_c_bindings::WalReceiverFunctionsType
                                             >,
                                             $crate::__pgrx_c_macros::expression::ReadWrite
-                                        >>(::core::ptr::addr_of_mut!($crate::WalReceiverFunctions))
+                                        >>(
+                                        ::core::ptr::addr_of_mut!(
+                                            $crate::__pgrx_c_bindings::WalReceiverFunctions
+                                        )
+                                    )
                                 )
                             )
                         )
@@ -3198,12 +3626,12 @@ macro_rules! walrcv_disconnect {
                                                         $crate::__pgrx_c_macros::expression::place::<
                                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                                    $crate::WalReceiverFunctionsType
+                                                                    $crate::__pgrx_c_bindings::WalReceiverFunctionsType
                                                                 >,
                                                                 $crate::__pgrx_c_macros::expression::ReadWrite
                                                             >>(
                                                             ::core::ptr::addr_of_mut!(
-                                                                $crate::WalReceiverFunctions
+                                                                $crate::__pgrx_c_bindings::WalReceiverFunctions
                                                             )
                                                         )
                                                     )
@@ -3246,12 +3674,12 @@ macro_rules! walrcv_disconnect {
                                             $crate::__pgrx_c_macros::expression::place::<
                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                        $crate::WalReceiverFunctionsType
+                                                        $crate::__pgrx_c_bindings::WalReceiverFunctionsType
                                                     >,
                                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                                 >>(
                                                 ::core::ptr::addr_of_mut!(
-                                                    $crate::WalReceiverFunctions
+                                                    $crate::__pgrx_c_bindings::WalReceiverFunctions
                                                 )
                                             )
                                         )
@@ -3278,8 +3706,8 @@ macro_rules! walrcv_disconnect {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -3307,13 +3735,13 @@ macro_rules! __pgrx_c_args_walrcv_endstreaming {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_walrcv_endstreaming!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_walrcv_endstreaming!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -3322,7 +3750,7 @@ macro_rules! __pgrx_c_args_walrcv_endstreaming {
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_walrcv_endstreaming!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -3349,31 +3777,35 @@ macro_rules! __pgrx_c_args_walrcv_endstreaming {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_walrcv_endstreaming!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_walrcv_endstreaming!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_walrcv_endstreaming!(@p2 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_walrcv_endstreaming!(
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative1 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_walrcv_endstreaming!(@p2 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_walrcv_endstreaming!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_walrcv_endstreaming!(
-            @p2 $mode [$($done)* (@literal [- $argument]),];
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_walrcv_endstreaming!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -3381,7 +3813,9 @@ macro_rules! __pgrx_c_args_walrcv_endstreaming {
         $crate::__pgrx_c_args_walrcv_endstreaming!(@negative1 $mode [$($done)*]; - $($raw)*)
     };
     (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_walrcv_endstreaming!(@p2 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_walrcv_endstreaming!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -3403,14 +3837,18 @@ macro_rules! __pgrx_c_args_walrcv_endstreaming {
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_walrcv_endstreaming!(@p2 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_walrcv_endstreaming!(
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_walrcv_endstreaming!(@p2 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_walrcv_endstreaming!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_walrcv_endstreaming!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -3437,13 +3875,13 @@ macro_rules! __pgrx_c_args_walrcv_endstreaming {
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_walrcv_endstreaming!(
-            @p2 $mode [$($done)* (@literal [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_walrcv_endstreaming!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -3502,11 +3940,13 @@ macro_rules! walrcv_endstreaming {
                                         $crate::__pgrx_c_macros::expression::place::<
                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                    $crate::WalReceiverFunctionsType
+                                                    $crate::__pgrx_c_bindings::WalReceiverFunctionsType
                                                 >,
                                                 $crate::__pgrx_c_macros::expression::ReadWrite
                                             >>(
-                                            ::core::ptr::addr_of_mut!($crate::WalReceiverFunctions)
+                                            ::core::ptr::addr_of_mut!(
+                                                $crate::__pgrx_c_bindings::WalReceiverFunctions
+                                            )
                                         )
                                     )
                                 )
@@ -3543,10 +3983,14 @@ macro_rules! walrcv_endstreaming {
                                     $crate::__pgrx_c_macros::expression::place::<
                                         $crate::__pgrx_c_macros::expression::CPointer<
                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                $crate::WalReceiverFunctionsType
+                                                $crate::__pgrx_c_bindings::WalReceiverFunctionsType
                                             >,
                                             $crate::__pgrx_c_macros::expression::ReadWrite
-                                        >>(::core::ptr::addr_of_mut!($crate::WalReceiverFunctions))
+                                        >>(
+                                        ::core::ptr::addr_of_mut!(
+                                            $crate::__pgrx_c_bindings::WalReceiverFunctions
+                                        )
+                                    )
                                 )
                             )
                         )
@@ -3581,10 +4025,14 @@ macro_rules! walrcv_endstreaming {
                                     $crate::__pgrx_c_macros::expression::place::<
                                         $crate::__pgrx_c_macros::expression::CPointer<
                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                $crate::WalReceiverFunctionsType
+                                                $crate::__pgrx_c_bindings::WalReceiverFunctionsType
                                             >,
                                             $crate::__pgrx_c_macros::expression::ReadWrite
-                                        >>(::core::ptr::addr_of_mut!($crate::WalReceiverFunctions))
+                                        >>(
+                                        ::core::ptr::addr_of_mut!(
+                                            $crate::__pgrx_c_bindings::WalReceiverFunctions
+                                        )
+                                    )
                                 )
                             )
                         )
@@ -3633,12 +4081,12 @@ macro_rules! walrcv_endstreaming {
                                                         $crate::__pgrx_c_macros::expression::place::<
                                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                                    $crate::WalReceiverFunctionsType
+                                                                    $crate::__pgrx_c_bindings::WalReceiverFunctionsType
                                                                 >,
                                                                 $crate::__pgrx_c_macros::expression::ReadWrite
                                                             >>(
                                                             ::core::ptr::addr_of_mut!(
-                                                                $crate::WalReceiverFunctions
+                                                                $crate::__pgrx_c_bindings::WalReceiverFunctions
                                                             )
                                                         )
                                                     )
@@ -3684,12 +4132,12 @@ macro_rules! walrcv_endstreaming {
                                             $crate::__pgrx_c_macros::expression::place::<
                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                        $crate::WalReceiverFunctionsType
+                                                        $crate::__pgrx_c_bindings::WalReceiverFunctionsType
                                                     >,
                                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                                 >>(
                                                 ::core::ptr::addr_of_mut!(
-                                                    $crate::WalReceiverFunctions
+                                                    $crate::__pgrx_c_bindings::WalReceiverFunctions
                                                 )
                                             )
                                         )
@@ -3719,8 +4167,8 @@ macro_rules! walrcv_endstreaming {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -3748,18 +4196,24 @@ macro_rules! __pgrx_c_args_walrcv_exec {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_walrcv_exec!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_walrcv_exec!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_walrcv_exec!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $($raw:tt)*) => {
         $crate::__pgrx_c_args_walrcv_exec!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
-        $crate::__pgrx_c_args_walrcv_exec!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_walrcv_exec!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
         $crate::__pgrx_c_classify!(
@@ -3781,25 +4235,37 @@ macro_rules! __pgrx_c_args_walrcv_exec {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_walrcv_exec!(@p1 $mode [$($done)* (@literal [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_walrcv_exec!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+            $($rest)*
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_walrcv_exec!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_walrcv_exec!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_walrcv_exec!(
-            @p2 $mode [$($done)* (@literal [- $argument]),];
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_walrcv_exec!(@p2 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_walrcv_exec!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $($raw:tt)*) => {
         $crate::__pgrx_c_args_walrcv_exec!(@negative1 $mode [$($done)*]; - $($raw)*)
     };
     (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
-        $crate::__pgrx_c_args_walrcv_exec!(@p2 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_walrcv_exec!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
         $crate::__pgrx_c_classify!(
@@ -3821,25 +4287,37 @@ macro_rules! __pgrx_c_args_walrcv_exec {
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_walrcv_exec!(@p2 $mode [$($done)* (@literal [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_walrcv_exec!(
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+            $($rest)*
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_walrcv_exec!(@p2 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_walrcv_exec!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p2 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_walrcv_exec!(
-            @p3 $mode [$($done)* (@literal [- $argument]),];
+            @p3 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative2 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_walrcv_exec!(@p3 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_walrcv_exec!(
+            @p3 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p2 $mode:ident [$($done:tt)*]; - $($raw:tt)*) => {
         $crate::__pgrx_c_args_walrcv_exec!(@negative2 $mode [$($done)*]; - $($raw)*)
     };
     (@p2 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
-        $crate::__pgrx_c_args_walrcv_exec!(@p3 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_walrcv_exec!(
+            @p3 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p2 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
         $crate::__pgrx_c_classify!(
@@ -3861,31 +4339,46 @@ macro_rules! __pgrx_c_args_walrcv_exec {
         )
     };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_walrcv_exec!(@p3 $mode [$($done)* (@literal [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_walrcv_exec!(
+            @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+            $($rest)*
+        )
     };
     (@p2 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_walrcv_exec!(@p3 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_walrcv_exec!(
+            @p3 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p3 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_walrcv_exec!(@p4 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_walrcv_exec!(
+            @p4 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative3 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_walrcv_exec!(@p4 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_walrcv_exec!(
+            @p4 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p3 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_walrcv_exec!(
-            @p4 $mode [$($done)* (@literal [- $argument]),];
+            @p4 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative3 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_walrcv_exec!(@p4 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_walrcv_exec!(
+            @p4 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p3 $mode:ident [$($done:tt)*]; - $($raw:tt)*) => {
         $crate::__pgrx_c_args_walrcv_exec!(@negative3 $mode [$($done)*]; - $($raw)*)
     };
     (@p3 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_walrcv_exec!(@p4 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_walrcv_exec!(
+            @p4 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p3 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -3907,13 +4400,20 @@ macro_rules! __pgrx_c_args_walrcv_exec {
         )
     };
     (@p3 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_walrcv_exec!(@p4 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_walrcv_exec!(
+            @p4 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p3 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_walrcv_exec!(@p4 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_walrcv_exec!(
+            @p4 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p3 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
-        $crate::__pgrx_c_args_walrcv_exec!(@p4 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_walrcv_exec!(
+            @p4 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p3 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
         $crate::__pgrx_c_classify!(
@@ -3935,10 +4435,16 @@ macro_rules! __pgrx_c_args_walrcv_exec {
         )
     };
     (@p3 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_walrcv_exec!(@p4 $mode [$($done)* (@literal [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_walrcv_exec!(
+            @p4 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+            $($rest)*
+        )
     };
     (@p3 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_walrcv_exec!(@p4 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_walrcv_exec!(
+            @p4 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p4 $mode:ident [$($done:tt)*];) => {
         $crate::walrcv_exec!(@$mode; $($done)*)
@@ -3997,11 +4503,13 @@ macro_rules! walrcv_exec {
                                         $crate::__pgrx_c_macros::expression::place::<
                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                    $crate::WalReceiverFunctionsType
+                                                    $crate::__pgrx_c_bindings::WalReceiverFunctionsType
                                                 >,
                                                 $crate::__pgrx_c_macros::expression::ReadWrite
                                             >>(
-                                            ::core::ptr::addr_of_mut!($crate::WalReceiverFunctions)
+                                            ::core::ptr::addr_of_mut!(
+                                                $crate::__pgrx_c_bindings::WalReceiverFunctions
+                                            )
                                         )
                                     )
                                 )
@@ -4044,10 +4552,14 @@ macro_rules! walrcv_exec {
                                     $crate::__pgrx_c_macros::expression::place::<
                                         $crate::__pgrx_c_macros::expression::CPointer<
                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                $crate::WalReceiverFunctionsType
+                                                $crate::__pgrx_c_bindings::WalReceiverFunctionsType
                                             >,
                                             $crate::__pgrx_c_macros::expression::ReadWrite
-                                        >>(::core::ptr::addr_of_mut!($crate::WalReceiverFunctions))
+                                        >>(
+                                        ::core::ptr::addr_of_mut!(
+                                            $crate::__pgrx_c_bindings::WalReceiverFunctions
+                                        )
+                                    )
                                 )
                             )
                         )
@@ -4088,10 +4600,14 @@ macro_rules! walrcv_exec {
                                     $crate::__pgrx_c_macros::expression::place::<
                                         $crate::__pgrx_c_macros::expression::CPointer<
                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                $crate::WalReceiverFunctionsType
+                                                $crate::__pgrx_c_bindings::WalReceiverFunctionsType
                                             >,
                                             $crate::__pgrx_c_macros::expression::ReadWrite
-                                        >>(::core::ptr::addr_of_mut!($crate::WalReceiverFunctions))
+                                        >>(
+                                        ::core::ptr::addr_of_mut!(
+                                            $crate::__pgrx_c_bindings::WalReceiverFunctions
+                                        )
+                                    )
                                 )
                             )
                         )
@@ -4148,12 +4664,12 @@ macro_rules! walrcv_exec {
                                                         $crate::__pgrx_c_macros::expression::place::<
                                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                                    $crate::WalReceiverFunctionsType
+                                                                    $crate::__pgrx_c_bindings::WalReceiverFunctionsType
                                                                 >,
                                                                 $crate::__pgrx_c_macros::expression::ReadWrite
                                                             >>(
                                                             ::core::ptr::addr_of_mut!(
-                                                                $crate::WalReceiverFunctions
+                                                                $crate::__pgrx_c_bindings::WalReceiverFunctions
                                                             )
                                                         )
                                                     )
@@ -4205,12 +4721,12 @@ macro_rules! walrcv_exec {
                                             $crate::__pgrx_c_macros::expression::place::<
                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                        $crate::WalReceiverFunctionsType
+                                                        $crate::__pgrx_c_bindings::WalReceiverFunctionsType
                                                     >,
                                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                                 >>(
                                                 ::core::ptr::addr_of_mut!(
-                                                    $crate::WalReceiverFunctions
+                                                    $crate::__pgrx_c_bindings::WalReceiverFunctions
                                                 )
                                             )
                                         )
@@ -4246,8 +4762,8 @@ macro_rules! walrcv_exec {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -4278,21 +4794,23 @@ macro_rules! __pgrx_c_args_walrcv_get_backend_pid {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
         $crate::__pgrx_c_args_walrcv_get_backend_pid!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_walrcv_get_backend_pid!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_walrcv_get_backend_pid!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_walrcv_get_backend_pid!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_walrcv_get_backend_pid!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -4300,7 +4818,9 @@ macro_rules! __pgrx_c_args_walrcv_get_backend_pid {
         $crate::__pgrx_c_args_walrcv_get_backend_pid!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_walrcv_get_backend_pid!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_walrcv_get_backend_pid!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -4325,15 +4845,17 @@ macro_rules! __pgrx_c_args_walrcv_get_backend_pid {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_walrcv_get_backend_pid!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_walrcv_get_backend_pid!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_walrcv_get_backend_pid!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_walrcv_get_backend_pid!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -4360,13 +4882,13 @@ macro_rules! __pgrx_c_args_walrcv_get_backend_pid {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_walrcv_get_backend_pid!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_walrcv_get_backend_pid!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -4427,11 +4949,13 @@ macro_rules! walrcv_get_backend_pid {
                                         $crate::__pgrx_c_macros::expression::place::<
                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                    $crate::WalReceiverFunctionsType
+                                                    $crate::__pgrx_c_bindings::WalReceiverFunctionsType
                                                 >,
                                                 $crate::__pgrx_c_macros::expression::ReadWrite
                                             >>(
-                                            ::core::ptr::addr_of_mut!($crate::WalReceiverFunctions)
+                                            ::core::ptr::addr_of_mut!(
+                                                $crate::__pgrx_c_bindings::WalReceiverFunctions
+                                            )
                                         )
                                     )
                                 )
@@ -4465,10 +4989,14 @@ macro_rules! walrcv_get_backend_pid {
                                     $crate::__pgrx_c_macros::expression::place::<
                                         $crate::__pgrx_c_macros::expression::CPointer<
                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                $crate::WalReceiverFunctionsType
+                                                $crate::__pgrx_c_bindings::WalReceiverFunctionsType
                                             >,
                                             $crate::__pgrx_c_macros::expression::ReadWrite
-                                        >>(::core::ptr::addr_of_mut!($crate::WalReceiverFunctions))
+                                        >>(
+                                        ::core::ptr::addr_of_mut!(
+                                            $crate::__pgrx_c_bindings::WalReceiverFunctions
+                                        )
+                                    )
                                 )
                             )
                         )
@@ -4500,10 +5028,14 @@ macro_rules! walrcv_get_backend_pid {
                                     $crate::__pgrx_c_macros::expression::place::<
                                         $crate::__pgrx_c_macros::expression::CPointer<
                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                $crate::WalReceiverFunctionsType
+                                                $crate::__pgrx_c_bindings::WalReceiverFunctionsType
                                             >,
                                             $crate::__pgrx_c_macros::expression::ReadWrite
-                                        >>(::core::ptr::addr_of_mut!($crate::WalReceiverFunctions))
+                                        >>(
+                                        ::core::ptr::addr_of_mut!(
+                                            $crate::__pgrx_c_bindings::WalReceiverFunctions
+                                        )
+                                    )
                                 )
                             )
                         )
@@ -4548,12 +5080,12 @@ macro_rules! walrcv_get_backend_pid {
                                                         $crate::__pgrx_c_macros::expression::place::<
                                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                                    $crate::WalReceiverFunctionsType
+                                                                    $crate::__pgrx_c_bindings::WalReceiverFunctionsType
                                                                 >,
                                                                 $crate::__pgrx_c_macros::expression::ReadWrite
                                                             >>(
                                                             ::core::ptr::addr_of_mut!(
-                                                                $crate::WalReceiverFunctions
+                                                                $crate::__pgrx_c_bindings::WalReceiverFunctions
                                                             )
                                                         )
                                                     )
@@ -4596,12 +5128,12 @@ macro_rules! walrcv_get_backend_pid {
                                             $crate::__pgrx_c_macros::expression::place::<
                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                        $crate::WalReceiverFunctionsType
+                                                        $crate::__pgrx_c_bindings::WalReceiverFunctionsType
                                                     >,
                                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                                 >>(
                                                 ::core::ptr::addr_of_mut!(
-                                                    $crate::WalReceiverFunctions
+                                                    $crate::__pgrx_c_bindings::WalReceiverFunctions
                                                 )
                                             )
                                         )
@@ -4628,8 +5160,8 @@ macro_rules! walrcv_get_backend_pid {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -4656,20 +5188,24 @@ macro_rules! __pgrx_c_args_walrcv_get_conninfo {
         $crate::__pgrx_c_args_walrcv_get_conninfo!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_walrcv_get_conninfo!(@p1 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_walrcv_get_conninfo!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_walrcv_get_conninfo!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_walrcv_get_conninfo!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_walrcv_get_conninfo!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_walrcv_get_conninfo!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -4677,7 +5213,9 @@ macro_rules! __pgrx_c_args_walrcv_get_conninfo {
         $crate::__pgrx_c_args_walrcv_get_conninfo!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_walrcv_get_conninfo!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_walrcv_get_conninfo!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -4699,14 +5237,18 @@ macro_rules! __pgrx_c_args_walrcv_get_conninfo {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_walrcv_get_conninfo!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_walrcv_get_conninfo!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_walrcv_get_conninfo!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_walrcv_get_conninfo!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_walrcv_get_conninfo!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -4733,13 +5275,13 @@ macro_rules! __pgrx_c_args_walrcv_get_conninfo {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_walrcv_get_conninfo!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_walrcv_get_conninfo!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -4797,11 +5339,13 @@ macro_rules! walrcv_get_conninfo {
                                         $crate::__pgrx_c_macros::expression::place::<
                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                    $crate::WalReceiverFunctionsType
+                                                    $crate::__pgrx_c_bindings::WalReceiverFunctionsType
                                                 >,
                                                 $crate::__pgrx_c_macros::expression::ReadWrite
                                             >>(
-                                            ::core::ptr::addr_of_mut!($crate::WalReceiverFunctions)
+                                            ::core::ptr::addr_of_mut!(
+                                                $crate::__pgrx_c_bindings::WalReceiverFunctions
+                                            )
                                         )
                                     )
                                 )
@@ -4835,10 +5379,14 @@ macro_rules! walrcv_get_conninfo {
                                     $crate::__pgrx_c_macros::expression::place::<
                                         $crate::__pgrx_c_macros::expression::CPointer<
                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                $crate::WalReceiverFunctionsType
+                                                $crate::__pgrx_c_bindings::WalReceiverFunctionsType
                                             >,
                                             $crate::__pgrx_c_macros::expression::ReadWrite
-                                        >>(::core::ptr::addr_of_mut!($crate::WalReceiverFunctions))
+                                        >>(
+                                        ::core::ptr::addr_of_mut!(
+                                            $crate::__pgrx_c_bindings::WalReceiverFunctions
+                                        )
+                                    )
                                 )
                             )
                         )
@@ -4870,10 +5418,14 @@ macro_rules! walrcv_get_conninfo {
                                     $crate::__pgrx_c_macros::expression::place::<
                                         $crate::__pgrx_c_macros::expression::CPointer<
                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                $crate::WalReceiverFunctionsType
+                                                $crate::__pgrx_c_bindings::WalReceiverFunctionsType
                                             >,
                                             $crate::__pgrx_c_macros::expression::ReadWrite
-                                        >>(::core::ptr::addr_of_mut!($crate::WalReceiverFunctions))
+                                        >>(
+                                        ::core::ptr::addr_of_mut!(
+                                            $crate::__pgrx_c_bindings::WalReceiverFunctions
+                                        )
+                                    )
                                 )
                             )
                         )
@@ -4918,12 +5470,12 @@ macro_rules! walrcv_get_conninfo {
                                                         $crate::__pgrx_c_macros::expression::place::<
                                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                                    $crate::WalReceiverFunctionsType
+                                                                    $crate::__pgrx_c_bindings::WalReceiverFunctionsType
                                                                 >,
                                                                 $crate::__pgrx_c_macros::expression::ReadWrite
                                                             >>(
                                                             ::core::ptr::addr_of_mut!(
-                                                                $crate::WalReceiverFunctions
+                                                                $crate::__pgrx_c_bindings::WalReceiverFunctions
                                                             )
                                                         )
                                                     )
@@ -4966,12 +5518,12 @@ macro_rules! walrcv_get_conninfo {
                                             $crate::__pgrx_c_macros::expression::place::<
                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                        $crate::WalReceiverFunctionsType
+                                                        $crate::__pgrx_c_bindings::WalReceiverFunctionsType
                                                     >,
                                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                                 >>(
                                                 ::core::ptr::addr_of_mut!(
-                                                    $crate::WalReceiverFunctions
+                                                    $crate::__pgrx_c_bindings::WalReceiverFunctions
                                                 )
                                             )
                                         )
@@ -4998,8 +5550,8 @@ macro_rules! walrcv_get_conninfo {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -5030,23 +5582,23 @@ macro_rules! __pgrx_c_args_walrcv_get_dbname_from_conninfo {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
         $crate::__pgrx_c_args_walrcv_get_dbname_from_conninfo!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_walrcv_get_dbname_from_conninfo!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_walrcv_get_dbname_from_conninfo!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_walrcv_get_dbname_from_conninfo!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -5058,7 +5610,7 @@ macro_rules! __pgrx_c_args_walrcv_get_dbname_from_conninfo {
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
         $crate::__pgrx_c_args_walrcv_get_dbname_from_conninfo!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
@@ -5084,17 +5636,17 @@ macro_rules! __pgrx_c_args_walrcv_get_dbname_from_conninfo {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_walrcv_get_dbname_from_conninfo!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_walrcv_get_dbname_from_conninfo!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_walrcv_get_dbname_from_conninfo!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -5121,13 +5673,13 @@ macro_rules! __pgrx_c_args_walrcv_get_dbname_from_conninfo {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_walrcv_get_dbname_from_conninfo!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_walrcv_get_dbname_from_conninfo!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -5188,11 +5740,13 @@ macro_rules! walrcv_get_dbname_from_conninfo {
                                         $crate::__pgrx_c_macros::expression::place::<
                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                    $crate::WalReceiverFunctionsType
+                                                    $crate::__pgrx_c_bindings::WalReceiverFunctionsType
                                                 >,
                                                 $crate::__pgrx_c_macros::expression::ReadWrite
                                             >>(
-                                            ::core::ptr::addr_of_mut!($crate::WalReceiverFunctions)
+                                            ::core::ptr::addr_of_mut!(
+                                                $crate::__pgrx_c_bindings::WalReceiverFunctions
+                                            )
                                         )
                                     )
                                 )
@@ -5229,10 +5783,14 @@ macro_rules! walrcv_get_dbname_from_conninfo {
                                     $crate::__pgrx_c_macros::expression::place::<
                                         $crate::__pgrx_c_macros::expression::CPointer<
                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                $crate::WalReceiverFunctionsType
+                                                $crate::__pgrx_c_bindings::WalReceiverFunctionsType
                                             >,
                                             $crate::__pgrx_c_macros::expression::ReadWrite
-                                        >>(::core::ptr::addr_of_mut!($crate::WalReceiverFunctions))
+                                        >>(
+                                        ::core::ptr::addr_of_mut!(
+                                            $crate::__pgrx_c_bindings::WalReceiverFunctions
+                                        )
+                                    )
                                 )
                             )
                         )
@@ -5267,10 +5825,14 @@ macro_rules! walrcv_get_dbname_from_conninfo {
                                     $crate::__pgrx_c_macros::expression::place::<
                                         $crate::__pgrx_c_macros::expression::CPointer<
                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                $crate::WalReceiverFunctionsType
+                                                $crate::__pgrx_c_bindings::WalReceiverFunctionsType
                                             >,
                                             $crate::__pgrx_c_macros::expression::ReadWrite
-                                        >>(::core::ptr::addr_of_mut!($crate::WalReceiverFunctions))
+                                        >>(
+                                        ::core::ptr::addr_of_mut!(
+                                            $crate::__pgrx_c_bindings::WalReceiverFunctions
+                                        )
+                                    )
                                 )
                             )
                         )
@@ -5318,12 +5880,12 @@ macro_rules! walrcv_get_dbname_from_conninfo {
                                                         $crate::__pgrx_c_macros::expression::place::<
                                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                                    $crate::WalReceiverFunctionsType
+                                                                    $crate::__pgrx_c_bindings::WalReceiverFunctionsType
                                                                 >,
                                                                 $crate::__pgrx_c_macros::expression::ReadWrite
                                                             >>(
                                                             ::core::ptr::addr_of_mut!(
-                                                                $crate::WalReceiverFunctions
+                                                                $crate::__pgrx_c_bindings::WalReceiverFunctions
                                                             )
                                                         )
                                                     )
@@ -5369,12 +5931,12 @@ macro_rules! walrcv_get_dbname_from_conninfo {
                                             $crate::__pgrx_c_macros::expression::place::<
                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                        $crate::WalReceiverFunctionsType
+                                                        $crate::__pgrx_c_bindings::WalReceiverFunctionsType
                                                     >,
                                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                                 >>(
                                                 ::core::ptr::addr_of_mut!(
-                                                    $crate::WalReceiverFunctions
+                                                    $crate::__pgrx_c_bindings::WalReceiverFunctions
                                                 )
                                             )
                                         )
@@ -5407,8 +5969,8 @@ macro_rules! walrcv_get_dbname_from_conninfo {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -5439,13 +6001,13 @@ macro_rules! __pgrx_c_args_walrcv_get_senderinfo {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_walrcv_get_senderinfo!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_walrcv_get_senderinfo!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -5454,7 +6016,7 @@ macro_rules! __pgrx_c_args_walrcv_get_senderinfo {
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_walrcv_get_senderinfo!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -5481,25 +6043,25 @@ macro_rules! __pgrx_c_args_walrcv_get_senderinfo {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_walrcv_get_senderinfo!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_walrcv_get_senderinfo!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_walrcv_get_senderinfo!(
-            @p2 $mode [$($done)* (@literal [- $argument]),];
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_walrcv_get_senderinfo!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -5508,7 +6070,7 @@ macro_rules! __pgrx_c_args_walrcv_get_senderinfo {
     };
     (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_walrcv_get_senderinfo!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -5535,33 +6097,35 @@ macro_rules! __pgrx_c_args_walrcv_get_senderinfo {
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_walrcv_get_senderinfo!(
-            @p2 $mode [$($done)* (@literal [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_walrcv_get_senderinfo!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
     (@p2 $mode:ident [$($done:tt)*]; - $argument:literal) => {
         $crate::__pgrx_c_args_walrcv_get_senderinfo!(
-            @p3 $mode [$($done)* (@literal [- $argument]),];
+            @p3 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
         )
     };
     (@negative2 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_walrcv_get_senderinfo!(@p3 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_walrcv_get_senderinfo!(
+            @p3 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p2 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_walrcv_get_senderinfo!(
-            @p3 $mode [$($done)* (@literal [- $argument]),];
+            @p3 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative2 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_walrcv_get_senderinfo!(
-            @p3 $mode [$($done)* (@native [$argument]),];
+            @p3 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -5569,7 +6133,9 @@ macro_rules! __pgrx_c_args_walrcv_get_senderinfo {
         $crate::__pgrx_c_args_walrcv_get_senderinfo!(@negative2 $mode [$($done)*]; - $($raw)*)
     };
     (@p2 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_walrcv_get_senderinfo!(@p3 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_walrcv_get_senderinfo!(
+            @p3 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p2 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -5591,14 +6157,18 @@ macro_rules! __pgrx_c_args_walrcv_get_senderinfo {
         )
     };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_walrcv_get_senderinfo!(@p3 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_walrcv_get_senderinfo!(
+            @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p2 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_walrcv_get_senderinfo!(@p3 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_walrcv_get_senderinfo!(
+            @p3 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p2 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_walrcv_get_senderinfo!(
-            @p3 $mode [$($done)* (@native [$argument]),];
+            @p3 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -5625,13 +6195,13 @@ macro_rules! __pgrx_c_args_walrcv_get_senderinfo {
     };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_walrcv_get_senderinfo!(
-            @p3 $mode [$($done)* (@literal [$argument]),];
+            @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p2 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_walrcv_get_senderinfo!(
-            @p3 $mode [$($done)* (@native [$argument]),];
+            @p3 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -5691,11 +6261,13 @@ macro_rules! walrcv_get_senderinfo {
                                         $crate::__pgrx_c_macros::expression::place::<
                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                    $crate::WalReceiverFunctionsType
+                                                    $crate::__pgrx_c_bindings::WalReceiverFunctionsType
                                                 >,
                                                 $crate::__pgrx_c_macros::expression::ReadWrite
                                             >>(
-                                            ::core::ptr::addr_of_mut!($crate::WalReceiverFunctions)
+                                            ::core::ptr::addr_of_mut!(
+                                                $crate::__pgrx_c_bindings::WalReceiverFunctions
+                                            )
                                         )
                                     )
                                 )
@@ -5735,10 +6307,14 @@ macro_rules! walrcv_get_senderinfo {
                                     $crate::__pgrx_c_macros::expression::place::<
                                         $crate::__pgrx_c_macros::expression::CPointer<
                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                $crate::WalReceiverFunctionsType
+                                                $crate::__pgrx_c_bindings::WalReceiverFunctionsType
                                             >,
                                             $crate::__pgrx_c_macros::expression::ReadWrite
-                                        >>(::core::ptr::addr_of_mut!($crate::WalReceiverFunctions))
+                                        >>(
+                                        ::core::ptr::addr_of_mut!(
+                                            $crate::__pgrx_c_bindings::WalReceiverFunctions
+                                        )
+                                    )
                                 )
                             )
                         )
@@ -5776,10 +6352,14 @@ macro_rules! walrcv_get_senderinfo {
                                     $crate::__pgrx_c_macros::expression::place::<
                                         $crate::__pgrx_c_macros::expression::CPointer<
                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                $crate::WalReceiverFunctionsType
+                                                $crate::__pgrx_c_bindings::WalReceiverFunctionsType
                                             >,
                                             $crate::__pgrx_c_macros::expression::ReadWrite
-                                        >>(::core::ptr::addr_of_mut!($crate::WalReceiverFunctions))
+                                        >>(
+                                        ::core::ptr::addr_of_mut!(
+                                            $crate::__pgrx_c_bindings::WalReceiverFunctions
+                                        )
+                                    )
                                 )
                             )
                         )
@@ -5832,12 +6412,12 @@ macro_rules! walrcv_get_senderinfo {
                                                         $crate::__pgrx_c_macros::expression::place::<
                                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                                    $crate::WalReceiverFunctionsType
+                                                                    $crate::__pgrx_c_bindings::WalReceiverFunctionsType
                                                                 >,
                                                                 $crate::__pgrx_c_macros::expression::ReadWrite
                                                             >>(
                                                             ::core::ptr::addr_of_mut!(
-                                                                $crate::WalReceiverFunctions
+                                                                $crate::__pgrx_c_bindings::WalReceiverFunctions
                                                             )
                                                         )
                                                     )
@@ -5886,12 +6466,12 @@ macro_rules! walrcv_get_senderinfo {
                                             $crate::__pgrx_c_macros::expression::place::<
                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                        $crate::WalReceiverFunctionsType
+                                                        $crate::__pgrx_c_bindings::WalReceiverFunctionsType
                                                     >,
                                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                                 >>(
                                                 ::core::ptr::addr_of_mut!(
-                                                    $crate::WalReceiverFunctions
+                                                    $crate::__pgrx_c_bindings::WalReceiverFunctions
                                                 )
                                             )
                                         )
@@ -5924,8 +6504,8 @@ macro_rules! walrcv_get_senderinfo {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -5956,13 +6536,13 @@ macro_rules! __pgrx_c_args_walrcv_identify_system {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_walrcv_identify_system!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_walrcv_identify_system!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -5971,7 +6551,7 @@ macro_rules! __pgrx_c_args_walrcv_identify_system {
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_walrcv_identify_system!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -5998,33 +6578,35 @@ macro_rules! __pgrx_c_args_walrcv_identify_system {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_walrcv_identify_system!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_walrcv_identify_system!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $argument:literal) => {
         $crate::__pgrx_c_args_walrcv_identify_system!(
-            @p2 $mode [$($done)* (@literal [- $argument]),];
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
         )
     };
     (@negative1 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_walrcv_identify_system!(@p2 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_walrcv_identify_system!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_walrcv_identify_system!(
-            @p2 $mode [$($done)* (@literal [- $argument]),];
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_walrcv_identify_system!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -6032,7 +6614,9 @@ macro_rules! __pgrx_c_args_walrcv_identify_system {
         $crate::__pgrx_c_args_walrcv_identify_system!(@negative1 $mode [$($done)*]; - $($raw)*)
     };
     (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_walrcv_identify_system!(@p2 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_walrcv_identify_system!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -6057,15 +6641,17 @@ macro_rules! __pgrx_c_args_walrcv_identify_system {
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_walrcv_identify_system!(
-            @p2 $mode [$($done)* (@literal [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_walrcv_identify_system!(@p2 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_walrcv_identify_system!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_walrcv_identify_system!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -6092,13 +6678,13 @@ macro_rules! __pgrx_c_args_walrcv_identify_system {
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_walrcv_identify_system!(
-            @p2 $mode [$($done)* (@literal [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_walrcv_identify_system!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -6160,11 +6746,13 @@ macro_rules! walrcv_identify_system {
                                         $crate::__pgrx_c_macros::expression::place::<
                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                    $crate::WalReceiverFunctionsType
+                                                    $crate::__pgrx_c_bindings::WalReceiverFunctionsType
                                                 >,
                                                 $crate::__pgrx_c_macros::expression::ReadWrite
                                             >>(
-                                            ::core::ptr::addr_of_mut!($crate::WalReceiverFunctions)
+                                            ::core::ptr::addr_of_mut!(
+                                                $crate::__pgrx_c_bindings::WalReceiverFunctions
+                                            )
                                         )
                                     )
                                 )
@@ -6201,10 +6789,14 @@ macro_rules! walrcv_identify_system {
                                     $crate::__pgrx_c_macros::expression::place::<
                                         $crate::__pgrx_c_macros::expression::CPointer<
                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                $crate::WalReceiverFunctionsType
+                                                $crate::__pgrx_c_bindings::WalReceiverFunctionsType
                                             >,
                                             $crate::__pgrx_c_macros::expression::ReadWrite
-                                        >>(::core::ptr::addr_of_mut!($crate::WalReceiverFunctions))
+                                        >>(
+                                        ::core::ptr::addr_of_mut!(
+                                            $crate::__pgrx_c_bindings::WalReceiverFunctions
+                                        )
+                                    )
                                 )
                             )
                         )
@@ -6239,10 +6831,14 @@ macro_rules! walrcv_identify_system {
                                     $crate::__pgrx_c_macros::expression::place::<
                                         $crate::__pgrx_c_macros::expression::CPointer<
                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                $crate::WalReceiverFunctionsType
+                                                $crate::__pgrx_c_bindings::WalReceiverFunctionsType
                                             >,
                                             $crate::__pgrx_c_macros::expression::ReadWrite
-                                        >>(::core::ptr::addr_of_mut!($crate::WalReceiverFunctions))
+                                        >>(
+                                        ::core::ptr::addr_of_mut!(
+                                            $crate::__pgrx_c_bindings::WalReceiverFunctions
+                                        )
+                                    )
                                 )
                             )
                         )
@@ -6291,12 +6887,12 @@ macro_rules! walrcv_identify_system {
                                                         $crate::__pgrx_c_macros::expression::place::<
                                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                                    $crate::WalReceiverFunctionsType
+                                                                    $crate::__pgrx_c_bindings::WalReceiverFunctionsType
                                                                 >,
                                                                 $crate::__pgrx_c_macros::expression::ReadWrite
                                                             >>(
                                                             ::core::ptr::addr_of_mut!(
-                                                                $crate::WalReceiverFunctions
+                                                                $crate::__pgrx_c_bindings::WalReceiverFunctions
                                                             )
                                                         )
                                                     )
@@ -6342,12 +6938,12 @@ macro_rules! walrcv_identify_system {
                                             $crate::__pgrx_c_macros::expression::place::<
                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                        $crate::WalReceiverFunctionsType
+                                                        $crate::__pgrx_c_bindings::WalReceiverFunctionsType
                                                     >,
                                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                                 >>(
                                                 ::core::ptr::addr_of_mut!(
-                                                    $crate::WalReceiverFunctions
+                                                    $crate::__pgrx_c_bindings::WalReceiverFunctions
                                                 )
                                             )
                                         )
@@ -6377,8 +6973,8 @@ macro_rules! walrcv_identify_system {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -6409,13 +7005,13 @@ macro_rules! __pgrx_c_args_walrcv_readtimelinehistoryfile {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_walrcv_readtimelinehistoryfile!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_walrcv_readtimelinehistoryfile!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -6427,7 +7023,7 @@ macro_rules! __pgrx_c_args_walrcv_readtimelinehistoryfile {
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_walrcv_readtimelinehistoryfile!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -6454,25 +7050,25 @@ macro_rules! __pgrx_c_args_walrcv_readtimelinehistoryfile {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_walrcv_readtimelinehistoryfile!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_walrcv_readtimelinehistoryfile!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_walrcv_readtimelinehistoryfile!(
-            @p2 $mode [$($done)* (@literal [- $argument]),];
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_walrcv_readtimelinehistoryfile!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -6484,7 +7080,7 @@ macro_rules! __pgrx_c_args_walrcv_readtimelinehistoryfile {
     };
     (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_walrcv_readtimelinehistoryfile!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -6511,25 +7107,25 @@ macro_rules! __pgrx_c_args_walrcv_readtimelinehistoryfile {
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_walrcv_readtimelinehistoryfile!(
-            @p2 $mode [$($done)* (@literal [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_walrcv_readtimelinehistoryfile!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
     (@p2 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_walrcv_readtimelinehistoryfile!(
-            @p3 $mode [$($done)* (@literal [- $argument]),];
+            @p3 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative2 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_walrcv_readtimelinehistoryfile!(
-            @p3 $mode [$($done)* (@native [$argument]),];
+            @p3 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -6541,7 +7137,7 @@ macro_rules! __pgrx_c_args_walrcv_readtimelinehistoryfile {
     };
     (@p2 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_walrcv_readtimelinehistoryfile!(
-            @p3 $mode [$($done)* (@native [$argument]),];
+            @p3 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -6568,25 +7164,25 @@ macro_rules! __pgrx_c_args_walrcv_readtimelinehistoryfile {
     };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_walrcv_readtimelinehistoryfile!(
-            @p3 $mode [$($done)* (@literal [$argument]),];
+            @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p2 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_walrcv_readtimelinehistoryfile!(
-            @p3 $mode [$($done)* (@native [$argument]),];
+            @p3 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
     (@p3 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_walrcv_readtimelinehistoryfile!(
-            @p4 $mode [$($done)* (@literal [- $argument]),];
+            @p4 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative3 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_walrcv_readtimelinehistoryfile!(
-            @p4 $mode [$($done)* (@native [$argument]),];
+            @p4 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -6598,7 +7194,7 @@ macro_rules! __pgrx_c_args_walrcv_readtimelinehistoryfile {
     };
     (@p3 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_walrcv_readtimelinehistoryfile!(
-            @p4 $mode [$($done)* (@native [$argument]),];
+            @p4 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -6625,35 +7221,35 @@ macro_rules! __pgrx_c_args_walrcv_readtimelinehistoryfile {
     };
     (@p3 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_walrcv_readtimelinehistoryfile!(
-            @p4 $mode [$($done)* (@literal [$argument]),];
+            @p4 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p3 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_walrcv_readtimelinehistoryfile!(
-            @p4 $mode [$($done)* (@native [$argument]),];
+            @p4 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
     (@p4 $mode:ident [$($done:tt)*]; - $argument:literal) => {
         $crate::__pgrx_c_args_walrcv_readtimelinehistoryfile!(
-            @p5 $mode [$($done)* (@literal [- $argument]),];
+            @p5 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
         )
     };
     (@negative4 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_walrcv_readtimelinehistoryfile!(
-            @p5 $mode [$($done)* (@native [$argument]),];
+            @p5 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p4 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_walrcv_readtimelinehistoryfile!(
-            @p5 $mode [$($done)* (@literal [- $argument]),];
+            @p5 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative4 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_walrcv_readtimelinehistoryfile!(
-            @p5 $mode [$($done)* (@native [$argument]),];
+            @p5 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -6665,7 +7261,7 @@ macro_rules! __pgrx_c_args_walrcv_readtimelinehistoryfile {
     };
     (@p4 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
         $crate::__pgrx_c_args_walrcv_readtimelinehistoryfile!(
-            @p5 $mode [$($done)* (@native [$argument]),];
+            @p5 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p4 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
@@ -6691,17 +7287,17 @@ macro_rules! __pgrx_c_args_walrcv_readtimelinehistoryfile {
     };
     (@p4 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_walrcv_readtimelinehistoryfile!(
-            @p5 $mode [$($done)* (@literal [$argument]),];
+            @p5 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
         )
     };
     (@p4 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_walrcv_readtimelinehistoryfile!(
-            @p5 $mode [$($done)* (@native [$argument]),];
+            @p5 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p4 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_walrcv_readtimelinehistoryfile!(
-            @p5 $mode [$($done)* (@native [$argument]),];
+            @p5 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -6728,13 +7324,13 @@ macro_rules! __pgrx_c_args_walrcv_readtimelinehistoryfile {
     };
     (@p4 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_walrcv_readtimelinehistoryfile!(
-            @p5 $mode [$($done)* (@literal [$argument]),];
+            @p5 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p4 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_walrcv_readtimelinehistoryfile!(
-            @p5 $mode [$($done)* (@native [$argument]),];
+            @p5 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -6806,11 +7402,13 @@ macro_rules! walrcv_readtimelinehistoryfile {
                                         $crate::__pgrx_c_macros::expression::place::<
                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                    $crate::WalReceiverFunctionsType
+                                                    $crate::__pgrx_c_bindings::WalReceiverFunctionsType
                                                 >,
                                                 $crate::__pgrx_c_macros::expression::ReadWrite
                                             >>(
-                                            ::core::ptr::addr_of_mut!($crate::WalReceiverFunctions)
+                                            ::core::ptr::addr_of_mut!(
+                                                $crate::__pgrx_c_bindings::WalReceiverFunctions
+                                            )
                                         )
                                     )
                                 )
@@ -6859,10 +7457,14 @@ macro_rules! walrcv_readtimelinehistoryfile {
                                     $crate::__pgrx_c_macros::expression::place::<
                                         $crate::__pgrx_c_macros::expression::CPointer<
                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                $crate::WalReceiverFunctionsType
+                                                $crate::__pgrx_c_bindings::WalReceiverFunctionsType
                                             >,
                                             $crate::__pgrx_c_macros::expression::ReadWrite
-                                        >>(::core::ptr::addr_of_mut!($crate::WalReceiverFunctions))
+                                        >>(
+                                        ::core::ptr::addr_of_mut!(
+                                            $crate::__pgrx_c_bindings::WalReceiverFunctions
+                                        )
+                                    )
                                 )
                             )
                         )
@@ -6909,10 +7511,14 @@ macro_rules! walrcv_readtimelinehistoryfile {
                                     $crate::__pgrx_c_macros::expression::place::<
                                         $crate::__pgrx_c_macros::expression::CPointer<
                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                $crate::WalReceiverFunctionsType
+                                                $crate::__pgrx_c_bindings::WalReceiverFunctionsType
                                             >,
                                             $crate::__pgrx_c_macros::expression::ReadWrite
-                                        >>(::core::ptr::addr_of_mut!($crate::WalReceiverFunctions))
+                                        >>(
+                                        ::core::ptr::addr_of_mut!(
+                                            $crate::__pgrx_c_bindings::WalReceiverFunctions
+                                        )
+                                    )
                                 )
                             )
                         )
@@ -6976,12 +7582,12 @@ macro_rules! walrcv_readtimelinehistoryfile {
                                                         $crate::__pgrx_c_macros::expression::place::<
                                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                                    $crate::WalReceiverFunctionsType
+                                                                    $crate::__pgrx_c_bindings::WalReceiverFunctionsType
                                                                 >,
                                                                 $crate::__pgrx_c_macros::expression::ReadWrite
                                                             >>(
                                                             ::core::ptr::addr_of_mut!(
-                                                                $crate::WalReceiverFunctions
+                                                                $crate::__pgrx_c_bindings::WalReceiverFunctions
                                                             )
                                                         )
                                                     )
@@ -7039,12 +7645,12 @@ macro_rules! walrcv_readtimelinehistoryfile {
                                             $crate::__pgrx_c_macros::expression::place::<
                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                        $crate::WalReceiverFunctionsType
+                                                        $crate::__pgrx_c_bindings::WalReceiverFunctionsType
                                                     >,
                                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                                 >>(
                                                 ::core::ptr::addr_of_mut!(
-                                                    $crate::WalReceiverFunctions
+                                                    $crate::__pgrx_c_bindings::WalReceiverFunctions
                                                 )
                                             )
                                         )
@@ -7089,8 +7695,8 @@ macro_rules! walrcv_readtimelinehistoryfile {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -7118,13 +7724,13 @@ macro_rules! __pgrx_c_args_walrcv_receive {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_walrcv_receive!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_walrcv_receive!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -7133,7 +7739,7 @@ macro_rules! __pgrx_c_args_walrcv_receive {
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_walrcv_receive!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -7160,25 +7766,25 @@ macro_rules! __pgrx_c_args_walrcv_receive {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_walrcv_receive!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_walrcv_receive!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_walrcv_receive!(
-            @p2 $mode [$($done)* (@literal [- $argument]),];
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_walrcv_receive!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -7187,7 +7793,7 @@ macro_rules! __pgrx_c_args_walrcv_receive {
     };
     (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_walrcv_receive!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -7214,31 +7820,35 @@ macro_rules! __pgrx_c_args_walrcv_receive {
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_walrcv_receive!(
-            @p2 $mode [$($done)* (@literal [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_walrcv_receive!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
     (@p2 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_walrcv_receive!(@p3 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_walrcv_receive!(
+            @p3 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative2 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_walrcv_receive!(@p3 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_walrcv_receive!(
+            @p3 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p2 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_walrcv_receive!(
-            @p3 $mode [$($done)* (@literal [- $argument]),];
+            @p3 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative2 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_walrcv_receive!(
-            @p3 $mode [$($done)* (@native [$argument]),];
+            @p3 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -7246,7 +7856,9 @@ macro_rules! __pgrx_c_args_walrcv_receive {
         $crate::__pgrx_c_args_walrcv_receive!(@negative2 $mode [$($done)*]; - $($raw)*)
     };
     (@p2 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_walrcv_receive!(@p3 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_walrcv_receive!(
+            @p3 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p2 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -7268,14 +7880,18 @@ macro_rules! __pgrx_c_args_walrcv_receive {
         )
     };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_walrcv_receive!(@p3 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_walrcv_receive!(
+            @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p2 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_walrcv_receive!(@p3 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_walrcv_receive!(
+            @p3 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p2 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_walrcv_receive!(
-            @p3 $mode [$($done)* (@native [$argument]),];
+            @p3 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -7302,13 +7918,13 @@ macro_rules! __pgrx_c_args_walrcv_receive {
     };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_walrcv_receive!(
-            @p3 $mode [$($done)* (@literal [$argument]),];
+            @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p2 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_walrcv_receive!(
-            @p3 $mode [$($done)* (@native [$argument]),];
+            @p3 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -7368,11 +7984,13 @@ macro_rules! walrcv_receive {
                                         $crate::__pgrx_c_macros::expression::place::<
                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                    $crate::WalReceiverFunctionsType
+                                                    $crate::__pgrx_c_bindings::WalReceiverFunctionsType
                                                 >,
                                                 $crate::__pgrx_c_macros::expression::ReadWrite
                                             >>(
-                                            ::core::ptr::addr_of_mut!($crate::WalReceiverFunctions)
+                                            ::core::ptr::addr_of_mut!(
+                                                $crate::__pgrx_c_bindings::WalReceiverFunctions
+                                            )
                                         )
                                     )
                                 )
@@ -7412,10 +8030,14 @@ macro_rules! walrcv_receive {
                                     $crate::__pgrx_c_macros::expression::place::<
                                         $crate::__pgrx_c_macros::expression::CPointer<
                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                $crate::WalReceiverFunctionsType
+                                                $crate::__pgrx_c_bindings::WalReceiverFunctionsType
                                             >,
                                             $crate::__pgrx_c_macros::expression::ReadWrite
-                                        >>(::core::ptr::addr_of_mut!($crate::WalReceiverFunctions))
+                                        >>(
+                                        ::core::ptr::addr_of_mut!(
+                                            $crate::__pgrx_c_bindings::WalReceiverFunctions
+                                        )
+                                    )
                                 )
                             )
                         )
@@ -7453,10 +8075,14 @@ macro_rules! walrcv_receive {
                                     $crate::__pgrx_c_macros::expression::place::<
                                         $crate::__pgrx_c_macros::expression::CPointer<
                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                $crate::WalReceiverFunctionsType
+                                                $crate::__pgrx_c_bindings::WalReceiverFunctionsType
                                             >,
                                             $crate::__pgrx_c_macros::expression::ReadWrite
-                                        >>(::core::ptr::addr_of_mut!($crate::WalReceiverFunctions))
+                                        >>(
+                                        ::core::ptr::addr_of_mut!(
+                                            $crate::__pgrx_c_bindings::WalReceiverFunctions
+                                        )
+                                    )
                                 )
                             )
                         )
@@ -7509,12 +8135,12 @@ macro_rules! walrcv_receive {
                                                         $crate::__pgrx_c_macros::expression::place::<
                                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                                    $crate::WalReceiverFunctionsType
+                                                                    $crate::__pgrx_c_bindings::WalReceiverFunctionsType
                                                                 >,
                                                                 $crate::__pgrx_c_macros::expression::ReadWrite
                                                             >>(
                                                             ::core::ptr::addr_of_mut!(
-                                                                $crate::WalReceiverFunctions
+                                                                $crate::__pgrx_c_bindings::WalReceiverFunctions
                                                             )
                                                         )
                                                     )
@@ -7563,12 +8189,12 @@ macro_rules! walrcv_receive {
                                             $crate::__pgrx_c_macros::expression::place::<
                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                        $crate::WalReceiverFunctionsType
+                                                        $crate::__pgrx_c_bindings::WalReceiverFunctionsType
                                                     >,
                                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                                 >>(
                                                 ::core::ptr::addr_of_mut!(
-                                                    $crate::WalReceiverFunctions
+                                                    $crate::__pgrx_c_bindings::WalReceiverFunctions
                                                 )
                                             )
                                         )
@@ -7601,8 +8227,8 @@ macro_rules! walrcv_receive {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -7630,18 +8256,24 @@ macro_rules! __pgrx_c_args_walrcv_send {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_walrcv_send!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_walrcv_send!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_walrcv_send!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $($raw:tt)*) => {
         $crate::__pgrx_c_args_walrcv_send!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
-        $crate::__pgrx_c_args_walrcv_send!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_walrcv_send!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
         $crate::__pgrx_c_classify!(
@@ -7663,25 +8295,37 @@ macro_rules! __pgrx_c_args_walrcv_send {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_walrcv_send!(@p1 $mode [$($done)* (@literal [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_walrcv_send!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+            $($rest)*
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_walrcv_send!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_walrcv_send!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_walrcv_send!(
-            @p2 $mode [$($done)* (@literal [- $argument]),];
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_walrcv_send!(@p2 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_walrcv_send!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $($raw:tt)*) => {
         $crate::__pgrx_c_args_walrcv_send!(@negative1 $mode [$($done)*]; - $($raw)*)
     };
     (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
-        $crate::__pgrx_c_args_walrcv_send!(@p2 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_walrcv_send!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
         $crate::__pgrx_c_classify!(
@@ -7703,31 +8347,46 @@ macro_rules! __pgrx_c_args_walrcv_send {
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_walrcv_send!(@p2 $mode [$($done)* (@literal [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_walrcv_send!(
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+            $($rest)*
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_walrcv_send!(@p2 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_walrcv_send!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p2 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_walrcv_send!(@p3 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_walrcv_send!(
+            @p3 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative2 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_walrcv_send!(@p3 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_walrcv_send!(
+            @p3 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p2 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_walrcv_send!(
-            @p3 $mode [$($done)* (@literal [- $argument]),];
+            @p3 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative2 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_walrcv_send!(@p3 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_walrcv_send!(
+            @p3 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p2 $mode:ident [$($done:tt)*]; - $($raw:tt)*) => {
         $crate::__pgrx_c_args_walrcv_send!(@negative2 $mode [$($done)*]; - $($raw)*)
     };
     (@p2 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_walrcv_send!(@p3 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_walrcv_send!(
+            @p3 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p2 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -7749,13 +8408,20 @@ macro_rules! __pgrx_c_args_walrcv_send {
         )
     };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_walrcv_send!(@p3 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_walrcv_send!(
+            @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p2 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_walrcv_send!(@p3 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_walrcv_send!(
+            @p3 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p2 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
-        $crate::__pgrx_c_args_walrcv_send!(@p3 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_walrcv_send!(
+            @p3 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p2 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
         $crate::__pgrx_c_classify!(
@@ -7777,10 +8443,16 @@ macro_rules! __pgrx_c_args_walrcv_send {
         )
     };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_walrcv_send!(@p3 $mode [$($done)* (@literal [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_walrcv_send!(
+            @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+            $($rest)*
+        )
     };
     (@p2 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_walrcv_send!(@p3 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_walrcv_send!(
+            @p3 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p3 $mode:ident [$($done:tt)*];) => {
         $crate::walrcv_send!(@$mode; $($done)*)
@@ -7838,11 +8510,13 @@ macro_rules! walrcv_send {
                                         $crate::__pgrx_c_macros::expression::place::<
                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                    $crate::WalReceiverFunctionsType
+                                                    $crate::__pgrx_c_bindings::WalReceiverFunctionsType
                                                 >,
                                                 $crate::__pgrx_c_macros::expression::ReadWrite
                                             >>(
-                                            ::core::ptr::addr_of_mut!($crate::WalReceiverFunctions)
+                                            ::core::ptr::addr_of_mut!(
+                                                $crate::__pgrx_c_bindings::WalReceiverFunctions
+                                            )
                                         )
                                     )
                                 )
@@ -7882,10 +8556,14 @@ macro_rules! walrcv_send {
                                     $crate::__pgrx_c_macros::expression::place::<
                                         $crate::__pgrx_c_macros::expression::CPointer<
                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                $crate::WalReceiverFunctionsType
+                                                $crate::__pgrx_c_bindings::WalReceiverFunctionsType
                                             >,
                                             $crate::__pgrx_c_macros::expression::ReadWrite
-                                        >>(::core::ptr::addr_of_mut!($crate::WalReceiverFunctions))
+                                        >>(
+                                        ::core::ptr::addr_of_mut!(
+                                            $crate::__pgrx_c_bindings::WalReceiverFunctions
+                                        )
+                                    )
                                 )
                             )
                         )
@@ -7923,10 +8601,14 @@ macro_rules! walrcv_send {
                                     $crate::__pgrx_c_macros::expression::place::<
                                         $crate::__pgrx_c_macros::expression::CPointer<
                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                $crate::WalReceiverFunctionsType
+                                                $crate::__pgrx_c_bindings::WalReceiverFunctionsType
                                             >,
                                             $crate::__pgrx_c_macros::expression::ReadWrite
-                                        >>(::core::ptr::addr_of_mut!($crate::WalReceiverFunctions))
+                                        >>(
+                                        ::core::ptr::addr_of_mut!(
+                                            $crate::__pgrx_c_bindings::WalReceiverFunctions
+                                        )
+                                    )
                                 )
                             )
                         )
@@ -7979,12 +8661,12 @@ macro_rules! walrcv_send {
                                                         $crate::__pgrx_c_macros::expression::place::<
                                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                                    $crate::WalReceiverFunctionsType
+                                                                    $crate::__pgrx_c_bindings::WalReceiverFunctionsType
                                                                 >,
                                                                 $crate::__pgrx_c_macros::expression::ReadWrite
                                                             >>(
                                                             ::core::ptr::addr_of_mut!(
-                                                                $crate::WalReceiverFunctions
+                                                                $crate::__pgrx_c_bindings::WalReceiverFunctions
                                                             )
                                                         )
                                                     )
@@ -8033,12 +8715,12 @@ macro_rules! walrcv_send {
                                             $crate::__pgrx_c_macros::expression::place::<
                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                        $crate::WalReceiverFunctionsType
+                                                        $crate::__pgrx_c_bindings::WalReceiverFunctionsType
                                                     >,
                                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                                 >>(
                                                 ::core::ptr::addr_of_mut!(
-                                                    $crate::WalReceiverFunctions
+                                                    $crate::__pgrx_c_bindings::WalReceiverFunctions
                                                 )
                                             )
                                         )
@@ -8071,8 +8753,8 @@ macro_rules! walrcv_send {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -8103,21 +8785,23 @@ macro_rules! __pgrx_c_args_walrcv_server_version {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
         $crate::__pgrx_c_args_walrcv_server_version!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_walrcv_server_version!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_walrcv_server_version!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_walrcv_server_version!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_walrcv_server_version!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -8125,7 +8809,9 @@ macro_rules! __pgrx_c_args_walrcv_server_version {
         $crate::__pgrx_c_args_walrcv_server_version!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_walrcv_server_version!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_walrcv_server_version!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -8147,14 +8833,18 @@ macro_rules! __pgrx_c_args_walrcv_server_version {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_walrcv_server_version!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_walrcv_server_version!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_walrcv_server_version!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_walrcv_server_version!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_walrcv_server_version!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -8181,13 +8871,13 @@ macro_rules! __pgrx_c_args_walrcv_server_version {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_walrcv_server_version!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_walrcv_server_version!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -8245,11 +8935,13 @@ macro_rules! walrcv_server_version {
                                         $crate::__pgrx_c_macros::expression::place::<
                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                    $crate::WalReceiverFunctionsType
+                                                    $crate::__pgrx_c_bindings::WalReceiverFunctionsType
                                                 >,
                                                 $crate::__pgrx_c_macros::expression::ReadWrite
                                             >>(
-                                            ::core::ptr::addr_of_mut!($crate::WalReceiverFunctions)
+                                            ::core::ptr::addr_of_mut!(
+                                                $crate::__pgrx_c_bindings::WalReceiverFunctions
+                                            )
                                         )
                                     )
                                 )
@@ -8283,10 +8975,14 @@ macro_rules! walrcv_server_version {
                                     $crate::__pgrx_c_macros::expression::place::<
                                         $crate::__pgrx_c_macros::expression::CPointer<
                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                $crate::WalReceiverFunctionsType
+                                                $crate::__pgrx_c_bindings::WalReceiverFunctionsType
                                             >,
                                             $crate::__pgrx_c_macros::expression::ReadWrite
-                                        >>(::core::ptr::addr_of_mut!($crate::WalReceiverFunctions))
+                                        >>(
+                                        ::core::ptr::addr_of_mut!(
+                                            $crate::__pgrx_c_bindings::WalReceiverFunctions
+                                        )
+                                    )
                                 )
                             )
                         )
@@ -8318,10 +9014,14 @@ macro_rules! walrcv_server_version {
                                     $crate::__pgrx_c_macros::expression::place::<
                                         $crate::__pgrx_c_macros::expression::CPointer<
                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                $crate::WalReceiverFunctionsType
+                                                $crate::__pgrx_c_bindings::WalReceiverFunctionsType
                                             >,
                                             $crate::__pgrx_c_macros::expression::ReadWrite
-                                        >>(::core::ptr::addr_of_mut!($crate::WalReceiverFunctions))
+                                        >>(
+                                        ::core::ptr::addr_of_mut!(
+                                            $crate::__pgrx_c_bindings::WalReceiverFunctions
+                                        )
+                                    )
                                 )
                             )
                         )
@@ -8366,12 +9066,12 @@ macro_rules! walrcv_server_version {
                                                         $crate::__pgrx_c_macros::expression::place::<
                                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                                    $crate::WalReceiverFunctionsType
+                                                                    $crate::__pgrx_c_bindings::WalReceiverFunctionsType
                                                                 >,
                                                                 $crate::__pgrx_c_macros::expression::ReadWrite
                                                             >>(
                                                             ::core::ptr::addr_of_mut!(
-                                                                $crate::WalReceiverFunctions
+                                                                $crate::__pgrx_c_bindings::WalReceiverFunctions
                                                             )
                                                         )
                                                     )
@@ -8414,12 +9114,12 @@ macro_rules! walrcv_server_version {
                                             $crate::__pgrx_c_macros::expression::place::<
                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                        $crate::WalReceiverFunctionsType
+                                                        $crate::__pgrx_c_bindings::WalReceiverFunctionsType
                                                     >,
                                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                                 >>(
                                                 ::core::ptr::addr_of_mut!(
-                                                    $crate::WalReceiverFunctions
+                                                    $crate::__pgrx_c_bindings::WalReceiverFunctions
                                                 )
                                             )
                                         )
@@ -8446,8 +9146,8 @@ macro_rules! walrcv_server_version {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -8478,13 +9178,13 @@ macro_rules! __pgrx_c_args_walrcv_startstreaming {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_walrcv_startstreaming!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_walrcv_startstreaming!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -8493,7 +9193,7 @@ macro_rules! __pgrx_c_args_walrcv_startstreaming {
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_walrcv_startstreaming!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -8520,33 +9220,35 @@ macro_rules! __pgrx_c_args_walrcv_startstreaming {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_walrcv_startstreaming!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_walrcv_startstreaming!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $argument:literal) => {
         $crate::__pgrx_c_args_walrcv_startstreaming!(
-            @p2 $mode [$($done)* (@literal [- $argument]),];
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
         )
     };
     (@negative1 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_walrcv_startstreaming!(@p2 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_walrcv_startstreaming!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_walrcv_startstreaming!(
-            @p2 $mode [$($done)* (@literal [- $argument]),];
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_walrcv_startstreaming!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -8554,7 +9256,9 @@ macro_rules! __pgrx_c_args_walrcv_startstreaming {
         $crate::__pgrx_c_args_walrcv_startstreaming!(@negative1 $mode [$($done)*]; - $($raw)*)
     };
     (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_walrcv_startstreaming!(@p2 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_walrcv_startstreaming!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -8576,14 +9280,18 @@ macro_rules! __pgrx_c_args_walrcv_startstreaming {
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_walrcv_startstreaming!(@p2 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_walrcv_startstreaming!(
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_walrcv_startstreaming!(@p2 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_walrcv_startstreaming!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_walrcv_startstreaming!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -8610,13 +9318,13 @@ macro_rules! __pgrx_c_args_walrcv_startstreaming {
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_walrcv_startstreaming!(
-            @p2 $mode [$($done)* (@literal [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_walrcv_startstreaming!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -8675,11 +9383,13 @@ macro_rules! walrcv_startstreaming {
                                         $crate::__pgrx_c_macros::expression::place::<
                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                    $crate::WalReceiverFunctionsType
+                                                    $crate::__pgrx_c_bindings::WalReceiverFunctionsType
                                                 >,
                                                 $crate::__pgrx_c_macros::expression::ReadWrite
                                             >>(
-                                            ::core::ptr::addr_of_mut!($crate::WalReceiverFunctions)
+                                            ::core::ptr::addr_of_mut!(
+                                                $crate::__pgrx_c_bindings::WalReceiverFunctions
+                                            )
                                         )
                                     )
                                 )
@@ -8716,10 +9426,14 @@ macro_rules! walrcv_startstreaming {
                                     $crate::__pgrx_c_macros::expression::place::<
                                         $crate::__pgrx_c_macros::expression::CPointer<
                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                $crate::WalReceiverFunctionsType
+                                                $crate::__pgrx_c_bindings::WalReceiverFunctionsType
                                             >,
                                             $crate::__pgrx_c_macros::expression::ReadWrite
-                                        >>(::core::ptr::addr_of_mut!($crate::WalReceiverFunctions))
+                                        >>(
+                                        ::core::ptr::addr_of_mut!(
+                                            $crate::__pgrx_c_bindings::WalReceiverFunctions
+                                        )
+                                    )
                                 )
                             )
                         )
@@ -8754,10 +9468,14 @@ macro_rules! walrcv_startstreaming {
                                     $crate::__pgrx_c_macros::expression::place::<
                                         $crate::__pgrx_c_macros::expression::CPointer<
                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                $crate::WalReceiverFunctionsType
+                                                $crate::__pgrx_c_bindings::WalReceiverFunctionsType
                                             >,
                                             $crate::__pgrx_c_macros::expression::ReadWrite
-                                        >>(::core::ptr::addr_of_mut!($crate::WalReceiverFunctions))
+                                        >>(
+                                        ::core::ptr::addr_of_mut!(
+                                            $crate::__pgrx_c_bindings::WalReceiverFunctions
+                                        )
+                                    )
                                 )
                             )
                         )
@@ -8806,12 +9524,12 @@ macro_rules! walrcv_startstreaming {
                                                         $crate::__pgrx_c_macros::expression::place::<
                                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                                    $crate::WalReceiverFunctionsType
+                                                                    $crate::__pgrx_c_bindings::WalReceiverFunctionsType
                                                                 >,
                                                                 $crate::__pgrx_c_macros::expression::ReadWrite
                                                             >>(
                                                             ::core::ptr::addr_of_mut!(
-                                                                $crate::WalReceiverFunctions
+                                                                $crate::__pgrx_c_bindings::WalReceiverFunctions
                                                             )
                                                         )
                                                     )
@@ -8857,12 +9575,12 @@ macro_rules! walrcv_startstreaming {
                                             $crate::__pgrx_c_macros::expression::place::<
                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                        $crate::WalReceiverFunctionsType
+                                                        $crate::__pgrx_c_bindings::WalReceiverFunctionsType
                                                     >,
                                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                                 >>(
                                                 ::core::ptr::addr_of_mut!(
-                                                    $crate::WalReceiverFunctions
+                                                    $crate::__pgrx_c_bindings::WalReceiverFunctions
                                                 )
                                             )
                                         )
@@ -8894,6 +9612,7 @@ macro_rules! walrcv_startstreaming {
 pub use AllowCascadeReplication;
 pub use walrcv_alter_slot;
 pub use walrcv_check_conninfo;
+pub use walrcv_clear_result;
 pub use walrcv_connect;
 pub use walrcv_create_slot;
 pub use walrcv_disconnect;

@@ -439,7 +439,8 @@ impl<'a> Fragments<'a> {
 }
 
 /// Split shared and private-native support at parsed item boundaries, preserving comments and
-/// same-scope includes while guarding native adapters for docs.rs.
+/// same-scope includes. Documentation builds also need these adapters because
+/// pgrx itself now invokes generated macros in ordinary library code.
 fn partition_support(
     source: &str,
     files: &mut BTreeMap<PathBuf, String>,
@@ -488,7 +489,6 @@ fn partition_support(
             native.push(&source[previous..closing])?;
             let fragments = native.finish()?;
             let mut shell = source[cursor..start].to_owned();
-            shell.push_str("#[cfg(not(docsrs))]\n");
             shell.push_str(&source[start..opening]);
             shell.push('\n');
             for fragment in fragments {
@@ -755,7 +755,8 @@ mod tests {
         let shared = &files.sources[Path::new("__pgrx_c_support/shared_0000.rs")];
         let native = &files.sources[Path::new("__pgrx_c_support/native_0000.rs")];
         assert!(shared.contains("const FIRST: &str = \"é\";"));
-        assert!(shared.contains("#[cfg(not(docsrs))]\n#[doc(hidden)] pub mod"));
+        assert!(shared.contains("#[doc(hidden)] pub mod"));
+        assert!(!shared.contains("#[cfg(not(docsrs))]"));
         assert!(shared.contains("// Ω"));
         assert!(native.contains("pub const VALUE: &str = \"λ\";"));
         syn::parse_file(shared).unwrap();
@@ -792,7 +793,7 @@ mod tests {
         assert!(shared.len() > 1 && native.len() > 1);
         let shared = shared.join("\n");
         let native = native.join("\n");
-        assert!(shared.contains("#[cfg(not(docsrs))]\n#[doc(hidden)]\npub mod __pgrx_c_generated"));
+        assert!(shared.contains("#[doc(hidden)]\npub mod __pgrx_c_generated"));
         assert!(shared.contains("include!(\"native_0000.rs\");"));
         for comment in [
             "// native leading comment",

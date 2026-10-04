@@ -5,8 +5,8 @@ This code is generated for documentation purposes, so that it is easy to referen
 // C macros from brin_tuple.h.
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -33,20 +33,24 @@ macro_rules! __pgrx_c_args_BrinTupleDataOffset {
         $crate::__pgrx_c_args_BrinTupleDataOffset!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_BrinTupleDataOffset!(@p1 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_BrinTupleDataOffset!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_BrinTupleDataOffset!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_BrinTupleDataOffset!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_BrinTupleDataOffset!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_BrinTupleDataOffset!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -54,7 +58,9 @@ macro_rules! __pgrx_c_args_BrinTupleDataOffset {
         $crate::__pgrx_c_args_BrinTupleDataOffset!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_BrinTupleDataOffset!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_BrinTupleDataOffset!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -76,14 +82,18 @@ macro_rules! __pgrx_c_args_BrinTupleDataOffset {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_BrinTupleDataOffset!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_BrinTupleDataOffset!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_BrinTupleDataOffset!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_BrinTupleDataOffset!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_BrinTupleDataOffset!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -110,13 +120,13 @@ macro_rules! __pgrx_c_args_BrinTupleDataOffset {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_BrinTupleDataOffset!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_BrinTupleDataOffset!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -162,7 +172,7 @@ macro_rules! BrinTupleDataOffset {
         (
             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::cast_as::<
-                    $crate::Size,
+                    $crate::__pgrx_c_bindings::Size,
                     $crate::__pgrx_c_macros::expression::CIntegerStorage<
                         $crate::__pgrx_c_macros::CUnsignedLong,
                         usize
@@ -186,10 +196,10 @@ macro_rules! BrinTupleDataOffset {
                                                         _
                                                     >(
                                                         $crate::__pgrx_c_macros::expression::cast_as::<
-                                                            *mut $crate::BrinTuple,
+                                                            *mut $crate::__pgrx_c_bindings::BrinTuple,
                                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                                    $crate::BrinTuple
+                                                                    $crate::__pgrx_c_bindings::BrinTuple
                                                                 >,
                                                                 $crate::__pgrx_c_macros::expression::ReadWrite
                                                             >,
@@ -215,7 +225,7 @@ macro_rules! BrinTupleDataOffset {
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                        $crate::BRIN_OFFSET_MASK as i32
+                                        $crate::__pgrx_c_bindings::BRIN_OFFSET_MASK as i32
                                     )
                                 )
                             )
@@ -252,7 +262,7 @@ macro_rules! BrinTupleDataOffset {
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::cast_as::<
-                                $crate::Size,
+                                $crate::__pgrx_c_bindings::Size,
                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                     $crate::__pgrx_c_macros::CUnsignedLong,
                                     usize
@@ -279,10 +289,10 @@ macro_rules! BrinTupleDataOffset {
                                                                     _
                                                                 >(
                                                                     $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                        *mut $crate::BrinTuple,
+                                                                        *mut $crate::__pgrx_c_bindings::BrinTuple,
                                                                         $crate::__pgrx_c_macros::expression::CPointer<
                                                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                $crate::BrinTuple
+                                                                                $crate::__pgrx_c_bindings::BrinTuple
                                                                             >,
                                                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                                                         >,
@@ -312,7 +322,9 @@ macro_rules! BrinTupleDataOffset {
                                             >(
                                                 $crate::__pgrx_c_macros::CValue::<
                                                     $crate::__pgrx_c_macros::CInt
-                                                >::new($crate::BRIN_OFFSET_MASK as i32)
+                                                >::new(
+                                                    $crate::__pgrx_c_bindings::BRIN_OFFSET_MASK as i32
+                                                )
                                             )
                                         )
                                     )
@@ -333,7 +345,7 @@ macro_rules! BrinTupleDataOffset {
         {
             let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::cast_as::<
-                    $crate::Size,
+                    $crate::__pgrx_c_bindings::Size,
                     $crate::__pgrx_c_macros::expression::CIntegerStorage<
                         $crate::__pgrx_c_macros::CUnsignedLong,
                         usize
@@ -357,10 +369,10 @@ macro_rules! BrinTupleDataOffset {
                                                         _
                                                     >(
                                                         $crate::__pgrx_c_macros::expression::cast_as::<
-                                                            *mut $crate::BrinTuple,
+                                                            *mut $crate::__pgrx_c_bindings::BrinTuple,
                                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                                    $crate::BrinTuple
+                                                                    $crate::__pgrx_c_bindings::BrinTuple
                                                                 >,
                                                                 $crate::__pgrx_c_macros::expression::ReadWrite
                                                             >,
@@ -386,7 +398,7 @@ macro_rules! BrinTupleDataOffset {
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                        $crate::BRIN_OFFSET_MASK as i32
+                                        $crate::__pgrx_c_bindings::BRIN_OFFSET_MASK as i32
                                     )
                                 )
                             )
@@ -405,8 +417,8 @@ macro_rules! BrinTupleDataOffset {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -433,20 +445,24 @@ macro_rules! __pgrx_c_args_BrinTupleHasNulls {
         $crate::__pgrx_c_args_BrinTupleHasNulls!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_BrinTupleHasNulls!(@p1 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_BrinTupleHasNulls!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_BrinTupleHasNulls!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_BrinTupleHasNulls!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_BrinTupleHasNulls!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_BrinTupleHasNulls!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -454,7 +470,9 @@ macro_rules! __pgrx_c_args_BrinTupleHasNulls {
         $crate::__pgrx_c_args_BrinTupleHasNulls!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_BrinTupleHasNulls!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_BrinTupleHasNulls!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -476,14 +494,18 @@ macro_rules! __pgrx_c_args_BrinTupleHasNulls {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_BrinTupleHasNulls!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_BrinTupleHasNulls!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_BrinTupleHasNulls!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_BrinTupleHasNulls!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_BrinTupleHasNulls!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -510,13 +532,13 @@ macro_rules! __pgrx_c_args_BrinTupleHasNulls {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_BrinTupleHasNulls!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_BrinTupleHasNulls!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -580,10 +602,10 @@ macro_rules! BrinTupleHasNulls {
                                                             _
                                                         >(
                                                             $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                *mut $crate::BrinTuple,
+                                                                *mut $crate::__pgrx_c_bindings::BrinTuple,
                                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                                        $crate::BrinTuple
+                                                                        $crate::__pgrx_c_bindings::BrinTuple
                                                                     >,
                                                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                                                 >,
@@ -610,7 +632,7 @@ macro_rules! BrinTupleHasNulls {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::CValue::<
                                             $crate::__pgrx_c_macros::CInt
-                                        >::new($crate::BRIN_NULLS_MASK as i32)
+                                        >::new($crate::__pgrx_c_bindings::BRIN_NULLS_MASK as i32)
                                     )
                                 )
                             )
@@ -678,10 +700,10 @@ macro_rules! BrinTupleHasNulls {
                                                                         _
                                                                     >(
                                                                         $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                            *mut $crate::BrinTuple,
+                                                                            *mut $crate::__pgrx_c_bindings::BrinTuple,
                                                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                    $crate::BrinTuple
+                                                                                    $crate::__pgrx_c_bindings::BrinTuple
                                                                                 >,
                                                                                 $crate::__pgrx_c_macros::expression::ReadWrite
                                                                             >,
@@ -713,7 +735,9 @@ macro_rules! BrinTupleHasNulls {
                                                 >(
                                                     $crate::__pgrx_c_macros::CValue::<
                                                         $crate::__pgrx_c_macros::CInt
-                                                    >::new($crate::BRIN_NULLS_MASK as i32)
+                                                    >::new(
+                                                        $crate::__pgrx_c_bindings::BRIN_NULLS_MASK as i32
+                                                    )
                                                 )
                                             )
                                         )
@@ -760,10 +784,10 @@ macro_rules! BrinTupleHasNulls {
                                                             _
                                                         >(
                                                             $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                *mut $crate::BrinTuple,
+                                                                *mut $crate::__pgrx_c_bindings::BrinTuple,
                                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                                        $crate::BrinTuple
+                                                                        $crate::__pgrx_c_bindings::BrinTuple
                                                                     >,
                                                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                                                 >,
@@ -790,7 +814,7 @@ macro_rules! BrinTupleHasNulls {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::CValue::<
                                             $crate::__pgrx_c_macros::CInt
-                                        >::new($crate::BRIN_NULLS_MASK as i32)
+                                        >::new($crate::__pgrx_c_bindings::BRIN_NULLS_MASK as i32)
                                     )
                                 )
                             )
@@ -816,8 +840,8 @@ macro_rules! BrinTupleHasNulls {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -848,21 +872,23 @@ macro_rules! __pgrx_c_args_BrinTupleIsEmptyRange {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
         $crate::__pgrx_c_args_BrinTupleIsEmptyRange!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_BrinTupleIsEmptyRange!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_BrinTupleIsEmptyRange!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_BrinTupleIsEmptyRange!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_BrinTupleIsEmptyRange!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -870,7 +896,9 @@ macro_rules! __pgrx_c_args_BrinTupleIsEmptyRange {
         $crate::__pgrx_c_args_BrinTupleIsEmptyRange!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_BrinTupleIsEmptyRange!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_BrinTupleIsEmptyRange!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -892,14 +920,18 @@ macro_rules! __pgrx_c_args_BrinTupleIsEmptyRange {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_BrinTupleIsEmptyRange!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_BrinTupleIsEmptyRange!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_BrinTupleIsEmptyRange!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_BrinTupleIsEmptyRange!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_BrinTupleIsEmptyRange!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -926,13 +958,13 @@ macro_rules! __pgrx_c_args_BrinTupleIsEmptyRange {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_BrinTupleIsEmptyRange!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_BrinTupleIsEmptyRange!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -996,10 +1028,10 @@ macro_rules! BrinTupleIsEmptyRange {
                                                             _
                                                         >(
                                                             $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                *mut $crate::BrinTuple,
+                                                                *mut $crate::__pgrx_c_bindings::BrinTuple,
                                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                                        $crate::BrinTuple
+                                                                        $crate::__pgrx_c_bindings::BrinTuple
                                                                     >,
                                                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                                                 >,
@@ -1026,7 +1058,9 @@ macro_rules! BrinTupleIsEmptyRange {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::CValue::<
                                             $crate::__pgrx_c_macros::CInt
-                                        >::new($crate::BRIN_EMPTY_RANGE_MASK as i32)
+                                        >::new(
+                                            $crate::__pgrx_c_bindings::BRIN_EMPTY_RANGE_MASK as i32
+                                        )
                                     )
                                 )
                             )
@@ -1094,10 +1128,10 @@ macro_rules! BrinTupleIsEmptyRange {
                                                                         _
                                                                     >(
                                                                         $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                            *mut $crate::BrinTuple,
+                                                                            *mut $crate::__pgrx_c_bindings::BrinTuple,
                                                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                    $crate::BrinTuple
+                                                                                    $crate::__pgrx_c_bindings::BrinTuple
                                                                                 >,
                                                                                 $crate::__pgrx_c_macros::expression::ReadWrite
                                                                             >,
@@ -1129,7 +1163,9 @@ macro_rules! BrinTupleIsEmptyRange {
                                                 >(
                                                     $crate::__pgrx_c_macros::CValue::<
                                                         $crate::__pgrx_c_macros::CInt
-                                                    >::new($crate::BRIN_EMPTY_RANGE_MASK as i32)
+                                                    >::new(
+                                                        $crate::__pgrx_c_bindings::BRIN_EMPTY_RANGE_MASK as i32
+                                                    )
                                                 )
                                             )
                                         )
@@ -1176,10 +1212,10 @@ macro_rules! BrinTupleIsEmptyRange {
                                                             _
                                                         >(
                                                             $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                *mut $crate::BrinTuple,
+                                                                *mut $crate::__pgrx_c_bindings::BrinTuple,
                                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                                        $crate::BrinTuple
+                                                                        $crate::__pgrx_c_bindings::BrinTuple
                                                                     >,
                                                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                                                 >,
@@ -1206,7 +1242,9 @@ macro_rules! BrinTupleIsEmptyRange {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::CValue::<
                                             $crate::__pgrx_c_macros::CInt
-                                        >::new($crate::BRIN_EMPTY_RANGE_MASK as i32)
+                                        >::new(
+                                            $crate::__pgrx_c_bindings::BRIN_EMPTY_RANGE_MASK as i32
+                                        )
                                     )
                                 )
                             )
@@ -1232,8 +1270,8 @@ macro_rules! BrinTupleIsEmptyRange {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -1264,21 +1302,23 @@ macro_rules! __pgrx_c_args_BrinTupleIsPlaceholder {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
         $crate::__pgrx_c_args_BrinTupleIsPlaceholder!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_BrinTupleIsPlaceholder!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_BrinTupleIsPlaceholder!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_BrinTupleIsPlaceholder!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_BrinTupleIsPlaceholder!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -1286,7 +1326,9 @@ macro_rules! __pgrx_c_args_BrinTupleIsPlaceholder {
         $crate::__pgrx_c_args_BrinTupleIsPlaceholder!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_BrinTupleIsPlaceholder!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_BrinTupleIsPlaceholder!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -1311,15 +1353,17 @@ macro_rules! __pgrx_c_args_BrinTupleIsPlaceholder {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_BrinTupleIsPlaceholder!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_BrinTupleIsPlaceholder!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_BrinTupleIsPlaceholder!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_BrinTupleIsPlaceholder!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -1346,13 +1390,13 @@ macro_rules! __pgrx_c_args_BrinTupleIsPlaceholder {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_BrinTupleIsPlaceholder!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_BrinTupleIsPlaceholder!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -1419,10 +1463,10 @@ macro_rules! BrinTupleIsPlaceholder {
                                                             _
                                                         >(
                                                             $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                *mut $crate::BrinTuple,
+                                                                *mut $crate::__pgrx_c_bindings::BrinTuple,
                                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                                        $crate::BrinTuple
+                                                                        $crate::__pgrx_c_bindings::BrinTuple
                                                                     >,
                                                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                                                 >,
@@ -1449,7 +1493,9 @@ macro_rules! BrinTupleIsPlaceholder {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::CValue::<
                                             $crate::__pgrx_c_macros::CInt
-                                        >::new($crate::BRIN_PLACEHOLDER_MASK as i32)
+                                        >::new(
+                                            $crate::__pgrx_c_bindings::BRIN_PLACEHOLDER_MASK as i32
+                                        )
                                     )
                                 )
                             )
@@ -1517,10 +1563,10 @@ macro_rules! BrinTupleIsPlaceholder {
                                                                         _
                                                                     >(
                                                                         $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                            *mut $crate::BrinTuple,
+                                                                            *mut $crate::__pgrx_c_bindings::BrinTuple,
                                                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                    $crate::BrinTuple
+                                                                                    $crate::__pgrx_c_bindings::BrinTuple
                                                                                 >,
                                                                                 $crate::__pgrx_c_macros::expression::ReadWrite
                                                                             >,
@@ -1552,7 +1598,9 @@ macro_rules! BrinTupleIsPlaceholder {
                                                 >(
                                                     $crate::__pgrx_c_macros::CValue::<
                                                         $crate::__pgrx_c_macros::CInt
-                                                    >::new($crate::BRIN_PLACEHOLDER_MASK as i32)
+                                                    >::new(
+                                                        $crate::__pgrx_c_bindings::BRIN_PLACEHOLDER_MASK as i32
+                                                    )
                                                 )
                                             )
                                         )
@@ -1599,10 +1647,10 @@ macro_rules! BrinTupleIsPlaceholder {
                                                             _
                                                         >(
                                                             $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                *mut $crate::BrinTuple,
+                                                                *mut $crate::__pgrx_c_bindings::BrinTuple,
                                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                                        $crate::BrinTuple
+                                                                        $crate::__pgrx_c_bindings::BrinTuple
                                                                     >,
                                                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                                                 >,
@@ -1629,7 +1677,9 @@ macro_rules! BrinTupleIsPlaceholder {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::CValue::<
                                             $crate::__pgrx_c_macros::CInt
-                                        >::new($crate::BRIN_PLACEHOLDER_MASK as i32)
+                                        >::new(
+                                            $crate::__pgrx_c_bindings::BRIN_PLACEHOLDER_MASK as i32
+                                        )
                                     )
                                 )
                             )

@@ -6,14 +6,26 @@ This code is generated for documentation purposes, so that it is easy to referen
 mod attnum;
 #[allow(unused_imports)]
 pub use attnum::*;
+#[path = "brin.rs"]
+mod brin;
+#[allow(unused_imports)]
+pub use brin::*;
 #[path = "brin_internal.rs"]
 mod brin_internal;
 #[allow(unused_imports)]
 pub use brin_internal::*;
+#[path = "brin_page.rs"]
+mod brin_page;
+#[allow(unused_imports)]
+pub use brin_page::*;
 #[path = "brin_tuple.rs"]
 mod brin_tuple;
 #[allow(unused_imports)]
 pub use brin_tuple::*;
+#[path = "detoast.rs"]
+mod detoast;
+#[allow(unused_imports)]
+pub use detoast::*;
 #[path = "genam.rs"]
 mod genam;
 #[allow(unused_imports)]
@@ -22,6 +34,10 @@ pub use genam::*;
 mod gin;
 #[allow(unused_imports)]
 pub use gin::*;
+#[path = "gin_private.rs"]
+mod gin_private;
+#[allow(unused_imports)]
+pub use gin_private::*;
 #[path = "ginblock.rs"]
 mod ginblock;
 #[allow(unused_imports)]
@@ -82,10 +98,18 @@ pub use rmgr::*;
 mod sdir;
 #[allow(unused_imports)]
 pub use sdir::*;
+#[path = "slru.rs"]
+mod slru;
+#[allow(unused_imports)]
+pub use slru::*;
 #[path = "spgist_private.rs"]
 mod spgist_private;
 #[allow(unused_imports)]
 pub use spgist_private::*;
+#[path = "tableam.rs"]
+mod tableam;
+#[allow(unused_imports)]
+pub use tableam::*;
 #[path = "toast_compression.rs"]
 mod toast_compression;
 #[allow(unused_imports)]
@@ -134,3 +158,7 @@ pub use xlogreader::*;
 mod xlogrecord;
 #[allow(unused_imports)]
 pub use xlogrecord::*;
+#[path = "xlogutils.rs"]
+mod xlogutils;
+#[allow(unused_imports)]
+pub use xlogutils::*;

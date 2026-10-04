@@ -50,6 +50,14 @@ pub use primnodes::*;
 mod print;
 #[allow(unused_imports)]
 pub use print::*;
+#[path = "queryjumble.rs"]
+mod queryjumble;
+#[allow(unused_imports)]
+pub use queryjumble::*;
+#[path = "tidbitmap.rs"]
+mod tidbitmap;
+#[allow(unused_imports)]
+pub use tidbitmap::*;
 #[path = "value.rs"]
 mod value;
 #[allow(unused_imports)]

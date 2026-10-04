@@ -202,6 +202,25 @@ pub(super) fn generate(analysis: &MacroAnalysis) -> Result<Option<ArgumentAdapte
         // :expr fallback, which could otherwise try parsing a native escape.
         let endings = if last { vec!["", ", $($rest:tt)*"] } else { vec![", $($rest:tt)*"] };
         let atomic = parameter.uses.iter().any(|usage| !usage.grouped);
+        if parameter.roles.contains(&ParameterRole::Spelling) {
+            // Preserve token trees before any :expr fragment can turn them into
+            // an opaque syntax node. Groups retain their delimiters and spans;
+            // an outer comma is the same argument separator as in C.
+            writeln!(rust, "(@p{index} $mode:ident [$($done:tt)*]; $($raw:tt)*) => {{ $crate::{normalizer}!(@spelling{index} $mode [$($done)*] [] [{}]; $($raw)*) }};", "@ ".repeat(TOKEN_BUDGET)).expect("String output");
+            writeln!(rust, "(@spelling{index} $mode:ident $done:tt $original:tt $budget:tt; , $($rest:tt)*) => {{ $crate::{normalizer}!(@spelled{index} $mode $done [$($rest)*] $original) }};").expect("String output");
+            if last {
+                writeln!(rust, "(@spelling{index} $mode:ident $done:tt $original:tt $budget:tt;) => {{ $crate::{normalizer}!(@spelled{index} $mode $done [] $original) }};").expect("String output");
+            }
+            writeln!(rust, "(@spelling{index} $mode:ident $done:tt [$($original:tt)*] [@ $($budget:tt)*]; $token:tt $($rest:tt)*) => {{ $crate::{normalizer}!(@spelling{index} $mode $done [$($original)* $token] [$($budget)*]; $($rest)*) }};").expect("String output");
+            writeln!(rust, "(@spelling{index} $mode:ident $done:tt $original:tt []; $($raw:tt)+) => {{ compile_error!(\"diagnostic C macro argument exceeds the 64-token normalization bound\") }};").expect("String output");
+            let original = if atomic { "$argument:tt" } else { "$($argument:tt)+" };
+            let forwarded = if atomic { "$argument" } else { "$($argument)+" };
+            writeln!(rust, "(@spelled{index} $mode:ident [$($done:tt)*] $rest:tt [{original}]) => {{ $crate::__pgrx_c_classify!(@argument [{normalizer}] [p{next} $mode [$($done)*] $rest] [{forwarded}]) }};").expect("String output");
+            if atomic {
+                writeln!(rust, "(@spelled{index} $mode:ident $done:tt $rest:tt [$($argument:tt)+]) => {{ compile_error!(\"an ungrouped C parameter requires one token tree\") }};").expect("String output");
+            }
+            continue;
+        }
         if parameter.roles != [ParameterRole::Type]
             && !parameter.roles.contains(&ParameterRole::Identifier)
             && !parameter.roles.contains(&ParameterRole::FieldDesignator)
@@ -214,11 +233,11 @@ pub(super) fn generate(analysis: &MacroAnalysis) -> Result<Option<ArgumentAdapte
                     "compile_error!(\"an ungrouped C parameter requires a parenthesized negative literal\")".into()
                 } else {
                     format!(
-                        "$crate::{normalizer}!(@p{next} $mode [$($done)* (@literal [- $argument]),]; {rest})"
+                        "$crate::{normalizer}!(@p{next} $mode [$($done)* (@original [- $argument] (@literal [- $argument])),]; {rest})"
                     )
                 };
                 writeln!(rust, "(@p{index} $mode:ident [$($done:tt)*]; - $argument:literal{ending}) => {{ {negative} }};").expect("String output");
-                writeln!(rust, "(@negative{index} $mode:ident [$($done:tt)*]; $argument:expr{ending}) => {{ $crate::{normalizer}!(@p{next} $mode [$($done)* (@native [$argument]),]; {rest}) }};").expect("String output");
+                writeln!(rust, "(@negative{index} $mode:ident [$($done:tt)*]; $argument:expr{ending}) => {{ $crate::{normalizer}!(@p{next} $mode [$($done)* (@original [$argument] (@native [$argument])),]; {rest}) }};").expect("String output");
             }
             let negative = if atomic {
                 "compile_error!(\"an ungrouped C parameter requires one token tree\")".into()
@@ -246,16 +265,16 @@ pub(super) fn generate(analysis: &MacroAnalysis) -> Result<Option<ArgumentAdapte
                 writeln!(rust, "(@p{index} $mode:ident [$($done:tt)*]; $head:ident $(.$tail:ident)*{ending}) => {{ $crate::{normalizer}!(@p{next} $mode [$($done)* ($head $(.$tail)*),]; {rest}) }};").expect("String output");
                 continue;
             }
-            writeln!(rust, "(@p{index} $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]){ending}) => {{ $crate::{normalizer}!(@p{next} $mode [$($done)* (@native [$argument]),]; {rest}) }};").expect("String output");
+            writeln!(rust, "(@p{index} $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]){ending}) => {{ $crate::{normalizer}!(@p{next} $mode [$($done)* (@original [$argument] (@native [$argument])),]; {rest}) }};").expect("String output");
             // Match calls and groups before :expr capture. Other Rust expressions
             // remain native operands; they are never parsed as C by this helper.
             for prefix in ["", "::"] {
                 writeln!(rust, "(@p{index} $mode:ident [$($done:tt)*]; {prefix}$head:ident $(::$tail:ident)* ! $group:tt{ending}) => {{ $crate::__pgrx_c_classify!(@argument [{normalizer}] {state} [{prefix}$head $(::$tail)* ! $group]) }};").expect("String output");
             }
             writeln!(rust, "(@p{index} $mode:ident [$($done:tt)*]; ($($inner:tt)*){ending}) => {{ $crate::__pgrx_c_classify!(@argument [{normalizer}] {state} [($($inner)*)]) }};").expect("String output");
-            writeln!(rust, "(@p{index} $mode:ident [$($done:tt)*]; $argument:literal{ending}) => {{ $crate::{normalizer}!(@p{next} $mode [$($done)* (@literal [$argument]),]; {rest}) }};").expect("String output");
+            writeln!(rust, "(@p{index} $mode:ident [$($done:tt)*]; $argument:literal{ending}) => {{ $crate::{normalizer}!(@p{next} $mode [$($done)* (@original [$argument] (@literal [$argument])),]; {rest}) }};").expect("String output");
             let fragment = if atomic { "tt" } else { "expr" };
-            writeln!(rust, "(@p{index} $mode:ident [$($done:tt)*]; $argument:{fragment}{ending}) => {{ $crate::{normalizer}!(@p{next} $mode [$($done)* (@native [$argument]),]; {rest}) }};").expect("String output");
+            writeln!(rust, "(@p{index} $mode:ident [$($done:tt)*]; $argument:{fragment}{ending}) => {{ $crate::{normalizer}!(@p{next} $mode [$($done)* (@original [$argument] (@native [$argument])),]; {rest}) }};").expect("String output");
         }
     }
     let count = analysis.parameters.len();
@@ -285,7 +304,7 @@ pub(super) fn shared(exports: &BTreeSet<String>, operands: bool) -> Result<Strin
     let mut rust = if operands {
         format!(
             "#[doc(hidden)]\n#[macro_export]\nmacro_rules! __pgrx_c_classify {{\n\
-         (@argument [$callback:ident] $state:tt [$($original:tt)*]) => {{ $crate::__pgrx_c_classify!(@walk [$callback] $state [$($original)*] [{}]; [$($original)*]) }};\n\
+         (@argument [$callback:ident] $state:tt [$($original:tt)*]) => {{ $crate::__pgrx_c_classify!(@walk [__pgrx_c_original] [$callback $state [$($original)*]] [$($original)*] [{}]; [$($original)*]) }};\n\
          (@walk [$callback:ident] $state:tt $original:tt [@ $($budget:tt)*]; [($($inner:tt)*)]) => {{ $crate::__pgrx_c_classify!(@walk [$callback] $state $original [$($budget)*]; [$($inner)*]) }};\n\
          (@walk [$callback:ident] $state:tt $original:tt $budget:tt; [@__pgrx_c_native [$expression:expr]]) => {{ $crate::$callback!(@classified $state (@native [$expression])) }};\n\
          (@walk [$callback:ident] $state:tt $original:tt $budget:tt; [- $argument:literal]) => {{ $crate::$callback!(@classified $state (@literal [- $argument])) }};\n\
@@ -332,7 +351,12 @@ pub(super) fn shared(exports: &BTreeSet<String>, operands: bool) -> Result<Strin
          (@known [$callback:ident] $state:tt [$($path:tt)*]; [$($inner:tt)*]) => { $crate::$callback!(@classified $state (@macro [$($path)*] [$($inner)*])) };\n\
          (@known [$callback:ident] $state:tt [$($path:tt)*]; {$($inner:tt)*}) => { $crate::$callback!(@classified $state (@macro [$($path)*] [$($inner)*])) };\n\
          ($($invalid:tt)*) => { compile_error!(\"invalid generated C macro argument descriptor\") };\n}\n\
+         #[doc(hidden)]\n#[macro_export]\nmacro_rules! __pgrx_c_original {\n\
+         (@classified [$callback:ident $state:tt [$($original:tt)*]] $descriptor:tt) => { $crate::$callback!(@classified $state (@original [$($original)*] $descriptor)) };\n}\n\
          #[doc(hidden)]\n#[macro_export]\nmacro_rules! __pgrx_c_operand {\n\
+         (@stringify; (@original [$($original:tt)*] $descriptor:tt)) => { ::core::stringify!($($original)*) };\n\
+         (@$mode:ident [$floats:tt]; (@original $original:tt $descriptor:tt)) => { $crate::__pgrx_c_operand!(@$mode [$floats]; $descriptor) };\n\
+         (@$mode:ident; (@original $original:tt $descriptor:tt)) => { $crate::__pgrx_c_operand!(@$mode; $descriptor) };\n\
          (@check_safety; (@native [$expression:expr])) => { { let _ = || { let _ = &($expression); }; } };\n\
          (@check_safety; (@deref [$($original:tt)*] $pointer:tt)) => { { let _ = || { let _ = &($($original)*); }; } };\n\
          (@check_safety; (@literal $argument:tt)) => {};\n\

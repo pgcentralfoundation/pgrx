@@ -156,24 +156,27 @@ pub const ALIGNOF_INT64_T: u32 = 8;
 pub const ALIGNOF_PG_INT128_TYPE: u32 = 16;
 pub const ALIGNOF_SHORT: u32 = 2;
 pub const BLCKSZ: u32 = 8192;
-pub const DEF_PGPORT: u32 = 28819;
-pub const DEF_PGPORT_STR: &::core::ffi::CStr = c"28819";
-pub const DLSUFFIX: &::core::ffi::CStr = c".dylib";
+pub const DEF_PGPORT: u32 = 5432;
+pub const DEF_PGPORT_STR: &::core::ffi::CStr = c"5432";
+pub const DLSUFFIX: &::core::ffi::CStr = c".so";
+pub const ENABLE_GSS: u32 = 1;
+pub const ENABLE_NLS: u32 = 1;
 pub const MAXIMUM_ALIGNOF: u32 = 8;
 pub const MEMSET_LOOP_LIMIT: u32 = 1024;
+pub const OPENSSL_API_COMPAT: u32 = 269488128;
 pub const PACKAGE_BUGREPORT: &::core::ffi::CStr = c"pgsql-bugs@lists.postgresql.org";
 pub const PACKAGE_NAME: &::core::ffi::CStr = c"PostgreSQL";
-pub const PACKAGE_STRING: &::core::ffi::CStr = c"PostgreSQL 19beta1";
+pub const PACKAGE_STRING: &::core::ffi::CStr = c"PostgreSQL 19beta4";
 pub const PACKAGE_TARNAME: &::core::ffi::CStr = c"postgresql";
 pub const PACKAGE_URL: &::core::ffi::CStr = c"https://www.postgresql.org/";
-pub const PACKAGE_VERSION: &::core::ffi::CStr = c"19beta1";
+pub const PACKAGE_VERSION: &::core::ffi::CStr = c"19beta4";
 pub const PG_KRB_SRVNAM: &::core::ffi::CStr = c"postgres";
 pub const PG_MAJORVERSION: &::core::ffi::CStr = c"19";
 pub const PG_MAJORVERSION_NUM: u32 = 19;
 pub const PG_MINORVERSION_NUM: u32 = 0;
-pub const PG_VERSION: &::core::ffi::CStr = c"19beta1";
+pub const PG_VERSION: &::core::ffi::CStr = c"19beta4 (Debian 19~beta4-1.pgdg13+1)";
 pub const PG_VERSION_NUM: u32 = 190000;
-pub const PG_VERSION_STR : & :: core :: ffi :: CStr = c"PostgreSQL 19beta1 on aarch64-apple-darwin25.4.0, compiled by Apple clang version 21.0.0 (clang-2100.0.123.102), 64-bit" ;
+pub const PG_VERSION_STR : & :: core :: ffi :: CStr = c"PostgreSQL 19beta4 (Debian 19~beta4-1.pgdg13+1) on x86_64-pc-linux-gnu, compiled by gcc (Debian 14.2.0-19) 14.2.0, 64-bit" ;
 pub const RELSEG_SIZE: u32 = 131072;
 pub const SIZEOF_INTMAX_T: u32 = 8;
 pub const SIZEOF_LONG: u32 = 8;
@@ -182,14 +185,25 @@ pub const SIZEOF_OFF_T: u32 = 8;
 pub const SIZEOF_SIZE_T: u32 = 8;
 pub const SIZEOF_VOID_P: u32 = 8;
 pub const STDC_HEADERS: u32 = 1;
-pub const STRERROR_R_INT: u32 = 1;
-pub const USE_ARMV8_CRC32C: u32 = 1;
-pub const USE_ASSERT_CHECKING: u32 = 1;
+pub const USE_AVX2_WITH_RUNTIME_CHECK: u32 = 1;
+pub const USE_AVX512_CRC32C_WITH_RUNTIME_CHECK: u32 = 1;
+pub const USE_AVX512_POPCNT_WITH_RUNTIME_CHECK: u32 = 1;
 pub const USE_ICU: u32 = 1;
-pub const USE_PMULL_CRC32C_WITH_RUNTIME_CHECK: u32 = 1;
-pub const USE_SVE_POPCNT_WITH_RUNTIME_CHECK: u32 = 1;
-pub const USE_SYSV_SEMAPHORES: u32 = 1;
+pub const USE_LDAP: u32 = 1;
+pub const USE_LIBCURL: u32 = 1;
+pub const USE_LIBNUMA: u32 = 1;
+pub const USE_LIBURING: u32 = 1;
+pub const USE_LIBXML: u32 = 1;
+pub const USE_LIBXSLT: u32 = 1;
+pub const USE_LLVM: u32 = 1;
+pub const USE_LZ4: u32 = 1;
+pub const USE_OPENSSL: u32 = 1;
+pub const USE_PAM: u32 = 1;
+pub const USE_SSE42_CRC32C_WITH_RUNTIME_CHECK: u32 = 1;
+pub const USE_SYSTEMD: u32 = 1;
 pub const USE_SYSV_SHARED_MEMORY: u32 = 1;
+pub const USE_UNNAMED_POSIX_SEMAPHORES: u32 = 1;
+pub const USE_ZSTD: u32 = 1;
 pub const XLOG_BLCKSZ: u32 = 8192;
 pub const DEFAULT_XLOG_SEG_SIZE: u32 = 16777216;
 pub const SLRU_PAGES_PER_SEGMENT: u32 = 32;
@@ -203,56 +217,16 @@ pub const MAXPGPATH: u32 = 1024;
 pub const BITS_PER_BYTE: u32 = 8;
 pub const ALIGNOF_BUFFER: u32 = 32;
 pub const DEFAULT_BACKEND_FLUSH_AFTER: u32 = 0;
-pub const DEFAULT_BGWRITER_FLUSH_AFTER: u32 = 0;
-pub const DEFAULT_CHECKPOINT_FLUSH_AFTER: u32 = 0;
+pub const DEFAULT_BGWRITER_FLUSH_AFTER: u32 = 64;
+pub const DEFAULT_CHECKPOINT_FLUSH_AFTER: u32 = 32;
 pub const WRITEBACK_MAX_PENDING_FLUSHES: u32 = 256;
-pub const DEFAULT_PGSOCKET_DIR: &::core::ffi::CStr = c"/tmp";
+pub const DEFAULT_PGSOCKET_DIR: &::core::ffi::CStr = c"/var/run/postgresql";
 pub const DEFAULT_EVENT_SOURCE: &::core::ffi::CStr = c"PostgreSQL";
 pub const PG_CACHE_LINE_SIZE: u32 = 128;
 pub const PG_IO_ALIGN_SIZE: u32 = 4096;
-pub const __darwin__: u32 = 1;
 pub const SIG_ATOMIC_MIN: i32 = -2147483648;
 pub const SIG_ATOMIC_MAX: u32 = 2147483647;
-pub const SIGHUP: u32 = 1;
-pub const SIGINT: u32 = 2;
-pub const SIGQUIT: u32 = 3;
-pub const SIGILL: u32 = 4;
-pub const SIGTRAP: u32 = 5;
-pub const SIGABRT: u32 = 6;
-pub const SIGIOT: u32 = 6;
-pub const SIGEMT: u32 = 7;
-pub const SIGFPE: u32 = 8;
-pub const SIGKILL: u32 = 9;
-pub const SIGBUS: u32 = 10;
-pub const SIGSEGV: u32 = 11;
-pub const SIGSYS: u32 = 12;
-pub const SIGPIPE: u32 = 13;
-pub const SIGALRM: u32 = 14;
-pub const SIGTERM: u32 = 15;
-pub const SIGURG: u32 = 16;
-pub const SIGSTOP: u32 = 17;
-pub const SIGTSTP: u32 = 18;
-pub const SIGCONT: u32 = 19;
-pub const SIGCHLD: u32 = 20;
-pub const SIGTTIN: u32 = 21;
-pub const SIGTTOU: u32 = 22;
-pub const SIGIO: u32 = 23;
-pub const SIGXCPU: u32 = 24;
-pub const SIGXFSZ: u32 = 25;
-pub const SIGVTALRM: u32 = 26;
-pub const SIGPROF: u32 = 27;
-pub const SIGWINCH: u32 = 28;
-pub const SIGINFO: u32 = 29;
-pub const SIGUSR1: u32 = 30;
-pub const SIGUSR2: u32 = 31;
-pub const SIGEV_NONE: u32 = 0;
-pub const SIGEV_SIGNAL: u32 = 1;
-pub const SIGEV_THREAD: u32 = 3;
-pub const SIGEV_KEVENT: u32 = 4;
-pub const SIG_BLOCK: u32 = 1;
-pub const SIG_UNBLOCK: u32 = 2;
-pub const SIG_SETMASK: u32 = 3;
-pub const SIGSTKSZ: u32 = 131072;
+pub const SIG_ATOMIC_WIDTH: u32 = 32;
 pub const PG_DIAG_SEVERITY: u8 = 83u8;
 pub const PG_DIAG_SEVERITY_NONLOCALIZED: u8 = 86u8;
 pub const PG_DIAG_SQLSTATE: u8 = 67u8;
@@ -271,9 +245,9 @@ pub const PG_DIAG_CONSTRAINT_NAME: u8 = 110u8;
 pub const PG_DIAG_SOURCE_FILE: u8 = 70u8;
 pub const PG_DIAG_SOURCE_LINE: u8 = 76u8;
 pub const PG_DIAG_SOURCE_FUNCTION: u8 = 82u8;
-pub const INT64_FORMAT: &::core::ffi::CStr = c"%lld";
-pub const UINT64_FORMAT: &::core::ffi::CStr = c"%llu";
-pub const OID8_FORMAT: &::core::ffi::CStr = c"%llu";
+pub const INT64_FORMAT: &::core::ffi::CStr = c"%ld";
+pub const UINT64_FORMAT: &::core::ffi::CStr = c"%lu";
+pub const OID8_FORMAT: &::core::ffi::CStr = c"%lu";
 pub const PG_INT8_MIN: i32 = -128;
 pub const PG_INT8_MAX: u32 = 127;
 pub const PG_UINT8_MAX: u32 = 255;
@@ -283,11 +257,7 @@ pub const PG_UINT16_MAX: u32 = 65535;
 pub const PG_INT32_MIN: i32 = -2147483648;
 pub const PG_INT32_MAX: u32 = 2147483647;
 pub const PG_UINT32_MAX: u32 = 4294967295;
-pub const PG_INT64_MIN: i64 = -9223372036854775808;
-pub const PG_INT64_MAX: u64 = 9223372036854775807;
-pub const PG_UINT64_MAX: i32 = -1;
 pub const FLOAT8PASSBYVAL: u32 = 1;
-pub const OID8_MAX: i32 = -1;
 pub const HIGHBIT: u32 = 128;
 pub const ESCAPE_STRING_SYNTAX: u8 = 69u8;
 pub const STATUS_OK: u32 = 0;
@@ -298,7 +268,8 @@ pub const PG_BINARY_A: &::core::ffi::CStr = c"a";
 pub const PG_BINARY_R: &::core::ffi::CStr = c"r";
 pub const PG_BINARY_W: &::core::ffi::CStr = c"w";
 pub const PGINVALID_SOCKET: i32 = -1;
-pub const PG_BACKEND_VERSIONSTR: &::core::ffi::CStr = c"postgres (PostgreSQL) 19beta1\n";
+pub const PG_BACKEND_VERSIONSTR: &::core::ffi::CStr =
+    c"postgres (PostgreSQL) 19beta4 (Debian 19~beta4-1.pgdg13+1)\n";
 pub const EXE: &::core::ffi::CStr = c"";
 pub const DEVNULL: &::core::ffi::CStr = c"/dev/null";
 pub const USE_REPL_SNPRINTF: u32 = 1;
@@ -334,6 +305,51 @@ pub const MCXT_ALLOC_ZERO: u32 = 4;
 pub const SIZEOF_DATUM: u32 = 8;
 pub const FIELDNO_NULLABLE_DATUM_DATUM: u32 = 0;
 pub const FIELDNO_NULLABLE_DATUM_ISNULL: u32 = 1;
+pub const MAX_TIMESTAMP_PRECISION: u32 = 6;
+pub const MAX_INTERVAL_PRECISION: u32 = 6;
+pub const TS_PREC_INV: f64 = 1000000.0;
+pub const DAYS_PER_YEAR: f64 = 365.25;
+pub const MONTHS_PER_YEAR: u32 = 12;
+pub const DAYS_PER_MONTH: u32 = 30;
+pub const DAYS_PER_WEEK: u32 = 7;
+pub const HOURS_PER_DAY: u32 = 24;
+pub const SECS_PER_YEAR: u32 = 31557600;
+pub const SECS_PER_DAY: u32 = 86400;
+pub const SECS_PER_HOUR: u32 = 3600;
+pub const SECS_PER_MINUTE: u32 = 60;
+pub const MINS_PER_HOUR: u32 = 60;
+pub const MAX_TZDISP_HOUR: u32 = 15;
+pub const TZDISP_LIMIT: u32 = 57600;
+pub const JULIAN_MINYEAR: i32 = -4713;
+pub const JULIAN_MINMONTH: u32 = 11;
+pub const JULIAN_MINDAY: u32 = 24;
+pub const JULIAN_MAXYEAR: u32 = 5874898;
+pub const JULIAN_MAXMONTH: u32 = 6;
+pub const JULIAN_MAXDAY: u32 = 3;
+pub const UNIX_EPOCH_JDATE: u32 = 2440588;
+pub const POSTGRES_EPOCH_JDATE: u32 = 2451545;
+pub const DATETIME_MIN_JULIAN: u32 = 0;
+pub const DATE_END_JULIAN: u32 = 2147483494;
+pub const TIMESTAMP_END_JULIAN: u32 = 109203528;
+pub const PG_SHA224_BLOCK_LENGTH: u32 = 64;
+pub const PG_SHA224_DIGEST_LENGTH: u32 = 28;
+pub const PG_SHA224_DIGEST_STRING_LENGTH: u32 = 57;
+pub const PG_SHA256_BLOCK_LENGTH: u32 = 64;
+pub const PG_SHA256_DIGEST_LENGTH: u32 = 32;
+pub const PG_SHA256_DIGEST_STRING_LENGTH: u32 = 65;
+pub const PG_SHA384_BLOCK_LENGTH: u32 = 128;
+pub const PG_SHA384_DIGEST_LENGTH: u32 = 48;
+pub const PG_SHA384_DIGEST_STRING_LENGTH: u32 = 97;
+pub const PG_SHA512_BLOCK_LENGTH: u32 = 128;
+pub const PG_SHA512_DIGEST_LENGTH: u32 = 64;
+pub const PG_SHA512_DIGEST_STRING_LENGTH: u32 = 129;
+pub const SCRAM_SHA_256_NAME: &::core::ffi::CStr = c"SCRAM-SHA-256";
+pub const SCRAM_SHA_256_PLUS_NAME: &::core::ffi::CStr = c"SCRAM-SHA-256-PLUS";
+pub const SCRAM_SHA_256_KEY_LEN: u32 = 32;
+pub const SCRAM_MAX_KEY_LEN: u32 = 32;
+pub const SCRAM_RAW_NONCE_LEN: u32 = 18;
+pub const SCRAM_DEFAULT_SALT_LEN: u32 = 16;
+pub const SCRAM_SHA_256_DEFAULT_ITERATIONS: u32 = 4096;
 pub const LP_UNUSED: u32 = 0;
 pub const LP_NORMAL: u32 = 1;
 pub const LP_REDIRECT: u32 = 2;
@@ -451,7 +467,7 @@ pub const ATTNULLABLE_UNRESTRICTED: u8 = 102u8;
 pub const ATTNULLABLE_UNKNOWN: u8 = 117u8;
 pub const ATTNULLABLE_VALID: u8 = 118u8;
 pub const ATTNULLABLE_INVALID: u8 = 105u8;
-pub const CATALOG_VERSION_NO: u32 = 202605131;
+pub const CATALOG_VERSION_NO: u32 = 202609165;
 pub const PG_TBLSPC_DIR: &::core::ffi::CStr = c"pg_tblspc";
 pub const PG_TBLSPC_DIR_SLASH: &::core::ffi::CStr = c"pg_tblspc/";
 pub const OIDCHARS: u32 = 10;
@@ -499,7 +515,7 @@ pub const PIV_LOG_LOG: u32 = 2;
 pub const PIV_IGNORE_CHECKSUM_FAILURE: u32 = 4;
 pub const PIV_ZERO_BUFFERS_ON_ERROR: u32 = 8;
 pub const SIZEOF_DSA_POINTER: u32 = 8;
-pub const DSA_POINTER_FORMAT: &::core::ffi::CStr = c"%016llx";
+pub const DSA_POINTER_FORMAT: &::core::ffi::CStr = c"%016lx";
 pub const DSA_ALLOC_HUGE: u32 = 1;
 pub const DSA_ALLOC_NO_OOM: u32 = 2;
 pub const DSA_ALLOC_ZERO: u32 = 4;
@@ -615,36 +631,6 @@ pub const TRANSACTION_STATUS_SUB_COMMITTED: u32 = 3;
 pub const CLOG_ZEROPAGE: u32 = 0;
 pub const CLOG_TRUNCATE: u32 = 16;
 pub const TZ_STRLEN_MAX: u32 = 255;
-pub const MAX_TIMESTAMP_PRECISION: u32 = 6;
-pub const MAX_INTERVAL_PRECISION: u32 = 6;
-pub const TS_PREC_INV: f64 = 1000000.0;
-pub const DAYS_PER_YEAR: f64 = 365.25;
-pub const MONTHS_PER_YEAR: u32 = 12;
-pub const DAYS_PER_MONTH: u32 = 30;
-pub const DAYS_PER_WEEK: u32 = 7;
-pub const HOURS_PER_DAY: u32 = 24;
-pub const SECS_PER_YEAR: u32 = 31557600;
-pub const SECS_PER_DAY: u32 = 86400;
-pub const SECS_PER_HOUR: u32 = 3600;
-pub const SECS_PER_MINUTE: u32 = 60;
-pub const MINS_PER_HOUR: u32 = 60;
-pub const MAX_TZDISP_HOUR: u32 = 15;
-pub const TZDISP_LIMIT: u32 = 57600;
-pub const TIMESTAMP_MINUS_INFINITY: i64 = -9223372036854775808;
-pub const TIMESTAMP_INFINITY: u64 = 9223372036854775807;
-pub const DT_NOBEGIN: i64 = -9223372036854775808;
-pub const DT_NOEND: u64 = 9223372036854775807;
-pub const JULIAN_MINYEAR: i32 = -4713;
-pub const JULIAN_MINMONTH: u32 = 11;
-pub const JULIAN_MINDAY: u32 = 24;
-pub const JULIAN_MAXYEAR: u32 = 5874898;
-pub const JULIAN_MAXMONTH: u32 = 6;
-pub const JULIAN_MAXDAY: u32 = 3;
-pub const UNIX_EPOCH_JDATE: u32 = 2440588;
-pub const POSTGRES_EPOCH_JDATE: u32 = 2451545;
-pub const DATETIME_MIN_JULIAN: u32 = 0;
-pub const DATE_END_JULIAN: u32 = 2147483494;
-pub const TIMESTAMP_END_JULIAN: u32 = 109203528;
 pub const CHECKPOINT_IS_SHUTDOWN: u32 = 1;
 pub const CHECKPOINT_END_OF_RECOVERY: u32 = 2;
 pub const CHECKPOINT_FAST: u32 = 4;
@@ -734,7 +720,6 @@ pub const RELKIND_COMPOSITE_TYPE: u8 = 99u8;
 pub const RELKIND_FOREIGN_TABLE: u8 = 102u8;
 pub const RELKIND_PARTITIONED_TABLE: u8 = 112u8;
 pub const RELKIND_PARTITIONED_INDEX: u8 = 73u8;
-pub const RELKIND_PROPGRAPH: u8 = 103u8;
 pub const RELPERSISTENCE_PERMANENT: u8 = 112u8;
 pub const RELPERSISTENCE_UNLOGGED: u8 = 117u8;
 pub const RELPERSISTENCE_TEMP: u8 = 116u8;
@@ -775,6 +760,7 @@ pub const INNER_VAR: i32 = -1;
 pub const OUTER_VAR: i32 = -2;
 pub const INDEX_VAR: i32 = -3;
 pub const ROWID_VAR: i32 = -4;
+pub const INVALID_VAR: i32 = -5;
 pub const PRS2_OLD_VARNO: u32 = 1;
 pub const PRS2_NEW_VARNO: u32 = 2;
 pub const NO_NULLTREATMENT: u32 = 0;
@@ -842,7 +828,6 @@ pub const CURSOR_OPT_FAST_PLAN: u32 = 256;
 pub const CURSOR_OPT_GENERIC_PLAN: u32 = 512;
 pub const CURSOR_OPT_CUSTOM_PLAN: u32 = 1024;
 pub const CURSOR_OPT_PARALLEL_OK: u32 = 2048;
-pub const FETCH_ALL: u64 = 9223372036854775807;
 pub const PublicationRelationId: Oid = Oid(6104);
 pub const PublicationObjectIndexId: u32 = 6110;
 pub const PublicationNameIndexId: u32 = 6111;
@@ -1262,7 +1247,7 @@ pub const IO_DIRECT_DATA: u32 = 1;
 pub const IO_DIRECT_WAL: u32 = 2;
 pub const IO_DIRECT_WAL_INIT: u32 = 4;
 pub const DEFAULT_FILE_EXTEND_METHOD: u32 = 0;
-pub const PG_O_DIRECT: u32 = 2147483648;
+pub const PG_O_DIRECT: u32 = 16384;
 pub const GIST_MAX_SPLIT_PAGES: u32 = 75;
 pub const GIST_ROOT_BLKNO: u32 = 0;
 pub const TUPLE_IS_VALID: u32 = 65535;
@@ -1320,6 +1305,44 @@ pub const XLOG_HASH_UPDATE_META_PAGE: u32 = 176;
 pub const XLOG_HASH_VACUUM_ONE_PAGE: u32 = 192;
 pub const XLH_SPLIT_META_UPDATE_MASKS: u32 = 1;
 pub const XLH_SPLIT_META_UPDATE_SPLITPOINT: u32 = 2;
+pub const SIGINT: u32 = 2;
+pub const SIGILL: u32 = 4;
+pub const SIGABRT: u32 = 6;
+pub const SIGFPE: u32 = 8;
+pub const SIGSEGV: u32 = 11;
+pub const SIGTERM: u32 = 15;
+pub const SIGHUP: u32 = 1;
+pub const SIGQUIT: u32 = 3;
+pub const SIGTRAP: u32 = 5;
+pub const SIGKILL: u32 = 9;
+pub const SIGPIPE: u32 = 13;
+pub const SIGALRM: u32 = 14;
+pub const SIGIOT: u32 = 6;
+pub const SIGSTKFLT: u32 = 16;
+pub const SIGPWR: u32 = 30;
+pub const SIGBUS: u32 = 7;
+pub const SIGSYS: u32 = 31;
+pub const SIGURG: u32 = 23;
+pub const SIGSTOP: u32 = 19;
+pub const SIGTSTP: u32 = 20;
+pub const SIGCONT: u32 = 18;
+pub const SIGCHLD: u32 = 17;
+pub const SIGTTIN: u32 = 21;
+pub const SIGTTOU: u32 = 22;
+pub const SIGPOLL: u32 = 29;
+pub const SIGXFSZ: u32 = 25;
+pub const SIGXCPU: u32 = 24;
+pub const SIGVTALRM: u32 = 26;
+pub const SIGPROF: u32 = 27;
+pub const SIGUSR1: u32 = 10;
+pub const SIGUSR2: u32 = 12;
+pub const SIGWINCH: u32 = 28;
+pub const SIGIO: u32 = 29;
+pub const SIGCLD: u32 = 17;
+pub const SIG_BLOCK: u32 = 0;
+pub const SIG_UNBLOCK: u32 = 1;
+pub const SIG_SETMASK: u32 = 2;
+pub const SIGSTKSZ: u32 = 8192;
 pub const SHAREDINVALCATALOG_ID: i32 = -1;
 pub const SHAREDINVALRELCACHE_ID: i32 = -2;
 pub const SHAREDINVALSMGR_ID: i32 = -3;
@@ -1364,8 +1387,18 @@ pub const XLH_DELETE_IS_SUPER: u32 = 8;
 pub const XLH_DELETE_IS_PARTITION_MOVE: u32 = 16;
 pub const XLH_DELETE_NO_LOGICAL: u32 = 32;
 pub const XLH_DELETE_CONTAINS_OLD: u32 = 6;
+pub const HEAP_DELETE_BLKREF_HEAP: u32 = 0;
+pub const HEAP_DELETE_BLKREF_VM: u32 = 1;
 pub const XLH_TRUNCATE_CASCADE: u32 = 1;
 pub const XLH_TRUNCATE_RESTART_SEQS: u32 = 2;
+pub const HEAP_INSERT_BLKREF_HEAP: u32 = 0;
+pub const HEAP_INSERT_BLKREF_VM: u32 = 1;
+pub const HEAP_MULTI_INSERT_BLKREF_HEAP: u32 = 0;
+pub const HEAP_MULTI_INSERT_BLKREF_VM: u32 = 1;
+pub const HEAP_UPDATE_BLKREF_HEAP_NEW: u32 = 0;
+pub const HEAP_UPDATE_BLKREF_HEAP_OLD: u32 = 1;
+pub const HEAP_UPDATE_BLKREF_VM_NEW: u32 = 2;
+pub const HEAP_UPDATE_BLKREF_VM_OLD: u32 = 3;
 pub const XLHP_IS_CATALOG_REL: u32 = 2;
 pub const XLHP_CLEANUP_LOCK: u32 = 4;
 pub const XLHP_HAS_CONFLICT_HORIZON: u32 = 8;
@@ -1383,6 +1416,8 @@ pub const XLHL_XMAX_EXCL_LOCK: u32 = 4;
 pub const XLHL_XMAX_KEYSHR_LOCK: u32 = 8;
 pub const XLHL_KEYS_UPDATED: u32 = 16;
 pub const XLH_LOCK_ALL_FROZEN_CLEARED: u32 = 1;
+pub const HEAP_LOCK_BLKREF_HEAP: u32 = 0;
+pub const HEAP_LOCK_BLKREF_VM: u32 = 1;
 pub const DEFAULT_SPINS_PER_DELAY: u32 = 100;
 pub const GIDSIZE: u32 = 200;
 pub const XACT_READ_UNCOMMITTED: u32 = 0;
@@ -1634,7 +1669,7 @@ pub const XLOG_SPGIST_VACUUM_REDIRECT: u32 = 128;
 pub const TOAST_PGLZ_COMPRESSION: u8 = 112u8;
 pub const TOAST_LZ4_COMPRESSION: u8 = 108u8;
 pub const InvalidCompressionMethod: u8 = 0u8;
-pub const DEFAULT_TOAST_COMPRESSION: u8 = 112u8;
+pub const DEFAULT_TOAST_COMPRESSION: u8 = 108u8;
 pub const TOAST_NEEDS_DELETE_OLD: u32 = 1;
 pub const TOAST_NEEDS_FREE: u32 = 2;
 pub const TOAST_HAS_NULLS: u32 = 4;
@@ -1680,7 +1715,7 @@ pub const BITS_PER_HEAPBLOCK: u32 = 2;
 pub const VISIBILITYMAP_ALL_VISIBLE: u32 = 1;
 pub const VISIBILITYMAP_ALL_FROZEN: u32 = 2;
 pub const VISIBILITYMAP_VALID_BITS: u32 = 3;
-pub const XLOG_PAGE_MAGIC: u32 = 53536;
+pub const XLOG_PAGE_MAGIC: u32 = 53538;
 pub const XLP_FIRST_IS_CONTRECORD: u32 = 1;
 pub const XLP_LONG_HEADER: u32 = 2;
 pub const XLP_FIRST_IS_OVERWRITE_CONTRECORD: u32 = 4;
@@ -1693,7 +1728,7 @@ pub const XLOGDIR: &::core::ffi::CStr = c"pg_wal";
 pub const XLOG_CONTROL_FILE: &::core::ffi::CStr = c"global/pg_control";
 pub const MAXFNAMELEN: u32 = 64;
 pub const XLOG_FNAME_LEN: u32 = 24;
-pub const PG_CONTROL_VERSION: u32 = 1902;
+pub const PG_CONTROL_VERSION: u32 = 1905;
 pub const MOCK_AUTH_NONCE_LEN: u32 = 32;
 pub const XLOG_CHECKPOINT_SHUTDOWN: u32 = 0;
 pub const XLOG_CHECKPOINT_ONLINE: u32 = 16;
@@ -1711,7 +1746,6 @@ pub const XLOG_ASSIGN_LSN: u32 = 192;
 pub const XLOG_OVERWRITE_CONTRECORD: u32 = 208;
 pub const XLOG_CHECKPOINT_REDO: u32 = 224;
 pub const XLOG_LOGICAL_DECODING_STATUS_CHANGE: u32 = 240;
-pub const XLOG2_CHECKSUMS: u32 = 0;
 pub const FLOATFORMAT_VALUE: f64 = 1234567.0;
 pub const PG_CONTROL_MAX_SAFE_SIZE: u32 = 512;
 pub const PG_CONTROL_FILE_SIZE: u32 = 8192;
@@ -1764,6 +1798,7 @@ pub const INDEX_CREATE_IF_NOT_EXISTS: u32 = 16;
 pub const INDEX_CREATE_PARTITIONED: u32 = 32;
 pub const INDEX_CREATE_INVALID: u32 = 64;
 pub const INDEX_CREATE_SUPPRESS_PROGRESS: u32 = 128;
+pub const INDEX_CREATE_DEFERRABLE: u32 = 256;
 pub const INDEX_CONSTR_CREATE_MARK_AS_PRIMARY: u32 = 1;
 pub const INDEX_CONSTR_CREATE_DEFERRABLE: u32 = 2;
 pub const INDEX_CONSTR_CREATE_INIT_DEFERRED: u32 = 4;
@@ -2026,7 +2061,6 @@ pub const Natts_pg_db_role_setting: u32 = 3;
 pub const EOH_HEADER_MAGIC: i32 = -1;
 pub const MAXDIM: u32 = 6;
 pub const EA_MAGIC: u32 = 689375833;
-pub const MAX_KILOBYTES: u32 = 2147483647;
 pub const PG_AUTOCONF_FILENAME: &::core::ffi::CStr = c"postgresql.auto.conf";
 pub const GUC_QUALIFIER_SEPARATOR: u8 = 46u8;
 pub const GUC_LIST_INPUT: u32 = 1;
@@ -2056,9 +2090,6 @@ pub const GUC_UNIT_S: u32 = 536870912;
 pub const GUC_UNIT_MIN: u32 = 805306368;
 pub const GUC_UNIT_TIME: u32 = 1879048192;
 pub const GUC_UNIT: u32 = 2130706432;
-pub const DEFAULT_DEBUG_COPY_PARSE_PLAN_TREES: u32 = 0;
-pub const DEFAULT_DEBUG_WRITE_READ_PARSE_PLAN_TREES: u32 = 0;
-pub const DEFAULT_DEBUG_RAW_EXPRESSION_COVERAGE_TEST: u32 = 0;
 pub const DefaultAclRelationId: Oid = Oid(826);
 pub const DefaultAclRoleNspObjIndexId: u32 = 827;
 pub const DefaultAclOidIndexId: u32 = 828;
@@ -2239,7 +2270,6 @@ pub const ACL_ALL_RIGHTS_FUNCTION: u32 = 128;
 pub const ACL_ALL_RIGHTS_LANGUAGE: u32 = 256;
 pub const ACL_ALL_RIGHTS_LARGEOBJECT: u32 = 6;
 pub const ACL_ALL_RIGHTS_PARAMETER_ACL: u32 = 12288;
-pub const ACL_ALL_RIGHTS_PROPGRAPH: u32 = 2;
 pub const ACL_ALL_RIGHTS_SCHEMA: u32 = 768;
 pub const ACL_ALL_RIGHTS_TABLESPACE: u32 = 512;
 pub const ACL_ALL_RIGHTS_TYPE: u32 = 256;
@@ -2343,6 +2373,7 @@ pub const OID_ARRAY_CONTAINED_OP: u32 = 2752;
 pub const RECORD_EQ_OP: u32 = 2988;
 pub const RECORD_LT_OP: u32 = 2990;
 pub const RECORD_GT_OP: u32 = 2991;
+pub const RANGE_EQ_OP: u32 = 3882;
 pub const OID_RANGE_LESS_OP: u32 = 3884;
 pub const OID_RANGE_LESS_EQUAL_OP: u32 = 3885;
 pub const OID_RANGE_GREATER_EQUAL_OP: u32 = 3886;
@@ -2357,6 +2388,7 @@ pub const OID_RANGE_RIGHT_OP: u32 = 3894;
 pub const OID_RANGE_OVERLAPS_LEFT_OP: u32 = 3895;
 pub const OID_RANGE_OVERLAPS_RIGHT_OP: u32 = 3896;
 pub const OID_RANGE_INTERSECT_RANGE_OP: u32 = 3900;
+pub const MULTIRANGE_EQ_OP: u32 = 2860;
 pub const OID_MULTIRANGE_LESS_OP: u32 = 2862;
 pub const OID_MULTIRANGE_LESS_EQUAL_OP: u32 = 2863;
 pub const OID_MULTIRANGE_GREATER_EQUAL_OP: u32 = 2864;
@@ -2410,6 +2442,7 @@ pub const BPCHAR_PATTERN_BTREE_FAM_OID: Oid = Oid(2097);
 pub const BOOL_HASH_FAM_OID: Oid = Oid(2222);
 pub const TEXT_SPGIST_FAM_OID: Oid = Oid(4017);
 pub const ParameterAclRelationId: Oid = Oid(6243);
+pub const ParameterAclRelation_Rowtype_Id: u32 = 2173;
 pub const PgParameterAclToastTable: u32 = 6244;
 pub const PgParameterAclToastIndex: u32 = 6245;
 pub const ParameterAclParnameIndexId: u32 = 6246;
@@ -2882,9 +2915,12 @@ pub const EIIT_IS_UPDATE: u32 = 1;
 pub const EIIT_NO_DUPE_ERROR: u32 = 2;
 pub const EIIT_ONLY_SUMMARIZING: u32 = 4;
 pub const TICKS_TO_NS_SHIFT: u32 = 14;
-pub const PG_INSTR_TICKS_TO_NS: u32 = 0;
-pub const PG_INSTR_TSC_CLOCK: u32 = 0;
-pub const PG_INSTR_SYSTEM_CLOCK_NAME: &::core::ffi::CStr = c"clock_gettime (CLOCK_MONOTONIC_RAW)";
+pub const PG_INSTR_TICKS_TO_NS: u32 = 1;
+pub const PG_INSTR_TSC_CLOCK: u32 = 1;
+pub const PG_INSTR_SYSTEM_CLOCK: u32 = 1;
+pub const PG_INSTR_SYSTEM_CLOCK_NAME: &::core::ffi::CStr = c"clock_gettime (CLOCK_MONOTONIC)";
+pub const PG_INSTR_TSC_CLOCK_NAME_FAST: &::core::ffi::CStr = c"RDTSC";
+pub const PG_INSTR_TSC_CLOCK_NAME: &::core::ffi::CStr = c"RDTSCP";
 pub const PROGRESS_VACUUM_PHASE: u32 = 0;
 pub const PROGRESS_VACUUM_TOTAL_HEAP_BLKS: u32 = 1;
 pub const PROGRESS_VACUUM_HEAP_BLKS_SCANNED: u32 = 2;
@@ -2999,21 +3035,9 @@ pub const PROGRESS_COPY_TYPE_FILE: u32 = 1;
 pub const PROGRESS_COPY_TYPE_PROGRAM: u32 = 2;
 pub const PROGRESS_COPY_TYPE_PIPE: u32 = 3;
 pub const PROGRESS_COPY_TYPE_CALLBACK: u32 = 4;
-pub const PROGRESS_DATACHECKSUMS_PHASE: u32 = 0;
-pub const PROGRESS_DATACHECKSUMS_DBS_TOTAL: u32 = 1;
-pub const PROGRESS_DATACHECKSUMS_DBS_DONE: u32 = 2;
-pub const PROGRESS_DATACHECKSUMS_RELS_TOTAL: u32 = 3;
-pub const PROGRESS_DATACHECKSUMS_RELS_DONE: u32 = 4;
-pub const PROGRESS_DATACHECKSUMS_BLOCKS_TOTAL: u32 = 5;
-pub const PROGRESS_DATACHECKSUMS_BLOCKS_DONE: u32 = 6;
-pub const PROGRESS_DATACHECKSUMS_PHASE_ENABLING: u32 = 0;
-pub const PROGRESS_DATACHECKSUMS_PHASE_DISABLING: u32 = 1;
-pub const PROGRESS_DATACHECKSUMS_PHASE_WAITING_TEMPREL: u32 = 2;
-pub const PROGRESS_DATACHECKSUMS_PHASE_WAITING_BARRIER: u32 = 3;
-pub const PROGRESS_DATACHECKSUMS_PHASE_DONE: u32 = 4;
 pub const MIN_DEBUG_DISCARD_CACHES: u32 = 0;
 pub const DEFAULT_DEBUG_DISCARD_CACHES: u32 = 0;
-pub const MAX_DEBUG_DISCARD_CACHES: u32 = 5;
+pub const MAX_DEBUG_DISCARD_CACHES: u32 = 0;
 pub const MAX_RELCACHE_INVAL_MSGS: u32 = 4096;
 pub const CLUOPT_VERBOSE: u32 = 1;
 pub const CLUOPT_RECHECK: u32 = 2;
@@ -3281,6 +3305,7 @@ pub const PqMsg_NegotiateProtocolVersion: u8 = 118u8;
 pub const PqMsg_CopyDone: u8 = 99u8;
 pub const PqMsg_CopyData: u8 = 100u8;
 pub const PqMsg_Progress: u8 = 80u8;
+pub const PqRepackMsg_Terminate: u8 = 88u8;
 pub const PqReplMsg_Keepalive: u8 = 107u8;
 pub const PqReplMsg_PrimaryStatusUpdate: u8 = 115u8;
 pub const PqReplMsg_WALData: u8 = 119u8;
@@ -3457,8 +3482,8 @@ pub const UNICODE_CASEMAP_LEN: u32 = 3;
 pub const UNICODE_CASEMAP_BUFSZ: u32 = 12;
 pub const MAXSTRLEN: u32 = 2047;
 pub const MAXSTRPOS: u32 = 1048575;
-pub const MAXENTRYPOS: u32 = 16384;
 pub const MAXNUMPOS: u32 = 256;
+pub const MAXENTRYPOS: u32 = 16384;
 pub const QI_VAL: u32 = 1;
 pub const QI_OPR: u32 = 2;
 pub const QI_VALSTOP: u32 = 3;
@@ -6996,7 +7021,6 @@ pub const F_HASHOID8EXTENDED: u32 = 6462;
 pub const F_BTOID8CMP: u32 = 6463;
 pub const F_BTOID8SORTSUPPORT: u32 = 6464;
 pub const F_BTOID8SKIPSUPPORT: u32 = 6465;
-pub const F_PG_GET_PROPGRAPHDEF: u32 = 6469;
 pub const F_REGDATABASEIN: u32 = 6485;
 pub const F_REGDATABASEOUT: u32 = 6486;
 pub const F_TO_REGDATABASE: u32 = 6487;
@@ -7007,15 +7031,9 @@ pub const F_MULTIRANGE_MINUS_MULTI: u32 = 6495;
 pub const F_RANGE_MINUS_MULTI: u32 = 6496;
 pub const F_ERROR_ON_NULL: u32 = 6497;
 pub const F_PG_STAT_GET_FUNCTION_STAT_RESET_TIME: u32 = 6498;
-pub const F_PG_GET_TABLESPACE_DDL_OID_TEXT: u32 = 6499;
-pub const F_PG_GET_TABLESPACE_DDL_NAME_TEXT: u32 = 6500;
-pub const F_PG_GET_ROLE_DDL: u32 = 6501;
-pub const F_PG_GET_DATABASE_DDL: u32 = 6502;
 pub const F_PG_GET_MULTIXACT_STATS: u32 = 6503;
 pub const F_PG_STAT_GET_STAT_RESET_TIME: u32 = 6504;
 pub const F_BINARY_UPGRADE_CREATE_CONFLICT_DETECTION_SLOT: u32 = 6505;
-pub const F_PG_ENABLE_DATA_CHECKSUMS: u32 = 6506;
-pub const F_PG_DISABLE_DATA_CHECKSUMS: u32 = 6507;
 pub const F_PG_GET_DSM_REGISTRY_ALLOCATIONS: u32 = 6508;
 pub const F_PG_STAT_GET_LOCK: u32 = 6509;
 pub const F_BYTEA_UUID: u32 = 6510;
@@ -7104,105 +7122,74 @@ pub const SELFLAG_USED_DEFAULT: u32 = 1;
 pub const TUPLESORT_NONE: u32 = 0;
 pub const TUPLESORT_RANDOMACCESS: u32 = 1;
 pub const TUPLESORT_ALLOWBOUNDED: u32 = 2;
-pub type __uint8_t = ::core::ffi::c_uchar;
 pub type __uint16_t = ::core::ffi::c_ushort;
-pub type __int32_t = ::core::ffi::c_int;
 pub type __uint32_t = ::core::ffi::c_uint;
-pub type __int64_t = ::core::ffi::c_longlong;
-pub type __uint64_t = ::core::ffi::c_ulonglong;
-pub type __darwin_va_list = __builtin_va_list;
-pub type __darwin_wchar_t = ::core::ffi::c_int;
-pub type __darwin_socklen_t = __uint32_t;
-pub type __darwin_dev_t = __int32_t;
-pub type __darwin_ino64_t = __uint64_t;
-pub type __darwin_ino_t = __darwin_ino64_t;
-pub type __darwin_mode_t = __uint16_t;
-pub type __darwin_off_t = __int64_t;
-pub type __darwin_pid_t = __int32_t;
+pub type __uint_least16_t = __uint16_t;
+pub type __uint_least32_t = __uint32_t;
+pub type __dev_t = ::core::ffi::c_ulong;
+pub type __uid_t = ::core::ffi::c_uint;
+pub type __gid_t = ::core::ffi::c_uint;
+pub type __ino_t = ::core::ffi::c_ulong;
+pub type __mode_t = ::core::ffi::c_uint;
+pub type __off_t = ::core::ffi::c_long;
+pub type __off64_t = ::core::ffi::c_long;
+pub type __pid_t = ::core::ffi::c_int;
+pub type __socklen_t = ::core::ffi::c_uint;
+pub type __sig_atomic_t = ::core::ffi::c_int;
+pub type __gnuc_va_list = __builtin_va_list;
+pub type FILE = _IO_FILE;
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
-pub struct _opaque_pthread_mutex_t {
-    pub __sig: ::core::ffi::c_long,
-    pub __opaque: [::core::ffi::c_char; 56usize],
-}
-impl Default for _opaque_pthread_mutex_t {
-    fn default() -> Self {
-        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-pub type __darwin_pthread_mutex_t = _opaque_pthread_mutex_t;
-pub type wchar_t = __darwin_wchar_t;
-pub type va_list = __darwin_va_list;
-pub type fpos_t = __darwin_off_t;
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct __sbuf {
-    pub _base: *mut ::core::ffi::c_uchar,
-    pub _size: ::core::ffi::c_int,
-}
-impl Default for __sbuf {
-    fn default() -> Self {
-        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct __sFILEX {
+pub struct _IO_marker {
     _unused: [u8; 0],
 }
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
-pub struct __sFILE {
-    pub _p: *mut ::core::ffi::c_uchar,
-    pub _r: ::core::ffi::c_int,
-    pub _w: ::core::ffi::c_int,
-    pub _flags: ::core::ffi::c_short,
-    pub _file: ::core::ffi::c_short,
-    pub _bf: __sbuf,
-    pub _lbfsize: ::core::ffi::c_int,
-    pub _cookie: *mut ::core::ffi::c_void,
-    pub _close: ::core::option::Option<
-        unsafe extern "C-unwind" fn(arg1: *mut ::core::ffi::c_void) -> ::core::ffi::c_int,
-    >,
-    pub _read: ::core::option::Option<
-        unsafe extern "C-unwind" fn(
-            arg1: *mut ::core::ffi::c_void,
-            arg2: *mut ::core::ffi::c_char,
-            __n: ::core::ffi::c_int,
-        ) -> ::core::ffi::c_int,
-    >,
-    pub _seek: ::core::option::Option<
-        unsafe extern "C-unwind" fn(
-            arg1: *mut ::core::ffi::c_void,
-            arg2: fpos_t,
-            arg3: ::core::ffi::c_int,
-        ) -> fpos_t,
-    >,
-    pub _write: ::core::option::Option<
-        unsafe extern "C-unwind" fn(
-            arg1: *mut ::core::ffi::c_void,
-            arg2: *const ::core::ffi::c_char,
-            __n: ::core::ffi::c_int,
-        ) -> ::core::ffi::c_int,
-    >,
-    pub _ub: __sbuf,
-    pub _extra: *mut __sFILEX,
-    pub _ur: ::core::ffi::c_int,
-    pub _ubuf: [::core::ffi::c_uchar; 3usize],
-    pub _nbuf: [::core::ffi::c_uchar; 1usize],
-    pub _lb: __sbuf,
-    pub _blksize: ::core::ffi::c_int,
-    pub _offset: fpos_t,
+pub struct _IO_codecvt {
+    _unused: [u8; 0],
 }
-impl Default for __sFILE {
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct _IO_wide_data {
+    _unused: [u8; 0],
+}
+pub type _IO_lock_t = ::core::ffi::c_void;
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct _IO_FILE {
+    pub _flags: ::core::ffi::c_int,
+    pub _IO_read_ptr: *mut ::core::ffi::c_char,
+    pub _IO_read_end: *mut ::core::ffi::c_char,
+    pub _IO_read_base: *mut ::core::ffi::c_char,
+    pub _IO_write_base: *mut ::core::ffi::c_char,
+    pub _IO_write_ptr: *mut ::core::ffi::c_char,
+    pub _IO_write_end: *mut ::core::ffi::c_char,
+    pub _IO_buf_base: *mut ::core::ffi::c_char,
+    pub _IO_buf_end: *mut ::core::ffi::c_char,
+    pub _IO_save_base: *mut ::core::ffi::c_char,
+    pub _IO_backup_base: *mut ::core::ffi::c_char,
+    pub _IO_save_end: *mut ::core::ffi::c_char,
+    pub _markers: *mut _IO_marker,
+    pub _chain: *mut _IO_FILE,
+    pub _fileno: ::core::ffi::c_int,
+    pub _bitfield_align_1: [u32; 0],
+    pub _bitfield_1: __BindgenBitfieldUnit<[u8; 3usize]>,
+    pub _short_backupbuf: [::core::ffi::c_char; 1usize],
+    pub _old_offset: __off_t,
+    pub _cur_column: ::core::ffi::c_ushort,
+    pub _vtable_offset: ::core::ffi::c_schar,
+    pub _shortbuf: [::core::ffi::c_char; 1usize],
+    pub _lock: *mut _IO_lock_t,
+    pub _offset: __off64_t,
+    pub _codecvt: *mut _IO_codecvt,
+    pub _wide_data: *mut _IO_wide_data,
+    pub _freeres_list: *mut _IO_FILE,
+    pub _freeres_buf: *mut ::core::ffi::c_void,
+    pub _prevchain: *mut *mut _IO_FILE,
+    pub _mode: ::core::ffi::c_int,
+    pub _unused2: [::core::ffi::c_char; 20usize],
+}
+impl Default for _IO_FILE {
     fn default() -> Self {
         let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
         unsafe {
@@ -7211,19 +7198,84 @@ impl Default for __sFILE {
         }
     }
 }
-pub type FILE = __sFILE;
-pub type off_t = __darwin_off_t;
-pub type pid_t = __darwin_pid_t;
-pub type sig_atomic_t = ::core::ffi::c_int;
-pub type dev_t = __darwin_dev_t;
-pub type mode_t = __darwin_mode_t;
-pub type ino_t = __darwin_ino_t;
+impl _IO_FILE {
+    #[inline]
+    pub fn _flags2(&self) -> ::core::ffi::c_int {
+        unsafe { ::core::mem::transmute(self._bitfield_1.get(0usize, 24u8) as u32) }
+    }
+    #[inline]
+    pub fn set__flags2(&mut self, val: ::core::ffi::c_int) {
+        unsafe {
+            let val: u32 = ::core::mem::transmute(val);
+            self._bitfield_1.set(0usize, 24u8, val as u64)
+        }
+    }
+    #[inline]
+    pub unsafe fn _flags2_raw(this: *const Self) -> ::core::ffi::c_int {
+        unsafe {
+            ::core::mem::transmute(<__BindgenBitfieldUnit<[u8; 3usize]>>::raw_get(
+                ::core::ptr::addr_of!((*this)._bitfield_1),
+                0usize,
+                24u8,
+            ) as u32)
+        }
+    }
+    #[inline]
+    pub unsafe fn set__flags2_raw(this: *mut Self, val: ::core::ffi::c_int) {
+        unsafe {
+            let val: u32 = ::core::mem::transmute(val);
+            <__BindgenBitfieldUnit<[u8; 3usize]>>::raw_set(
+                ::core::ptr::addr_of_mut!((*this)._bitfield_1),
+                0usize,
+                24u8,
+                val as u64,
+            )
+        }
+    }
+    #[inline]
+    pub fn new_bitfield_1(_flags2: ::core::ffi::c_int) -> __BindgenBitfieldUnit<[u8; 3usize]> {
+        let mut __bindgen_bitfield_unit: __BindgenBitfieldUnit<[u8; 3usize]> = Default::default();
+        __bindgen_bitfield_unit.set(0usize, 24u8, {
+            let _flags2: u32 = unsafe { ::core::mem::transmute(_flags2) };
+            _flags2 as u64
+        });
+        __bindgen_bitfield_unit
+    }
+}
+pub type va_list = __gnuc_va_list;
+pub type off_t = __off_t;
+pub type wchar_t = ::core::ffi::c_int;
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
-pub struct _xlocale {
-    _unused: [u8; 0],
+pub struct __locale_struct {
+    pub __locales: [*mut __locale_data; 13usize],
+    pub __ctype_b: *const ::core::ffi::c_ushort,
+    pub __ctype_tolower: *const ::core::ffi::c_int,
+    pub __ctype_toupper: *const ::core::ffi::c_int,
+    pub __names: [*const ::core::ffi::c_char; 13usize],
 }
-pub type locale_t = *mut _xlocale;
+impl Default for __locale_struct {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+pub type __locale_t = *mut __locale_struct;
+pub type locale_t = __locale_t;
+pub type ino_t = __ino_t;
+pub type dev_t = __dev_t;
+pub type gid_t = __gid_t;
+pub type mode_t = __mode_t;
+pub type uid_t = __uid_t;
+pub type pid_t = __pid_t;
+#[repr(C)]
+#[derive(Debug, Default, Copy, Clone)]
+pub struct __sigset_t {
+    pub __val: [::core::ffi::c_ulong; 16usize],
+}
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct lconv {
@@ -7246,8 +7298,8 @@ pub struct lconv {
     pub p_sign_posn: ::core::ffi::c_char,
     pub n_sign_posn: ::core::ffi::c_char,
     pub int_p_cs_precedes: ::core::ffi::c_char,
-    pub int_n_cs_precedes: ::core::ffi::c_char,
     pub int_p_sep_by_space: ::core::ffi::c_char,
+    pub int_n_cs_precedes: ::core::ffi::c_char,
     pub int_n_sep_by_space: ::core::ffi::c_char,
     pub int_p_sign_posn: ::core::ffi::c_char,
     pub int_n_sign_posn: ::core::ffi::c_char,
@@ -7418,9 +7470,17 @@ pub type pqsigfunc = ::core::option::Option<
         pg_siginfo: *const pg_signal_info,
     ),
 >;
-pub type char16_t = u16;
-pub type char32_t = u32;
-pub type sigjmp_buf = [::core::ffi::c_int; 49usize];
+pub type char16_t = __uint_least16_t;
+pub type char32_t = __uint_least32_t;
+pub type __jmp_buf = [::core::ffi::c_long; 8usize];
+#[repr(C)]
+#[derive(Debug, Default, Copy, Clone)]
+pub struct __jmp_buf_tag {
+    pub __jmpbuf: __jmp_buf,
+    pub __mask_was_saved: ::core::ffi::c_int,
+    pub __saved_mask: __sigset_t,
+}
+pub type sigjmp_buf = [__jmp_buf_tag; 1usize];
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct StringInfoData {
@@ -7544,6 +7604,50 @@ pub mod pg_ternary {
     pub const PG_TERNARY_FALSE: Type = 0;
     pub const PG_TERNARY_TRUE: Type = 1;
     pub const PG_TERNARY_UNSET: Type = -1;
+}
+pub type Timestamp = int64;
+pub type TimestampTz = int64;
+pub type TimeOffset = int64;
+pub type fsec_t = int32;
+#[repr(C)]
+#[derive(Debug, Default, Copy, Clone)]
+pub struct Interval {
+    pub time: TimeOffset,
+    pub day: int32,
+    pub month: int32,
+}
+#[repr(C)]
+#[derive(Debug, Default, Copy, Clone)]
+pub struct pg_itm {
+    pub tm_usec: ::core::ffi::c_int,
+    pub tm_sec: ::core::ffi::c_int,
+    pub tm_min: ::core::ffi::c_int,
+    pub tm_hour: int64,
+    pub tm_mday: ::core::ffi::c_int,
+    pub tm_mon: ::core::ffi::c_int,
+    pub tm_year: ::core::ffi::c_int,
+}
+#[repr(C)]
+#[derive(Debug, Default, Copy, Clone)]
+pub struct pg_itm_in {
+    pub tm_usec: int64,
+    pub tm_mday: ::core::ffi::c_int,
+    pub tm_mon: ::core::ffi::c_int,
+    pub tm_year: ::core::ffi::c_int,
+}
+pub mod pg_cryptohash_type {
+    pub type Type = ::core::ffi::c_uint;
+    pub const PG_MD5: Type = 0;
+    pub const PG_SHA1: Type = 1;
+    pub const PG_SHA224: Type = 2;
+    pub const PG_SHA256: Type = 3;
+    pub const PG_SHA384: Type = 4;
+    pub const PG_SHA512: Type = 5;
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct pg_cryptohash_ctx {
+    _unused: [u8; 0],
 }
 pub mod CompareType {
     pub type Type = ::core::ffi::c_uint;
@@ -8263,447 +8367,432 @@ pub enum NodeTag {
     T_NextValueExpr = 59,
     T_InferenceElem = 60,
     T_ReturningExpr = 61,
-    T_GraphLabelRef = 62,
-    T_GraphPropertyRef = 63,
-    T_TargetEntry = 64,
-    T_RangeTblRef = 65,
-    T_JoinExpr = 66,
-    T_FromExpr = 67,
-    T_OnConflictExpr = 68,
-    T_ForPortionOfExpr = 69,
-    T_Query = 70,
-    T_TypeName = 71,
-    T_ColumnRef = 72,
-    T_ParamRef = 73,
-    T_A_Expr = 74,
-    T_A_Const = 75,
-    T_TypeCast = 76,
-    T_CollateClause = 77,
-    T_RoleSpec = 78,
-    T_FuncCall = 79,
-    T_A_Star = 80,
-    T_A_Indices = 81,
-    T_A_Indirection = 82,
-    T_A_ArrayExpr = 83,
-    T_ResTarget = 84,
-    T_MultiAssignRef = 85,
-    T_SortBy = 86,
-    T_WindowDef = 87,
-    T_RangeSubselect = 88,
-    T_RangeFunction = 89,
-    T_RangeTableFunc = 90,
-    T_RangeTableFuncCol = 91,
-    T_RangeGraphTable = 92,
-    T_RangeTableSample = 93,
-    T_ColumnDef = 94,
-    T_TableLikeClause = 95,
-    T_IndexElem = 96,
-    T_DefElem = 97,
-    T_LockingClause = 98,
-    T_XmlSerialize = 99,
-    T_PartitionElem = 100,
-    T_PartitionSpec = 101,
-    T_PartitionBoundSpec = 102,
-    T_PartitionRangeDatum = 103,
-    T_SinglePartitionSpec = 104,
-    T_PartitionCmd = 105,
-    T_GraphPattern = 106,
-    T_GraphElementPattern = 107,
-    T_RangeTblEntry = 108,
-    T_RTEPermissionInfo = 109,
-    T_RangeTblFunction = 110,
-    T_TableSampleClause = 111,
-    T_WithCheckOption = 112,
-    T_SortGroupClause = 113,
-    T_GroupingSet = 114,
-    T_WindowClause = 115,
-    T_RowMarkClause = 116,
-    T_ForPortionOfClause = 117,
-    T_WithClause = 118,
-    T_InferClause = 119,
-    T_OnConflictClause = 120,
-    T_CTESearchClause = 121,
-    T_CTECycleClause = 122,
-    T_CommonTableExpr = 123,
-    T_MergeWhenClause = 124,
-    T_ReturningOption = 125,
-    T_ReturningClause = 126,
-    T_TriggerTransition = 127,
-    T_JsonOutput = 128,
-    T_JsonArgument = 129,
-    T_JsonFuncExpr = 130,
-    T_JsonTablePathSpec = 131,
-    T_JsonTable = 132,
-    T_JsonTableColumn = 133,
-    T_JsonKeyValue = 134,
-    T_JsonParseExpr = 135,
-    T_JsonScalarExpr = 136,
-    T_JsonSerializeExpr = 137,
-    T_JsonObjectConstructor = 138,
-    T_JsonArrayConstructor = 139,
-    T_JsonArrayQueryConstructor = 140,
-    T_JsonAggConstructor = 141,
-    T_JsonObjectAgg = 142,
-    T_JsonArrayAgg = 143,
-    T_RawStmt = 144,
-    T_InsertStmt = 145,
-    T_DeleteStmt = 146,
-    T_UpdateStmt = 147,
-    T_MergeStmt = 148,
-    T_SelectStmt = 149,
-    T_SetOperationStmt = 150,
-    T_ReturnStmt = 151,
-    T_PLAssignStmt = 152,
-    T_CreateSchemaStmt = 153,
-    T_AlterTableStmt = 154,
-    T_AlterTableCmd = 155,
-    T_ATAlterConstraint = 156,
-    T_ReplicaIdentityStmt = 157,
-    T_AlterCollationStmt = 158,
-    T_AlterDomainStmt = 159,
-    T_GrantStmt = 160,
-    T_ObjectWithArgs = 161,
-    T_AccessPriv = 162,
-    T_GrantRoleStmt = 163,
-    T_AlterDefaultPrivilegesStmt = 164,
-    T_CopyStmt = 165,
-    T_VariableSetStmt = 166,
-    T_VariableShowStmt = 167,
-    T_CreateStmt = 168,
-    T_Constraint = 169,
-    T_CreateTableSpaceStmt = 170,
-    T_DropTableSpaceStmt = 171,
-    T_AlterTableSpaceOptionsStmt = 172,
-    T_AlterTableMoveAllStmt = 173,
-    T_CreateExtensionStmt = 174,
-    T_AlterExtensionStmt = 175,
-    T_AlterExtensionContentsStmt = 176,
-    T_CreateFdwStmt = 177,
-    T_AlterFdwStmt = 178,
-    T_CreateForeignServerStmt = 179,
-    T_AlterForeignServerStmt = 180,
-    T_CreateForeignTableStmt = 181,
-    T_CreateUserMappingStmt = 182,
-    T_AlterUserMappingStmt = 183,
-    T_DropUserMappingStmt = 184,
-    T_ImportForeignSchemaStmt = 185,
-    T_CreatePolicyStmt = 186,
-    T_AlterPolicyStmt = 187,
-    T_CreateAmStmt = 188,
-    T_CreateTrigStmt = 189,
-    T_CreateEventTrigStmt = 190,
-    T_AlterEventTrigStmt = 191,
-    T_CreatePLangStmt = 192,
-    T_CreateRoleStmt = 193,
-    T_AlterRoleStmt = 194,
-    T_AlterRoleSetStmt = 195,
-    T_DropRoleStmt = 196,
-    T_CreateSeqStmt = 197,
-    T_AlterSeqStmt = 198,
-    T_DefineStmt = 199,
-    T_CreateDomainStmt = 200,
-    T_CreateOpClassStmt = 201,
-    T_CreateOpClassItem = 202,
-    T_CreateOpFamilyStmt = 203,
-    T_AlterOpFamilyStmt = 204,
-    T_DropStmt = 205,
-    T_TruncateStmt = 206,
-    T_CommentStmt = 207,
-    T_SecLabelStmt = 208,
-    T_DeclareCursorStmt = 209,
-    T_ClosePortalStmt = 210,
-    T_FetchStmt = 211,
-    T_IndexStmt = 212,
-    T_CreateStatsStmt = 213,
-    T_StatsElem = 214,
-    T_AlterStatsStmt = 215,
-    T_CreateFunctionStmt = 216,
-    T_FunctionParameter = 217,
-    T_AlterFunctionStmt = 218,
-    T_DoStmt = 219,
-    T_InlineCodeBlock = 220,
-    T_CallStmt = 221,
-    T_CallContext = 222,
-    T_RenameStmt = 223,
-    T_AlterObjectDependsStmt = 224,
-    T_AlterObjectSchemaStmt = 225,
-    T_AlterOwnerStmt = 226,
-    T_AlterOperatorStmt = 227,
-    T_AlterTypeStmt = 228,
-    T_RuleStmt = 229,
-    T_NotifyStmt = 230,
-    T_ListenStmt = 231,
-    T_UnlistenStmt = 232,
-    T_TransactionStmt = 233,
-    T_CompositeTypeStmt = 234,
-    T_CreateEnumStmt = 235,
-    T_CreateRangeStmt = 236,
-    T_AlterEnumStmt = 237,
-    T_ViewStmt = 238,
-    T_LoadStmt = 239,
-    T_CreatedbStmt = 240,
-    T_AlterDatabaseStmt = 241,
-    T_AlterDatabaseRefreshCollStmt = 242,
-    T_AlterDatabaseSetStmt = 243,
-    T_DropdbStmt = 244,
-    T_AlterSystemStmt = 245,
-    T_VacuumStmt = 246,
-    T_VacuumRelation = 247,
-    T_RepackStmt = 248,
-    T_ExplainStmt = 249,
-    T_CreateTableAsStmt = 250,
-    T_RefreshMatViewStmt = 251,
-    T_CheckPointStmt = 252,
-    T_DiscardStmt = 253,
-    T_LockStmt = 254,
-    T_ConstraintsSetStmt = 255,
-    T_ReindexStmt = 256,
-    T_CreateConversionStmt = 257,
-    T_CreateCastStmt = 258,
-    T_CreatePropGraphStmt = 259,
-    T_PropGraphVertex = 260,
-    T_PropGraphEdge = 261,
-    T_PropGraphLabelAndProperties = 262,
-    T_PropGraphProperties = 263,
-    T_AlterPropGraphStmt = 264,
-    T_CreateTransformStmt = 265,
-    T_PrepareStmt = 266,
-    T_ExecuteStmt = 267,
-    T_DeallocateStmt = 268,
-    T_DropOwnedStmt = 269,
-    T_ReassignOwnedStmt = 270,
-    T_AlterTSDictionaryStmt = 271,
-    T_AlterTSConfigurationStmt = 272,
-    T_PublicationTable = 273,
-    T_PublicationObjSpec = 274,
-    T_PublicationAllObjSpec = 275,
-    T_CreatePublicationStmt = 276,
-    T_AlterPublicationStmt = 277,
-    T_CreateSubscriptionStmt = 278,
-    T_AlterSubscriptionStmt = 279,
-    T_DropSubscriptionStmt = 280,
-    T_WaitStmt = 281,
-    T_PlannerGlobal = 282,
-    T_PlannerInfo = 283,
-    T_RelOptInfo = 284,
-    T_RelAggInfo = 285,
-    T_IndexOptInfo = 286,
-    T_ForeignKeyOptInfo = 287,
-    T_StatisticExtInfo = 288,
-    T_JoinDomain = 289,
-    T_EquivalenceClass = 290,
-    T_EquivalenceMember = 291,
-    T_PathKey = 292,
-    T_GroupByOrdering = 293,
-    T_PathTarget = 294,
-    T_ParamPathInfo = 295,
-    T_Path = 296,
-    T_IndexPath = 297,
-    T_IndexClause = 298,
-    T_BitmapHeapPath = 299,
-    T_BitmapAndPath = 300,
-    T_BitmapOrPath = 301,
-    T_TidPath = 302,
-    T_TidRangePath = 303,
-    T_SubqueryScanPath = 304,
-    T_ForeignPath = 305,
-    T_CustomPath = 306,
-    T_AppendPath = 307,
-    T_MergeAppendPath = 308,
-    T_GroupResultPath = 309,
-    T_MaterialPath = 310,
-    T_MemoizePath = 311,
-    T_GatherPath = 312,
-    T_GatherMergePath = 313,
-    T_NestPath = 314,
-    T_MergePath = 315,
-    T_HashPath = 316,
-    T_ProjectionPath = 317,
-    T_ProjectSetPath = 318,
-    T_SortPath = 319,
-    T_IncrementalSortPath = 320,
-    T_GroupPath = 321,
-    T_UniquePath = 322,
-    T_AggPath = 323,
-    T_GroupingSetData = 324,
-    T_RollupData = 325,
-    T_GroupingSetsPath = 326,
-    T_MinMaxAggPath = 327,
-    T_WindowAggPath = 328,
-    T_SetOpPath = 329,
-    T_RecursiveUnionPath = 330,
-    T_LockRowsPath = 331,
-    T_ModifyTablePath = 332,
-    T_LimitPath = 333,
-    T_RestrictInfo = 334,
-    T_PlaceHolderVar = 335,
-    T_SpecialJoinInfo = 336,
-    T_OuterJoinClauseInfo = 337,
-    T_AppendRelInfo = 338,
-    T_RowIdentityVarInfo = 339,
-    T_PlaceHolderInfo = 340,
-    T_MinMaxAggInfo = 341,
-    T_AggClauseInfo = 342,
-    T_GroupingExprInfo = 343,
-    T_PlannerParamItem = 344,
-    T_AggInfo = 345,
-    T_AggTransInfo = 346,
-    T_UniqueRelInfo = 347,
-    T_PlannedStmt = 348,
-    T_Result = 349,
-    T_ProjectSet = 350,
-    T_ModifyTable = 351,
-    T_Append = 352,
-    T_MergeAppend = 353,
-    T_RecursiveUnion = 354,
-    T_BitmapAnd = 355,
-    T_BitmapOr = 356,
-    T_SeqScan = 357,
-    T_SampleScan = 358,
-    T_IndexScan = 359,
-    T_IndexOnlyScan = 360,
-    T_BitmapIndexScan = 361,
-    T_BitmapHeapScan = 362,
-    T_TidScan = 363,
-    T_TidRangeScan = 364,
-    T_SubqueryScan = 365,
-    T_FunctionScan = 366,
-    T_ValuesScan = 367,
-    T_TableFuncScan = 368,
-    T_CteScan = 369,
-    T_NamedTuplestoreScan = 370,
-    T_WorkTableScan = 371,
-    T_ForeignScan = 372,
-    T_CustomScan = 373,
-    T_NestLoop = 374,
-    T_NestLoopParam = 375,
-    T_MergeJoin = 376,
-    T_HashJoin = 377,
-    T_Material = 378,
-    T_Memoize = 379,
-    T_Sort = 380,
-    T_IncrementalSort = 381,
-    T_Group = 382,
-    T_Agg = 383,
-    T_WindowAgg = 384,
-    T_Unique = 385,
-    T_Gather = 386,
-    T_GatherMerge = 387,
-    T_Hash = 388,
-    T_SetOp = 389,
-    T_LockRows = 390,
-    T_Limit = 391,
-    T_PlanRowMark = 392,
-    T_PartitionPruneInfo = 393,
-    T_PartitionedRelPruneInfo = 394,
-    T_PartitionPruneStepOp = 395,
-    T_PartitionPruneStepCombine = 396,
-    T_PlanInvalItem = 397,
-    T_SubPlanRTInfo = 398,
-    T_ElidedNode = 399,
-    T_ExprState = 400,
-    T_IndexInfo = 401,
-    T_ExprContext = 402,
-    T_ReturnSetInfo = 403,
-    T_ProjectionInfo = 404,
-    T_JunkFilter = 405,
-    T_OnConflictActionState = 406,
-    T_MergeActionState = 407,
-    T_ForPortionOfState = 408,
-    T_ResultRelInfo = 409,
-    T_EState = 410,
-    T_WindowFuncExprState = 411,
-    T_SetExprState = 412,
-    T_SubPlanState = 413,
-    T_DomainConstraintState = 414,
-    T_ResultState = 415,
-    T_ProjectSetState = 416,
-    T_ModifyTableState = 417,
-    T_AppendState = 418,
-    T_MergeAppendState = 419,
-    T_RecursiveUnionState = 420,
-    T_BitmapAndState = 421,
-    T_BitmapOrState = 422,
-    T_ScanState = 423,
-    T_SeqScanState = 424,
-    T_SampleScanState = 425,
-    T_IndexScanState = 426,
-    T_IndexOnlyScanState = 427,
-    T_BitmapIndexScanState = 428,
-    T_BitmapHeapScanState = 429,
-    T_TidScanState = 430,
-    T_TidRangeScanState = 431,
-    T_SubqueryScanState = 432,
-    T_FunctionScanState = 433,
-    T_ValuesScanState = 434,
-    T_TableFuncScanState = 435,
-    T_CteScanState = 436,
-    T_NamedTuplestoreScanState = 437,
-    T_WorkTableScanState = 438,
-    T_ForeignScanState = 439,
-    T_CustomScanState = 440,
-    T_JoinState = 441,
-    T_NestLoopState = 442,
-    T_MergeJoinState = 443,
-    T_HashJoinState = 444,
-    T_MaterialState = 445,
-    T_MemoizeState = 446,
-    T_SortState = 447,
-    T_IncrementalSortState = 448,
-    T_GroupState = 449,
-    T_AggState = 450,
-    T_WindowAggState = 451,
-    T_UniqueState = 452,
-    T_GatherState = 453,
-    T_GatherMergeState = 454,
-    T_HashState = 455,
-    T_SetOpState = 456,
-    T_LockRowsState = 457,
-    T_LimitState = 458,
-    T_IndexAmRoutine = 459,
-    T_TableAmRoutine = 460,
-    T_TsmRoutine = 461,
-    T_EventTriggerData = 462,
-    T_TriggerData = 463,
-    T_TupleTableSlot = 464,
-    T_FdwRoutine = 465,
-    T_Bitmapset = 466,
-    T_ExtensibleNode = 467,
-    T_ErrorSaveContext = 468,
-    T_IdentifySystemCmd = 469,
-    T_BaseBackupCmd = 470,
-    T_CreateReplicationSlotCmd = 471,
-    T_DropReplicationSlotCmd = 472,
-    T_AlterReplicationSlotCmd = 473,
-    T_StartReplicationCmd = 474,
-    T_ReadReplicationSlotCmd = 475,
-    T_TimeLineHistoryCmd = 476,
-    T_UploadManifestCmd = 477,
-    T_SupportRequestSimplify = 478,
-    T_SupportRequestSimplifyAggref = 479,
-    T_SupportRequestInlineInFrom = 480,
-    T_SupportRequestSelectivity = 481,
-    T_SupportRequestCost = 482,
-    T_SupportRequestRows = 483,
-    T_SupportRequestIndexCondition = 484,
-    T_SupportRequestWFuncMonotonic = 485,
-    T_SupportRequestOptimizeWindowClause = 486,
-    T_SupportRequestModifyInPlace = 487,
-    T_Integer = 488,
-    T_Float = 489,
-    T_Boolean = 490,
-    T_String = 491,
-    T_BitString = 492,
-    T_ForeignKeyCacheInfo = 493,
-    T_IntList = 494,
-    T_OidList = 495,
-    T_XidList = 496,
-    T_AllocSetContext = 497,
-    T_GenerationContext = 498,
-    T_SlabContext = 499,
-    T_BumpContext = 500,
-    T_TIDBitmap = 501,
-    T_WindowObjectData = 502,
+    T_TargetEntry = 62,
+    T_RangeTblRef = 63,
+    T_JoinExpr = 64,
+    T_FromExpr = 65,
+    T_OnConflictExpr = 66,
+    T_Query = 67,
+    T_TypeName = 68,
+    T_ColumnRef = 69,
+    T_ParamRef = 70,
+    T_A_Expr = 71,
+    T_A_Const = 72,
+    T_TypeCast = 73,
+    T_CollateClause = 74,
+    T_RoleSpec = 75,
+    T_FuncCall = 76,
+    T_A_Star = 77,
+    T_A_Indices = 78,
+    T_A_Indirection = 79,
+    T_A_ArrayExpr = 80,
+    T_ResTarget = 81,
+    T_MultiAssignRef = 82,
+    T_SortBy = 83,
+    T_WindowDef = 84,
+    T_RangeSubselect = 85,
+    T_RangeFunction = 86,
+    T_RangeTableFunc = 87,
+    T_RangeTableFuncCol = 88,
+    T_RangeTableSample = 89,
+    T_ColumnDef = 90,
+    T_TableLikeClause = 91,
+    T_IndexElem = 92,
+    T_DefElem = 93,
+    T_LockingClause = 94,
+    T_XmlSerialize = 95,
+    T_PartitionElem = 96,
+    T_PartitionSpec = 97,
+    T_PartitionBoundSpec = 98,
+    T_PartitionRangeDatum = 99,
+    T_PartitionCmd = 100,
+    T_RangeTblEntry = 101,
+    T_RTEPermissionInfo = 102,
+    T_RangeTblFunction = 103,
+    T_TableSampleClause = 104,
+    T_WithCheckOption = 105,
+    T_SortGroupClause = 106,
+    T_GroupingSet = 107,
+    T_WindowClause = 108,
+    T_RowMarkClause = 109,
+    T_WithClause = 110,
+    T_InferClause = 111,
+    T_OnConflictClause = 112,
+    T_CTESearchClause = 113,
+    T_CTECycleClause = 114,
+    T_CommonTableExpr = 115,
+    T_MergeWhenClause = 116,
+    T_ReturningOption = 117,
+    T_ReturningClause = 118,
+    T_TriggerTransition = 119,
+    T_JsonOutput = 120,
+    T_JsonArgument = 121,
+    T_JsonFuncExpr = 122,
+    T_JsonTablePathSpec = 123,
+    T_JsonTable = 124,
+    T_JsonTableColumn = 125,
+    T_JsonKeyValue = 126,
+    T_JsonParseExpr = 127,
+    T_JsonScalarExpr = 128,
+    T_JsonSerializeExpr = 129,
+    T_JsonObjectConstructor = 130,
+    T_JsonArrayConstructor = 131,
+    T_JsonArrayQueryConstructor = 132,
+    T_JsonAggConstructor = 133,
+    T_JsonObjectAgg = 134,
+    T_JsonArrayAgg = 135,
+    T_RawStmt = 136,
+    T_InsertStmt = 137,
+    T_DeleteStmt = 138,
+    T_UpdateStmt = 139,
+    T_MergeStmt = 140,
+    T_SelectStmt = 141,
+    T_SetOperationStmt = 142,
+    T_ReturnStmt = 143,
+    T_PLAssignStmt = 144,
+    T_CreateSchemaStmt = 145,
+    T_AlterTableStmt = 146,
+    T_AlterTableCmd = 147,
+    T_ATAlterConstraint = 148,
+    T_ReplicaIdentityStmt = 149,
+    T_AlterCollationStmt = 150,
+    T_AlterDomainStmt = 151,
+    T_GrantStmt = 152,
+    T_ObjectWithArgs = 153,
+    T_AccessPriv = 154,
+    T_GrantRoleStmt = 155,
+    T_AlterDefaultPrivilegesStmt = 156,
+    T_CopyStmt = 157,
+    T_VariableSetStmt = 158,
+    T_VariableShowStmt = 159,
+    T_CreateStmt = 160,
+    T_Constraint = 161,
+    T_CreateTableSpaceStmt = 162,
+    T_DropTableSpaceStmt = 163,
+    T_AlterTableSpaceOptionsStmt = 164,
+    T_AlterTableMoveAllStmt = 165,
+    T_CreateExtensionStmt = 166,
+    T_AlterExtensionStmt = 167,
+    T_AlterExtensionContentsStmt = 168,
+    T_CreateFdwStmt = 169,
+    T_AlterFdwStmt = 170,
+    T_CreateForeignServerStmt = 171,
+    T_AlterForeignServerStmt = 172,
+    T_CreateForeignTableStmt = 173,
+    T_CreateUserMappingStmt = 174,
+    T_AlterUserMappingStmt = 175,
+    T_DropUserMappingStmt = 176,
+    T_ImportForeignSchemaStmt = 177,
+    T_CreatePolicyStmt = 178,
+    T_AlterPolicyStmt = 179,
+    T_CreateAmStmt = 180,
+    T_CreateTrigStmt = 181,
+    T_CreateEventTrigStmt = 182,
+    T_AlterEventTrigStmt = 183,
+    T_CreatePLangStmt = 184,
+    T_CreateRoleStmt = 185,
+    T_AlterRoleStmt = 186,
+    T_AlterRoleSetStmt = 187,
+    T_DropRoleStmt = 188,
+    T_CreateSeqStmt = 189,
+    T_AlterSeqStmt = 190,
+    T_DefineStmt = 191,
+    T_CreateDomainStmt = 192,
+    T_CreateOpClassStmt = 193,
+    T_CreateOpClassItem = 194,
+    T_CreateOpFamilyStmt = 195,
+    T_AlterOpFamilyStmt = 196,
+    T_DropStmt = 197,
+    T_TruncateStmt = 198,
+    T_CommentStmt = 199,
+    T_SecLabelStmt = 200,
+    T_DeclareCursorStmt = 201,
+    T_ClosePortalStmt = 202,
+    T_FetchStmt = 203,
+    T_IndexStmt = 204,
+    T_CreateStatsStmt = 205,
+    T_StatsElem = 206,
+    T_AlterStatsStmt = 207,
+    T_CreateFunctionStmt = 208,
+    T_FunctionParameter = 209,
+    T_AlterFunctionStmt = 210,
+    T_DoStmt = 211,
+    T_InlineCodeBlock = 212,
+    T_CallStmt = 213,
+    T_CallContext = 214,
+    T_RenameStmt = 215,
+    T_AlterObjectDependsStmt = 216,
+    T_AlterObjectSchemaStmt = 217,
+    T_AlterOwnerStmt = 218,
+    T_AlterOperatorStmt = 219,
+    T_AlterTypeStmt = 220,
+    T_RuleStmt = 221,
+    T_NotifyStmt = 222,
+    T_ListenStmt = 223,
+    T_UnlistenStmt = 224,
+    T_TransactionStmt = 225,
+    T_CompositeTypeStmt = 226,
+    T_CreateEnumStmt = 227,
+    T_CreateRangeStmt = 228,
+    T_AlterEnumStmt = 229,
+    T_ViewStmt = 230,
+    T_LoadStmt = 231,
+    T_CreatedbStmt = 232,
+    T_AlterDatabaseStmt = 233,
+    T_AlterDatabaseRefreshCollStmt = 234,
+    T_AlterDatabaseSetStmt = 235,
+    T_DropdbStmt = 236,
+    T_AlterSystemStmt = 237,
+    T_VacuumStmt = 238,
+    T_VacuumRelation = 239,
+    T_RepackStmt = 240,
+    T_ExplainStmt = 241,
+    T_CreateTableAsStmt = 242,
+    T_RefreshMatViewStmt = 243,
+    T_CheckPointStmt = 244,
+    T_DiscardStmt = 245,
+    T_LockStmt = 246,
+    T_ConstraintsSetStmt = 247,
+    T_ReindexStmt = 248,
+    T_CreateConversionStmt = 249,
+    T_CreateCastStmt = 250,
+    T_CreateTransformStmt = 251,
+    T_PrepareStmt = 252,
+    T_ExecuteStmt = 253,
+    T_DeallocateStmt = 254,
+    T_DropOwnedStmt = 255,
+    T_ReassignOwnedStmt = 256,
+    T_AlterTSDictionaryStmt = 257,
+    T_AlterTSConfigurationStmt = 258,
+    T_PublicationTable = 259,
+    T_PublicationObjSpec = 260,
+    T_PublicationAllObjSpec = 261,
+    T_CreatePublicationStmt = 262,
+    T_AlterPublicationStmt = 263,
+    T_CreateSubscriptionStmt = 264,
+    T_AlterSubscriptionStmt = 265,
+    T_DropSubscriptionStmt = 266,
+    T_WaitStmt = 267,
+    T_PlannerGlobal = 268,
+    T_PlannerInfo = 269,
+    T_RelOptInfo = 270,
+    T_RelAggInfo = 271,
+    T_IndexOptInfo = 272,
+    T_ForeignKeyOptInfo = 273,
+    T_StatisticExtInfo = 274,
+    T_JoinDomain = 275,
+    T_EquivalenceClass = 276,
+    T_EquivalenceMember = 277,
+    T_PathKey = 278,
+    T_GroupByOrdering = 279,
+    T_PathTarget = 280,
+    T_ParamPathInfo = 281,
+    T_Path = 282,
+    T_IndexPath = 283,
+    T_IndexClause = 284,
+    T_BitmapHeapPath = 285,
+    T_BitmapAndPath = 286,
+    T_BitmapOrPath = 287,
+    T_TidPath = 288,
+    T_TidRangePath = 289,
+    T_SubqueryScanPath = 290,
+    T_ForeignPath = 291,
+    T_CustomPath = 292,
+    T_AppendPath = 293,
+    T_MergeAppendPath = 294,
+    T_GroupResultPath = 295,
+    T_MaterialPath = 296,
+    T_MemoizePath = 297,
+    T_GatherPath = 298,
+    T_GatherMergePath = 299,
+    T_NestPath = 300,
+    T_MergePath = 301,
+    T_HashPath = 302,
+    T_ProjectionPath = 303,
+    T_ProjectSetPath = 304,
+    T_SortPath = 305,
+    T_IncrementalSortPath = 306,
+    T_GroupPath = 307,
+    T_UniquePath = 308,
+    T_AggPath = 309,
+    T_GroupingSetData = 310,
+    T_RollupData = 311,
+    T_GroupingSetsPath = 312,
+    T_MinMaxAggPath = 313,
+    T_WindowAggPath = 314,
+    T_SetOpPath = 315,
+    T_RecursiveUnionPath = 316,
+    T_LockRowsPath = 317,
+    T_ModifyTablePath = 318,
+    T_LimitPath = 319,
+    T_RestrictInfo = 320,
+    T_PlaceHolderVar = 321,
+    T_SpecialJoinInfo = 322,
+    T_OuterJoinClauseInfo = 323,
+    T_AppendRelInfo = 324,
+    T_RowIdentityVarInfo = 325,
+    T_PlaceHolderInfo = 326,
+    T_MinMaxAggInfo = 327,
+    T_AggClauseInfo = 328,
+    T_GroupingExprInfo = 329,
+    T_PlannerParamItem = 330,
+    T_AggInfo = 331,
+    T_AggTransInfo = 332,
+    T_UniqueRelInfo = 333,
+    T_PlannedStmt = 334,
+    T_Result = 335,
+    T_ProjectSet = 336,
+    T_ModifyTable = 337,
+    T_Append = 338,
+    T_MergeAppend = 339,
+    T_RecursiveUnion = 340,
+    T_BitmapAnd = 341,
+    T_BitmapOr = 342,
+    T_SeqScan = 343,
+    T_SampleScan = 344,
+    T_IndexScan = 345,
+    T_IndexOnlyScan = 346,
+    T_BitmapIndexScan = 347,
+    T_BitmapHeapScan = 348,
+    T_TidScan = 349,
+    T_TidRangeScan = 350,
+    T_SubqueryScan = 351,
+    T_FunctionScan = 352,
+    T_ValuesScan = 353,
+    T_TableFuncScan = 354,
+    T_CteScan = 355,
+    T_NamedTuplestoreScan = 356,
+    T_WorkTableScan = 357,
+    T_ForeignScan = 358,
+    T_CustomScan = 359,
+    T_NestLoop = 360,
+    T_NestLoopParam = 361,
+    T_MergeJoin = 362,
+    T_HashJoin = 363,
+    T_Material = 364,
+    T_Memoize = 365,
+    T_Sort = 366,
+    T_IncrementalSort = 367,
+    T_Group = 368,
+    T_Agg = 369,
+    T_WindowAgg = 370,
+    T_Unique = 371,
+    T_Gather = 372,
+    T_GatherMerge = 373,
+    T_Hash = 374,
+    T_SetOp = 375,
+    T_LockRows = 376,
+    T_Limit = 377,
+    T_PlanRowMark = 378,
+    T_PartitionPruneInfo = 379,
+    T_PartitionedRelPruneInfo = 380,
+    T_PartitionPruneStepOp = 381,
+    T_PartitionPruneStepCombine = 382,
+    T_PlanInvalItem = 383,
+    T_SubPlanRTInfo = 384,
+    T_ElidedNode = 385,
+    T_ExprState = 386,
+    T_IndexInfo = 387,
+    T_ExprContext = 388,
+    T_ReturnSetInfo = 389,
+    T_ProjectionInfo = 390,
+    T_JunkFilter = 391,
+    T_OnConflictActionState = 392,
+    T_MergeActionState = 393,
+    T_ResultRelInfo = 394,
+    T_EState = 395,
+    T_WindowFuncExprState = 396,
+    T_SetExprState = 397,
+    T_SubPlanState = 398,
+    T_DomainConstraintState = 399,
+    T_ResultState = 400,
+    T_ProjectSetState = 401,
+    T_ModifyTableState = 402,
+    T_AppendState = 403,
+    T_MergeAppendState = 404,
+    T_RecursiveUnionState = 405,
+    T_BitmapAndState = 406,
+    T_BitmapOrState = 407,
+    T_ScanState = 408,
+    T_SeqScanState = 409,
+    T_SampleScanState = 410,
+    T_IndexScanState = 411,
+    T_IndexOnlyScanState = 412,
+    T_BitmapIndexScanState = 413,
+    T_BitmapHeapScanState = 414,
+    T_TidScanState = 415,
+    T_TidRangeScanState = 416,
+    T_SubqueryScanState = 417,
+    T_FunctionScanState = 418,
+    T_ValuesScanState = 419,
+    T_TableFuncScanState = 420,
+    T_CteScanState = 421,
+    T_NamedTuplestoreScanState = 422,
+    T_WorkTableScanState = 423,
+    T_ForeignScanState = 424,
+    T_CustomScanState = 425,
+    T_JoinState = 426,
+    T_NestLoopState = 427,
+    T_MergeJoinState = 428,
+    T_HashJoinState = 429,
+    T_MaterialState = 430,
+    T_MemoizeState = 431,
+    T_SortState = 432,
+    T_IncrementalSortState = 433,
+    T_GroupState = 434,
+    T_AggState = 435,
+    T_WindowAggState = 436,
+    T_UniqueState = 437,
+    T_GatherState = 438,
+    T_GatherMergeState = 439,
+    T_HashState = 440,
+    T_SetOpState = 441,
+    T_LockRowsState = 442,
+    T_LimitState = 443,
+    T_IndexAmRoutine = 444,
+    T_TableAmRoutine = 445,
+    T_TsmRoutine = 446,
+    T_EventTriggerData = 447,
+    T_TriggerData = 448,
+    T_TupleTableSlot = 449,
+    T_FdwRoutine = 450,
+    T_Bitmapset = 451,
+    T_ExtensibleNode = 452,
+    T_ErrorSaveContext = 453,
+    T_IdentifySystemCmd = 454,
+    T_BaseBackupCmd = 455,
+    T_CreateReplicationSlotCmd = 456,
+    T_DropReplicationSlotCmd = 457,
+    T_AlterReplicationSlotCmd = 458,
+    T_StartReplicationCmd = 459,
+    T_ReadReplicationSlotCmd = 460,
+    T_TimeLineHistoryCmd = 461,
+    T_UploadManifestCmd = 462,
+    T_SupportRequestSimplify = 463,
+    T_SupportRequestSimplifyAggref = 464,
+    T_SupportRequestInlineInFrom = 465,
+    T_SupportRequestSelectivity = 466,
+    T_SupportRequestCost = 467,
+    T_SupportRequestRows = 468,
+    T_SupportRequestIndexCondition = 469,
+    T_SupportRequestWFuncMonotonic = 470,
+    T_SupportRequestOptimizeWindowClause = 471,
+    T_SupportRequestModifyInPlace = 472,
+    T_Integer = 473,
+    T_Float = 474,
+    T_Boolean = 475,
+    T_String = 476,
+    T_BitString = 477,
+    T_ForeignKeyCacheInfo = 478,
+    T_IntList = 479,
+    T_OidList = 480,
+    T_XidList = 481,
+    T_AllocSetContext = 482,
+    T_GenerationContext = 483,
+    T_SlabContext = 484,
+    T_BumpContext = 485,
+    T_TIDBitmap = 486,
+    T_WindowObjectData = 487,
 }
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
@@ -9976,6 +10065,21 @@ pub struct BrinStatsData {
     pub pagesPerRange: BlockNumber,
     pub revmapNumPages: BlockNumber,
 }
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct iovec {
+    pub iov_base: *mut ::core::ffi::c_void,
+    pub iov_len: usize,
+}
+impl Default for iovec {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
 pub type XLogRecPtr = uint64;
 pub type XLogSegNo = uint64;
 pub type TimeLineID = uint32;
@@ -10014,7 +10118,7 @@ pub type PageHeader = *mut PageHeaderData;
 #[repr(C)]
 #[derive(Debug, Default, Copy, Clone)]
 pub struct pg_atomic_flag {
-    pub value: ::core::ffi::c_int,
+    pub value: ::core::ffi::c_char,
 }
 #[repr(C)]
 #[derive(Debug, Default, Copy, Clone)]
@@ -10288,8 +10392,7 @@ pub mod RmgrIds {
     pub const RM_REPLORIGIN_ID: Type = 19;
     pub const RM_GENERIC_ID: Type = 20;
     pub const RM_LOGICALMSG_ID: Type = 21;
-    pub const RM_XLOG2_ID: Type = 22;
-    pub const RM_NEXT_ID: Type = 23;
+    pub const RM_NEXT_ID: Type = 22;
 }
 pub type pg_crc32c = uint32;
 pub type ProcNumber = ::core::ffi::c_int;
@@ -10573,21 +10676,7 @@ pub struct xl_brin_desummarize {
     pub heapBlk: BlockNumber,
     pub regOffset: OffsetNumber,
 }
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct iovec {
-    pub iov_base: *mut ::core::ffi::c_void,
-    pub iov_len: usize,
-}
-impl Default for iovec {
-    fn default() -> Self {
-        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
+pub type socklen_t = __socklen_t;
 #[repr(C)]
 #[derive(Debug, Default, Copy, Clone)]
 pub struct PgAioWaitRef {
@@ -11132,36 +11221,6 @@ impl Default for BackupState {
         }
     }
 }
-pub type Timestamp = int64;
-pub type TimestampTz = int64;
-pub type TimeOffset = int64;
-pub type fsec_t = int32;
-#[repr(C)]
-#[derive(Debug, Default, Copy, Clone)]
-pub struct Interval {
-    pub time: TimeOffset,
-    pub day: int32,
-    pub month: int32,
-}
-#[repr(C)]
-#[derive(Debug, Default, Copy, Clone)]
-pub struct pg_itm {
-    pub tm_usec: ::core::ffi::c_int,
-    pub tm_sec: ::core::ffi::c_int,
-    pub tm_min: ::core::ffi::c_int,
-    pub tm_hour: int64,
-    pub tm_mday: ::core::ffi::c_int,
-    pub tm_mon: ::core::ffi::c_int,
-    pub tm_year: ::core::ffi::c_int,
-}
-#[repr(C)]
-#[derive(Debug, Default, Copy, Clone)]
-pub struct pg_itm_in {
-    pub tm_usec: int64,
-    pub tm_mday: ::core::ffi::c_int,
-    pub tm_mon: ::core::ffi::c_int,
-    pub tm_year: ::core::ffi::c_int,
-}
 pub mod WalSyncMethod {
     pub type Type = ::core::ffi::c_uint;
     pub const WAL_SYNC_METHOD_FSYNC: Type = 0;
@@ -11401,51 +11460,43 @@ pub mod SysCacheIdentifier {
     pub const PARTRELID: Type = 45;
     pub const PROCNAMEARGSNSP: Type = 46;
     pub const PROCOID: Type = 47;
-    pub const PROPGRAPHELALIAS: Type = 48;
-    pub const PROPGRAPHELEMENTLABELELEMENTLABEL: Type = 49;
-    pub const PROPGRAPHELOID: Type = 50;
-    pub const PROPGRAPHLABELNAME: Type = 51;
-    pub const PROPGRAPHLABELOID: Type = 52;
-    pub const PROPGRAPHLABELPROP: Type = 53;
-    pub const PROPGRAPHPROPNAME: Type = 54;
-    pub const PROPGRAPHPROPOID: Type = 55;
-    pub const PUBLICATIONNAME: Type = 56;
-    pub const PUBLICATIONNAMESPACE: Type = 57;
-    pub const PUBLICATIONNAMESPACEMAP: Type = 58;
-    pub const PUBLICATIONOID: Type = 59;
-    pub const PUBLICATIONREL: Type = 60;
-    pub const PUBLICATIONRELMAP: Type = 61;
-    pub const RANGEMULTIRANGE: Type = 62;
-    pub const RANGETYPE: Type = 63;
-    pub const RELNAMENSP: Type = 64;
-    pub const RELOID: Type = 65;
-    pub const REPLORIGIDENT: Type = 66;
-    pub const REPLORIGNAME: Type = 67;
-    pub const RULERELNAME: Type = 68;
-    pub const SEQRELID: Type = 69;
-    pub const STATEXTDATASTXOID: Type = 70;
-    pub const STATEXTNAMENSP: Type = 71;
-    pub const STATEXTOID: Type = 72;
-    pub const STATRELATTINH: Type = 73;
-    pub const SUBSCRIPTIONNAME: Type = 74;
-    pub const SUBSCRIPTIONOID: Type = 75;
-    pub const SUBSCRIPTIONRELMAP: Type = 76;
-    pub const TABLESPACEOID: Type = 77;
-    pub const TRFOID: Type = 78;
-    pub const TRFTYPELANG: Type = 79;
-    pub const TSCONFIGMAP: Type = 80;
-    pub const TSCONFIGNAMENSP: Type = 81;
-    pub const TSCONFIGOID: Type = 82;
-    pub const TSDICTNAMENSP: Type = 83;
-    pub const TSDICTOID: Type = 84;
-    pub const TSPARSERNAMENSP: Type = 85;
-    pub const TSPARSEROID: Type = 86;
-    pub const TSTEMPLATENAMENSP: Type = 87;
-    pub const TSTEMPLATEOID: Type = 88;
-    pub const TYPENAMENSP: Type = 89;
-    pub const TYPEOID: Type = 90;
-    pub const USERMAPPINGOID: Type = 91;
-    pub const USERMAPPINGUSERSERVER: Type = 92;
+    pub const PUBLICATIONNAME: Type = 48;
+    pub const PUBLICATIONNAMESPACE: Type = 49;
+    pub const PUBLICATIONNAMESPACEMAP: Type = 50;
+    pub const PUBLICATIONOID: Type = 51;
+    pub const PUBLICATIONREL: Type = 52;
+    pub const PUBLICATIONRELMAP: Type = 53;
+    pub const RANGEMULTIRANGE: Type = 54;
+    pub const RANGETYPE: Type = 55;
+    pub const RELNAMENSP: Type = 56;
+    pub const RELOID: Type = 57;
+    pub const REPLORIGIDENT: Type = 58;
+    pub const REPLORIGNAME: Type = 59;
+    pub const RULERELNAME: Type = 60;
+    pub const SEQRELID: Type = 61;
+    pub const STATEXTDATASTXOID: Type = 62;
+    pub const STATEXTNAMENSP: Type = 63;
+    pub const STATEXTOID: Type = 64;
+    pub const STATRELATTINH: Type = 65;
+    pub const SUBSCRIPTIONNAME: Type = 66;
+    pub const SUBSCRIPTIONOID: Type = 67;
+    pub const SUBSCRIPTIONRELMAP: Type = 68;
+    pub const TABLESPACEOID: Type = 69;
+    pub const TRFOID: Type = 70;
+    pub const TRFTYPELANG: Type = 71;
+    pub const TSCONFIGMAP: Type = 72;
+    pub const TSCONFIGNAMENSP: Type = 73;
+    pub const TSCONFIGOID: Type = 74;
+    pub const TSDICTNAMENSP: Type = 75;
+    pub const TSDICTOID: Type = 76;
+    pub const TSPARSERNAMENSP: Type = 77;
+    pub const TSPARSEROID: Type = 78;
+    pub const TSTEMPLATENAMENSP: Type = 79;
+    pub const TSTEMPLATEOID: Type = 80;
+    pub const TYPENAMENSP: Type = 81;
+    pub const TYPEOID: Type = 82;
+    pub const USERMAPPINGOID: Type = 83;
+    pub const USERMAPPINGUSERSERVER: Type = 84;
 }
 pub mod LockClauseStrength {
     pub type Type = ::core::ffi::c_uint;
@@ -12460,6 +12511,7 @@ pub struct JsonConstructorExpr {
     pub coercion: *mut Expr,
     pub returning: *mut JsonReturning,
     pub orig_query: *mut Node,
+    pub format: *mut JsonFormat,
     pub absent_on_null: bool,
     pub unique: bool,
     pub location: ParseLoc,
@@ -12839,42 +12891,6 @@ impl Default for ReturningExpr {
 }
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
-pub struct GraphLabelRef {
-    pub type_: NodeTag,
-    pub labelid: Oid,
-    pub location: ParseLoc,
-}
-impl Default for GraphLabelRef {
-    fn default() -> Self {
-        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct GraphPropertyRef {
-    pub xpr: Expr,
-    pub elvarname: *const ::core::ffi::c_char,
-    pub propid: Oid,
-    pub typeId: Oid,
-    pub typmod: int32,
-    pub collation: Oid,
-    pub location: ParseLoc,
-}
-impl Default for GraphPropertyRef {
-    fn default() -> Self {
-        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
 pub struct TargetEntry {
     pub xpr: Expr,
     pub expr: *mut Expr,
@@ -12963,32 +12979,6 @@ pub struct OnConflictExpr {
     pub exclRelTlist: *mut List,
 }
 impl Default for OnConflictExpr {
-    fn default() -> Self {
-        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct ForPortionOfExpr {
-    pub type_: NodeTag,
-    pub rangeVar: *mut Var,
-    pub range_name: *mut ::core::ffi::c_char,
-    pub targetFrom: *mut Node,
-    pub targetTo: *mut Node,
-    pub targetRange: *mut Node,
-    pub rangeType: Oid,
-    pub isDomain: bool,
-    pub overlapsExpr: *mut Node,
-    pub rangeTargetList: *mut List,
-    pub withoutPortionProc: Oid,
-    pub location: ParseLoc,
-    pub targetLocation: ParseLoc,
-}
-impl Default for ForPortionOfExpr {
     fn default() -> Self {
         let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
         unsafe {
@@ -13125,7 +13115,6 @@ pub struct Query {
     pub canSetTag: bool,
     pub utilityStmt: *mut Node,
     pub resultRelation: ::core::ffi::c_int,
-    pub forPortionOf: *mut ForPortionOfExpr,
     pub hasAggs: bool,
     pub hasWindowFuncs: bool,
     pub hasTargetSRFs: bool,
@@ -13152,7 +13141,6 @@ pub struct Query {
     pub returningList: *mut List,
     pub groupClause: *mut List,
     pub groupDistinct: bool,
-    pub groupByAll: bool,
     pub groupingSets: *mut List,
     pub havingQual: *mut Node,
     pub windowClause: *mut List,
@@ -13613,25 +13601,6 @@ impl Default for RangeTableFuncCol {
 }
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
-pub struct RangeGraphTable {
-    pub type_: NodeTag,
-    pub graph_name: *mut RangeVar,
-    pub graph_pattern: *mut GraphPattern,
-    pub columns: *mut List,
-    pub alias: *mut Alias,
-    pub location: ParseLoc,
-}
-impl Default for RangeGraphTable {
-    fn default() -> Self {
-        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
 pub struct RangeTableSample {
     pub type_: NodeTag,
     pub relation: *mut Node,
@@ -13886,75 +13855,13 @@ impl Default for PartitionRangeDatum {
 }
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
-pub struct SinglePartitionSpec {
-    pub type_: NodeTag,
-    pub name: *mut RangeVar,
-    pub bound: *mut PartitionBoundSpec,
-}
-impl Default for SinglePartitionSpec {
-    fn default() -> Self {
-        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
 pub struct PartitionCmd {
     pub type_: NodeTag,
     pub name: *mut RangeVar,
     pub bound: *mut PartitionBoundSpec,
-    pub partlist: *mut List,
     pub concurrent: bool,
 }
 impl Default for PartitionCmd {
-    fn default() -> Self {
-        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct GraphPattern {
-    pub type_: NodeTag,
-    pub path_pattern_list: *mut List,
-    pub whereClause: *mut Node,
-}
-impl Default for GraphPattern {
-    fn default() -> Self {
-        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-pub mod GraphElementPatternKind {
-    pub type Type = ::core::ffi::c_uint;
-    pub const VERTEX_PATTERN: Type = 0;
-    pub const EDGE_PATTERN_LEFT: Type = 1;
-    pub const EDGE_PATTERN_RIGHT: Type = 2;
-    pub const EDGE_PATTERN_ANY: Type = 3;
-    pub const PAREN_EXPR: Type = 4;
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct GraphElementPattern {
-    pub type_: NodeTag,
-    pub kind: GraphElementPatternKind::Type,
-    pub variable: *const ::core::ffi::c_char,
-    pub labelexpr: *mut Node,
-    pub subexpr: *mut List,
-    pub whereClause: *mut Node,
-    pub quantifier: *mut List,
-    pub location: ParseLoc,
-}
-impl Default for GraphElementPattern {
     fn default() -> Self {
         let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
         unsafe {
@@ -13973,9 +13880,8 @@ pub mod RTEKind {
     pub const RTE_VALUES: Type = 5;
     pub const RTE_CTE: Type = 6;
     pub const RTE_NAMEDTUPLESTORE: Type = 7;
-    pub const RTE_GRAPH_TABLE: Type = 8;
-    pub const RTE_RESULT: Type = 9;
-    pub const RTE_GROUP: Type = 10;
+    pub const RTE_RESULT: Type = 8;
+    pub const RTE_GROUP: Type = 9;
 }
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
@@ -14001,8 +13907,6 @@ pub struct RangeTblEntry {
     pub functions: *mut List,
     pub funcordinality: bool,
     pub tablefunc: *mut TableFunc,
-    pub graph_pattern: *mut GraphPattern,
-    pub graph_table_columns: *mut List,
     pub values_lists: *mut List,
     pub ctename: *mut ::core::ffi::c_char,
     pub ctelevelsup: Index,
@@ -14196,26 +14100,6 @@ pub struct RowMarkClause {
     pub pushedDown: bool,
 }
 impl Default for RowMarkClause {
-    fn default() -> Self {
-        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct ForPortionOfClause {
-    pub type_: NodeTag,
-    pub range_name: *mut ::core::ffi::c_char,
-    pub location: ParseLoc,
-    pub target_location: ParseLoc,
-    pub target: *mut Node,
-    pub target_start: *mut Node,
-    pub target_end: *mut Node,
-}
-impl Default for ForPortionOfClause {
     fn default() -> Self {
         let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
         unsafe {
@@ -14792,7 +14676,6 @@ pub struct DeleteStmt {
     pub whereClause: *mut Node,
     pub returningClause: *mut ReturningClause,
     pub withClause: *mut WithClause,
-    pub forPortionOf: *mut ForPortionOfClause,
 }
 impl Default for DeleteStmt {
     fn default() -> Self {
@@ -14813,7 +14696,6 @@ pub struct UpdateStmt {
     pub fromClause: *mut List,
     pub returningClause: *mut ReturningClause,
     pub withClause: *mut WithClause,
-    pub forPortionOf: *mut ForPortionOfClause,
 }
 impl Default for UpdateStmt {
     fn default() -> Self {
@@ -14862,7 +14744,6 @@ pub struct SelectStmt {
     pub whereClause: *mut Node,
     pub groupClause: *mut List,
     pub groupDistinct: bool,
-    pub groupByAll: bool,
     pub havingClause: *mut Node,
     pub windowClause: *mut List,
     pub valuesLists: *mut List,
@@ -14975,8 +14856,8 @@ pub mod ObjectType {
     pub const OBJECT_PARAMETER_ACL: Type = 27;
     pub const OBJECT_POLICY: Type = 28;
     pub const OBJECT_PROCEDURE: Type = 29;
-    pub const OBJECT_PROPGRAPH: Type = 30;
-    pub const OBJECT_PUBLICATION: Type = 31;
+    pub const OBJECT_PUBLICATION: Type = 30;
+    pub const OBJECT_PUBLICATION_EXCLUDED_REL: Type = 31;
     pub const OBJECT_PUBLICATION_NAMESPACE: Type = 32;
     pub const OBJECT_PUBLICATION_REL: Type = 33;
     pub const OBJECT_ROLE: Type = 34;
@@ -15104,12 +14985,10 @@ pub mod AlterTableType {
     pub const AT_AttachPartition: Type = 59;
     pub const AT_DetachPartition: Type = 60;
     pub const AT_DetachPartitionFinalize: Type = 61;
-    pub const AT_SplitPartition: Type = 62;
-    pub const AT_MergePartitions: Type = 63;
-    pub const AT_AddIdentity: Type = 64;
-    pub const AT_SetIdentity: Type = 65;
-    pub const AT_DropIdentity: Type = 66;
-    pub const AT_ReAddStatistics: Type = 67;
+    pub const AT_AddIdentity: Type = 62;
+    pub const AT_SetIdentity: Type = 63;
+    pub const AT_DropIdentity: Type = 64;
+    pub const AT_ReAddStatistics: Type = 65;
 }
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
@@ -16320,6 +16199,7 @@ pub struct CreateStatsStmt {
     pub stxcomment: *mut ::core::ffi::c_char,
     pub transformed: bool,
     pub if_not_exists: bool,
+    pub owner: Oid,
 }
 impl Default for CreateStatsStmt {
     fn default() -> Self {
@@ -17155,132 +17035,6 @@ impl Default for CreateCastStmt {
 }
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
-pub struct CreatePropGraphStmt {
-    pub type_: NodeTag,
-    pub pgname: *mut RangeVar,
-    pub vertex_tables: *mut List,
-    pub edge_tables: *mut List,
-}
-impl Default for CreatePropGraphStmt {
-    fn default() -> Self {
-        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct PropGraphVertex {
-    pub type_: NodeTag,
-    pub vtable: *mut RangeVar,
-    pub vkey: *mut List,
-    pub labels: *mut List,
-    pub location: ParseLoc,
-}
-impl Default for PropGraphVertex {
-    fn default() -> Self {
-        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct PropGraphEdge {
-    pub type_: NodeTag,
-    pub etable: *mut RangeVar,
-    pub ekey: *mut List,
-    pub esrckey: *mut List,
-    pub esrcvertex: *mut ::core::ffi::c_char,
-    pub esrcvertexcols: *mut List,
-    pub edestkey: *mut List,
-    pub edestvertex: *mut ::core::ffi::c_char,
-    pub edestvertexcols: *mut List,
-    pub labels: *mut List,
-    pub location: ParseLoc,
-}
-impl Default for PropGraphEdge {
-    fn default() -> Self {
-        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct PropGraphLabelAndProperties {
-    pub type_: NodeTag,
-    pub label: *const ::core::ffi::c_char,
-    pub properties: *mut PropGraphProperties,
-    pub location: ParseLoc,
-}
-impl Default for PropGraphLabelAndProperties {
-    fn default() -> Self {
-        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct PropGraphProperties {
-    pub type_: NodeTag,
-    pub properties: *mut List,
-    pub all: bool,
-    pub location: ParseLoc,
-}
-impl Default for PropGraphProperties {
-    fn default() -> Self {
-        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-pub mod AlterPropGraphElementKind {
-    pub type Type = ::core::ffi::c_uint;
-    pub const PROPGRAPH_ELEMENT_KIND_VERTEX: Type = 1;
-    pub const PROPGRAPH_ELEMENT_KIND_EDGE: Type = 2;
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct AlterPropGraphStmt {
-    pub type_: NodeTag,
-    pub pgname: *mut RangeVar,
-    pub missing_ok: bool,
-    pub add_vertex_tables: *mut List,
-    pub add_edge_tables: *mut List,
-    pub drop_vertex_tables: *mut List,
-    pub drop_edge_tables: *mut List,
-    pub drop_behavior: DropBehavior::Type,
-    pub element_kind: AlterPropGraphElementKind::Type,
-    pub element_alias: *const ::core::ffi::c_char,
-    pub add_labels: *mut List,
-    pub drop_label: *const ::core::ffi::c_char,
-    pub alter_label: *const ::core::ffi::c_char,
-    pub add_properties: *mut PropGraphProperties,
-    pub drop_properties: *mut List,
-}
-impl Default for AlterPropGraphStmt {
-    fn default() -> Self {
-        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
 pub struct CreateTransformStmt {
     pub type_: NodeTag,
     pub replace: bool,
@@ -17611,6 +17365,7 @@ pub struct WaitStmt {
     pub type_: NodeTag,
     pub lsn_literal: *mut ::core::ffi::c_char,
     pub options: *mut List,
+    pub lsn_location: ParseLoc,
 }
 impl Default for WaitStmt {
     fn default() -> Self {
@@ -18795,7 +18550,7 @@ impl Default for SortSupportData {
 pub struct GinTuple {
     pub tuplen: ::core::ffi::c_int,
     pub attrnum: OffsetNumber,
-    pub keylen: uint16,
+    pub keylen: Size,
     pub typlen: int16,
     pub typbyval: bool,
     pub category: ::core::ffi::c_schar,
@@ -18978,12 +18733,11 @@ impl Default for GistEntryVector {
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct dirent {
-    pub d_ino: __uint64_t,
-    pub d_seekoff: __uint64_t,
-    pub d_reclen: __uint16_t,
-    pub d_namlen: __uint16_t,
-    pub d_type: __uint8_t,
-    pub d_name: [::core::ffi::c_char; 1024usize],
+    pub d_ino: __ino_t,
+    pub d_off: __off_t,
+    pub d_reclen: ::core::ffi::c_ushort,
+    pub d_type: ::core::ffi::c_uchar,
+    pub d_name: [::core::ffi::c_char; 256usize],
 }
 impl Default for dirent {
     fn default() -> Self {
@@ -18996,36 +18750,15 @@ impl Default for dirent {
 }
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
-pub struct _telldir {
+pub struct __dirstream {
     _unused: [u8; 0],
 }
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct DIR {
-    pub __dd_fd: ::core::ffi::c_int,
-    pub __dd_loc: usize,
-    pub __dd_size: usize,
-    pub __dd_buf: *mut ::core::ffi::c_char,
-    pub __dd_len: ::core::ffi::c_int,
-    pub __dd_seek: ::core::ffi::c_long,
-    pub __padding: ::core::ffi::c_long,
-    pub __dd_flags: ::core::ffi::c_int,
-    pub __dd_lock: __darwin_pthread_mutex_t,
-    pub __dd_td: *mut _telldir,
-}
-impl Default for DIR {
-    fn default() -> Self {
-        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
+pub type DIR = __dirstream;
 pub type File = ::core::ffi::c_int;
 pub mod FileExtendMethod {
     pub type Type = ::core::ffi::c_uint;
-    pub const FILE_EXTEND_METHOD_WRITE_ZEROS: Type = 0;
+    pub const FILE_EXTEND_METHOD_POSIX_FALLOCATE: Type = 0;
+    pub const FILE_EXTEND_METHOD_WRITE_ZEROS: Type = 1;
 }
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
@@ -19576,6 +19309,14 @@ impl Default for xl_hash_vacuum_one_page {
         }
     }
 }
+pub type sig_atomic_t = __sig_atomic_t;
+pub mod _bindgen_ty_16 {
+    pub type Type = ::core::ffi::c_uint;
+    pub const SIGEV_SIGNAL: Type = 0;
+    pub const SIGEV_NONE: Type = 1;
+    pub const SIGEV_THREAD: Type = 2;
+    pub const SIGEV_THREAD_ID: Type = 4;
+}
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct SharedInvalCatcacheMsg {
@@ -19929,7 +19670,7 @@ impl Default for xl_heap_rewrite_mapping {
         }
     }
 }
-pub type slock_t = ::core::ffi::c_int;
+pub type slock_t = ::core::ffi::c_uchar;
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct SpinDelayStatus {
@@ -21734,180 +21475,177 @@ pub mod CommandTag {
     pub const CMDTAG_ALTER_OPERATOR_FAMILY: Type = 21;
     pub const CMDTAG_ALTER_POLICY: Type = 22;
     pub const CMDTAG_ALTER_PROCEDURE: Type = 23;
-    pub const CMDTAG_ALTER_PROPERTY_GRAPH: Type = 24;
-    pub const CMDTAG_ALTER_PUBLICATION: Type = 25;
-    pub const CMDTAG_ALTER_ROLE: Type = 26;
-    pub const CMDTAG_ALTER_ROUTINE: Type = 27;
-    pub const CMDTAG_ALTER_RULE: Type = 28;
-    pub const CMDTAG_ALTER_SCHEMA: Type = 29;
-    pub const CMDTAG_ALTER_SEQUENCE: Type = 30;
-    pub const CMDTAG_ALTER_SERVER: Type = 31;
-    pub const CMDTAG_ALTER_STATISTICS: Type = 32;
-    pub const CMDTAG_ALTER_SUBSCRIPTION: Type = 33;
-    pub const CMDTAG_ALTER_SYSTEM: Type = 34;
-    pub const CMDTAG_ALTER_TABLE: Type = 35;
-    pub const CMDTAG_ALTER_TABLESPACE: Type = 36;
-    pub const CMDTAG_ALTER_TEXT_SEARCH_CONFIGURATION: Type = 37;
-    pub const CMDTAG_ALTER_TEXT_SEARCH_DICTIONARY: Type = 38;
-    pub const CMDTAG_ALTER_TEXT_SEARCH_PARSER: Type = 39;
-    pub const CMDTAG_ALTER_TEXT_SEARCH_TEMPLATE: Type = 40;
-    pub const CMDTAG_ALTER_TRANSFORM: Type = 41;
-    pub const CMDTAG_ALTER_TRIGGER: Type = 42;
-    pub const CMDTAG_ALTER_TYPE: Type = 43;
-    pub const CMDTAG_ALTER_USER_MAPPING: Type = 44;
-    pub const CMDTAG_ALTER_VIEW: Type = 45;
-    pub const CMDTAG_ANALYZE: Type = 46;
-    pub const CMDTAG_BEGIN: Type = 47;
-    pub const CMDTAG_CALL: Type = 48;
-    pub const CMDTAG_CHECKPOINT: Type = 49;
-    pub const CMDTAG_CLOSE: Type = 50;
-    pub const CMDTAG_CLOSE_CURSOR: Type = 51;
-    pub const CMDTAG_CLOSE_CURSOR_ALL: Type = 52;
-    pub const CMDTAG_CLUSTER: Type = 53;
-    pub const CMDTAG_COMMENT: Type = 54;
-    pub const CMDTAG_COMMIT: Type = 55;
-    pub const CMDTAG_COMMIT_PREPARED: Type = 56;
-    pub const CMDTAG_COPY: Type = 57;
-    pub const CMDTAG_COPY_FROM: Type = 58;
-    pub const CMDTAG_CREATE_ACCESS_METHOD: Type = 59;
-    pub const CMDTAG_CREATE_AGGREGATE: Type = 60;
-    pub const CMDTAG_CREATE_CAST: Type = 61;
-    pub const CMDTAG_CREATE_COLLATION: Type = 62;
-    pub const CMDTAG_CREATE_CONSTRAINT: Type = 63;
-    pub const CMDTAG_CREATE_CONVERSION: Type = 64;
-    pub const CMDTAG_CREATE_DATABASE: Type = 65;
-    pub const CMDTAG_CREATE_DOMAIN: Type = 66;
-    pub const CMDTAG_CREATE_EVENT_TRIGGER: Type = 67;
-    pub const CMDTAG_CREATE_EXTENSION: Type = 68;
-    pub const CMDTAG_CREATE_FOREIGN_DATA_WRAPPER: Type = 69;
-    pub const CMDTAG_CREATE_FOREIGN_TABLE: Type = 70;
-    pub const CMDTAG_CREATE_FUNCTION: Type = 71;
-    pub const CMDTAG_CREATE_INDEX: Type = 72;
-    pub const CMDTAG_CREATE_LANGUAGE: Type = 73;
-    pub const CMDTAG_CREATE_MATERIALIZED_VIEW: Type = 74;
-    pub const CMDTAG_CREATE_OPERATOR: Type = 75;
-    pub const CMDTAG_CREATE_OPERATOR_CLASS: Type = 76;
-    pub const CMDTAG_CREATE_OPERATOR_FAMILY: Type = 77;
-    pub const CMDTAG_CREATE_POLICY: Type = 78;
-    pub const CMDTAG_CREATE_PROCEDURE: Type = 79;
-    pub const CMDTAG_CREATE_PROPERTY_GRAPH: Type = 80;
-    pub const CMDTAG_CREATE_PUBLICATION: Type = 81;
-    pub const CMDTAG_CREATE_ROLE: Type = 82;
-    pub const CMDTAG_CREATE_ROUTINE: Type = 83;
-    pub const CMDTAG_CREATE_RULE: Type = 84;
-    pub const CMDTAG_CREATE_SCHEMA: Type = 85;
-    pub const CMDTAG_CREATE_SEQUENCE: Type = 86;
-    pub const CMDTAG_CREATE_SERVER: Type = 87;
-    pub const CMDTAG_CREATE_STATISTICS: Type = 88;
-    pub const CMDTAG_CREATE_SUBSCRIPTION: Type = 89;
-    pub const CMDTAG_CREATE_TABLE: Type = 90;
-    pub const CMDTAG_CREATE_TABLE_AS: Type = 91;
-    pub const CMDTAG_CREATE_TABLESPACE: Type = 92;
-    pub const CMDTAG_CREATE_TEXT_SEARCH_CONFIGURATION: Type = 93;
-    pub const CMDTAG_CREATE_TEXT_SEARCH_DICTIONARY: Type = 94;
-    pub const CMDTAG_CREATE_TEXT_SEARCH_PARSER: Type = 95;
-    pub const CMDTAG_CREATE_TEXT_SEARCH_TEMPLATE: Type = 96;
-    pub const CMDTAG_CREATE_TRANSFORM: Type = 97;
-    pub const CMDTAG_CREATE_TRIGGER: Type = 98;
-    pub const CMDTAG_CREATE_TYPE: Type = 99;
-    pub const CMDTAG_CREATE_USER_MAPPING: Type = 100;
-    pub const CMDTAG_CREATE_VIEW: Type = 101;
-    pub const CMDTAG_DEALLOCATE: Type = 102;
-    pub const CMDTAG_DEALLOCATE_ALL: Type = 103;
-    pub const CMDTAG_DECLARE_CURSOR: Type = 104;
-    pub const CMDTAG_DELETE: Type = 105;
-    pub const CMDTAG_DISCARD: Type = 106;
-    pub const CMDTAG_DISCARD_ALL: Type = 107;
-    pub const CMDTAG_DISCARD_PLANS: Type = 108;
-    pub const CMDTAG_DISCARD_SEQUENCES: Type = 109;
-    pub const CMDTAG_DISCARD_TEMP: Type = 110;
-    pub const CMDTAG_DO: Type = 111;
-    pub const CMDTAG_DROP_ACCESS_METHOD: Type = 112;
-    pub const CMDTAG_DROP_AGGREGATE: Type = 113;
-    pub const CMDTAG_DROP_CAST: Type = 114;
-    pub const CMDTAG_DROP_COLLATION: Type = 115;
-    pub const CMDTAG_DROP_CONSTRAINT: Type = 116;
-    pub const CMDTAG_DROP_CONVERSION: Type = 117;
-    pub const CMDTAG_DROP_DATABASE: Type = 118;
-    pub const CMDTAG_DROP_DOMAIN: Type = 119;
-    pub const CMDTAG_DROP_EVENT_TRIGGER: Type = 120;
-    pub const CMDTAG_DROP_EXTENSION: Type = 121;
-    pub const CMDTAG_DROP_FOREIGN_DATA_WRAPPER: Type = 122;
-    pub const CMDTAG_DROP_FOREIGN_TABLE: Type = 123;
-    pub const CMDTAG_DROP_FUNCTION: Type = 124;
-    pub const CMDTAG_DROP_INDEX: Type = 125;
-    pub const CMDTAG_DROP_LANGUAGE: Type = 126;
-    pub const CMDTAG_DROP_MATERIALIZED_VIEW: Type = 127;
-    pub const CMDTAG_DROP_OPERATOR: Type = 128;
-    pub const CMDTAG_DROP_OPERATOR_CLASS: Type = 129;
-    pub const CMDTAG_DROP_OPERATOR_FAMILY: Type = 130;
-    pub const CMDTAG_DROP_OWNED: Type = 131;
-    pub const CMDTAG_DROP_POLICY: Type = 132;
-    pub const CMDTAG_DROP_PROCEDURE: Type = 133;
-    pub const CMDTAG_DROP_PROPERTY_GRAPH: Type = 134;
-    pub const CMDTAG_DROP_PUBLICATION: Type = 135;
-    pub const CMDTAG_DROP_ROLE: Type = 136;
-    pub const CMDTAG_DROP_ROUTINE: Type = 137;
-    pub const CMDTAG_DROP_RULE: Type = 138;
-    pub const CMDTAG_DROP_SCHEMA: Type = 139;
-    pub const CMDTAG_DROP_SEQUENCE: Type = 140;
-    pub const CMDTAG_DROP_SERVER: Type = 141;
-    pub const CMDTAG_DROP_STATISTICS: Type = 142;
-    pub const CMDTAG_DROP_SUBSCRIPTION: Type = 143;
-    pub const CMDTAG_DROP_TABLE: Type = 144;
-    pub const CMDTAG_DROP_TABLESPACE: Type = 145;
-    pub const CMDTAG_DROP_TEXT_SEARCH_CONFIGURATION: Type = 146;
-    pub const CMDTAG_DROP_TEXT_SEARCH_DICTIONARY: Type = 147;
-    pub const CMDTAG_DROP_TEXT_SEARCH_PARSER: Type = 148;
-    pub const CMDTAG_DROP_TEXT_SEARCH_TEMPLATE: Type = 149;
-    pub const CMDTAG_DROP_TRANSFORM: Type = 150;
-    pub const CMDTAG_DROP_TRIGGER: Type = 151;
-    pub const CMDTAG_DROP_TYPE: Type = 152;
-    pub const CMDTAG_DROP_USER_MAPPING: Type = 153;
-    pub const CMDTAG_DROP_VIEW: Type = 154;
-    pub const CMDTAG_EXECUTE: Type = 155;
-    pub const CMDTAG_EXPLAIN: Type = 156;
-    pub const CMDTAG_FETCH: Type = 157;
-    pub const CMDTAG_GRANT: Type = 158;
-    pub const CMDTAG_GRANT_ROLE: Type = 159;
-    pub const CMDTAG_IMPORT_FOREIGN_SCHEMA: Type = 160;
-    pub const CMDTAG_INSERT: Type = 161;
-    pub const CMDTAG_LISTEN: Type = 162;
-    pub const CMDTAG_LOAD: Type = 163;
-    pub const CMDTAG_LOCK_TABLE: Type = 164;
-    pub const CMDTAG_LOGIN: Type = 165;
-    pub const CMDTAG_MERGE: Type = 166;
-    pub const CMDTAG_MOVE: Type = 167;
-    pub const CMDTAG_NOTIFY: Type = 168;
-    pub const CMDTAG_PREPARE: Type = 169;
-    pub const CMDTAG_PREPARE_TRANSACTION: Type = 170;
-    pub const CMDTAG_REASSIGN_OWNED: Type = 171;
-    pub const CMDTAG_REFRESH_MATERIALIZED_VIEW: Type = 172;
-    pub const CMDTAG_REINDEX: Type = 173;
-    pub const CMDTAG_RELEASE: Type = 174;
-    pub const CMDTAG_REPACK: Type = 175;
-    pub const CMDTAG_RESET: Type = 176;
-    pub const CMDTAG_REVOKE: Type = 177;
-    pub const CMDTAG_REVOKE_ROLE: Type = 178;
-    pub const CMDTAG_ROLLBACK: Type = 179;
-    pub const CMDTAG_ROLLBACK_PREPARED: Type = 180;
-    pub const CMDTAG_SAVEPOINT: Type = 181;
-    pub const CMDTAG_SECURITY_LABEL: Type = 182;
-    pub const CMDTAG_SELECT: Type = 183;
-    pub const CMDTAG_SELECT_FOR_KEY_SHARE: Type = 184;
-    pub const CMDTAG_SELECT_FOR_NO_KEY_UPDATE: Type = 185;
-    pub const CMDTAG_SELECT_FOR_SHARE: Type = 186;
-    pub const CMDTAG_SELECT_FOR_UPDATE: Type = 187;
-    pub const CMDTAG_SELECT_INTO: Type = 188;
-    pub const CMDTAG_SET: Type = 189;
-    pub const CMDTAG_SET_CONSTRAINTS: Type = 190;
-    pub const CMDTAG_SHOW: Type = 191;
-    pub const CMDTAG_START_TRANSACTION: Type = 192;
-    pub const CMDTAG_TRUNCATE_TABLE: Type = 193;
-    pub const CMDTAG_UNLISTEN: Type = 194;
-    pub const CMDTAG_UPDATE: Type = 195;
-    pub const CMDTAG_VACUUM: Type = 196;
-    pub const CMDTAG_WAIT: Type = 197;
+    pub const CMDTAG_ALTER_PUBLICATION: Type = 24;
+    pub const CMDTAG_ALTER_ROLE: Type = 25;
+    pub const CMDTAG_ALTER_ROUTINE: Type = 26;
+    pub const CMDTAG_ALTER_RULE: Type = 27;
+    pub const CMDTAG_ALTER_SCHEMA: Type = 28;
+    pub const CMDTAG_ALTER_SEQUENCE: Type = 29;
+    pub const CMDTAG_ALTER_SERVER: Type = 30;
+    pub const CMDTAG_ALTER_STATISTICS: Type = 31;
+    pub const CMDTAG_ALTER_SUBSCRIPTION: Type = 32;
+    pub const CMDTAG_ALTER_SYSTEM: Type = 33;
+    pub const CMDTAG_ALTER_TABLE: Type = 34;
+    pub const CMDTAG_ALTER_TABLESPACE: Type = 35;
+    pub const CMDTAG_ALTER_TEXT_SEARCH_CONFIGURATION: Type = 36;
+    pub const CMDTAG_ALTER_TEXT_SEARCH_DICTIONARY: Type = 37;
+    pub const CMDTAG_ALTER_TEXT_SEARCH_PARSER: Type = 38;
+    pub const CMDTAG_ALTER_TEXT_SEARCH_TEMPLATE: Type = 39;
+    pub const CMDTAG_ALTER_TRANSFORM: Type = 40;
+    pub const CMDTAG_ALTER_TRIGGER: Type = 41;
+    pub const CMDTAG_ALTER_TYPE: Type = 42;
+    pub const CMDTAG_ALTER_USER_MAPPING: Type = 43;
+    pub const CMDTAG_ALTER_VIEW: Type = 44;
+    pub const CMDTAG_ANALYZE: Type = 45;
+    pub const CMDTAG_BEGIN: Type = 46;
+    pub const CMDTAG_CALL: Type = 47;
+    pub const CMDTAG_CHECKPOINT: Type = 48;
+    pub const CMDTAG_CLOSE: Type = 49;
+    pub const CMDTAG_CLOSE_CURSOR: Type = 50;
+    pub const CMDTAG_CLOSE_CURSOR_ALL: Type = 51;
+    pub const CMDTAG_CLUSTER: Type = 52;
+    pub const CMDTAG_COMMENT: Type = 53;
+    pub const CMDTAG_COMMIT: Type = 54;
+    pub const CMDTAG_COMMIT_PREPARED: Type = 55;
+    pub const CMDTAG_COPY: Type = 56;
+    pub const CMDTAG_COPY_FROM: Type = 57;
+    pub const CMDTAG_CREATE_ACCESS_METHOD: Type = 58;
+    pub const CMDTAG_CREATE_AGGREGATE: Type = 59;
+    pub const CMDTAG_CREATE_CAST: Type = 60;
+    pub const CMDTAG_CREATE_COLLATION: Type = 61;
+    pub const CMDTAG_CREATE_CONSTRAINT: Type = 62;
+    pub const CMDTAG_CREATE_CONVERSION: Type = 63;
+    pub const CMDTAG_CREATE_DATABASE: Type = 64;
+    pub const CMDTAG_CREATE_DOMAIN: Type = 65;
+    pub const CMDTAG_CREATE_EVENT_TRIGGER: Type = 66;
+    pub const CMDTAG_CREATE_EXTENSION: Type = 67;
+    pub const CMDTAG_CREATE_FOREIGN_DATA_WRAPPER: Type = 68;
+    pub const CMDTAG_CREATE_FOREIGN_TABLE: Type = 69;
+    pub const CMDTAG_CREATE_FUNCTION: Type = 70;
+    pub const CMDTAG_CREATE_INDEX: Type = 71;
+    pub const CMDTAG_CREATE_LANGUAGE: Type = 72;
+    pub const CMDTAG_CREATE_MATERIALIZED_VIEW: Type = 73;
+    pub const CMDTAG_CREATE_OPERATOR: Type = 74;
+    pub const CMDTAG_CREATE_OPERATOR_CLASS: Type = 75;
+    pub const CMDTAG_CREATE_OPERATOR_FAMILY: Type = 76;
+    pub const CMDTAG_CREATE_POLICY: Type = 77;
+    pub const CMDTAG_CREATE_PROCEDURE: Type = 78;
+    pub const CMDTAG_CREATE_PUBLICATION: Type = 79;
+    pub const CMDTAG_CREATE_ROLE: Type = 80;
+    pub const CMDTAG_CREATE_ROUTINE: Type = 81;
+    pub const CMDTAG_CREATE_RULE: Type = 82;
+    pub const CMDTAG_CREATE_SCHEMA: Type = 83;
+    pub const CMDTAG_CREATE_SEQUENCE: Type = 84;
+    pub const CMDTAG_CREATE_SERVER: Type = 85;
+    pub const CMDTAG_CREATE_STATISTICS: Type = 86;
+    pub const CMDTAG_CREATE_SUBSCRIPTION: Type = 87;
+    pub const CMDTAG_CREATE_TABLE: Type = 88;
+    pub const CMDTAG_CREATE_TABLE_AS: Type = 89;
+    pub const CMDTAG_CREATE_TABLESPACE: Type = 90;
+    pub const CMDTAG_CREATE_TEXT_SEARCH_CONFIGURATION: Type = 91;
+    pub const CMDTAG_CREATE_TEXT_SEARCH_DICTIONARY: Type = 92;
+    pub const CMDTAG_CREATE_TEXT_SEARCH_PARSER: Type = 93;
+    pub const CMDTAG_CREATE_TEXT_SEARCH_TEMPLATE: Type = 94;
+    pub const CMDTAG_CREATE_TRANSFORM: Type = 95;
+    pub const CMDTAG_CREATE_TRIGGER: Type = 96;
+    pub const CMDTAG_CREATE_TYPE: Type = 97;
+    pub const CMDTAG_CREATE_USER_MAPPING: Type = 98;
+    pub const CMDTAG_CREATE_VIEW: Type = 99;
+    pub const CMDTAG_DEALLOCATE: Type = 100;
+    pub const CMDTAG_DEALLOCATE_ALL: Type = 101;
+    pub const CMDTAG_DECLARE_CURSOR: Type = 102;
+    pub const CMDTAG_DELETE: Type = 103;
+    pub const CMDTAG_DISCARD: Type = 104;
+    pub const CMDTAG_DISCARD_ALL: Type = 105;
+    pub const CMDTAG_DISCARD_PLANS: Type = 106;
+    pub const CMDTAG_DISCARD_SEQUENCES: Type = 107;
+    pub const CMDTAG_DISCARD_TEMP: Type = 108;
+    pub const CMDTAG_DO: Type = 109;
+    pub const CMDTAG_DROP_ACCESS_METHOD: Type = 110;
+    pub const CMDTAG_DROP_AGGREGATE: Type = 111;
+    pub const CMDTAG_DROP_CAST: Type = 112;
+    pub const CMDTAG_DROP_COLLATION: Type = 113;
+    pub const CMDTAG_DROP_CONSTRAINT: Type = 114;
+    pub const CMDTAG_DROP_CONVERSION: Type = 115;
+    pub const CMDTAG_DROP_DATABASE: Type = 116;
+    pub const CMDTAG_DROP_DOMAIN: Type = 117;
+    pub const CMDTAG_DROP_EVENT_TRIGGER: Type = 118;
+    pub const CMDTAG_DROP_EXTENSION: Type = 119;
+    pub const CMDTAG_DROP_FOREIGN_DATA_WRAPPER: Type = 120;
+    pub const CMDTAG_DROP_FOREIGN_TABLE: Type = 121;
+    pub const CMDTAG_DROP_FUNCTION: Type = 122;
+    pub const CMDTAG_DROP_INDEX: Type = 123;
+    pub const CMDTAG_DROP_LANGUAGE: Type = 124;
+    pub const CMDTAG_DROP_MATERIALIZED_VIEW: Type = 125;
+    pub const CMDTAG_DROP_OPERATOR: Type = 126;
+    pub const CMDTAG_DROP_OPERATOR_CLASS: Type = 127;
+    pub const CMDTAG_DROP_OPERATOR_FAMILY: Type = 128;
+    pub const CMDTAG_DROP_OWNED: Type = 129;
+    pub const CMDTAG_DROP_POLICY: Type = 130;
+    pub const CMDTAG_DROP_PROCEDURE: Type = 131;
+    pub const CMDTAG_DROP_PUBLICATION: Type = 132;
+    pub const CMDTAG_DROP_ROLE: Type = 133;
+    pub const CMDTAG_DROP_ROUTINE: Type = 134;
+    pub const CMDTAG_DROP_RULE: Type = 135;
+    pub const CMDTAG_DROP_SCHEMA: Type = 136;
+    pub const CMDTAG_DROP_SEQUENCE: Type = 137;
+    pub const CMDTAG_DROP_SERVER: Type = 138;
+    pub const CMDTAG_DROP_STATISTICS: Type = 139;
+    pub const CMDTAG_DROP_SUBSCRIPTION: Type = 140;
+    pub const CMDTAG_DROP_TABLE: Type = 141;
+    pub const CMDTAG_DROP_TABLESPACE: Type = 142;
+    pub const CMDTAG_DROP_TEXT_SEARCH_CONFIGURATION: Type = 143;
+    pub const CMDTAG_DROP_TEXT_SEARCH_DICTIONARY: Type = 144;
+    pub const CMDTAG_DROP_TEXT_SEARCH_PARSER: Type = 145;
+    pub const CMDTAG_DROP_TEXT_SEARCH_TEMPLATE: Type = 146;
+    pub const CMDTAG_DROP_TRANSFORM: Type = 147;
+    pub const CMDTAG_DROP_TRIGGER: Type = 148;
+    pub const CMDTAG_DROP_TYPE: Type = 149;
+    pub const CMDTAG_DROP_USER_MAPPING: Type = 150;
+    pub const CMDTAG_DROP_VIEW: Type = 151;
+    pub const CMDTAG_EXECUTE: Type = 152;
+    pub const CMDTAG_EXPLAIN: Type = 153;
+    pub const CMDTAG_FETCH: Type = 154;
+    pub const CMDTAG_GRANT: Type = 155;
+    pub const CMDTAG_GRANT_ROLE: Type = 156;
+    pub const CMDTAG_IMPORT_FOREIGN_SCHEMA: Type = 157;
+    pub const CMDTAG_INSERT: Type = 158;
+    pub const CMDTAG_LISTEN: Type = 159;
+    pub const CMDTAG_LOAD: Type = 160;
+    pub const CMDTAG_LOCK_TABLE: Type = 161;
+    pub const CMDTAG_LOGIN: Type = 162;
+    pub const CMDTAG_MERGE: Type = 163;
+    pub const CMDTAG_MOVE: Type = 164;
+    pub const CMDTAG_NOTIFY: Type = 165;
+    pub const CMDTAG_PREPARE: Type = 166;
+    pub const CMDTAG_PREPARE_TRANSACTION: Type = 167;
+    pub const CMDTAG_REASSIGN_OWNED: Type = 168;
+    pub const CMDTAG_REFRESH_MATERIALIZED_VIEW: Type = 169;
+    pub const CMDTAG_REINDEX: Type = 170;
+    pub const CMDTAG_RELEASE: Type = 171;
+    pub const CMDTAG_REPACK: Type = 172;
+    pub const CMDTAG_RESET: Type = 173;
+    pub const CMDTAG_REVOKE: Type = 174;
+    pub const CMDTAG_REVOKE_ROLE: Type = 175;
+    pub const CMDTAG_ROLLBACK: Type = 176;
+    pub const CMDTAG_ROLLBACK_PREPARED: Type = 177;
+    pub const CMDTAG_SAVEPOINT: Type = 178;
+    pub const CMDTAG_SECURITY_LABEL: Type = 179;
+    pub const CMDTAG_SELECT: Type = 180;
+    pub const CMDTAG_SELECT_FOR_KEY_SHARE: Type = 181;
+    pub const CMDTAG_SELECT_FOR_NO_KEY_UPDATE: Type = 182;
+    pub const CMDTAG_SELECT_FOR_SHARE: Type = 183;
+    pub const CMDTAG_SELECT_FOR_UPDATE: Type = 184;
+    pub const CMDTAG_SELECT_INTO: Type = 185;
+    pub const CMDTAG_SET: Type = 186;
+    pub const CMDTAG_SET_CONSTRAINTS: Type = 187;
+    pub const CMDTAG_SHOW: Type = 188;
+    pub const CMDTAG_START_TRANSACTION: Type = 189;
+    pub const CMDTAG_TRUNCATE_TABLE: Type = 190;
+    pub const CMDTAG_UNLISTEN: Type = 191;
+    pub const CMDTAG_UPDATE: Type = 192;
+    pub const CMDTAG_VACUUM: Type = 193;
+    pub const CMDTAG_WAIT: Type = 194;
 }
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
@@ -22221,7 +21959,6 @@ pub struct ModifyTable {
     pub onConflictSet: *mut List,
     pub onConflictCols: *mut List,
     pub onConflictWhere: *mut Node,
-    pub forPortionOf: *mut Node,
     pub exclRelRTI: Index,
     pub exclRelTlist: *mut List,
     pub mergeActionLists: *mut List,
@@ -23441,27 +23178,6 @@ impl Default for MergeActionState {
 }
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
-pub struct ForPortionOfState {
-    pub type_: NodeTag,
-    pub fp_rangeName: *mut ::core::ffi::c_char,
-    pub fp_rangeType: Oid,
-    pub fp_rangeAttno: ::core::ffi::c_int,
-    pub fp_targetRange: Datum,
-    pub fp_leftoverstypcache: *mut TypeCacheEntry,
-    pub fp_Existing: *mut TupleTableSlot,
-    pub fp_Leftover: *mut TupleTableSlot,
-}
-impl Default for ForPortionOfState {
-    fn default() -> Self {
-        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
 pub struct ResultRelInfo {
     pub type_: NodeTag,
     pub ri_RangeTableIndex: Index,
@@ -23507,7 +23223,6 @@ pub struct ResultRelInfo {
     pub ri_onConflict: *mut OnConflictActionState,
     pub ri_MergeActions: [*mut List; 3usize],
     pub ri_MergeJoinCondition: *mut ExprState,
-    pub ri_forPortionOf: *mut ForPortionOfState,
     pub ri_PartitionCheckExpr: *mut ExprState,
     pub ri_ChildToRootMap: *mut TupleConversionMap,
     pub ri_ChildToRootMapValid: bool,
@@ -23992,6 +23707,7 @@ pub struct ModifyTableState {
     pub mt_updateColnosLists: *mut List,
     pub mt_mergeActionLists: *mut List,
     pub mt_mergeJoinConditions: *mut List,
+    pub mt_fdwPrivLists: *mut List,
 }
 impl Default for ModifyTableState {
     fn default() -> Self {
@@ -28260,7 +27976,6 @@ pub struct ModifyTablePath {
     pub returningLists: *mut List,
     pub rowMarks: *mut List,
     pub onconflict: *mut OnConflictExpr,
-    pub forPortionOf: *mut ForPortionOfExpr,
     pub epqParam: ::core::ffi::c_int,
     pub mergeActionLists: *mut List,
     pub mergeJoinConditions: *mut List,
@@ -28822,8 +28537,6 @@ pub mod ChecksumStateType {
     pub type Type = ::core::ffi::c_uint;
     pub const PG_DATA_CHECKSUM_OFF: Type = 0;
     pub const PG_DATA_CHECKSUM_VERSION: Type = 1;
-    pub const PG_DATA_CHECKSUM_INPROGRESS_OFF: Type = 2;
-    pub const PG_DATA_CHECKSUM_INPROGRESS_ON: Type = 3;
 }
 #[repr(C)]
 #[derive(Debug, Default, Copy, Clone)]
@@ -28872,20 +28585,6 @@ impl Default for xl_restore_point {
     }
 }
 #[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct xl_checksum_state {
-    pub new_checksum_state: ChecksumStateType::Type,
-}
-impl Default for xl_checksum_state {
-    fn default() -> Self {
-        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
 #[derive(Debug, Default, Copy, Clone)]
 pub struct xl_overwrite_contrecord {
     pub overwritten_lsn: XLogRecPtr,
@@ -28903,7 +28602,6 @@ pub struct xl_end_of_recovery {
 #[derive(Debug, Default, Copy, Clone)]
 pub struct xl_checkpoint_redo {
     pub wal_level: ::core::ffi::c_int,
-    pub data_checksum_version: uint32,
 }
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
@@ -28981,7 +28679,6 @@ pub struct CheckPoint {
     pub oldestCommitTsXid: TransactionId,
     pub newestCommitTsXid: TransactionId,
     pub oldestActiveXid: TransactionId,
-    pub dataChecksumState: uint32,
 }
 impl Default for CheckPoint {
     fn default() -> Self {
@@ -29037,6 +28734,7 @@ pub struct ControlFileData {
     pub toast_max_chunk_size: uint32,
     pub loblksize: uint32,
     pub float8ByVal: bool,
+    pub data_checksum_version_init: uint32,
     pub data_checksum_version: uint32,
     pub default_char_signedness: bool,
     pub mock_authentication_nonce: [::core::ffi::c_char; 32usize],
@@ -29129,6 +28827,7 @@ pub mod RecoveryPauseState {
 pub struct XLogRecoveryCtlData {
     pub SharedHotStandbyActive: bool,
     pub SharedPromoteIsTriggered: bool,
+    pub SharedRecoverySubtransInitialized: bool,
     pub recoveryWakeupLatch: Latch,
     pub lastReplayedReadRecPtr: XLogRecPtr,
     pub lastReplayedEndRecPtr: XLogRecPtr,
@@ -29309,34 +29008,32 @@ pub mod ParseExprKind {
     pub const EXPR_KIND_UPDATE_SOURCE: Type = 16;
     pub const EXPR_KIND_UPDATE_TARGET: Type = 17;
     pub const EXPR_KIND_MERGE_WHEN: Type = 18;
-    pub const EXPR_KIND_FOR_PORTION: Type = 19;
-    pub const EXPR_KIND_GROUP_BY: Type = 20;
-    pub const EXPR_KIND_ORDER_BY: Type = 21;
-    pub const EXPR_KIND_DISTINCT_ON: Type = 22;
-    pub const EXPR_KIND_LIMIT: Type = 23;
-    pub const EXPR_KIND_OFFSET: Type = 24;
-    pub const EXPR_KIND_RETURNING: Type = 25;
-    pub const EXPR_KIND_MERGE_RETURNING: Type = 26;
-    pub const EXPR_KIND_VALUES: Type = 27;
-    pub const EXPR_KIND_VALUES_SINGLE: Type = 28;
-    pub const EXPR_KIND_CHECK_CONSTRAINT: Type = 29;
-    pub const EXPR_KIND_DOMAIN_CHECK: Type = 30;
-    pub const EXPR_KIND_COLUMN_DEFAULT: Type = 31;
-    pub const EXPR_KIND_FUNCTION_DEFAULT: Type = 32;
-    pub const EXPR_KIND_INDEX_EXPRESSION: Type = 33;
-    pub const EXPR_KIND_INDEX_PREDICATE: Type = 34;
-    pub const EXPR_KIND_STATS_EXPRESSION: Type = 35;
-    pub const EXPR_KIND_ALTER_COL_TRANSFORM: Type = 36;
-    pub const EXPR_KIND_EXECUTE_PARAMETER: Type = 37;
-    pub const EXPR_KIND_TRIGGER_WHEN: Type = 38;
-    pub const EXPR_KIND_POLICY: Type = 39;
-    pub const EXPR_KIND_PARTITION_BOUND: Type = 40;
-    pub const EXPR_KIND_PARTITION_EXPRESSION: Type = 41;
-    pub const EXPR_KIND_CALL_ARGUMENT: Type = 42;
-    pub const EXPR_KIND_COPY_WHERE: Type = 43;
-    pub const EXPR_KIND_GENERATED_COLUMN: Type = 44;
-    pub const EXPR_KIND_CYCLE_MARK: Type = 45;
-    pub const EXPR_KIND_PROPGRAPH_PROPERTY: Type = 46;
+    pub const EXPR_KIND_GROUP_BY: Type = 19;
+    pub const EXPR_KIND_ORDER_BY: Type = 20;
+    pub const EXPR_KIND_DISTINCT_ON: Type = 21;
+    pub const EXPR_KIND_LIMIT: Type = 22;
+    pub const EXPR_KIND_OFFSET: Type = 23;
+    pub const EXPR_KIND_RETURNING: Type = 24;
+    pub const EXPR_KIND_MERGE_RETURNING: Type = 25;
+    pub const EXPR_KIND_VALUES: Type = 26;
+    pub const EXPR_KIND_VALUES_SINGLE: Type = 27;
+    pub const EXPR_KIND_CHECK_CONSTRAINT: Type = 28;
+    pub const EXPR_KIND_DOMAIN_CHECK: Type = 29;
+    pub const EXPR_KIND_COLUMN_DEFAULT: Type = 30;
+    pub const EXPR_KIND_FUNCTION_DEFAULT: Type = 31;
+    pub const EXPR_KIND_INDEX_EXPRESSION: Type = 32;
+    pub const EXPR_KIND_INDEX_PREDICATE: Type = 33;
+    pub const EXPR_KIND_STATS_EXPRESSION: Type = 34;
+    pub const EXPR_KIND_ALTER_COL_TRANSFORM: Type = 35;
+    pub const EXPR_KIND_EXECUTE_PARAMETER: Type = 36;
+    pub const EXPR_KIND_TRIGGER_WHEN: Type = 37;
+    pub const EXPR_KIND_POLICY: Type = 38;
+    pub const EXPR_KIND_PARTITION_BOUND: Type = 39;
+    pub const EXPR_KIND_PARTITION_EXPRESSION: Type = 40;
+    pub const EXPR_KIND_CALL_ARGUMENT: Type = 41;
+    pub const EXPR_KIND_COPY_WHERE: Type = 42;
+    pub const EXPR_KIND_GENERATED_COLUMN: Type = 43;
+    pub const EXPR_KIND_CYCLE_MARK: Type = 44;
 }
 pub type PreParseColumnRefHook = ::core::option::Option<
     unsafe extern "C-unwind" fn(pstate: *mut ParseState, cref: *mut ColumnRef) -> *mut Node,
@@ -29360,22 +29057,6 @@ pub type CoerceParamHook = ::core::option::Option<
         location: ::core::ffi::c_int,
     ) -> *mut Node,
 >;
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct GraphTableParseState {
-    pub graphid: Oid,
-    pub variables: *mut List,
-    pub cur_gep: *mut GraphElementPattern,
-}
-impl Default for GraphTableParseState {
-    fn default() -> Self {
-        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct ParseState {
@@ -29402,7 +29083,6 @@ pub struct ParseState {
     pub p_locked_from_parent: bool,
     pub p_resolve_unknowns: bool,
     pub p_queryEnv: *mut QueryEnvironment,
-    pub p_graph_table_pstate: *mut GraphTableParseState,
     pub p_hasAggs: bool,
     pub p_hasWindowFuncs: bool,
     pub p_hasTargetSRFs: bool,
@@ -31083,7 +30763,6 @@ pub struct Subscription {
     pub retaindeadtuples: bool,
     pub maxretention: int32,
     pub retentionactive: bool,
-    pub conninfo: *mut ::core::ffi::c_char,
     pub slotname: *mut ::core::ffi::c_char,
     pub synccommit: *mut ::core::ffi::c_char,
     pub walrcvtimeout: *mut ::core::ffi::c_char,
@@ -31589,8 +31268,6 @@ impl Default for TransitionCaptureState {
         }
     }
 }
-pub type AfterTriggerBatchCallback =
-    ::core::option::Option<unsafe extern "C-unwind" fn(arg: *mut ::core::ffi::c_void)>;
 pub mod CopySource {
     pub type Type = ::core::ffi::c_uint;
     pub const COPY_FILE: Type = 0;
@@ -31987,7 +31664,6 @@ pub struct MemoryContextMethods {
             print_to_stderr: bool,
         ),
     >,
-    pub check: ::core::option::Option<unsafe extern "C-unwind" fn(context: MemoryContext)>,
 }
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
@@ -32065,6 +31741,23 @@ pub mod TimingClockSourceType {
     pub type Type = ::core::ffi::c_uint;
     pub const TIMING_CLOCK_SOURCE_AUTO: Type = 0;
     pub const TIMING_CLOCK_SOURCE_SYSTEM: Type = 1;
+    pub const TIMING_CLOCK_SOURCE_TSC: Type = 2;
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct TscClockSourceInfo {
+    pub frequency_khz: int32,
+    pub calibrated_frequency_khz: int32,
+    pub frequency_source: [::core::ffi::c_char; 128usize],
+}
+impl Default for TscClockSourceInfo {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
 }
 #[repr(C)]
 #[derive(Debug, Default, Copy, Clone)]
@@ -32877,16 +32570,13 @@ pub struct OutputPluginCallbacks {
     pub stream_message_cb: LogicalDecodeStreamMessageCB,
     pub stream_truncate_cb: LogicalDecodeStreamTruncateCB,
 }
-pub type socklen_t = __darwin_socklen_t;
-pub type sa_family_t = __uint8_t;
+pub type sa_family_t = ::core::ffi::c_ushort;
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct sockaddr_storage {
-    pub ss_len: __uint8_t,
     pub ss_family: sa_family_t,
-    pub __ss_pad1: [::core::ffi::c_char; 6usize],
-    pub __ss_align: __int64_t,
-    pub __ss_pad2: [::core::ffi::c_char; 112usize],
+    pub __ss_padding: [::core::ffi::c_char; 118usize],
+    pub __ss_align: ::core::ffi::c_ulong,
 }
 impl Default for sockaddr_storage {
     fn default() -> Self {
@@ -33236,6 +32926,7 @@ pub type walrcv_identify_system_fn = ::core::option::Option<
     unsafe extern "C-unwind" fn(
         conn: *mut WalReceiverConn,
         primary_tli: *mut TimeLineID,
+        server_lsn: *mut XLogRecPtr,
     ) -> *mut ::core::ffi::c_char,
 >;
 pub type walrcv_get_dbname_from_conninfo_fn = ::core::option::Option<
@@ -33538,9 +33229,10 @@ pub struct DecodingWorkerShared {
     pub mutex: slock_t,
     pub dbid: Oid,
     pub roleid: Oid,
+    pub lock_timeout: ::core::ffi::c_int,
+    pub transaction_timeout: ::core::ffi::c_int,
     pub relid: Oid,
     pub cv: ConditionVariable,
-    pub backend_proc: *mut PGPROC,
     pub backend_pid: pid_t,
     pub backend_proc_number: ProcNumber,
     pub error_queue: __IncompleteArrayField<::core::ffi::c_char>,
@@ -35106,9 +34798,7 @@ pub mod BackendType {
     pub const B_WAL_RECEIVER: Type = 14;
     pub const B_WAL_SUMMARIZER: Type = 15;
     pub const B_WAL_WRITER: Type = 16;
-    pub const B_DATACHECKSUMSWORKER_LAUNCHER: Type = 17;
-    pub const B_DATACHECKSUMSWORKER_WORKER: Type = 18;
-    pub const B_LOGGER: Type = 19;
+    pub const B_LOGGER: Type = 17;
 }
 pub mod ProcessingMode {
     #[doc = "\t  pmod.h --\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t *\n\t\t\tPOSTGRES processing mode definitions.                            *"]
@@ -35117,6 +34807,7 @@ pub mod ProcessingMode {
     pub const InitProcessing: Type = 1;
     pub const NormalProcessing: Type = 2;
 }
+pub type ConnectionWarningFilter = ::core::option::Option<unsafe extern "C-unwind" fn() -> bool>;
 pub type shmem_request_hook_type = ::core::option::Option<unsafe extern "C-unwind" fn()>;
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
@@ -36375,7 +36066,6 @@ pub struct JumbleState {
     pub highest_extern_param_id: ::core::ffi::c_int,
     pub has_squashed_lists: bool,
     pub pending_nulls: ::core::ffi::c_uint,
-    pub total_jumble_len: Size,
 }
 impl Default for JumbleState {
     fn default() -> Self {
@@ -36765,6 +36455,9 @@ impl Default for WindowFuncLists {
         }
     }
 }
+pub type grouping_eqop_callback = ::core::option::Option<
+    unsafe extern "C-unwind" fn(var: *mut Var, context: *mut ::core::ffi::c_void) -> Oid,
+>;
 pub mod ConstraintExclusionType {
     pub type Type = ::core::ffi::c_uint;
     pub const CONSTRAINT_EXCLUSION_OFF: Type = 0;
@@ -36779,10 +36472,16 @@ pub struct pg_prng_state {
 }
 pub type Gene = ::core::ffi::c_int;
 #[repr(C)]
+#[derive(Debug, Default, Copy, Clone)]
+pub struct Fitness {
+    pub disabled_nodes: ::core::ffi::c_int,
+    pub cost: Cost,
+}
+#[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct Chromosome {
     pub string: *mut Gene,
-    pub worth: Cost,
+    pub worth: Fitness,
 }
 impl Default for Chromosome {
     fn default() -> Self {
@@ -37193,7 +36892,6 @@ pub mod ProgressCommandType {
     pub const PROGRESS_COMMAND_BASEBACKUP: Type = 4;
     pub const PROGRESS_COMMAND_COPY: Type = 5;
     pub const PROGRESS_COMMAND_REPACK: Type = 6;
-    pub const PROGRESS_COMMAND_DATACHECKSUMS: Type = 7;
 }
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
@@ -37536,7 +37234,7 @@ pub struct PgStat_PendingIO {
 #[derive(Debug, Default, Copy, Clone)]
 pub struct PgStat_IO {
     pub stat_reset_timestamp: TimestampTz,
-    pub stats: [PgStat_BktypeIO; 20usize],
+    pub stats: [PgStat_BktypeIO; 18usize],
 }
 #[repr(C)]
 #[derive(Debug, Default, Copy, Clone)]
@@ -37871,7 +37569,7 @@ pub mod PLpgSQL_stmt_type {
     pub const PLPGSQL_STMT_COMMIT: Type = 25;
     pub const PLPGSQL_STMT_ROLLBACK: Type = 26;
 }
-pub mod _bindgen_ty_1 {
+pub mod _bindgen_ty_26 {
     pub type Type = ::core::ffi::c_uint;
     pub const PLPGSQL_RC_OK: Type = 0;
     pub const PLPGSQL_RC_EXIT: Type = 1;
@@ -39086,7 +38784,7 @@ pub struct PipeProtoHeader {
 #[repr(C)]
 pub union PipeProtoChunk {
     pub proto: ::core::mem::ManuallyDrop<PipeProtoHeader>,
-    pub filler: ::core::mem::ManuallyDrop<[::core::ffi::c_char; 512usize]>,
+    pub filler: ::core::mem::ManuallyDrop<[::core::ffi::c_char; 4096usize]>,
 }
 impl Default for PipeProtoChunk {
     fn default() -> Self {
@@ -39449,17 +39147,6 @@ pub mod ReplaceVarsNoMatchOption {
     pub const REPLACEVARS_CHANGE_VARNO: Type = 1;
     pub const REPLACEVARS_SUBSTITUTE_NULL: Type = 2;
 }
-pub type ChangeVarNodes_callback = ::core::option::Option<
-    unsafe extern "C-unwind" fn(node: *mut Node, arg: *mut ChangeVarNodes_context) -> bool,
->;
-#[repr(C)]
-#[derive(Debug, Default, Copy, Clone)]
-pub struct ChangeVarNodes_context {
-    pub rt_index: ::core::ffi::c_int,
-    pub new_index: ::core::ffi::c_int,
-    pub sublevels_up: ::core::ffi::c_int,
-    pub callback: ChangeVarNodes_callback,
-}
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct RowSecurityPolicy {
@@ -39701,6 +39388,7 @@ pub mod IoMethod {
     pub type Type = ::core::ffi::c_uint;
     pub const IOMETHOD_SYNC: Type = 0;
     pub const IOMETHOD_WORKER: Type = 1;
+    pub const IOMETHOD_IO_URING: Type = 2;
 }
 pub mod PgAioHandleFlags {
     pub type Type = ::core::ffi::c_uint;
@@ -40852,10 +40540,6 @@ pub mod ProcSignalBarrierType {
     pub type Type = ::core::ffi::c_uint;
     pub const PROCSIGNAL_BARRIER_SMGRRELEASE: Type = 0;
     pub const PROCSIGNAL_BARRIER_UPDATE_XLOG_LOGICAL_INFO: Type = 1;
-    pub const PROCSIGNAL_BARRIER_CHECKSUM_OFF: Type = 2;
-    pub const PROCSIGNAL_BARRIER_CHECKSUM_INPROGRESS_ON: Type = 3;
-    pub const PROCSIGNAL_BARRIER_CHECKSUM_INPROGRESS_OFF: Type = 4;
-    pub const PROCSIGNAL_BARRIER_CHECKSUM_ON: Type = 5;
 }
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
@@ -41142,15 +40826,6 @@ pub struct ctype_methods {
             locale: pg_locale_t,
         ) -> usize,
     >,
-    pub downcase_ident: ::core::option::Option<
-        unsafe extern "C-unwind" fn(
-            dest: *mut ::core::ffi::c_char,
-            destsize: usize,
-            src: *const ::core::ffi::c_char,
-            srclen: usize,
-            locale: pg_locale_t,
-        ) -> usize,
-    >,
     pub wc_isdigit: ::core::option::Option<
         unsafe extern "C-unwind" fn(wc: pg_wchar, locale: pg_locale_t) -> bool,
     >,
@@ -41230,7 +40905,6 @@ pub struct pg_locale_struct__bindgen_ty_1__bindgen_ty_2 {
     pub locale: *const ::core::ffi::c_char,
     pub ucol: *mut UCollator,
     pub ucasemap: *mut UCaseMap,
-    pub lt: locale_t,
 }
 impl Default for pg_locale_struct__bindgen_ty_1__bindgen_ty_2 {
     fn default() -> Self {
@@ -42982,11 +42656,8 @@ pub mod WaitEventClient {
     pub const WAIT_EVENT_LIBPQWALRECEIVER_RECEIVE: Type = 100663300;
     pub const WAIT_EVENT_SSL_OPEN_SERVER: Type = 100663301;
     pub const WAIT_EVENT_WAIT_FOR_STANDBY_CONFIRMATION: Type = 100663302;
-    pub const WAIT_EVENT_WAIT_FOR_WAL_FLUSH: Type = 100663303;
-    pub const WAIT_EVENT_WAIT_FOR_WAL_REPLAY: Type = 100663304;
-    pub const WAIT_EVENT_WAIT_FOR_WAL_WRITE: Type = 100663305;
-    pub const WAIT_EVENT_WAL_SENDER_WAIT_FOR_WAL: Type = 100663306;
-    pub const WAIT_EVENT_WAL_SENDER_WRITE_DATA: Type = 100663307;
+    pub const WAIT_EVENT_WAL_SENDER_WAIT_FOR_WAL: Type = 100663303;
+    pub const WAIT_EVENT_WAL_SENDER_WRITE_DATA: Type = 100663304;
 }
 pub mod WaitEventIO {
     pub type Type = ::core::ffi::c_uint;
@@ -43089,53 +42760,55 @@ pub mod WaitEventIPC {
     pub const WAIT_EVENT_CHECKPOINT_DELAY_START: Type = 134217738;
     pub const WAIT_EVENT_CHECKPOINT_DONE: Type = 134217739;
     pub const WAIT_EVENT_CHECKPOINT_START: Type = 134217740;
-    pub const WAIT_EVENT_CHECKSUM_ENABLE_STARTCONDITION: Type = 134217741;
-    pub const WAIT_EVENT_CHECKSUM_ENABLE_TEMPTABLE_WAIT: Type = 134217742;
-    pub const WAIT_EVENT_EXECUTE_GATHER: Type = 134217743;
-    pub const WAIT_EVENT_HASH_BATCH_ALLOCATE: Type = 134217744;
-    pub const WAIT_EVENT_HASH_BATCH_ELECT: Type = 134217745;
-    pub const WAIT_EVENT_HASH_BATCH_LOAD: Type = 134217746;
-    pub const WAIT_EVENT_HASH_BUILD_ALLOCATE: Type = 134217747;
-    pub const WAIT_EVENT_HASH_BUILD_ELECT: Type = 134217748;
-    pub const WAIT_EVENT_HASH_BUILD_HASH_INNER: Type = 134217749;
-    pub const WAIT_EVENT_HASH_BUILD_HASH_OUTER: Type = 134217750;
-    pub const WAIT_EVENT_HASH_GROW_BATCHES_DECIDE: Type = 134217751;
-    pub const WAIT_EVENT_HASH_GROW_BATCHES_ELECT: Type = 134217752;
-    pub const WAIT_EVENT_HASH_GROW_BATCHES_FINISH: Type = 134217753;
-    pub const WAIT_EVENT_HASH_GROW_BATCHES_REALLOCATE: Type = 134217754;
-    pub const WAIT_EVENT_HASH_GROW_BATCHES_REPARTITION: Type = 134217755;
-    pub const WAIT_EVENT_HASH_GROW_BUCKETS_ELECT: Type = 134217756;
-    pub const WAIT_EVENT_HASH_GROW_BUCKETS_REALLOCATE: Type = 134217757;
-    pub const WAIT_EVENT_HASH_GROW_BUCKETS_REINSERT: Type = 134217758;
-    pub const WAIT_EVENT_LOGICAL_APPLY_SEND_DATA: Type = 134217759;
-    pub const WAIT_EVENT_LOGICAL_PARALLEL_APPLY_STATE_CHANGE: Type = 134217760;
-    pub const WAIT_EVENT_LOGICAL_SYNC_DATA: Type = 134217761;
-    pub const WAIT_EVENT_LOGICAL_SYNC_STATE_CHANGE: Type = 134217762;
-    pub const WAIT_EVENT_MESSAGE_QUEUE_INTERNAL: Type = 134217763;
-    pub const WAIT_EVENT_MESSAGE_QUEUE_PUT_MESSAGE: Type = 134217764;
-    pub const WAIT_EVENT_MESSAGE_QUEUE_RECEIVE: Type = 134217765;
-    pub const WAIT_EVENT_MESSAGE_QUEUE_SEND: Type = 134217766;
-    pub const WAIT_EVENT_MULTIXACT_CREATION: Type = 134217767;
-    pub const WAIT_EVENT_PARALLEL_BITMAP_SCAN: Type = 134217768;
-    pub const WAIT_EVENT_PARALLEL_CREATE_INDEX_SCAN: Type = 134217769;
-    pub const WAIT_EVENT_PARALLEL_FINISH: Type = 134217770;
-    pub const WAIT_EVENT_PROCARRAY_GROUP_UPDATE: Type = 134217771;
-    pub const WAIT_EVENT_PROC_SIGNAL_BARRIER: Type = 134217772;
-    pub const WAIT_EVENT_PROMOTE: Type = 134217773;
-    pub const WAIT_EVENT_RECOVERY_CONFLICT_SNAPSHOT: Type = 134217774;
-    pub const WAIT_EVENT_RECOVERY_CONFLICT_TABLESPACE: Type = 134217775;
-    pub const WAIT_EVENT_RECOVERY_END_COMMAND: Type = 134217776;
-    pub const WAIT_EVENT_RECOVERY_PAUSE: Type = 134217777;
-    pub const WAIT_EVENT_REPACK_WORKER_EXPORT: Type = 134217778;
-    pub const WAIT_EVENT_REPLICATION_ORIGIN_DROP: Type = 134217779;
-    pub const WAIT_EVENT_REPLICATION_SLOT_DROP: Type = 134217780;
-    pub const WAIT_EVENT_RESTORE_COMMAND: Type = 134217781;
-    pub const WAIT_EVENT_SAFE_SNAPSHOT: Type = 134217782;
-    pub const WAIT_EVENT_SYNC_REP: Type = 134217783;
-    pub const WAIT_EVENT_WAL_RECEIVER_EXIT: Type = 134217784;
-    pub const WAIT_EVENT_WAL_RECEIVER_WAIT_START: Type = 134217785;
-    pub const WAIT_EVENT_WAL_SUMMARY_READY: Type = 134217786;
-    pub const WAIT_EVENT_XACT_GROUP_UPDATE: Type = 134217787;
+    pub const WAIT_EVENT_EXECUTE_GATHER: Type = 134217741;
+    pub const WAIT_EVENT_HASH_BATCH_ALLOCATE: Type = 134217742;
+    pub const WAIT_EVENT_HASH_BATCH_ELECT: Type = 134217743;
+    pub const WAIT_EVENT_HASH_BATCH_LOAD: Type = 134217744;
+    pub const WAIT_EVENT_HASH_BUILD_ALLOCATE: Type = 134217745;
+    pub const WAIT_EVENT_HASH_BUILD_ELECT: Type = 134217746;
+    pub const WAIT_EVENT_HASH_BUILD_HASH_INNER: Type = 134217747;
+    pub const WAIT_EVENT_HASH_BUILD_HASH_OUTER: Type = 134217748;
+    pub const WAIT_EVENT_HASH_GROW_BATCHES_DECIDE: Type = 134217749;
+    pub const WAIT_EVENT_HASH_GROW_BATCHES_ELECT: Type = 134217750;
+    pub const WAIT_EVENT_HASH_GROW_BATCHES_FINISH: Type = 134217751;
+    pub const WAIT_EVENT_HASH_GROW_BATCHES_REALLOCATE: Type = 134217752;
+    pub const WAIT_EVENT_HASH_GROW_BATCHES_REPARTITION: Type = 134217753;
+    pub const WAIT_EVENT_HASH_GROW_BUCKETS_ELECT: Type = 134217754;
+    pub const WAIT_EVENT_HASH_GROW_BUCKETS_REALLOCATE: Type = 134217755;
+    pub const WAIT_EVENT_HASH_GROW_BUCKETS_REINSERT: Type = 134217756;
+    pub const WAIT_EVENT_LOGICAL_APPLY_SEND_DATA: Type = 134217757;
+    pub const WAIT_EVENT_LOGICAL_PARALLEL_APPLY_STATE_CHANGE: Type = 134217758;
+    pub const WAIT_EVENT_LOGICAL_SYNC_DATA: Type = 134217759;
+    pub const WAIT_EVENT_LOGICAL_SYNC_STATE_CHANGE: Type = 134217760;
+    pub const WAIT_EVENT_MESSAGE_QUEUE_INTERNAL: Type = 134217761;
+    pub const WAIT_EVENT_MESSAGE_QUEUE_PUT_MESSAGE: Type = 134217762;
+    pub const WAIT_EVENT_MESSAGE_QUEUE_RECEIVE: Type = 134217763;
+    pub const WAIT_EVENT_MESSAGE_QUEUE_SEND: Type = 134217764;
+    pub const WAIT_EVENT_MULTIXACT_CREATION: Type = 134217765;
+    pub const WAIT_EVENT_PARALLEL_BITMAP_SCAN: Type = 134217766;
+    pub const WAIT_EVENT_PARALLEL_CREATE_INDEX_SCAN: Type = 134217767;
+    pub const WAIT_EVENT_PARALLEL_FINISH: Type = 134217768;
+    pub const WAIT_EVENT_PROCARRAY_GROUP_UPDATE: Type = 134217769;
+    pub const WAIT_EVENT_PROC_SIGNAL_BARRIER: Type = 134217770;
+    pub const WAIT_EVENT_PROMOTE: Type = 134217771;
+    pub const WAIT_EVENT_RECOVERY_CONFLICT_SNAPSHOT: Type = 134217772;
+    pub const WAIT_EVENT_RECOVERY_CONFLICT_TABLESPACE: Type = 134217773;
+    pub const WAIT_EVENT_RECOVERY_END_COMMAND: Type = 134217774;
+    pub const WAIT_EVENT_RECOVERY_PAUSE: Type = 134217775;
+    pub const WAIT_EVENT_REPACK_WORKER_EXPORT: Type = 134217776;
+    pub const WAIT_EVENT_REPLICATION_ORIGIN_DROP: Type = 134217777;
+    pub const WAIT_EVENT_REPLICATION_SLOT_DROP: Type = 134217778;
+    pub const WAIT_EVENT_RESTORE_COMMAND: Type = 134217779;
+    pub const WAIT_EVENT_SAFE_SNAPSHOT: Type = 134217780;
+    pub const WAIT_EVENT_SYNC_REP: Type = 134217781;
+    pub const WAIT_EVENT_WAIT_FOR_WAL_FLUSH: Type = 134217782;
+    pub const WAIT_EVENT_WAIT_FOR_WAL_REPLAY: Type = 134217783;
+    pub const WAIT_EVENT_WAIT_FOR_WAL_WRITE: Type = 134217784;
+    pub const WAIT_EVENT_WAL_RECEIVER_EXIT: Type = 134217785;
+    pub const WAIT_EVENT_WAL_RECEIVER_UPSTREAM_CATCHUP: Type = 134217786;
+    pub const WAIT_EVENT_WAL_RECEIVER_WAIT_START: Type = 134217787;
+    pub const WAIT_EVENT_WAL_SUMMARY_READY: Type = 134217788;
+    pub const WAIT_EVENT_XACT_GROUP_UPDATE: Type = 134217789;
 }
 pub mod WaitEventTimeout {
     pub type Type = ::core::ffi::c_uint;
@@ -43151,7 +42824,29 @@ pub mod WaitEventTimeout {
     pub const WAIT_EVENT_VACUUM_TRUNCATE: Type = 150994953;
     pub const WAIT_EVENT_WAL_SUMMARIZER_ERROR: Type = 150994954;
 }
-pub type __builtin_va_list = *mut ::core::ffi::c_char;
+pub type __builtin_va_list = [__va_list_tag; 1usize];
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct __va_list_tag {
+    pub gp_offset: ::core::ffi::c_uint,
+    pub fp_offset: ::core::ffi::c_uint,
+    pub overflow_arg_area: *mut ::core::ffi::c_void,
+    pub reg_save_area: *mut ::core::ffi::c_void,
+}
+impl Default for __va_list_tag {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Default, Copy, Clone)]
+pub struct __locale_data {
+    pub _address: u8,
+}
 #[repr(C)]
 #[derive(Debug, Default, Copy, Clone)]
 pub struct GlobalVisState {
@@ -43229,7 +42924,6 @@ unsafe extern "C-unwind" {
         fileName: *const ::core::ffi::c_char,
         lineNumber: ::core::ffi::c_int,
     );
-    pub fn fdatasync(fd: ::core::ffi::c_int) -> ::core::ffi::c_int;
     pub fn pg_set_noblock(sock: pgsocket) -> bool;
     pub fn pg_set_block(sock: pgsocket) -> bool;
     pub fn has_drive_prefix(path: *const ::core::ffi::c_char) -> bool;
@@ -43340,7 +43034,7 @@ unsafe extern "C-unwind" {
         str_: *mut ::core::ffi::c_char,
         count: usize,
         fmt: *const ::core::ffi::c_char,
-        args: va_list,
+        args: *mut __va_list_tag,
     ) -> ::core::ffi::c_int;
     pub fn pg_snprintf(
         str_: *mut ::core::ffi::c_char,
@@ -43351,7 +43045,7 @@ unsafe extern "C-unwind" {
     pub fn pg_vsprintf(
         str_: *mut ::core::ffi::c_char,
         fmt: *const ::core::ffi::c_char,
-        args: va_list,
+        args: *mut __va_list_tag,
     ) -> ::core::ffi::c_int;
     pub fn pg_sprintf(
         str_: *mut ::core::ffi::c_char,
@@ -43361,14 +43055,17 @@ unsafe extern "C-unwind" {
     pub fn pg_vfprintf(
         stream: *mut FILE,
         fmt: *const ::core::ffi::c_char,
-        args: va_list,
+        args: *mut __va_list_tag,
     ) -> ::core::ffi::c_int;
     pub fn pg_fprintf(
         stream: *mut FILE,
         fmt: *const ::core::ffi::c_char,
         ...
     ) -> ::core::ffi::c_int;
-    pub fn pg_vprintf(fmt: *const ::core::ffi::c_char, args: va_list) -> ::core::ffi::c_int;
+    pub fn pg_vprintf(
+        fmt: *const ::core::ffi::c_char,
+        args: *mut __va_list_tag,
+    ) -> ::core::ffi::c_int;
     pub fn pg_printf(fmt: *const ::core::ffi::c_char, ...) -> ::core::ffi::c_int;
     pub fn pg_strfromd(
         str_: *mut ::core::ffi::c_char,
@@ -43385,7 +43082,16 @@ unsafe extern "C-unwind" {
     pub fn pg_strsignal(signum: ::core::ffi::c_int) -> *const ::core::ffi::c_char;
     pub fn pclose_check(stream: *mut FILE) -> ::core::ffi::c_int;
     pub fn rmtree(path: *const ::core::ffi::c_char, rmtopdir: bool) -> bool;
-    pub fn explicit_bzero(buf: *mut ::core::ffi::c_void, len: usize);
+    pub fn getpeereid(
+        sock: ::core::ffi::c_int,
+        uid: *mut uid_t,
+        gid: *mut gid_t,
+    ) -> ::core::ffi::c_int;
+    pub fn timingsafe_bcmp(
+        b1: *const ::core::ffi::c_void,
+        b2: *const ::core::ffi::c_void,
+        n: usize,
+    ) -> ::core::ffi::c_int;
     pub fn pg_qsort(
         base: *mut ::core::ffi::c_void,
         nel: usize,
@@ -43486,7 +43192,7 @@ unsafe extern "C-unwind" {
     pub fn appendStringInfoVA(
         str_: StringInfo,
         fmt: *const ::core::ffi::c_char,
-        args: va_list,
+        args: *mut __va_list_tag,
     ) -> ::core::ffi::c_int;
     pub fn appendStringInfoString(str_: StringInfo, s: *const ::core::ffi::c_char);
     pub fn appendStringInfoChar(str_: StringInfo, ch: ::core::ffi::c_char);
@@ -43599,7 +43305,7 @@ unsafe extern "C-unwind" {
     pub fn write_csvlog(edata: *mut ErrorData);
     pub fn write_jsonlog(edata: *mut ErrorData);
     pub fn write_stderr(fmt: *const ::core::ffi::c_char, ...);
-    pub fn vwrite_stderr(fmt: *const ::core::ffi::c_char, ap: va_list);
+    pub fn vwrite_stderr(fmt: *const ::core::ffi::c_char, ap: *mut __va_list_tag);
     pub static mut CurrentMemoryContext: MemoryContext;
     pub fn MemoryContextAlloc(context: MemoryContext, size: Size) -> *mut ::core::ffi::c_void;
     pub fn MemoryContextAllocZero(context: MemoryContext, size: Size) -> *mut ::core::ffi::c_void;
@@ -43657,6 +43363,8 @@ unsafe extern "C-unwind" {
     pub fn MemoryContextAllocHuge(context: MemoryContext, size: Size) -> *mut ::core::ffi::c_void;
     pub fn repalloc_huge(pointer: *mut ::core::ffi::c_void, size: Size)
     -> *mut ::core::ffi::c_void;
+    #[link_name = "MemoryContextSwitchTo__pgrx_cshim"]
+    pub fn MemoryContextSwitchTo(context: MemoryContext) -> MemoryContext;
     pub fn MemoryContextRegisterResetCallback(
         context: MemoryContext,
         cb: *mut MemoryContextCallback,
@@ -43677,7 +43385,7 @@ unsafe extern "C-unwind" {
         buf: *mut ::core::ffi::c_char,
         len: usize,
         fmt: *const ::core::ffi::c_char,
-        args: va_list,
+        args: *mut __va_list_tag,
     ) -> usize;
     #[link_name = "DatumGetBool__pgrx_cshim"]
     pub fn DatumGetBool(X: Datum) -> bool;
@@ -43751,6 +43459,60 @@ unsafe extern "C-unwind" {
     pub fn DatumGetFloat8(X: Datum) -> float8;
     #[link_name = "Float8GetDatum__pgrx_cshim"]
     pub fn Float8GetDatum(X: float8) -> Datum;
+    pub fn pg_cryptohash_create(type_: pg_cryptohash_type::Type) -> *mut pg_cryptohash_ctx;
+    pub fn pg_cryptohash_init(ctx: *mut pg_cryptohash_ctx) -> ::core::ffi::c_int;
+    pub fn pg_cryptohash_update(
+        ctx: *mut pg_cryptohash_ctx,
+        data: *const uint8,
+        len: usize,
+    ) -> ::core::ffi::c_int;
+    pub fn pg_cryptohash_final(
+        ctx: *mut pg_cryptohash_ctx,
+        dest: *mut uint8,
+        len: usize,
+    ) -> ::core::ffi::c_int;
+    pub fn pg_cryptohash_free(ctx: *mut pg_cryptohash_ctx);
+    pub fn pg_cryptohash_error(ctx: *mut pg_cryptohash_ctx) -> *const ::core::ffi::c_char;
+    pub fn scram_SaltedPassword(
+        password: *const ::core::ffi::c_char,
+        hash_type: pg_cryptohash_type::Type,
+        key_length: ::core::ffi::c_int,
+        salt: *const uint8,
+        saltlen: ::core::ffi::c_int,
+        iterations: ::core::ffi::c_int,
+        result: *mut uint8,
+        errstr: *mut *const ::core::ffi::c_char,
+    ) -> ::core::ffi::c_int;
+    pub fn scram_H(
+        input: *const uint8,
+        hash_type: pg_cryptohash_type::Type,
+        key_length: ::core::ffi::c_int,
+        result: *mut uint8,
+        errstr: *mut *const ::core::ffi::c_char,
+    ) -> ::core::ffi::c_int;
+    pub fn scram_ClientKey(
+        salted_password: *const uint8,
+        hash_type: pg_cryptohash_type::Type,
+        key_length: ::core::ffi::c_int,
+        result: *mut uint8,
+        errstr: *mut *const ::core::ffi::c_char,
+    ) -> ::core::ffi::c_int;
+    pub fn scram_ServerKey(
+        salted_password: *const uint8,
+        hash_type: pg_cryptohash_type::Type,
+        key_length: ::core::ffi::c_int,
+        result: *mut uint8,
+        errstr: *mut *const ::core::ffi::c_char,
+    ) -> ::core::ffi::c_int;
+    pub fn scram_build_secret(
+        hash_type: pg_cryptohash_type::Type,
+        key_length: ::core::ffi::c_int,
+        salt: *const uint8,
+        saltlen: ::core::ffi::c_int,
+        iterations: ::core::ffi::c_int,
+        password: *const ::core::ffi::c_char,
+        errstr: *mut *const ::core::ffi::c_char,
+    ) -> *mut ::core::ffi::c_char;
     #[link_name = "BlockNumberIsValid__pgrx_cshim"]
     pub fn BlockNumberIsValid(blockNumber: BlockNumber) -> bool;
     #[link_name = "BlockIdSet__pgrx_cshim"]
@@ -44364,8 +44126,6 @@ unsafe extern "C-unwind" {
     pub fn systable_inplace_update_cancel(state: *mut ::core::ffi::c_void);
     #[link_name = "newNode__pgrx_cshim"]
     pub fn newNode(size: usize, tag: NodeTag) -> *mut Node;
-    #[link_name = "castNodeImpl__pgrx_cshim"]
-    pub fn castNodeImpl(type_: NodeTag, ptr: *mut ::core::ffi::c_void) -> *mut Node;
     pub fn outNode(str_: *mut StringInfoData, obj: *const ::core::ffi::c_void);
     pub fn outToken(str_: *mut StringInfoData, s: *const ::core::ffi::c_char);
     pub fn outBitmapset(str_: *mut StringInfoData, bms: *const Bitmapset);
@@ -44379,7 +44139,6 @@ unsafe extern "C-unwind" {
     pub fn nodeToStringWithLocations(obj: *const ::core::ffi::c_void) -> *mut ::core::ffi::c_char;
     pub fn bmsToString(bms: *const Bitmapset) -> *mut ::core::ffi::c_char;
     pub fn stringToNode(str_: *const ::core::ffi::c_char) -> *mut ::core::ffi::c_void;
-    pub fn stringToNodeWithLocations(str_: *const ::core::ffi::c_char) -> *mut ::core::ffi::c_void;
     pub fn readBitmapset() -> *mut Bitmapset;
     pub fn readDatum(typbyval: bool) -> Datum;
     pub fn readBoolCols(numCols: ::core::ffi::c_int) -> *mut bool;
@@ -44754,9 +44513,9 @@ unsafe extern "C-unwind" {
         key2: *const ::core::ffi::c_void,
         keysize: Size,
     ) -> ::core::ffi::c_int;
+    #[link_name = "AssertCouldGetRelation__pgrx_cshim"]
     pub fn AssertCouldGetRelation();
     pub fn RelationIdGetRelation(relationId: Oid) -> Relation;
-    pub fn RelationGetQualifiedRelationName(rel: Relation) -> *mut ::core::ffi::c_char;
     pub fn RelationClose(relation: Relation);
     pub fn RelationGetFKeyList(relation: Relation) -> *mut List;
     pub fn RelationGetIndexList(relation: Relation) -> *mut List;
@@ -44812,7 +44571,6 @@ unsafe extern "C-unwind" {
     pub fn RelationForgetRelation(rid: Oid);
     pub fn RelationCacheInvalidateEntry(relationId: Oid);
     pub fn RelationCacheInvalidate(debug_discard: bool);
-    pub fn AssertPendingSyncs_RelationCache();
     pub fn AtEOXact_RelationCache(isCommit: bool);
     pub fn AtEOSubXact_RelationCache(
         isCommit: bool,
@@ -45053,6 +44811,8 @@ unsafe extern "C-unwind" {
     pub fn PageSetPageSizeAndVersion(page: Page, size: Size, version: uint8);
     #[link_name = "PageGetSpecialSize__pgrx_cshim"]
     pub fn PageGetSpecialSize(page: *const PageData) -> uint16;
+    #[link_name = "PageValidateSpecialPointer__pgrx_cshim"]
+    pub fn PageValidateSpecialPointer(page: *const PageData);
     #[link_name = "PageGetItem__pgrx_cshim"]
     pub fn PageGetItem(page: *mut PageData, itemId: *const ItemIdData) -> *mut ::core::ffi::c_void;
     #[link_name = "PageGetMaxOffsetNumber__pgrx_cshim"]
@@ -45118,40 +44878,42 @@ unsafe extern "C-unwind" {
         newsize: Size,
     ) -> bool;
     pub fn PageSetChecksum(page: Page, blkno: BlockNumber);
+    #[link_name = "pg_spin_delay_impl__pgrx_cshim"]
+    pub fn pg_spin_delay_impl();
     #[link_name = "pg_atomic_test_set_flag_impl__pgrx_cshim"]
     pub fn pg_atomic_test_set_flag_impl(ptr: *mut pg_atomic_flag) -> bool;
-    #[link_name = "pg_atomic_unlocked_test_flag_impl__pgrx_cshim"]
-    pub fn pg_atomic_unlocked_test_flag_impl(ptr: *mut pg_atomic_flag) -> bool;
     #[link_name = "pg_atomic_clear_flag_impl__pgrx_cshim"]
     pub fn pg_atomic_clear_flag_impl(ptr: *mut pg_atomic_flag);
-    #[link_name = "pg_atomic_init_flag_impl__pgrx_cshim"]
-    pub fn pg_atomic_init_flag_impl(ptr: *mut pg_atomic_flag);
     #[link_name = "pg_atomic_compare_exchange_u32_impl__pgrx_cshim"]
     pub fn pg_atomic_compare_exchange_u32_impl(
         ptr: *mut pg_atomic_uint32,
         expected: *mut uint32,
         newval: uint32,
     ) -> bool;
-    #[link_name = "pg_atomic_exchange_u32_impl__pgrx_cshim"]
-    pub fn pg_atomic_exchange_u32_impl(ptr: *mut pg_atomic_uint32, newval: uint32) -> uint32;
     #[link_name = "pg_atomic_fetch_add_u32_impl__pgrx_cshim"]
     pub fn pg_atomic_fetch_add_u32_impl(ptr: *mut pg_atomic_uint32, add_: int32) -> uint32;
-    #[link_name = "pg_atomic_fetch_sub_u32_impl__pgrx_cshim"]
-    pub fn pg_atomic_fetch_sub_u32_impl(ptr: *mut pg_atomic_uint32, sub_: int32) -> uint32;
-    #[link_name = "pg_atomic_fetch_and_u32_impl__pgrx_cshim"]
-    pub fn pg_atomic_fetch_and_u32_impl(ptr: *mut pg_atomic_uint32, and_: uint32) -> uint32;
-    #[link_name = "pg_atomic_fetch_or_u32_impl__pgrx_cshim"]
-    pub fn pg_atomic_fetch_or_u32_impl(ptr: *mut pg_atomic_uint32, or_: uint32) -> uint32;
     #[link_name = "pg_atomic_compare_exchange_u64_impl__pgrx_cshim"]
     pub fn pg_atomic_compare_exchange_u64_impl(
         ptr: *mut pg_atomic_uint64,
         expected: *mut uint64,
         newval: uint64,
     ) -> bool;
-    #[link_name = "pg_atomic_exchange_u64_impl__pgrx_cshim"]
-    pub fn pg_atomic_exchange_u64_impl(ptr: *mut pg_atomic_uint64, newval: uint64) -> uint64;
     #[link_name = "pg_atomic_fetch_add_u64_impl__pgrx_cshim"]
     pub fn pg_atomic_fetch_add_u64_impl(ptr: *mut pg_atomic_uint64, add_: int64) -> uint64;
+    #[link_name = "pg_atomic_unlocked_test_flag_impl__pgrx_cshim"]
+    pub fn pg_atomic_unlocked_test_flag_impl(ptr: *mut pg_atomic_flag) -> bool;
+    #[link_name = "pg_atomic_init_flag_impl__pgrx_cshim"]
+    pub fn pg_atomic_init_flag_impl(ptr: *mut pg_atomic_flag);
+    #[link_name = "pg_atomic_exchange_u32_impl__pgrx_cshim"]
+    pub fn pg_atomic_exchange_u32_impl(ptr: *mut pg_atomic_uint32, newval: uint32) -> uint32;
+    #[link_name = "pg_atomic_fetch_sub_u32_impl__pgrx_cshim"]
+    pub fn pg_atomic_fetch_sub_u32_impl(ptr: *mut pg_atomic_uint32, sub_: int32) -> uint32;
+    #[link_name = "pg_atomic_fetch_and_u32_impl__pgrx_cshim"]
+    pub fn pg_atomic_fetch_and_u32_impl(ptr: *mut pg_atomic_uint32, and_: uint32) -> uint32;
+    #[link_name = "pg_atomic_fetch_or_u32_impl__pgrx_cshim"]
+    pub fn pg_atomic_fetch_or_u32_impl(ptr: *mut pg_atomic_uint32, or_: uint32) -> uint32;
+    #[link_name = "pg_atomic_exchange_u64_impl__pgrx_cshim"]
+    pub fn pg_atomic_exchange_u64_impl(ptr: *mut pg_atomic_uint64, newval: uint64) -> uint64;
     #[link_name = "pg_atomic_fetch_sub_u64_impl__pgrx_cshim"]
     pub fn pg_atomic_fetch_sub_u64_impl(ptr: *mut pg_atomic_uint64, sub_: int64) -> uint64;
     #[link_name = "pg_atomic_fetch_and_u64_impl__pgrx_cshim"]
@@ -45476,6 +45238,14 @@ unsafe extern "C-unwind" {
     pub fn FullTransactionIdRetreat(dest: *mut FullTransactionId);
     #[link_name = "FullTransactionIdAdvance__pgrx_cshim"]
     pub fn FullTransactionIdAdvance(dest: *mut FullTransactionId);
+    #[link_name = "TransactionIdPrecedes__pgrx_cshim"]
+    pub fn TransactionIdPrecedes(id1: TransactionId, id2: TransactionId) -> bool;
+    #[link_name = "TransactionIdPrecedesOrEquals__pgrx_cshim"]
+    pub fn TransactionIdPrecedesOrEquals(id1: TransactionId, id2: TransactionId) -> bool;
+    #[link_name = "TransactionIdFollows__pgrx_cshim"]
+    pub fn TransactionIdFollows(id1: TransactionId, id2: TransactionId) -> bool;
+    #[link_name = "TransactionIdFollowsOrEquals__pgrx_cshim"]
+    pub fn TransactionIdFollowsOrEquals(id1: TransactionId, id2: TransactionId) -> bool;
     pub fn TransactionStartedDuringRecovery() -> bool;
     pub static mut TransamVariables: *mut TransamVariablesData;
     pub fn TransactionIdDidCommit(transactionId: TransactionId) -> bool;
@@ -45510,7 +45280,6 @@ unsafe extern "C-unwind" {
     pub fn ForceTransactionIdLimitUpdate() -> bool;
     pub fn GetNewObjectId() -> Oid;
     pub fn StopGeneratingPinnedObjectIds();
-    pub fn AssertTransactionIdInAllowableRange(xid: TransactionId);
     #[link_name = "ReadNextTransactionId__pgrx_cshim"]
     pub fn ReadNextTransactionId() -> TransactionId;
     #[link_name = "TransactionIdRetreatedBy__pgrx_cshim"]
@@ -45530,6 +45299,11 @@ unsafe extern "C-unwind" {
     pub fn RmgrIdIsBuiltin(rmid: ::core::ffi::c_int) -> bool;
     #[link_name = "RmgrIdIsCustom__pgrx_cshim"]
     pub fn RmgrIdIsCustom(rmid: ::core::ffi::c_int) -> bool;
+    pub fn pg_comp_crc32c_sb8(
+        crc: pg_crc32c,
+        data: *const ::core::ffi::c_void,
+        len: usize,
+    ) -> pg_crc32c;
     pub static mut pg_comp_crc32c: ::core::option::Option<
         unsafe extern "C-unwind" fn(
             crc: pg_crc32c,
@@ -45537,12 +45311,12 @@ unsafe extern "C-unwind" {
             len: usize,
         ) -> pg_crc32c,
     >;
-    pub fn pg_comp_crc32c_armv8(
+    pub fn pg_comp_crc32c_sse42(
         crc: pg_crc32c,
         data: *const ::core::ffi::c_void,
         len: usize,
     ) -> pg_crc32c;
-    pub fn pg_comp_crc32c_pmull(
+    pub fn pg_comp_crc32c_avx512(
         crc: pg_crc32c,
         data: *const ::core::ffi::c_void,
         len: usize,
@@ -45848,7 +45622,6 @@ unsafe extern "C-unwind" {
     ) -> Buffer;
     pub fn InitBufferManagerAccess();
     pub fn AtEOXact_Buffers(isCommit: bool);
-    pub fn AssertBufferLocksPermitCatalogRead();
     pub fn DebugPrintBufferRefcount(buffer: Buffer) -> *mut ::core::ffi::c_char;
     pub fn CheckPointBuffers(flags: ::core::ffi::c_int);
     pub fn BufferGetBlockNumber(buffer: Buffer) -> BlockNumber;
@@ -46067,7 +45840,6 @@ unsafe extern "C-unwind" {
     pub static mut CommitSiblings: ::core::ffi::c_int;
     pub static mut track_wal_io_timing: bool;
     pub static mut wal_decode_buffer_size: ::core::ffi::c_int;
-    pub static mut data_checksums: ::core::ffi::c_int;
     pub static mut CheckPointSegments: ::core::ffi::c_int;
     pub static mut XLogArchiveMode: ::core::ffi::c_int;
     pub static mut wal_level: ::core::ffi::c_int;
@@ -46093,11 +45865,8 @@ unsafe extern "C-unwind" {
     pub fn XLogSetReplicationSlotMinimumLSN(lsn: XLogRecPtr);
     pub fn XLogGetReplicationSlotMinimumLSN() -> XLogRecPtr;
     pub fn xlog_redo(record: *mut XLogReaderState);
-    pub fn xlog2_redo(record: *mut XLogReaderState);
     pub fn xlog_desc(buf: StringInfo, record: *mut XLogReaderState);
-    pub fn xlog2_desc(buf: StringInfo, record: *mut XLogReaderState);
     pub fn xlog_identify(info: uint8) -> *const ::core::ffi::c_char;
-    pub fn xlog2_identify(info: uint8) -> *const ::core::ffi::c_char;
     pub fn issue_xlog_fsync(fd: ::core::ffi::c_int, segno: XLogSegNo, tli: TimeLineID);
     pub fn RecoveryInProgress() -> bool;
     pub fn GetRecoveryState() -> RecoveryState::Type;
@@ -46107,18 +45876,7 @@ unsafe extern "C-unwind" {
     pub fn GetXLogWriteRecPtr() -> XLogRecPtr;
     pub fn GetSystemIdentifier() -> uint64;
     pub fn GetMockAuthenticationNonce() -> *mut ::core::ffi::c_char;
-    pub fn DataChecksumsNeedWrite() -> bool;
-    pub fn DataChecksumsNeedVerify() -> bool;
-    pub fn DataChecksumsOn() -> bool;
-    pub fn DataChecksumsOff() -> bool;
-    pub fn DataChecksumsInProgressOn() -> bool;
-    pub fn SetDataChecksumsOnInProgress();
-    pub fn SetDataChecksumsOn();
-    pub fn SetDataChecksumsOff();
-    pub fn show_data_checksums() -> *const ::core::ffi::c_char;
-    pub fn get_checksum_state_string(state: uint32) -> *const ::core::ffi::c_char;
-    pub fn InitLocalDataChecksumState();
-    pub fn SetLocalDataChecksumState(data_checksum_version: uint32);
+    pub fn DataChecksumsEnabled() -> bool;
     pub fn GetDefaultCharSignedness() -> bool;
     pub fn GetFakeLSNForUnloggedRel() -> XLogRecPtr;
     pub fn BootStrapXLOG(data_checksum_version: uint32);
@@ -46386,6 +46144,7 @@ unsafe extern "C-unwind" {
     ) -> *mut Publication;
     pub fn GetRelationIncludedPublications(relid: Oid) -> *mut List;
     pub fn GetRelationExcludedPublications(relid: Oid) -> *mut List;
+    pub fn RelationHasPublication(relid: Oid) -> bool;
     pub fn GetIncludedPublicationRelations(
         pubid: Oid,
         pub_partopt: PublicationPartOpt::Type,
@@ -46821,6 +46580,8 @@ unsafe extern "C-unwind" {
     pub fn HeapTupleHeaderSetMatch(tup: *mut MinimalTupleData);
     #[link_name = "HeapTupleHeaderClearMatch__pgrx_cshim"]
     pub fn HeapTupleHeaderClearMatch(tup: *mut MinimalTupleData);
+    #[link_name = "GETSTRUCT__pgrx_cshim"]
+    pub fn GETSTRUCT(tuple: *const HeapTupleData) -> *mut ::core::ffi::c_void;
     #[link_name = "HeapTupleHasNulls__pgrx_cshim"]
     pub fn HeapTupleHasNulls(tuple: *const HeapTupleData) -> bool;
     #[link_name = "HeapTupleNoNulls__pgrx_cshim"]
@@ -46915,10 +46676,18 @@ unsafe extern "C-unwind" {
     pub fn heap_copy_minimal_tuple(mtup: MinimalTuple, extra: Size) -> MinimalTuple;
     pub fn heap_tuple_from_minimal_tuple(mtup: MinimalTuple) -> HeapTuple;
     pub fn minimal_tuple_from_heap_tuple(htup: HeapTuple, extra: Size) -> MinimalTuple;
+    pub fn varsize_any(p: *mut ::core::ffi::c_void) -> usize;
     pub fn heap_expand_tuple(sourceTuple: HeapTuple, tupleDesc: TupleDesc) -> HeapTuple;
     pub fn minimal_expand_tuple(sourceTuple: HeapTuple, tupleDesc: TupleDesc) -> MinimalTuple;
     #[link_name = "fastgetattr__pgrx_cshim"]
     pub fn fastgetattr(
+        tup: HeapTuple,
+        attnum: ::core::ffi::c_int,
+        tupleDesc: TupleDesc,
+        isnull: *mut bool,
+    ) -> Datum;
+    #[link_name = "heap_getattr__pgrx_cshim"]
+    pub fn heap_getattr(
         tup: HeapTuple,
         attnum: ::core::ffi::c_int,
         tupleDesc: TupleDesc,
@@ -47310,7 +47079,7 @@ unsafe extern "C-unwind" {
     );
     pub fn ginInsertCleanup(
         ginstate: *mut GinState,
-        full_clean: bool,
+        must_empty_list: bool,
         fill_fsm: bool,
         forceCleanup: bool,
         stats: *mut IndexBulkDeleteResult,
@@ -48535,6 +48304,7 @@ unsafe extern "C-unwind" {
     ) -> *mut ReadStream;
     pub fn read_stream_pause(stream: *mut ReadStream) -> BlockNumber;
     pub fn read_stream_resume(stream: *mut ReadStream);
+    pub fn read_stream_clear_strategy(stream: *mut ReadStream);
     pub fn read_stream_reset(stream: *mut ReadStream);
     pub fn read_stream_end(stream: *mut ReadStream);
     pub fn read_stream_enable_stats(stream: *mut ReadStream, stats: *mut IOStats);
@@ -49131,14 +48901,6 @@ unsafe extern "C-unwind" {
         params: *const VacuumParams,
         bstrategy: BufferAccessStrategy,
     );
-    pub fn heap_page_is_all_visible(
-        rel: Relation,
-        buf: Buffer,
-        vistest: *mut GlobalVisState,
-        all_frozen: *mut bool,
-        newest_live_xid: *mut TransactionId,
-        logging_offnum: *mut OffsetNumber,
-    ) -> bool;
     pub fn HeapTupleSatisfiesVisibility(
         htup: HeapTuple,
         snapshot: Snapshot,
@@ -49228,6 +48990,10 @@ unsafe extern "C-unwind" {
         vmbuffer_other: *mut Buffer,
         num_pages: ::core::ffi::c_int,
     ) -> Buffer;
+    #[link_name = "MultiXactIdPrecedes__pgrx_cshim"]
+    pub fn MultiXactIdPrecedes(multi1: MultiXactId, multi2: MultiXactId) -> bool;
+    #[link_name = "MultiXactIdPrecedesOrEquals__pgrx_cshim"]
+    pub fn MultiXactIdPrecedesOrEquals(multi1: MultiXactId, multi2: MultiXactId) -> bool;
     pub fn MultiXactIdCreate(
         xid1: TransactionId,
         status1: MultiXactStatus::Type,
@@ -49259,8 +49025,6 @@ unsafe extern "C-unwind" {
         oldestMultiXactId: *mut MultiXactId,
         oldestOffset: *mut MultiXactOffset,
     );
-    pub fn MultiXactIdPrecedes(multi1: MultiXactId, multi2: MultiXactId) -> bool;
-    pub fn MultiXactIdPrecedesOrEquals(multi1: MultiXactId, multi2: MultiXactId) -> bool;
     pub fn multixactoffsetssyncfiletag(
         ftag: *const FileTag,
         path: *mut ::core::ffi::c_char,
@@ -50275,7 +50039,6 @@ unsafe extern "C-unwind" {
     ) -> ::core::ffi::c_int;
     pub fn SimpleLruWritePage(ctl: *mut SlruDesc, slotno: ::core::ffi::c_int);
     pub fn SimpleLruWriteAll(ctl: *mut SlruDesc, allow_redirtied: bool);
-    pub fn SlruPagePrecedesUnitTests(ctl: *mut SlruDesc, per_page: ::core::ffi::c_int);
     pub fn SimpleLruTruncate(ctl: *mut SlruDesc, cutoffPage: int64);
     pub fn SimpleLruDoesPhysicalPageExist(ctl: *mut SlruDesc, pageno: int64) -> bool;
     pub fn SlruScanDirectory(
@@ -50721,7 +50484,7 @@ unsafe extern "C-unwind" {
         vmBuf: Buffer,
         flags: uint8,
         rlocator: RelFileLocator,
-    );
+    ) -> uint8;
     pub fn visibilitymap_get_status(
         rel: Relation,
         heapBlk: BlockNumber,
@@ -51064,6 +50827,8 @@ unsafe extern "C-unwind" {
     pub fn GetCurrentReplayRecPtr(replayEndTLI: *mut TimeLineID) -> XLogRecPtr;
     pub fn PromoteIsTriggered() -> bool;
     pub fn CheckPromoteSignal() -> bool;
+    pub fn RecoverySubtransInitialized() -> bool;
+    pub fn SetRecoverySubtransInitialized();
     pub fn WakeupRecovery();
     pub fn StartupRequestWalReceiverRestart();
     pub fn XLogRequestWalReceiverReply();
@@ -51093,6 +50858,11 @@ unsafe extern "C-unwind" {
         buf: *mut Buffer,
     ) -> XLogRedoAction::Type;
     pub fn XLogInitBufferForRedo(record: *mut XLogReaderState, block_id: uint8) -> Buffer;
+    pub fn XLogFlushBufferForRedoIfInit(
+        record: *mut XLogReaderState,
+        block_id: uint8,
+        buffer: Buffer,
+    );
     pub fn XLogReadBufferForRedoExtended(
         record: *mut XLogReaderState,
         block_id: uint8,
@@ -51143,7 +50913,7 @@ unsafe extern "C-unwind" {
     pub fn WaitForLSN(
         lsnType: WaitLSNType::Type,
         targetLSN: XLogRecPtr,
-        timeout: int64,
+        timeout: ::core::ffi::c_int,
     ) -> WaitLSNResult::Type;
     pub static mut binary_upgrade_next_pg_tablespace_oid: Oid;
     pub static mut binary_upgrade_next_pg_type_oid: Oid;
@@ -51162,11 +50932,6 @@ unsafe extern "C-unwind" {
     pub fn AcquireDeletionLock(object: *const ObjectAddress, flags: ::core::ffi::c_int);
     pub fn ReleaseDeletionLock(object: *const ObjectAddress);
     pub fn performDeletion(
-        object: *const ObjectAddress,
-        behavior: DropBehavior::Type,
-        flags: ::core::ffi::c_int,
-    );
-    pub fn performDeletionCheck(
         object: *const ObjectAddress,
         behavior: DropBehavior::Type,
         flags: ::core::ffi::c_int,
@@ -51195,6 +50960,8 @@ unsafe extern "C-unwind" {
         self_behavior: DependencyType::Type,
         reverse_self: bool,
     );
+    pub fn CheckUsageOnTypesInExpr(expr: *mut Node, rtable: *mut List, roleid: Oid);
+    pub fn CheckUsageOnTypesInSingleRelExpr(expr: *mut Node, relId: Oid, roleid: Oid);
     pub fn find_temp_object(
         addrs: *const ObjectAddresses,
         local_temp_okay: bool,
@@ -51548,6 +51315,7 @@ unsafe extern "C-unwind" {
         attmap: *const AttrMap,
     ) -> bool;
     pub fn BuildSpeculativeIndexInfo(index: Relation, ii: *mut IndexInfo);
+    pub fn IsIndexCompatibleAsArbiter(indexRel1: Relation, indexRel2: Relation) -> bool;
     pub fn FormIndexDatum(
         indexInfo: *mut IndexInfo,
         slot: *mut TupleTableSlot,
@@ -51785,6 +51553,7 @@ unsafe extern "C-unwind" {
         finalfnModify: ::core::ffi::c_char,
         mfinalfnModify: ::core::ffi::c_char,
         aggsortopName: *mut List,
+        aggsupportfuncName: *mut List,
         aggTransType: Oid,
         aggTransSpace: int32,
         aggmTransType: Oid,
@@ -52298,9 +52067,6 @@ unsafe extern "C-unwind" {
     pub static mut Debug_print_raw_parse: bool;
     pub static mut Debug_print_rewritten: bool;
     pub static mut Debug_pretty_print: bool;
-    pub static mut Debug_copy_parse_plan_trees: bool;
-    pub static mut Debug_write_read_parse_plan_trees: bool;
-    pub static mut Debug_raw_expression_coverage_test: bool;
     pub static mut log_parser_stats: bool;
     pub static mut log_planner_stats: bool;
     pub static mut log_executor_stats: bool;
@@ -52637,6 +52403,7 @@ unsafe extern "C-unwind" {
     pub fn is_member_of_role(member: Oid, role: Oid) -> bool;
     pub fn is_member_of_role_nosuper(member: Oid, role: Oid) -> bool;
     pub fn is_admin_of_role(member: Oid, role: Oid) -> bool;
+    pub fn has_admin_privs_of_role(member: Oid, role: Oid) -> bool;
     pub fn select_best_admin(member: Oid, role: Oid) -> Oid;
     pub fn get_role_oid(rolname: *const ::core::ffi::c_char, missing_ok: bool) -> Oid;
     pub fn get_role_oid_or_public(rolname: *const ::core::ffi::c_char) -> Oid;
@@ -52652,6 +52419,7 @@ unsafe extern "C-unwind" {
         grantorId: *mut Oid,
         grantOptions: *mut AclMode,
     );
+    pub static mut cached_db_hash: uint32;
     pub fn initialize_acl();
     pub fn ExecuteGrantStmt(stmt: *mut GrantStmt);
     pub fn ExecAlterDefaultPrivilegesStmt(
@@ -52833,7 +52601,8 @@ unsafe extern "C-unwind" {
         mltrngConstruct2: RegProcedure,
     );
     pub fn RangeDelete(rangeTypeOid: Oid);
-    pub fn GetSubscription(subid: Oid, missing_ok: bool, aclcheck: bool) -> *mut Subscription;
+    pub fn GetSubscription(subid: Oid, missing_ok: bool) -> *mut Subscription;
+    pub fn SubscriptionConninfo(sub: *mut Subscription) -> *mut ::core::ffi::c_char;
     pub fn DisableSubscription(subid: Oid);
     pub fn CountDBSubscriptions(dbid: Oid) -> ::core::ffi::c_int;
     pub fn GetPublicationsStr(publications: *mut List, dest: StringInfo, quote_literal: bool);
@@ -52967,7 +52736,7 @@ unsafe extern "C-unwind" {
     pub fn smgr_redo(record: *mut XLogReaderState);
     pub fn smgr_desc(buf: StringInfo, record: *mut XLogReaderState);
     pub fn smgr_identify(info: uint8) -> *const ::core::ffi::c_char;
-    pub static sys_fk_relationships: [SysFKRelationship; 238usize];
+    pub static sys_fk_relationships: [SysFKRelationship; 226usize];
     pub fn NewRelationCreateToastTable(relOid: Oid, reloptions: Datum);
     pub fn NewHeapCreateToastTable(
         relOid: Oid,
@@ -53267,11 +53036,7 @@ unsafe extern "C-unwind" {
     pub fn RI_Initial_Check(trigger: *mut Trigger, fk_rel: Relation, pk_rel: Relation) -> bool;
     pub fn RI_PartitionRemove_Check(trigger: *mut Trigger, fk_rel: Relation, pk_rel: Relation);
     pub fn RI_FKey_trigger_type(tgfoid: Oid) -> ::core::ffi::c_int;
-    pub fn RegisterAfterTriggerBatchCallback(
-        callback: AfterTriggerBatchCallback,
-        arg: *mut ::core::ffi::c_void,
-    );
-    pub fn AfterTriggerIsActive() -> bool;
+    pub fn AtEOXact_RI(isCommit: bool);
     pub fn ReceiveCopyBegin(cstate: CopyFromState);
     pub fn ReceiveCopyBinaryHeader(cstate: CopyFromState);
     pub fn CopyFromTextOneRow(
@@ -53414,7 +53179,11 @@ unsafe extern "C-unwind" {
     pub fn DefineOperator(names: *mut List, parameters: *mut List) -> ObjectAddress;
     pub fn RemoveOperatorById(operOid: Oid);
     pub fn AlterOperator(stmt: *mut AlterOperatorStmt) -> ObjectAddress;
-    pub fn CreateStatistics(stmt: *mut CreateStatsStmt, check_rights: bool) -> ObjectAddress;
+    pub fn CreateStatistics(
+        relids: *mut List,
+        stmt: *mut CreateStatsStmt,
+        check_rights: bool,
+    ) -> ObjectAddress;
     pub fn AlterStatistics(stmt: *mut AlterStatsStmt) -> ObjectAddress;
     pub fn RemoveStatisticsById(statsOid: Oid);
     pub fn RemoveStatisticsDataById(statsOid: Oid, inh: bool);
@@ -53573,6 +53342,7 @@ unsafe extern "C-unwind" {
     pub fn MemoryContextDeleteChildren(context: MemoryContext);
     pub fn MemoryContextSetIdentifier(context: MemoryContext, id: *const ::core::ffi::c_char);
     pub fn MemoryContextSetParent(context: MemoryContext, new_parent: MemoryContext);
+    pub fn GetMemoryChunkContext(pointer: *mut ::core::ffi::c_void) -> MemoryContext;
     pub fn GetMemoryChunkSpace(pointer: *mut ::core::ffi::c_void) -> Size;
     pub fn MemoryContextGetParent(context: MemoryContext) -> MemoryContext;
     pub fn MemoryContextIsEmpty(context: MemoryContext) -> bool;
@@ -53586,7 +53356,6 @@ unsafe extern "C-unwind" {
         print_to_stderr: bool,
     );
     pub fn MemoryContextAllowInCriticalSection(context: MemoryContext, allow: bool);
-    pub fn MemoryContextCheck(context: MemoryContext);
     pub fn HandleLogMemoryContextInterrupt();
     pub fn ProcessLogMemoryContextInterrupt();
     pub fn AllocSetContextCreateInternal(
@@ -53848,11 +53617,6 @@ unsafe extern "C-unwind" {
     #[link_name = "ExecProcNode__pgrx_cshim"]
     pub fn ExecProcNode(node: *mut PlanState) -> *mut TupleTableSlot;
     pub fn ExecInitExpr(node: *mut Expr, parent: *mut PlanState) -> *mut ExprState;
-    pub fn ExecInitExprWithContext(
-        node: *mut Expr,
-        parent: *mut PlanState,
-        escontext: *mut Node,
-    ) -> *mut ExprState;
     pub fn ExecInitExprWithParams(node: *mut Expr, ext_params: ParamListInfo) -> *mut ExprState;
     pub fn ExecInitQual(qual: *mut List, parent: *mut PlanState) -> *mut ExprState;
     pub fn ExecInitCheck(qual: *mut List, parent: *mut PlanState) -> *mut ExprState;
@@ -53921,11 +53685,6 @@ unsafe extern "C-unwind" {
         parent: *mut PlanState,
     ) -> *mut ProjectionInfo;
     pub fn ExecPrepareExpr(node: *mut Expr, estate: *mut EState) -> *mut ExprState;
-    pub fn ExecPrepareExprWithContext(
-        node: *mut Expr,
-        estate: *mut EState,
-        escontext: *mut Node,
-    ) -> *mut ExprState;
     pub fn ExecPrepareQual(qual: *mut List, estate: *mut EState) -> *mut ExprState;
     pub fn ExecPrepareCheck(qual: *mut List, estate: *mut EState) -> *mut ExprState;
     pub fn ExecPrepareExprList(nodes: *mut List, estate: *mut EState) -> *mut List;
@@ -54063,6 +53822,7 @@ unsafe extern "C-unwind" {
     );
     pub fn ExecCloseRangeTableRelations(estate: *mut EState);
     pub fn ExecCloseResultRelations(estate: *mut EState);
+    pub fn ExecCloseTrigTargetRelations(estate: *mut EState);
     #[link_name = "exec_rt_fetch__pgrx_cshim"]
     pub fn exec_rt_fetch(rti: Index, estate: *mut EState) -> *mut RangeTblEntry;
     pub fn ExecGetRangeTableRelation(
@@ -54235,6 +53995,8 @@ unsafe extern "C-unwind" {
     pub fn pg_set_timing_clock_source(source: TimingClockSourceType::Type) -> bool;
     pub static mut timing_tsc_enabled: bool;
     pub static mut timing_tsc_frequency_khz: int32;
+    pub fn pg_initialize_timing_tsc();
+    pub fn pg_timing_tsc_clock_source_info() -> *const TscClockSourceInfo;
     #[link_name = "pg_current_timing_clock_source__pgrx_cshim"]
     pub fn pg_current_timing_clock_source() -> TimingClockSourceType::Type;
     #[link_name = "pg_get_ticks_system__pgrx_cshim"]
@@ -54243,6 +54005,10 @@ unsafe extern "C-unwind" {
     pub fn pg_ticks_to_ns(ticks: int64) -> int64;
     #[link_name = "pg_ns_to_ticks__pgrx_cshim"]
     pub fn pg_ns_to_ticks(ns: int64) -> int64;
+    #[link_name = "pg_rdtsc__pgrx_cshim"]
+    pub fn pg_rdtsc() -> int64;
+    #[link_name = "pg_rdtscp__pgrx_cshim"]
+    pub fn pg_rdtscp() -> int64;
     #[link_name = "pg_get_ticks__pgrx_cshim"]
     pub fn pg_get_ticks() -> instr_time;
     #[link_name = "pg_get_ticks_fast__pgrx_cshim"]
@@ -55226,8 +54992,8 @@ unsafe extern "C-unwind" {
         moveto: XLogRecPtr,
         found_consistent_snapshot: *mut bool,
     ) -> XLogRecPtr;
+    pub static mut output_plugin_libraries_string: *mut ::core::ffi::c_char;
     pub fn xlog_decode(ctx: *mut LogicalDecodingContext, buf: *mut XLogRecordBuffer);
-    pub fn xlog2_decode(ctx: *mut LogicalDecodingContext, buf: *mut XLogRecordBuffer);
     pub fn heap_decode(ctx: *mut LogicalDecodingContext, buf: *mut XLogRecordBuffer);
     pub fn heap2_decode(ctx: *mut LogicalDecodingContext, buf: *mut XLogRecordBuffer);
     pub fn xact_decode(ctx: *mut LogicalDecodingContext, buf: *mut XLogRecordBuffer);
@@ -55309,6 +55075,7 @@ unsafe extern "C-unwind" {
         retention_active: bool,
         max_retention_set: bool,
     );
+    pub fn CheckPubDeadTupleRetention(wrconn: *mut WalReceiverConn);
     pub fn DefineRelation(
         stmt: *mut CreateStmt,
         relkind: ::core::ffi::c_char,
@@ -55449,6 +55216,7 @@ unsafe extern "C-unwind" {
         names: *mut List,
         newConstraint: *mut Node,
         constrAddr: *mut ObjectAddress,
+        is_readd: bool,
     ) -> ObjectAddress;
     pub fn AlterDomainValidateConstraint(
         names: *mut List,
@@ -56100,7 +55868,11 @@ unsafe extern "C-unwind" {
         out_dbname: *mut ::core::ffi::c_char,
     );
     pub fn BaseInit();
-    pub fn StoreConnectionWarning(msg: *mut ::core::ffi::c_char, detail: *mut ::core::ffi::c_char);
+    pub fn StoreConnectionWarning(
+        msg: *mut ::core::ffi::c_char,
+        detail: *mut ::core::ffi::c_char,
+        filter: ConnectionWarningFilter,
+    );
     pub static mut IgnoreSystemIndexes: bool;
     pub static mut process_shared_preload_libraries_in_progress: bool;
     pub static mut process_shared_preload_libraries_done: bool;
@@ -56845,7 +56617,7 @@ unsafe extern "C-unwind" {
     ) -> ::core::ffi::c_int;
     pub fn SPI_execp(
         plan: SPIPlanPtr,
-        Values: *mut Datum,
+        Values: *const Datum,
         Nulls: *const ::core::ffi::c_char,
         tcount: ::core::ffi::c_long,
     ) -> ::core::ffi::c_int;
@@ -56906,7 +56678,7 @@ unsafe extern "C-unwind" {
         tuple: HeapTuple,
         natts: ::core::ffi::c_int,
         attnum: *mut ::core::ffi::c_int,
-        Values: *mut Datum,
+        Values: *const Datum,
         Nulls: *const ::core::ffi::c_char,
     ) -> HeapTuple;
     pub fn SPI_fnumber(tupdesc: TupleDesc, fname: *const ::core::ffi::c_char)
@@ -56946,7 +56718,7 @@ unsafe extern "C-unwind" {
         src: *const ::core::ffi::c_char,
         nargs: ::core::ffi::c_int,
         argtypes: *mut Oid,
-        Values: *mut Datum,
+        Values: *const Datum,
         Nulls: *const ::core::ffi::c_char,
         read_only: bool,
         cursorOptions: ::core::ffi::c_int,
@@ -57025,6 +56797,11 @@ unsafe extern "C-unwind" {
         server: *mut ForeignServer,
     ) -> *mut ::core::ffi::c_char;
     pub fn GetUserMapping(userid: Oid, serverid: Oid) -> *mut UserMapping;
+    pub fn GetUserMappingExtended(
+        userid: Oid,
+        serverid: Oid,
+        elevel: ::core::ffi::c_int,
+    ) -> *mut UserMapping;
     pub fn GetForeignDataWrapper(fdwid: Oid) -> *mut ForeignDataWrapper;
     pub fn GetForeignDataWrapperExtended(fdwid: Oid, flags: uint16) -> *mut ForeignDataWrapper;
     pub fn GetForeignDataWrapperByName(
@@ -57262,6 +57039,8 @@ unsafe extern "C-unwind" {
     pub fn GetDatabaseEncodingName() -> *const ::core::ffi::c_char;
     pub fn SetMessageEncoding(encoding: ::core::ffi::c_int);
     pub fn GetMessageEncoding() -> ::core::ffi::c_int;
+    pub fn pg_bind_textdomain_codeset(domainname: *const ::core::ffi::c_char)
+    -> ::core::ffi::c_int;
     pub fn pg_do_encoding_conversion(
         src: *mut ::core::ffi::c_uchar,
         len: ::core::ffi::c_int,
@@ -57758,7 +57537,6 @@ unsafe extern "C-unwind" {
     pub fn JumbleQuery(query: *mut Query) -> *mut JumbleState;
     pub fn EnableQueryId();
     pub static mut query_id_enabled: bool;
-    pub static mut restore_location_fields: bool;
     pub fn pg_strtok(length: *mut ::core::ffi::c_int) -> *const ::core::ffi::c_char;
     pub fn debackslash(
         token: *const ::core::ffi::c_char,
@@ -57850,6 +57628,11 @@ unsafe extern "C-unwind" {
     pub fn CommuteOpExpr(clause: *mut OpExpr);
     pub fn inline_function_in_from(root: *mut PlannerInfo, rte: *mut RangeTblEntry) -> *mut Query;
     pub fn pull_paramids(expr: *mut Expr) -> *mut Bitmapset;
+    pub fn expression_has_grouping_conflict(
+        expr: *mut Node,
+        get_eqop: grouping_eqop_callback,
+        context: *mut ::core::ffi::c_void,
+    ) -> bool;
     pub static mut disable_cost: Cost;
     pub static mut max_parallel_workers_per_gather: ::core::ffi::c_int;
     pub static mut enable_seqscan: bool;
@@ -58216,6 +57999,10 @@ unsafe extern "C-unwind" {
     pub fn pg_prng_double(state: *mut pg_prng_state) -> f64;
     pub fn pg_prng_double_normal(state: *mut pg_prng_state) -> f64;
     pub fn pg_prng_bool(state: *mut pg_prng_state) -> bool;
+    #[link_name = "fitness_is_valid__pgrx_cshim"]
+    pub fn fitness_is_valid(fitness: Fitness) -> bool;
+    #[link_name = "fitness_compare__pgrx_cshim"]
+    pub fn fitness_compare(fitness1: Fitness, fitness2: Fitness) -> ::core::ffi::c_int;
     pub static mut Geqo_effort: ::core::ffi::c_int;
     pub static mut Geqo_pool_size: ::core::ffi::c_int;
     pub static mut Geqo_generations: ::core::ffi::c_int;
@@ -58229,8 +58016,11 @@ unsafe extern "C-unwind" {
         number_of_rels: ::core::ffi::c_int,
         initial_rels: *mut List,
     ) -> *mut RelOptInfo;
-    pub fn geqo_eval(root: *mut PlannerInfo, tour: *mut Gene, num_gene: ::core::ffi::c_int)
-    -> Cost;
+    pub fn geqo_eval(
+        root: *mut PlannerInfo,
+        tour: *mut Gene,
+        num_gene: ::core::ffi::c_int,
+    ) -> Fitness;
     pub fn gimme_tree(
         root: *mut PlannerInfo,
         tour: *mut Gene,
@@ -58349,11 +58139,6 @@ unsafe extern "C-unwind" {
         rel2: *mut RelOptInfo,
     ) -> bool;
     pub fn add_join_clause_to_rels(
-        root: *mut PlannerInfo,
-        restrictinfo: *mut RestrictInfo,
-        join_relids: Relids,
-    );
-    pub fn remove_join_clause_from_rels(
         root: *mut PlannerInfo,
         restrictinfo: *mut RestrictInfo,
         join_relids: Relids,
@@ -58963,7 +58748,6 @@ unsafe extern "C-unwind" {
         onconflict: *mut OnConflictExpr,
         mergeActionLists: *mut List,
         mergeJoinConditions: *mut List,
-        forPortionOf: *mut ForPortionOfExpr,
         epqParam: ::core::ffi::c_int,
     ) -> *mut ModifyTablePath;
     pub fn create_limit_path(
@@ -59176,7 +58960,6 @@ unsafe extern "C-unwind" {
         req_collation: Oid,
     ) -> *mut Expr;
     pub fn reconsider_outer_join_clauses(root: *mut PlannerInfo);
-    pub fn rebuild_eclass_attr_needed(root: *mut PlannerInfo);
     pub fn get_eclass_for_sort_expr(
         root: *mut PlannerInfo,
         expr: *mut Expr,
@@ -59286,7 +59069,6 @@ unsafe extern "C-unwind" {
         rinfo: *mut RestrictInfo,
         indexclauses: *mut List,
     ) -> bool;
-    pub fn ec_clear_derived_clauses(ec: *mut EquivalenceClass);
     pub fn compare_pathkeys(keys1: *mut List, keys2: *mut List) -> PathKeysComparison::Type;
     pub fn pathkeys_contained_in(keys1: *mut List, keys2: *mut List) -> bool;
     pub fn pathkeys_count_contained_in(
@@ -59405,7 +59187,6 @@ unsafe extern "C-unwind" {
     ) -> *mut PlaceHolderInfo;
     pub fn find_placeholders_in_jointree(root: *mut PlannerInfo);
     pub fn fix_placeholder_input_needed_levels(root: *mut PlannerInfo);
-    pub fn rebuild_placeholder_attr_needed(root: *mut PlannerInfo);
     pub fn add_placeholders_to_base_rels(root: *mut PlannerInfo);
     pub fn add_placeholders_to_joinrel(
         root: *mut PlannerInfo,
@@ -59548,11 +59329,9 @@ unsafe extern "C-unwind" {
     pub fn add_other_rels_to_query(root: *mut PlannerInfo);
     pub fn build_base_rel_tlists(root: *mut PlannerInfo, final_tlist: *mut List);
     pub fn add_vars_to_targetlist(root: *mut PlannerInfo, vars: *mut List, where_needed: Relids);
-    pub fn add_vars_to_attr_needed(root: *mut PlannerInfo, vars: *mut List, where_needed: Relids);
     pub fn remove_useless_groupby_columns(root: *mut PlannerInfo);
     pub fn setup_eager_aggregation(root: *mut PlannerInfo);
     pub fn find_lateral_references(root: *mut PlannerInfo);
-    pub fn rebuild_lateral_attr_needed(root: *mut PlannerInfo);
     pub fn create_lateral_join_info(root: *mut PlannerInfo);
     pub fn deconstruct_jointree(root: *mut PlannerInfo) -> *mut List;
     pub fn restriction_is_always_true(
@@ -59583,10 +59362,9 @@ unsafe extern "C-unwind" {
         qualscope: Relids,
         security_level: Index,
     ) -> *mut RestrictInfo;
-    pub fn rebuild_joinclause_attr_needed(root: *mut PlannerInfo);
     pub fn match_foreign_keys_to_quals(root: *mut PlannerInfo);
-    pub fn remove_useless_joins(root: *mut PlannerInfo, joinlist: *mut List) -> *mut List;
-    pub fn reduce_unique_semijoins(root: *mut PlannerInfo);
+    pub fn remove_useless_outer_joins(root: *mut PlannerInfo) -> bool;
+    pub fn reduce_unique_semijoins(root: *mut PlannerInfo) -> bool;
     pub fn query_supports_distinctness(query: *mut Query) -> bool;
     pub fn query_is_distinct_for(query: *mut Query, distinct_cols: *mut List) -> bool;
     pub fn innerrel_is_unique(
@@ -59598,17 +59376,7 @@ unsafe extern "C-unwind" {
         restrictlist: *mut List,
         force_cache: bool,
     ) -> bool;
-    pub fn innerrel_is_unique_ext(
-        root: *mut PlannerInfo,
-        joinrelids: Relids,
-        outerrelids: Relids,
-        innerrel: *mut RelOptInfo,
-        jointype: JoinType::Type,
-        restrictlist: *mut List,
-        force_cache: bool,
-        extra_clauses: *mut *mut List,
-    ) -> bool;
-    pub fn remove_useless_self_joins(root: *mut PlannerInfo, joinlist: *mut List) -> *mut List;
+    pub fn remove_useless_self_joins(root: *mut PlannerInfo, joinlist: *mut List) -> bool;
     pub fn set_plan_references(root: *mut PlannerInfo, plan: *mut Plan) -> *mut Plan;
     pub fn trivial_subqueryscan(plan: *mut SubqueryScan) -> bool;
     pub fn find_minmax_agg_replacement_param(
@@ -59646,7 +59414,6 @@ unsafe extern "C-unwind" {
     pub fn limit_needed(parse: *mut Query) -> bool;
     pub fn mark_partial_aggref(agg: *mut Aggref, aggsplit: AggSplit::Type);
     pub fn get_cheapest_fractional_path(rel: *mut RelOptInfo, tuple_fraction: f64) -> *mut Path;
-    pub fn preprocess_phv_expression(root: *mut PlannerInfo, expr: *mut Expr) -> *mut Expr;
     pub fn create_unique_paths(
         root: *mut PlannerInfo,
         rel: *mut RelOptInfo,
@@ -59845,11 +59612,7 @@ unsafe extern "C-unwind" {
         attrnos: *mut List,
         strip_indirection: bool,
     ) -> *mut List;
-    pub fn transformUpdateTargetList(
-        pstate: *mut ParseState,
-        origTlist: *mut List,
-        forPortionOf: *mut ForPortionOfExpr,
-    ) -> *mut List;
+    pub fn transformUpdateTargetList(pstate: *mut ParseState, origTlist: *mut List) -> *mut List;
     pub fn transformReturningClause(
         pstate: *mut ParseState,
         qry: *mut Query,
@@ -59874,15 +59637,6 @@ unsafe extern "C-unwind" {
     -> *mut List;
     pub fn makeSortGroupClauseForSetOp(rescoltype: Oid, require_hash: bool)
     -> *mut SortGroupClause;
-    pub fn constructSetOpTargetlist(
-        pstate: *mut ParseState,
-        op: *mut SetOperationStmt,
-        ltargetlist: *const List,
-        rtargetlist: *const List,
-        targetlist: *mut *mut List,
-        context: *const ::core::ffi::c_char,
-        recursive: bool,
-    );
     pub fn transformAggregateCall(
         pstate: *mut ParseState,
         agg: *mut Aggref,
@@ -59957,7 +59711,6 @@ unsafe extern "C-unwind" {
     pub fn transformGroupClause(
         pstate: *mut ParseState,
         grouplist: *mut List,
-        groupByAll: bool,
         groupingSets: *mut *mut List,
         targetlist: *mut *mut List,
         sortClause: *mut List,
@@ -60324,6 +60077,7 @@ unsafe extern "C-unwind" {
         varno: ::core::ffi::c_int,
         sublevels_up: ::core::ffi::c_int,
     ) -> *mut ParseNamespaceItem;
+    pub fn GetNSItemByVar(pstate: *mut ParseState, var: *mut Var) -> *mut ParseNamespaceItem;
     pub fn GetRTEByRangeTablePosn(
         pstate: *mut ParseState,
         varno: ::core::ffi::c_int,
@@ -60398,16 +60152,6 @@ unsafe extern "C-unwind" {
     pub fn addRangeTableEntryForTableFunc(
         pstate: *mut ParseState,
         tf: *mut TableFunc,
-        alias: *mut Alias,
-        lateral: bool,
-        inFromCl: bool,
-    ) -> *mut ParseNamespaceItem;
-    pub fn addRangeTableEntryForGraphTable(
-        pstate: *mut ParseState,
-        graphid: Oid,
-        graph_pattern: *mut GraphPattern,
-        columns: *mut List,
-        colnames: *mut List,
         alias: *mut Alias,
         lateral: bool,
         inFromCl: bool,
@@ -60805,19 +60549,6 @@ unsafe extern "C-unwind" {
         modulus: ::core::ffi::c_int,
         remainder: ::core::ffi::c_int,
     ) -> ::core::ffi::c_int;
-    pub fn check_partitions_for_split(
-        parent: Relation,
-        splitPartOid: Oid,
-        partlist: *mut List,
-        pstate: *mut ParseState,
-    );
-    pub fn calculate_partition_bound_for_merge(
-        parent: Relation,
-        partNames: *mut List,
-        partOids: *mut List,
-        spec: *mut PartitionBoundSpec,
-        pstate: *mut ParseState,
-    );
     pub fn RelationGetPartitionDesc(rel: Relation, omit_detached: bool) -> PartitionDesc;
     pub fn CreatePartitionDirectory(mcxt: MemoryContext, omit_detached: bool)
     -> PartitionDirectory;
@@ -60971,7 +60702,7 @@ unsafe extern "C-unwind" {
     ) -> bool;
     pub fn pgstat_lock_flush(nowait: bool);
     pub fn pgstat_count_lock_fastpath_exceeded(locktag_type: uint8);
-    pub fn pgstat_count_lock_waits(locktag_type: uint8, msecs: ::core::ffi::c_long);
+    pub fn pgstat_count_lock_waits(locktag_type: uint8, usecs: PgStat_Counter);
     pub fn pgstat_fetch_stat_lock() -> *mut PgStat_Lock;
     pub fn pgstat_drop_database(databaseid: Oid);
     pub fn pgstat_report_autovac(dboid: Oid);
@@ -61488,6 +61219,7 @@ unsafe extern "C-unwind" {
     pub static mut Log_truncate_on_rotation: bool;
     pub static mut Log_file_mode: ::core::ffi::c_int;
     pub static mut syslogPipe: [::core::ffi::c_int; 2usize];
+    pub static mut syslogger_setup_done: bool;
     pub fn SysLogger_Start(child_slot: ::core::ffi::c_int) -> ::core::ffi::c_int;
     pub fn write_syslogger_file(
         buffer: *const ::core::ffi::c_char,
@@ -61676,6 +61408,7 @@ unsafe extern "C-unwind" {
     pub static mut MyParallelShared: *mut ParallelApplyWorkerShared;
     pub static mut LogRepWorkerWalRcvConn: *mut WalReceiverConn;
     pub static mut MySubscription: *mut Subscription;
+    pub static mut MySubscriptionConninfo: *mut ::core::ffi::c_char;
     pub static mut MyLogicalRepWorker: *mut LogicalRepWorker;
     pub static mut in_remote_transaction: bool;
     pub static mut InitializingApplyWorker: bool;
@@ -61839,11 +61572,6 @@ unsafe extern "C-unwind" {
         rt_index: ::core::ffi::c_int,
     ) -> *mut Node;
     pub fn build_generation_expression(rel: Relation, attrno: ::core::ffi::c_int) -> *mut Node;
-    pub fn adjust_relid_set(
-        relids: Relids,
-        oldrelid: ::core::ffi::c_int,
-        newrelid: ::core::ffi::c_int,
-    ) -> Relids;
     pub fn CombineRangeTables(
         dst_rtable: *mut *mut List,
         dst_perminfos: *mut *mut List,
@@ -61861,17 +61589,6 @@ unsafe extern "C-unwind" {
         new_index: ::core::ffi::c_int,
         sublevels_up: ::core::ffi::c_int,
     );
-    pub fn ChangeVarNodesExtended(
-        node: *mut Node,
-        rt_index: ::core::ffi::c_int,
-        new_index: ::core::ffi::c_int,
-        sublevels_up: ::core::ffi::c_int,
-        callback: ChangeVarNodes_callback,
-    );
-    pub fn ChangeVarNodesWalkExpression(
-        node: *mut Node,
-        context: *mut ChangeVarNodes_context,
-    ) -> bool;
     pub fn IncrementVarSublevelsUp(
         node: *mut Node,
         delta_sublevels_up: ::core::ffi::c_int,
@@ -62016,6 +61733,34 @@ unsafe extern "C-unwind" {
         nclauses: ::core::ffi::c_int,
     ) -> *mut StatisticExtInfo;
     pub fn statext_expressions_load(stxoid: Oid, inh: bool, idx: ::core::ffi::c_int) -> HeapTuple;
+    pub fn import_relation_statistics(
+        rel: Relation,
+        version: *const NullableDatum,
+        relpages: *const NullableDatum,
+        reltuples: *const NullableDatum,
+        relallvisible: *const NullableDatum,
+        relallfrozen: *const NullableDatum,
+    ) -> bool;
+    pub fn import_attribute_statistics(
+        rel: Relation,
+        attnum: AttrNumber,
+        inherited: bool,
+        version: *const NullableDatum,
+        null_frac: *const NullableDatum,
+        avg_width: *const NullableDatum,
+        n_distinct: *const NullableDatum,
+        most_common_vals: *const NullableDatum,
+        most_common_freqs: *const NullableDatum,
+        histogram_bounds: *const NullableDatum,
+        correlation: *const NullableDatum,
+        most_common_elems: *const NullableDatum,
+        most_common_elem_freqs: *const NullableDatum,
+        elem_count_histogram: *const NullableDatum,
+        range_length_histogram: *const NullableDatum,
+        range_empty_frac: *const NullableDatum,
+        range_bounds_histogram: *const NullableDatum,
+    ) -> bool;
+    pub fn delete_attribute_statistics(rel: Relation, attnum: AttrNumber, inherited: bool) -> bool;
     pub fn statext_ndistinct_build(totalrows: f64, data: *mut StatsBuildData) -> *mut MVNDistinct;
     pub fn statext_ndistinct_serialize(ndistinct: *mut MVNDistinct) -> *mut bytea;
     pub fn statext_ndistinct_deserialize(data: *mut bytea) -> *mut MVNDistinct;
@@ -62307,6 +62052,7 @@ unsafe extern "C-unwind" {
     pub fn pgaio_io_get_target_name(ioh: *mut PgAioHandle) -> *const ::core::ffi::c_char;
     pub static pgaio_sync_ops: IoMethodOps;
     pub static pgaio_worker_ops: IoMethodOps;
+    pub static pgaio_uring_ops: IoMethodOps;
     pub static mut pgaio_method_ops: *const IoMethodOps;
     pub static mut pgaio_ctl: *mut PgAioCtl;
     pub static mut pgaio_my_backend: *mut PgAioBackend;
@@ -62712,7 +62458,7 @@ unsafe extern "C-unwind" {
     pub fn LockReleaseCurrentOwner(locallocks: *mut *mut LOCALLOCK, nlocks: ::core::ffi::c_int);
     pub fn LockReassignCurrentOwner(locallocks: *mut *mut LOCALLOCK, nlocks: ::core::ffi::c_int);
     pub fn LockHeldByMe(locktag: *const LOCKTAG, lockmode: LOCKMODE, orstronger: bool) -> bool;
-    pub fn GetLockMethodLocalHash() -> *mut HTAB;
+    pub fn GetAnyGrantedHeavyweightLock(locktag: *mut LOCKTAG) -> bool;
     pub fn LockHasWaiters(locktag: *const LOCKTAG, lockmode: LOCKMODE, sessionLock: bool) -> bool;
     pub fn GetLockConflicts(
         locktag: *const LOCKTAG,
@@ -62896,6 +62642,9 @@ unsafe extern "C-unwind" {
     pub fn MarkPostmasterChildWalSender();
     pub fn PostmasterIsAliveInternal() -> bool;
     pub fn PostmasterDeathSignalInit();
+    pub static mut postmaster_possibly_dead: sig_atomic_t;
+    #[link_name = "PostmasterIsAlive__pgrx_cshim"]
+    pub fn PostmasterIsAlive() -> bool;
     pub static mut max_predicate_locks_per_xact: ::core::ffi::c_int;
     pub static mut max_predicate_locks_per_relation: ::core::ffi::c_int;
     pub static mut max_predicate_locks_per_page: ::core::ffi::c_int;
@@ -63286,7 +63035,6 @@ unsafe extern "C-unwind" {
     pub static WaitEventCustomShmemCallbacks: ShmemCallbacks;
     pub static WaitLSNShmemCallbacks: ShmemCallbacks;
     pub static LogicalDecodingCtlShmemCallbacks: ShmemCallbacks;
-    pub static DataChecksumsShmemCallbacks: ShmemCallbacks;
     pub static AioShmemCallbacks: ShmemCallbacks;
     pub static mut Trace_connection_negotiation: bool;
     pub static mut log_connections: uint32;
@@ -63495,12 +63243,6 @@ unsafe extern "C-unwind" {
         src: *const ::core::ffi::c_char,
         srclen: usize,
         locale: pg_locale_t,
-    ) -> usize;
-    pub fn pg_downcase_ident(
-        dst: *mut ::core::ffi::c_char,
-        dstsize: usize,
-        src: *const ::core::ffi::c_char,
-        srclen: usize,
     ) -> usize;
     pub fn pg_strcoll(
         arg1: *const ::core::ffi::c_char,
@@ -66713,7 +66455,6 @@ unsafe extern "C-unwind" {
     pub fn btoid8cmp(fcinfo: FunctionCallInfo) -> Datum;
     pub fn btoid8sortsupport(fcinfo: FunctionCallInfo) -> Datum;
     pub fn btoid8skipsupport(fcinfo: FunctionCallInfo) -> Datum;
-    pub fn pg_get_propgraphdef(fcinfo: FunctionCallInfo) -> Datum;
     pub fn regdatabasein(fcinfo: FunctionCallInfo) -> Datum;
     pub fn regdatabaseout(fcinfo: FunctionCallInfo) -> Datum;
     pub fn to_regdatabase(fcinfo: FunctionCallInfo) -> Datum;
@@ -66724,15 +66465,9 @@ unsafe extern "C-unwind" {
     pub fn range_minus_multi(fcinfo: FunctionCallInfo) -> Datum;
     pub fn pg_error_on_null(fcinfo: FunctionCallInfo) -> Datum;
     pub fn pg_stat_get_function_stat_reset_time(fcinfo: FunctionCallInfo) -> Datum;
-    pub fn pg_get_tablespace_ddl_oid(fcinfo: FunctionCallInfo) -> Datum;
-    pub fn pg_get_tablespace_ddl_name(fcinfo: FunctionCallInfo) -> Datum;
-    pub fn pg_get_role_ddl(fcinfo: FunctionCallInfo) -> Datum;
-    pub fn pg_get_database_ddl(fcinfo: FunctionCallInfo) -> Datum;
     pub fn pg_get_multixact_stats(fcinfo: FunctionCallInfo) -> Datum;
     pub fn pg_stat_get_stat_reset_time(fcinfo: FunctionCallInfo) -> Datum;
     pub fn binary_upgrade_create_conflict_detection_slot(fcinfo: FunctionCallInfo) -> Datum;
-    pub fn enable_data_checksums(fcinfo: FunctionCallInfo) -> Datum;
-    pub fn disable_data_checksums(fcinfo: FunctionCallInfo) -> Datum;
     pub fn pg_get_dsm_registry_allocations(fcinfo: FunctionCallInfo) -> Datum;
     pub fn pg_stat_get_lock(fcinfo: FunctionCallInfo) -> Datum;
     pub fn uuid_bytea(fcinfo: FunctionCallInfo) -> Datum;
@@ -67303,6 +67038,7 @@ unsafe extern "C-unwind" {
     pub fn numeric_mod_safe(num1: Numeric, num2: Numeric, escontext: *mut Node) -> Numeric;
     pub fn numeric_int4_safe(num: Numeric, escontext: *mut Node) -> int32;
     pub fn numeric_int8_safe(num: Numeric, escontext: *mut Node) -> int64;
+    pub fn make_numeric_typmod_safe(precision: int32, scale: int32, escontext: *mut Node) -> int32;
     pub fn random_numeric(state: *mut pg_prng_state, rmin: Numeric, rmax: Numeric) -> Numeric;
     #[link_name = "DatumGetJsonbP__pgrx_cshim"]
     pub fn DatumGetJsonbP(d: Datum) -> *mut Jsonb;
@@ -67433,6 +67169,12 @@ unsafe extern "C-unwind" {
     -> bool;
     pub fn get_op_hash_functions(
         opno: Oid,
+        lhs_procno: *mut RegProcedure,
+        rhs_procno: *mut RegProcedure,
+    ) -> bool;
+    pub fn get_op_hash_functions_ext(
+        opno: Oid,
+        inputtype: Oid,
         lhs_procno: *mut RegProcedure,
         rhs_procno: *mut RegProcedure,
     ) -> bool;
@@ -67583,7 +67325,6 @@ unsafe extern "C-unwind" {
     ) -> *mut ::core::ffi::c_char;
     pub fn get_range_subtype(rangeOid: Oid) -> Oid;
     pub fn get_range_collation(rangeOid: Oid) -> Oid;
-    pub fn get_range_constructor2(rangeOid: Oid) -> Oid;
     pub fn get_range_multirange(rangeOid: Oid) -> Oid;
     pub fn get_multirange_range(multirangeOid: Oid) -> Oid;
     pub fn get_index_column_opclass(index_oid: Oid, attno: ::core::ffi::c_int) -> Oid;
@@ -67594,8 +67335,6 @@ unsafe extern "C-unwind" {
     pub fn get_publication_name(pubid: Oid, missing_ok: bool) -> *mut ::core::ffi::c_char;
     pub fn get_subscription_oid(subname: *const ::core::ffi::c_char, missing_ok: bool) -> Oid;
     pub fn get_subscription_name(subid: Oid, missing_ok: bool) -> *mut ::core::ffi::c_char;
-    pub fn get_propgraph_label_name(labeloid: Oid) -> *mut ::core::ffi::c_char;
-    pub fn get_propgraph_property_name(propoid: Oid) -> *mut ::core::ffi::c_char;
     pub static mut update_process_title: bool;
     pub fn save_ps_display_args(
         argc: ::core::ffi::c_int,
@@ -67812,7 +67551,6 @@ unsafe extern "C-unwind" {
     pub fn generate_collation_name(collid: Oid) -> *mut ::core::ffi::c_char;
     pub fn generate_opclass_name(opclass: Oid) -> *mut ::core::ffi::c_char;
     pub fn get_range_partbound_string(bound_datums: *mut List) -> *mut ::core::ffi::c_char;
-    pub fn get_reloptions(buf: StringInfo, reloptions: Datum);
     pub fn pg_get_statisticsobjdef_string(statextid: Oid) -> *mut ::core::ffi::c_char;
     pub fn sampler_random_init_state(seed: uint32, randstate: *mut pg_prng_state);
     pub fn sampler_random_fract(randstate: *mut pg_prng_state) -> f64;
@@ -68361,6 +68099,1394 @@ unsafe extern "C-unwind" {
         nwaitevents: *mut ::core::ffi::c_int,
     ) -> *mut *mut ::core::ffi::c_char;
 }
+#[doc = " Compiler-verified C object macro `ACLITEM_ALL_GOPTION_BITS`, omitted by bindgen."]
+pub const ACLITEM_ALL_GOPTION_BITS: usize = 18446744069414584320;
+#[doc = " Compiler-verified C object macro `ACLITEM_ALL_PRIV_BITS`, omitted by bindgen."]
+pub const ACLITEM_ALL_PRIV_BITS: usize = 4294967295;
+#[doc = " Compiler-verified C object macro `ALLOCSET_DEFAULT_SIZES`, omitted by bindgen."]
+pub const ALLOCSET_DEFAULT_SIZES: i32 = 8388608;
+#[doc = " Compiler-verified C object macro `ALLOCSET_SMALL_SIZES`, omitted by bindgen."]
+pub const ALLOCSET_SMALL_SIZES: i32 = 8192;
+#[doc = " Compiler-verified C object macro `ALLOCSET_START_SMALL_SIZES`, omitted by bindgen."]
+pub const ALLOCSET_START_SMALL_SIZES: i32 = 8388608;
+#[doc = " Compiler-verified C object macro `ALL_SET`, omitted by bindgen."]
+pub const ALL_SET: u32 = 4294967295;
+#[doc = " Compiler-verified C object macro `ATTRIBUTE_FIXED_PART_SIZE`, omitted by bindgen."]
+pub const ATTRIBUTE_FIXED_PART_SIZE: usize = 100;
+#[doc = " Compiler-verified C object macro `BACKEND_NUM_TYPES`, omitted by bindgen."]
+pub const BACKEND_NUM_TYPES: i32 = 18;
+#[doc = " Compiler-verified C object macro `BM_CHECKPOINT_NEEDED`, omitted by bindgen."]
+pub const BM_CHECKPOINT_NEEDED: usize = 1073741824;
+#[doc = " Compiler-verified C object macro `BM_DIRTY`, omitted by bindgen."]
+pub const BM_DIRTY: usize = 8388608;
+#[doc = " Compiler-verified C object macro `BM_IO_ERROR`, omitted by bindgen."]
+pub const BM_IO_ERROR: usize = 134217728;
+#[doc = " Compiler-verified C object macro `BM_IO_IN_PROGRESS`, omitted by bindgen."]
+pub const BM_IO_IN_PROGRESS: usize = 67108864;
+#[doc = " Compiler-verified C object macro `BM_LOCKED`, omitted by bindgen."]
+pub const BM_LOCKED: usize = 4194304;
+#[doc = " Compiler-verified C object macro `BM_LOCK_HAS_WAITERS`, omitted by bindgen."]
+pub const BM_LOCK_HAS_WAITERS: usize = 4294967296;
+#[doc = " Compiler-verified C object macro `BM_LOCK_MASK`, omitted by bindgen."]
+pub const BM_LOCK_MASK: usize = 18014381329612800;
+#[doc = " Compiler-verified C object macro `BM_LOCK_VAL_EXCLUSIVE`, omitted by bindgen."]
+pub const BM_LOCK_VAL_EXCLUSIVE: usize = 9007199254740992;
+#[doc = " Compiler-verified C object macro `BM_LOCK_VAL_SHARED`, omitted by bindgen."]
+pub const BM_LOCK_VAL_SHARED: usize = 17179869184;
+#[doc = " Compiler-verified C object macro `BM_LOCK_VAL_SHARE_EXCLUSIVE`, omitted by bindgen."]
+pub const BM_LOCK_VAL_SHARE_EXCLUSIVE: usize = 4503599627370496;
+#[doc = " Compiler-verified C object macro `BM_LOCK_WAKE_IN_PROGRESS`, omitted by bindgen."]
+pub const BM_LOCK_WAKE_IN_PROGRESS: usize = 8589934592;
+#[doc = " Compiler-verified C object macro `BM_PERMANENT`, omitted by bindgen."]
+pub const BM_PERMANENT: usize = 2147483648;
+#[doc = " Compiler-verified C object macro `BM_PIN_COUNT_WAITER`, omitted by bindgen."]
+pub const BM_PIN_COUNT_WAITER: usize = 536870912;
+#[doc = " Compiler-verified C object macro `BM_TAG_VALID`, omitted by bindgen."]
+pub const BM_TAG_VALID: usize = 33554432;
+#[doc = " Compiler-verified C object macro `BM_VALID`, omitted by bindgen."]
+pub const BM_VALID: usize = 16777216;
+#[doc = " Compiler-verified C object macro `BTMaxItemSize`, omitted by bindgen."]
+pub const BTMaxItemSize: usize = 2704;
+#[doc = " Compiler-verified C object macro `BTMaxItemSizeNoHeapTid`, omitted by bindgen."]
+pub const BTMaxItemSizeNoHeapTid: usize = 2712;
+#[doc = " Compiler-verified C object macro `BT_READ`, omitted by bindgen."]
+pub const BT_READ: i32 = 1;
+#[doc = " Compiler-verified C object macro `BT_WRITE`, omitted by bindgen."]
+pub const BT_WRITE: i32 = 3;
+#[doc = " Compiler-verified C object macro `BUFFERDESC_PAD_TO_SIZE`, omitted by bindgen."]
+pub const BUFFERDESC_PAD_TO_SIZE: i32 = 64;
+#[doc = " Compiler-verified C object macro `BUFFER_PAGE_DATA_OFFSET`, omitted by bindgen."]
+pub const BUFFER_PAGE_DATA_OFFSET: usize = 8;
+#[doc = " Compiler-verified C object macro `BUF_FLAG_MASK`, omitted by bindgen."]
+pub const BUF_FLAG_MASK: usize = 17175674880;
+#[doc = " Compiler-verified C object macro `BUF_REFCOUNT_MASK`, omitted by bindgen."]
+pub const BUF_REFCOUNT_MASK: usize = 262143;
+#[doc = " Compiler-verified C object macro `BUF_USAGECOUNT_MASK`, omitted by bindgen."]
+pub const BUF_USAGECOUNT_MASK: usize = 3932160;
+#[doc = " Compiler-verified C object macro `BUF_USAGECOUNT_ONE`, omitted by bindgen."]
+pub const BUF_USAGECOUNT_ONE: usize = 262144;
+#[doc = " Compiler-verified C object macro `BootstrapTransactionId`, omitted by bindgen."]
+pub const BootstrapTransactionId: u32 = 1;
+#[doc = " Compiler-verified C object macro `CANCEL_REQUEST_CODE`, omitted by bindgen."]
+pub const CANCEL_REQUEST_CODE: i32 = 80877102;
+#[doc = " Compiler-verified C object macro `CASHOID`, omitted by bindgen."]
+pub const CASHOID: i32 = 790;
+#[doc = " Compiler-verified C object macro `CLASS_TUPLE_SIZE`, omitted by bindgen."]
+pub const CLASS_TUPLE_SIZE: usize = 144;
+#[doc = " Compiler-verified C object macro `CONFLICT_NUM_TYPES`, omitted by bindgen."]
+pub const CONFLICT_NUM_TYPES: i32 = 8;
+#[doc = " Compiler-verified C object macro `CV_MINIMAL_SIZE`, omitted by bindgen."]
+pub const CV_MINIMAL_SIZE: i32 = 16;
+#[doc = " Compiler-verified C object macro `DATAHDRSIZE`, omitted by bindgen."]
+pub const DATAHDRSIZE: usize = 8;
+#[doc = " Compiler-verified C object macro `DATEVAL_NOBEGIN`, omitted by bindgen."]
+pub const DATEVAL_NOBEGIN: i32 = -2147483648;
+#[doc = " Compiler-verified C object macro `DATEVAL_NOEND`, omitted by bindgen."]
+pub const DATEVAL_NOEND: i32 = 2147483647;
+#[doc = " Compiler-verified C object macro `DEFAULT_IO_COMBINE_LIMIT`, omitted by bindgen."]
+pub const DEFAULT_IO_COMBINE_LIMIT: i32 = 16;
+#[doc = " Compiler-verified C object macro `DEFAULT_IO_METHOD`, omitted by bindgen."]
+pub const DEFAULT_IO_METHOD: i32 = 1;
+#[doc = " Compiler-verified C object macro `DEFAULT_SHARED_MEMORY_TYPE`, omitted by bindgen."]
+pub const DEFAULT_SHARED_MEMORY_TYPE: i32 = 2;
+#[doc = " Compiler-verified C object macro `DEFAULT_WAL_SYNC_METHOD`, omitted by bindgen."]
+pub const DEFAULT_WAL_SYNC_METHOD: i32 = 1;
+#[doc = " Compiler-verified C object macro `DSA_DEFAULT_INIT_SEGMENT_SIZE`, omitted by bindgen."]
+pub const DSA_DEFAULT_INIT_SEGMENT_SIZE: usize = 1048576;
+#[doc = " Compiler-verified C object macro `DSA_HANDLE_INVALID`, omitted by bindgen."]
+pub const DSA_HANDLE_INVALID: u32 = 0;
+#[doc = " Compiler-verified C object macro `DSA_MAX_SEGMENT_SIZE`, omitted by bindgen."]
+pub const DSA_MAX_SEGMENT_SIZE: usize = 1099511627776;
+#[doc = " Compiler-verified C object macro `DSA_MIN_SEGMENT_SIZE`, omitted by bindgen."]
+pub const DSA_MIN_SEGMENT_SIZE: usize = 262144;
+#[doc = " Compiler-verified C object macro `DSHASH_HANDLE_INVALID`, omitted by bindgen."]
+pub const DSHASH_HANDLE_INVALID: usize = 0;
+#[doc = " Compiler-verified C object macro `DSM_HANDLE_INVALID`, omitted by bindgen."]
+pub const DSM_HANDLE_INVALID: u32 = 0;
+#[doc = " Compiler-verified C object macro `DTK_ALL_SECS_M`, omitted by bindgen."]
+pub const DTK_ALL_SECS_M: i32 = 28672;
+#[doc = " Compiler-verified C object macro `DTK_DATE_M`, omitted by bindgen."]
+pub const DTK_DATE_M: i32 = 14;
+#[doc = " Compiler-verified C object macro `DTK_TIME_M`, omitted by bindgen."]
+pub const DTK_TIME_M: i32 = 31744;
+#[doc = " Compiler-verified C object macro `DT_NOBEGIN`, omitted by bindgen."]
+pub const DT_NOBEGIN: i64 = -9223372036854775808;
+#[doc = " Compiler-verified C object macro `DT_NOEND`, omitted by bindgen."]
+pub const DT_NOEND: i64 = 9223372036854775807;
+#[doc = " Compiler-verified C object macro `END_TIMESTAMP`, omitted by bindgen."]
+pub const END_TIMESTAMP: i64 = 9223371331200000000;
+#[doc = " Compiler-verified C object macro `ERRCODE_ACTIVE_SQL_TRANSACTION`, omitted by bindgen."]
+pub const ERRCODE_ACTIVE_SQL_TRANSACTION: i32 = 16777538;
+#[doc = " Compiler-verified C object macro `ERRCODE_ADMIN_SHUTDOWN`, omitted by bindgen."]
+pub const ERRCODE_ADMIN_SHUTDOWN: i32 = 16908741;
+#[doc = " Compiler-verified C object macro `ERRCODE_AMBIGUOUS_ALIAS`, omitted by bindgen."]
+pub const ERRCODE_AMBIGUOUS_ALIAS: i32 = 151126148;
+#[doc = " Compiler-verified C object macro `ERRCODE_AMBIGUOUS_COLUMN`, omitted by bindgen."]
+pub const ERRCODE_AMBIGUOUS_COLUMN: i32 = 33583236;
+#[doc = " Compiler-verified C object macro `ERRCODE_AMBIGUOUS_FUNCTION`, omitted by bindgen."]
+pub const ERRCODE_AMBIGUOUS_FUNCTION: i32 = 84439172;
+#[doc = " Compiler-verified C object macro `ERRCODE_AMBIGUOUS_PARAMETER`, omitted by bindgen."]
+pub const ERRCODE_AMBIGUOUS_PARAMETER: i32 = 134348932;
+#[doc = " Compiler-verified C object macro `ERRCODE_ARRAY_ELEMENT_ERROR`, omitted by bindgen."]
+pub const ERRCODE_ARRAY_ELEMENT_ERROR: i32 = 352845954;
+#[doc = " Compiler-verified C object macro `ERRCODE_ARRAY_SUBSCRIPT_ERROR`, omitted by bindgen."]
+pub const ERRCODE_ARRAY_SUBSCRIPT_ERROR: i32 = 352845954;
+#[doc = " Compiler-verified C object macro `ERRCODE_ASSERT_FAILURE`, omitted by bindgen."]
+pub const ERRCODE_ASSERT_FAILURE: i32 = 67108896;
+#[doc = " Compiler-verified C object macro `ERRCODE_BAD_COPY_FILE_FORMAT`, omitted by bindgen."]
+pub const ERRCODE_BAD_COPY_FILE_FORMAT: i32 = 67240066;
+#[doc = " Compiler-verified C object macro `ERRCODE_BRANCH_TRANSACTION_ALREADY_ACTIVE`, omitted by bindgen."]
+pub const ERRCODE_BRANCH_TRANSACTION_ALREADY_ACTIVE: i32 = 33554754;
+#[doc = " Compiler-verified C object macro `ERRCODE_CANNOT_COERCE`, omitted by bindgen."]
+pub const ERRCODE_CANNOT_COERCE: i32 = 101744772;
+#[doc = " Compiler-verified C object macro `ERRCODE_CANNOT_CONNECT_NOW`, omitted by bindgen."]
+pub const ERRCODE_CANNOT_CONNECT_NOW: i32 = 50463173;
+#[doc = " Compiler-verified C object macro `ERRCODE_CANT_CHANGE_RUNTIME_PARAM`, omitted by bindgen."]
+pub const ERRCODE_CANT_CHANGE_RUNTIME_PARAM: i32 = 33685829;
+#[doc = " Compiler-verified C object macro `ERRCODE_CARDINALITY_VIOLATION`, omitted by bindgen."]
+pub const ERRCODE_CARDINALITY_VIOLATION: i32 = 66;
+#[doc = " Compiler-verified C object macro `ERRCODE_CASE_NOT_FOUND`, omitted by bindgen."]
+pub const ERRCODE_CASE_NOT_FOUND: i32 = 2;
+#[doc = " Compiler-verified C object macro `ERRCODE_CHARACTER_NOT_IN_REPERTOIRE`, omitted by bindgen."]
+pub const ERRCODE_CHARACTER_NOT_IN_REPERTOIRE: i32 = 17301634;
+#[doc = " Compiler-verified C object macro `ERRCODE_CHECK_VIOLATION`, omitted by bindgen."]
+pub const ERRCODE_CHECK_VIOLATION: i32 = 67391682;
+#[doc = " Compiler-verified C object macro `ERRCODE_COLLATION_MISMATCH`, omitted by bindgen."]
+pub const ERRCODE_COLLATION_MISMATCH: i32 = 17432708;
+#[doc = " Compiler-verified C object macro `ERRCODE_CONFIGURATION_LIMIT_EXCEEDED`, omitted by bindgen."]
+pub const ERRCODE_CONFIGURATION_LIMIT_EXCEEDED: i32 = 16581;
+#[doc = " Compiler-verified C object macro `ERRCODE_CONFIG_FILE_ERROR`, omitted by bindgen."]
+pub const ERRCODE_CONFIG_FILE_ERROR: i32 = 22;
+#[doc = " Compiler-verified C object macro `ERRCODE_CONNECTION_DOES_NOT_EXIST`, omitted by bindgen."]
+pub const ERRCODE_CONNECTION_DOES_NOT_EXIST: i32 = 50332160;
+#[doc = " Compiler-verified C object macro `ERRCODE_CONNECTION_EXCEPTION`, omitted by bindgen."]
+pub const ERRCODE_CONNECTION_EXCEPTION: i32 = 512;
+#[doc = " Compiler-verified C object macro `ERRCODE_CONNECTION_FAILURE`, omitted by bindgen."]
+pub const ERRCODE_CONNECTION_FAILURE: i32 = 100663808;
+#[doc = " Compiler-verified C object macro `ERRCODE_CRASH_SHUTDOWN`, omitted by bindgen."]
+pub const ERRCODE_CRASH_SHUTDOWN: i32 = 33685957;
+#[doc = " Compiler-verified C object macro `ERRCODE_DATABASE_DROPPED`, omitted by bindgen."]
+pub const ERRCODE_DATABASE_DROPPED: i32 = 67240389;
+#[doc = " Compiler-verified C object macro `ERRCODE_DATATYPE_MISMATCH`, omitted by bindgen."]
+pub const ERRCODE_DATATYPE_MISMATCH: i32 = 67141764;
+#[doc = " Compiler-verified C object macro `ERRCODE_DATA_CORRUPTED`, omitted by bindgen."]
+pub const ERRCODE_DATA_CORRUPTED: i32 = 16779816;
+#[doc = " Compiler-verified C object macro `ERRCODE_DATA_EXCEPTION`, omitted by bindgen."]
+pub const ERRCODE_DATA_EXCEPTION: i32 = 130;
+#[doc = " Compiler-verified C object macro `ERRCODE_DATETIME_FIELD_OVERFLOW`, omitted by bindgen."]
+pub const ERRCODE_DATETIME_FIELD_OVERFLOW: i32 = 134217858;
+#[doc = " Compiler-verified C object macro `ERRCODE_DATETIME_VALUE_OUT_OF_RANGE`, omitted by bindgen."]
+pub const ERRCODE_DATETIME_VALUE_OUT_OF_RANGE: i32 = 134217858;
+#[doc = " Compiler-verified C object macro `ERRCODE_DEPENDENT_OBJECTS_STILL_EXIST`, omitted by bindgen."]
+pub const ERRCODE_DEPENDENT_OBJECTS_STILL_EXIST: i32 = 16909442;
+#[doc = " Compiler-verified C object macro `ERRCODE_DEPENDENT_PRIVILEGE_DESCRIPTORS_STILL_EXIST`, omitted by bindgen."]
+pub const ERRCODE_DEPENDENT_PRIVILEGE_DESCRIPTORS_STILL_EXIST: i32 = 1154;
+#[doc = " Compiler-verified C object macro `ERRCODE_DIAGNOSTICS_EXCEPTION`, omitted by bindgen."]
+pub const ERRCODE_DIAGNOSTICS_EXCEPTION: i32 = 2688;
+#[doc = " Compiler-verified C object macro `ERRCODE_DISK_FULL`, omitted by bindgen."]
+pub const ERRCODE_DISK_FULL: i32 = 4293;
+#[doc = " Compiler-verified C object macro `ERRCODE_DIVISION_BY_ZERO`, omitted by bindgen."]
+pub const ERRCODE_DIVISION_BY_ZERO: i32 = 33816706;
+#[doc = " Compiler-verified C object macro `ERRCODE_DUPLICATE_ALIAS`, omitted by bindgen."]
+pub const ERRCODE_DUPLICATE_ALIAS: i32 = 33845380;
+#[doc = " Compiler-verified C object macro `ERRCODE_DUPLICATE_COLUMN`, omitted by bindgen."]
+pub const ERRCODE_DUPLICATE_COLUMN: i32 = 16806020;
+#[doc = " Compiler-verified C object macro `ERRCODE_DUPLICATE_CURSOR`, omitted by bindgen."]
+pub const ERRCODE_DUPLICATE_CURSOR: i32 = 50462852;
+#[doc = " Compiler-verified C object macro `ERRCODE_DUPLICATE_DATABASE`, omitted by bindgen."]
+pub const ERRCODE_DUPLICATE_DATABASE: i32 = 67240068;
+#[doc = " Compiler-verified C object macro `ERRCODE_DUPLICATE_FILE`, omitted by bindgen."]
+pub const ERRCODE_DUPLICATE_FILE: i32 = 33686021;
+#[doc = " Compiler-verified C object macro `ERRCODE_DUPLICATE_FUNCTION`, omitted by bindgen."]
+pub const ERRCODE_DUPLICATE_FUNCTION: i32 = 50884740;
+#[doc = " Compiler-verified C object macro `ERRCODE_DUPLICATE_JSON_OBJECT_KEY_VALUE`, omitted by bindgen."]
+pub const ERRCODE_DUPLICATE_JSON_OBJECT_KEY_VALUE: i32 = 786562;
+#[doc = " Compiler-verified C object macro `ERRCODE_DUPLICATE_OBJECT`, omitted by bindgen."]
+pub const ERRCODE_DUPLICATE_OBJECT: i32 = 290948;
+#[doc = " Compiler-verified C object macro `ERRCODE_DUPLICATE_PSTATEMENT`, omitted by bindgen."]
+pub const ERRCODE_DUPLICATE_PSTATEMENT: i32 = 84017284;
+#[doc = " Compiler-verified C object macro `ERRCODE_DUPLICATE_SCHEMA`, omitted by bindgen."]
+pub const ERRCODE_DUPLICATE_SCHEMA: i32 = 100794500;
+#[doc = " Compiler-verified C object macro `ERRCODE_DUPLICATE_TABLE`, omitted by bindgen."]
+pub const ERRCODE_DUPLICATE_TABLE: i32 = 117571716;
+#[doc = " Compiler-verified C object macro `ERRCODE_ERROR_IN_ASSIGNMENT`, omitted by bindgen."]
+pub const ERRCODE_ERROR_IN_ASSIGNMENT: i32 = 83886210;
+#[doc = " Compiler-verified C object macro `ERRCODE_ESCAPE_CHARACTER_CONFLICT`, omitted by bindgen."]
+pub const ERRCODE_ESCAPE_CHARACTER_CONFLICT: i32 = 301990018;
+#[doc = " Compiler-verified C object macro `ERRCODE_EXCLUSION_VIOLATION`, omitted by bindgen."]
+pub const ERRCODE_EXCLUSION_VIOLATION: i32 = 16908482;
+#[doc = " Compiler-verified C object macro `ERRCODE_EXTERNAL_ROUTINE_EXCEPTION`, omitted by bindgen."]
+pub const ERRCODE_EXTERNAL_ROUTINE_EXCEPTION: i32 = 515;
+#[doc = " Compiler-verified C object macro `ERRCODE_EXTERNAL_ROUTINE_INVOCATION_EXCEPTION`, omitted by bindgen."]
+pub const ERRCODE_EXTERNAL_ROUTINE_INVOCATION_EXCEPTION: i32 = 579;
+#[doc = " Compiler-verified C object macro `ERRCODE_E_R_E_CONTAINING_SQL_NOT_PERMITTED`, omitted by bindgen."]
+pub const ERRCODE_E_R_E_CONTAINING_SQL_NOT_PERMITTED: i32 = 16777731;
+#[doc = " Compiler-verified C object macro `ERRCODE_E_R_E_MODIFYING_SQL_DATA_NOT_PERMITTED`, omitted by bindgen."]
+pub const ERRCODE_E_R_E_MODIFYING_SQL_DATA_NOT_PERMITTED: i32 = 33554947;
+#[doc = " Compiler-verified C object macro `ERRCODE_E_R_E_PROHIBITED_SQL_STATEMENT_ATTEMPTED`, omitted by bindgen."]
+pub const ERRCODE_E_R_E_PROHIBITED_SQL_STATEMENT_ATTEMPTED: i32 = 50332163;
+#[doc = " Compiler-verified C object macro `ERRCODE_E_R_E_READING_SQL_DATA_NOT_PERMITTED`, omitted by bindgen."]
+pub const ERRCODE_E_R_E_READING_SQL_DATA_NOT_PERMITTED: i32 = 67109379;
+#[doc = " Compiler-verified C object macro `ERRCODE_E_R_I_E_EVENT_TRIGGER_PROTOCOL_VIOLATED`, omitted by bindgen."]
+pub const ERRCODE_E_R_I_E_EVENT_TRIGGER_PROTOCOL_VIOLATED: i32 = 50463299;
+#[doc = " Compiler-verified C object macro `ERRCODE_E_R_I_E_INVALID_SQLSTATE_RETURNED`, omitted by bindgen."]
+pub const ERRCODE_E_R_I_E_INVALID_SQLSTATE_RETURNED: i32 = 16777795;
+#[doc = " Compiler-verified C object macro `ERRCODE_E_R_I_E_NULL_VALUE_NOT_ALLOWED`, omitted by bindgen."]
+pub const ERRCODE_E_R_I_E_NULL_VALUE_NOT_ALLOWED: i32 = 67109443;
+#[doc = " Compiler-verified C object macro `ERRCODE_E_R_I_E_SRF_PROTOCOL_VIOLATED`, omitted by bindgen."]
+pub const ERRCODE_E_R_I_E_SRF_PROTOCOL_VIOLATED: i32 = 33686083;
+#[doc = " Compiler-verified C object macro `ERRCODE_E_R_I_E_TRIGGER_PROTOCOL_VIOLATED`, omitted by bindgen."]
+pub const ERRCODE_E_R_I_E_TRIGGER_PROTOCOL_VIOLATED: i32 = 16908867;
+#[doc = " Compiler-verified C object macro `ERRCODE_FDW_COLUMN_NAME_NOT_FOUND`, omitted by bindgen."]
+pub const ERRCODE_FDW_COLUMN_NAME_NOT_FOUND: i32 = 83888536;
+#[doc = " Compiler-verified C object macro `ERRCODE_FDW_DYNAMIC_PARAMETER_VALUE_NEEDED`, omitted by bindgen."]
+pub const ERRCODE_FDW_DYNAMIC_PARAMETER_VALUE_NEEDED: i32 = 33556888;
+#[doc = " Compiler-verified C object macro `ERRCODE_FDW_ERROR`, omitted by bindgen."]
+pub const ERRCODE_FDW_ERROR: i32 = 2456;
+#[doc = " Compiler-verified C object macro `ERRCODE_FDW_FUNCTION_SEQUENCE_ERROR`, omitted by bindgen."]
+pub const ERRCODE_FDW_FUNCTION_SEQUENCE_ERROR: i32 = 264600;
+#[doc = " Compiler-verified C object macro `ERRCODE_FDW_INCONSISTENT_DESCRIPTOR_INFORMATION`, omitted by bindgen."]
+pub const ERRCODE_FDW_INCONSISTENT_DESCRIPTOR_INFORMATION: i32 = 17303960;
+#[doc = " Compiler-verified C object macro `ERRCODE_FDW_INVALID_ATTRIBUTE_VALUE`, omitted by bindgen."]
+pub const ERRCODE_FDW_INVALID_ATTRIBUTE_VALUE: i32 = 67635608;
+#[doc = " Compiler-verified C object macro `ERRCODE_FDW_INVALID_COLUMN_NAME`, omitted by bindgen."]
+pub const ERRCODE_FDW_INVALID_COLUMN_NAME: i32 = 117442968;
+#[doc = " Compiler-verified C object macro `ERRCODE_FDW_INVALID_COLUMN_NUMBER`, omitted by bindgen."]
+pub const ERRCODE_FDW_INVALID_COLUMN_NUMBER: i32 = 134220184;
+#[doc = " Compiler-verified C object macro `ERRCODE_FDW_INVALID_DATA_TYPE`, omitted by bindgen."]
+pub const ERRCODE_FDW_INVALID_DATA_TYPE: i32 = 67111320;
+#[doc = " Compiler-verified C object macro `ERRCODE_FDW_INVALID_DATA_TYPE_DESCRIPTORS`, omitted by bindgen."]
+pub const ERRCODE_FDW_INVALID_DATA_TYPE_DESCRIPTORS: i32 = 100665752;
+#[doc = " Compiler-verified C object macro `ERRCODE_FDW_INVALID_DESCRIPTOR_FIELD_IDENTIFIER`, omitted by bindgen."]
+pub const ERRCODE_FDW_INVALID_DESCRIPTOR_FIELD_IDENTIFIER: i32 = 19138968;
+#[doc = " Compiler-verified C object macro `ERRCODE_FDW_INVALID_HANDLE`, omitted by bindgen."]
+pub const ERRCODE_FDW_INVALID_HANDLE: i32 = 301992344;
+#[doc = " Compiler-verified C object macro `ERRCODE_FDW_INVALID_OPTION_INDEX`, omitted by bindgen."]
+pub const ERRCODE_FDW_INVALID_OPTION_INDEX: i32 = 318769560;
+#[doc = " Compiler-verified C object macro `ERRCODE_FDW_INVALID_OPTION_NAME`, omitted by bindgen."]
+pub const ERRCODE_FDW_INVALID_OPTION_NAME: i32 = 335546776;
+#[doc = " Compiler-verified C object macro `ERRCODE_FDW_INVALID_STRING_FORMAT`, omitted by bindgen."]
+pub const ERRCODE_FDW_INVALID_STRING_FORMAT: i32 = 285215128;
+#[doc = " Compiler-verified C object macro `ERRCODE_FDW_INVALID_STRING_LENGTH_OR_BUFFER_LENGTH`, omitted by bindgen."]
+pub const ERRCODE_FDW_INVALID_STRING_LENGTH_OR_BUFFER_LENGTH: i32 = 2361752;
+#[doc = " Compiler-verified C object macro `ERRCODE_FDW_INVALID_USE_OF_NULL_POINTER`, omitted by bindgen."]
+pub const ERRCODE_FDW_INVALID_USE_OF_NULL_POINTER: i32 = 150997400;
+#[doc = " Compiler-verified C object macro `ERRCODE_FDW_NO_SCHEMAS`, omitted by bindgen."]
+pub const ERRCODE_FDW_NO_SCHEMAS: i32 = 536873368;
+#[doc = " Compiler-verified C object macro `ERRCODE_FDW_OPTION_NAME_NOT_FOUND`, omitted by bindgen."]
+pub const ERRCODE_FDW_OPTION_NAME_NOT_FOUND: i32 = 436210072;
+#[doc = " Compiler-verified C object macro `ERRCODE_FDW_OUT_OF_MEMORY`, omitted by bindgen."]
+pub const ERRCODE_FDW_OUT_OF_MEMORY: i32 = 16779672;
+#[doc = " Compiler-verified C object macro `ERRCODE_FDW_REPLY_HANDLE`, omitted by bindgen."]
+pub const ERRCODE_FDW_REPLY_HANDLE: i32 = 452987288;
+#[doc = " Compiler-verified C object macro `ERRCODE_FDW_SCHEMA_NOT_FOUND`, omitted by bindgen."]
+pub const ERRCODE_FDW_SCHEMA_NOT_FOUND: i32 = 553650584;
+#[doc = " Compiler-verified C object macro `ERRCODE_FDW_TABLE_NOT_FOUND`, omitted by bindgen."]
+pub const ERRCODE_FDW_TABLE_NOT_FOUND: i32 = 570427800;
+#[doc = " Compiler-verified C object macro `ERRCODE_FDW_TOO_MANY_HANDLES`, omitted by bindgen."]
+pub const ERRCODE_FDW_TOO_MANY_HANDLES: i32 = 67373464;
+#[doc = " Compiler-verified C object macro `ERRCODE_FDW_UNABLE_TO_CREATE_EXECUTION`, omitted by bindgen."]
+pub const ERRCODE_FDW_UNABLE_TO_CREATE_EXECUTION: i32 = 469764504;
+#[doc = " Compiler-verified C object macro `ERRCODE_FDW_UNABLE_TO_CREATE_REPLY`, omitted by bindgen."]
+pub const ERRCODE_FDW_UNABLE_TO_CREATE_REPLY: i32 = 486541720;
+#[doc = " Compiler-verified C object macro `ERRCODE_FDW_UNABLE_TO_ESTABLISH_CONNECTION`, omitted by bindgen."]
+pub const ERRCODE_FDW_UNABLE_TO_ESTABLISH_CONNECTION: i32 = 503318936;
+#[doc = " Compiler-verified C object macro `ERRCODE_FEATURE_NOT_SUPPORTED`, omitted by bindgen."]
+pub const ERRCODE_FEATURE_NOT_SUPPORTED: i32 = 1088;
+#[doc = " Compiler-verified C object macro `ERRCODE_FILE_NAME_TOO_LONG`, omitted by bindgen."]
+pub const ERRCODE_FILE_NAME_TOO_LONG: i32 = 50463237;
+#[doc = " Compiler-verified C object macro `ERRCODE_FLOATING_POINT_EXCEPTION`, omitted by bindgen."]
+pub const ERRCODE_FLOATING_POINT_EXCEPTION: i32 = 16908418;
+#[doc = " Compiler-verified C object macro `ERRCODE_FOREIGN_KEY_VIOLATION`, omitted by bindgen."]
+pub const ERRCODE_FOREIGN_KEY_VIOLATION: i32 = 50352322;
+#[doc = " Compiler-verified C object macro `ERRCODE_GENERATED_ALWAYS`, omitted by bindgen."]
+pub const ERRCODE_GENERATED_ALWAYS: i32 = 156008580;
+#[doc = " Compiler-verified C object macro `ERRCODE_GROUPING_ERROR`, omitted by bindgen."]
+pub const ERRCODE_GROUPING_ERROR: i32 = 50364548;
+#[doc = " Compiler-verified C object macro `ERRCODE_HELD_CURSOR_REQUIRES_SAME_ISOLATION_LEVEL`, omitted by bindgen."]
+pub const ERRCODE_HELD_CURSOR_REQUIRES_SAME_ISOLATION_LEVEL: i32 = 134218050;
+#[doc = " Compiler-verified C object macro `ERRCODE_IDLE_IN_TRANSACTION_SESSION_TIMEOUT`, omitted by bindgen."]
+pub const ERRCODE_IDLE_IN_TRANSACTION_SESSION_TIMEOUT: i32 = 50463042;
+#[doc = " Compiler-verified C object macro `ERRCODE_IDLE_SESSION_TIMEOUT`, omitted by bindgen."]
+pub const ERRCODE_IDLE_SESSION_TIMEOUT: i32 = 84017605;
+#[doc = " Compiler-verified C object macro `ERRCODE_INAPPROPRIATE_ACCESS_MODE_FOR_BRANCH_TRANSACTION`, omitted by bindgen."]
+pub const ERRCODE_INAPPROPRIATE_ACCESS_MODE_FOR_BRANCH_TRANSACTION: i32 = 50331970;
+#[doc = " Compiler-verified C object macro `ERRCODE_INAPPROPRIATE_ISOLATION_LEVEL_FOR_BRANCH_TRANSACTION`, omitted by bindgen."]
+pub const ERRCODE_INAPPROPRIATE_ISOLATION_LEVEL_FOR_BRANCH_TRANSACTION: i32 = 67109186;
+#[doc = " Compiler-verified C object macro `ERRCODE_INDETERMINATE_COLLATION`, omitted by bindgen."]
+pub const ERRCODE_INDETERMINATE_COLLATION: i32 = 34209924;
+#[doc = " Compiler-verified C object macro `ERRCODE_INDETERMINATE_DATATYPE`, omitted by bindgen."]
+pub const ERRCODE_INDETERMINATE_DATATYPE: i32 = 134611076;
+#[doc = " Compiler-verified C object macro `ERRCODE_INDEX_CORRUPTED`, omitted by bindgen."]
+pub const ERRCODE_INDEX_CORRUPTED: i32 = 33557032;
+#[doc = " Compiler-verified C object macro `ERRCODE_INDICATOR_OVERFLOW`, omitted by bindgen."]
+pub const ERRCODE_INDICATOR_OVERFLOW: i32 = 34078850;
+#[doc = " Compiler-verified C object macro `ERRCODE_INSUFFICIENT_PRIVILEGE`, omitted by bindgen."]
+pub const ERRCODE_INSUFFICIENT_PRIVILEGE: i32 = 16797828;
+#[doc = " Compiler-verified C object macro `ERRCODE_INSUFFICIENT_RESOURCES`, omitted by bindgen."]
+pub const ERRCODE_INSUFFICIENT_RESOURCES: i32 = 197;
+#[doc = " Compiler-verified C object macro `ERRCODE_INTEGRITY_CONSTRAINT_VIOLATION`, omitted by bindgen."]
+pub const ERRCODE_INTEGRITY_CONSTRAINT_VIOLATION: i32 = 194;
+#[doc = " Compiler-verified C object macro `ERRCODE_INTERNAL_ERROR`, omitted by bindgen."]
+pub const ERRCODE_INTERNAL_ERROR: i32 = 2600;
+#[doc = " Compiler-verified C object macro `ERRCODE_INTERVAL_FIELD_OVERFLOW`, omitted by bindgen."]
+pub const ERRCODE_INTERVAL_FIELD_OVERFLOW: i32 = 84148354;
+#[doc = " Compiler-verified C object macro `ERRCODE_INVALID_ARGUMENT_FOR_LOG`, omitted by bindgen."]
+pub const ERRCODE_INVALID_ARGUMENT_FOR_LOG: i32 = 352583810;
+#[doc = " Compiler-verified C object macro `ERRCODE_INVALID_ARGUMENT_FOR_NTH_VALUE`, omitted by bindgen."]
+pub const ERRCODE_INVALID_ARGUMENT_FOR_NTH_VALUE: i32 = 100925570;
+#[doc = " Compiler-verified C object macro `ERRCODE_INVALID_ARGUMENT_FOR_NTILE`, omitted by bindgen."]
+pub const ERRCODE_INVALID_ARGUMENT_FOR_NTILE: i32 = 67371138;
+#[doc = " Compiler-verified C object macro `ERRCODE_INVALID_ARGUMENT_FOR_POWER_FUNCTION`, omitted by bindgen."]
+pub const ERRCODE_INVALID_ARGUMENT_FOR_POWER_FUNCTION: i32 = 369361026;
+#[doc = " Compiler-verified C object macro `ERRCODE_INVALID_ARGUMENT_FOR_SQL_JSON_DATETIME_FUNCTION`, omitted by bindgen."]
+pub const ERRCODE_INVALID_ARGUMENT_FOR_SQL_JSON_DATETIME_FUNCTION: i32 = 17563778;
+#[doc = " Compiler-verified C object macro `ERRCODE_INVALID_ARGUMENT_FOR_WIDTH_BUCKET_FUNCTION`, omitted by bindgen."]
+pub const ERRCODE_INVALID_ARGUMENT_FOR_WIDTH_BUCKET_FUNCTION: i32 = 386138242;
+#[doc = " Compiler-verified C object macro `ERRCODE_INVALID_ARGUMENT_FOR_XQUERY`, omitted by bindgen."]
+pub const ERRCODE_INVALID_ARGUMENT_FOR_XQUERY: i32 = 134242305;
+#[doc = " Compiler-verified C object macro `ERRCODE_INVALID_AUTHORIZATION_SPECIFICATION`, omitted by bindgen."]
+pub const ERRCODE_INVALID_AUTHORIZATION_SPECIFICATION: i32 = 514;
+#[doc = " Compiler-verified C object macro `ERRCODE_INVALID_BINARY_REPRESENTATION`, omitted by bindgen."]
+pub const ERRCODE_INVALID_BINARY_REPRESENTATION: i32 = 50462850;
+#[doc = " Compiler-verified C object macro `ERRCODE_INVALID_CATALOG_NAME`, omitted by bindgen."]
+pub const ERRCODE_INVALID_CATALOG_NAME: i32 = 1283;
+#[doc = " Compiler-verified C object macro `ERRCODE_INVALID_CHARACTER_VALUE_FOR_CAST`, omitted by bindgen."]
+pub const ERRCODE_INVALID_CHARACTER_VALUE_FOR_CAST: i32 = 134480002;
+#[doc = " Compiler-verified C object macro `ERRCODE_INVALID_COLUMN_DEFINITION`, omitted by bindgen."]
+pub const ERRCODE_INVALID_COLUMN_DEFINITION: i32 = 17064068;
+#[doc = " Compiler-verified C object macro `ERRCODE_INVALID_COLUMN_REFERENCE`, omitted by bindgen."]
+pub const ERRCODE_INVALID_COLUMN_REFERENCE: i32 = 393348;
+#[doc = " Compiler-verified C object macro `ERRCODE_INVALID_CURSOR_DEFINITION`, omitted by bindgen."]
+pub const ERRCODE_INVALID_CURSOR_DEFINITION: i32 = 17170564;
+#[doc = " Compiler-verified C object macro `ERRCODE_INVALID_CURSOR_NAME`, omitted by bindgen."]
+pub const ERRCODE_INVALID_CURSOR_NAME: i32 = 259;
+#[doc = " Compiler-verified C object macro `ERRCODE_INVALID_CURSOR_STATE`, omitted by bindgen."]
+pub const ERRCODE_INVALID_CURSOR_STATE: i32 = 258;
+#[doc = " Compiler-verified C object macro `ERRCODE_INVALID_DATABASE_DEFINITION`, omitted by bindgen."]
+pub const ERRCODE_INVALID_DATABASE_DEFINITION: i32 = 33947780;
+#[doc = " Compiler-verified C object macro `ERRCODE_INVALID_DATETIME_FORMAT`, omitted by bindgen."]
+pub const ERRCODE_INVALID_DATETIME_FORMAT: i32 = 117440642;
+#[doc = " Compiler-verified C object macro `ERRCODE_INVALID_ESCAPE_CHARACTER`, omitted by bindgen."]
+pub const ERRCODE_INVALID_ESCAPE_CHARACTER: i32 = 151257218;
+#[doc = " Compiler-verified C object macro `ERRCODE_INVALID_ESCAPE_OCTET`, omitted by bindgen."]
+pub const ERRCODE_INVALID_ESCAPE_OCTET: i32 = 335544450;
+#[doc = " Compiler-verified C object macro `ERRCODE_INVALID_ESCAPE_SEQUENCE`, omitted by bindgen."]
+pub const ERRCODE_INVALID_ESCAPE_SEQUENCE: i32 = 84410498;
+#[doc = " Compiler-verified C object macro `ERRCODE_INVALID_FOREIGN_KEY`, omitted by bindgen."]
+pub const ERRCODE_INVALID_FOREIGN_KEY: i32 = 819332;
+#[doc = " Compiler-verified C object macro `ERRCODE_INVALID_FUNCTION_DEFINITION`, omitted by bindgen."]
+pub const ERRCODE_INVALID_FUNCTION_DEFINITION: i32 = 50724996;
+#[doc = " Compiler-verified C object macro `ERRCODE_INVALID_GRANTOR`, omitted by bindgen."]
+pub const ERRCODE_INVALID_GRANTOR: i32 = 1792;
+#[doc = " Compiler-verified C object macro `ERRCODE_INVALID_GRANT_OPERATION`, omitted by bindgen."]
+pub const ERRCODE_INVALID_GRANT_OPERATION: i32 = 16910080;
+#[doc = " Compiler-verified C object macro `ERRCODE_INVALID_INDICATOR_PARAMETER_VALUE`, omitted by bindgen."]
+pub const ERRCODE_INVALID_INDICATOR_PARAMETER_VALUE: i32 = 262274;
+#[doc = " Compiler-verified C object macro `ERRCODE_INVALID_JSON_TEXT`, omitted by bindgen."]
+pub const ERRCODE_INVALID_JSON_TEXT: i32 = 34340994;
+#[doc = " Compiler-verified C object macro `ERRCODE_INVALID_NAME`, omitted by bindgen."]
+pub const ERRCODE_INVALID_NAME: i32 = 33579140;
+#[doc = " Compiler-verified C object macro `ERRCODE_INVALID_OBJECT_DEFINITION`, omitted by bindgen."]
+pub const ERRCODE_INVALID_OBJECT_DEFINITION: i32 = 117833860;
+#[doc = " Compiler-verified C object macro `ERRCODE_INVALID_PARAMETER_VALUE`, omitted by bindgen."]
+pub const ERRCODE_INVALID_PARAMETER_VALUE: i32 = 50856066;
+#[doc = " Compiler-verified C object macro `ERRCODE_INVALID_PASSWORD`, omitted by bindgen."]
+pub const ERRCODE_INVALID_PASSWORD: i32 = 16908802;
+#[doc = " Compiler-verified C object macro `ERRCODE_INVALID_PRECEDING_OR_FOLLOWING_SIZE`, omitted by bindgen."]
+pub const ERRCODE_INVALID_PRECEDING_OR_FOLLOWING_SIZE: i32 = 50593922;
+#[doc = " Compiler-verified C object macro `ERRCODE_INVALID_PSTATEMENT_DEFINITION`, omitted by bindgen."]
+pub const ERRCODE_INVALID_PSTATEMENT_DEFINITION: i32 = 67502212;
+#[doc = " Compiler-verified C object macro `ERRCODE_INVALID_RECURSION`, omitted by bindgen."]
+pub const ERRCODE_INVALID_RECURSION: i32 = 151388292;
+#[doc = " Compiler-verified C object macro `ERRCODE_INVALID_REGULAR_EXPRESSION`, omitted by bindgen."]
+pub const ERRCODE_INVALID_REGULAR_EXPRESSION: i32 = 302252162;
+#[doc = " Compiler-verified C object macro `ERRCODE_INVALID_ROLE_SPECIFICATION`, omitted by bindgen."]
+pub const ERRCODE_INVALID_ROLE_SPECIFICATION: i32 = 2048;
+#[doc = " Compiler-verified C object macro `ERRCODE_INVALID_ROW_COUNT_IN_LIMIT_CLAUSE`, omitted by bindgen."]
+pub const ERRCODE_INVALID_ROW_COUNT_IN_LIMIT_CLAUSE: i32 = 654573698;
+#[doc = " Compiler-verified C object macro `ERRCODE_INVALID_ROW_COUNT_IN_RESULT_OFFSET_CLAUSE`, omitted by bindgen."]
+pub const ERRCODE_INVALID_ROW_COUNT_IN_RESULT_OFFSET_CLAUSE: i32 = 671350914;
+#[doc = " Compiler-verified C object macro `ERRCODE_INVALID_SCHEMA_DEFINITION`, omitted by bindgen."]
+pub const ERRCODE_INVALID_SCHEMA_DEFINITION: i32 = 84279428;
+#[doc = " Compiler-verified C object macro `ERRCODE_INVALID_SCHEMA_NAME`, omitted by bindgen."]
+pub const ERRCODE_INVALID_SCHEMA_NAME: i32 = 1411;
+#[doc = " Compiler-verified C object macro `ERRCODE_INVALID_SQL_JSON_SUBSCRIPT`, omitted by bindgen."]
+pub const ERRCODE_INVALID_SQL_JSON_SUBSCRIPT: i32 = 51118210;
+#[doc = " Compiler-verified C object macro `ERRCODE_INVALID_SQL_STATEMENT_NAME`, omitted by bindgen."]
+pub const ERRCODE_INVALID_SQL_STATEMENT_NAME: i32 = 386;
+#[doc = " Compiler-verified C object macro `ERRCODE_INVALID_TABLESAMPLE_ARGUMENT`, omitted by bindgen."]
+pub const ERRCODE_INVALID_TABLESAMPLE_ARGUMENT: i32 = 403177602;
+#[doc = " Compiler-verified C object macro `ERRCODE_INVALID_TABLESAMPLE_REPEAT`, omitted by bindgen."]
+pub const ERRCODE_INVALID_TABLESAMPLE_REPEAT: i32 = 386400386;
+#[doc = " Compiler-verified C object macro `ERRCODE_INVALID_TABLE_DEFINITION`, omitted by bindgen."]
+pub const ERRCODE_INVALID_TABLE_DEFINITION: i32 = 101056644;
+#[doc = " Compiler-verified C object macro `ERRCODE_INVALID_TEXT_REPRESENTATION`, omitted by bindgen."]
+pub const ERRCODE_INVALID_TEXT_REPRESENTATION: i32 = 33685634;
+#[doc = " Compiler-verified C object macro `ERRCODE_INVALID_TIME_ZONE_DISPLACEMENT_VALUE`, omitted by bindgen."]
+pub const ERRCODE_INVALID_TIME_ZONE_DISPLACEMENT_VALUE: i32 = 150995074;
+#[doc = " Compiler-verified C object macro `ERRCODE_INVALID_TRANSACTION_INITIATION`, omitted by bindgen."]
+pub const ERRCODE_INVALID_TRANSACTION_INITIATION: i32 = 1152;
+#[doc = " Compiler-verified C object macro `ERRCODE_INVALID_TRANSACTION_STATE`, omitted by bindgen."]
+pub const ERRCODE_INVALID_TRANSACTION_STATE: i32 = 322;
+#[doc = " Compiler-verified C object macro `ERRCODE_INVALID_TRANSACTION_TERMINATION`, omitted by bindgen."]
+pub const ERRCODE_INVALID_TRANSACTION_TERMINATION: i32 = 1282;
+#[doc = " Compiler-verified C object macro `ERRCODE_INVALID_USE_OF_ESCAPE_CHARACTER`, omitted by bindgen."]
+pub const ERRCODE_INVALID_USE_OF_ESCAPE_CHARACTER: i32 = 318767234;
+#[doc = " Compiler-verified C object macro `ERRCODE_INVALID_XML_COMMENT`, omitted by bindgen."]
+pub const ERRCODE_INVALID_XML_COMMENT: i32 = 587202690;
+#[doc = " Compiler-verified C object macro `ERRCODE_INVALID_XML_CONTENT`, omitted by bindgen."]
+pub const ERRCODE_INVALID_XML_CONTENT: i32 = 503316610;
+#[doc = " Compiler-verified C object macro `ERRCODE_INVALID_XML_DOCUMENT`, omitted by bindgen."]
+pub const ERRCODE_INVALID_XML_DOCUMENT: i32 = 486539394;
+#[doc = " Compiler-verified C object macro `ERRCODE_INVALID_XML_PROCESSING_INSTRUCTION`, omitted by bindgen."]
+pub const ERRCODE_INVALID_XML_PROCESSING_INSTRUCTION: i32 = 603979906;
+#[doc = " Compiler-verified C object macro `ERRCODE_IN_FAILED_SQL_TRANSACTION`, omitted by bindgen."]
+pub const ERRCODE_IN_FAILED_SQL_TRANSACTION: i32 = 33685826;
+#[doc = " Compiler-verified C object macro `ERRCODE_IO_ERROR`, omitted by bindgen."]
+pub const ERRCODE_IO_ERROR: i32 = 786949;
+#[doc = " Compiler-verified C object macro `ERRCODE_LOCATOR_EXCEPTION`, omitted by bindgen."]
+pub const ERRCODE_LOCATOR_EXCEPTION: i32 = 1408;
+#[doc = " Compiler-verified C object macro `ERRCODE_LOCK_FILE_EXISTS`, omitted by bindgen."]
+pub const ERRCODE_LOCK_FILE_EXISTS: i32 = 16777238;
+#[doc = " Compiler-verified C object macro `ERRCODE_LOCK_NOT_AVAILABLE`, omitted by bindgen."]
+pub const ERRCODE_LOCK_NOT_AVAILABLE: i32 = 50463045;
+#[doc = " Compiler-verified C object macro `ERRCODE_L_E_INVALID_SPECIFICATION`, omitted by bindgen."]
+pub const ERRCODE_L_E_INVALID_SPECIFICATION: i32 = 16778624;
+#[doc = " Compiler-verified C object macro `ERRCODE_MORE_THAN_ONE_SQL_JSON_ITEM`, omitted by bindgen."]
+pub const ERRCODE_MORE_THAN_ONE_SQL_JSON_ITEM: i32 = 67895426;
+#[doc = " Compiler-verified C object macro `ERRCODE_MOST_SPECIFIC_TYPE_MISMATCH`, omitted by bindgen."]
+pub const ERRCODE_MOST_SPECIFIC_TYPE_MISMATCH: i32 = 385876098;
+#[doc = " Compiler-verified C object macro `ERRCODE_NAME_TOO_LONG`, omitted by bindgen."]
+pub const ERRCODE_NAME_TOO_LONG: i32 = 34103428;
+#[doc = " Compiler-verified C object macro `ERRCODE_NONSTANDARD_USE_OF_ESCAPE_CHARACTER`, omitted by bindgen."]
+pub const ERRCODE_NONSTANDARD_USE_OF_ESCAPE_CHARACTER: i32 = 100794498;
+#[doc = " Compiler-verified C object macro `ERRCODE_NON_NUMERIC_SQL_JSON_ITEM`, omitted by bindgen."]
+pub const ERRCODE_NON_NUMERIC_SQL_JSON_ITEM: i32 = 101449858;
+#[doc = " Compiler-verified C object macro `ERRCODE_NON_UNIQUE_KEYS_IN_A_JSON_OBJECT`, omitted by bindgen."]
+pub const ERRCODE_NON_UNIQUE_KEYS_IN_A_JSON_OBJECT: i32 = 118227074;
+#[doc = " Compiler-verified C object macro `ERRCODE_NOT_AN_XML_DOCUMENT`, omitted by bindgen."]
+pub const ERRCODE_NOT_AN_XML_DOCUMENT: i32 = 469762178;
+#[doc = " Compiler-verified C object macro `ERRCODE_NOT_NULL_VIOLATION`, omitted by bindgen."]
+pub const ERRCODE_NOT_NULL_VIOLATION: i32 = 33575106;
+#[doc = " Compiler-verified C object macro `ERRCODE_NO_ACTIVE_SQL_TRANSACTION`, omitted by bindgen."]
+pub const ERRCODE_NO_ACTIVE_SQL_TRANSACTION: i32 = 16908610;
+#[doc = " Compiler-verified C object macro `ERRCODE_NO_ACTIVE_SQL_TRANSACTION_FOR_BRANCH_TRANSACTION`, omitted by bindgen."]
+pub const ERRCODE_NO_ACTIVE_SQL_TRANSACTION_FOR_BRANCH_TRANSACTION: i32 = 83886402;
+#[doc = " Compiler-verified C object macro `ERRCODE_NO_ADDITIONAL_DYNAMIC_RESULT_SETS_RETURNED`, omitted by bindgen."]
+pub const ERRCODE_NO_ADDITIONAL_DYNAMIC_RESULT_SETS_RETURNED: i32 = 16777344;
+#[doc = " Compiler-verified C object macro `ERRCODE_NO_DATA`, omitted by bindgen."]
+pub const ERRCODE_NO_DATA: i32 = 128;
+#[doc = " Compiler-verified C object macro `ERRCODE_NO_DATA_FOUND`, omitted by bindgen."]
+pub const ERRCODE_NO_DATA_FOUND: i32 = 33554464;
+#[doc = " Compiler-verified C object macro `ERRCODE_NO_SQL_JSON_ITEM`, omitted by bindgen."]
+pub const ERRCODE_NO_SQL_JSON_ITEM: i32 = 84672642;
+#[doc = " Compiler-verified C object macro `ERRCODE_NULL_VALUE_NOT_ALLOWED`, omitted by bindgen."]
+pub const ERRCODE_NULL_VALUE_NOT_ALLOWED: i32 = 67108994;
+#[doc = " Compiler-verified C object macro `ERRCODE_NULL_VALUE_NO_INDICATOR_PARAMETER`, omitted by bindgen."]
+pub const ERRCODE_NULL_VALUE_NO_INDICATOR_PARAMETER: i32 = 33554562;
+#[doc = " Compiler-verified C object macro `ERRCODE_NUMERIC_VALUE_OUT_OF_RANGE`, omitted by bindgen."]
+pub const ERRCODE_NUMERIC_VALUE_OUT_OF_RANGE: i32 = 50331778;
+#[doc = " Compiler-verified C object macro `ERRCODE_OBJECT_IN_USE`, omitted by bindgen."]
+pub const ERRCODE_OBJECT_IN_USE: i32 = 100663621;
+#[doc = " Compiler-verified C object macro `ERRCODE_OBJECT_NOT_IN_PREREQUISITE_STATE`, omitted by bindgen."]
+pub const ERRCODE_OBJECT_NOT_IN_PREREQUISITE_STATE: i32 = 325;
+#[doc = " Compiler-verified C object macro `ERRCODE_OPERATOR_INTERVENTION`, omitted by bindgen."]
+pub const ERRCODE_OPERATOR_INTERVENTION: i32 = 453;
+#[doc = " Compiler-verified C object macro `ERRCODE_OUT_OF_MEMORY`, omitted by bindgen."]
+pub const ERRCODE_OUT_OF_MEMORY: i32 = 8389;
+#[doc = " Compiler-verified C object macro `ERRCODE_PLPGSQL_ERROR`, omitted by bindgen."]
+pub const ERRCODE_PLPGSQL_ERROR: i32 = 32;
+#[doc = " Compiler-verified C object macro `ERRCODE_PROGRAM_LIMIT_EXCEEDED`, omitted by bindgen."]
+pub const ERRCODE_PROGRAM_LIMIT_EXCEEDED: i32 = 261;
+#[doc = " Compiler-verified C object macro `ERRCODE_PROTOCOL_VIOLATION`, omitted by bindgen."]
+pub const ERRCODE_PROTOCOL_VIOLATION: i32 = 16908800;
+#[doc = " Compiler-verified C object macro `ERRCODE_QUERY_CANCELED`, omitted by bindgen."]
+pub const ERRCODE_QUERY_CANCELED: i32 = 67371461;
+#[doc = " Compiler-verified C object macro `ERRCODE_RAISE_EXCEPTION`, omitted by bindgen."]
+pub const ERRCODE_RAISE_EXCEPTION: i32 = 16777248;
+#[doc = " Compiler-verified C object macro `ERRCODE_READ_ONLY_SQL_TRANSACTION`, omitted by bindgen."]
+pub const ERRCODE_READ_ONLY_SQL_TRANSACTION: i32 = 100663618;
+#[doc = " Compiler-verified C object macro `ERRCODE_RESERVED_NAME`, omitted by bindgen."]
+pub const ERRCODE_RESERVED_NAME: i32 = 151818372;
+#[doc = " Compiler-verified C object macro `ERRCODE_RESTRICT_VIOLATION`, omitted by bindgen."]
+pub const ERRCODE_RESTRICT_VIOLATION: i32 = 16777410;
+#[doc = " Compiler-verified C object macro `ERRCODE_SAVEPOINT_EXCEPTION`, omitted by bindgen."]
+pub const ERRCODE_SAVEPOINT_EXCEPTION: i32 = 1155;
+#[doc = " Compiler-verified C object macro `ERRCODE_SCHEMA_AND_DATA_STATEMENT_MIXING_NOT_SUPPORTED`, omitted by bindgen."]
+pub const ERRCODE_SCHEMA_AND_DATA_STATEMENT_MIXING_NOT_SUPPORTED: i32 = 117440834;
+#[doc = " Compiler-verified C object macro `ERRCODE_SEQUENCE_GENERATOR_LIMIT_EXCEEDED`, omitted by bindgen."]
+pub const ERRCODE_SEQUENCE_GENERATOR_LIMIT_EXCEEDED: i32 = 402653314;
+#[doc = " Compiler-verified C object macro `ERRCODE_SINGLETON_SQL_JSON_ITEM_REQUIRED`, omitted by bindgen."]
+pub const ERRCODE_SINGLETON_SQL_JSON_ITEM_REQUIRED: i32 = 135004290;
+#[doc = " Compiler-verified C object macro `ERRCODE_SQLCLIENT_UNABLE_TO_ESTABLISH_SQLCONNECTION`, omitted by bindgen."]
+pub const ERRCODE_SQLCLIENT_UNABLE_TO_ESTABLISH_SQLCONNECTION: i32 = 16777728;
+#[doc = " Compiler-verified C object macro `ERRCODE_SQLSERVER_REJECTED_ESTABLISHMENT_OF_SQLCONNECTION`, omitted by bindgen."]
+pub const ERRCODE_SQLSERVER_REJECTED_ESTABLISHMENT_OF_SQLCONNECTION: i32 = 67109376;
+#[doc = " Compiler-verified C object macro `ERRCODE_SQL_JSON_ARRAY_NOT_FOUND`, omitted by bindgen."]
+pub const ERRCODE_SQL_JSON_ARRAY_NOT_FOUND: i32 = 151781506;
+#[doc = " Compiler-verified C object macro `ERRCODE_SQL_JSON_ITEM_CANNOT_BE_CAST_TO_TARGET_TYPE`, omitted by bindgen."]
+pub const ERRCODE_SQL_JSON_ITEM_CANNOT_BE_CAST_TO_TARGET_TYPE: i32 = 386662530;
+#[doc = " Compiler-verified C object macro `ERRCODE_SQL_JSON_MEMBER_NOT_FOUND`, omitted by bindgen."]
+pub const ERRCODE_SQL_JSON_MEMBER_NOT_FOUND: i32 = 285999234;
+#[doc = " Compiler-verified C object macro `ERRCODE_SQL_JSON_NUMBER_NOT_FOUND`, omitted by bindgen."]
+pub const ERRCODE_SQL_JSON_NUMBER_NOT_FOUND: i32 = 302776450;
+#[doc = " Compiler-verified C object macro `ERRCODE_SQL_JSON_OBJECT_NOT_FOUND`, omitted by bindgen."]
+pub const ERRCODE_SQL_JSON_OBJECT_NOT_FOUND: i32 = 319553666;
+#[doc = " Compiler-verified C object macro `ERRCODE_SQL_JSON_SCALAR_REQUIRED`, omitted by bindgen."]
+pub const ERRCODE_SQL_JSON_SCALAR_REQUIRED: i32 = 369885314;
+#[doc = " Compiler-verified C object macro `ERRCODE_SQL_ROUTINE_EXCEPTION`, omitted by bindgen."]
+pub const ERRCODE_SQL_ROUTINE_EXCEPTION: i32 = 1410;
+#[doc = " Compiler-verified C object macro `ERRCODE_SQL_STATEMENT_NOT_YET_COMPLETE`, omitted by bindgen."]
+pub const ERRCODE_SQL_STATEMENT_NOT_YET_COMPLETE: i32 = 192;
+#[doc = " Compiler-verified C object macro `ERRCODE_STACKED_DIAGNOSTICS_ACCESSED_WITHOUT_ACTIVE_HANDLER`, omitted by bindgen."]
+pub const ERRCODE_STACKED_DIAGNOSTICS_ACCESSED_WITHOUT_ACTIVE_HANDLER: i32 = 33557120;
+#[doc = " Compiler-verified C object macro `ERRCODE_STATEMENT_TOO_COMPLEX`, omitted by bindgen."]
+pub const ERRCODE_STATEMENT_TOO_COMPLEX: i32 = 16777477;
+#[doc = " Compiler-verified C object macro `ERRCODE_STRING_DATA_LENGTH_MISMATCH`, omitted by bindgen."]
+pub const ERRCODE_STRING_DATA_LENGTH_MISMATCH: i32 = 101187714;
+#[doc = " Compiler-verified C object macro `ERRCODE_STRING_DATA_RIGHT_TRUNCATION`, omitted by bindgen."]
+pub const ERRCODE_STRING_DATA_RIGHT_TRUNCATION: i32 = 16777346;
+#[doc = " Compiler-verified C object macro `ERRCODE_SUBSTRING_ERROR`, omitted by bindgen."]
+pub const ERRCODE_SUBSTRING_ERROR: i32 = 17039490;
+#[doc = " Compiler-verified C object macro `ERRCODE_SUCCESSFUL_COMPLETION`, omitted by bindgen."]
+pub const ERRCODE_SUCCESSFUL_COMPLETION: i32 = 0;
+#[doc = " Compiler-verified C object macro `ERRCODE_SYNTAX_ERROR`, omitted by bindgen."]
+pub const ERRCODE_SYNTAX_ERROR: i32 = 16801924;
+#[doc = " Compiler-verified C object macro `ERRCODE_SYNTAX_ERROR_OR_ACCESS_RULE_VIOLATION`, omitted by bindgen."]
+pub const ERRCODE_SYNTAX_ERROR_OR_ACCESS_RULE_VIOLATION: i32 = 132;
+#[doc = " Compiler-verified C object macro `ERRCODE_SYSTEM_ERROR`, omitted by bindgen."]
+pub const ERRCODE_SYSTEM_ERROR: i32 = 517;
+#[doc = " Compiler-verified C object macro `ERRCODE_S_E_INVALID_SPECIFICATION`, omitted by bindgen."]
+pub const ERRCODE_S_E_INVALID_SPECIFICATION: i32 = 16778371;
+#[doc = " Compiler-verified C object macro `ERRCODE_S_R_E_FUNCTION_EXECUTED_NO_RETURN_STATEMENT`, omitted by bindgen."]
+pub const ERRCODE_S_R_E_FUNCTION_EXECUTED_NO_RETURN_STATEMENT: i32 = 83887490;
+#[doc = " Compiler-verified C object macro `ERRCODE_S_R_E_MODIFYING_SQL_DATA_NOT_PERMITTED`, omitted by bindgen."]
+pub const ERRCODE_S_R_E_MODIFYING_SQL_DATA_NOT_PERMITTED: i32 = 33555842;
+#[doc = " Compiler-verified C object macro `ERRCODE_S_R_E_PROHIBITED_SQL_STATEMENT_ATTEMPTED`, omitted by bindgen."]
+pub const ERRCODE_S_R_E_PROHIBITED_SQL_STATEMENT_ATTEMPTED: i32 = 50333058;
+#[doc = " Compiler-verified C object macro `ERRCODE_S_R_E_READING_SQL_DATA_NOT_PERMITTED`, omitted by bindgen."]
+pub const ERRCODE_S_R_E_READING_SQL_DATA_NOT_PERMITTED: i32 = 67110274;
+#[doc = " Compiler-verified C object macro `ERRCODE_TOO_MANY_ARGUMENTS`, omitted by bindgen."]
+pub const ERRCODE_TOO_MANY_ARGUMENTS: i32 = 50856197;
+#[doc = " Compiler-verified C object macro `ERRCODE_TOO_MANY_COLUMNS`, omitted by bindgen."]
+pub const ERRCODE_TOO_MANY_COLUMNS: i32 = 17039621;
+#[doc = " Compiler-verified C object macro `ERRCODE_TOO_MANY_CONNECTIONS`, omitted by bindgen."]
+pub const ERRCODE_TOO_MANY_CONNECTIONS: i32 = 12485;
+#[doc = " Compiler-verified C object macro `ERRCODE_TOO_MANY_JSON_ARRAY_ELEMENTS`, omitted by bindgen."]
+pub const ERRCODE_TOO_MANY_JSON_ARRAY_ELEMENTS: i32 = 336330882;
+#[doc = " Compiler-verified C object macro `ERRCODE_TOO_MANY_JSON_OBJECT_MEMBERS`, omitted by bindgen."]
+pub const ERRCODE_TOO_MANY_JSON_OBJECT_MEMBERS: i32 = 353108098;
+#[doc = " Compiler-verified C object macro `ERRCODE_TOO_MANY_ROWS`, omitted by bindgen."]
+pub const ERRCODE_TOO_MANY_ROWS: i32 = 50331680;
+#[doc = " Compiler-verified C object macro `ERRCODE_TRANSACTION_RESOLUTION_UNKNOWN`, omitted by bindgen."]
+pub const ERRCODE_TRANSACTION_RESOLUTION_UNKNOWN: i32 = 117441024;
+#[doc = " Compiler-verified C object macro `ERRCODE_TRANSACTION_ROLLBACK`, omitted by bindgen."]
+pub const ERRCODE_TRANSACTION_ROLLBACK: i32 = 4;
+#[doc = " Compiler-verified C object macro `ERRCODE_TRANSACTION_TIMEOUT`, omitted by bindgen."]
+pub const ERRCODE_TRANSACTION_TIMEOUT: i32 = 67240258;
+#[doc = " Compiler-verified C object macro `ERRCODE_TRIGGERED_ACTION_EXCEPTION`, omitted by bindgen."]
+pub const ERRCODE_TRIGGERED_ACTION_EXCEPTION: i32 = 576;
+#[doc = " Compiler-verified C object macro `ERRCODE_TRIGGERED_DATA_CHANGE_VIOLATION`, omitted by bindgen."]
+pub const ERRCODE_TRIGGERED_DATA_CHANGE_VIOLATION: i32 = 450;
+#[doc = " Compiler-verified C object macro `ERRCODE_TRIM_ERROR`, omitted by bindgen."]
+pub const ERRCODE_TRIM_ERROR: i32 = 117964930;
+#[doc = " Compiler-verified C object macro `ERRCODE_T_R_DEADLOCK_DETECTED`, omitted by bindgen."]
+pub const ERRCODE_T_R_DEADLOCK_DETECTED: i32 = 16908292;
+#[doc = " Compiler-verified C object macro `ERRCODE_T_R_INTEGRITY_CONSTRAINT_VIOLATION`, omitted by bindgen."]
+pub const ERRCODE_T_R_INTEGRITY_CONSTRAINT_VIOLATION: i32 = 33554436;
+#[doc = " Compiler-verified C object macro `ERRCODE_T_R_SERIALIZATION_FAILURE`, omitted by bindgen."]
+pub const ERRCODE_T_R_SERIALIZATION_FAILURE: i32 = 16777220;
+#[doc = " Compiler-verified C object macro `ERRCODE_T_R_STATEMENT_COMPLETION_UNKNOWN`, omitted by bindgen."]
+pub const ERRCODE_T_R_STATEMENT_COMPLETION_UNKNOWN: i32 = 50331652;
+#[doc = " Compiler-verified C object macro `ERRCODE_UNDEFINED_COLUMN`, omitted by bindgen."]
+pub const ERRCODE_UNDEFINED_COLUMN: i32 = 50360452;
+#[doc = " Compiler-verified C object macro `ERRCODE_UNDEFINED_CURSOR`, omitted by bindgen."]
+pub const ERRCODE_UNDEFINED_CURSOR: i32 = 259;
+#[doc = " Compiler-verified C object macro `ERRCODE_UNDEFINED_DATABASE`, omitted by bindgen."]
+pub const ERRCODE_UNDEFINED_DATABASE: i32 = 1283;
+#[doc = " Compiler-verified C object macro `ERRCODE_UNDEFINED_FILE`, omitted by bindgen."]
+pub const ERRCODE_UNDEFINED_FILE: i32 = 16908805;
+#[doc = " Compiler-verified C object macro `ERRCODE_UNDEFINED_FUNCTION`, omitted by bindgen."]
+pub const ERRCODE_UNDEFINED_FUNCTION: i32 = 52461700;
+#[doc = " Compiler-verified C object macro `ERRCODE_UNDEFINED_OBJECT`, omitted by bindgen."]
+pub const ERRCODE_UNDEFINED_OBJECT: i32 = 67137668;
+#[doc = " Compiler-verified C object macro `ERRCODE_UNDEFINED_PARAMETER`, omitted by bindgen."]
+pub const ERRCODE_UNDEFINED_PARAMETER: i32 = 33685636;
+#[doc = " Compiler-verified C object macro `ERRCODE_UNDEFINED_PSTATEMENT`, omitted by bindgen."]
+pub const ERRCODE_UNDEFINED_PSTATEMENT: i32 = 386;
+#[doc = " Compiler-verified C object macro `ERRCODE_UNDEFINED_SCHEMA`, omitted by bindgen."]
+pub const ERRCODE_UNDEFINED_SCHEMA: i32 = 1411;
+#[doc = " Compiler-verified C object macro `ERRCODE_UNDEFINED_TABLE`, omitted by bindgen."]
+pub const ERRCODE_UNDEFINED_TABLE: i32 = 16908420;
+#[doc = " Compiler-verified C object macro `ERRCODE_UNIQUE_VIOLATION`, omitted by bindgen."]
+pub const ERRCODE_UNIQUE_VIOLATION: i32 = 83906754;
+#[doc = " Compiler-verified C object macro `ERRCODE_UNSAFE_NEW_ENUM_VALUE_USAGE`, omitted by bindgen."]
+pub const ERRCODE_UNSAFE_NEW_ENUM_VALUE_USAGE: i32 = 67240261;
+#[doc = " Compiler-verified C object macro `ERRCODE_UNTERMINATED_C_STRING`, omitted by bindgen."]
+pub const ERRCODE_UNTERMINATED_C_STRING: i32 = 67633282;
+#[doc = " Compiler-verified C object macro `ERRCODE_UNTRANSLATABLE_CHARACTER`, omitted by bindgen."]
+pub const ERRCODE_UNTRANSLATABLE_CHARACTER: i32 = 84017282;
+#[doc = " Compiler-verified C object macro `ERRCODE_WARNING`, omitted by bindgen."]
+pub const ERRCODE_WARNING: i32 = 64;
+#[doc = " Compiler-verified C object macro `ERRCODE_WARNING_DEPRECATED_FEATURE`, omitted by bindgen."]
+pub const ERRCODE_WARNING_DEPRECATED_FEATURE: i32 = 16908352;
+#[doc = " Compiler-verified C object macro `ERRCODE_WARNING_DYNAMIC_RESULT_SETS_RETURNED`, omitted by bindgen."]
+pub const ERRCODE_WARNING_DYNAMIC_RESULT_SETS_RETURNED: i32 = 318767168;
+#[doc = " Compiler-verified C object macro `ERRCODE_WARNING_IMPLICIT_ZERO_BIT_PADDING`, omitted by bindgen."]
+pub const ERRCODE_WARNING_IMPLICIT_ZERO_BIT_PADDING: i32 = 134217792;
+#[doc = " Compiler-verified C object macro `ERRCODE_WARNING_NULL_VALUE_ELIMINATED_IN_SET_FUNCTION`, omitted by bindgen."]
+pub const ERRCODE_WARNING_NULL_VALUE_ELIMINATED_IN_SET_FUNCTION: i32 = 50331712;
+#[doc = " Compiler-verified C object macro `ERRCODE_WARNING_PRIVILEGE_NOT_GRANTED`, omitted by bindgen."]
+pub const ERRCODE_WARNING_PRIVILEGE_NOT_GRANTED: i32 = 117440576;
+#[doc = " Compiler-verified C object macro `ERRCODE_WARNING_PRIVILEGE_NOT_REVOKED`, omitted by bindgen."]
+pub const ERRCODE_WARNING_PRIVILEGE_NOT_REVOKED: i32 = 100663360;
+#[doc = " Compiler-verified C object macro `ERRCODE_WARNING_STRING_DATA_RIGHT_TRUNCATION`, omitted by bindgen."]
+pub const ERRCODE_WARNING_STRING_DATA_RIGHT_TRUNCATION: i32 = 67108928;
+#[doc = " Compiler-verified C object macro `ERRCODE_WINDOWING_ERROR`, omitted by bindgen."]
+pub const ERRCODE_WINDOWING_ERROR: i32 = 655492;
+#[doc = " Compiler-verified C object macro `ERRCODE_WITH_CHECK_OPTION_VIOLATION`, omitted by bindgen."]
+pub const ERRCODE_WITH_CHECK_OPTION_VIOLATION: i32 = 260;
+#[doc = " Compiler-verified C object macro `ERRCODE_WRONG_OBJECT_TYPE`, omitted by bindgen."]
+pub const ERRCODE_WRONG_OBJECT_TYPE: i32 = 151027844;
+#[doc = " Compiler-verified C object macro `ERRCODE_ZERO_LENGTH_CHARACTER_STRING`, omitted by bindgen."]
+pub const ERRCODE_ZERO_LENGTH_CHARACTER_STRING: i32 = 369098882;
+#[doc = " Compiler-verified C object macro `ERROR`, omitted by bindgen."]
+pub const ERROR: i32 = 21;
+#[doc = " Compiler-verified C object macro `EXPANDED_POINTER_SIZE`, omitted by bindgen."]
+pub const EXPANDED_POINTER_SIZE: usize = 10;
+#[doc = " Compiler-verified C object macro `EXTERN_TUPLE_MAX_SIZE`, omitted by bindgen."]
+pub const EXTERN_TUPLE_MAX_SIZE: usize = 2032;
+#[doc = " Compiler-verified C object macro `FETCH_ALL`, omitted by bindgen."]
+pub const FETCH_ALL: i64 = 9223372036854775807;
+#[doc = " Compiler-verified C object macro `FirstCommandId`, omitted by bindgen."]
+pub const FirstCommandId: u32 = 0;
+#[doc = " Compiler-verified C object macro `FirstMultiXactId`, omitted by bindgen."]
+pub const FirstMultiXactId: u32 = 1;
+#[doc = " Compiler-verified C object macro `FirstNormalSerCommitSeqNo`, omitted by bindgen."]
+pub const FirstNormalSerCommitSeqNo: usize = 2;
+#[doc = " Compiler-verified C object macro `FirstNormalTransactionId`, omitted by bindgen."]
+pub const FirstNormalTransactionId: u32 = 3;
+#[doc = " Compiler-verified C object macro `FirstNormalUnloggedLSN`, omitted by bindgen."]
+pub const FirstNormalUnloggedLSN: usize = 1000;
+#[doc = " Compiler-verified C object macro `FirstOffsetNumber`, omitted by bindgen."]
+pub const FirstOffsetNumber: u16 = 1;
+#[doc = " Compiler-verified C object macro `FrozenTransactionId`, omitted by bindgen."]
+pub const FrozenTransactionId: u32 = 2;
+#[doc = " Compiler-verified C object macro `GEVHDRSZ`, omitted by bindgen."]
+pub const GEVHDRSZ: usize = 8;
+#[doc = " Compiler-verified C object macro `GIN_EXCLUSIVE`, omitted by bindgen."]
+pub const GIN_EXCLUSIVE: i32 = 3;
+#[doc = " Compiler-verified C object macro `GIN_NDELETE_AT_ONCE`, omitted by bindgen."]
+pub const GIN_NDELETE_AT_ONCE: i32 = 16;
+#[doc = " Compiler-verified C object macro `GIN_SHARE`, omitted by bindgen."]
+pub const GIN_SHARE: i32 = 1;
+#[doc = " Compiler-verified C object macro `GIN_TREE_POSTING`, omitted by bindgen."]
+pub const GIN_TREE_POSTING: u16 = 65535;
+#[doc = " Compiler-verified C object macro `GIN_UNLOCK`, omitted by bindgen."]
+pub const GIN_UNLOCK: i32 = 0;
+#[doc = " Compiler-verified C object macro `GISTMaxIndexKeySize`, omitted by bindgen."]
+pub const GISTMaxIndexKeySize: usize = 2024;
+#[doc = " Compiler-verified C object macro `GISTMaxIndexTupleSize`, omitted by bindgen."]
+pub const GISTMaxIndexTupleSize: usize = 2032;
+#[doc = " Compiler-verified C object macro `GIST_EXCLUSIVE`, omitted by bindgen."]
+pub const GIST_EXCLUSIVE: i32 = 3;
+#[doc = " Compiler-verified C object macro `GIST_SHARE`, omitted by bindgen."]
+pub const GIST_SHARE: i32 = 1;
+#[doc = " Compiler-verified C object macro `GIST_UNLOCK`, omitted by bindgen."]
+pub const GIST_UNLOCK: i32 = 0;
+#[doc = " Compiler-verified C object macro `GiSTPageSize`, omitted by bindgen."]
+pub const GiSTPageSize: usize = 8152;
+#[doc = " Compiler-verified C object macro `GinDataPageMaxDataSize`, omitted by bindgen."]
+pub const GinDataPageMaxDataSize: usize = 8152;
+#[doc = " Compiler-verified C object macro `GinListPageSize`, omitted by bindgen."]
+pub const GinListPageSize: usize = 8160;
+#[doc = " Compiler-verified C object macro `GinMaxItemSize`, omitted by bindgen."]
+pub const GinMaxItemSize: usize = 2712;
+#[doc = " Compiler-verified C object macro `GistBuildLSN`, omitted by bindgen."]
+pub const GistBuildLSN: usize = 1;
+#[doc = " Compiler-verified C object macro `HASH_CHUNK_HEADER_SIZE`, omitted by bindgen."]
+pub const HASH_CHUNK_HEADER_SIZE: usize = 32;
+#[doc = " Compiler-verified C object macro `HASH_CHUNK_SIZE`, omitted by bindgen."]
+pub const HASH_CHUNK_SIZE: usize = 32768;
+#[doc = " Compiler-verified C object macro `HASH_CHUNK_THRESHOLD`, omitted by bindgen."]
+pub const HASH_CHUNK_THRESHOLD: usize = 8192;
+#[doc = " Compiler-verified C object macro `HASH_MAX_BITMAPS`, omitted by bindgen."]
+pub const HASH_MAX_BITMAPS: i32 = 1024;
+#[doc = " Compiler-verified C object macro `HASH_PARTITION_SEED`, omitted by bindgen."]
+pub const HASH_PARTITION_SEED: usize = 8816678312871386365;
+#[doc = " Compiler-verified C object macro `HASH_READ`, omitted by bindgen."]
+pub const HASH_READ: i32 = 1;
+#[doc = " Compiler-verified C object macro `HASH_WRITE`, omitted by bindgen."]
+pub const HASH_WRITE: i32 = 3;
+#[doc = " Compiler-verified C object macro `HAVE_APPEND_HISTORY`, omitted by bindgen."]
+pub const HAVE_APPEND_HISTORY: i32 = 1;
+#[doc = " Compiler-verified C object macro `HAVE_BACKTRACE_SYMBOLS`, omitted by bindgen."]
+pub const HAVE_BACKTRACE_SYMBOLS: i32 = 1;
+#[doc = " Compiler-verified C object macro `HAVE_COMPUTED_GOTO`, omitted by bindgen."]
+pub const HAVE_COMPUTED_GOTO: i32 = 1;
+#[doc = " Compiler-verified C object macro `HAVE_COPY_FILE_RANGE`, omitted by bindgen."]
+pub const HAVE_COPY_FILE_RANGE: i32 = 1;
+#[doc = " Compiler-verified C object macro `HAVE_CXX_TYPEOF`, omitted by bindgen."]
+pub const HAVE_CXX_TYPEOF: i32 = 1;
+#[doc = " Compiler-verified C object macro `HAVE_DECL_FDATASYNC`, omitted by bindgen."]
+pub const HAVE_DECL_FDATASYNC: i32 = 1;
+#[doc = " Compiler-verified C object macro `HAVE_DECL_F_FULLFSYNC`, omitted by bindgen."]
+pub const HAVE_DECL_F_FULLFSYNC: i32 = 0;
+#[doc = " Compiler-verified C object macro `HAVE_DECL_MEMSET_S`, omitted by bindgen."]
+pub const HAVE_DECL_MEMSET_S: i32 = 0;
+#[doc = " Compiler-verified C object macro `HAVE_DECL_POSIX_FADVISE`, omitted by bindgen."]
+pub const HAVE_DECL_POSIX_FADVISE: i32 = 1;
+#[doc = " Compiler-verified C object macro `HAVE_DECL_PREADV`, omitted by bindgen."]
+pub const HAVE_DECL_PREADV: i32 = 1;
+#[doc = " Compiler-verified C object macro `HAVE_DECL_PWRITEV`, omitted by bindgen."]
+pub const HAVE_DECL_PWRITEV: i32 = 1;
+#[doc = " Compiler-verified C object macro `HAVE_DECL_STRCHRNUL`, omitted by bindgen."]
+pub const HAVE_DECL_STRCHRNUL: i32 = 1;
+#[doc = " Compiler-verified C object macro `HAVE_DECL_STRLCAT`, omitted by bindgen."]
+pub const HAVE_DECL_STRLCAT: i32 = 1;
+#[doc = " Compiler-verified C object macro `HAVE_DECL_STRLCPY`, omitted by bindgen."]
+pub const HAVE_DECL_STRLCPY: i32 = 1;
+#[doc = " Compiler-verified C object macro `HAVE_DECL_STRSEP`, omitted by bindgen."]
+pub const HAVE_DECL_STRSEP: i32 = 1;
+#[doc = " Compiler-verified C object macro `HAVE_DECL_TIMINGSAFE_BCMP`, omitted by bindgen."]
+pub const HAVE_DECL_TIMINGSAFE_BCMP: i32 = 0;
+#[doc = " Compiler-verified C object macro `HAVE_EXECINFO_H`, omitted by bindgen."]
+pub const HAVE_EXECINFO_H: i32 = 1;
+#[doc = " Compiler-verified C object macro `HAVE_EXPLICIT_BZERO`, omitted by bindgen."]
+pub const HAVE_EXPLICIT_BZERO: i32 = 1;
+#[doc = " Compiler-verified C object macro `HAVE_FSEEKO`, omitted by bindgen."]
+pub const HAVE_FSEEKO: i32 = 1;
+#[doc = " Compiler-verified C object macro `HAVE_GCC__ATOMIC_INT32_CAS`, omitted by bindgen."]
+pub const HAVE_GCC__ATOMIC_INT32_CAS: i32 = 1;
+#[doc = " Compiler-verified C object macro `HAVE_GCC__ATOMIC_INT64_CAS`, omitted by bindgen."]
+pub const HAVE_GCC__ATOMIC_INT64_CAS: i32 = 1;
+#[doc = " Compiler-verified C object macro `HAVE_GCC__SYNC_CHAR_TAS`, omitted by bindgen."]
+pub const HAVE_GCC__SYNC_CHAR_TAS: i32 = 1;
+#[doc = " Compiler-verified C object macro `HAVE_GCC__SYNC_INT32_CAS`, omitted by bindgen."]
+pub const HAVE_GCC__SYNC_INT32_CAS: i32 = 1;
+#[doc = " Compiler-verified C object macro `HAVE_GCC__SYNC_INT32_TAS`, omitted by bindgen."]
+pub const HAVE_GCC__SYNC_INT32_TAS: i32 = 1;
+#[doc = " Compiler-verified C object macro `HAVE_GCC__SYNC_INT64_CAS`, omitted by bindgen."]
+pub const HAVE_GCC__SYNC_INT64_CAS: i32 = 1;
+#[doc = " Compiler-verified C object macro `HAVE_GETAUXVAL`, omitted by bindgen."]
+pub const HAVE_GETAUXVAL: i32 = 1;
+#[doc = " Compiler-verified C object macro `HAVE_GETIFADDRS`, omitted by bindgen."]
+pub const HAVE_GETIFADDRS: i32 = 1;
+#[doc = " Compiler-verified C object macro `HAVE_GETOPT`, omitted by bindgen."]
+pub const HAVE_GETOPT: i32 = 1;
+#[doc = " Compiler-verified C object macro `HAVE_GETOPT_H`, omitted by bindgen."]
+pub const HAVE_GETOPT_H: i32 = 1;
+#[doc = " Compiler-verified C object macro `HAVE_GETOPT_LONG`, omitted by bindgen."]
+pub const HAVE_GETOPT_LONG: i32 = 1;
+#[doc = " Compiler-verified C object macro `HAVE_GETRLIMIT`, omitted by bindgen."]
+pub const HAVE_GETRLIMIT: i32 = 1;
+#[doc = " Compiler-verified C object macro `HAVE_GSSAPI_GSSAPI_EXT_H`, omitted by bindgen."]
+pub const HAVE_GSSAPI_GSSAPI_EXT_H: i32 = 1;
+#[doc = " Compiler-verified C object macro `HAVE_GSSAPI_GSSAPI_H`, omitted by bindgen."]
+pub const HAVE_GSSAPI_GSSAPI_H: i32 = 1;
+#[doc = " Compiler-verified C object macro `HAVE_HISTORY_TRUNCATE_FILE`, omitted by bindgen."]
+pub const HAVE_HISTORY_TRUNCATE_FILE: i32 = 1;
+#[doc = " Compiler-verified C object macro `HAVE_IFADDRS_H`, omitted by bindgen."]
+pub const HAVE_IFADDRS_H: i32 = 1;
+#[doc = " Compiler-verified C object macro `HAVE_INET_ATON`, omitted by bindgen."]
+pub const HAVE_INET_ATON: i32 = 1;
+#[doc = " Compiler-verified C object macro `HAVE_INET_PTON`, omitted by bindgen."]
+pub const HAVE_INET_PTON: i32 = 1;
+#[doc = " Compiler-verified C object macro `HAVE_INT128`, omitted by bindgen."]
+pub const HAVE_INT128: i32 = 1;
+#[doc = " Compiler-verified C object macro `HAVE_INTTYPES_H`, omitted by bindgen."]
+pub const HAVE_INTTYPES_H: i32 = 1;
+#[doc = " Compiler-verified C object macro `HAVE_INT_OPTERR`, omitted by bindgen."]
+pub const HAVE_INT_OPTERR: i32 = 1;
+#[doc = " Compiler-verified C object macro `HAVE_INT_TIMEZONE`, omitted by bindgen."]
+pub const HAVE_INT_TIMEZONE: i32 = 1;
+#[doc = " Compiler-verified C object macro `HAVE_IO_URING_QUEUE_INIT_MEM`, omitted by bindgen."]
+pub const HAVE_IO_URING_QUEUE_INIT_MEM: i32 = 1;
+#[doc = " Compiler-verified C object macro `HAVE_LDAP_INITIALIZE`, omitted by bindgen."]
+pub const HAVE_LDAP_INITIALIZE: i32 = 1;
+#[doc = " Compiler-verified C object macro `HAVE_LIBCRYPTO`, omitted by bindgen."]
+pub const HAVE_LIBCRYPTO: i32 = 1;
+#[doc = " Compiler-verified C object macro `HAVE_LIBCURL`, omitted by bindgen."]
+pub const HAVE_LIBCURL: i32 = 1;
+#[doc = " Compiler-verified C object macro `HAVE_LIBLDAP`, omitted by bindgen."]
+pub const HAVE_LIBLDAP: i32 = 1;
+#[doc = " Compiler-verified C object macro `HAVE_LIBLZ4`, omitted by bindgen."]
+pub const HAVE_LIBLZ4: i32 = 1;
+#[doc = " Compiler-verified C object macro `HAVE_LIBM`, omitted by bindgen."]
+pub const HAVE_LIBM: i32 = 1;
+#[doc = " Compiler-verified C object macro `HAVE_LIBNUMA`, omitted by bindgen."]
+pub const HAVE_LIBNUMA: i32 = 1;
+#[doc = " Compiler-verified C object macro `HAVE_LIBPAM`, omitted by bindgen."]
+pub const HAVE_LIBPAM: i32 = 1;
+#[doc = " Compiler-verified C object macro `HAVE_LIBREADLINE`, omitted by bindgen."]
+pub const HAVE_LIBREADLINE: i32 = 1;
+#[doc = " Compiler-verified C object macro `HAVE_LIBSELINUX`, omitted by bindgen."]
+pub const HAVE_LIBSELINUX: i32 = 1;
+#[doc = " Compiler-verified C object macro `HAVE_LIBSSL`, omitted by bindgen."]
+pub const HAVE_LIBSSL: i32 = 1;
+#[doc = " Compiler-verified C object macro `HAVE_LIBXML2`, omitted by bindgen."]
+pub const HAVE_LIBXML2: i32 = 1;
+#[doc = " Compiler-verified C object macro `HAVE_LIBXSLT`, omitted by bindgen."]
+pub const HAVE_LIBXSLT: i32 = 1;
+#[doc = " Compiler-verified C object macro `HAVE_LIBZ`, omitted by bindgen."]
+pub const HAVE_LIBZ: i32 = 1;
+#[doc = " Compiler-verified C object macro `HAVE_LIBZSTD`, omitted by bindgen."]
+pub const HAVE_LIBZSTD: i32 = 1;
+#[doc = " Compiler-verified C object macro `HAVE_MKDTEMP`, omitted by bindgen."]
+pub const HAVE_MKDTEMP: i32 = 1;
+#[doc = " Compiler-verified C object macro `HAVE_POLL`, omitted by bindgen."]
+pub const HAVE_POLL: i32 = 1;
+#[doc = " Compiler-verified C object macro `HAVE_POLL_H`, omitted by bindgen."]
+pub const HAVE_POLL_H: i32 = 1;
+#[doc = " Compiler-verified C object macro `HAVE_POSIX_FADVISE`, omitted by bindgen."]
+pub const HAVE_POSIX_FADVISE: i32 = 1;
+#[doc = " Compiler-verified C object macro `HAVE_POSIX_FALLOCATE`, omitted by bindgen."]
+pub const HAVE_POSIX_FALLOCATE: i32 = 1;
+#[doc = " Compiler-verified C object macro `HAVE_PPOLL`, omitted by bindgen."]
+pub const HAVE_PPOLL: i32 = 1;
+#[doc = " Compiler-verified C object macro `HAVE_PRAGMA_GCC_SYSTEM_HEADER`, omitted by bindgen."]
+pub const HAVE_PRAGMA_GCC_SYSTEM_HEADER: i32 = 1;
+#[doc = " Compiler-verified C object macro `HAVE_PTHREAD`, omitted by bindgen."]
+pub const HAVE_PTHREAD: i32 = 1;
+#[doc = " Compiler-verified C object macro `HAVE_PTHREAD_BARRIER_WAIT`, omitted by bindgen."]
+pub const HAVE_PTHREAD_BARRIER_WAIT: i32 = 1;
+#[doc = " Compiler-verified C object macro `HAVE_PTHREAD_PRIO_INHERIT`, omitted by bindgen."]
+pub const HAVE_PTHREAD_PRIO_INHERIT: i32 = 1;
+#[doc = " Compiler-verified C object macro `HAVE_READLINE_HISTORY_H`, omitted by bindgen."]
+pub const HAVE_READLINE_HISTORY_H: i32 = 1;
+#[doc = " Compiler-verified C object macro `HAVE_READLINE_READLINE_H`, omitted by bindgen."]
+pub const HAVE_READLINE_READLINE_H: i32 = 1;
+#[doc = " Compiler-verified C object macro `HAVE_READLINK`, omitted by bindgen."]
+pub const HAVE_READLINK: i32 = 1;
+#[doc = " Compiler-verified C object macro `HAVE_RL_COMPLETION_MATCHES`, omitted by bindgen."]
+pub const HAVE_RL_COMPLETION_MATCHES: i32 = 1;
+#[doc = " Compiler-verified C object macro `HAVE_RL_COMPLETION_SUPPRESS_QUOTE`, omitted by bindgen."]
+pub const HAVE_RL_COMPLETION_SUPPRESS_QUOTE: i32 = 1;
+#[doc = " Compiler-verified C object macro `HAVE_RL_FILENAME_COMPLETION_FUNCTION`, omitted by bindgen."]
+pub const HAVE_RL_FILENAME_COMPLETION_FUNCTION: i32 = 1;
+#[doc = " Compiler-verified C object macro `HAVE_RL_FILENAME_QUOTE_CHARACTERS`, omitted by bindgen."]
+pub const HAVE_RL_FILENAME_QUOTE_CHARACTERS: i32 = 1;
+#[doc = " Compiler-verified C object macro `HAVE_RL_FILENAME_QUOTING_FUNCTION`, omitted by bindgen."]
+pub const HAVE_RL_FILENAME_QUOTING_FUNCTION: i32 = 1;
+#[doc = " Compiler-verified C object macro `HAVE_RL_RESET_SCREEN_SIZE`, omitted by bindgen."]
+pub const HAVE_RL_RESET_SCREEN_SIZE: i32 = 1;
+#[doc = " Compiler-verified C object macro `HAVE_RL_VARIABLE_BIND`, omitted by bindgen."]
+pub const HAVE_RL_VARIABLE_BIND: i32 = 1;
+#[doc = " Compiler-verified C object macro `HAVE_SA_SIGINFO`, omitted by bindgen."]
+pub const HAVE_SA_SIGINFO: i32 = 1;
+#[doc = " Compiler-verified C object macro `HAVE_SECURITY_PAM_APPL_H`, omitted by bindgen."]
+pub const HAVE_SECURITY_PAM_APPL_H: i32 = 1;
+#[doc = " Compiler-verified C object macro `HAVE_SETSID`, omitted by bindgen."]
+pub const HAVE_SETSID: i32 = 1;
+#[doc = " Compiler-verified C object macro `HAVE_SHM_OPEN`, omitted by bindgen."]
+pub const HAVE_SHM_OPEN: i32 = 1;
+#[doc = " Compiler-verified C object macro `HAVE_SOCKLEN_T`, omitted by bindgen."]
+pub const HAVE_SOCKLEN_T: i32 = 1;
+#[doc = " Compiler-verified C object macro `HAVE_SSL_CTX_SET_CERT_CB`, omitted by bindgen."]
+pub const HAVE_SSL_CTX_SET_CERT_CB: i32 = 1;
+#[doc = " Compiler-verified C object macro `HAVE_SSL_CTX_SET_CIPHERSUITES`, omitted by bindgen."]
+pub const HAVE_SSL_CTX_SET_CIPHERSUITES: i32 = 1;
+#[doc = " Compiler-verified C object macro `HAVE_SSL_CTX_SET_CLIENT_HELLO_CB`, omitted by bindgen."]
+pub const HAVE_SSL_CTX_SET_CLIENT_HELLO_CB: i32 = 1;
+#[doc = " Compiler-verified C object macro `HAVE_SSL_CTX_SET_KEYLOG_CALLBACK`, omitted by bindgen."]
+pub const HAVE_SSL_CTX_SET_KEYLOG_CALLBACK: i32 = 1;
+#[doc = " Compiler-verified C object macro `HAVE_SSL_CTX_SET_NUM_TICKETS`, omitted by bindgen."]
+pub const HAVE_SSL_CTX_SET_NUM_TICKETS: i32 = 1;
+#[doc = " Compiler-verified C object macro `HAVE_STDINT_H`, omitted by bindgen."]
+pub const HAVE_STDINT_H: i32 = 1;
+#[doc = " Compiler-verified C object macro `HAVE_STDIO_H`, omitted by bindgen."]
+pub const HAVE_STDIO_H: i32 = 1;
+#[doc = " Compiler-verified C object macro `HAVE_STDLIB_H`, omitted by bindgen."]
+pub const HAVE_STDLIB_H: i32 = 1;
+#[doc = " Compiler-verified C object macro `HAVE_STRERROR_R`, omitted by bindgen."]
+pub const HAVE_STRERROR_R: i32 = 1;
+#[doc = " Compiler-verified C object macro `HAVE_STRINGS_H`, omitted by bindgen."]
+pub const HAVE_STRINGS_H: i32 = 1;
+#[doc = " Compiler-verified C object macro `HAVE_STRING_H`, omitted by bindgen."]
+pub const HAVE_STRING_H: i32 = 1;
+#[doc = " Compiler-verified C object macro `HAVE_STRLCAT`, omitted by bindgen."]
+pub const HAVE_STRLCAT: i32 = 1;
+#[doc = " Compiler-verified C object macro `HAVE_STRLCPY`, omitted by bindgen."]
+pub const HAVE_STRLCPY: i32 = 1;
+#[doc = " Compiler-verified C object macro `HAVE_STRSEP`, omitted by bindgen."]
+pub const HAVE_STRSEP: i32 = 1;
+#[doc = " Compiler-verified C object macro `HAVE_STRSIGNAL`, omitted by bindgen."]
+pub const HAVE_STRSIGNAL: i32 = 1;
+#[doc = " Compiler-verified C object macro `HAVE_STRUCT_OPTION`, omitted by bindgen."]
+pub const HAVE_STRUCT_OPTION: i32 = 1;
+#[doc = " Compiler-verified C object macro `HAVE_STRUCT_TM_TM_ZONE`, omitted by bindgen."]
+pub const HAVE_STRUCT_TM_TM_ZONE: i32 = 1;
+#[doc = " Compiler-verified C object macro `HAVE_SYMLINK`, omitted by bindgen."]
+pub const HAVE_SYMLINK: i32 = 1;
+#[doc = " Compiler-verified C object macro `HAVE_SYNCFS`, omitted by bindgen."]
+pub const HAVE_SYNCFS: i32 = 1;
+#[doc = " Compiler-verified C object macro `HAVE_SYNC_FILE_RANGE`, omitted by bindgen."]
+pub const HAVE_SYNC_FILE_RANGE: i32 = 1;
+#[doc = " Compiler-verified C object macro `HAVE_SYSLOG`, omitted by bindgen."]
+pub const HAVE_SYSLOG: i32 = 1;
+#[doc = " Compiler-verified C object macro `HAVE_SYS_EPOLL_H`, omitted by bindgen."]
+pub const HAVE_SYS_EPOLL_H: i32 = 1;
+#[doc = " Compiler-verified C object macro `HAVE_SYS_PERSONALITY_H`, omitted by bindgen."]
+pub const HAVE_SYS_PERSONALITY_H: i32 = 1;
+#[doc = " Compiler-verified C object macro `HAVE_SYS_PRCTL_H`, omitted by bindgen."]
+pub const HAVE_SYS_PRCTL_H: i32 = 1;
+#[doc = " Compiler-verified C object macro `HAVE_SYS_SIGNALFD_H`, omitted by bindgen."]
+pub const HAVE_SYS_SIGNALFD_H: i32 = 1;
+#[doc = " Compiler-verified C object macro `HAVE_SYS_STAT_H`, omitted by bindgen."]
+pub const HAVE_SYS_STAT_H: i32 = 1;
+#[doc = " Compiler-verified C object macro `HAVE_SYS_TYPES_H`, omitted by bindgen."]
+pub const HAVE_SYS_TYPES_H: i32 = 1;
+#[doc = " Compiler-verified C object macro `HAVE_TERMIOS_H`, omitted by bindgen."]
+pub const HAVE_TERMIOS_H: i32 = 1;
+#[doc = " Compiler-verified C object macro `HAVE_THREADSAFE_CURL_GLOBAL_INIT`, omitted by bindgen."]
+pub const HAVE_THREADSAFE_CURL_GLOBAL_INIT: i32 = 1;
+#[doc = " Compiler-verified C object macro `HAVE_TYPEOF`, omitted by bindgen."]
+pub const HAVE_TYPEOF: i32 = 1;
+#[doc = " Compiler-verified C object macro `HAVE_TYPEOF_UNQUAL`, omitted by bindgen."]
+pub const HAVE_TYPEOF_UNQUAL: i32 = 1;
+#[doc = " Compiler-verified C object macro `HAVE_UCHAR_H`, omitted by bindgen."]
+pub const HAVE_UCHAR_H: i32 = 1;
+#[doc = " Compiler-verified C object macro `HAVE_UNISTD_H`, omitted by bindgen."]
+pub const HAVE_UNISTD_H: i32 = 1;
+#[doc = " Compiler-verified C object macro `HAVE_USELOCALE`, omitted by bindgen."]
+pub const HAVE_USELOCALE: i32 = 1;
+#[doc = " Compiler-verified C object macro `HAVE_UUID_E2FS`, omitted by bindgen."]
+pub const HAVE_UUID_E2FS: i32 = 1;
+#[doc = " Compiler-verified C object macro `HAVE_UUID_UUID_H`, omitted by bindgen."]
+pub const HAVE_UUID_UUID_H: i32 = 1;
+#[doc = " Compiler-verified C object macro `HAVE_VISIBILITY_ATTRIBUTE`, omitted by bindgen."]
+pub const HAVE_VISIBILITY_ATTRIBUTE: i32 = 1;
+#[doc = " Compiler-verified C object macro `HAVE_X509_GET_SIGNATURE_INFO`, omitted by bindgen."]
+pub const HAVE_X509_GET_SIGNATURE_INFO: i32 = 1;
+#[doc = " Compiler-verified C object macro `HAVE_X86_64_POPCNTQ`, omitted by bindgen."]
+pub const HAVE_X86_64_POPCNTQ: i32 = 1;
+#[doc = " Compiler-verified C object macro `HAVE_XSAVE_INTRINSICS`, omitted by bindgen."]
+pub const HAVE_XSAVE_INTRINSICS: i32 = 1;
+#[doc = " Compiler-verified C object macro `HAVE__BUILTIN_BSWAP16`, omitted by bindgen."]
+pub const HAVE__BUILTIN_BSWAP16: i32 = 1;
+#[doc = " Compiler-verified C object macro `HAVE__BUILTIN_BSWAP32`, omitted by bindgen."]
+pub const HAVE__BUILTIN_BSWAP32: i32 = 1;
+#[doc = " Compiler-verified C object macro `HAVE__BUILTIN_BSWAP64`, omitted by bindgen."]
+pub const HAVE__BUILTIN_BSWAP64: i32 = 1;
+#[doc = " Compiler-verified C object macro `HAVE__BUILTIN_CLZ`, omitted by bindgen."]
+pub const HAVE__BUILTIN_CLZ: i32 = 1;
+#[doc = " Compiler-verified C object macro `HAVE__BUILTIN_CONSTANT_P`, omitted by bindgen."]
+pub const HAVE__BUILTIN_CONSTANT_P: i32 = 1;
+#[doc = " Compiler-verified C object macro `HAVE__BUILTIN_CTZ`, omitted by bindgen."]
+pub const HAVE__BUILTIN_CTZ: i32 = 1;
+#[doc = " Compiler-verified C object macro `HAVE__BUILTIN_FRAME_ADDRESS`, omitted by bindgen."]
+pub const HAVE__BUILTIN_FRAME_ADDRESS: i32 = 1;
+#[doc = " Compiler-verified C object macro `HAVE__BUILTIN_OP_OVERFLOW`, omitted by bindgen."]
+pub const HAVE__BUILTIN_OP_OVERFLOW: i32 = 1;
+#[doc = " Compiler-verified C object macro `HAVE__BUILTIN_TYPES_COMPATIBLE_P`, omitted by bindgen."]
+pub const HAVE__BUILTIN_TYPES_COMPATIBLE_P: i32 = 1;
+#[doc = " Compiler-verified C object macro `HAVE__BUILTIN_UNREACHABLE`, omitted by bindgen."]
+pub const HAVE__BUILTIN_UNREACHABLE: i32 = 1;
+#[doc = " Compiler-verified C object macro `HAVE__CPUIDEX`, omitted by bindgen."]
+pub const HAVE__CPUIDEX: i32 = 1;
+#[doc = " Compiler-verified C object macro `HAVE__GET_CPUID`, omitted by bindgen."]
+pub const HAVE__GET_CPUID: i32 = 1;
+#[doc = " Compiler-verified C object macro `HAVE__GET_CPUID_COUNT`, omitted by bindgen."]
+pub const HAVE__GET_CPUID_COUNT: i32 = 1;
+#[doc = " Compiler-verified C object macro `HDRSIZETQ`, omitted by bindgen."]
+pub const HDRSIZETQ: usize = 8;
+#[doc = " Compiler-verified C object macro `HEAPTUPLESIZE`, omitted by bindgen."]
+pub const HEAPTUPLESIZE: usize = 24;
+#[doc = " Compiler-verified C object macro `HJTUPLE_OVERHEAD`, omitted by bindgen."]
+pub const HJTUPLE_OVERHEAD: usize = 16;
+#[doc = " Compiler-verified C object macro `INDIRECT_POINTER_SIZE`, omitted by bindgen."]
+pub const INDIRECT_POINTER_SIZE: usize = 10;
+#[doc = " Compiler-verified C object macro `INVALID_TUPLEDESC_IDENTIFIER`, omitted by bindgen."]
+pub const INVALID_TUPLEDESC_IDENTIFIER: usize = 1;
+#[doc = " Compiler-verified C object macro `IOCONTEXT_NUM_TYPES`, omitted by bindgen."]
+pub const IOCONTEXT_NUM_TYPES: i32 = 5;
+#[doc = " Compiler-verified C object macro `IOOBJECT_NUM_TYPES`, omitted by bindgen."]
+pub const IOOBJECT_NUM_TYPES: i32 = 3;
+#[doc = " Compiler-verified C object macro `IOOP_NUM_TYPES`, omitted by bindgen."]
+pub const IOOP_NUM_TYPES: i32 = 8;
+#[doc = " Compiler-verified C object macro `InvalidBlockNumber`, omitted by bindgen."]
+pub const InvalidBlockNumber: u32 = 4294967295;
+#[doc = " Compiler-verified C object macro `InvalidBucket`, omitted by bindgen."]
+pub const InvalidBucket: u32 = 4294967295;
+#[doc = " Compiler-verified C object macro `InvalidCommandId`, omitted by bindgen."]
+pub const InvalidCommandId: u32 = 4294967295;
+#[doc = " Compiler-verified C object macro `InvalidDsaPointer`, omitted by bindgen."]
+pub const InvalidDsaPointer: usize = 0;
+#[doc = " Compiler-verified C object macro `InvalidMultiXactId`, omitted by bindgen."]
+pub const InvalidMultiXactId: u32 = 0;
+#[doc = " Compiler-verified C object macro `InvalidOffsetNumber`, omitted by bindgen."]
+pub const InvalidOffsetNumber: u16 = 0;
+#[doc = " Compiler-verified C object macro `InvalidOid`, omitted by bindgen."]
+pub const InvalidOid: u32 = 0;
+#[doc = " Compiler-verified C object macro `InvalidOid8`, omitted by bindgen."]
+pub const InvalidOid8: usize = 0;
+#[doc = " Compiler-verified C object macro `InvalidRelFileNumber`, omitted by bindgen."]
+pub const InvalidRelFileNumber: u32 = 0;
+#[doc = " Compiler-verified C object macro `InvalidSerCommitSeqNo`, omitted by bindgen."]
+pub const InvalidSerCommitSeqNo: usize = 18446744073709551615;
+#[doc = " Compiler-verified C object macro `InvalidStrategy`, omitted by bindgen."]
+pub const InvalidStrategy: u16 = 0;
+#[doc = " Compiler-verified C object macro `InvalidSubTransactionId`, omitted by bindgen."]
+pub const InvalidSubTransactionId: u32 = 0;
+#[doc = " Compiler-verified C object macro `InvalidTransactionId`, omitted by bindgen."]
+pub const InvalidTransactionId: u32 = 0;
+#[doc = " Compiler-verified C object macro `LOCKTAG_LAST_TYPE`, omitted by bindgen."]
+pub const LOCKTAG_LAST_TYPE: i32 = 11;
+#[doc = " Compiler-verified C object macro `LSNOID`, omitted by bindgen."]
+pub const LSNOID: i32 = 3220;
+#[doc = " Compiler-verified C object macro `LeafNodesPerPage`, omitted by bindgen."]
+pub const LeafNodesPerPage: usize = 4069;
+#[doc = " Compiler-verified C object macro `MAX_FORKNUM`, omitted by bindgen."]
+pub const MAX_FORKNUM: i32 = 3;
+#[doc = " Compiler-verified C object macro `MAX_IO_COMBINE_LIMIT`, omitted by bindgen."]
+pub const MAX_IO_COMBINE_LIMIT: i32 = 128;
+#[doc = " Compiler-verified C object macro `MAX_KILOBYTES`, omitted by bindgen."]
+pub const MAX_KILOBYTES: i32 = 2147483647;
+#[doc = " Compiler-verified C object macro `MAX_LARGE_OBJECT_SIZE`, omitted by bindgen."]
+pub const MAX_LARGE_OBJECT_SIZE: i64 = 4398046509056;
+#[doc = " Compiler-verified C object macro `MINIMAL_TUPLE_DATA_OFFSET`, omitted by bindgen."]
+pub const MINIMAL_TUPLE_DATA_OFFSET: usize = 10;
+#[doc = " Compiler-verified C object macro `MINIMAL_TUPLE_OFFSET`, omitted by bindgen."]
+pub const MINIMAL_TUPLE_OFFSET: usize = 8;
+#[doc = " Compiler-verified C object macro `MINIMAL_TUPLE_PADDING`, omitted by bindgen."]
+pub const MINIMAL_TUPLE_PADDING: usize = 6;
+#[doc = " Compiler-verified C object macro `MIN_TIMESTAMP`, omitted by bindgen."]
+pub const MIN_TIMESTAMP: i64 = -211813488000000000;
+#[doc = " Compiler-verified C object macro `MULTIXACT_MEMBERGROUPS_PER_PAGE`, omitted by bindgen."]
+pub const MULTIXACT_MEMBERGROUPS_PER_PAGE: usize = 409;
+#[doc = " Compiler-verified C object macro `MULTIXACT_MEMBERGROUP_SIZE`, omitted by bindgen."]
+pub const MULTIXACT_MEMBERGROUP_SIZE: usize = 20;
+#[doc = " Compiler-verified C object macro `MULTIXACT_MEMBERS_PER_PAGE`, omitted by bindgen."]
+pub const MULTIXACT_MEMBERS_PER_PAGE: usize = 1636;
+#[doc = " Compiler-verified C object macro `MULTIXACT_OFFSETS_PER_PAGE`, omitted by bindgen."]
+pub const MULTIXACT_OFFSETS_PER_PAGE: usize = 1024;
+#[doc = " Compiler-verified C object macro `MaxAllocSize`, omitted by bindgen."]
+pub const MaxAllocSize: usize = 1073741823;
+#[doc = " Compiler-verified C object macro `MaxArraySize`, omitted by bindgen."]
+pub const MaxArraySize: usize = 134217727;
+#[doc = " Compiler-verified C object macro `MaxBlockNumber`, omitted by bindgen."]
+pub const MaxBlockNumber: u32 = 4294967294;
+#[doc = " Compiler-verified C object macro `MaxHeapTupleSize`, omitted by bindgen."]
+pub const MaxHeapTupleSize: usize = 8160;
+#[doc = " Compiler-verified C object macro `MaxHeapTuplesPerPage`, omitted by bindgen."]
+pub const MaxHeapTuplesPerPage: i32 = 291;
+#[doc = " Compiler-verified C object macro `MaxIndexTuplesPerPage`, omitted by bindgen."]
+pub const MaxIndexTuplesPerPage: i32 = 408;
+#[doc = " Compiler-verified C object macro `MaxLockTupleMode`, omitted by bindgen."]
+pub const MaxLockTupleMode: i32 = 3;
+#[doc = " Compiler-verified C object macro `MaxMultiXactId`, omitted by bindgen."]
+pub const MaxMultiXactId: u32 = 4294967295;
+#[doc = " Compiler-verified C object macro `MaxMultiXactStatus`, omitted by bindgen."]
+pub const MaxMultiXactStatus: i32 = 5;
+#[doc = " Compiler-verified C object macro `MaxOffsetNumber`, omitted by bindgen."]
+pub const MaxOffsetNumber: u16 = 2048;
+#[doc = " Compiler-verified C object macro `MaxSizeOfXLogRecordBlockHeader`, omitted by bindgen."]
+pub const MaxSizeOfXLogRecordBlockHeader: usize = 27;
+#[doc = " Compiler-verified C object macro `MaxTIDsPerBTreePage`, omitted by bindgen."]
+pub const MaxTIDsPerBTreePage: i32 = 1358;
+#[doc = " Compiler-verified C object macro `MaxTransactionId`, omitted by bindgen."]
+pub const MaxTransactionId: u32 = 4294967295;
+#[doc = " Compiler-verified C object macro `MinHeapTupleSize`, omitted by bindgen."]
+pub const MinHeapTupleSize: usize = 24;
+#[doc = " Compiler-verified C object macro `MinSizeOfDbaseDropRec`, omitted by bindgen."]
+pub const MinSizeOfDbaseDropRec: usize = 8;
+#[doc = " Compiler-verified C object macro `MinSizeOfHeapInplace`, omitted by bindgen."]
+pub const MinSizeOfHeapInplace: usize = 20;
+#[doc = " Compiler-verified C object macro `MinSizeOfInvalidations`, omitted by bindgen."]
+pub const MinSizeOfInvalidations: usize = 16;
+#[doc = " Compiler-verified C object macro `MinSizeOfXactAbort`, omitted by bindgen."]
+pub const MinSizeOfXactAbort: usize = 8;
+#[doc = " Compiler-verified C object macro `MinSizeOfXactAssignment`, omitted by bindgen."]
+pub const MinSizeOfXactAssignment: usize = 8;
+#[doc = " Compiler-verified C object macro `MinSizeOfXactCommit`, omitted by bindgen."]
+pub const MinSizeOfXactCommit: usize = 8;
+#[doc = " Compiler-verified C object macro `MinSizeOfXactInvals`, omitted by bindgen."]
+pub const MinSizeOfXactInvals: usize = 4;
+#[doc = " Compiler-verified C object macro `MinSizeOfXactRelfileLocators`, omitted by bindgen."]
+pub const MinSizeOfXactRelfileLocators: usize = 4;
+#[doc = " Compiler-verified C object macro `MinSizeOfXactRunningXacts`, omitted by bindgen."]
+pub const MinSizeOfXactRunningXacts: usize = 24;
+#[doc = " Compiler-verified C object macro `MinSizeOfXactStatsItems`, omitted by bindgen."]
+pub const MinSizeOfXactStatsItems: usize = 4;
+#[doc = " Compiler-verified C object macro `MinSizeOfXactSubxacts`, omitted by bindgen."]
+pub const MinSizeOfXactSubxacts: usize = 4;
+#[doc = " Compiler-verified C object macro `MovedPartitionsBlockNumber`, omitted by bindgen."]
+pub const MovedPartitionsBlockNumber: u32 = 4294967295;
+#[doc = " Compiler-verified C object macro `NEGOTIATE_GSS_CODE`, omitted by bindgen."]
+pub const NEGOTIATE_GSS_CODE: i32 = 80877104;
+#[doc = " Compiler-verified C object macro `NEGOTIATE_SSL_CODE`, omitted by bindgen."]
+pub const NEGOTIATE_SSL_CODE: i32 = 80877103;
+#[doc = " Compiler-verified C object macro `NS_PER_MS`, omitted by bindgen."]
+pub const NS_PER_MS: i64 = 1000000;
+#[doc = " Compiler-verified C object macro `NS_PER_S`, omitted by bindgen."]
+pub const NS_PER_S: i64 = 1000000000;
+#[doc = " Compiler-verified C object macro `NS_PER_US`, omitted by bindgen."]
+pub const NS_PER_US: i64 = 1000;
+#[doc = " Compiler-verified C object macro `NUM_MERGE_MATCH_KINDS`, omitted by bindgen."]
+pub const NUM_MERGE_MATCH_KINDS: i32 = 3;
+#[doc = " Compiler-verified C object macro `NUM_PMSIGNALS`, omitted by bindgen."]
+pub const NUM_PMSIGNALS: i32 = 11;
+#[doc = " Compiler-verified C object macro `NUM_PROCSIGNALS`, omitted by bindgen."]
+pub const NUM_PROCSIGNALS: i32 = 10;
+#[doc = " Compiler-verified C object macro `NUM_RECOVERY_CONFLICT_REASONS`, omitted by bindgen."]
+pub const NUM_RECOVERY_CONFLICT_REASONS: i32 = 8;
+#[doc = " Compiler-verified C object macro `NodesPerPage`, omitted by bindgen."]
+pub const NodesPerPage: usize = 8164;
+#[doc = " Compiler-verified C object macro `OID8_MAX`, omitted by bindgen."]
+pub const OID8_MAX: usize = 18446744073709551615;
+#[doc = " Compiler-verified C object macro `OID_MAX`, omitted by bindgen."]
+pub const OID_MAX: u32 = 4294967295;
+#[doc = " Compiler-verified C object macro `PARALLEL_KEY_SCAN_INSTRUMENT_OFFSET`, omitted by bindgen."]
+pub const PARALLEL_KEY_SCAN_INSTRUMENT_OFFSET: usize = 14987979559889010688;
+#[doc = " Compiler-verified C object macro `PGAIO_HCB_MAX`, omitted by bindgen."]
+pub const PGAIO_HCB_MAX: i32 = 3;
+#[doc = " Compiler-verified C object macro `PGAIO_OP_COUNT`, omitted by bindgen."]
+pub const PGAIO_OP_COUNT: i32 = 3;
+#[doc = " Compiler-verified C object macro `PGAIO_TID_COUNT`, omitted by bindgen."]
+pub const PGAIO_TID_COUNT: i32 = 2;
+#[doc = " Compiler-verified C object macro `PG_ENCODING_BE_LAST`, omitted by bindgen."]
+pub const PG_ENCODING_BE_LAST: i32 = 34;
+#[doc = " Compiler-verified C object macro `PG_INT64_MAX`, omitted by bindgen."]
+pub const PG_INT64_MAX: i64 = 9223372036854775807;
+#[doc = " Compiler-verified C object macro `PG_INT64_MIN`, omitted by bindgen."]
+pub const PG_INT64_MIN: i64 = -9223372036854775808;
+#[doc = " Compiler-verified C object macro `PG_IOV_MAX`, omitted by bindgen."]
+pub const PG_IOV_MAX: i32 = 128;
+#[doc = " Compiler-verified C object macro `PG_PROTOCOL_EARLIEST`, omitted by bindgen."]
+pub const PG_PROTOCOL_EARLIEST: i32 = 196608;
+#[doc = " Compiler-verified C object macro `PG_PROTOCOL_GREASE`, omitted by bindgen."]
+pub const PG_PROTOCOL_GREASE: i32 = 206607;
+#[doc = " Compiler-verified C object macro `PG_PROTOCOL_LATEST`, omitted by bindgen."]
+pub const PG_PROTOCOL_LATEST: i32 = 196610;
+#[doc = " Compiler-verified C object macro `PG_PROTOCOL_RESERVED_31`, omitted by bindgen."]
+pub const PG_PROTOCOL_RESERVED_31: i32 = 196609;
+#[doc = " Compiler-verified C object macro `PG_UINT64_MAX`, omitted by bindgen."]
+pub const PG_UINT64_MAX: usize = 18446744073709551615;
+#[doc = " Compiler-verified C object macro `PIPE_CHUNK_SIZE`, omitted by bindgen."]
+pub const PIPE_CHUNK_SIZE: i32 = 4096;
+#[doc = " Compiler-verified C object macro `PIPE_HEADER_SIZE`, omitted by bindgen."]
+pub const PIPE_HEADER_SIZE: usize = 9;
+#[doc = " Compiler-verified C object macro `PIPE_MAX_PAYLOAD`, omitted by bindgen."]
+pub const PIPE_MAX_PAYLOAD: i32 = 4087;
+#[doc = " Compiler-verified C object macro `PLATFORM_DEFAULT_WAL_SYNC_METHOD`, omitted by bindgen."]
+pub const PLATFORM_DEFAULT_WAL_SYNC_METHOD: i32 = 1;
+#[doc = " Compiler-verified C object macro `PLPGSQL_XCHECK_ALL`, omitted by bindgen."]
+pub const PLPGSQL_XCHECK_ALL: i32 = -1;
+#[doc = " Compiler-verified C object macro `P_FIRSTKEY`, omitted by bindgen."]
+pub const P_FIRSTKEY: u16 = 2;
+#[doc = " Compiler-verified C object macro `P_HIKEY`, omitted by bindgen."]
+pub const P_HIKEY: u16 = 1;
+#[doc = " Compiler-verified C object macro `P_NEW`, omitted by bindgen."]
+pub const P_NEW: u32 = 4294967295;
+#[doc = " Compiler-verified C object macro `PredXactListDataSize`, omitted by bindgen."]
+pub const PredXactListDataSize: usize = 88;
+#[doc = " Compiler-verified C object macro `REL_PATH_STR_MAXLEN`, omitted by bindgen."]
+pub const REL_PATH_STR_MAXLEN: usize = 71;
+#[doc = " Compiler-verified C object macro `REVMAP_CONTENT_SIZE`, omitted by bindgen."]
+pub const REVMAP_CONTENT_SIZE: usize = 8160;
+#[doc = " Compiler-verified C object macro `REVMAP_PAGE_MAXITEMS`, omitted by bindgen."]
+pub const REVMAP_PAGE_MAXITEMS: usize = 1360;
+#[doc = " Compiler-verified C object macro `RM_MAX_BUILTIN_ID`, omitted by bindgen."]
+pub const RM_MAX_BUILTIN_ID: i32 = 21;
+#[doc = " Compiler-verified C object macro `RM_N_BUILTIN_IDS`, omitted by bindgen."]
+pub const RM_N_BUILTIN_IDS: i32 = 22;
+#[doc = " Compiler-verified C object macro `RWConflictDataSize`, omitted by bindgen."]
+pub const RWConflictDataSize: usize = 48;
+#[doc = " Compiler-verified C object macro `RWConflictPoolHeaderDataSize`, omitted by bindgen."]
+pub const RWConflictPoolHeaderDataSize: usize = 24;
+#[doc = " Compiler-verified C object macro `RecoverySerCommitSeqNo`, omitted by bindgen."]
+pub const RecoverySerCommitSeqNo: usize = 1;
+#[doc = " Compiler-verified C object macro `SGDTSIZE`, omitted by bindgen."]
+pub const SGDTSIZE: usize = 16;
+#[doc = " Compiler-verified C object macro `SGITHDRSZ`, omitted by bindgen."]
+pub const SGITHDRSZ: usize = 8;
+#[doc = " Compiler-verified C object macro `SGNTHDRSZ`, omitted by bindgen."]
+pub const SGNTHDRSZ: usize = 8;
+#[doc = " Compiler-verified C object macro `SIZE_T_ALIGN_MASK`, omitted by bindgen."]
+pub const SIZE_T_ALIGN_MASK: usize = 7;
+#[doc = " Compiler-verified C object macro `SKEW_BUCKET_OVERHEAD`, omitted by bindgen."]
+pub const SKEW_BUCKET_OVERHEAD: usize = 16;
+#[doc = " Compiler-verified C object macro `SO_INTERNAL_FLAGS`, omitted by bindgen."]
+pub const SO_INTERNAL_FLAGS: i32 = 1023;
+#[doc = " Compiler-verified C object macro `SPGIST_PAGE_CAPACITY`, omitted by bindgen."]
+pub const SPGIST_PAGE_CAPACITY: usize = 8160;
+#[doc = " Compiler-verified C object macro `SYNCHRONOUS_COMMIT_ON`, omitted by bindgen."]
+pub const SYNCHRONOUS_COMMIT_ON: i32 = 3;
+#[doc = " Compiler-verified C object macro `SizeOfBrinCreateIdx`, omitted by bindgen."]
+pub const SizeOfBrinCreateIdx: usize = 6;
+#[doc = " Compiler-verified C object macro `SizeOfBrinDesummarize`, omitted by bindgen."]
+pub const SizeOfBrinDesummarize: usize = 10;
+#[doc = " Compiler-verified C object macro `SizeOfBrinInsert`, omitted by bindgen."]
+pub const SizeOfBrinInsert: usize = 10;
+#[doc = " Compiler-verified C object macro `SizeOfBrinRevmapExtend`, omitted by bindgen."]
+pub const SizeOfBrinRevmapExtend: usize = 4;
+#[doc = " Compiler-verified C object macro `SizeOfBrinSamepageUpdate`, omitted by bindgen."]
+pub const SizeOfBrinSamepageUpdate: usize = 2;
+#[doc = " Compiler-verified C object macro `SizeOfBrinTuple`, omitted by bindgen."]
+pub const SizeOfBrinTuple: usize = 5;
+#[doc = " Compiler-verified C object macro `SizeOfBrinUpdate`, omitted by bindgen."]
+pub const SizeOfBrinUpdate: usize = 14;
+#[doc = " Compiler-verified C object macro `SizeOfBtreeDedup`, omitted by bindgen."]
+pub const SizeOfBtreeDedup: usize = 2;
+#[doc = " Compiler-verified C object macro `SizeOfBtreeDelete`, omitted by bindgen."]
+pub const SizeOfBtreeDelete: usize = 9;
+#[doc = " Compiler-verified C object macro `SizeOfBtreeInsert`, omitted by bindgen."]
+pub const SizeOfBtreeInsert: usize = 2;
+#[doc = " Compiler-verified C object macro `SizeOfBtreeMarkPageHalfDead`, omitted by bindgen."]
+pub const SizeOfBtreeMarkPageHalfDead: usize = 20;
+#[doc = " Compiler-verified C object macro `SizeOfBtreeNewroot`, omitted by bindgen."]
+pub const SizeOfBtreeNewroot: usize = 8;
+#[doc = " Compiler-verified C object macro `SizeOfBtreeReusePage`, omitted by bindgen."]
+pub const SizeOfBtreeReusePage: usize = 25;
+#[doc = " Compiler-verified C object macro `SizeOfBtreeSplit`, omitted by bindgen."]
+pub const SizeOfBtreeSplit: usize = 10;
+#[doc = " Compiler-verified C object macro `SizeOfBtreeUnlinkPage`, omitted by bindgen."]
+pub const SizeOfBtreeUnlinkPage: usize = 36;
+#[doc = " Compiler-verified C object macro `SizeOfBtreeUpdate`, omitted by bindgen."]
+pub const SizeOfBtreeUpdate: usize = 2;
+#[doc = " Compiler-verified C object macro `SizeOfBtreeVacuum`, omitted by bindgen."]
+pub const SizeOfBtreeVacuum: usize = 4;
+#[doc = " Compiler-verified C object macro `SizeOfCommitTsTruncate`, omitted by bindgen."]
+pub const SizeOfCommitTsTruncate: usize = 12;
+#[doc = " Compiler-verified C object macro `SizeOfGistxlogDelete`, omitted by bindgen."]
+pub const SizeOfGistxlogDelete: usize = 8;
+#[doc = " Compiler-verified C object macro `SizeOfGistxlogPageDelete`, omitted by bindgen."]
+pub const SizeOfGistxlogPageDelete: usize = 10;
+#[doc = " Compiler-verified C object macro `SizeOfGistxlogPageReuse`, omitted by bindgen."]
+pub const SizeOfGistxlogPageReuse: usize = 25;
+#[doc = " Compiler-verified C object macro `SizeOfHashAddOvflPage`, omitted by bindgen."]
+pub const SizeOfHashAddOvflPage: usize = 3;
+#[doc = " Compiler-verified C object macro `SizeOfHashDelete`, omitted by bindgen."]
+pub const SizeOfHashDelete: usize = 2;
+#[doc = " Compiler-verified C object macro `SizeOfHashInitBitmapPage`, omitted by bindgen."]
+pub const SizeOfHashInitBitmapPage: usize = 2;
+#[doc = " Compiler-verified C object macro `SizeOfHashInitMetaPage`, omitted by bindgen."]
+pub const SizeOfHashInitMetaPage: usize = 14;
+#[doc = " Compiler-verified C object macro `SizeOfHashInsert`, omitted by bindgen."]
+pub const SizeOfHashInsert: usize = 2;
+#[doc = " Compiler-verified C object macro `SizeOfHashMovePageContents`, omitted by bindgen."]
+pub const SizeOfHashMovePageContents: usize = 3;
+#[doc = " Compiler-verified C object macro `SizeOfHashSplitAllocPage`, omitted by bindgen."]
+pub const SizeOfHashSplitAllocPage: usize = 9;
+#[doc = " Compiler-verified C object macro `SizeOfHashSplitComplete`, omitted by bindgen."]
+pub const SizeOfHashSplitComplete: usize = 4;
+#[doc = " Compiler-verified C object macro `SizeOfHashSqueezePage`, omitted by bindgen."]
+pub const SizeOfHashSqueezePage: usize = 12;
+#[doc = " Compiler-verified C object macro `SizeOfHashUpdateMetaPage`, omitted by bindgen."]
+pub const SizeOfHashUpdateMetaPage: usize = 8;
+#[doc = " Compiler-verified C object macro `SizeOfHashVacuumOnePage`, omitted by bindgen."]
+pub const SizeOfHashVacuumOnePage: usize = 8;
+#[doc = " Compiler-verified C object macro `SizeOfHeapConfirm`, omitted by bindgen."]
+pub const SizeOfHeapConfirm: usize = 2;
+#[doc = " Compiler-verified C object macro `SizeOfHeapDelete`, omitted by bindgen."]
+pub const SizeOfHeapDelete: usize = 8;
+#[doc = " Compiler-verified C object macro `SizeOfHeapHeader`, omitted by bindgen."]
+pub const SizeOfHeapHeader: usize = 5;
+#[doc = " Compiler-verified C object macro `SizeOfHeapInsert`, omitted by bindgen."]
+pub const SizeOfHeapInsert: usize = 3;
+#[doc = " Compiler-verified C object macro `SizeOfHeapLock`, omitted by bindgen."]
+pub const SizeOfHeapLock: usize = 8;
+#[doc = " Compiler-verified C object macro `SizeOfHeapLockUpdated`, omitted by bindgen."]
+pub const SizeOfHeapLockUpdated: usize = 8;
+#[doc = " Compiler-verified C object macro `SizeOfHeapMultiInsert`, omitted by bindgen."]
+pub const SizeOfHeapMultiInsert: usize = 4;
+#[doc = " Compiler-verified C object macro `SizeOfHeapNewCid`, omitted by bindgen."]
+pub const SizeOfHeapNewCid: usize = 34;
+#[doc = " Compiler-verified C object macro `SizeOfHeapPrune`, omitted by bindgen."]
+pub const SizeOfHeapPrune: usize = 2;
+#[doc = " Compiler-verified C object macro `SizeOfHeapTruncate`, omitted by bindgen."]
+pub const SizeOfHeapTruncate: usize = 12;
+#[doc = " Compiler-verified C object macro `SizeOfHeapUpdate`, omitted by bindgen."]
+pub const SizeOfHeapUpdate: usize = 14;
+#[doc = " Compiler-verified C object macro `SizeOfLogicalMessage`, omitted by bindgen."]
+pub const SizeOfLogicalMessage: usize = 24;
+#[doc = " Compiler-verified C object macro `SizeOfMultiInsertTuple`, omitted by bindgen."]
+pub const SizeOfMultiInsertTuple: usize = 7;
+#[doc = " Compiler-verified C object macro `SizeOfMultiXactCreate`, omitted by bindgen."]
+pub const SizeOfMultiXactCreate: usize = 20;
+#[doc = " Compiler-verified C object macro `SizeOfMultiXactTruncate`, omitted by bindgen."]
+pub const SizeOfMultiXactTruncate: usize = 16;
+#[doc = " Compiler-verified C object macro `SizeOfPageHeaderData`, omitted by bindgen."]
+pub const SizeOfPageHeaderData: usize = 24;
+#[doc = " Compiler-verified C object macro `SizeOfSpgxlogMoveLeafs`, omitted by bindgen."]
+pub const SizeOfSpgxlogMoveLeafs: usize = 20;
+#[doc = " Compiler-verified C object macro `SizeOfSpgxlogPickSplit`, omitted by bindgen."]
+pub const SizeOfSpgxlogPickSplit: usize = 28;
+#[doc = " Compiler-verified C object macro `SizeOfSpgxlogVacuumLeaf`, omitted by bindgen."]
+pub const SizeOfSpgxlogVacuumLeaf: usize = 16;
+#[doc = " Compiler-verified C object macro `SizeOfSpgxlogVacuumRedirect`, omitted by bindgen."]
+pub const SizeOfSpgxlogVacuumRedirect: usize = 10;
+#[doc = " Compiler-verified C object macro `SizeOfSpgxlogVacuumRoot`, omitted by bindgen."]
+pub const SizeOfSpgxlogVacuumRoot: usize = 12;
+#[doc = " Compiler-verified C object macro `SizeOfXLogLongPHD`, omitted by bindgen."]
+pub const SizeOfXLogLongPHD: usize = 40;
+#[doc = " Compiler-verified C object macro `SizeOfXLogRecord`, omitted by bindgen."]
+pub const SizeOfXLogRecord: usize = 24;
+#[doc = " Compiler-verified C object macro `SizeOfXLogRecordBlockCompressHeader`, omitted by bindgen."]
+pub const SizeOfXLogRecordBlockCompressHeader: usize = 2;
+#[doc = " Compiler-verified C object macro `SizeOfXLogRecordBlockHeader`, omitted by bindgen."]
+pub const SizeOfXLogRecordBlockHeader: usize = 4;
+#[doc = " Compiler-verified C object macro `SizeOfXLogRecordBlockImageHeader`, omitted by bindgen."]
+pub const SizeOfXLogRecordBlockImageHeader: usize = 5;
+#[doc = " Compiler-verified C object macro `SizeOfXLogRecordDataHeaderLong`, omitted by bindgen."]
+pub const SizeOfXLogRecordDataHeaderLong: usize = 5;
+#[doc = " Compiler-verified C object macro `SizeOfXLogRecordDataHeaderShort`, omitted by bindgen."]
+pub const SizeOfXLogRecordDataHeaderShort: usize = 2;
+#[doc = " Compiler-verified C object macro `SizeOfXLogShortPHD`, omitted by bindgen."]
+pub const SizeOfXLogShortPHD: usize = 24;
+#[doc = " Compiler-verified C object macro `SizeofHeapTupleHeader`, omitted by bindgen."]
+pub const SizeofHeapTupleHeader: usize = 23;
+#[doc = " Compiler-verified C object macro `SizeofMinimalTupleHeader`, omitted by bindgen."]
+pub const SizeofMinimalTupleHeader: usize = 15;
+#[doc = " Compiler-verified C object macro `SlotsPerFSMPage`, omitted by bindgen."]
+pub const SlotsPerFSMPage: usize = 4069;
+#[doc = " Compiler-verified C object macro `SysCacheSize`, omitted by bindgen."]
+pub const SysCacheSize: i32 = 85;
+#[doc = " Compiler-verified C object macro `TBM_MAX_TUPLES_PER_PAGE`, omitted by bindgen."]
+pub const TBM_MAX_TUPLES_PER_PAGE: i32 = 291;
+#[doc = " Compiler-verified C object macro `TIMESTAMP_INFINITY`, omitted by bindgen."]
+pub const TIMESTAMP_INFINITY: i64 = 9223372036854775807;
+#[doc = " Compiler-verified C object macro `TIMESTAMP_MINUS_INFINITY`, omitted by bindgen."]
+pub const TIMESTAMP_MINUS_INFINITY: i64 = -9223372036854775808;
+#[doc = " Compiler-verified C object macro `TOAST_INDEX_TARGET`, omitted by bindgen."]
+pub const TOAST_INDEX_TARGET: usize = 510;
+#[doc = " Compiler-verified C object macro `TOAST_MAX_CHUNK_SIZE`, omitted by bindgen."]
+pub const TOAST_MAX_CHUNK_SIZE: usize = 1996;
+#[doc = " Compiler-verified C object macro `TOAST_POINTER_SIZE`, omitted by bindgen."]
+pub const TOAST_POINTER_SIZE: usize = 18;
+#[doc = " Compiler-verified C object macro `TOAST_TUPLE_TARGET`, omitted by bindgen."]
+pub const TOAST_TUPLE_TARGET: usize = 2032;
+#[doc = " Compiler-verified C object macro `TOAST_TUPLE_TARGET_MAIN`, omitted by bindgen."]
+pub const TOAST_TUPLE_TARGET_MAIN: usize = 8160;
+#[doc = " Compiler-verified C object macro `TOAST_TUPLE_THRESHOLD`, omitted by bindgen."]
+pub const TOAST_TUPLE_THRESHOLD: usize = 2032;
+#[doc = " Compiler-verified C object macro `TSQS_SIGLEN`, omitted by bindgen."]
+pub const TSQS_SIGLEN: usize = 64;
+#[doc = " Compiler-verified C object macro `TopSubTransactionId`, omitted by bindgen."]
+pub const TopSubTransactionId: u32 = 1;
+#[doc = " Compiler-verified C object macro `UNIXSOCK_PATH_BUFLEN`, omitted by bindgen."]
+pub const UNIXSOCK_PATH_BUFLEN: usize = 108;
+#[doc = " Compiler-verified C object macro `USECS_PER_DAY`, omitted by bindgen."]
+pub const USECS_PER_DAY: i64 = 86400000000;
+#[doc = " Compiler-verified C object macro `USECS_PER_HOUR`, omitted by bindgen."]
+pub const USECS_PER_HOUR: i64 = 3600000000;
+#[doc = " Compiler-verified C object macro `USECS_PER_MINUTE`, omitted by bindgen."]
+pub const USECS_PER_MINUTE: i64 = 60000000;
+#[doc = " Compiler-verified C object macro `USECS_PER_SEC`, omitted by bindgen."]
+pub const USECS_PER_SEC: i64 = 1000000;
+#[doc = " Compiler-verified C object macro `VARHDRSZ`, omitted by bindgen."]
+pub const VARHDRSZ: i32 = 4;
+#[doc = " Compiler-verified C object macro `VARHDRSZ_COMPRESSED`, omitted by bindgen."]
+pub const VARHDRSZ_COMPRESSED: usize = 8;
+#[doc = " Compiler-verified C object macro `VARHDRSZ_EXTERNAL`, omitted by bindgen."]
+pub const VARHDRSZ_EXTERNAL: usize = 2;
+#[doc = " Compiler-verified C object macro `VARHDRSZ_SHORT`, omitted by bindgen."]
+pub const VARHDRSZ_SHORT: usize = 1;
+#[doc = " Compiler-verified C object macro `WAIT_LSN_TYPE_COUNT`, omitted by bindgen."]
+pub const WAIT_LSN_TYPE_COUNT: i32 = 4;
+#[doc = " Compiler-verified C object macro `WAL_COMPRESSION_ON`, omitted by bindgen."]
+pub const WAL_COMPRESSION_ON: i32 = 3;
 impl pg_sys::seal::Sealed for ATAlterConstraint {}
 impl pg_sys::PgNode for ATAlterConstraint {
     const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_ATAlterConstraint];
@@ -68673,15 +69799,6 @@ impl pg_sys::PgNode for AlterPolicyStmt {
     const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_AlterPolicyStmt];
 }
 impl ::core::fmt::Display for AlterPolicyStmt {
-    fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
-        self.display_node().fmt(f)
-    }
-}
-impl pg_sys::seal::Sealed for AlterPropGraphStmt {}
-impl pg_sys::PgNode for AlterPropGraphStmt {
-    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_AlterPropGraphStmt];
-}
-impl ::core::fmt::Display for AlterPropGraphStmt {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
@@ -69424,15 +70541,6 @@ impl ::core::fmt::Display for CreatePolicyStmt {
         self.display_node().fmt(f)
     }
 }
-impl pg_sys::seal::Sealed for CreatePropGraphStmt {}
-impl pg_sys::PgNode for CreatePropGraphStmt {
-    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_CreatePropGraphStmt];
-}
-impl ::core::fmt::Display for CreatePropGraphStmt {
-    fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
-        self.display_node().fmt(f)
-    }
-}
 impl pg_sys::seal::Sealed for CreatePublicationStmt {}
 impl pg_sys::PgNode for CreatePublicationStmt {
     const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_CreatePublicationStmt];
@@ -69863,7 +70971,6 @@ impl pg_sys::PgNode for Expr {
         pg_sys::NodeTag::T_FieldSelect,
         pg_sys::NodeTag::T_FieldStore,
         pg_sys::NodeTag::T_FuncExpr,
-        pg_sys::NodeTag::T_GraphPropertyRef,
         pg_sys::NodeTag::T_GroupingFunc,
         pg_sys::NodeTag::T_InferenceElem,
         pg_sys::NodeTag::T_JsonConstructorExpr,
@@ -69967,33 +71074,6 @@ impl pg_sys::PgNode for Float {
     const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_Float];
 }
 impl ::core::fmt::Display for Float {
-    fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
-        self.display_node().fmt(f)
-    }
-}
-impl pg_sys::seal::Sealed for ForPortionOfClause {}
-impl pg_sys::PgNode for ForPortionOfClause {
-    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_ForPortionOfClause];
-}
-impl ::core::fmt::Display for ForPortionOfClause {
-    fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
-        self.display_node().fmt(f)
-    }
-}
-impl pg_sys::seal::Sealed for ForPortionOfExpr {}
-impl pg_sys::PgNode for ForPortionOfExpr {
-    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_ForPortionOfExpr];
-}
-impl ::core::fmt::Display for ForPortionOfExpr {
-    fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
-        self.display_node().fmt(f)
-    }
-}
-impl pg_sys::seal::Sealed for ForPortionOfState {}
-impl pg_sys::PgNode for ForPortionOfState {
-    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_ForPortionOfState];
-}
-impl ::core::fmt::Display for ForPortionOfState {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
@@ -70165,42 +71245,6 @@ impl pg_sys::PgNode for GrantStmt {
     const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_GrantStmt];
 }
 impl ::core::fmt::Display for GrantStmt {
-    fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
-        self.display_node().fmt(f)
-    }
-}
-impl pg_sys::seal::Sealed for GraphElementPattern {}
-impl pg_sys::PgNode for GraphElementPattern {
-    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_GraphElementPattern];
-}
-impl ::core::fmt::Display for GraphElementPattern {
-    fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
-        self.display_node().fmt(f)
-    }
-}
-impl pg_sys::seal::Sealed for GraphLabelRef {}
-impl pg_sys::PgNode for GraphLabelRef {
-    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_GraphLabelRef];
-}
-impl ::core::fmt::Display for GraphLabelRef {
-    fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
-        self.display_node().fmt(f)
-    }
-}
-impl pg_sys::seal::Sealed for GraphPattern {}
-impl pg_sys::PgNode for GraphPattern {
-    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_GraphPattern];
-}
-impl ::core::fmt::Display for GraphPattern {
-    fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
-        self.display_node().fmt(f)
-    }
-}
-impl pg_sys::seal::Sealed for GraphPropertyRef {}
-impl pg_sys::PgNode for GraphPropertyRef {
-    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_GraphPropertyRef];
-}
-impl ::core::fmt::Display for GraphPropertyRef {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
@@ -71768,42 +72812,6 @@ impl ::core::fmt::Display for ProjectionPath {
         self.display_node().fmt(f)
     }
 }
-impl pg_sys::seal::Sealed for PropGraphEdge {}
-impl pg_sys::PgNode for PropGraphEdge {
-    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_PropGraphEdge];
-}
-impl ::core::fmt::Display for PropGraphEdge {
-    fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
-        self.display_node().fmt(f)
-    }
-}
-impl pg_sys::seal::Sealed for PropGraphLabelAndProperties {}
-impl pg_sys::PgNode for PropGraphLabelAndProperties {
-    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_PropGraphLabelAndProperties];
-}
-impl ::core::fmt::Display for PropGraphLabelAndProperties {
-    fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
-        self.display_node().fmt(f)
-    }
-}
-impl pg_sys::seal::Sealed for PropGraphProperties {}
-impl pg_sys::PgNode for PropGraphProperties {
-    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_PropGraphProperties];
-}
-impl ::core::fmt::Display for PropGraphProperties {
-    fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
-        self.display_node().fmt(f)
-    }
-}
-impl pg_sys::seal::Sealed for PropGraphVertex {}
-impl pg_sys::PgNode for PropGraphVertex {
-    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_PropGraphVertex];
-}
-impl ::core::fmt::Display for PropGraphVertex {
-    fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
-        self.display_node().fmt(f)
-    }
-}
 impl pg_sys::seal::Sealed for PublicationAllObjSpec {}
 impl pg_sys::PgNode for PublicationAllObjSpec {
     const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_PublicationAllObjSpec];
@@ -71854,15 +72862,6 @@ impl pg_sys::PgNode for RangeFunction {
     const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_RangeFunction];
 }
 impl ::core::fmt::Display for RangeFunction {
-    fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
-        self.display_node().fmt(f)
-    }
-}
-impl pg_sys::seal::Sealed for RangeGraphTable {}
-impl pg_sys::PgNode for RangeGraphTable {
-    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_RangeGraphTable];
-}
-impl ::core::fmt::Display for RangeGraphTable {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }
@@ -72402,15 +73401,6 @@ impl pg_sys::PgNode for SetToDefault {
     const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_SetToDefault];
 }
 impl ::core::fmt::Display for SetToDefault {
-    fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
-        self.display_node().fmt(f)
-    }
-}
-impl pg_sys::seal::Sealed for SinglePartitionSpec {}
-impl pg_sys::PgNode for SinglePartitionSpec {
-    const CAST_TAGS: &'static [pg_sys::NodeTag] = &[pg_sys::NodeTag::T_SinglePartitionSpec];
-}
-impl ::core::fmt::Display for SinglePartitionSpec {
     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
         self.display_node().fmt(f)
     }

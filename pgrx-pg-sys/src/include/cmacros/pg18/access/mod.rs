@@ -22,6 +22,10 @@ pub use brin_page::*;
 mod brin_tuple;
 #[allow(unused_imports)]
 pub use brin_tuple::*;
+#[path = "detoast.rs"]
+mod detoast;
+#[allow(unused_imports)]
+pub use detoast::*;
 #[path = "genam.rs"]
 mod genam;
 #[allow(unused_imports)]
@@ -34,6 +38,10 @@ pub use gin::*;
 mod gin_private;
 #[allow(unused_imports)]
 pub use gin_private::*;
+#[path = "gin_tuple.rs"]
+mod gin_tuple;
+#[allow(unused_imports)]
+pub use gin_tuple::*;
 #[path = "ginblock.rs"]
 mod ginblock;
 #[allow(unused_imports)]
@@ -66,6 +74,10 @@ pub use htup::*;
 mod htup_details;
 #[allow(unused_imports)]
 pub use htup_details::*;
+#[path = "itup.rs"]
+mod itup;
+#[allow(unused_imports)]
+pub use itup::*;
 #[path = "multixact.rs"]
 mod multixact;
 #[allow(unused_imports)]
@@ -98,6 +110,10 @@ pub use slru::*;
 mod spgist_private;
 #[allow(unused_imports)]
 pub use spgist_private::*;
+#[path = "tableam.rs"]
+mod tableam;
+#[allow(unused_imports)]
+pub use tableam::*;
 #[path = "toast_compression.rs"]
 mod toast_compression;
 #[allow(unused_imports)]
@@ -118,6 +134,10 @@ pub use tupdesc::*;
 mod tupmacs;
 #[allow(unused_imports)]
 pub use tupmacs::*;
+#[path = "valid.rs"]
+mod valid;
+#[allow(unused_imports)]
+pub use valid::*;
 #[path = "visibilitymap.rs"]
 mod visibilitymap;
 #[allow(unused_imports)]
@@ -146,3 +166,7 @@ pub use xlogreader::*;
 mod xlogrecord;
 #[allow(unused_imports)]
 pub use xlogrecord::*;
+#[path = "xlogutils.rs"]
+mod xlogutils;
+#[allow(unused_imports)]
+pub use xlogutils::*;

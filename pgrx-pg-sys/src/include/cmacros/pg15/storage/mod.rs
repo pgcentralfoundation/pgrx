@@ -46,6 +46,10 @@ pub use itemptr::*;
 mod lock;
 #[allow(unused_imports)]
 pub use lock::*;
+#[path = "lwlocknames.rs"]
+mod lwlocknames;
+#[allow(unused_imports)]
+pub use lwlocknames::*;
 #[path = "off.rs"]
 mod off;
 #[allow(unused_imports)]

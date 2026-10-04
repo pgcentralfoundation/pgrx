@@ -5,8 +5,8 @@ This code is generated for documentation purposes, so that it is easy to referen
 // C macros from walsender.h.
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -57,7 +57,11 @@ macro_rules! WalSndWakeupProcessRequests {
                         $crate::__pgrx_c_macros::expression::load(
                             $crate::__pgrx_c_macros::expression::place::<
                                 $crate::__pgrx_c_macros::CBool
-                            >(::core::ptr::addr_of_mut!($crate::wake_wal_senders))
+                            >(
+                                ::core::ptr::addr_of_mut!(
+                                    $crate::__pgrx_c_bindings::wake_wal_senders
+                                )
+                            )
                         )
                     )
                 )
@@ -68,7 +72,11 @@ macro_rules! WalSndWakeupProcessRequests {
                             $crate::__pgrx_c_macros::expression::assign(
                                 $crate::__pgrx_c_macros::expression::place::<
                                     $crate::__pgrx_c_macros::CBool
-                                >(::core::ptr::addr_of_mut!($crate::wake_wal_senders)),
+                                >(
+                                    ::core::ptr::addr_of_mut!(
+                                        $crate::__pgrx_c_bindings::wake_wal_senders
+                                    )
+                                ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::null_constant(
                                         /* PGRX: false remains expanded because no integer constant binding is available in the defining Rust crate. */
@@ -88,7 +96,11 @@ macro_rules! WalSndWakeupProcessRequests {
                                         $crate::__pgrx_c_macros::expression::load(
                                             $crate::__pgrx_c_macros::expression::place::<
                                                 $crate::__pgrx_c_macros::CInt
-                                            >(::core::ptr::addr_of_mut!($crate::max_wal_senders))
+                                            >(
+                                                ::core::ptr::addr_of_mut!(
+                                                    $crate::__pgrx_c_bindings::max_wal_senders
+                                                )
+                                            )
                                         )
                                     ),
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
@@ -104,7 +116,7 @@ macro_rules! WalSndWakeupProcessRequests {
                     ) {
                         {
                             let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                                $crate::WalSndWakeup()
+                                $crate::__pgrx_c_bindings::WalSndWakeup()
                             );
                         };
                     }
@@ -136,8 +148,8 @@ macro_rules! WalSndWakeupProcessRequests {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -182,7 +194,7 @@ macro_rules! WalSndWakeupRequest {
                 let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                     $crate::__pgrx_c_macros::expression::assign(
                         $crate::__pgrx_c_macros::expression::place::<$crate::__pgrx_c_macros::CBool>(
-                            ::core::ptr::addr_of_mut!($crate::wake_wal_senders)
+                            ::core::ptr::addr_of_mut!($crate::__pgrx_c_bindings::wake_wal_senders)
                         ),
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             /* PGRX: true remains expanded because no integer constant binding is available in the defining Rust crate. */

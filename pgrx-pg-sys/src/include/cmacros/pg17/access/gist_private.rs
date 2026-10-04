@@ -5,8 +5,8 @@ This code is generated for documentation purposes, so that it is easy to referen
 // C macros from gist_private.h.
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -34,13 +34,13 @@ macro_rules! __pgrx_c_args_BUFFER_HALF_FILLED {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_BUFFER_HALF_FILLED!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_BUFFER_HALF_FILLED!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -49,7 +49,7 @@ macro_rules! __pgrx_c_args_BUFFER_HALF_FILLED {
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_BUFFER_HALF_FILLED!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -76,31 +76,35 @@ macro_rules! __pgrx_c_args_BUFFER_HALF_FILLED {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_BUFFER_HALF_FILLED!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_BUFFER_HALF_FILLED!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_BUFFER_HALF_FILLED!(@p2 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_BUFFER_HALF_FILLED!(
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative1 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_BUFFER_HALF_FILLED!(@p2 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_BUFFER_HALF_FILLED!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_BUFFER_HALF_FILLED!(
-            @p2 $mode [$($done)* (@literal [- $argument]),];
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_BUFFER_HALF_FILLED!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -108,7 +112,9 @@ macro_rules! __pgrx_c_args_BUFFER_HALF_FILLED {
         $crate::__pgrx_c_args_BUFFER_HALF_FILLED!(@negative1 $mode [$($done)*]; - $($raw)*)
     };
     (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_BUFFER_HALF_FILLED!(@p2 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_BUFFER_HALF_FILLED!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -130,14 +136,18 @@ macro_rules! __pgrx_c_args_BUFFER_HALF_FILLED {
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_BUFFER_HALF_FILLED!(@p2 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_BUFFER_HALF_FILLED!(
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_BUFFER_HALF_FILLED!(@p2 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_BUFFER_HALF_FILLED!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_BUFFER_HALF_FILLED!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -164,13 +174,13 @@ macro_rules! __pgrx_c_args_BUFFER_HALF_FILLED {
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_BUFFER_HALF_FILLED!(
-            @p2 $mode [$($done)* (@literal [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_BUFFER_HALF_FILLED!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -429,8 +439,8 @@ macro_rules! BUFFER_HALF_FILLED {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -458,13 +468,13 @@ macro_rules! __pgrx_c_args_BUFFER_OVERFLOWED {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_BUFFER_OVERFLOWED!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_BUFFER_OVERFLOWED!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -473,7 +483,7 @@ macro_rules! __pgrx_c_args_BUFFER_OVERFLOWED {
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_BUFFER_OVERFLOWED!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -500,31 +510,35 @@ macro_rules! __pgrx_c_args_BUFFER_OVERFLOWED {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_BUFFER_OVERFLOWED!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_BUFFER_OVERFLOWED!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_BUFFER_OVERFLOWED!(@p2 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_BUFFER_OVERFLOWED!(
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative1 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_BUFFER_OVERFLOWED!(@p2 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_BUFFER_OVERFLOWED!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_BUFFER_OVERFLOWED!(
-            @p2 $mode [$($done)* (@literal [- $argument]),];
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_BUFFER_OVERFLOWED!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -532,7 +546,9 @@ macro_rules! __pgrx_c_args_BUFFER_OVERFLOWED {
         $crate::__pgrx_c_args_BUFFER_OVERFLOWED!(@negative1 $mode [$($done)*]; - $($raw)*)
     };
     (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_BUFFER_OVERFLOWED!(@p2 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_BUFFER_OVERFLOWED!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -554,14 +570,18 @@ macro_rules! __pgrx_c_args_BUFFER_OVERFLOWED {
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_BUFFER_OVERFLOWED!(@p2 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_BUFFER_OVERFLOWED!(
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_BUFFER_OVERFLOWED!(@p2 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_BUFFER_OVERFLOWED!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_BUFFER_OVERFLOWED!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -588,13 +608,13 @@ macro_rules! __pgrx_c_args_BUFFER_OVERFLOWED {
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_BUFFER_OVERFLOWED!(
-            @p2 $mode [$($done)* (@literal [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_BUFFER_OVERFLOWED!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -816,8 +836,8 @@ macro_rules! BUFFER_OVERFLOWED {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -848,21 +868,23 @@ macro_rules! __pgrx_c_args_GISTSearchItemIsHeap {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
         $crate::__pgrx_c_args_GISTSearchItemIsHeap!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_GISTSearchItemIsHeap!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_GISTSearchItemIsHeap!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GISTSearchItemIsHeap!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GISTSearchItemIsHeap!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -870,7 +892,9 @@ macro_rules! __pgrx_c_args_GISTSearchItemIsHeap {
         $crate::__pgrx_c_args_GISTSearchItemIsHeap!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_GISTSearchItemIsHeap!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_GISTSearchItemIsHeap!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -892,14 +916,18 @@ macro_rules! __pgrx_c_args_GISTSearchItemIsHeap {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_GISTSearchItemIsHeap!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_GISTSearchItemIsHeap!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_GISTSearchItemIsHeap!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_GISTSearchItemIsHeap!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_GISTSearchItemIsHeap!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -926,13 +954,13 @@ macro_rules! __pgrx_c_args_GISTSearchItemIsHeap {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GISTSearchItemIsHeap!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GISTSearchItemIsHeap!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -984,9 +1012,8 @@ macro_rules! GISTSearchItemIsHeap {
                         )
                     ),
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                        /* PGRX: InvalidBlockNumber remains expanded because no integer constant binding is available in the defining Rust crate. */
                         $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CUnsignedInt>::new(
-                            4294967295u32
+                            $crate::__pgrx_c_bindings::InvalidBlockNumber as u32
                         )
                     )
                 )
@@ -1030,10 +1057,9 @@ macro_rules! GISTSearchItemIsHeap {
                                     )
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                                    /* PGRX: InvalidBlockNumber remains expanded because no integer constant binding is available in the defining Rust crate. */
                                     $crate::__pgrx_c_macros::CValue::<
                                         $crate::__pgrx_c_macros::CUnsignedInt
-                                    >::new(4294967295u32)
+                                    >::new($crate::__pgrx_c_bindings::InvalidBlockNumber as u32)
                                 )
                             )
                         )
@@ -1061,9 +1087,8 @@ macro_rules! GISTSearchItemIsHeap {
                         )
                     ),
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                        /* PGRX: InvalidBlockNumber remains expanded because no integer constant binding is available in the defining Rust crate. */
                         $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CUnsignedInt>::new(
-                            4294967295u32
+                            $crate::__pgrx_c_bindings::InvalidBlockNumber as u32
                         )
                     )
                 )
@@ -1079,8 +1104,8 @@ macro_rules! GISTSearchItemIsHeap {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -1107,20 +1132,24 @@ macro_rules! __pgrx_c_args_GistTupleIsInvalid {
         $crate::__pgrx_c_args_GistTupleIsInvalid!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_GistTupleIsInvalid!(@p1 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_GistTupleIsInvalid!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_GistTupleIsInvalid!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_GistTupleIsInvalid!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GistTupleIsInvalid!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GistTupleIsInvalid!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -1128,7 +1157,9 @@ macro_rules! __pgrx_c_args_GistTupleIsInvalid {
         $crate::__pgrx_c_args_GistTupleIsInvalid!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_GistTupleIsInvalid!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_GistTupleIsInvalid!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -1150,14 +1181,18 @@ macro_rules! __pgrx_c_args_GistTupleIsInvalid {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_GistTupleIsInvalid!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_GistTupleIsInvalid!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_GistTupleIsInvalid!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_GistTupleIsInvalid!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_GistTupleIsInvalid!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -1184,13 +1219,13 @@ macro_rules! __pgrx_c_args_GistTupleIsInvalid {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GistTupleIsInvalid!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GistTupleIsInvalid!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -1240,11 +1275,11 @@ macro_rules! GistTupleIsInvalid {
                         <
                             $crate::__pgrx_c_macros::CUnsignedShort as $crate::__pgrx_c_macros::expression::CType
                         >::from_storage(
-                            $crate::ItemPointerGetOffsetNumber(
+                            $crate::__pgrx_c_bindings::ItemPointerGetOffsetNumber(
                                 <
                                     $crate::__pgrx_c_macros::expression::CPointer<
                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                            $crate::ItemPointerData
+                                            $crate::__pgrx_c_bindings::ItemPointerData
                                         >,
                                         $crate::__pgrx_c_macros::expression::ReadOnly
                                     > as $crate::__pgrx_c_macros::expression::CType
@@ -1252,7 +1287,7 @@ macro_rules! GistTupleIsInvalid {
                                     $crate::__pgrx_c_macros::expression::implicit::<
                                         $crate::__pgrx_c_macros::expression::CPointer<
                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                $crate::ItemPointerData
+                                                $crate::__pgrx_c_bindings::ItemPointerData
                                             >,
                                             $crate::__pgrx_c_macros::expression::ReadOnly
                                         >,
@@ -1293,7 +1328,7 @@ macro_rules! GistTupleIsInvalid {
                     ),
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                            $crate::TUPLE_IS_INVALID as i32
+                            $crate::__pgrx_c_bindings::TUPLE_IS_INVALID as i32
                         )
                     )
                 )
@@ -1331,11 +1366,11 @@ macro_rules! GistTupleIsInvalid {
                                     <
                                         $crate::__pgrx_c_macros::CUnsignedShort as $crate::__pgrx_c_macros::expression::CType
                                     >::from_storage(
-                                        $crate::ItemPointerGetOffsetNumber(
+                                        $crate::__pgrx_c_bindings::ItemPointerGetOffsetNumber(
                                             <
                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                        $crate::ItemPointerData
+                                                        $crate::__pgrx_c_bindings::ItemPointerData
                                                     >,
                                                     $crate::__pgrx_c_macros::expression::ReadOnly
                                                 > as $crate::__pgrx_c_macros::expression::CType
@@ -1343,7 +1378,7 @@ macro_rules! GistTupleIsInvalid {
                                                 $crate::__pgrx_c_macros::expression::implicit::<
                                                     $crate::__pgrx_c_macros::expression::CPointer<
                                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                                            $crate::ItemPointerData
+                                                            $crate::__pgrx_c_bindings::ItemPointerData
                                                         >,
                                                         $crate::__pgrx_c_macros::expression::ReadOnly
                                                     >,
@@ -1384,7 +1419,7 @@ macro_rules! GistTupleIsInvalid {
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                        $crate::TUPLE_IS_INVALID as i32
+                                        $crate::__pgrx_c_bindings::TUPLE_IS_INVALID as i32
                                     )
                                 )
                             )
@@ -1407,11 +1442,11 @@ macro_rules! GistTupleIsInvalid {
                         <
                             $crate::__pgrx_c_macros::CUnsignedShort as $crate::__pgrx_c_macros::expression::CType
                         >::from_storage(
-                            $crate::ItemPointerGetOffsetNumber(
+                            $crate::__pgrx_c_bindings::ItemPointerGetOffsetNumber(
                                 <
                                     $crate::__pgrx_c_macros::expression::CPointer<
                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                            $crate::ItemPointerData
+                                            $crate::__pgrx_c_bindings::ItemPointerData
                                         >,
                                         $crate::__pgrx_c_macros::expression::ReadOnly
                                     > as $crate::__pgrx_c_macros::expression::CType
@@ -1419,7 +1454,7 @@ macro_rules! GistTupleIsInvalid {
                                     $crate::__pgrx_c_macros::expression::implicit::<
                                         $crate::__pgrx_c_macros::expression::CPointer<
                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                $crate::ItemPointerData
+                                                $crate::__pgrx_c_bindings::ItemPointerData
                                             >,
                                             $crate::__pgrx_c_macros::expression::ReadOnly
                                         >,
@@ -1460,7 +1495,7 @@ macro_rules! GistTupleIsInvalid {
                     ),
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                            $crate::TUPLE_IS_INVALID as i32
+                            $crate::__pgrx_c_bindings::TUPLE_IS_INVALID as i32
                         )
                     )
                 )
@@ -1476,8 +1511,8 @@ macro_rules! GistTupleIsInvalid {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -1504,20 +1539,24 @@ macro_rules! __pgrx_c_args_GistTupleSetValid {
         $crate::__pgrx_c_args_GistTupleSetValid!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_GistTupleSetValid!(@p1 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_GistTupleSetValid!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_GistTupleSetValid!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_GistTupleSetValid!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GistTupleSetValid!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GistTupleSetValid!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -1525,7 +1564,9 @@ macro_rules! __pgrx_c_args_GistTupleSetValid {
         $crate::__pgrx_c_args_GistTupleSetValid!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_GistTupleSetValid!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_GistTupleSetValid!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -1547,14 +1588,18 @@ macro_rules! __pgrx_c_args_GistTupleSetValid {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_GistTupleSetValid!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_GistTupleSetValid!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_GistTupleSetValid!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_GistTupleSetValid!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_GistTupleSetValid!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -1581,13 +1626,13 @@ macro_rules! __pgrx_c_args_GistTupleSetValid {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GistTupleSetValid!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_GistTupleSetValid!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -1632,16 +1677,20 @@ macro_rules! GistTupleSetValid {
     (@__pgrx_emit_value; $itup:tt $(,)?) => {
         /* PGRX: GistTupleSetValid remains expanded because ItemPointerSetOffsetNumber is not an active function-like macro. */
         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-            $crate::ItemPointerSetOffsetNumber(
+            $crate::__pgrx_c_bindings::ItemPointerSetOffsetNumber(
                 <
                     $crate::__pgrx_c_macros::expression::CPointer<
-                        $crate::__pgrx_c_macros::expression::CRecord<$crate::ItemPointerData>,
+                        $crate::__pgrx_c_macros::expression::CRecord<
+                            $crate::__pgrx_c_bindings::ItemPointerData
+                        >,
                         $crate::__pgrx_c_macros::expression::ReadWrite
                     > as $crate::__pgrx_c_macros::expression::CType
                 >::into_storage(
                     $crate::__pgrx_c_macros::expression::implicit::<
                         $crate::__pgrx_c_macros::expression::CPointer<
-                            $crate::__pgrx_c_macros::expression::CRecord<$crate::ItemPointerData>,
+                            $crate::__pgrx_c_macros::expression::CRecord<
+                                $crate::__pgrx_c_bindings::ItemPointerData
+                            >,
                             $crate::__pgrx_c_macros::expression::ReadWrite
                         >,
                         _
@@ -1677,7 +1726,7 @@ macro_rules! GistTupleSetValid {
                     >(
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                $crate::TUPLE_IS_VALID as i32
+                                $crate::__pgrx_c_bindings::TUPLE_IS_VALID as i32
                             )
                         )
                     )
@@ -1712,11 +1761,11 @@ macro_rules! GistTupleSetValid {
                 Some(
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                            $crate::ItemPointerSetOffsetNumber(
+                            $crate::__pgrx_c_bindings::ItemPointerSetOffsetNumber(
                                 <
                                     $crate::__pgrx_c_macros::expression::CPointer<
                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                            $crate::ItemPointerData
+                                            $crate::__pgrx_c_bindings::ItemPointerData
                                         >,
                                         $crate::__pgrx_c_macros::expression::ReadWrite
                                     > as $crate::__pgrx_c_macros::expression::CType
@@ -1724,7 +1773,7 @@ macro_rules! GistTupleSetValid {
                                     $crate::__pgrx_c_macros::expression::implicit::<
                                         $crate::__pgrx_c_macros::expression::CPointer<
                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                $crate::ItemPointerData
+                                                $crate::__pgrx_c_bindings::ItemPointerData
                                             >,
                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                         >,
@@ -1773,7 +1822,7 @@ macro_rules! GistTupleSetValid {
                                         >(
                                             $crate::__pgrx_c_macros::CValue::<
                                                 $crate::__pgrx_c_macros::CInt
-                                            >::new($crate::TUPLE_IS_VALID as i32)
+                                            >::new($crate::__pgrx_c_bindings::TUPLE_IS_VALID as i32)
                                         )
                                     )
                                 ),
@@ -1793,17 +1842,19 @@ macro_rules! GistTupleSetValid {
         /* PGRX: GistTupleSetValid remains expanded because ItemPointerSetOffsetNumber is not an active function-like macro. */
         {
             let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                $crate::ItemPointerSetOffsetNumber(
+                $crate::__pgrx_c_bindings::ItemPointerSetOffsetNumber(
                     <
                         $crate::__pgrx_c_macros::expression::CPointer<
-                            $crate::__pgrx_c_macros::expression::CRecord<$crate::ItemPointerData>,
+                            $crate::__pgrx_c_macros::expression::CRecord<
+                                $crate::__pgrx_c_bindings::ItemPointerData
+                            >,
                             $crate::__pgrx_c_macros::expression::ReadWrite
                         > as $crate::__pgrx_c_macros::expression::CType
                     >::into_storage(
                         $crate::__pgrx_c_macros::expression::implicit::<
                             $crate::__pgrx_c_macros::expression::CPointer<
                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                    $crate::ItemPointerData
+                                    $crate::__pgrx_c_bindings::ItemPointerData
                                 >,
                                 $crate::__pgrx_c_macros::expression::ReadWrite
                             >,
@@ -1845,7 +1896,7 @@ macro_rules! GistTupleSetValid {
                         >(
                             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                 $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                    $crate::TUPLE_IS_VALID as i32
+                                    $crate::__pgrx_c_bindings::TUPLE_IS_VALID as i32
                                 )
                             )
                         )
@@ -1863,8 +1914,8 @@ macro_rules! GistTupleSetValid {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -1892,13 +1943,13 @@ macro_rules! __pgrx_c_args_LEVEL_HAS_BUFFERS {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_LEVEL_HAS_BUFFERS!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_LEVEL_HAS_BUFFERS!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -1907,7 +1958,7 @@ macro_rules! __pgrx_c_args_LEVEL_HAS_BUFFERS {
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_LEVEL_HAS_BUFFERS!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -1934,31 +1985,35 @@ macro_rules! __pgrx_c_args_LEVEL_HAS_BUFFERS {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_LEVEL_HAS_BUFFERS!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_LEVEL_HAS_BUFFERS!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_LEVEL_HAS_BUFFERS!(@p2 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_LEVEL_HAS_BUFFERS!(
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative1 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_LEVEL_HAS_BUFFERS!(@p2 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_LEVEL_HAS_BUFFERS!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_LEVEL_HAS_BUFFERS!(
-            @p2 $mode [$($done)* (@literal [- $argument]),];
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_LEVEL_HAS_BUFFERS!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -1966,7 +2021,9 @@ macro_rules! __pgrx_c_args_LEVEL_HAS_BUFFERS {
         $crate::__pgrx_c_args_LEVEL_HAS_BUFFERS!(@negative1 $mode [$($done)*]; - $($raw)*)
     };
     (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_LEVEL_HAS_BUFFERS!(@p2 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_LEVEL_HAS_BUFFERS!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -1988,14 +2045,18 @@ macro_rules! __pgrx_c_args_LEVEL_HAS_BUFFERS {
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_LEVEL_HAS_BUFFERS!(@p2 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_LEVEL_HAS_BUFFERS!(
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_LEVEL_HAS_BUFFERS!(@p2 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_LEVEL_HAS_BUFFERS!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_LEVEL_HAS_BUFFERS!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -2022,13 +2083,13 @@ macro_rules! __pgrx_c_args_LEVEL_HAS_BUFFERS {
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_LEVEL_HAS_BUFFERS!(
-            @p2 $mode [$($done)* (@literal [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_LEVEL_HAS_BUFFERS!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -2539,8 +2600,8 @@ macro_rules! LEVEL_HAS_BUFFERS {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -2570,14 +2631,16 @@ macro_rules! __pgrx_c_args_PAGE_FREE_SPACE {
         compile_error!("an ungrouped C parameter requires a parenthesized negative literal")
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_PAGE_FREE_SPACE!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_PAGE_FREE_SPACE!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         compile_error!("an ungrouped C parameter requires a parenthesized negative literal")
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_PAGE_FREE_SPACE!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -2585,7 +2648,9 @@ macro_rules! __pgrx_c_args_PAGE_FREE_SPACE {
         compile_error!("an ungrouped C parameter requires one token tree")
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_PAGE_FREE_SPACE!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_PAGE_FREE_SPACE!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -2607,14 +2672,18 @@ macro_rules! __pgrx_c_args_PAGE_FREE_SPACE {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_PAGE_FREE_SPACE!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_PAGE_FREE_SPACE!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:tt) => {
-        $crate::__pgrx_c_args_PAGE_FREE_SPACE!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_PAGE_FREE_SPACE!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_PAGE_FREE_SPACE!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -2641,13 +2710,13 @@ macro_rules! __pgrx_c_args_PAGE_FREE_SPACE {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_PAGE_FREE_SPACE!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:tt, $($rest:tt)*) => {
         $crate::__pgrx_c_args_PAGE_FREE_SPACE!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -2802,8 +2871,8 @@ macro_rules! PAGE_FREE_SPACE {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -2833,14 +2902,16 @@ macro_rules! __pgrx_c_args_PAGE_IS_EMPTY {
         compile_error!("an ungrouped C parameter requires a parenthesized negative literal")
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_PAGE_IS_EMPTY!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_PAGE_IS_EMPTY!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         compile_error!("an ungrouped C parameter requires a parenthesized negative literal")
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_PAGE_IS_EMPTY!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -2848,7 +2919,9 @@ macro_rules! __pgrx_c_args_PAGE_IS_EMPTY {
         compile_error!("an ungrouped C parameter requires one token tree")
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_PAGE_IS_EMPTY!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_PAGE_IS_EMPTY!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -2870,14 +2943,18 @@ macro_rules! __pgrx_c_args_PAGE_IS_EMPTY {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_PAGE_IS_EMPTY!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_PAGE_IS_EMPTY!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:tt) => {
-        $crate::__pgrx_c_args_PAGE_IS_EMPTY!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_PAGE_IS_EMPTY!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_PAGE_IS_EMPTY!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -2904,13 +2981,13 @@ macro_rules! __pgrx_c_args_PAGE_IS_EMPTY {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_PAGE_IS_EMPTY!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:tt, $($rest:tt)*) => {
         $crate::__pgrx_c_args_PAGE_IS_EMPTY!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -2980,7 +3057,7 @@ macro_rules! PAGE_IS_EMPTY {
                         >(
                             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                 $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                    $crate::BLCKSZ as i32
+                                    $crate::__pgrx_c_bindings::BLCKSZ as i32
                                 )
                             ),
                             (
@@ -3013,7 +3090,7 @@ macro_rules! PAGE_IS_EMPTY {
                                                                     >(
                                                                         $crate::__pgrx_c_macros::expression::offset_of::<
                                                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                $crate::GISTNodeBufferPage
+                                                                                $crate::__pgrx_c_bindings::GISTNodeBufferPage
                                                                             >,
                                                                             $crate::__pgrx_c_field_marker!(
                                                                                 @path;
@@ -3043,7 +3120,7 @@ macro_rules! PAGE_IS_EMPTY {
                                                                         $crate::__pgrx_c_macros::CValue::<
                                                                             $crate::__pgrx_c_macros::CInt
                                                                         >::new(
-                                                                            $crate::MAXIMUM_ALIGNOF as i32
+                                                                            $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                         )
                                                                     )
                                                                 ),
@@ -3094,7 +3171,7 @@ macro_rules! PAGE_IS_EMPTY {
                                                                                 $crate::__pgrx_c_macros::CValue::<
                                                                                     $crate::__pgrx_c_macros::CInt
                                                                                 >::new(
-                                                                                    $crate::MAXIMUM_ALIGNOF as i32
+                                                                                    $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                                 )
                                                                             )
                                                                         ),
@@ -3179,7 +3256,7 @@ macro_rules! PAGE_IS_EMPTY {
                                         >(
                                             $crate::__pgrx_c_macros::CValue::<
                                                 $crate::__pgrx_c_macros::CInt
-                                            >::new($crate::BLCKSZ as i32)
+                                            >::new($crate::__pgrx_c_bindings::BLCKSZ as i32)
                                         ),
                                         (
                                             $crate::__pgrx_c_macros::expression::profile_value::<
@@ -3214,7 +3291,7 @@ macro_rules! PAGE_IS_EMPTY {
                                                                                 >(
                                                                                     $crate::__pgrx_c_macros::expression::offset_of::<
                                                                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                            $crate::GISTNodeBufferPage
+                                                                                            $crate::__pgrx_c_bindings::GISTNodeBufferPage
                                                                                         >,
                                                                                         $crate::__pgrx_c_field_marker!(
                                                                                             @path;
@@ -3244,7 +3321,7 @@ macro_rules! PAGE_IS_EMPTY {
                                                                                     $crate::__pgrx_c_macros::CValue::<
                                                                                         $crate::__pgrx_c_macros::CInt
                                                                                     >::new(
-                                                                                        $crate::MAXIMUM_ALIGNOF as i32
+                                                                                        $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                                     )
                                                                                 )
                                                                             ),
@@ -3295,7 +3372,7 @@ macro_rules! PAGE_IS_EMPTY {
                                                                                             $crate::__pgrx_c_macros::CValue::<
                                                                                                 $crate::__pgrx_c_macros::CInt
                                                                                             >::new(
-                                                                                                $crate::MAXIMUM_ALIGNOF as i32
+                                                                                                $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                                             )
                                                                                         )
                                                                                     ),
@@ -3360,7 +3437,7 @@ macro_rules! PAGE_IS_EMPTY {
                         >(
                             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                 $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                    $crate::BLCKSZ as i32
+                                    $crate::__pgrx_c_bindings::BLCKSZ as i32
                                 )
                             ),
                             (
@@ -3393,7 +3470,7 @@ macro_rules! PAGE_IS_EMPTY {
                                                                     >(
                                                                         $crate::__pgrx_c_macros::expression::offset_of::<
                                                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                $crate::GISTNodeBufferPage
+                                                                                $crate::__pgrx_c_bindings::GISTNodeBufferPage
                                                                             >,
                                                                             $crate::__pgrx_c_field_marker!(
                                                                                 @path;
@@ -3423,7 +3500,7 @@ macro_rules! PAGE_IS_EMPTY {
                                                                         $crate::__pgrx_c_macros::CValue::<
                                                                             $crate::__pgrx_c_macros::CInt
                                                                         >::new(
-                                                                            $crate::MAXIMUM_ALIGNOF as i32
+                                                                            $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                         )
                                                                     )
                                                                 ),
@@ -3474,7 +3551,7 @@ macro_rules! PAGE_IS_EMPTY {
                                                                                 $crate::__pgrx_c_macros::CValue::<
                                                                                     $crate::__pgrx_c_macros::CInt
                                                                                 >::new(
-                                                                                    $crate::MAXIMUM_ALIGNOF as i32
+                                                                                    $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                                 )
                                                                             )
                                                                         ),
@@ -3512,8 +3589,8 @@ macro_rules! PAGE_IS_EMPTY {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -3544,7 +3621,7 @@ macro_rules! __pgrx_c_args_PAGE_NO_SPACE {
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_PAGE_NO_SPACE!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -3553,7 +3630,7 @@ macro_rules! __pgrx_c_args_PAGE_NO_SPACE {
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_PAGE_NO_SPACE!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -3580,31 +3657,35 @@ macro_rules! __pgrx_c_args_PAGE_NO_SPACE {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_PAGE_NO_SPACE!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:tt, $($rest:tt)*) => {
         $crate::__pgrx_c_args_PAGE_NO_SPACE!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_PAGE_NO_SPACE!(@p2 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_PAGE_NO_SPACE!(
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative1 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_PAGE_NO_SPACE!(@p2 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_PAGE_NO_SPACE!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_PAGE_NO_SPACE!(
-            @p2 $mode [$($done)* (@literal [- $argument]),];
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_PAGE_NO_SPACE!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -3612,7 +3693,9 @@ macro_rules! __pgrx_c_args_PAGE_NO_SPACE {
         $crate::__pgrx_c_args_PAGE_NO_SPACE!(@negative1 $mode [$($done)*]; - $($raw)*)
     };
     (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_PAGE_NO_SPACE!(@p2 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_PAGE_NO_SPACE!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -3634,14 +3717,18 @@ macro_rules! __pgrx_c_args_PAGE_NO_SPACE {
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_PAGE_NO_SPACE!(@p2 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_PAGE_NO_SPACE!(
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_PAGE_NO_SPACE!(@p2 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_PAGE_NO_SPACE!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_PAGE_NO_SPACE!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -3668,13 +3755,13 @@ macro_rules! __pgrx_c_args_PAGE_NO_SPACE {
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_PAGE_NO_SPACE!(
-            @p2 $mode [$($done)* (@literal [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_PAGE_NO_SPACE!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -3767,7 +3854,7 @@ macro_rules! PAGE_NO_SPACE {
                                                                     _
                                                                 >(
                                                                     $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                        $crate::Size,
+                                                                        $crate::__pgrx_c_bindings::Size,
                                                                         $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                                             $crate::__pgrx_c_macros::CUnsignedLong,
                                                                             usize
@@ -3815,7 +3902,7 @@ macro_rules! PAGE_NO_SPACE {
                                                                                         $crate::__pgrx_c_macros::CValue::<
                                                                                             $crate::__pgrx_c_macros::CInt
                                                                                         >::new(
-                                                                                            $crate::INDEX_SIZE_MASK as i32
+                                                                                            $crate::__pgrx_c_bindings::INDEX_SIZE_MASK as i32
                                                                                         )
                                                                                     )
                                                                                 )
@@ -3846,7 +3933,7 @@ macro_rules! PAGE_NO_SPACE {
                                                                 $crate::__pgrx_c_macros::CValue::<
                                                                     $crate::__pgrx_c_macros::CInt
                                                                 >::new(
-                                                                    $crate::MAXIMUM_ALIGNOF as i32
+                                                                    $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                 )
                                                             )
                                                         ),
@@ -3894,7 +3981,7 @@ macro_rules! PAGE_NO_SPACE {
                                                                         $crate::__pgrx_c_macros::CValue::<
                                                                             $crate::__pgrx_c_macros::CInt
                                                                         >::new(
-                                                                            $crate::MAXIMUM_ALIGNOF as i32
+                                                                            $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                         )
                                                                     )
                                                                 ),
@@ -4003,7 +4090,7 @@ macro_rules! PAGE_NO_SPACE {
                                                                                 _
                                                                             >(
                                                                                 $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                                    $crate::Size,
+                                                                                    $crate::__pgrx_c_bindings::Size,
                                                                                     $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                                                         $crate::__pgrx_c_macros::CUnsignedLong,
                                                                                         usize
@@ -4051,7 +4138,7 @@ macro_rules! PAGE_NO_SPACE {
                                                                                                     $crate::__pgrx_c_macros::CValue::<
                                                                                                         $crate::__pgrx_c_macros::CInt
                                                                                                     >::new(
-                                                                                                        $crate::INDEX_SIZE_MASK as i32
+                                                                                                        $crate::__pgrx_c_bindings::INDEX_SIZE_MASK as i32
                                                                                                     )
                                                                                                 )
                                                                                             )
@@ -4082,7 +4169,7 @@ macro_rules! PAGE_NO_SPACE {
                                                                             $crate::__pgrx_c_macros::CValue::<
                                                                                 $crate::__pgrx_c_macros::CInt
                                                                             >::new(
-                                                                                $crate::MAXIMUM_ALIGNOF as i32
+                                                                                $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                             )
                                                                         )
                                                                     ),
@@ -4133,7 +4220,7 @@ macro_rules! PAGE_NO_SPACE {
                                                                                     $crate::__pgrx_c_macros::CValue::<
                                                                                         $crate::__pgrx_c_macros::CInt
                                                                                     >::new(
-                                                                                        $crate::MAXIMUM_ALIGNOF as i32
+                                                                                        $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                                     )
                                                                                 )
                                                                             ),
@@ -4218,7 +4305,7 @@ macro_rules! PAGE_NO_SPACE {
                                                                     _
                                                                 >(
                                                                     $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                        $crate::Size,
+                                                                        $crate::__pgrx_c_bindings::Size,
                                                                         $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                                             $crate::__pgrx_c_macros::CUnsignedLong,
                                                                             usize
@@ -4266,7 +4353,7 @@ macro_rules! PAGE_NO_SPACE {
                                                                                         $crate::__pgrx_c_macros::CValue::<
                                                                                             $crate::__pgrx_c_macros::CInt
                                                                                         >::new(
-                                                                                            $crate::INDEX_SIZE_MASK as i32
+                                                                                            $crate::__pgrx_c_bindings::INDEX_SIZE_MASK as i32
                                                                                         )
                                                                                     )
                                                                                 )
@@ -4297,7 +4384,7 @@ macro_rules! PAGE_NO_SPACE {
                                                                 $crate::__pgrx_c_macros::CValue::<
                                                                     $crate::__pgrx_c_macros::CInt
                                                                 >::new(
-                                                                    $crate::MAXIMUM_ALIGNOF as i32
+                                                                    $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                 )
                                                             )
                                                         ),
@@ -4345,7 +4432,7 @@ macro_rules! PAGE_NO_SPACE {
                                                                         $crate::__pgrx_c_macros::CValue::<
                                                                             $crate::__pgrx_c_macros::CInt
                                                                         >::new(
-                                                                            $crate::MAXIMUM_ALIGNOF as i32
+                                                                            $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                         )
                                                                     )
                                                                 ),
@@ -4381,8 +4468,8 @@ macro_rules! PAGE_NO_SPACE {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -4413,21 +4500,23 @@ macro_rules! __pgrx_c_args_SizeOfGISTSearchItem {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
         $crate::__pgrx_c_args_SizeOfGISTSearchItem!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_SizeOfGISTSearchItem!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_SizeOfGISTSearchItem!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SizeOfGISTSearchItem!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SizeOfGISTSearchItem!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -4435,7 +4524,9 @@ macro_rules! __pgrx_c_args_SizeOfGISTSearchItem {
         $crate::__pgrx_c_args_SizeOfGISTSearchItem!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_SizeOfGISTSearchItem!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_SizeOfGISTSearchItem!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -4457,14 +4548,18 @@ macro_rules! __pgrx_c_args_SizeOfGISTSearchItem {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_SizeOfGISTSearchItem!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_SizeOfGISTSearchItem!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_SizeOfGISTSearchItem!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_SizeOfGISTSearchItem!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_SizeOfGISTSearchItem!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -4491,13 +4586,13 @@ macro_rules! __pgrx_c_args_SizeOfGISTSearchItem {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SizeOfGISTSearchItem!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SizeOfGISTSearchItem!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -4546,7 +4641,9 @@ macro_rules! SizeOfGISTSearchItem {
                 $crate::__pgrx_c_macros::expression::add::<$crate::__pgrx_c_macros::Wrapping, _, _>(
                     $crate::__pgrx_c_macros::expression::profile_value::<false, _>(
                         $crate::__pgrx_c_macros::expression::offset_of::<
-                            $crate::__pgrx_c_macros::expression::CRecord<$crate::GISTSearchItem>,
+                            $crate::__pgrx_c_macros::expression::CRecord<
+                                $crate::__pgrx_c_bindings::GISTSearchItem
+                            >,
                             $crate::__pgrx_c_field_marker!(@path; distances)
                         >()
                     ),
@@ -4559,7 +4656,7 @@ macro_rules! SizeOfGISTSearchItem {
                             $crate::__pgrx_c_macros::expression::profile_value::<false, _>(
                                 $crate::__pgrx_c_macros::expression::size_of::<
                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                        $crate::IndexOrderByDistance
+                                        $crate::__pgrx_c_bindings::IndexOrderByDistance
                                     >>()
                             ),
                             (
@@ -4608,7 +4705,7 @@ macro_rules! SizeOfGISTSearchItem {
                                 $crate::__pgrx_c_macros::expression::profile_value::<false, _>(
                                     $crate::__pgrx_c_macros::expression::offset_of::<
                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                            $crate::GISTSearchItem
+                                            $crate::__pgrx_c_bindings::GISTSearchItem
                                         >,
                                         $crate::__pgrx_c_field_marker!(@path; distances)
                                     >()
@@ -4625,7 +4722,7 @@ macro_rules! SizeOfGISTSearchItem {
                                         >(
                                             $crate::__pgrx_c_macros::expression::size_of::<
                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                    $crate::IndexOrderByDistance
+                                                    $crate::__pgrx_c_bindings::IndexOrderByDistance
                                                 >>()
                                         ),
                                         (
@@ -4660,7 +4757,9 @@ macro_rules! SizeOfGISTSearchItem {
                 $crate::__pgrx_c_macros::expression::add::<$crate::__pgrx_c_macros::Wrapping, _, _>(
                     $crate::__pgrx_c_macros::expression::profile_value::<false, _>(
                         $crate::__pgrx_c_macros::expression::offset_of::<
-                            $crate::__pgrx_c_macros::expression::CRecord<$crate::GISTSearchItem>,
+                            $crate::__pgrx_c_macros::expression::CRecord<
+                                $crate::__pgrx_c_bindings::GISTSearchItem
+                            >,
                             $crate::__pgrx_c_field_marker!(@path; distances)
                         >()
                     ),
@@ -4673,7 +4772,7 @@ macro_rules! SizeOfGISTSearchItem {
                             $crate::__pgrx_c_macros::expression::profile_value::<false, _>(
                                 $crate::__pgrx_c_macros::expression::size_of::<
                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                        $crate::IndexOrderByDistance
+                                        $crate::__pgrx_c_bindings::IndexOrderByDistance
                                     >>()
                             ),
                             (

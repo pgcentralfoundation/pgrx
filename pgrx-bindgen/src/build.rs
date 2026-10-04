@@ -14,7 +14,8 @@ use eyre::{WrapErr, eyre};
 use pgrx_c_macros::{
     AnalysisSession, BindingCatalog, BuildInputs, CompilationProfile, Diagnostic, EmissionStatus,
     IntegerConstant, MacroEmission, MacroScanner, PostgresConfig, generate_with_bindings,
-    pg_sys_integer_bridges, postgres_function_macro_names,
+    lower_msvc_runtime_flags, pg_sys_integer_bridges, postgres_function_macro_names,
+    postgres_inline_function_names, postgres_object_macro_names, probe_integer_object_constants,
 };
 use pgrx_pg_config::{PgConfig, PgMinorVersion, PgVersion, Pgrx, SUPPORTED_VERSIONS};
 use quote::{ToTokens, quote};
@@ -58,6 +59,10 @@ mod binding_symbols;
 mod macro_files;
 /// Compile generated native access helpers under the already verified C invocation profile.
 mod macro_support;
+/// Recover module and function ABI records by invoking PostgreSQL's original declaration macros.
+mod metadata_support;
+/// Carry matching fresh bindings, macro adapters and native code across target builds.
+mod target_artifacts;
 use macro_files::MacroFiles;
 use macro_support::{NativeBuild, compile_macro_support, link_macro_support};
 pub(super) mod clang;
@@ -349,9 +354,8 @@ fn generate_bindings(
         active,
         cshim: (active && enable_cshim).then_some(build_paths.shim_src.as_path()),
     };
-    let (bindgen_output, macros) =
-        get_bindings(major_version, pg_config, &include_h, enable_cshim, native)
-            .wrap_err_with(|| format!("bindgen failed for pg{major_version}"))?;
+    let (bindgen_output, macros) = get_bindings(major_version, pg_config, &include_h, native)
+        .wrap_err_with(|| format!("bindgen failed for pg{major_version}"))?;
 
     let oids = extract_oids(&bindgen_output);
     let rewritten_items = rewrite_items(bindgen_output, &oids)
@@ -487,7 +491,7 @@ impl BuildPaths {
     }
 }
 
-/// Add documentation-only guards to installation-specific target checks and native adapters
+/// Add documentation-only guards to installation-specific target checks
 /// while preserving original source comments and macro templates.
 fn macro_snapshot(source: &str) -> eyre::Result<String> {
     let file = syn::parse_file(source).wrap_err("could not parse generated C macros")?;
@@ -502,16 +506,6 @@ fn macro_snapshot(source: &str) -> eyre::Result<String> {
             guards.insert(
                 item.mac.path.span().start().line,
                 ("compile_error!", "C macro target guard"),
-            );
-        } else if let Item::Mod(item) = item
-            && item.ident == "__pgrx_c_generated"
-            && !item.attrs.iter().any(|attr| attr.meta == syn::parse_quote!(cfg(not(docsrs))))
-        {
-            // Native adapters describe the generation installation's types and
-            // layout. Documentation builds use shipped bindings and no C shims.
-            guards.insert(
-                item.mod_token.span().start().line,
-                ("pub mod __pgrx_c_generated", "C macro native support module"),
             );
         }
     }
@@ -713,7 +707,7 @@ fn write_rs_file(
         write!(file, " */")
     }?;
     write!(file, "{contents}")?;
-    rust_fmt(file_path, "2021")
+    rust_fmt(file_path, "2024")
 }
 
 /// Given a token stream representing a file, apply a series of transformations to munge
@@ -1128,33 +1122,41 @@ struct TypeDescriptor<'a> {
     children: Vec<usize>,
 }
 
-/// Choose normal generation or an unavailable macro result when externally supplied bindings
-/// lack the current C inspection facts.
+/// Generate from original C inputs or import their complete verified target bundle.
+/// Raw bindings alone cannot implement the migrated macro consumers.
 fn get_bindings(
     major_version: u16,
     pg_config: &PgConfig,
     include_h: &path::Path,
-    enable_cshim: bool,
     native: NativeBuild<'_>,
 ) -> eyre::Result<(syn::File, MacroOutput)> {
     let (bindings, macros) = if let Some(info_dir) =
         target_env_tracked(&format!("PGRX_TARGET_INFO_PATH_PG{major_version}"))
     {
-        let bindings_file = format!("{info_dir}/pg{major_version}_raw_bindings.rs");
-        cargo_input_path(Path::new(&bindings_file))?;
-        println!("cargo:rerun-if-changed={bindings_file}");
-        let bindings = std::fs::read_to_string(&bindings_file)
-            .wrap_err_with(|| format!("failed to read raw bindings from {bindings_file}"))?;
-        let reason = "precomputed target bindings do not include an inspected C macro profile; macro generation is unavailable without matching target headers and metadata";
-        if macro_debug_enabled() {
-            println!("cargo:warning=pg{major_version}: {reason}");
-        }
-        (bindings, MacroOutput::unavailable(major_version, reason)?)
+        target_artifacts::import(
+            Path::new(&info_dir),
+            target_artifact_domain(major_version)?,
+            native.out_dir,
+            native.active,
+        )?
     } else {
-        let (bindings, macros) =
-            run_bindgen(major_version, pg_config, include_h, enable_cshim, native)?;
+        let (bindings, macros) = run_bindgen(major_version, pg_config, include_h, native)?;
         if let Some(path) = env_tracked("PGRX_PG_SYS_EXTRA_OUTPUT_PATH") {
             std::fs::write(path, &bindings)?;
+        }
+        if let Some(path) = env_tracked("PGRX_PG_SYS_EXTRA_TARGET_INFO_PATH") {
+            if !native.active {
+                return Err(eyre!(
+                    "target artifact export requires exactly the active PostgreSQL version"
+                ));
+            }
+            target_artifacts::export(
+                Path::new(&path),
+                target_artifact_domain(major_version)?,
+                &bindings,
+                &macros,
+                native.out_dir,
+            )?;
         }
         (bindings, macros)
     };
@@ -1163,13 +1165,23 @@ fn get_bindings(
     Ok((bindings, macros))
 }
 
+/// Bind imported native archives to Cargo's exact target and selected shim feature.
+fn target_artifact_domain(major: u16) -> eyre::Result<target_artifacts::ArtifactDomain> {
+    Ok(target_artifacts::ArtifactDomain {
+        major,
+        rust_target: env_tracked("TARGET")
+            .ok_or_else(|| eyre!("target artifact needs Cargo TARGET"))?,
+        cshim: env_tracked("CARGO_FEATURE_CSHIM").as_deref() == Some("1"),
+        generator_version: env!("CARGO_PKG_VERSION").to_owned(),
+    })
+}
+
 /// Given a specific postgres version, `run_bindgen` generates bindings for the given
 /// postgres version and returns them as a token stream.
 fn run_bindgen(
     major_version: u16,
     pg_config: &PgConfig,
     include_h: &path::Path,
-    enable_cshim: bool,
     native: NativeBuild<'_>,
 ) -> eyre::Result<(String, MacroOutput)> {
     eprintln!("Generating bindings for pg{major_version}");
@@ -1183,11 +1195,10 @@ fn run_bindgen(
     eprintln!("pg_target_includes = {pg_target_includes:?}");
     let (autodetect, includes) = clang::detect_include_paths_for(preferred_clang);
     let mut binder = bindgen::Builder::default();
-    binder = add_blocklists(binder, major_version, enable_cshim);
+    binder = add_blocklists(binder, major_version);
     binder = add_allowlists(binder, pg_target_includes.iter().map(|x| x.as_str()));
     binder = add_derives(binder);
     let out_path = PathBuf::from(std::env::var("OUT_DIR").unwrap());
-    let windows = env_tracked("CARGO_CFG_TARGET_OS").as_deref() == Some("windows");
     let mut arguments = Vec::new();
     if !autodetect {
         for include in includes {
@@ -1201,8 +1212,7 @@ fn run_bindgen(
     arguments.extend(pg_target_includes.iter().map(|include| format!("-I{include}")));
     let environment_arguments = bindgen_environment_arguments(env_tracked);
     // Make bindgen's otherwise implicit Cargo target explicit for both inspections.
-    if !windows
-        && !has_explicit_clang_target(arguments.iter().chain(&environment_arguments))
+    if !has_explicit_clang_target(arguments.iter().chain(&environment_arguments))
         && let Some(target) = env_tracked("TARGET")
     {
         arguments.insert(0, format!("--target={}", clang_target(&target)));
@@ -1229,7 +1239,10 @@ fn run_bindgen(
             .formatter(bindgen::Formatter::None)
             .layout_tests(false)
             .default_non_copy_union_style(NonCopyUnionStyle::ManuallyDrop)
-            .wrap_static_fns(enable_cshim)
+            // PostgreSQL routinely replaces macros with inline functions. Keep
+            // their generated native bindings available with either cshim API
+            // configuration instead of maintaining Rust translations.
+            .wrap_static_fns(true)
             .wrap_static_fns_path(out_path.join(cshim_static_wrapper_name(major_version)))
             .wrap_static_fns_suffix("__pgrx_cshim")
             .generate()
@@ -1244,6 +1257,15 @@ fn run_bindgen(
     let macros =
         optional_macro_output(major_version, macro_generation_refusal(env_tracked), || {
             let (mut macro_arguments, cflags_recorded) = postgres_cflags(pg_config)?;
+            // Ordinary bindings deliberately omit MSVC CPPFLAGS. The separate
+            // macro profile still needs the recorded preprocessing controls.
+            if env_tracked("CARGO_CFG_TARGET_OS").as_deref() == Some("windows") {
+                let flags = pg_config.cppflags()?;
+                let flags =
+                    flags.to_str().ok_or_else(|| eyre!("PostgreSQL CPPFLAGS are not UTF-8"))?;
+                macro_arguments
+                    .extend(pgrx_c_macros::split_recorded_cflags(flags, true)?.unwrap_or_default());
+            }
             macro_arguments.extend_from_slice(&arguments);
             generate_macros(
                 pg_config,
@@ -1261,6 +1283,18 @@ fn run_bindgen(
         Some(bindings) => bindings,
         None => generate(arguments)?,
     };
+    // Static bindings are ordinary pg-sys APIs, so an optional macro refusal
+    // must not leave their generated extern declarations without definitions.
+    // The enabled C shim owns this wrapper in the existing main build path.
+    if native.active && !macros.inspected && native.cshim.is_none() {
+        let wrapper =
+            native.out_dir.join(format!("{}.c", cshim_static_wrapper_name(major_version)));
+        if wrapper.is_file() {
+            ordinary_c_support(pg_config)?
+                .file(wrapper)
+                .compile(&format!("pgrx_c_inline_pg{major_version}"));
+        }
+    }
     Ok((bindings, macros))
 }
 
@@ -1330,6 +1364,8 @@ struct MacroReport<'a> {
     macros: &'a [MacroEmission],
     /// Compiler-owned constant facts used to verify symbolic binding references.
     integer_constants: &'a BTreeMap<String, IntegerConstant>,
+    /// Absent bindgen constants independently resolved from the original C definitions.
+    supplemental_constants: &'a pgrx_c_macros::ObjectIntegerConstants,
     /// Fresh Rust binding paths, storage, and values reconciled with the C catalog.
     integer_bindings: &'a BindingCatalog,
     /// Explanation when checked pg_sys integer bridges could not be proved.
@@ -1354,13 +1390,71 @@ fn generate_macros(
     let scanner = MacroScanner::new().wrap_err("could not initialize C macro discovery")?;
     let postgres = PostgresConfig::from_pg_config(pg_config.clone())?;
     let major_version = pg_config.major_version()?;
+    let msvc = env_tracked("CARGO_CFG_TARGET_ENV").as_deref() == Some("msvc");
+    // Bindgen appends its original environment tail itself. A CRT selection
+    // there cannot be lowered without changing the tail seen by libclang;
+    // refuse instead of inspecting different flags from the binding parser.
+    if msvc && lower_msvc_runtime_flags(environment_arguments, true)? != environment_arguments {
+        return Err(eyre!(
+            "MSVC runtime selections in BINDGEN_EXTRA_CLANG_ARGS are unsupported; \
+             supply them in the recorded PostgreSQL CFLAGS/CPPFLAGS instead"
+        ));
+    }
     let mut effective_arguments = binder_arguments.clone();
     effective_arguments.extend_from_slice(environment_arguments);
     let frontend = postgres
         .inspect_with_arguments(&scanner, header, &effective_arguments, preferred_clang)
         .wrap_err("could not establish the binding generator's C macro compilation profile")?;
-    let names = postgres_function_macro_names(&frontend, postgres.server_include_dir())?;
-    let session = AnalysisSession::prepare(&scanner, &frontend, &names)?;
+    let mut names = postgres_function_macro_names(&frontend, postgres.server_include_dir())?;
+    let owned_objects = postgres_object_macro_names(&frontend, postgres.server_include_dir())?
+        .into_iter()
+        .collect::<BTreeSet<_>>();
+    let mut global_roots = frontend
+        .environment()
+        .active
+        .iter()
+        .filter_map(|(name, active)| {
+            active
+                .definition
+                .tokens
+                .iter()
+                .any(|token| frontend.declarations().variables.contains_key(&token.spelling))
+                .then_some(name.clone())
+        })
+        .collect::<BTreeSet<_>>();
+    // Propagate declaration references once through caller edges. Integer
+    // constants belong in bindings; only context-bearing object expressions
+    // require a zero-argument macro rather than duplicated constant exports.
+    global_roots.extend(
+        frontend
+            .dependencies()
+            .impacts(&global_roots.iter().collect::<Vec<_>>())
+            .into_iter()
+            .map(|impact| impact.name),
+    );
+    let object_names = frontend
+        .environment()
+        .active
+        .iter()
+        .filter_map(|(name, active)| {
+            let definition = &active.definition;
+            (definition.kind == pgrx_c_macros::MacroKind::ObjectLike
+                && definition.tokens.len() > 1
+                && global_roots.contains(name)
+                && owned_objects.contains(name))
+            .then_some(name.clone())
+        })
+        .collect::<Vec<_>>();
+    let inline_names = postgres_inline_function_names(&frontend, postgres.server_include_dir())?;
+    let session = AnalysisSession::prepare_with_inline_functions(
+        &scanner,
+        &frontend,
+        &names,
+        &object_names,
+        &inline_names,
+    )?;
+    names.extend(object_names);
+    names.extend(inline_names);
     emit_macro_rerun_inputs(session.inputs(), native.out_dir)?;
     let mut source = String::new();
     let integer_bridge_unavailable = match pg_sys_integer_bridges(&frontend) {
@@ -1373,18 +1467,91 @@ fn generate_macros(
     // Retain ordinary bindings even if a later optional macro phase refuses.
     // Successful macros require an unchanged input window around generation.
     *bindings = Some(generate_bindings()?);
-    let bindings = bindings.as_deref().expect("binding generation just succeeded");
+    let bindings = bindings.as_mut().expect("binding generation just succeeded");
     session.verify_inputs().wrap_err("C inputs changed during binding generation")?;
     let mut parsed_bindings =
         syn::parse_file(bindings).wrap_err("could not parse bindings for C symbol references")?;
+    let available =
+        parsed_bindings
+            .items
+            .iter()
+            .filter_map(|item| {
+                if let Item::Const(item) = item { Some(item.ident.to_string()) } else { None }
+            })
+            .collect::<BTreeSet<_>>();
+    let missing_objects = frontend
+        .environment()
+        .active
+        .iter()
+        .filter_map(|(name, active)| {
+            let definition = &active.definition;
+            if definition.kind != pgrx_c_macros::MacroKind::ObjectLike
+                || available.contains(name)
+                || !owned_objects.contains(name)
+            {
+                return None;
+            }
+            let body = &definition.tokens[1..];
+            // Empty header guards, strings and declaration fragments are not
+            // numeric binding candidates. The compiler owns the final type proof.
+            let numeric = body.iter().any(|token| {
+                (token.kind == pgrx_c_macros::TokenKind::Literal
+                    && !token.spelling.starts_with('"'))
+                    || matches!(
+                        token.spelling.as_str(),
+                        "sizeof" | "offsetof" | "__builtin_offsetof"
+                    )
+                    || frontend.declarations().integer_constants.contains_key(&token.spelling)
+                    || frontend.environment().active.get(&token.spelling).is_some_and(|active| {
+                        active.definition.kind == pgrx_c_macros::MacroKind::ObjectLike
+                            && active.definition.tokens.len() > 1
+                    })
+            });
+            (numeric
+                && !body.iter().any(|token| matches!(token.spelling.as_str(), "{" | "}" | ";")))
+            .then_some(name.clone())
+        })
+        .collect::<Vec<_>>();
+    let objects = probe_integer_object_constants(&scanner, &frontend, &missing_objects)?;
+    for (name, constant) in &objects.constants {
+        let pgrx_c_macros::TypeCategory::Integer(kind) = constant.ty.category else { continue };
+        let layout = &frontend.profile().target.integers[&kind];
+        let ty = if kind == pgrx_c_macros::IntegerKind::Bool {
+            "bool".to_owned()
+        } else if kind == frontend.profile().target.size_type {
+            "usize".to_owned()
+        } else {
+            format!("{}{}", if layout.signed { "i" } else { "u" }, layout.bits)
+        };
+        let value = match constant.value {
+            pgrx_c_macros::IntegerValue::Signed(value) => value.to_string(),
+            pgrx_c_macros::IntegerValue::Unsigned(value) => value.to_string(),
+        };
+        let value = if kind == pgrx_c_macros::IntegerKind::Bool {
+            (value != "0").to_string()
+        } else {
+            value
+        };
+        let item = syn::parse_str::<syn::ItemConst>(&format!(
+            "/// Compiler-verified C object macro `{name}`, omitted by bindgen.\npub const {name}: {ty} = {value};"
+        ))?;
+        bindings.push_str(&item.to_token_stream().to_string());
+        parsed_bindings.items.push(Item::Const(item));
+    }
     // Callback storage facts must reflect the same ABI rewrite as the final
     // bindings, while foreign function guards are still generated afterward.
     rewrite_c_abi_to_c_unwind(&mut parsed_bindings);
-    let mut symbols = binding_symbols::collect_bindings(
+    let mut symbols = binding_symbols::collect_bindings_at(
         &parsed_bindings,
-        session.integer_constants(),
+        &session
+            .integer_constants()
+            .iter()
+            .chain(objects.constants.iter())
+            .map(|(name, constant)| (name.clone(), constant.clone()))
+            .collect(),
         frontend.declarations(),
         &frontend.profile().target,
+        &["__pgrx_c_bindings".into()],
     );
     symbols.ffi_boundary = Some(vec!["ffi".into(), "pg_guard_ffi_boundary".into()]);
     if integer_bridge_unavailable.is_none() {
@@ -1403,9 +1570,22 @@ fn generate_macros(
     }
     let pgrx_c_macros::MacroGeneration { macros: emissions, support } =
         generate_with_bindings(&session, &names, &symbols).map_err(|message| eyre!(message))?;
+    let metadata = metadata_support::generate(&frontend, &symbols)?;
+    source.push_str(&metadata.rust);
     source.push_str(&support.rust);
-    let integrated_cshim = if native.active && !support.c_source.is_empty() {
-        compile_macro_support(major_version, frontend.profile(), &support.c_source, &native)?
+    let static_wrapper =
+        native.out_dir.join(format!("{}.c", cshim_static_wrapper_name(major_version)));
+    let native_built = native.active
+        && (!support.c_source.is_empty()
+            || !metadata.c_source.is_empty()
+            || static_wrapper.is_file());
+    let integrated_cshim = if native_built {
+        compile_macro_support(
+            major_version,
+            frontend.profile(),
+            &format!("{}\n{}", support.c_source, metadata.c_source),
+            &native,
+        )?
     } else {
         false
     };
@@ -1442,10 +1622,11 @@ fn generate_macros(
         diagnostics: &frontend.inventory().diagnostics,
         macros: &emissions,
         integer_constants: session.integer_constants(),
+        supplemental_constants: &objects,
         integer_bindings: &symbols,
         integer_bridge_unavailable,
     })?;
-    if native.active && !support.c_source.is_empty() {
+    if native_built {
         // Publish linkage only after every proof, fingerprint and serialization
         // succeeds. Failed optional generation must leave no linked C artifact.
         link_macro_support(major_version, native.out_dir);
@@ -1669,22 +1850,17 @@ fn write_content_stable(path: &Path, content: &[u8]) -> eyre::Result<()> {
     fs::write(path, content).wrap_err_with(|| format!("could not write {}", path.display()))
 }
 
-fn add_blocklists(
-    bind: bindgen::Builder,
-    major_version: u16,
-    enable_cshim: bool,
-) -> bindgen::Builder {
-    let bind = if major_version >= 19 {
-        // Postgres 19 turned these into `static inline` functions, so without the cshim there's
-        // no symbol to link against.  We implement them ourselves, in Rust, in `port.rs`
-        bind.blocklist_function("TransactionId(Precedes|PrecedesOrEquals|Follows|FollowsOrEquals)")
-    } else {
-        bind
-    };
-    let bind = if major_version < 16 || !enable_cshim {
-        // Before Postgres 16 these are macros. Without cshim, Postgres 16+ static inline
-        // functions have no symbol to link against. Use the Rust fallback in both cases.
-        bind.blocklist_function("BufferGetBlock").blocklist_function("BufferGetPage")
+fn add_blocklists(bind: bindgen::Builder, major_version: u16) -> bindgen::Builder {
+    let bind = if major_version < 16 {
+        // PG15's unprototyped tree callbacks have explicit guarded ABI
+        // declarations. On later versions these names are generated C macros.
+        bind.blocklist_function("expression_tree_walker")
+            .blocklist_function("planstate_tree_walker")
+            .blocklist_function("query_or_expression_tree_walker")
+            .blocklist_function("query_tree_walker")
+            .blocklist_function("range_table_entry_walker")
+            .blocklist_function("range_table_walker")
+            .blocklist_function("raw_expression_tree_walker")
     } else {
         bind
     };
@@ -1698,33 +1874,11 @@ fn add_blocklists(
         // It's used by explict `extern "C-unwind"`
         .blocklist_function("pg_re_throw")
         .blocklist_function("err(start|code|msg|detail|context_msg|hint|finish)")
-        // These functions are already ported in Rust
-        .blocklist_function("heap_getattr")
-        .blocklist_function("BufferIsLocal")
-        .blocklist_function("GetMemoryChunkContext")
-        .blocklist_function("GETSTRUCT")
-        .blocklist_function("MAXALIGN")
-        .blocklist_function("MemoryContextIsValid")
-        .blocklist_function("MemoryContextSwitchTo")
-        .blocklist_function("TYPEALIGN")
-        .blocklist_function("TransactionIdIsNormal")
-        .blocklist_function("expression_tree_walker")
+        // Rust version utilities are independent of PostgreSQL declarations.
         .blocklist_function("get_pg_major_minor_version_string")
         .blocklist_function("get_pg_major_version_num")
         .blocklist_function("get_pg_major_version_string")
         .blocklist_function("get_pg_version_string")
-        .blocklist_function("heap_tuple_get_struct")
-        .blocklist_function("planstate_tree_walker")
-        .blocklist_function("query_or_expression_tree_walker")
-        .blocklist_function("query_tree_walker")
-        .blocklist_function("range_table_entry_walker")
-        .blocklist_function("range_table_walker")
-        .blocklist_function("raw_expression_tree_walker")
-        .blocklist_function("type_is_array")
-        .blocklist_function("varsize_any")
-        // we define these ourselves b/c Postgres is schizophrenic about them across versions
-        .blocklist_function("PageValidateSpecialPointer")
-        .blocklist_function("PageIsValid")
         // it's defined twice on Windows, so use PGERROR instead
         .blocklist_item("ERROR")
         // Keep these inline helpers blocklisted for compatibility with Windows linking.
@@ -1811,10 +1965,21 @@ fn build_shim(
 
     std::fs::copy(shim_src, shim_dst).unwrap();
 
-    let mut build = cc::Build::new();
+    let mut build = ordinary_c_support(pg_config)?;
     // pgrx-cshim.c includes the generated bindgen wrapper through this macro so
     // each cshim build picks the wrapper that matches its postgres headers
     build.define("PGRX_CSHIM_STATIC", Some(generated_wrapper.as_str()));
+    build.file(shim_dst);
+    build.compile("pgrx-cshim");
+    Ok(())
+}
+
+/// Share the established target compiler and preprocessing settings between
+/// the ordinary C shim and static bindings retained when macro generation refuses.
+/// Historical macro-only CFLAGS never change this independent binding contract.
+fn ordinary_c_support(pg_config: &PgConfig) -> eyre::Result<cc::Build> {
+    let major_version = pg_config.major_version()?;
+    let mut build = cc::Build::new();
     let compiler = build.get_compiler();
     if compiler.is_like_gnu() || compiler.is_like_clang() {
         build.flag("-ffunction-sections");
@@ -1833,9 +1998,7 @@ fn build_shim(
     if compiler.is_like_gnu() || compiler.is_like_clang() {
         build.flag("-fno-lto");
     }
-    build.file(shim_dst);
-    build.compile("pgrx-cshim");
-    Ok(())
+    Ok(build)
 }
 
 /// Decode the installation's recorded compiler flags without losing shell quoting;
@@ -1853,6 +2016,8 @@ fn postgres_cflags(pg_config: &PgConfig) -> eyre::Result<(Vec<String>, bool)> {
     })
 }
 
+/// Preserve the established ordinary binding arguments independently of optional macro
+/// inspection; PostgreSQL's historical CFLAGS belong to the separate verified macro profile.
 fn extra_bindgen_clang_args(pg_config: &PgConfig) -> eyre::Result<Vec<String>> {
     let mut out = vec![];
     let flags = shlex::split(&pg_config.cppflags()?.to_string_lossy()).unwrap_or_default();
@@ -2098,7 +2263,7 @@ mod macro_build_tests {
         );
     }
 
-    /// Checks that documentation snapshots guard native support and preserve macro templates.
+    /// Keep documentation target guards while retaining macro adapters needed by pgrx callers.
     #[test]
     fn documentation_snapshots_guard_native_support_and_preserve_macro_templates() {
         let source = r#"#[cfg(not(target_pointer_width = "64"))]
@@ -2136,24 +2301,16 @@ macro_rules! EXAMPLE {
         let Item::Macro(target_guard) = &mut expected.items[0] else {
             panic!("fixture target guard must be a macro item");
         };
-        target_guard.attrs.push(documentation_guard.clone());
-        let Item::Mod(native_support) = &mut expected.items[2] else {
-            panic!("fixture native support must be a module item");
-        };
-        native_support.attrs.push(documentation_guard);
+        target_guard.attrs.push(documentation_guard);
         assert_eq!(syn::parse_file(&snapshot).unwrap(), expected);
     }
 
     /// Checks that documentation snapshots require guarded items on their own lines.
     #[test]
     fn documentation_snapshots_require_guarded_items_on_their_own_lines() {
-        for (source, description) in [
-            ("const PROFILE: () = (); compile_error!(\"wrong target\");", "C macro target guard"),
-            (
-                "const PROFILE: () = (); pub mod __pgrx_c_generated {}",
-                "C macro native support module",
-            ),
-        ] {
+        for (source, description) in
+            [("const PROFILE: () = (); compile_error!(\"wrong target\");", "C macro target guard")]
+        {
             let error = macro_snapshot(source).unwrap_err().to_string();
             assert_eq!(error, format!("{description} does not start on its own line"));
         }

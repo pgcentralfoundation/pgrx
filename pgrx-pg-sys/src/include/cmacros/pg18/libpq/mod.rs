@@ -6,3 +6,7 @@ This code is generated for documentation purposes, so that it is easy to referen
 mod pqcomm;
 #[allow(unused_imports)]
 pub use pqcomm::*;
+#[path = "pqformat.rs"]
+mod pqformat;
+#[allow(unused_imports)]
+pub use pqformat::*;

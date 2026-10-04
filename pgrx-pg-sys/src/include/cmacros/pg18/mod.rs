@@ -31,6 +31,10 @@ pub use datatype::*;
 mod executor;
 #[allow(unused_imports)]
 pub use executor::*;
+#[path = "foreign/mod.rs"]
+mod foreign;
+#[allow(unused_imports)]
+pub use foreign::*;
 #[path = "lib/mod.rs"]
 mod lib;
 #[allow(unused_imports)]
@@ -75,6 +79,10 @@ pub use replication::*;
 mod storage;
 #[allow(unused_imports)]
 pub use storage::*;
+#[path = "tcop/mod.rs"]
+mod tcop;
+#[allow(unused_imports)]
+pub use tcop::*;
 #[path = "tsearch/mod.rs"]
 mod tsearch;
 #[allow(unused_imports)]
@@ -111,6 +119,10 @@ pub use plpgsql::*;
 mod __pgrx_c_header_706f72742e68;
 #[allow(unused_imports)]
 pub use __pgrx_c_header_706f72742e68::*;
+#[path = "postgres.rs"]
+mod postgres;
+#[allow(unused_imports)]
+pub use postgres::*;
 #[path = "postgres_ext.rs"]
 mod postgres_ext;
 #[allow(unused_imports)]

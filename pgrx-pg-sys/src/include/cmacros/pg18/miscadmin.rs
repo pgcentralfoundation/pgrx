@@ -5,8 +5,8 @@ This code is generated for documentation purposes, so that it is easy to referen
 // C macros from miscadmin.h.
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -59,12 +59,14 @@ macro_rules! AmArchiverProcess {
                                     $crate::__pgrx_c_generated::EnumIdentity_34713727133be8f7574405853c61a88219dcfd07258a250036597fe2e414c866,
                                     $crate::__pgrx_c_macros::CUnsignedInt,
                                     u32
-                                >>(::core::ptr::addr_of_mut!($crate::MyBackendType))
+                                >>(
+                                ::core::ptr::addr_of_mut!($crate::__pgrx_c_bindings::MyBackendType)
+                            )
                         )
                     ),
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                            $crate::BackendType::B_ARCHIVER as i32
+                            $crate::__pgrx_c_bindings::BackendType::B_ARCHIVER as i32
                         )
                     )
                 )
@@ -103,12 +105,16 @@ macro_rules! AmArchiverProcess {
                                                 $crate::__pgrx_c_generated::EnumIdentity_34713727133be8f7574405853c61a88219dcfd07258a250036597fe2e414c866,
                                                 $crate::__pgrx_c_macros::CUnsignedInt,
                                                 u32
-                                            >>(::core::ptr::addr_of_mut!($crate::MyBackendType))
+                                            >>(
+                                            ::core::ptr::addr_of_mut!(
+                                                $crate::__pgrx_c_bindings::MyBackendType
+                                            )
+                                        )
                                     )
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                        $crate::BackendType::B_ARCHIVER as i32
+                                        $crate::__pgrx_c_bindings::BackendType::B_ARCHIVER as i32
                                     )
                                 )
                             )
@@ -134,12 +140,14 @@ macro_rules! AmArchiverProcess {
                                     $crate::__pgrx_c_generated::EnumIdentity_34713727133be8f7574405853c61a88219dcfd07258a250036597fe2e414c866,
                                     $crate::__pgrx_c_macros::CUnsignedInt,
                                     u32
-                                >>(::core::ptr::addr_of_mut!($crate::MyBackendType))
+                                >>(
+                                ::core::ptr::addr_of_mut!($crate::__pgrx_c_bindings::MyBackendType)
+                            )
                         )
                     ),
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                            $crate::BackendType::B_ARCHIVER as i32
+                            $crate::__pgrx_c_bindings::BackendType::B_ARCHIVER as i32
                         )
                     )
                 )
@@ -161,8 +169,8 @@ macro_rules! AmArchiverProcess {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -215,12 +223,14 @@ macro_rules! AmAutoVacuumLauncherProcess {
                                     $crate::__pgrx_c_generated::EnumIdentity_34713727133be8f7574405853c61a88219dcfd07258a250036597fe2e414c866,
                                     $crate::__pgrx_c_macros::CUnsignedInt,
                                     u32
-                                >>(::core::ptr::addr_of_mut!($crate::MyBackendType))
+                                >>(
+                                ::core::ptr::addr_of_mut!($crate::__pgrx_c_bindings::MyBackendType)
+                            )
                         )
                     ),
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                            $crate::BackendType::B_AUTOVAC_LAUNCHER as i32
+                            $crate::__pgrx_c_bindings::BackendType::B_AUTOVAC_LAUNCHER as i32
                         )
                     )
                 )
@@ -259,12 +269,16 @@ macro_rules! AmAutoVacuumLauncherProcess {
                                                 $crate::__pgrx_c_generated::EnumIdentity_34713727133be8f7574405853c61a88219dcfd07258a250036597fe2e414c866,
                                                 $crate::__pgrx_c_macros::CUnsignedInt,
                                                 u32
-                                            >>(::core::ptr::addr_of_mut!($crate::MyBackendType))
+                                            >>(
+                                            ::core::ptr::addr_of_mut!(
+                                                $crate::__pgrx_c_bindings::MyBackendType
+                                            )
+                                        )
                                     )
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                        $crate::BackendType::B_AUTOVAC_LAUNCHER as i32
+                                        $crate::__pgrx_c_bindings::BackendType::B_AUTOVAC_LAUNCHER as i32
                                     )
                                 )
                             )
@@ -290,12 +304,14 @@ macro_rules! AmAutoVacuumLauncherProcess {
                                     $crate::__pgrx_c_generated::EnumIdentity_34713727133be8f7574405853c61a88219dcfd07258a250036597fe2e414c866,
                                     $crate::__pgrx_c_macros::CUnsignedInt,
                                     u32
-                                >>(::core::ptr::addr_of_mut!($crate::MyBackendType))
+                                >>(
+                                ::core::ptr::addr_of_mut!($crate::__pgrx_c_bindings::MyBackendType)
+                            )
                         )
                     ),
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                            $crate::BackendType::B_AUTOVAC_LAUNCHER as i32
+                            $crate::__pgrx_c_bindings::BackendType::B_AUTOVAC_LAUNCHER as i32
                         )
                     )
                 )
@@ -317,8 +333,8 @@ macro_rules! AmAutoVacuumLauncherProcess {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -371,12 +387,14 @@ macro_rules! AmAutoVacuumWorkerProcess {
                                     $crate::__pgrx_c_generated::EnumIdentity_34713727133be8f7574405853c61a88219dcfd07258a250036597fe2e414c866,
                                     $crate::__pgrx_c_macros::CUnsignedInt,
                                     u32
-                                >>(::core::ptr::addr_of_mut!($crate::MyBackendType))
+                                >>(
+                                ::core::ptr::addr_of_mut!($crate::__pgrx_c_bindings::MyBackendType)
+                            )
                         )
                     ),
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                            $crate::BackendType::B_AUTOVAC_WORKER as i32
+                            $crate::__pgrx_c_bindings::BackendType::B_AUTOVAC_WORKER as i32
                         )
                     )
                 )
@@ -415,12 +433,16 @@ macro_rules! AmAutoVacuumWorkerProcess {
                                                 $crate::__pgrx_c_generated::EnumIdentity_34713727133be8f7574405853c61a88219dcfd07258a250036597fe2e414c866,
                                                 $crate::__pgrx_c_macros::CUnsignedInt,
                                                 u32
-                                            >>(::core::ptr::addr_of_mut!($crate::MyBackendType))
+                                            >>(
+                                            ::core::ptr::addr_of_mut!(
+                                                $crate::__pgrx_c_bindings::MyBackendType
+                                            )
+                                        )
                                     )
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                        $crate::BackendType::B_AUTOVAC_WORKER as i32
+                                        $crate::__pgrx_c_bindings::BackendType::B_AUTOVAC_WORKER as i32
                                     )
                                 )
                             )
@@ -446,12 +468,14 @@ macro_rules! AmAutoVacuumWorkerProcess {
                                     $crate::__pgrx_c_generated::EnumIdentity_34713727133be8f7574405853c61a88219dcfd07258a250036597fe2e414c866,
                                     $crate::__pgrx_c_macros::CUnsignedInt,
                                     u32
-                                >>(::core::ptr::addr_of_mut!($crate::MyBackendType))
+                                >>(
+                                ::core::ptr::addr_of_mut!($crate::__pgrx_c_bindings::MyBackendType)
+                            )
                         )
                     ),
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                            $crate::BackendType::B_AUTOVAC_WORKER as i32
+                            $crate::__pgrx_c_bindings::BackendType::B_AUTOVAC_WORKER as i32
                         )
                     )
                 )
@@ -473,8 +497,8 @@ macro_rules! AmAutoVacuumWorkerProcess {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -527,12 +551,14 @@ macro_rules! AmBackgroundWorkerProcess {
                                     $crate::__pgrx_c_generated::EnumIdentity_34713727133be8f7574405853c61a88219dcfd07258a250036597fe2e414c866,
                                     $crate::__pgrx_c_macros::CUnsignedInt,
                                     u32
-                                >>(::core::ptr::addr_of_mut!($crate::MyBackendType))
+                                >>(
+                                ::core::ptr::addr_of_mut!($crate::__pgrx_c_bindings::MyBackendType)
+                            )
                         )
                     ),
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                            $crate::BackendType::B_BG_WORKER as i32
+                            $crate::__pgrx_c_bindings::BackendType::B_BG_WORKER as i32
                         )
                     )
                 )
@@ -571,12 +597,16 @@ macro_rules! AmBackgroundWorkerProcess {
                                                 $crate::__pgrx_c_generated::EnumIdentity_34713727133be8f7574405853c61a88219dcfd07258a250036597fe2e414c866,
                                                 $crate::__pgrx_c_macros::CUnsignedInt,
                                                 u32
-                                            >>(::core::ptr::addr_of_mut!($crate::MyBackendType))
+                                            >>(
+                                            ::core::ptr::addr_of_mut!(
+                                                $crate::__pgrx_c_bindings::MyBackendType
+                                            )
+                                        )
                                     )
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                        $crate::BackendType::B_BG_WORKER as i32
+                                        $crate::__pgrx_c_bindings::BackendType::B_BG_WORKER as i32
                                     )
                                 )
                             )
@@ -602,12 +632,14 @@ macro_rules! AmBackgroundWorkerProcess {
                                     $crate::__pgrx_c_generated::EnumIdentity_34713727133be8f7574405853c61a88219dcfd07258a250036597fe2e414c866,
                                     $crate::__pgrx_c_macros::CUnsignedInt,
                                     u32
-                                >>(::core::ptr::addr_of_mut!($crate::MyBackendType))
+                                >>(
+                                ::core::ptr::addr_of_mut!($crate::__pgrx_c_bindings::MyBackendType)
+                            )
                         )
                     ),
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                            $crate::BackendType::B_BG_WORKER as i32
+                            $crate::__pgrx_c_bindings::BackendType::B_BG_WORKER as i32
                         )
                     )
                 )
@@ -629,8 +661,8 @@ macro_rules! AmBackgroundWorkerProcess {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -683,12 +715,14 @@ macro_rules! AmBackgroundWriterProcess {
                                     $crate::__pgrx_c_generated::EnumIdentity_34713727133be8f7574405853c61a88219dcfd07258a250036597fe2e414c866,
                                     $crate::__pgrx_c_macros::CUnsignedInt,
                                     u32
-                                >>(::core::ptr::addr_of_mut!($crate::MyBackendType))
+                                >>(
+                                ::core::ptr::addr_of_mut!($crate::__pgrx_c_bindings::MyBackendType)
+                            )
                         )
                     ),
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                            $crate::BackendType::B_BG_WRITER as i32
+                            $crate::__pgrx_c_bindings::BackendType::B_BG_WRITER as i32
                         )
                     )
                 )
@@ -727,12 +761,16 @@ macro_rules! AmBackgroundWriterProcess {
                                                 $crate::__pgrx_c_generated::EnumIdentity_34713727133be8f7574405853c61a88219dcfd07258a250036597fe2e414c866,
                                                 $crate::__pgrx_c_macros::CUnsignedInt,
                                                 u32
-                                            >>(::core::ptr::addr_of_mut!($crate::MyBackendType))
+                                            >>(
+                                            ::core::ptr::addr_of_mut!(
+                                                $crate::__pgrx_c_bindings::MyBackendType
+                                            )
+                                        )
                                     )
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                        $crate::BackendType::B_BG_WRITER as i32
+                                        $crate::__pgrx_c_bindings::BackendType::B_BG_WRITER as i32
                                     )
                                 )
                             )
@@ -758,12 +796,14 @@ macro_rules! AmBackgroundWriterProcess {
                                     $crate::__pgrx_c_generated::EnumIdentity_34713727133be8f7574405853c61a88219dcfd07258a250036597fe2e414c866,
                                     $crate::__pgrx_c_macros::CUnsignedInt,
                                     u32
-                                >>(::core::ptr::addr_of_mut!($crate::MyBackendType))
+                                >>(
+                                ::core::ptr::addr_of_mut!($crate::__pgrx_c_bindings::MyBackendType)
+                            )
                         )
                     ),
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                            $crate::BackendType::B_BG_WRITER as i32
+                            $crate::__pgrx_c_bindings::BackendType::B_BG_WRITER as i32
                         )
                     )
                 )
@@ -785,8 +825,8 @@ macro_rules! AmBackgroundWriterProcess {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -839,12 +879,14 @@ macro_rules! AmCheckpointerProcess {
                                     $crate::__pgrx_c_generated::EnumIdentity_34713727133be8f7574405853c61a88219dcfd07258a250036597fe2e414c866,
                                     $crate::__pgrx_c_macros::CUnsignedInt,
                                     u32
-                                >>(::core::ptr::addr_of_mut!($crate::MyBackendType))
+                                >>(
+                                ::core::ptr::addr_of_mut!($crate::__pgrx_c_bindings::MyBackendType)
+                            )
                         )
                     ),
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                            $crate::BackendType::B_CHECKPOINTER as i32
+                            $crate::__pgrx_c_bindings::BackendType::B_CHECKPOINTER as i32
                         )
                     )
                 )
@@ -883,12 +925,16 @@ macro_rules! AmCheckpointerProcess {
                                                 $crate::__pgrx_c_generated::EnumIdentity_34713727133be8f7574405853c61a88219dcfd07258a250036597fe2e414c866,
                                                 $crate::__pgrx_c_macros::CUnsignedInt,
                                                 u32
-                                            >>(::core::ptr::addr_of_mut!($crate::MyBackendType))
+                                            >>(
+                                            ::core::ptr::addr_of_mut!(
+                                                $crate::__pgrx_c_bindings::MyBackendType
+                                            )
+                                        )
                                     )
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                        $crate::BackendType::B_CHECKPOINTER as i32
+                                        $crate::__pgrx_c_bindings::BackendType::B_CHECKPOINTER as i32
                                     )
                                 )
                             )
@@ -914,12 +960,14 @@ macro_rules! AmCheckpointerProcess {
                                     $crate::__pgrx_c_generated::EnumIdentity_34713727133be8f7574405853c61a88219dcfd07258a250036597fe2e414c866,
                                     $crate::__pgrx_c_macros::CUnsignedInt,
                                     u32
-                                >>(::core::ptr::addr_of_mut!($crate::MyBackendType))
+                                >>(
+                                ::core::ptr::addr_of_mut!($crate::__pgrx_c_bindings::MyBackendType)
+                            )
                         )
                     ),
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                            $crate::BackendType::B_CHECKPOINTER as i32
+                            $crate::__pgrx_c_bindings::BackendType::B_CHECKPOINTER as i32
                         )
                     )
                 )
@@ -941,8 +989,8 @@ macro_rules! AmCheckpointerProcess {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -995,12 +1043,14 @@ macro_rules! AmIoWorkerProcess {
                                     $crate::__pgrx_c_generated::EnumIdentity_34713727133be8f7574405853c61a88219dcfd07258a250036597fe2e414c866,
                                     $crate::__pgrx_c_macros::CUnsignedInt,
                                     u32
-                                >>(::core::ptr::addr_of_mut!($crate::MyBackendType))
+                                >>(
+                                ::core::ptr::addr_of_mut!($crate::__pgrx_c_bindings::MyBackendType)
+                            )
                         )
                     ),
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                            $crate::BackendType::B_IO_WORKER as i32
+                            $crate::__pgrx_c_bindings::BackendType::B_IO_WORKER as i32
                         )
                     )
                 )
@@ -1039,12 +1089,16 @@ macro_rules! AmIoWorkerProcess {
                                                 $crate::__pgrx_c_generated::EnumIdentity_34713727133be8f7574405853c61a88219dcfd07258a250036597fe2e414c866,
                                                 $crate::__pgrx_c_macros::CUnsignedInt,
                                                 u32
-                                            >>(::core::ptr::addr_of_mut!($crate::MyBackendType))
+                                            >>(
+                                            ::core::ptr::addr_of_mut!(
+                                                $crate::__pgrx_c_bindings::MyBackendType
+                                            )
+                                        )
                                     )
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                        $crate::BackendType::B_IO_WORKER as i32
+                                        $crate::__pgrx_c_bindings::BackendType::B_IO_WORKER as i32
                                     )
                                 )
                             )
@@ -1070,12 +1124,14 @@ macro_rules! AmIoWorkerProcess {
                                     $crate::__pgrx_c_generated::EnumIdentity_34713727133be8f7574405853c61a88219dcfd07258a250036597fe2e414c866,
                                     $crate::__pgrx_c_macros::CUnsignedInt,
                                     u32
-                                >>(::core::ptr::addr_of_mut!($crate::MyBackendType))
+                                >>(
+                                ::core::ptr::addr_of_mut!($crate::__pgrx_c_bindings::MyBackendType)
+                            )
                         )
                     ),
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                            $crate::BackendType::B_IO_WORKER as i32
+                            $crate::__pgrx_c_bindings::BackendType::B_IO_WORKER as i32
                         )
                     )
                 )
@@ -1097,8 +1153,8 @@ macro_rules! AmIoWorkerProcess {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -1151,12 +1207,14 @@ macro_rules! AmLogicalSlotSyncWorkerProcess {
                                     $crate::__pgrx_c_generated::EnumIdentity_34713727133be8f7574405853c61a88219dcfd07258a250036597fe2e414c866,
                                     $crate::__pgrx_c_macros::CUnsignedInt,
                                     u32
-                                >>(::core::ptr::addr_of_mut!($crate::MyBackendType))
+                                >>(
+                                ::core::ptr::addr_of_mut!($crate::__pgrx_c_bindings::MyBackendType)
+                            )
                         )
                     ),
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                            $crate::BackendType::B_SLOTSYNC_WORKER as i32
+                            $crate::__pgrx_c_bindings::BackendType::B_SLOTSYNC_WORKER as i32
                         )
                     )
                 )
@@ -1195,12 +1253,16 @@ macro_rules! AmLogicalSlotSyncWorkerProcess {
                                                 $crate::__pgrx_c_generated::EnumIdentity_34713727133be8f7574405853c61a88219dcfd07258a250036597fe2e414c866,
                                                 $crate::__pgrx_c_macros::CUnsignedInt,
                                                 u32
-                                            >>(::core::ptr::addr_of_mut!($crate::MyBackendType))
+                                            >>(
+                                            ::core::ptr::addr_of_mut!(
+                                                $crate::__pgrx_c_bindings::MyBackendType
+                                            )
+                                        )
                                     )
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                        $crate::BackendType::B_SLOTSYNC_WORKER as i32
+                                        $crate::__pgrx_c_bindings::BackendType::B_SLOTSYNC_WORKER as i32
                                     )
                                 )
                             )
@@ -1226,12 +1288,14 @@ macro_rules! AmLogicalSlotSyncWorkerProcess {
                                     $crate::__pgrx_c_generated::EnumIdentity_34713727133be8f7574405853c61a88219dcfd07258a250036597fe2e414c866,
                                     $crate::__pgrx_c_macros::CUnsignedInt,
                                     u32
-                                >>(::core::ptr::addr_of_mut!($crate::MyBackendType))
+                                >>(
+                                ::core::ptr::addr_of_mut!($crate::__pgrx_c_bindings::MyBackendType)
+                            )
                         )
                     ),
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                            $crate::BackendType::B_SLOTSYNC_WORKER as i32
+                            $crate::__pgrx_c_bindings::BackendType::B_SLOTSYNC_WORKER as i32
                         )
                     )
                 )
@@ -1253,8 +1317,8 @@ macro_rules! AmLogicalSlotSyncWorkerProcess {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -1307,12 +1371,14 @@ macro_rules! AmRegularBackendProcess {
                                     $crate::__pgrx_c_generated::EnumIdentity_34713727133be8f7574405853c61a88219dcfd07258a250036597fe2e414c866,
                                     $crate::__pgrx_c_macros::CUnsignedInt,
                                     u32
-                                >>(::core::ptr::addr_of_mut!($crate::MyBackendType))
+                                >>(
+                                ::core::ptr::addr_of_mut!($crate::__pgrx_c_bindings::MyBackendType)
+                            )
                         )
                     ),
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                            $crate::BackendType::B_BACKEND as i32
+                            $crate::__pgrx_c_bindings::BackendType::B_BACKEND as i32
                         )
                     )
                 )
@@ -1351,12 +1417,16 @@ macro_rules! AmRegularBackendProcess {
                                                 $crate::__pgrx_c_generated::EnumIdentity_34713727133be8f7574405853c61a88219dcfd07258a250036597fe2e414c866,
                                                 $crate::__pgrx_c_macros::CUnsignedInt,
                                                 u32
-                                            >>(::core::ptr::addr_of_mut!($crate::MyBackendType))
+                                            >>(
+                                            ::core::ptr::addr_of_mut!(
+                                                $crate::__pgrx_c_bindings::MyBackendType
+                                            )
+                                        )
                                     )
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                        $crate::BackendType::B_BACKEND as i32
+                                        $crate::__pgrx_c_bindings::BackendType::B_BACKEND as i32
                                     )
                                 )
                             )
@@ -1382,12 +1452,14 @@ macro_rules! AmRegularBackendProcess {
                                     $crate::__pgrx_c_generated::EnumIdentity_34713727133be8f7574405853c61a88219dcfd07258a250036597fe2e414c866,
                                     $crate::__pgrx_c_macros::CUnsignedInt,
                                     u32
-                                >>(::core::ptr::addr_of_mut!($crate::MyBackendType))
+                                >>(
+                                ::core::ptr::addr_of_mut!($crate::__pgrx_c_bindings::MyBackendType)
+                            )
                         )
                     ),
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                            $crate::BackendType::B_BACKEND as i32
+                            $crate::__pgrx_c_bindings::BackendType::B_BACKEND as i32
                         )
                     )
                 )
@@ -1409,8 +1481,8 @@ macro_rules! AmRegularBackendProcess {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -1468,13 +1540,19 @@ macro_rules! AmSpecialWorkerProcess {
                                                     $crate::__pgrx_c_generated::EnumIdentity_34713727133be8f7574405853c61a88219dcfd07258a250036597fe2e414c866,
                                                     $crate::__pgrx_c_macros::CUnsignedInt,
                                                     u32
-                                                >>(::core::ptr::addr_of_mut!($crate::MyBackendType))
+                                                >>(
+                                                ::core::ptr::addr_of_mut!(
+                                                    $crate::__pgrx_c_bindings::MyBackendType
+                                                )
+                                            )
                                         )
                                     ),
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::CValue::<
                                             $crate::__pgrx_c_macros::CInt
-                                        >::new($crate::BackendType::B_AUTOVAC_LAUNCHER as i32)
+                                        >::new(
+                                            $crate::__pgrx_c_bindings::BackendType::B_AUTOVAC_LAUNCHER as i32
+                                        )
                                     )
                                 )
                             )
@@ -1490,13 +1568,19 @@ macro_rules! AmSpecialWorkerProcess {
                                                     $crate::__pgrx_c_generated::EnumIdentity_34713727133be8f7574405853c61a88219dcfd07258a250036597fe2e414c866,
                                                     $crate::__pgrx_c_macros::CUnsignedInt,
                                                     u32
-                                                >>(::core::ptr::addr_of_mut!($crate::MyBackendType))
+                                                >>(
+                                                ::core::ptr::addr_of_mut!(
+                                                    $crate::__pgrx_c_bindings::MyBackendType
+                                                )
+                                            )
                                         )
                                     ),
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::CValue::<
                                             $crate::__pgrx_c_macros::CInt
-                                        >::new($crate::BackendType::B_SLOTSYNC_WORKER as i32)
+                                        >::new(
+                                            $crate::__pgrx_c_bindings::BackendType::B_SLOTSYNC_WORKER as i32
+                                        )
                                     )
                                 )
                             )
@@ -1555,7 +1639,7 @@ macro_rules! AmSpecialWorkerProcess {
                                                                 u32
                                                             >>(
                                                             ::core::ptr::addr_of_mut!(
-                                                                $crate::MyBackendType
+                                                                $crate::__pgrx_c_bindings::MyBackendType
                                                             )
                                                         )
                                                     )
@@ -1567,7 +1651,7 @@ macro_rules! AmSpecialWorkerProcess {
                                                     $crate::__pgrx_c_macros::CValue::<
                                                         $crate::__pgrx_c_macros::CInt
                                                     >::new(
-                                                        $crate::BackendType::B_AUTOVAC_LAUNCHER as i32
+                                                        $crate::__pgrx_c_bindings::BackendType::B_AUTOVAC_LAUNCHER as i32
                                                     )
                                                 )
                                             )
@@ -1592,7 +1676,7 @@ macro_rules! AmSpecialWorkerProcess {
                                                                 u32
                                                             >>(
                                                             ::core::ptr::addr_of_mut!(
-                                                                $crate::MyBackendType
+                                                                $crate::__pgrx_c_bindings::MyBackendType
                                                             )
                                                         )
                                                     )
@@ -1604,7 +1688,7 @@ macro_rules! AmSpecialWorkerProcess {
                                                     $crate::__pgrx_c_macros::CValue::<
                                                         $crate::__pgrx_c_macros::CInt
                                                     >::new(
-                                                        $crate::BackendType::B_SLOTSYNC_WORKER as i32
+                                                        $crate::__pgrx_c_bindings::BackendType::B_SLOTSYNC_WORKER as i32
                                                     )
                                                 )
                                             )
@@ -1643,13 +1727,19 @@ macro_rules! AmSpecialWorkerProcess {
                                                     $crate::__pgrx_c_generated::EnumIdentity_34713727133be8f7574405853c61a88219dcfd07258a250036597fe2e414c866,
                                                     $crate::__pgrx_c_macros::CUnsignedInt,
                                                     u32
-                                                >>(::core::ptr::addr_of_mut!($crate::MyBackendType))
+                                                >>(
+                                                ::core::ptr::addr_of_mut!(
+                                                    $crate::__pgrx_c_bindings::MyBackendType
+                                                )
+                                            )
                                         )
                                     ),
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::CValue::<
                                             $crate::__pgrx_c_macros::CInt
-                                        >::new($crate::BackendType::B_AUTOVAC_LAUNCHER as i32)
+                                        >::new(
+                                            $crate::__pgrx_c_bindings::BackendType::B_AUTOVAC_LAUNCHER as i32
+                                        )
                                     )
                                 )
                             )
@@ -1665,13 +1755,19 @@ macro_rules! AmSpecialWorkerProcess {
                                                     $crate::__pgrx_c_generated::EnumIdentity_34713727133be8f7574405853c61a88219dcfd07258a250036597fe2e414c866,
                                                     $crate::__pgrx_c_macros::CUnsignedInt,
                                                     u32
-                                                >>(::core::ptr::addr_of_mut!($crate::MyBackendType))
+                                                >>(
+                                                ::core::ptr::addr_of_mut!(
+                                                    $crate::__pgrx_c_bindings::MyBackendType
+                                                )
+                                            )
                                         )
                                     ),
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::CValue::<
                                             $crate::__pgrx_c_macros::CInt
-                                        >::new($crate::BackendType::B_SLOTSYNC_WORKER as i32)
+                                        >::new(
+                                            $crate::__pgrx_c_bindings::BackendType::B_SLOTSYNC_WORKER as i32
+                                        )
                                     )
                                 )
                             )
@@ -1700,8 +1796,8 @@ macro_rules! AmSpecialWorkerProcess {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -1754,12 +1850,14 @@ macro_rules! AmStartupProcess {
                                     $crate::__pgrx_c_generated::EnumIdentity_34713727133be8f7574405853c61a88219dcfd07258a250036597fe2e414c866,
                                     $crate::__pgrx_c_macros::CUnsignedInt,
                                     u32
-                                >>(::core::ptr::addr_of_mut!($crate::MyBackendType))
+                                >>(
+                                ::core::ptr::addr_of_mut!($crate::__pgrx_c_bindings::MyBackendType)
+                            )
                         )
                     ),
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                            $crate::BackendType::B_STARTUP as i32
+                            $crate::__pgrx_c_bindings::BackendType::B_STARTUP as i32
                         )
                     )
                 )
@@ -1798,12 +1896,16 @@ macro_rules! AmStartupProcess {
                                                 $crate::__pgrx_c_generated::EnumIdentity_34713727133be8f7574405853c61a88219dcfd07258a250036597fe2e414c866,
                                                 $crate::__pgrx_c_macros::CUnsignedInt,
                                                 u32
-                                            >>(::core::ptr::addr_of_mut!($crate::MyBackendType))
+                                            >>(
+                                            ::core::ptr::addr_of_mut!(
+                                                $crate::__pgrx_c_bindings::MyBackendType
+                                            )
+                                        )
                                     )
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                        $crate::BackendType::B_STARTUP as i32
+                                        $crate::__pgrx_c_bindings::BackendType::B_STARTUP as i32
                                     )
                                 )
                             )
@@ -1829,12 +1931,14 @@ macro_rules! AmStartupProcess {
                                     $crate::__pgrx_c_generated::EnumIdentity_34713727133be8f7574405853c61a88219dcfd07258a250036597fe2e414c866,
                                     $crate::__pgrx_c_macros::CUnsignedInt,
                                     u32
-                                >>(::core::ptr::addr_of_mut!($crate::MyBackendType))
+                                >>(
+                                ::core::ptr::addr_of_mut!($crate::__pgrx_c_bindings::MyBackendType)
+                            )
                         )
                     ),
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                            $crate::BackendType::B_STARTUP as i32
+                            $crate::__pgrx_c_bindings::BackendType::B_STARTUP as i32
                         )
                     )
                 )
@@ -1856,8 +1960,8 @@ macro_rules! AmStartupProcess {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -1910,12 +2014,14 @@ macro_rules! AmWalReceiverProcess {
                                     $crate::__pgrx_c_generated::EnumIdentity_34713727133be8f7574405853c61a88219dcfd07258a250036597fe2e414c866,
                                     $crate::__pgrx_c_macros::CUnsignedInt,
                                     u32
-                                >>(::core::ptr::addr_of_mut!($crate::MyBackendType))
+                                >>(
+                                ::core::ptr::addr_of_mut!($crate::__pgrx_c_bindings::MyBackendType)
+                            )
                         )
                     ),
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                            $crate::BackendType::B_WAL_RECEIVER as i32
+                            $crate::__pgrx_c_bindings::BackendType::B_WAL_RECEIVER as i32
                         )
                     )
                 )
@@ -1954,12 +2060,16 @@ macro_rules! AmWalReceiverProcess {
                                                 $crate::__pgrx_c_generated::EnumIdentity_34713727133be8f7574405853c61a88219dcfd07258a250036597fe2e414c866,
                                                 $crate::__pgrx_c_macros::CUnsignedInt,
                                                 u32
-                                            >>(::core::ptr::addr_of_mut!($crate::MyBackendType))
+                                            >>(
+                                            ::core::ptr::addr_of_mut!(
+                                                $crate::__pgrx_c_bindings::MyBackendType
+                                            )
+                                        )
                                     )
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                        $crate::BackendType::B_WAL_RECEIVER as i32
+                                        $crate::__pgrx_c_bindings::BackendType::B_WAL_RECEIVER as i32
                                     )
                                 )
                             )
@@ -1985,12 +2095,14 @@ macro_rules! AmWalReceiverProcess {
                                     $crate::__pgrx_c_generated::EnumIdentity_34713727133be8f7574405853c61a88219dcfd07258a250036597fe2e414c866,
                                     $crate::__pgrx_c_macros::CUnsignedInt,
                                     u32
-                                >>(::core::ptr::addr_of_mut!($crate::MyBackendType))
+                                >>(
+                                ::core::ptr::addr_of_mut!($crate::__pgrx_c_bindings::MyBackendType)
+                            )
                         )
                     ),
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                            $crate::BackendType::B_WAL_RECEIVER as i32
+                            $crate::__pgrx_c_bindings::BackendType::B_WAL_RECEIVER as i32
                         )
                     )
                 )
@@ -2012,8 +2124,8 @@ macro_rules! AmWalReceiverProcess {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -2066,12 +2178,14 @@ macro_rules! AmWalSenderProcess {
                                     $crate::__pgrx_c_generated::EnumIdentity_34713727133be8f7574405853c61a88219dcfd07258a250036597fe2e414c866,
                                     $crate::__pgrx_c_macros::CUnsignedInt,
                                     u32
-                                >>(::core::ptr::addr_of_mut!($crate::MyBackendType))
+                                >>(
+                                ::core::ptr::addr_of_mut!($crate::__pgrx_c_bindings::MyBackendType)
+                            )
                         )
                     ),
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                            $crate::BackendType::B_WAL_SENDER as i32
+                            $crate::__pgrx_c_bindings::BackendType::B_WAL_SENDER as i32
                         )
                     )
                 )
@@ -2110,12 +2224,16 @@ macro_rules! AmWalSenderProcess {
                                                 $crate::__pgrx_c_generated::EnumIdentity_34713727133be8f7574405853c61a88219dcfd07258a250036597fe2e414c866,
                                                 $crate::__pgrx_c_macros::CUnsignedInt,
                                                 u32
-                                            >>(::core::ptr::addr_of_mut!($crate::MyBackendType))
+                                            >>(
+                                            ::core::ptr::addr_of_mut!(
+                                                $crate::__pgrx_c_bindings::MyBackendType
+                                            )
+                                        )
                                     )
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                        $crate::BackendType::B_WAL_SENDER as i32
+                                        $crate::__pgrx_c_bindings::BackendType::B_WAL_SENDER as i32
                                     )
                                 )
                             )
@@ -2141,12 +2259,14 @@ macro_rules! AmWalSenderProcess {
                                     $crate::__pgrx_c_generated::EnumIdentity_34713727133be8f7574405853c61a88219dcfd07258a250036597fe2e414c866,
                                     $crate::__pgrx_c_macros::CUnsignedInt,
                                     u32
-                                >>(::core::ptr::addr_of_mut!($crate::MyBackendType))
+                                >>(
+                                ::core::ptr::addr_of_mut!($crate::__pgrx_c_bindings::MyBackendType)
+                            )
                         )
                     ),
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                            $crate::BackendType::B_WAL_SENDER as i32
+                            $crate::__pgrx_c_bindings::BackendType::B_WAL_SENDER as i32
                         )
                     )
                 )
@@ -2168,8 +2288,8 @@ macro_rules! AmWalSenderProcess {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -2222,12 +2342,14 @@ macro_rules! AmWalSummarizerProcess {
                                     $crate::__pgrx_c_generated::EnumIdentity_34713727133be8f7574405853c61a88219dcfd07258a250036597fe2e414c866,
                                     $crate::__pgrx_c_macros::CUnsignedInt,
                                     u32
-                                >>(::core::ptr::addr_of_mut!($crate::MyBackendType))
+                                >>(
+                                ::core::ptr::addr_of_mut!($crate::__pgrx_c_bindings::MyBackendType)
+                            )
                         )
                     ),
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                            $crate::BackendType::B_WAL_SUMMARIZER as i32
+                            $crate::__pgrx_c_bindings::BackendType::B_WAL_SUMMARIZER as i32
                         )
                     )
                 )
@@ -2266,12 +2388,16 @@ macro_rules! AmWalSummarizerProcess {
                                                 $crate::__pgrx_c_generated::EnumIdentity_34713727133be8f7574405853c61a88219dcfd07258a250036597fe2e414c866,
                                                 $crate::__pgrx_c_macros::CUnsignedInt,
                                                 u32
-                                            >>(::core::ptr::addr_of_mut!($crate::MyBackendType))
+                                            >>(
+                                            ::core::ptr::addr_of_mut!(
+                                                $crate::__pgrx_c_bindings::MyBackendType
+                                            )
+                                        )
                                     )
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                        $crate::BackendType::B_WAL_SUMMARIZER as i32
+                                        $crate::__pgrx_c_bindings::BackendType::B_WAL_SUMMARIZER as i32
                                     )
                                 )
                             )
@@ -2297,12 +2423,14 @@ macro_rules! AmWalSummarizerProcess {
                                     $crate::__pgrx_c_generated::EnumIdentity_34713727133be8f7574405853c61a88219dcfd07258a250036597fe2e414c866,
                                     $crate::__pgrx_c_macros::CUnsignedInt,
                                     u32
-                                >>(::core::ptr::addr_of_mut!($crate::MyBackendType))
+                                >>(
+                                ::core::ptr::addr_of_mut!($crate::__pgrx_c_bindings::MyBackendType)
+                            )
                         )
                     ),
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                            $crate::BackendType::B_WAL_SUMMARIZER as i32
+                            $crate::__pgrx_c_bindings::BackendType::B_WAL_SUMMARIZER as i32
                         )
                     )
                 )
@@ -2324,8 +2452,8 @@ macro_rules! AmWalSummarizerProcess {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -2378,12 +2506,14 @@ macro_rules! AmWalWriterProcess {
                                     $crate::__pgrx_c_generated::EnumIdentity_34713727133be8f7574405853c61a88219dcfd07258a250036597fe2e414c866,
                                     $crate::__pgrx_c_macros::CUnsignedInt,
                                     u32
-                                >>(::core::ptr::addr_of_mut!($crate::MyBackendType))
+                                >>(
+                                ::core::ptr::addr_of_mut!($crate::__pgrx_c_bindings::MyBackendType)
+                            )
                         )
                     ),
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                            $crate::BackendType::B_WAL_WRITER as i32
+                            $crate::__pgrx_c_bindings::BackendType::B_WAL_WRITER as i32
                         )
                     )
                 )
@@ -2422,12 +2552,16 @@ macro_rules! AmWalWriterProcess {
                                                 $crate::__pgrx_c_generated::EnumIdentity_34713727133be8f7574405853c61a88219dcfd07258a250036597fe2e414c866,
                                                 $crate::__pgrx_c_macros::CUnsignedInt,
                                                 u32
-                                            >>(::core::ptr::addr_of_mut!($crate::MyBackendType))
+                                            >>(
+                                            ::core::ptr::addr_of_mut!(
+                                                $crate::__pgrx_c_bindings::MyBackendType
+                                            )
+                                        )
                                     )
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                        $crate::BackendType::B_WAL_WRITER as i32
+                                        $crate::__pgrx_c_bindings::BackendType::B_WAL_WRITER as i32
                                     )
                                 )
                             )
@@ -2453,12 +2587,14 @@ macro_rules! AmWalWriterProcess {
                                     $crate::__pgrx_c_generated::EnumIdentity_34713727133be8f7574405853c61a88219dcfd07258a250036597fe2e414c866,
                                     $crate::__pgrx_c_macros::CUnsignedInt,
                                     u32
-                                >>(::core::ptr::addr_of_mut!($crate::MyBackendType))
+                                >>(
+                                ::core::ptr::addr_of_mut!($crate::__pgrx_c_bindings::MyBackendType)
+                            )
                         )
                     ),
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                            $crate::BackendType::B_WAL_WRITER as i32
+                            $crate::__pgrx_c_bindings::BackendType::B_WAL_WRITER as i32
                         )
                     )
                 )
@@ -2480,8 +2616,8 @@ macro_rules! AmWalWriterProcess {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -2549,7 +2685,7 @@ macro_rules! CHECK_FOR_INTERRUPTS {
                                                                 $crate::__pgrx_c_macros::CInt
                                                             >>(
                                                             ::core::ptr::addr_of_mut!(
-                                                                $crate::InterruptPending
+                                                                $crate::__pgrx_c_bindings::InterruptPending
                                                             )
                                                         )
                                                     )
@@ -2587,7 +2723,7 @@ macro_rules! CHECK_FOR_INTERRUPTS {
             ) {
                 {
                     let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                        $crate::ProcessInterrupts()
+                        $crate::__pgrx_c_bindings::ProcessInterrupts()
                     );
                 };
             }
@@ -2617,8 +2753,8 @@ macro_rules! CHECK_FOR_INTERRUPTS {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -2684,7 +2820,9 @@ macro_rules! END_CRIT_SECTION {
                         $crate::__pgrx_c_macros::expression::place::<
                             $crate::__pgrx_c_macros::expression::CVolatile<
                                 $crate::__pgrx_c_macros::CUnsignedInt
-                            >>(::core::ptr::addr_of_mut!($crate::CritSectionCount)),
+                            >>(
+                            ::core::ptr::addr_of_mut!($crate::__pgrx_c_bindings::CritSectionCount)
+                        ),
                         $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(1i32),
                         |__pgrx_old,
                         __pgrx_rhs| $crate::__pgrx_c_macros::expression::sub::<
@@ -2721,8 +2859,8 @@ macro_rules! END_CRIT_SECTION {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -2772,7 +2910,7 @@ macro_rules! GetProcessingMode {
                         $crate::__pgrx_c_generated::EnumIdentity_4ca2c285256867fc75bff1837ce284413ffccb46ace5b6874312e1e3e72f6f3c,
                         $crate::__pgrx_c_macros::CUnsignedInt,
                         u32
-                    >>(::core::ptr::addr_of_mut!($crate::Mode))
+                    >>(::core::ptr::addr_of_mut!($crate::__pgrx_c_bindings::Mode))
             )
         )
     };
@@ -2785,7 +2923,7 @@ macro_rules! GetProcessingMode {
                 $crate::__pgrx_c_generated::EnumIdentity_4ca2c285256867fc75bff1837ce284413ffccb46ace5b6874312e1e3e72f6f3c,
                 $crate::__pgrx_c_macros::CUnsignedInt,
                 u32
-            >>(::core::ptr::addr_of_mut!($crate::Mode))
+            >>(::core::ptr::addr_of_mut!($crate::__pgrx_c_bindings::Mode))
     };
     (@__pgrx_c_place; $($raw:tt)*) => {
         $crate::GetProcessingMode!(@__pgrx_emit_place; $($raw)*)
@@ -2796,7 +2934,7 @@ macro_rules! GetProcessingMode {
                 $crate::__pgrx_c_generated::EnumIdentity_4ca2c285256867fc75bff1837ce284413ffccb46ace5b6874312e1e3e72f6f3c,
                 $crate::__pgrx_c_macros::CUnsignedInt,
                 u32
-            >>(::core::ptr::addr_of_mut!($crate::Mode))
+            >>(::core::ptr::addr_of_mut!($crate::__pgrx_c_bindings::Mode))
     };
     (@__pgrx_c_read_place; $($raw:tt)*) => {
         $crate::GetProcessingMode!(@__pgrx_emit_read_place; $($raw)*)
@@ -2814,7 +2952,7 @@ macro_rules! GetProcessingMode {
                                 $crate::__pgrx_c_generated::EnumIdentity_4ca2c285256867fc75bff1837ce284413ffccb46ace5b6874312e1e3e72f6f3c,
                                 $crate::__pgrx_c_macros::CUnsignedInt,
                                 u32
-                            >>(::core::ptr::addr_of_mut!($crate::Mode))
+                            >>(::core::ptr::addr_of_mut!($crate::__pgrx_c_bindings::Mode))
                     }
                 )
             } else {
@@ -2834,7 +2972,7 @@ macro_rules! GetProcessingMode {
                             $crate::__pgrx_c_generated::EnumIdentity_4ca2c285256867fc75bff1837ce284413ffccb46ace5b6874312e1e3e72f6f3c,
                             $crate::__pgrx_c_macros::CUnsignedInt,
                             u32
-                        >>(::core::ptr::addr_of_mut!($crate::Mode))
+                        >>(::core::ptr::addr_of_mut!($crate::__pgrx_c_bindings::Mode))
                 )
             );
         }
@@ -2854,8 +2992,8 @@ macro_rules! GetProcessingMode {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -2908,7 +3046,11 @@ macro_rules! HOLD_CANCEL_INTERRUPTS {
                     $crate::__pgrx_c_macros::expression::place::<
                         $crate::__pgrx_c_macros::expression::CVolatile<
                             $crate::__pgrx_c_macros::CUnsignedInt
-                        >>(::core::ptr::addr_of_mut!($crate::QueryCancelHoldoffCount)),
+                        >>(
+                        ::core::ptr::addr_of_mut!(
+                            $crate::__pgrx_c_bindings::QueryCancelHoldoffCount
+                        )
+                    ),
                     $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(1i32),
                     |__pgrx_old,
                     __pgrx_rhs| $crate::__pgrx_c_macros::expression::add::<
@@ -2948,7 +3090,11 @@ macro_rules! HOLD_CANCEL_INTERRUPTS {
                                 $crate::__pgrx_c_macros::expression::place::<
                                     $crate::__pgrx_c_macros::expression::CVolatile<
                                         $crate::__pgrx_c_macros::CUnsignedInt
-                                    >>(::core::ptr::addr_of_mut!($crate::QueryCancelHoldoffCount)),
+                                    >>(
+                                    ::core::ptr::addr_of_mut!(
+                                        $crate::__pgrx_c_bindings::QueryCancelHoldoffCount
+                                    )
+                                ),
                                 $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
                                     1i32
                                 ),
@@ -2977,7 +3123,11 @@ macro_rules! HOLD_CANCEL_INTERRUPTS {
                     $crate::__pgrx_c_macros::expression::place::<
                         $crate::__pgrx_c_macros::expression::CVolatile<
                             $crate::__pgrx_c_macros::CUnsignedInt
-                        >>(::core::ptr::addr_of_mut!($crate::QueryCancelHoldoffCount)),
+                        >>(
+                        ::core::ptr::addr_of_mut!(
+                            $crate::__pgrx_c_bindings::QueryCancelHoldoffCount
+                        )
+                    ),
                     $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(1i32),
                     |__pgrx_old,
                     __pgrx_rhs| $crate::__pgrx_c_macros::expression::add::<
@@ -3004,8 +3154,8 @@ macro_rules! HOLD_CANCEL_INTERRUPTS {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -3058,7 +3208,9 @@ macro_rules! HOLD_INTERRUPTS {
                     $crate::__pgrx_c_macros::expression::place::<
                         $crate::__pgrx_c_macros::expression::CVolatile<
                             $crate::__pgrx_c_macros::CUnsignedInt
-                        >>(::core::ptr::addr_of_mut!($crate::InterruptHoldoffCount)),
+                        >>(
+                        ::core::ptr::addr_of_mut!($crate::__pgrx_c_bindings::InterruptHoldoffCount)
+                    ),
                     $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(1i32),
                     |__pgrx_old,
                     __pgrx_rhs| $crate::__pgrx_c_macros::expression::add::<
@@ -3098,7 +3250,11 @@ macro_rules! HOLD_INTERRUPTS {
                                 $crate::__pgrx_c_macros::expression::place::<
                                     $crate::__pgrx_c_macros::expression::CVolatile<
                                         $crate::__pgrx_c_macros::CUnsignedInt
-                                    >>(::core::ptr::addr_of_mut!($crate::InterruptHoldoffCount)),
+                                    >>(
+                                    ::core::ptr::addr_of_mut!(
+                                        $crate::__pgrx_c_bindings::InterruptHoldoffCount
+                                    )
+                                ),
                                 $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
                                     1i32
                                 ),
@@ -3127,7 +3283,9 @@ macro_rules! HOLD_INTERRUPTS {
                     $crate::__pgrx_c_macros::expression::place::<
                         $crate::__pgrx_c_macros::expression::CVolatile<
                             $crate::__pgrx_c_macros::CUnsignedInt
-                        >>(::core::ptr::addr_of_mut!($crate::InterruptHoldoffCount)),
+                        >>(
+                        ::core::ptr::addr_of_mut!($crate::__pgrx_c_bindings::InterruptHoldoffCount)
+                    ),
                     $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(1i32),
                     |__pgrx_old,
                     __pgrx_rhs| $crate::__pgrx_c_macros::expression::add::<
@@ -3154,8 +3312,8 @@ macro_rules! HOLD_INTERRUPTS {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -3217,7 +3375,7 @@ macro_rules! INTERRUPTS_CAN_BE_PROCESSED {
                                                             $crate::__pgrx_c_macros::CUnsignedInt
                                                         >>(
                                                         ::core::ptr::addr_of_mut!(
-                                                            $crate::InterruptHoldoffCount
+                                                            $crate::__pgrx_c_bindings::InterruptHoldoffCount
                                                         )
                                                     )
                                                 )
@@ -3247,7 +3405,7 @@ macro_rules! INTERRUPTS_CAN_BE_PROCESSED {
                                                             $crate::__pgrx_c_macros::CUnsignedInt
                                                         >>(
                                                         ::core::ptr::addr_of_mut!(
-                                                            $crate::CritSectionCount
+                                                            $crate::__pgrx_c_bindings::CritSectionCount
                                                         )
                                                     )
                                                 )
@@ -3281,7 +3439,7 @@ macro_rules! INTERRUPTS_CAN_BE_PROCESSED {
                                                 $crate::__pgrx_c_macros::CUnsignedInt
                                             >>(
                                             ::core::ptr::addr_of_mut!(
-                                                $crate::QueryCancelHoldoffCount
+                                                $crate::__pgrx_c_bindings::QueryCancelHoldoffCount
                                             )
                                         )
                                     )
@@ -3350,7 +3508,7 @@ macro_rules! INTERRUPTS_CAN_BE_PROCESSED {
                                                                         $crate::__pgrx_c_macros::CUnsignedInt
                                                                     >>(
                                                                     ::core::ptr::addr_of_mut!(
-                                                                        $crate::InterruptHoldoffCount
+                                                                        $crate::__pgrx_c_bindings::InterruptHoldoffCount
                                                                     )
                                                                 )
                                                             )
@@ -3383,7 +3541,7 @@ macro_rules! INTERRUPTS_CAN_BE_PROCESSED {
                                                                         $crate::__pgrx_c_macros::CUnsignedInt
                                                                     >>(
                                                                     ::core::ptr::addr_of_mut!(
-                                                                        $crate::CritSectionCount
+                                                                        $crate::__pgrx_c_bindings::CritSectionCount
                                                                     )
                                                                 )
                                                             )
@@ -3420,7 +3578,7 @@ macro_rules! INTERRUPTS_CAN_BE_PROCESSED {
                                                             $crate::__pgrx_c_macros::CUnsignedInt
                                                         >>(
                                                         ::core::ptr::addr_of_mut!(
-                                                            $crate::QueryCancelHoldoffCount
+                                                            $crate::__pgrx_c_bindings::QueryCancelHoldoffCount
                                                         )
                                                     )
                                                 )
@@ -3474,7 +3632,7 @@ macro_rules! INTERRUPTS_CAN_BE_PROCESSED {
                                                             $crate::__pgrx_c_macros::CUnsignedInt
                                                         >>(
                                                         ::core::ptr::addr_of_mut!(
-                                                            $crate::InterruptHoldoffCount
+                                                            $crate::__pgrx_c_bindings::InterruptHoldoffCount
                                                         )
                                                     )
                                                 )
@@ -3504,7 +3662,7 @@ macro_rules! INTERRUPTS_CAN_BE_PROCESSED {
                                                             $crate::__pgrx_c_macros::CUnsignedInt
                                                         >>(
                                                         ::core::ptr::addr_of_mut!(
-                                                            $crate::CritSectionCount
+                                                            $crate::__pgrx_c_bindings::CritSectionCount
                                                         )
                                                     )
                                                 )
@@ -3538,7 +3696,7 @@ macro_rules! INTERRUPTS_CAN_BE_PROCESSED {
                                                 $crate::__pgrx_c_macros::CUnsignedInt
                                             >>(
                                             ::core::ptr::addr_of_mut!(
-                                                $crate::QueryCancelHoldoffCount
+                                                $crate::__pgrx_c_bindings::QueryCancelHoldoffCount
                                             )
                                         )
                                     )
@@ -3576,8 +3734,8 @@ macro_rules! INTERRUPTS_CAN_BE_PROCESSED {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -3641,7 +3799,9 @@ macro_rules! INTERRUPTS_PENDING_CONDITION {
                                                 $crate::__pgrx_c_macros::expression::CVolatile<
                                                     $crate::__pgrx_c_macros::CInt
                                                 >>(
-                                                ::core::ptr::addr_of_mut!($crate::InterruptPending)
+                                                ::core::ptr::addr_of_mut!(
+                                                    $crate::__pgrx_c_bindings::InterruptPending
+                                                )
                                             )
                                         )
                                     )
@@ -3688,7 +3848,11 @@ macro_rules! INTERRUPTS_PENDING_CONDITION {
                                         $crate::__pgrx_c_macros::expression::place::<
                                             $crate::__pgrx_c_macros::expression::CVolatile<
                                                 $crate::__pgrx_c_macros::CInt
-                                            >>(::core::ptr::addr_of_mut!($crate::InterruptPending))
+                                            >>(
+                                            ::core::ptr::addr_of_mut!(
+                                                $crate::__pgrx_c_bindings::InterruptPending
+                                            )
+                                        )
                                     )
                                 )
                             ),
@@ -3730,7 +3894,11 @@ macro_rules! INTERRUPTS_PENDING_CONDITION {
                                         $crate::__pgrx_c_macros::expression::place::<
                                             $crate::__pgrx_c_macros::expression::CVolatile<
                                                 $crate::__pgrx_c_macros::CInt
-                                            >>(::core::ptr::addr_of_mut!($crate::InterruptPending))
+                                            >>(
+                                            ::core::ptr::addr_of_mut!(
+                                                $crate::__pgrx_c_bindings::InterruptPending
+                                            )
+                                        )
                                     )
                                 )
                             ),
@@ -3787,7 +3955,7 @@ macro_rules! INTERRUPTS_PENDING_CONDITION {
                                                                 $crate::__pgrx_c_macros::CInt
                                                             >>(
                                                             ::core::ptr::addr_of_mut!(
-                                                                $crate::InterruptPending
+                                                                $crate::__pgrx_c_bindings::InterruptPending
                                                             )
                                                         )
                                                     )
@@ -3848,7 +4016,9 @@ macro_rules! INTERRUPTS_PENDING_CONDITION {
                                                 $crate::__pgrx_c_macros::expression::CVolatile<
                                                     $crate::__pgrx_c_macros::CInt
                                                 >>(
-                                                ::core::ptr::addr_of_mut!($crate::InterruptPending)
+                                                ::core::ptr::addr_of_mut!(
+                                                    $crate::__pgrx_c_bindings::InterruptPending
+                                                )
                                             )
                                         )
                                     )
@@ -3894,8 +4064,8 @@ macro_rules! INTERRUPTS_PENDING_CONDITION {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -3948,13 +4118,13 @@ macro_rules! IsBootstrapProcessingMode {
                                     $crate::__pgrx_c_generated::EnumIdentity_4ca2c285256867fc75bff1837ce284413ffccb46ace5b6874312e1e3e72f6f3c,
                                     $crate::__pgrx_c_macros::CUnsignedInt,
                                     u32
-                                >>(::core::ptr::addr_of_mut!($crate::Mode))
+                                >>(::core::ptr::addr_of_mut!($crate::__pgrx_c_bindings::Mode))
                         )
                     ),
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::expression::null_constant(
                             $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                $crate::ProcessingMode::BootstrapProcessing as i32
+                                $crate::__pgrx_c_bindings::ProcessingMode::BootstrapProcessing as i32
                             )
                         )
                     )
@@ -3994,14 +4164,20 @@ macro_rules! IsBootstrapProcessingMode {
                                                 $crate::__pgrx_c_generated::EnumIdentity_4ca2c285256867fc75bff1837ce284413ffccb46ace5b6874312e1e3e72f6f3c,
                                                 $crate::__pgrx_c_macros::CUnsignedInt,
                                                 u32
-                                            >>(::core::ptr::addr_of_mut!($crate::Mode))
+                                            >>(
+                                            ::core::ptr::addr_of_mut!(
+                                                $crate::__pgrx_c_bindings::Mode
+                                            )
+                                        )
                                     )
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::null_constant(
                                         $crate::__pgrx_c_macros::CValue::<
                                             $crate::__pgrx_c_macros::CInt
-                                        >::new($crate::ProcessingMode::BootstrapProcessing as i32)
+                                        >::new(
+                                            $crate::__pgrx_c_bindings::ProcessingMode::BootstrapProcessing as i32
+                                        )
                                     )
                                 )
                             )
@@ -4027,13 +4203,13 @@ macro_rules! IsBootstrapProcessingMode {
                                     $crate::__pgrx_c_generated::EnumIdentity_4ca2c285256867fc75bff1837ce284413ffccb46ace5b6874312e1e3e72f6f3c,
                                     $crate::__pgrx_c_macros::CUnsignedInt,
                                     u32
-                                >>(::core::ptr::addr_of_mut!($crate::Mode))
+                                >>(::core::ptr::addr_of_mut!($crate::__pgrx_c_bindings::Mode))
                         )
                     ),
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::expression::null_constant(
                             $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                $crate::ProcessingMode::BootstrapProcessing as i32
+                                $crate::__pgrx_c_bindings::ProcessingMode::BootstrapProcessing as i32
                             )
                         )
                     )
@@ -4056,8 +4232,8 @@ macro_rules! IsBootstrapProcessingMode {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -4091,7 +4267,7 @@ macro_rules! __pgrx_c_args_IsExternalConnectionBackend {
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_IsExternalConnectionBackend!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
@@ -4099,7 +4275,7 @@ macro_rules! __pgrx_c_args_IsExternalConnectionBackend {
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_IsExternalConnectionBackend!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -4108,7 +4284,7 @@ macro_rules! __pgrx_c_args_IsExternalConnectionBackend {
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
         $crate::__pgrx_c_args_IsExternalConnectionBackend!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
@@ -4134,17 +4310,17 @@ macro_rules! __pgrx_c_args_IsExternalConnectionBackend {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_IsExternalConnectionBackend!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:tt) => {
         $crate::__pgrx_c_args_IsExternalConnectionBackend!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_IsExternalConnectionBackend!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -4171,13 +4347,13 @@ macro_rules! __pgrx_c_args_IsExternalConnectionBackend {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_IsExternalConnectionBackend!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:tt, $($rest:tt)*) => {
         $crate::__pgrx_c_args_IsExternalConnectionBackend!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -4230,7 +4406,7 @@ macro_rules! IsExternalConnectionBackend {
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                        $crate::BackendType::B_BACKEND as i32
+                                        $crate::__pgrx_c_bindings::BackendType::B_BACKEND as i32
                                     )
                                 )
                             )
@@ -4243,7 +4419,7 @@ macro_rules! IsExternalConnectionBackend {
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                        $crate::BackendType::B_WAL_SENDER as i32
+                                        $crate::__pgrx_c_bindings::BackendType::B_WAL_SENDER as i32
                                     )
                                 )
                             )
@@ -4305,7 +4481,9 @@ macro_rules! IsExternalConnectionBackend {
                                             >(
                                                 $crate::__pgrx_c_macros::CValue::<
                                                     $crate::__pgrx_c_macros::CInt
-                                                >::new($crate::BackendType::B_BACKEND as i32)
+                                                >::new(
+                                                    $crate::__pgrx_c_bindings::BackendType::B_BACKEND as i32
+                                                )
                                             )
                                         )
                                     )
@@ -4327,7 +4505,9 @@ macro_rules! IsExternalConnectionBackend {
                                             >(
                                                 $crate::__pgrx_c_macros::CValue::<
                                                     $crate::__pgrx_c_macros::CInt
-                                                >::new($crate::BackendType::B_WAL_SENDER as i32)
+                                                >::new(
+                                                    $crate::__pgrx_c_bindings::BackendType::B_WAL_SENDER as i32
+                                                )
                                             )
                                         )
                                     )
@@ -4360,7 +4540,7 @@ macro_rules! IsExternalConnectionBackend {
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                        $crate::BackendType::B_BACKEND as i32
+                                        $crate::__pgrx_c_bindings::BackendType::B_BACKEND as i32
                                     )
                                 )
                             )
@@ -4373,7 +4553,7 @@ macro_rules! IsExternalConnectionBackend {
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                        $crate::BackendType::B_WAL_SENDER as i32
+                                        $crate::__pgrx_c_bindings::BackendType::B_WAL_SENDER as i32
                                     )
                                 )
                             )
@@ -4399,8 +4579,8 @@ macro_rules! IsExternalConnectionBackend {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -4453,12 +4633,12 @@ macro_rules! IsInitProcessingMode {
                                     $crate::__pgrx_c_generated::EnumIdentity_4ca2c285256867fc75bff1837ce284413ffccb46ace5b6874312e1e3e72f6f3c,
                                     $crate::__pgrx_c_macros::CUnsignedInt,
                                     u32
-                                >>(::core::ptr::addr_of_mut!($crate::Mode))
+                                >>(::core::ptr::addr_of_mut!($crate::__pgrx_c_bindings::Mode))
                         )
                     ),
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                            $crate::ProcessingMode::InitProcessing as i32
+                            $crate::__pgrx_c_bindings::ProcessingMode::InitProcessing as i32
                         )
                     )
                 )
@@ -4497,12 +4677,16 @@ macro_rules! IsInitProcessingMode {
                                                 $crate::__pgrx_c_generated::EnumIdentity_4ca2c285256867fc75bff1837ce284413ffccb46ace5b6874312e1e3e72f6f3c,
                                                 $crate::__pgrx_c_macros::CUnsignedInt,
                                                 u32
-                                            >>(::core::ptr::addr_of_mut!($crate::Mode))
+                                            >>(
+                                            ::core::ptr::addr_of_mut!(
+                                                $crate::__pgrx_c_bindings::Mode
+                                            )
+                                        )
                                     )
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                        $crate::ProcessingMode::InitProcessing as i32
+                                        $crate::__pgrx_c_bindings::ProcessingMode::InitProcessing as i32
                                     )
                                 )
                             )
@@ -4528,12 +4712,12 @@ macro_rules! IsInitProcessingMode {
                                     $crate::__pgrx_c_generated::EnumIdentity_4ca2c285256867fc75bff1837ce284413ffccb46ace5b6874312e1e3e72f6f3c,
                                     $crate::__pgrx_c_macros::CUnsignedInt,
                                     u32
-                                >>(::core::ptr::addr_of_mut!($crate::Mode))
+                                >>(::core::ptr::addr_of_mut!($crate::__pgrx_c_bindings::Mode))
                         )
                     ),
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                            $crate::ProcessingMode::InitProcessing as i32
+                            $crate::__pgrx_c_bindings::ProcessingMode::InitProcessing as i32
                         )
                     )
                 )
@@ -4555,8 +4739,8 @@ macro_rules! IsInitProcessingMode {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -4609,12 +4793,12 @@ macro_rules! IsNormalProcessingMode {
                                     $crate::__pgrx_c_generated::EnumIdentity_4ca2c285256867fc75bff1837ce284413ffccb46ace5b6874312e1e3e72f6f3c,
                                     $crate::__pgrx_c_macros::CUnsignedInt,
                                     u32
-                                >>(::core::ptr::addr_of_mut!($crate::Mode))
+                                >>(::core::ptr::addr_of_mut!($crate::__pgrx_c_bindings::Mode))
                         )
                     ),
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                            $crate::ProcessingMode::NormalProcessing as i32
+                            $crate::__pgrx_c_bindings::ProcessingMode::NormalProcessing as i32
                         )
                     )
                 )
@@ -4653,12 +4837,16 @@ macro_rules! IsNormalProcessingMode {
                                                 $crate::__pgrx_c_generated::EnumIdentity_4ca2c285256867fc75bff1837ce284413ffccb46ace5b6874312e1e3e72f6f3c,
                                                 $crate::__pgrx_c_macros::CUnsignedInt,
                                                 u32
-                                            >>(::core::ptr::addr_of_mut!($crate::Mode))
+                                            >>(
+                                            ::core::ptr::addr_of_mut!(
+                                                $crate::__pgrx_c_bindings::Mode
+                                            )
+                                        )
                                     )
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                        $crate::ProcessingMode::NormalProcessing as i32
+                                        $crate::__pgrx_c_bindings::ProcessingMode::NormalProcessing as i32
                                     )
                                 )
                             )
@@ -4684,12 +4872,12 @@ macro_rules! IsNormalProcessingMode {
                                     $crate::__pgrx_c_generated::EnumIdentity_4ca2c285256867fc75bff1837ce284413ffccb46ace5b6874312e1e3e72f6f3c,
                                     $crate::__pgrx_c_macros::CUnsignedInt,
                                     u32
-                                >>(::core::ptr::addr_of_mut!($crate::Mode))
+                                >>(::core::ptr::addr_of_mut!($crate::__pgrx_c_bindings::Mode))
                         )
                     ),
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                            $crate::ProcessingMode::NormalProcessing as i32
+                            $crate::__pgrx_c_bindings::ProcessingMode::NormalProcessing as i32
                         )
                     )
                 )
@@ -4711,8 +4899,8 @@ macro_rules! IsNormalProcessingMode {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -4778,7 +4966,11 @@ macro_rules! RESUME_CANCEL_INTERRUPTS {
                         $crate::__pgrx_c_macros::expression::place::<
                             $crate::__pgrx_c_macros::expression::CVolatile<
                                 $crate::__pgrx_c_macros::CUnsignedInt
-                            >>(::core::ptr::addr_of_mut!($crate::QueryCancelHoldoffCount)),
+                            >>(
+                            ::core::ptr::addr_of_mut!(
+                                $crate::__pgrx_c_bindings::QueryCancelHoldoffCount
+                            )
+                        ),
                         $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(1i32),
                         |__pgrx_old,
                         __pgrx_rhs| $crate::__pgrx_c_macros::expression::sub::<
@@ -4815,8 +5007,8 @@ macro_rules! RESUME_CANCEL_INTERRUPTS {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -4882,7 +5074,11 @@ macro_rules! RESUME_INTERRUPTS {
                         $crate::__pgrx_c_macros::expression::place::<
                             $crate::__pgrx_c_macros::expression::CVolatile<
                                 $crate::__pgrx_c_macros::CUnsignedInt
-                            >>(::core::ptr::addr_of_mut!($crate::InterruptHoldoffCount)),
+                            >>(
+                            ::core::ptr::addr_of_mut!(
+                                $crate::__pgrx_c_bindings::InterruptHoldoffCount
+                            )
+                        ),
                         $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(1i32),
                         |__pgrx_old,
                         __pgrx_rhs| $crate::__pgrx_c_macros::expression::sub::<
@@ -4919,8 +5115,8 @@ macro_rules! RESUME_INTERRUPTS {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -4973,7 +5169,7 @@ macro_rules! START_CRIT_SECTION {
                     $crate::__pgrx_c_macros::expression::place::<
                         $crate::__pgrx_c_macros::expression::CVolatile<
                             $crate::__pgrx_c_macros::CUnsignedInt
-                        >>(::core::ptr::addr_of_mut!($crate::CritSectionCount)),
+                        >>(::core::ptr::addr_of_mut!($crate::__pgrx_c_bindings::CritSectionCount)),
                     $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(1i32),
                     |__pgrx_old,
                     __pgrx_rhs| $crate::__pgrx_c_macros::expression::add::<
@@ -5013,7 +5209,11 @@ macro_rules! START_CRIT_SECTION {
                                 $crate::__pgrx_c_macros::expression::place::<
                                     $crate::__pgrx_c_macros::expression::CVolatile<
                                         $crate::__pgrx_c_macros::CUnsignedInt
-                                    >>(::core::ptr::addr_of_mut!($crate::CritSectionCount)),
+                                    >>(
+                                    ::core::ptr::addr_of_mut!(
+                                        $crate::__pgrx_c_bindings::CritSectionCount
+                                    )
+                                ),
                                 $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
                                     1i32
                                 ),
@@ -5042,7 +5242,7 @@ macro_rules! START_CRIT_SECTION {
                     $crate::__pgrx_c_macros::expression::place::<
                         $crate::__pgrx_c_macros::expression::CVolatile<
                             $crate::__pgrx_c_macros::CUnsignedInt
-                        >>(::core::ptr::addr_of_mut!($crate::CritSectionCount)),
+                        >>(::core::ptr::addr_of_mut!($crate::__pgrx_c_bindings::CritSectionCount)),
                     $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(1i32),
                     |__pgrx_old,
                     __pgrx_rhs| $crate::__pgrx_c_macros::expression::add::<
@@ -5069,8 +5269,8 @@ macro_rules! START_CRIT_SECTION {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -5097,20 +5297,24 @@ macro_rules! __pgrx_c_args_SetProcessingMode {
         $crate::__pgrx_c_args_SetProcessingMode!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_SetProcessingMode!(@p1 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_SetProcessingMode!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_SetProcessingMode!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_SetProcessingMode!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SetProcessingMode!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SetProcessingMode!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -5118,7 +5322,9 @@ macro_rules! __pgrx_c_args_SetProcessingMode {
         $crate::__pgrx_c_args_SetProcessingMode!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_SetProcessingMode!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_SetProcessingMode!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -5140,14 +5346,18 @@ macro_rules! __pgrx_c_args_SetProcessingMode {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_SetProcessingMode!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_SetProcessingMode!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_SetProcessingMode!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_SetProcessingMode!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_SetProcessingMode!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -5174,13 +5384,13 @@ macro_rules! __pgrx_c_args_SetProcessingMode {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SetProcessingMode!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SetProcessingMode!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -5244,7 +5454,7 @@ macro_rules! SetProcessingMode {
                                 $crate::__pgrx_c_generated::EnumIdentity_4ca2c285256867fc75bff1837ce284413ffccb46ace5b6874312e1e3e72f6f3c,
                                 $crate::__pgrx_c_macros::CUnsignedInt,
                                 u32
-                            >>(::core::ptr::addr_of_mut!($crate::Mode)),
+                            >>(::core::ptr::addr_of_mut!($crate::__pgrx_c_bindings::Mode)),
                         (
                             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                 $crate::__pgrx_c_operand!(@value [true]; $mode)

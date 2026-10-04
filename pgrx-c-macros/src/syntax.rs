@@ -166,6 +166,22 @@ pub struct ExpressionNode {
     pub tokens: TokenRange,
 }
 
+/// Compiler-expanded diagnostic text interleaved with unevaluated formal spelling.
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(tag = "kind", rename_all = "snake_case")]
+pub enum StringPart {
+    /// Decoded ASCII bytes supplied by the original C stringification template.
+    Text {
+        /// Original decoded bytes, without an added terminating zero.
+        bytes: Vec<u8>,
+    },
+    /// The outer Rust invocation's raw tokens for one original C formal.
+    Parameter {
+        /// Formal index whose spelling is retained without evaluating its value.
+        index: usize,
+    },
+}
+
 /// Keep evaluated operands, places, type operands, and structural designators distinct until semantic
 /// lowering.
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
@@ -183,6 +199,20 @@ pub enum ExpressionKind {
         /// Original C spelling, magnitude, radix, and suffix before target-dependent type selection.
         literal: IntegerLiteral,
     },
+    /// An ordinary narrow C string, including its complete terminating-zero array.
+    StringLiteral {
+        /// Decoded ASCII execution bytes, concatenated before one final zero byte.
+        bytes: Vec<u8>,
+    },
+    /// A dependency's compiler-owned stringification template for a native diagnostic.
+    Stringification {
+        /// Text and raw formal spelling; this node never evaluates a formal.
+        parts: Vec<StringPart>,
+    },
+    /// The generated macro's Rust source invocation filename, with static C string storage.
+    InvocationFile,
+    /// The generated macro's Rust source invocation line, checked as a C int.
+    InvocationLine,
     /// An original named constant/declaration or later explicit caller capture awaiting analysis.
     Identifier {
         /// Original identifier spelling awaiting declaration lookup or explicit caller-capture
@@ -493,6 +523,8 @@ pub(crate) enum SyntaxErrorKind {
     InvalidExpression,
     /// The literal lies outside the verified ordinary integer/basic-character subset.
     UnsupportedLiteral,
+    /// Stringification lacks the bounded diagnostic or complete-array contract.
+    Stringification,
     /// Pointer syntax or operand compatibility lacks the required semantic proof.
     PointerOperation,
     /// Assignment or update lacks a supported place/evaluation contract.
@@ -527,6 +559,8 @@ struct Parser<'a, F> {
     position: usize,
     /// Formal-name to index lookup so every occurrence refers to the same operand hole.
     parameters: HashMap<&'a str, usize>,
+    /// Only a prepared compiler expansion can contain fresh formal markers in strings.
+    formal_strings: bool,
     /// Formals independently established as type operands before ambiguous expressions are reparsed.
     type_parameters: HashSet<usize>,
     /// Potential formal applications that need independent type evidence before becoming casts.
@@ -545,7 +579,7 @@ pub(crate) fn parse_expression(
     parameters: &[String],
     is_type: impl Fn(&str) -> bool,
 ) -> Result<Expression, SyntaxError> {
-    parse(tokens, parameters, is_type, false)
+    parse(tokens, parameters, is_type, false, false)
 }
 
 /// Parse an expression or a complete structured statement replacement.
@@ -554,7 +588,16 @@ pub(crate) fn parse_replacement(
     parameters: &[String],
     is_type: impl Fn(&str) -> bool,
 ) -> Result<Expression, SyntaxError> {
-    parse(tokens, parameters, is_type, true)
+    parse(tokens, parameters, is_type, true, false)
+}
+
+/// Parse compiler-expanded strings with fresh formal markers and preserved C templates.
+pub(crate) fn parse_expanded_replacement(
+    tokens: &[Token],
+    parameters: &[String],
+    is_type: impl Fn(&str) -> bool,
+) -> Result<Expression, SyntaxError> {
+    parse(tokens, parameters, is_type, true, true)
 }
 
 /// Initialize the bounded parser, resolve supported type holes, and require a complete expression or
@@ -564,6 +607,7 @@ fn parse(
     parameters: &[String],
     is_type: impl Fn(&str) -> bool,
     allow_statements: bool,
+    formal_strings: bool,
 ) -> Result<Expression, SyntaxError> {
     if tokens.len() > MAX_TOKENS {
         return Err(SyntaxError {
@@ -581,6 +625,7 @@ fn parse(
             .collect(),
         position: 0,
         parameters: parameters.iter().enumerate().map(|(i, name)| (name.as_str(), i)).collect(),
+        formal_strings,
         type_parameters: HashSet::new(),
         ambiguous_casts: HashSet::new(),
         nodes: Vec::new(),
@@ -938,6 +983,45 @@ impl<F: Fn(&str) -> bool> Parser<'_, F> {
             _ => {}
         }
         if lexeme.token.kind == TokenKind::Literal {
+            if spelling.starts_with('"') {
+                let mut bytes = Vec::new();
+                let literal_start = self.position;
+                while let Some(lexeme) = self.tokens.get(self.position)
+                    && lexeme.token.kind == TokenKind::Literal
+                    && lexeme.token.spelling.starts_with('"')
+                {
+                    bytes.extend(parse_string_literal(&lexeme.token.spelling).map_err(
+                        |message| self.error(SyntaxErrorKind::UnsupportedLiteral, message),
+                    )?);
+                    self.position += 1;
+                }
+                let end = self.tokens[self.position - 1].index + 1;
+                if self.formal_strings {
+                    let parts = string_parts(&bytes, &self.parameters);
+                    if parts.iter().any(|part| matches!(part, StringPart::Parameter { .. })) {
+                        if self.position != literal_start + 1 {
+                            return Err(self.error(
+                                SyntaxErrorKind::Stringification,
+                                "operand-dependent diagnostic strings cannot promise a concatenated C array extent",
+                            ));
+                        }
+                        return Ok(self.push(
+                            ExpressionKind::Stringification { parts },
+                            TokenRange { start, end },
+                        ));
+                    }
+                }
+                bytes.push(0);
+                return Ok(
+                    self.push(ExpressionKind::StringLiteral { bytes }, TokenRange { start, end })
+                );
+            }
+            if ["L\"", "u\"", "U\"", "u8\""].iter().any(|prefix| spelling.starts_with(prefix)) {
+                return Err(self.error(
+                    SyntaxErrorKind::UnsupportedLiteral,
+                    "prefixed strings require an encoding and C array-element contract",
+                ));
+            }
             let literal = parse_literal(spelling)
                 .map_err(|message| self.error(SyntaxErrorKind::UnsupportedLiteral, message))?;
             self.position += 1;
@@ -988,7 +1072,11 @@ impl<F: Fn(&str) -> bool> Parser<'_, F> {
                     "unsupported statement or caller control-flow shape",
                 ));
             }
-            let kind = ExpressionKind::Identifier { name: spelling.into() };
+            let kind = match spelling {
+                "__FILE__" => ExpressionKind::InvocationFile,
+                "__LINE__" => ExpressionKind::InvocationLine,
+                _ => ExpressionKind::Identifier { name: spelling.into() },
+            };
             self.position += 1;
             return Ok(self.push(kind, TokenRange { start, end: start + 1 }));
         }
@@ -1307,6 +1395,107 @@ fn parse_literal(spelling: &str) -> Result<IntegerLiteral, String> {
     parse_integer_literal(spelling)
 }
 
+/// Decode the bounded ordinary-string grammar; Clang remains responsible for preprocessing.
+fn parse_string_literal(spelling: &str) -> Result<Vec<u8>, String> {
+    let body = spelling
+        .strip_prefix('"')
+        .and_then(|body| body.strip_suffix('"'))
+        .ok_or_else(|| "unterminated ordinary string literal".to_string())?;
+    if !body.is_ascii() {
+        return Err("non-ASCII ordinary strings require an execution-encoding contract".into());
+    }
+    let mut decoded = Vec::with_capacity(body.len());
+    let mut bytes = body.bytes().peekable();
+    while let Some(byte) = bytes.next() {
+        let value = if byte != b'\\' {
+            if !(byte.is_ascii_alphanumeric() || b" !#%&()*+,-./:;<=>?[\\]^_{|}~'".contains(&byte))
+            {
+                return Err("string character is outside the portable basic execution set".into());
+            }
+            u32::from(byte)
+        } else {
+            match bytes.next() {
+                Some(first @ b'0'..=b'7') => {
+                    let mut value = u32::from(first - b'0');
+                    for _ in 0..2 {
+                        let Some(&next @ b'0'..=b'7') = bytes.peek() else { break };
+                        bytes.next();
+                        value = value * 8 + u32::from(next - b'0');
+                    }
+                    value
+                }
+                Some(b'x') => {
+                    let mut value = 0u32;
+                    let mut digits = 0usize;
+                    while let Some(&next) = bytes.peek()
+                        && next.is_ascii_hexdigit()
+                    {
+                        bytes.next();
+                        digits += 1;
+                        value = value
+                            .checked_mul(16)
+                            .and_then(|value| value.checked_add((next as char).to_digit(16)?))
+                            .ok_or_else(|| "string escape exceeds the ASCII range".to_string())?;
+                    }
+                    if digits == 0 {
+                        return Err("hexadecimal string escape requires a digit".into());
+                    }
+                    value
+                }
+                Some(b'\'') => 39,
+                Some(b'"') => 34,
+                Some(b'?') => 63,
+                Some(b'\\') => 92,
+                Some(b'a') => 7,
+                Some(b'b') => 8,
+                Some(b'f') => 12,
+                Some(b'n') => 10,
+                Some(b'r') => 13,
+                Some(b't') => 9,
+                Some(b'v') => 11,
+                Some(b'u' | b'U') => {
+                    return Err("universal string escapes require an encoding contract".into());
+                }
+                _ => return Err("unknown or incomplete string escape".into()),
+            }
+        };
+        if value > 127 {
+            return Err("string escape exceeds the supported ASCII range 0..=127".into());
+        }
+        decoded.push(value as u8);
+    }
+    Ok(decoded)
+}
+
+/// Split complete fresh identifier markers without interpreting ordinary literal text as a formal.
+fn string_parts(bytes: &[u8], parameters: &HashMap<&str, usize>) -> Vec<StringPart> {
+    let identifier = |byte: u8| byte.is_ascii_alphanumeric() || byte == b'_';
+    let mut parts = Vec::new();
+    let mut start = 0;
+    let mut position = 0;
+    while position < bytes.len() {
+        let formal = parameters.iter().find(|(name, _)| {
+            bytes[position..].starts_with(name.as_bytes())
+                && (position == 0 || !identifier(bytes[position - 1]))
+                && bytes.get(position + name.len()).is_none_or(|byte| !identifier(*byte))
+        });
+        if let Some((name, &index)) = formal {
+            if start < position {
+                parts.push(StringPart::Text { bytes: bytes[start..position].to_vec() });
+            }
+            parts.push(StringPart::Parameter { index });
+            position += name.len();
+            start = position;
+        } else {
+            position += 1;
+        }
+    }
+    if start < bytes.len() {
+        parts.push(StringPart::Text { bytes: bytes[start..].to_vec() });
+    }
+    parts
+}
+
 // C ordinary single-character constants have int type, including numeric escapes.
 // Only the basic execution set and positive ASCII escape range are decoded here;
 // the independently verified compilation profile establishes their actual C values.
@@ -1429,6 +1618,51 @@ mod tests {
                 spelling: spelling.into(),
             })
             .collect()
+    }
+
+    /// Only compiler-expanded fresh identifiers become diagnostic spelling holes.
+    #[test]
+    fn diagnostic_templates_preserve_text_and_reject_unknown_array_extent() {
+        let marker = "__fresh_parameter_0";
+        let literal =
+            |spelling: &str| Token { kind: TokenKind::Literal, spelling: spelling.into() };
+        let original =
+            parse_replacement(&[literal("\"value\"")], &["value".into()], |_| false).unwrap();
+        assert!(matches!(
+            &original.nodes[original.root].kind,
+            ExpressionKind::StringLiteral { bytes } if bytes == b"value\0"
+        ));
+        let expanded = parse_expanded_replacement(
+            &[literal(&format!("\"(({marker}) != 0) and {marker}\""))],
+            &[marker.into()],
+            |_| false,
+        )
+        .unwrap();
+        assert_eq!(
+            expanded.nodes[expanded.root].kind,
+            ExpressionKind::Stringification {
+                parts: vec![
+                    StringPart::Text { bytes: b"((".to_vec() },
+                    StringPart::Parameter { index: 0 },
+                    StringPart::Text { bytes: b") != 0) and ".to_vec() },
+                    StringPart::Parameter { index: 0 },
+                ]
+            }
+        );
+        let boundary = parse_expanded_replacement(
+            &[literal(&format!("\"x{marker} {marker}suffix\""))],
+            &[marker.into()],
+            |_| false,
+        )
+        .unwrap();
+        assert!(matches!(boundary.nodes[boundary.root].kind, ExpressionKind::StringLiteral { .. }));
+        let adjacent = parse_expanded_replacement(
+            &[literal(&format!("\"{marker}\"")), literal("\" suffix\"")],
+            &[marker.into()],
+            |_| false,
+        )
+        .unwrap_err();
+        assert_eq!(adjacent.kind, SyntaxErrorKind::Stringification);
     }
 
     /// Checks precedence and left associativity.

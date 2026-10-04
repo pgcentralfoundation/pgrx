@@ -31,6 +31,7 @@ mod constants;
 /// instrumentation.
 mod paste;
 pub(crate) use constants::retain_integer_constants;
+pub use constants::{ObjectIntegerConstants, probe_integer_object_constants};
 
 /// Probe-only diagnostic policy that accepts source markers and makes invalid token pasting an error.
 const PROBE_PRAGMAS: &str = "\n\n#pragma clang diagnostic ignored \"-Wgnu-line-marker\"\n#pragma clang diagnostic error \"-Winvalid-token-paste\"\n";
@@ -144,6 +145,8 @@ pub enum ExpansionSkipCode {
     /// The selected definition has no function-style parameter list and is retained only as expansion
     /// context.
     NotFunctionLike,
+    /// An explicitly selected object expression is defined as a function-style macro.
+    NotObjectLike,
     /// The original macro signature cannot establish an ordinary bounded formal list.
     MalformedParameters,
     /// An open macro or callable argument tail falls outside the supported substitution contract.
@@ -235,6 +238,17 @@ pub(crate) fn prepare_inner(
     names: &[impl AsRef<str>],
     limits: ExpansionLimits,
 ) -> Result<ExpansionBatch, FrontendError> {
+    prepare_inner_with_objects(scanner, frontend, names, &BTreeSet::new(), limits)
+}
+
+/// Prepare function roots and an explicitly selected set of object-expression roots.
+pub(crate) fn prepare_inner_with_objects(
+    scanner: &MacroScanner,
+    frontend: &FrontendOutput,
+    names: &[impl AsRef<str>],
+    objects: &BTreeSet<String>,
+    limits: ExpansionLimits,
+) -> Result<ExpansionBatch, FrontendError> {
     let mut results = BTreeMap::new();
     let mut discovered_dependencies = BTreeMap::new();
     let mut dependencies = Dependencies { frontend, nodes: HashMap::new(), tokens: 0, limits };
@@ -289,13 +303,23 @@ pub(crate) fn prepare_inner(
             );
             continue;
         };
-        if active.definition.kind != MacroKind::FunctionLike {
+        let object = objects.contains(&name);
+        let expected = if object { MacroKind::ObjectLike } else { MacroKind::FunctionLike };
+        if active.definition.kind != expected {
             record_skip(
                 &mut results,
                 &name,
                 skip(
-                    ExpansionSkipCode::NotFunctionLike,
-                    "only function-like macros are primary expansion candidates",
+                    if object {
+                        ExpansionSkipCode::NotObjectLike
+                    } else {
+                        ExpansionSkipCode::NotFunctionLike
+                    },
+                    if object {
+                        "selected object expression is not an object-like macro"
+                    } else {
+                        "only function-like macros are primary expansion candidates"
+                    },
                     Some(&name),
                     frontend,
                 ),
@@ -329,6 +353,23 @@ pub(crate) fn prepare_inner(
                 continue;
             }
         };
+        if active.definition.tokens[body_start..]
+            .iter()
+            .any(|token| matches!(token.spelling.as_str(), "#" | "%:"))
+        {
+            record_skip(
+                &mut results,
+                &name,
+                skip(
+                    ExpansionSkipCode::Stringification,
+                    "root stringification requires a C preprocessing operand-spelling contract",
+                    Some(&name),
+                    frontend,
+                ),
+                frontend,
+            );
+            continue;
+        }
         let (closure, pastes) = match dependencies.closure(active_name) {
             Ok(closure) => closure,
             Err(reason) => {
@@ -346,7 +387,10 @@ pub(crate) fn prepare_inner(
         let end = format!("{prefix}end_{index}");
         let tag = probe_tag(&directory.0, index)?;
         // GNU markers without flags reset inherited system-header status.
-        let invocation = format!("# 1 {tag:?}\n{begin}\n{name}({})\n{end}\n", markers.join(","));
+        let invocation = format!(
+            "# 1 {tag:?}\n{begin}\n{}\n{end}\n",
+            symbolic_invocation(&active.definition, &markers)
+        );
         if source_bytes.saturating_add(invocation.len()) > limits.source_bytes {
             record_skip(
                 &mut results,
@@ -494,7 +538,7 @@ pub(crate) fn prepare_inner(
             );
             continue;
         };
-        let body = definition.tokens.into_iter().skip(1).collect::<Vec<_>>();
+        let mut body = definition.tokens.into_iter().skip(1).collect::<Vec<_>>();
         token_count = token_count.saturating_add(body.len());
         if body.len() > limits.macro_tokens || token_count > limits.total_tokens {
             record_skip(
@@ -516,6 +560,28 @@ pub(crate) fn prepare_inner(
             .enumerate()
             .map(|(index, marker)| (marker.as_str(), index))
             .collect::<HashMap<_, _>>();
+        // Clang owns dependency stringification and its surrounding template.
+        // Current formal markers can retain Rust invocation spelling later;
+        // invocation builtins inside a string still have no such contract.
+        if body.iter().any(|token| {
+            token.kind == TokenKind::Literal
+                && token.spelling.contains(&prefix)
+                && !formal_string(&token.spelling, &item.markers, &prefix)
+        }) {
+            record_skip(
+                &mut results,
+                &item.definition.name,
+                skip(
+                    ExpansionSkipCode::Stringification,
+                    "dependency stringification contains unsupported invocation context",
+                    Some(&item.definition.name),
+                    frontend,
+                ),
+                frontend,
+            );
+            continue;
+        }
+        restore_invocation_diagnostics(&mut body, &prefix);
         let mut occurrences = Vec::new();
         for (index, token) in body.iter().enumerate() {
             if let Some(&parameter) = markers.get(token.spelling.as_str()) {
@@ -523,7 +589,10 @@ pub(crate) fn prepare_inner(
             }
         }
         if body.iter().any(|token| {
-            token.spelling.contains(&prefix) && !markers.contains_key(token.spelling.as_str())
+            token.spelling.contains(&prefix)
+                && !markers.contains_key(token.spelling.as_str())
+                && !(token.kind == TokenKind::Literal
+                    && formal_string(&token.spelling, &item.markers, &prefix))
         }) {
             record_skip(
                 &mut results,
@@ -554,7 +623,9 @@ pub(crate) fn prepare_inner(
                     .skip(index + 1)
                     .find(|next| next.kind != TokenKind::Comment)
                     .is_some_and(|next| next.spelling == "(");
-            (dynamic_builtin(&token.spelling) || reserved_call).then_some(token)
+            ((dynamic_builtin(&token.spelling) && !invocation_diagnostic(&token.spelling))
+                || reserved_call)
+                .then_some(token)
         }) {
             record_skip(
                 &mut results,
@@ -603,6 +674,28 @@ pub(crate) fn prepare_inner(
         );
     }
     Ok(ExpansionBatch { results, discovered_dependencies, inputs })
+}
+
+/// Recognize strings containing only this invocation's fresh formal markers.
+/// Context markers remain refusals, and syntax analysis still validates literal
+/// decoding and the native consumer before admitting diagnostic substitution.
+fn formal_string(spelling: &str, markers: &[String], prefix: &str) -> bool {
+    let mut remaining = spelling;
+    while let Some(position) = remaining.find(prefix) {
+        let candidate = &remaining[position..];
+        let boundary = |byte: u8| !byte.is_ascii_alphanumeric() && byte != b'_';
+        if position != 0 && !boundary(remaining.as_bytes()[position - 1]) {
+            return false;
+        }
+        let Some(marker) = markers.iter().find(|marker| {
+            candidate.starts_with(marker.as_str())
+                && candidate.as_bytes().get(marker.len()).is_none_or(|byte| boundary(*byte))
+        }) else {
+            return false;
+        };
+        remaining = &candidate[marker.len()..];
+    }
+    true
 }
 
 /// Reject changes to recorded compiler environment values before combining observations across
@@ -691,15 +784,18 @@ fn preprocess_prepared<'a>(
         }
         let mut source = original.to_vec();
         source.extend_from_slice(PROBE_PRAGMAS.as_bytes());
+        // Preserve invocation diagnostics as symbolic nodes. Redefinition is
+        // confined to this verified probe, after the original header; generated
+        // code supplies the Rust invocation's filename and line instead.
+        source.extend_from_slice(invocation_diagnostic_preamble(&namespace(frontend)).as_bytes());
         let mut locations = BTreeMap::new();
         for &index in &pending {
             let item = &prepared[index];
             let tag = probe_tag(directory, index)?;
             let invocation = format!(
-                "# 1 {tag:?}\n{}\n{}({})\n{}\n",
+                "# 1 {tag:?}\n{}\n{}\n{}\n",
                 item.begin,
-                item.definition.name,
-                item.markers.join(","),
+                symbolic_invocation(item.definition, &item.markers),
                 item.end
             );
             if source.len().saturating_add(invocation.len()) > limits.source_bytes {
@@ -1141,12 +1237,12 @@ fn inspect_dependency<'a>(frontend: &'a FrontendOutput, name: &'a str) -> Depend
                 continue;
             }
             "#" | "%:" => {
-                return reject(
-                    ExpansionSkipCode::Stringification,
-                    "dependency uses stringification",
-                );
+                // Clang will stringify the substituted dependency operand. The
+                // resulting literal is admitted only when no symbolic marker
+                // survives inside its spelling.
+                continue;
             }
-            spelling if dynamic_builtin(spelling) => {
+            spelling if dynamic_builtin(spelling) && !invocation_diagnostic(spelling) => {
                 return reject(
                     ExpansionSkipCode::DynamicBuiltin,
                     "dependency uses an invocation-sensitive preprocessing builtin",
@@ -1204,7 +1300,45 @@ fn dynamic_builtin(name: &str) -> bool {
                 | "__is_identifier"
                 | "__building_module"
                 | "__MODULE__"
+                | "__func__"
+                | "__FUNCTION__"
+                | "__PRETTY_FUNCTION__"
         )
+}
+
+/// Invocation-sensitive diagnostics with an explicit Rust source-location contract.
+fn invocation_diagnostic(name: &str) -> bool {
+    matches!(name, "__FILE__" | "__LINE__")
+}
+
+/// Preserve the original object/function invocation shape in independent compiler probes.
+pub(super) fn symbolic_invocation(definition: &MacroDefinition, parameters: &[String]) -> String {
+    match definition.kind {
+        MacroKind::ObjectLike => definition.name.clone(),
+        MacroKind::FunctionLike => format!("{}({})", definition.name, parameters.join(",")),
+    }
+}
+
+/// Defer file/line values to the Rust source invocation in probe-only preprocessing.
+pub(super) fn invocation_diagnostic_preamble(prefix: &str) -> String {
+    format!(
+        "\n#pragma clang diagnostic ignored \"-Wbuiltin-macro-redefined\"\n\
+         #undef __FILE__\n#define __FILE__ {prefix}invocation_file\n\
+         #undef __LINE__\n#define __LINE__ {prefix}invocation_line\n"
+    )
+}
+
+/// Restore diagnostic nodes after a compiler pass without altering literal spelling.
+pub(super) fn restore_invocation_diagnostics(tokens: &mut [crate::Token], prefix: &str) {
+    let file = format!("{prefix}invocation_file");
+    let line = format!("{prefix}invocation_line");
+    for token in tokens {
+        if token.spelling == file {
+            token.spelling = "__FILE__".into();
+        } else if token.spelling == line {
+            token.spelling = "__LINE__".into();
+        }
+    }
 }
 
 /// Parse a macro signature and locate its replacement body without adding probe-side argument
@@ -1212,6 +1346,9 @@ fn dynamic_builtin(name: &str) -> bool {
 fn parameters(
     definition: &MacroDefinition,
 ) -> Result<(Vec<String>, usize), (ExpansionSkipCode, String)> {
+    if definition.kind == MacroKind::ObjectLike {
+        return Ok((Vec::new(), 1));
+    }
     let tokens = &definition.tokens;
     let mut index = 1;
     while tokens.get(index).is_some_and(|token| token.kind == TokenKind::Comment) {

@@ -127,14 +127,19 @@ pub(crate) fn probe(
             }
             pure.push(allowed);
         }
-        // Successful analysis already proved the flat function-macro signature.
-        let body_start = expansion
-            .definition
-            .tokens
-            .iter()
-            .position(|token| token.spelling == ")")
-            .expect("candidate function-macro signature")
-            + 1;
+        // Object roots have no formal signature. Function roots already have a
+        // proved flat signature before this independent source-level ICE probe.
+        let body_start = if expansion.definition.kind == crate::MacroKind::ObjectLike {
+            1
+        } else {
+            expansion
+                .definition
+                .tokens
+                .iter()
+                .position(|token| token.spelling == ")")
+                .expect("candidate function-macro signature")
+                + 1
+        };
         let tokens = &expansion.definition.tokens[body_start..];
         for (index, node) in expression.syntax.nodes.iter().enumerate() {
             if !pure[index] || enclosed[index] {

@@ -5,8 +5,8 @@ This code is generated for documentation purposes, so that it is easy to referen
 // C macros from heaptoast.h.
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -37,21 +37,23 @@ macro_rules! __pgrx_c_args_MaximumBytesPerTuple {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
         $crate::__pgrx_c_args_MaximumBytesPerTuple!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_MaximumBytesPerTuple!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_MaximumBytesPerTuple!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_MaximumBytesPerTuple!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_MaximumBytesPerTuple!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -59,7 +61,9 @@ macro_rules! __pgrx_c_args_MaximumBytesPerTuple {
         $crate::__pgrx_c_args_MaximumBytesPerTuple!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_MaximumBytesPerTuple!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_MaximumBytesPerTuple!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -81,14 +85,18 @@ macro_rules! __pgrx_c_args_MaximumBytesPerTuple {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_MaximumBytesPerTuple!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_MaximumBytesPerTuple!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_MaximumBytesPerTuple!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_MaximumBytesPerTuple!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_MaximumBytesPerTuple!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -115,13 +123,13 @@ macro_rules! __pgrx_c_args_MaximumBytesPerTuple {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_MaximumBytesPerTuple!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_MaximumBytesPerTuple!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -184,7 +192,7 @@ macro_rules! MaximumBytesPerTuple {
                                         >(
                                             $crate::__pgrx_c_macros::CValue::<
                                                 $crate::__pgrx_c_macros::CInt
-                                            >::new($crate::BLCKSZ as i32)
+                                            >::new($crate::__pgrx_c_bindings::BLCKSZ as i32)
                                         ),
                                         (
                                             $crate::__pgrx_c_macros::expression::profile_value::<
@@ -229,7 +237,7 @@ macro_rules! MaximumBytesPerTuple {
                                                                                             >(
                                                                                                 $crate::__pgrx_c_macros::expression::offset_of::<
                                                                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                        $crate::PageHeaderData
+                                                                                                        $crate::__pgrx_c_bindings::PageHeaderData
                                                                                                     >,
                                                                                                     $crate::__pgrx_c_field_marker!(
                                                                                                         @path;
@@ -266,7 +274,7 @@ macro_rules! MaximumBytesPerTuple {
                                                                                                 >(
                                                                                                     $crate::__pgrx_c_macros::expression::size_of::<
                                                                                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                            $crate::ItemIdData
+                                                                                                            $crate::__pgrx_c_bindings::ItemIdData
                                                                                                         >>()
                                                                                                 )
                                                                                             )
@@ -295,7 +303,7 @@ macro_rules! MaximumBytesPerTuple {
                                                                                     $crate::__pgrx_c_macros::CValue::<
                                                                                         $crate::__pgrx_c_macros::CInt
                                                                                     >::new(
-                                                                                        $crate::MAXIMUM_ALIGNOF as i32
+                                                                                        $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                                     )
                                                                                 )
                                                                             ),
@@ -346,7 +354,7 @@ macro_rules! MaximumBytesPerTuple {
                                                                                             $crate::__pgrx_c_macros::CValue::<
                                                                                                 $crate::__pgrx_c_macros::CInt
                                                                                             >::new(
-                                                                                                $crate::MAXIMUM_ALIGNOF as i32
+                                                                                                $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                                             )
                                                                                         )
                                                                                     ),
@@ -409,7 +417,9 @@ macro_rules! MaximumBytesPerTuple {
                                                         >(
                                                             $crate::__pgrx_c_macros::CValue::<
                                                                 $crate::__pgrx_c_macros::CInt
-                                                            >::new($crate::BLCKSZ as i32)
+                                                            >::new(
+                                                                $crate::__pgrx_c_bindings::BLCKSZ as i32
+                                                            )
                                                         ),
                                                         (
                                                             $crate::__pgrx_c_macros::expression::profile_value::<
@@ -454,7 +464,7 @@ macro_rules! MaximumBytesPerTuple {
                                                                                                             >(
                                                                                                                 $crate::__pgrx_c_macros::expression::offset_of::<
                                                                                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                                        $crate::PageHeaderData
+                                                                                                                        $crate::__pgrx_c_bindings::PageHeaderData
                                                                                                                     >,
                                                                                                                     $crate::__pgrx_c_field_marker!(
                                                                                                                         @path;
@@ -491,7 +501,7 @@ macro_rules! MaximumBytesPerTuple {
                                                                                                                 >(
                                                                                                                     $crate::__pgrx_c_macros::expression::size_of::<
                                                                                                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                                            $crate::ItemIdData
+                                                                                                                            $crate::__pgrx_c_bindings::ItemIdData
                                                                                                                         >>()
                                                                                                                 )
                                                                                                             )
@@ -520,7 +530,7 @@ macro_rules! MaximumBytesPerTuple {
                                                                                                     $crate::__pgrx_c_macros::CValue::<
                                                                                                         $crate::__pgrx_c_macros::CInt
                                                                                                     >::new(
-                                                                                                        $crate::MAXIMUM_ALIGNOF as i32
+                                                                                                        $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                                                     )
                                                                                                 )
                                                                                             ),
@@ -573,7 +583,7 @@ macro_rules! MaximumBytesPerTuple {
                                                                                                             $crate::__pgrx_c_macros::CValue::<
                                                                                                                 $crate::__pgrx_c_macros::CInt
                                                                                                             >::new(
-                                                                                                                $crate::MAXIMUM_ALIGNOF as i32
+                                                                                                                $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                                                             )
                                                                                                         )
                                                                                                     ),
@@ -648,7 +658,7 @@ macro_rules! MaximumBytesPerTuple {
                                         >(
                                             $crate::__pgrx_c_macros::CValue::<
                                                 $crate::__pgrx_c_macros::CInt
-                                            >::new($crate::BLCKSZ as i32)
+                                            >::new($crate::__pgrx_c_bindings::BLCKSZ as i32)
                                         ),
                                         (
                                             $crate::__pgrx_c_macros::expression::profile_value::<
@@ -693,7 +703,7 @@ macro_rules! MaximumBytesPerTuple {
                                                                                             >(
                                                                                                 $crate::__pgrx_c_macros::expression::offset_of::<
                                                                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                        $crate::PageHeaderData
+                                                                                                        $crate::__pgrx_c_bindings::PageHeaderData
                                                                                                     >,
                                                                                                     $crate::__pgrx_c_field_marker!(
                                                                                                         @path;
@@ -730,7 +740,7 @@ macro_rules! MaximumBytesPerTuple {
                                                                                                 >(
                                                                                                     $crate::__pgrx_c_macros::expression::size_of::<
                                                                                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                            $crate::ItemIdData
+                                                                                                            $crate::__pgrx_c_bindings::ItemIdData
                                                                                                         >>()
                                                                                                 )
                                                                                             )
@@ -759,7 +769,7 @@ macro_rules! MaximumBytesPerTuple {
                                                                                     $crate::__pgrx_c_macros::CValue::<
                                                                                         $crate::__pgrx_c_macros::CInt
                                                                                     >::new(
-                                                                                        $crate::MAXIMUM_ALIGNOF as i32
+                                                                                        $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                                     )
                                                                                 )
                                                                             ),
@@ -810,7 +820,7 @@ macro_rules! MaximumBytesPerTuple {
                                                                                             $crate::__pgrx_c_macros::CValue::<
                                                                                                 $crate::__pgrx_c_macros::CInt
                                                                                             >::new(
-                                                                                                $crate::MAXIMUM_ALIGNOF as i32
+                                                                                                $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                                             )
                                                                                         )
                                                                                     ),
@@ -873,7 +883,9 @@ macro_rules! MaximumBytesPerTuple {
                                                         >(
                                                             $crate::__pgrx_c_macros::CValue::<
                                                                 $crate::__pgrx_c_macros::CInt
-                                                            >::new($crate::BLCKSZ as i32)
+                                                            >::new(
+                                                                $crate::__pgrx_c_bindings::BLCKSZ as i32
+                                                            )
                                                         ),
                                                         (
                                                             $crate::__pgrx_c_macros::expression::profile_value::<
@@ -918,7 +930,7 @@ macro_rules! MaximumBytesPerTuple {
                                                                                                             >(
                                                                                                                 $crate::__pgrx_c_macros::expression::offset_of::<
                                                                                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                                        $crate::PageHeaderData
+                                                                                                                        $crate::__pgrx_c_bindings::PageHeaderData
                                                                                                                     >,
                                                                                                                     $crate::__pgrx_c_field_marker!(
                                                                                                                         @path;
@@ -955,7 +967,7 @@ macro_rules! MaximumBytesPerTuple {
                                                                                                                 >(
                                                                                                                     $crate::__pgrx_c_macros::expression::size_of::<
                                                                                                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                                            $crate::ItemIdData
+                                                                                                                            $crate::__pgrx_c_bindings::ItemIdData
                                                                                                                         >>()
                                                                                                                 )
                                                                                                             )
@@ -984,7 +996,7 @@ macro_rules! MaximumBytesPerTuple {
                                                                                                     $crate::__pgrx_c_macros::CValue::<
                                                                                                         $crate::__pgrx_c_macros::CInt
                                                                                                     >::new(
-                                                                                                        $crate::MAXIMUM_ALIGNOF as i32
+                                                                                                        $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                                                     )
                                                                                                 )
                                                                                             ),
@@ -1037,7 +1049,7 @@ macro_rules! MaximumBytesPerTuple {
                                                                                                             $crate::__pgrx_c_macros::CValue::<
                                                                                                                 $crate::__pgrx_c_macros::CInt
                                                                                                             >::new(
-                                                                                                                $crate::MAXIMUM_ALIGNOF as i32
+                                                                                                                $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                                                             )
                                                                                                         )
                                                                                                     ),
@@ -1112,7 +1124,7 @@ macro_rules! MaximumBytesPerTuple {
                                         >(
                                             $crate::__pgrx_c_macros::CValue::<
                                                 $crate::__pgrx_c_macros::CInt
-                                            >::new($crate::BLCKSZ as i32)
+                                            >::new($crate::__pgrx_c_bindings::BLCKSZ as i32)
                                         ),
                                         (
                                             $crate::__pgrx_c_macros::expression::profile_value::<
@@ -1157,7 +1169,7 @@ macro_rules! MaximumBytesPerTuple {
                                                                                             >(
                                                                                                 $crate::__pgrx_c_macros::expression::offset_of::<
                                                                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                        $crate::PageHeaderData
+                                                                                                        $crate::__pgrx_c_bindings::PageHeaderData
                                                                                                     >,
                                                                                                     $crate::__pgrx_c_field_marker!(
                                                                                                         @path;
@@ -1194,7 +1206,7 @@ macro_rules! MaximumBytesPerTuple {
                                                                                                 >(
                                                                                                     $crate::__pgrx_c_macros::expression::size_of::<
                                                                                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                            $crate::ItemIdData
+                                                                                                            $crate::__pgrx_c_bindings::ItemIdData
                                                                                                         >>()
                                                                                                 )
                                                                                             )
@@ -1223,7 +1235,7 @@ macro_rules! MaximumBytesPerTuple {
                                                                                     $crate::__pgrx_c_macros::CValue::<
                                                                                         $crate::__pgrx_c_macros::CInt
                                                                                     >::new(
-                                                                                        $crate::MAXIMUM_ALIGNOF as i32
+                                                                                        $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                                     )
                                                                                 )
                                                                             ),
@@ -1274,7 +1286,7 @@ macro_rules! MaximumBytesPerTuple {
                                                                                             $crate::__pgrx_c_macros::CValue::<
                                                                                                 $crate::__pgrx_c_macros::CInt
                                                                                             >::new(
-                                                                                                $crate::MAXIMUM_ALIGNOF as i32
+                                                                                                $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                                             )
                                                                                         )
                                                                                     ),
@@ -1337,7 +1349,9 @@ macro_rules! MaximumBytesPerTuple {
                                                         >(
                                                             $crate::__pgrx_c_macros::CValue::<
                                                                 $crate::__pgrx_c_macros::CInt
-                                                            >::new($crate::BLCKSZ as i32)
+                                                            >::new(
+                                                                $crate::__pgrx_c_bindings::BLCKSZ as i32
+                                                            )
                                                         ),
                                                         (
                                                             $crate::__pgrx_c_macros::expression::profile_value::<
@@ -1382,7 +1396,7 @@ macro_rules! MaximumBytesPerTuple {
                                                                                                             >(
                                                                                                                 $crate::__pgrx_c_macros::expression::offset_of::<
                                                                                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                                        $crate::PageHeaderData
+                                                                                                                        $crate::__pgrx_c_bindings::PageHeaderData
                                                                                                                     >,
                                                                                                                     $crate::__pgrx_c_field_marker!(
                                                                                                                         @path;
@@ -1419,7 +1433,7 @@ macro_rules! MaximumBytesPerTuple {
                                                                                                                 >(
                                                                                                                     $crate::__pgrx_c_macros::expression::size_of::<
                                                                                                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                                            $crate::ItemIdData
+                                                                                                                            $crate::__pgrx_c_bindings::ItemIdData
                                                                                                                         >>()
                                                                                                                 )
                                                                                                             )
@@ -1448,7 +1462,7 @@ macro_rules! MaximumBytesPerTuple {
                                                                                                     $crate::__pgrx_c_macros::CValue::<
                                                                                                         $crate::__pgrx_c_macros::CInt
                                                                                                     >::new(
-                                                                                                        $crate::MAXIMUM_ALIGNOF as i32
+                                                                                                        $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                                                     )
                                                                                                 )
                                                                                             ),
@@ -1501,7 +1515,7 @@ macro_rules! MaximumBytesPerTuple {
                                                                                                             $crate::__pgrx_c_macros::CValue::<
                                                                                                                 $crate::__pgrx_c_macros::CInt
                                                                                                             >::new(
-                                                                                                                $crate::MAXIMUM_ALIGNOF as i32
+                                                                                                                $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                                                             )
                                                                                                         )
                                                                                                     ),
@@ -1576,7 +1590,7 @@ macro_rules! MaximumBytesPerTuple {
                                         >(
                                             $crate::__pgrx_c_macros::CValue::<
                                                 $crate::__pgrx_c_macros::CInt
-                                            >::new($crate::BLCKSZ as i32)
+                                            >::new($crate::__pgrx_c_bindings::BLCKSZ as i32)
                                         ),
                                         (
                                             $crate::__pgrx_c_macros::expression::profile_value::<
@@ -1621,7 +1635,7 @@ macro_rules! MaximumBytesPerTuple {
                                                                                             >(
                                                                                                 $crate::__pgrx_c_macros::expression::offset_of::<
                                                                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                        $crate::PageHeaderData
+                                                                                                        $crate::__pgrx_c_bindings::PageHeaderData
                                                                                                     >,
                                                                                                     $crate::__pgrx_c_field_marker!(
                                                                                                         @path;
@@ -1658,7 +1672,7 @@ macro_rules! MaximumBytesPerTuple {
                                                                                                 >(
                                                                                                     $crate::__pgrx_c_macros::expression::size_of::<
                                                                                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                            $crate::ItemIdData
+                                                                                                            $crate::__pgrx_c_bindings::ItemIdData
                                                                                                         >>()
                                                                                                 )
                                                                                             )
@@ -1687,7 +1701,7 @@ macro_rules! MaximumBytesPerTuple {
                                                                                     $crate::__pgrx_c_macros::CValue::<
                                                                                         $crate::__pgrx_c_macros::CInt
                                                                                     >::new(
-                                                                                        $crate::MAXIMUM_ALIGNOF as i32
+                                                                                        $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                                     )
                                                                                 )
                                                                             ),
@@ -1738,7 +1752,7 @@ macro_rules! MaximumBytesPerTuple {
                                                                                             $crate::__pgrx_c_macros::CValue::<
                                                                                                 $crate::__pgrx_c_macros::CInt
                                                                                             >::new(
-                                                                                                $crate::MAXIMUM_ALIGNOF as i32
+                                                                                                $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                                             )
                                                                                         )
                                                                                     ),
@@ -1801,7 +1815,9 @@ macro_rules! MaximumBytesPerTuple {
                                                         >(
                                                             $crate::__pgrx_c_macros::CValue::<
                                                                 $crate::__pgrx_c_macros::CInt
-                                                            >::new($crate::BLCKSZ as i32)
+                                                            >::new(
+                                                                $crate::__pgrx_c_bindings::BLCKSZ as i32
+                                                            )
                                                         ),
                                                         (
                                                             $crate::__pgrx_c_macros::expression::profile_value::<
@@ -1846,7 +1862,7 @@ macro_rules! MaximumBytesPerTuple {
                                                                                                             >(
                                                                                                                 $crate::__pgrx_c_macros::expression::offset_of::<
                                                                                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                                        $crate::PageHeaderData
+                                                                                                                        $crate::__pgrx_c_bindings::PageHeaderData
                                                                                                                     >,
                                                                                                                     $crate::__pgrx_c_field_marker!(
                                                                                                                         @path;
@@ -1883,7 +1899,7 @@ macro_rules! MaximumBytesPerTuple {
                                                                                                                 >(
                                                                                                                     $crate::__pgrx_c_macros::expression::size_of::<
                                                                                                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                                            $crate::ItemIdData
+                                                                                                                            $crate::__pgrx_c_bindings::ItemIdData
                                                                                                                         >>()
                                                                                                                 )
                                                                                                             )
@@ -1912,7 +1928,7 @@ macro_rules! MaximumBytesPerTuple {
                                                                                                     $crate::__pgrx_c_macros::CValue::<
                                                                                                         $crate::__pgrx_c_macros::CInt
                                                                                                     >::new(
-                                                                                                        $crate::MAXIMUM_ALIGNOF as i32
+                                                                                                        $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                                                     )
                                                                                                 )
                                                                                             ),
@@ -1965,7 +1981,7 @@ macro_rules! MaximumBytesPerTuple {
                                                                                                             $crate::__pgrx_c_macros::CValue::<
                                                                                                                 $crate::__pgrx_c_macros::CInt
                                                                                                             >::new(
-                                                                                                                $crate::MAXIMUM_ALIGNOF as i32
+                                                                                                                $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                                                             )
                                                                                                         )
                                                                                                     ),
@@ -2040,7 +2056,7 @@ macro_rules! MaximumBytesPerTuple {
                                         >(
                                             $crate::__pgrx_c_macros::CValue::<
                                                 $crate::__pgrx_c_macros::CInt
-                                            >::new($crate::BLCKSZ as i32)
+                                            >::new($crate::__pgrx_c_bindings::BLCKSZ as i32)
                                         ),
                                         (
                                             $crate::__pgrx_c_macros::expression::profile_value::<
@@ -2085,7 +2101,7 @@ macro_rules! MaximumBytesPerTuple {
                                                                                             >(
                                                                                                 $crate::__pgrx_c_macros::expression::offset_of::<
                                                                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                        $crate::PageHeaderData
+                                                                                                        $crate::__pgrx_c_bindings::PageHeaderData
                                                                                                     >,
                                                                                                     $crate::__pgrx_c_field_marker!(
                                                                                                         @path;
@@ -2122,7 +2138,7 @@ macro_rules! MaximumBytesPerTuple {
                                                                                                 >(
                                                                                                     $crate::__pgrx_c_macros::expression::size_of::<
                                                                                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                            $crate::ItemIdData
+                                                                                                            $crate::__pgrx_c_bindings::ItemIdData
                                                                                                         >>()
                                                                                                 )
                                                                                             )
@@ -2151,7 +2167,7 @@ macro_rules! MaximumBytesPerTuple {
                                                                                     $crate::__pgrx_c_macros::CValue::<
                                                                                         $crate::__pgrx_c_macros::CInt
                                                                                     >::new(
-                                                                                        $crate::MAXIMUM_ALIGNOF as i32
+                                                                                        $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                                     )
                                                                                 )
                                                                             ),
@@ -2202,7 +2218,7 @@ macro_rules! MaximumBytesPerTuple {
                                                                                             $crate::__pgrx_c_macros::CValue::<
                                                                                                 $crate::__pgrx_c_macros::CInt
                                                                                             >::new(
-                                                                                                $crate::MAXIMUM_ALIGNOF as i32
+                                                                                                $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                                             )
                                                                                         )
                                                                                     ),
@@ -2265,7 +2281,9 @@ macro_rules! MaximumBytesPerTuple {
                                                         >(
                                                             $crate::__pgrx_c_macros::CValue::<
                                                                 $crate::__pgrx_c_macros::CInt
-                                                            >::new($crate::BLCKSZ as i32)
+                                                            >::new(
+                                                                $crate::__pgrx_c_bindings::BLCKSZ as i32
+                                                            )
                                                         ),
                                                         (
                                                             $crate::__pgrx_c_macros::expression::profile_value::<
@@ -2310,7 +2328,7 @@ macro_rules! MaximumBytesPerTuple {
                                                                                                             >(
                                                                                                                 $crate::__pgrx_c_macros::expression::offset_of::<
                                                                                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                                        $crate::PageHeaderData
+                                                                                                                        $crate::__pgrx_c_bindings::PageHeaderData
                                                                                                                     >,
                                                                                                                     $crate::__pgrx_c_field_marker!(
                                                                                                                         @path;
@@ -2347,7 +2365,7 @@ macro_rules! MaximumBytesPerTuple {
                                                                                                                 >(
                                                                                                                     $crate::__pgrx_c_macros::expression::size_of::<
                                                                                                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                                            $crate::ItemIdData
+                                                                                                                            $crate::__pgrx_c_bindings::ItemIdData
                                                                                                                         >>()
                                                                                                                 )
                                                                                                             )
@@ -2376,7 +2394,7 @@ macro_rules! MaximumBytesPerTuple {
                                                                                                     $crate::__pgrx_c_macros::CValue::<
                                                                                                         $crate::__pgrx_c_macros::CInt
                                                                                                     >::new(
-                                                                                                        $crate::MAXIMUM_ALIGNOF as i32
+                                                                                                        $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                                                     )
                                                                                                 )
                                                                                             ),
@@ -2429,7 +2447,7 @@ macro_rules! MaximumBytesPerTuple {
                                                                                                             $crate::__pgrx_c_macros::CValue::<
                                                                                                                 $crate::__pgrx_c_macros::CInt
                                                                                                             >::new(
-                                                                                                                $crate::MAXIMUM_ALIGNOF as i32
+                                                                                                                $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                                                                                                             )
                                                                                                         )
                                                                                                     ),

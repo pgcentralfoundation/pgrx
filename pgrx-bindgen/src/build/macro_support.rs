@@ -13,12 +13,13 @@
 //! headers can define external functions, and including them in two linked
 //! objects would give those functions duplicate definitions.
 
-use eyre::WrapErr;
+use eyre::{WrapErr, eyre};
 use pgrx_c_macros::CompilationProfile;
 use std::path::Path;
 
 /// Select the native artifact for the active Cargo feature while still allowing
 /// release generation to emit Rust bindings and macros for every supported version.
+#[derive(Clone, Copy)]
 pub(super) struct NativeBuild<'a> {
     /// Directory shared with bindgen's version-specific static function wrappers.
     pub(super) out_dir: &'a Path,
@@ -41,11 +42,16 @@ pub(super) fn compile_macro_support(
     let out_dir = build.out_dir;
     let stem = format!("pgrx_c_macros_pg{major}");
     let c_path = out_dir.join(format!("{stem}.c"));
-    let msvc = profile.target.triple.ends_with("-msvc");
+    let msvc = profile.target.uses_msvc_abi();
     let object = out_dir.join(format!("{stem}.{}", if msvc { "obj" } else { "o" }));
     let archive = out_dir.join(if msvc { format!("{stem}.lib") } else { format!("lib{stem}.a") });
     let wrapper = out_dir.join(format!("{}.c", super::cshim_static_wrapper_name(major)));
-    let translation_unit = native_source(&wrapper, &profile.header, source, build.cshim)?;
+    let translation_unit = native_source(
+        wrapper.is_file().then_some(wrapper.as_path()),
+        &profile.header,
+        source,
+        build.cshim,
+    )?;
     super::write_content_stable(&c_path, translation_unit.as_bytes())?;
     pgrx_c_macros::compile_native_support(profile, &c_path, &object, &archive)
         .wrap_err("could not compile and archive generated C access support")?;
@@ -64,17 +70,22 @@ pub(super) fn link_macro_support(major: u16, out_dir: &Path) {
 /// intentionally lack include guards, so including the header a second time is
 /// invalid even within a single translation unit.
 fn native_source(
-    wrapper: &Path,
+    wrapper: Option<&Path>,
     header: &Path,
     source: &str,
     cshim: Option<&Path>,
 ) -> eyre::Result<String> {
     let prefix = if let Some(cshim) = cshim {
+        let wrapper = wrapper.ok_or_else(|| eyre!("C shim needs its generated static wrapper"))?;
         format!(
             "#define PGRX_CSHIM_STATIC \"{}\"\n#include \"{}\"\n",
             native_include_path(wrapper)?,
             native_include_path(cshim)?,
         )
+    } else if let Some(wrapper) = wrapper {
+        // The generated wrapper includes the original header. Its inline
+        // bindings belong to the ordinary pg-sys API, independently of cshim.
+        format!("#include \"{}\"\n", native_include_path(wrapper)?)
     } else {
         format!("#include \"{}\"\n", native_include_path(header)?)
     };
@@ -141,7 +152,7 @@ mod tests {
     #[test]
     fn combined_source_includes_header_only_through_the_versioned_cshim() {
         let source = native_source(
-            Path::new("/output/pgrx-cshim-static-pg15.c"),
+            Some(Path::new("/output/pgrx-cshim-static-pg15.c")),
             Path::new("/headers/pg15.h"),
             "int macro_helper(void) { return header_function(); }\n",
             Some(Path::new("/source/pgrx-cshim.c")),
@@ -158,13 +169,7 @@ mod tests {
     #[test]
     fn native_source_without_cshim_includes_the_inspected_header() {
         assert_eq!(
-            native_source(
-                Path::new("unused.c"),
-                Path::new("/headers/pg18.h"),
-                "int helper;\n",
-                None
-            )
-            .unwrap(),
+            native_source(None, Path::new("/headers/pg18.h"), "int helper;\n", None).unwrap(),
             "#include \"/headers/pg18.h\"\nint helper;\n"
         );
     }
@@ -174,10 +179,10 @@ mod tests {
     #[test]
     fn invalid_include_paths_cannot_change_the_translation_unit() {
         for invalid in ["header\n.h", "header\r.h", "header\".h", "header\0.h"] {
-            assert!(native_source(Path::new("unused.c"), Path::new(invalid), "", None).is_err());
+            assert!(native_source(None, Path::new(invalid), "", None).is_err());
             assert!(
                 native_source(
-                    Path::new("wrapper.c"),
+                    Some(Path::new("wrapper.c")),
                     Path::new("valid.h"),
                     "",
                     Some(Path::new(invalid))
@@ -186,13 +191,27 @@ mod tests {
             );
             assert!(
                 native_source(
-                    Path::new(invalid),
+                    Some(Path::new(invalid)),
                     Path::new("valid.h"),
                     "",
                     Some(Path::new("shim.c"))
                 )
                 .is_err()
             );
+        }
+    }
+
+    /// Preserve Windows directory separators as C include path separators,
+    /// including extended drive and UNC paths, without treating them as escapes.
+    #[test]
+    #[cfg(windows)]
+    fn windows_include_paths_preserve_filesystem_identity() {
+        for (input, expected) in [
+            (r"C:\headers\pg18.h", "C:/headers/pg18.h"),
+            (r"\\?\C:\headers\pg18.h", "C:/headers/pg18.h"),
+            (r"\\?\UNC\server\headers\pg18.h", "//server/headers/pg18.h"),
+        ] {
+            assert_eq!(super::native_include_path(Path::new(input)).unwrap(), expected);
         }
     }
 
@@ -228,19 +247,27 @@ mod tests {
         .unwrap();
         let scanner = pgrx_c_macros::MacroScanner::new().unwrap();
         let frontend = pgrx_c_macros::inspect(&scanner, &header, &[], None).unwrap();
-        assert!(
+        for cshim in [None, Some(cshim.as_path())] {
+            assert!(
             compile_macro_support(
                 15,
                 frontend.profile(),
                 "int macro_read(void) { return inline_read(); }\nint *macro_global(void) { return &header_global; }\nint (*macro_function(void))(void) { return header_external; }\n",
-                &NativeBuild { out_dir: &directory.0, active: true, cshim: Some(&cshim) },
+                &NativeBuild { out_dir: &directory.0, active: true, cshim },
             )
-            .unwrap()
+            .unwrap() == cshim.is_some()
         );
-        let main = directory.0.join("main.c");
-        std::fs::write(
-            &main,
-            r#"
+            let main = directory.0.join("main.c");
+            let shim_declarations = if cshim.is_some() {
+                "int cshim_mutate(void);"
+            } else {
+                "int cshim_mutate(void) { return ++header_global; }"
+            };
+            std::fs::write(
+                &main,
+                format!(
+                    "extern int header_global;\n{shim_declarations}\n{}",
+                    r#"
 extern int header_global;
 int header_external(void);
 int cshim_read(void);
@@ -255,20 +282,22 @@ int main(void) {
     if (cshim_mutate() != 8 || macro_read() != 8) return 4;
     return 0;
 }
-"#,
-        )
-        .unwrap();
-        let executable = directory.0.join("native-test");
-        // The host linker locates its system runtime independently of the
-        // inspected Clang used to generate the portable native archive.
-        let output = std::process::Command::new("cc")
-            .arg(&main)
-            .arg(directory.0.join("libpgrx_c_macros_pg15.a"))
-            .arg("-o")
-            .arg(&executable)
-            .output()
+"#
+                ),
+            )
             .unwrap();
-        assert!(output.status.success(), "{}", String::from_utf8_lossy(&output.stderr));
-        assert!(std::process::Command::new(&executable).status().unwrap().success());
+            let executable = directory.0.join("native-test");
+            // The host linker locates its system runtime independently of the
+            // inspected Clang used to generate the portable native archive.
+            let output = std::process::Command::new("cc")
+                .arg(&main)
+                .arg(directory.0.join("libpgrx_c_macros_pg15.a"))
+                .arg("-o")
+                .arg(&executable)
+                .output()
+                .unwrap();
+            assert!(output.status.success(), "{}", String::from_utf8_lossy(&output.stderr));
+            assert!(std::process::Command::new(&executable).status().unwrap().success());
+        }
     }
 }

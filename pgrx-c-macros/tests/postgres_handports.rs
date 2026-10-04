@@ -2,11 +2,11 @@
 //LICENSE
 //LICENSE Use of this source code is governed by the MIT license that can be found in the LICENSE file.
 
-//! Use existing port names to choose C-oracle coverage, not expected behavior.
+//! Preserve original-C coverage for primitives that previously had handwritten ports.
 //!
-//! The test discovers handwritten pgrx function names and compares every emittable
-//! counterpart across configured PostgreSQL versions with the original C macro.
-//! This catches mistakes in either implementation without blessing an old port.
+//! The fixed corpus compares generated macros across configured PostgreSQL versions
+//! with the original headers. It survives deletion of the old Rust implementations;
+//! their names and bodies never determine expected behavior.
 //!
 //! These generated consumers use the actual inspected C profile on each native host.
 //! Cross-profile checks retain original compiler facts without executing foreign code.
@@ -29,8 +29,7 @@ use pgrx_c_macros::{
 use std::collections::BTreeSet;
 use std::path::PathBuf;
 
-/// Representative macro families used alongside discovered handport names for
-/// original-PostgreSQL oracle coverage.
+/// Trigger predicates whose low/high-bit inputs and evaluation counts have original-C cases.
 const TRIGGERS: &[&str] = &[
     "TRIGGER_FIRED_BY_INSERT",
     "TRIGGER_FIRED_BY_DELETE",
@@ -43,31 +42,24 @@ const TRIGGERS: &[&str] = &[
     "TRIGGER_FIRED_INSTEAD",
 ];
 
-// Names establish coverage only. No Rust body, type, or result is an oracle.
-/// Discover the old port names as a coverage selection only; their implementations do not
-/// determine expected results.
-fn handwritten_function_names() -> BTreeSet<String> {
-    [
-        include_str!("../../pgrx-pg-sys/src/port.rs"),
-        include_str!("../../pgrx/src/trigger_support/mod.rs"),
-        include_str!("../../pgrx/src/varlena.rs"),
-        include_str!("../../pgrx-pg-sys/src/submodules/errcodes.rs"),
-    ]
-    .into_iter()
-    .flat_map(str::lines)
-    .filter_map(|line| {
-        let declaration = line.strip_prefix("pub ").unwrap_or(line);
-        let declaration = declaration.strip_prefix("const ").unwrap_or(declaration);
-        let declaration = declaration.strip_prefix("unsafe ").unwrap_or(declaration);
-        let function = declaration.strip_prefix("fn ")?;
-        function.split(['(', '<']).next().map(str::to_ascii_lowercase)
-    })
-    .collect()
-}
+/// Test corpus roots, with signatures and results inferred from C rather than prescribed here.
+const PRIMITIVES: &[&str] = &[
+    "TYPEALIGN",
+    "MAXALIGN",
+    "BufferIsLocal",
+    "TransactionIdIsNormal",
+    "VARATT_NOT_PAD_BYTE",
+    "type_is_array",
+    "PGSIXBIT",
+    "MAKE_SQLSTATE",
+    "PageSizeIsValid",
+    "PageIsValid",
+    "VARTAG_IS_EXPANDED",
+];
 
-/// Checks that every emittable handport matches each original PostgreSQL version.
+/// Compare every migrated corpus primitive with each configured original PostgreSQL version.
 #[test]
-fn every_emittable_handport_matches_each_original_postgres_version() {
+fn migrated_primitives_match_each_original_postgres_version() {
     let installations = installed::configured();
     if installations.is_empty() {
         return;
@@ -77,7 +69,7 @@ fn every_emittable_handport_matches_each_original_postgres_version() {
         .join("../pgrx-pg-sys/src/c_macros/support.rs")
         .canonicalize()
         .unwrap();
-    let handwritten = handwritten_function_names();
+    let coverage: BTreeSet<_> = PRIMITIVES.iter().chain(TRIGGERS).copied().collect();
     for postgres in installations {
         let major = postgres.pg_config().major_version().unwrap();
         let inspection_arguments = vec!["-O2".into()];
@@ -97,7 +89,7 @@ fn every_emittable_handport_matches_each_original_postgres_version() {
             .inventory()
             .macros
             .iter()
-            .filter(|definition| handwritten.contains(&definition.name.to_ascii_lowercase()))
+            .filter(|definition| coverage.contains(definition.name.as_str()))
             .map(|definition| definition.name.as_str())
             .collect::<Vec<_>>();
         let session = AnalysisSession::prepare(&scanner, &frontend, &names).unwrap();
@@ -111,7 +103,10 @@ fn every_emittable_handport_matches_each_original_postgres_version() {
         for emission in generation.macros {
             if let EmissionStatus::Emitted { rust: generated, .. } = emission.status {
                 let name = emission.analysis.name;
-                assert!(emitted.insert(name), "a handport must have one primary definition");
+                assert!(
+                    emitted.insert(name),
+                    "a corpus primitive must have one primary definition"
+                );
                 rust.push_str(&generated);
             }
         }
@@ -136,7 +131,7 @@ fn every_emittable_handport_matches_each_original_postgres_version() {
         assert_eq!(
             emitted.iter().map(String::as_str).collect::<BTreeSet<_>>(),
             expected,
-            "PG{major}: every emittable handport needs an original-C case"
+            "PG{major}: every emitted corpus primitive needs an original-C case"
         );
 
         let mut prefix = String::new();
@@ -254,11 +249,11 @@ record("VARTAG_IS_EXPANDED_EVAL", 0, value, first.get(), second.get());
         let page_cases = if major == 15 {
             r#"
 first.set(0); second.set(0);
-record("PageSizeIsValid_BELOW", 0, PageSizeIsValid!(CValue::<CUnsignedLong>::new(u64::from(block_size) - 1)), 0, 0);
-record("PageSizeIsValid_EXACT", 0, PageSizeIsValid!(CValue::<CUnsignedLong>::new(u64::from(block_size))), 0, 0);
-record("PageSizeIsValid_ABOVE", 0, PageSizeIsValid!(CValue::<CUnsignedLong>::new(u64::from(block_size) + 1)), 0, 0);
+record("PageSizeIsValid_BELOW", 0, PageSizeIsValid!(CValue::<CSize>::new((u64::from(block_size) - 1) as _)), 0, 0);
+record("PageSizeIsValid_EXACT", 0, PageSizeIsValid!(CValue::<CSize>::new(u64::from(block_size) as _)), 0, 0);
+record("PageSizeIsValid_ABOVE", 0, PageSizeIsValid!(CValue::<CSize>::new((u64::from(block_size) + 1) as _)), 0, 0);
 record("PageSizeIsValid_UNSIGNED_LITERAL", 0, PageSizeIsValid!(block_size), 0, 0);
-let page_size_argument = || { first.set(first.get() + 1); CValue::<CUnsignedLong>::new(u64::from(block_size)) };
+let page_size_argument = || { first.set(first.get() + 1); CValue::<CSize>::new(u64::from(block_size) as _) };
 let value = PageSizeIsValid!(page_size_argument());
 record("PageSizeIsValid_EVAL", 0, value, first.get(), second.get());
 "#
@@ -325,6 +320,9 @@ record("PageIsValid_EVAL", 0, value, first.get(), second.get());
         for (index, (c, rust)) in original.lines().zip(generated.lines()).enumerate() {
             assert_eq!(rust, c, "PG{major}: original C vs generated Rust record {index}");
         }
-        eprintln!("PG{major}: {} handports, {expected_rows} C/Rust records", emitted.len());
+        eprintln!(
+            "PG{major}: {} migrated primitives, {expected_rows} C/Rust records",
+            emitted.len()
+        );
     }
 }

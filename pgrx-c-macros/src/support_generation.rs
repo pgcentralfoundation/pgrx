@@ -309,6 +309,30 @@ pub fn support_alignment_profile(
 /// storage uses exposed provenance when crossing its C integer representation.
 pub fn pg_sys_integer_bridges(frontend: &FrontendOutput) -> Result<String, SupportProfileError> {
     let mut rust = support_abi_assertions(frontend.profile())?;
+    rust.push_str("/// C integer identities established from this installation's typedef declarations.\n#[doc(hidden)]\n#[allow(non_camel_case_types)]\npub mod __pgrx_c_types {\n");
+    for (name, ty) in &frontend.declarations().types {
+        let TypeCategory::Integer(kind) = ty.category else { continue };
+        // C type spellings with spaces or declarator syntax are not typedef
+        // identifiers and cannot form a Rust alias. Parse identifiers rather
+        // than interpolating arbitrary compiler spellings into source.
+        if !name.parse::<proc_macro2::TokenStream>().ok().is_some_and(|tokens| {
+            let mut tokens = tokens.into_iter();
+            matches!(tokens.next(), Some(proc_macro2::TokenTree::Ident(_)))
+                && tokens.next().is_none()
+        }) || matches!(name.as_str(), "self" | "Self" | "super" | "crate")
+        {
+            continue;
+        }
+        let Some(layout) = frontend.profile().target.integers.get(&kind) else { continue };
+        if ty.size != Some(u64::from(layout.bits / 8)) || ty.is_const || ty.is_volatile {
+            continue;
+        }
+        rust.push_str(&format!(
+            "/// Preserve the compiler-established rank and width of C `{name}`.\npub type r#{name} = crate::__pgrx_c_macros::{};\n",
+            crate::emit::marker(kind),
+        ));
+    }
+    rust.push_str("}\n");
     for (name, accessor, constructor) in
         [("Oid", "to_u32", "from_u32"), ("TransactionId", "into_inner", "from_inner")]
     {
@@ -693,5 +717,59 @@ mod tests {
         let rust = support_alignment_profile(&profile).unwrap();
         assert!(rust.contains("pub const CInt128: (usize, usize) = (0, 0)"));
         assert!(rust.contains("pub const CUnsignedInt128: (usize, usize) = (0, 0)"));
+    }
+    /// Keep typedef aliases and Datum provenance bridges tied to LLP64's actual C integer ranks.
+    #[test]
+    fn windows_typedef_aliases_preserve_long_long_identity() {
+        use crate::{DeclarationCatalog, MacroEnvironment, MacroInventory};
+        let environment = MacroEnvironment::default();
+        let dependencies = crate::MacroDependencyGraph::from_environment(&environment);
+        let mut windows = profile();
+        windows.target.triple = "x86_64-pc-windows-msvc".into();
+        for kind in [IntegerKind::Long, IntegerKind::UnsignedLong] {
+            windows.target.integers.get_mut(&kind).unwrap().bits = 32;
+        }
+        windows.target.size_type = IntegerKind::UnsignedLongLong;
+        windows.target.ptrdiff_type = IntegerKind::LongLong;
+        let mut frontend = FrontendOutput {
+            profile: windows,
+            environment,
+            declarations: DeclarationCatalog::default(),
+            inventory: MacroInventory { macros: Vec::new(), diagnostics: Vec::new() },
+            dependencies,
+        };
+        for (name, kind, size) in [
+            ("Oid", IntegerKind::UnsignedInt, 4),
+            ("TransactionId", IntegerKind::UnsignedInt, 4),
+            ("size_t", IntegerKind::UnsignedLongLong, 8),
+            ("uintptr_t", IntegerKind::UnsignedLongLong, 8),
+            ("ptrdiff_t", IntegerKind::LongLong, 8),
+            ("Datum", IntegerKind::UnsignedLongLong, 8),
+        ] {
+            frontend.declarations.types.insert(
+                name.into(),
+                TypeInfo {
+                    spelling: name.into(),
+                    canonical_spelling: match kind {
+                        IntegerKind::UnsignedInt => "unsigned int",
+                        IntegerKind::UnsignedLongLong => "unsigned long long",
+                        IntegerKind::LongLong => "long long",
+                        _ => unreachable!("fixture table has three reviewed integer identities"),
+                    }
+                    .into(),
+                    category: TypeCategory::Integer(kind),
+                    size: Some(size),
+                    alignment: Some(size),
+                    is_const: false,
+                    is_volatile: false,
+                },
+            );
+        }
+        let rust = pg_sys_integer_bridges(&frontend).unwrap();
+        assert!(rust.contains("pub type r#size_t = crate::__pgrx_c_macros::CUnsignedLongLong;"));
+        assert!(rust.contains("pub type r#uintptr_t = crate::__pgrx_c_macros::CUnsignedLongLong;"));
+        assert!(rust.contains("pub type r#ptrdiff_t = crate::__pgrx_c_macros::CLongLong;"));
+        assert!(rust.contains("type Kind = crate::__pgrx_c_macros::CUnsignedLongLong;"));
+        assert!(rust.contains("with_exposed_provenance_mut"));
     }
 }

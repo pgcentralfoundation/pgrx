@@ -2,6 +2,10 @@
 
 This code is generated for documentation purposes, so that it is easy to reference on docs.rs. C macros and their support code are regenerated for your build of pgrx, and your Postgres configuration may differ.
 */
+#[path = "block.rs"]
+mod block;
+#[allow(unused_imports)]
+pub use block::*;
 #[path = "buf.rs"]
 mod buf;
 #[allow(unused_imports)]
@@ -38,6 +42,10 @@ pub use itemptr::*;
 mod lock;
 #[allow(unused_imports)]
 pub use lock::*;
+#[path = "lwlocknames.rs"]
+mod lwlocknames;
+#[allow(unused_imports)]
+pub use lwlocknames::*;
 #[path = "off.rs"]
 mod off;
 #[allow(unused_imports)]

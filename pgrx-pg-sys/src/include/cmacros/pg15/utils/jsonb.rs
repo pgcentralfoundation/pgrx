@@ -5,8 +5,8 @@ This code is generated for documentation purposes, so that it is easy to referen
 // C macros from jsonb.h.
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -33,20 +33,24 @@ macro_rules! __pgrx_c_args_DatumGetJsonbP {
         $crate::__pgrx_c_args_DatumGetJsonbP!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_DatumGetJsonbP!(@p1 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_DatumGetJsonbP!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_DatumGetJsonbP!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_DatumGetJsonbP!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_DatumGetJsonbP!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_DatumGetJsonbP!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -54,7 +58,9 @@ macro_rules! __pgrx_c_args_DatumGetJsonbP {
         $crate::__pgrx_c_args_DatumGetJsonbP!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_DatumGetJsonbP!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_DatumGetJsonbP!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -76,14 +82,18 @@ macro_rules! __pgrx_c_args_DatumGetJsonbP {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_DatumGetJsonbP!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_DatumGetJsonbP!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_DatumGetJsonbP!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_DatumGetJsonbP!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_DatumGetJsonbP!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -110,13 +120,13 @@ macro_rules! __pgrx_c_args_DatumGetJsonbP {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_DatumGetJsonbP!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_DatumGetJsonbP!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -163,9 +173,11 @@ macro_rules! DatumGetJsonbP {
         (
             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::cast_as::<
-                    *mut $crate::Jsonb,
+                    *mut $crate::__pgrx_c_bindings::Jsonb,
                     $crate::__pgrx_c_macros::expression::CPointer<
-                        $crate::__pgrx_c_macros::expression::CRecord<$crate::Jsonb>,
+                        $crate::__pgrx_c_macros::expression::CRecord<
+                            $crate::__pgrx_c_bindings::Jsonb
+                        >,
                         $crate::__pgrx_c_macros::expression::ReadWrite
                     >,
                     _
@@ -173,15 +185,17 @@ macro_rules! DatumGetJsonbP {
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         <
                             $crate::__pgrx_c_macros::expression::CPointer<
-                                $crate::__pgrx_c_macros::expression::CRecord<$crate::varlena>,
+                                $crate::__pgrx_c_macros::expression::CRecord<
+                                    $crate::__pgrx_c_bindings::varlena
+                                >,
                                 $crate::__pgrx_c_macros::expression::ReadWrite
                             > as $crate::__pgrx_c_macros::expression::CType
                         >::from_storage(
-                            $crate::pg_detoast_datum(
+                            $crate::__pgrx_c_bindings::pg_detoast_datum(
                                 <
                                     $crate::__pgrx_c_macros::expression::CPointer<
                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                            $crate::varlena
+                                            $crate::__pgrx_c_bindings::varlena
                                         >,
                                         $crate::__pgrx_c_macros::expression::ReadWrite
                                     > as $crate::__pgrx_c_macros::expression::CType
@@ -189,7 +203,7 @@ macro_rules! DatumGetJsonbP {
                                     $crate::__pgrx_c_macros::expression::implicit::<
                                         $crate::__pgrx_c_macros::expression::CPointer<
                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                $crate::varlena
+                                                $crate::__pgrx_c_bindings::varlena
                                             >,
                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                         >,
@@ -200,10 +214,10 @@ macro_rules! DatumGetJsonbP {
                                             _
                                         >(
                                             $crate::__pgrx_c_macros::expression::cast_as::<
-                                                *mut $crate::varlena,
+                                                *mut $crate::__pgrx_c_bindings::varlena,
                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                        $crate::varlena
+                                                        $crate::__pgrx_c_bindings::varlena
                                                     >,
                                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                                 >,
@@ -215,7 +229,7 @@ macro_rules! DatumGetJsonbP {
                                                         _
                                                     >(
                                                         $crate::__pgrx_c_macros::expression::cast_as::<
-                                                            $crate::Pointer,
+                                                            $crate::__pgrx_c_bindings::Pointer,
                                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                                     $crate::__pgrx_c_macros::CChar,
@@ -278,9 +292,11 @@ macro_rules! DatumGetJsonbP {
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::cast_as::<
-                                *mut $crate::Jsonb,
+                                *mut $crate::__pgrx_c_bindings::Jsonb,
                                 $crate::__pgrx_c_macros::expression::CPointer<
-                                    $crate::__pgrx_c_macros::expression::CRecord<$crate::Jsonb>,
+                                    $crate::__pgrx_c_macros::expression::CRecord<
+                                        $crate::__pgrx_c_bindings::Jsonb
+                                    >,
                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                 >,
                                 _
@@ -289,16 +305,16 @@ macro_rules! DatumGetJsonbP {
                                     <
                                         $crate::__pgrx_c_macros::expression::CPointer<
                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                $crate::varlena
+                                                $crate::__pgrx_c_bindings::varlena
                                             >,
                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::from_storage(
-                                        $crate::pg_detoast_datum(
+                                        $crate::__pgrx_c_bindings::pg_detoast_datum(
                                             <
                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                        $crate::varlena
+                                                        $crate::__pgrx_c_bindings::varlena
                                                     >,
                                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                                 > as $crate::__pgrx_c_macros::expression::CType
@@ -306,7 +322,7 @@ macro_rules! DatumGetJsonbP {
                                                 $crate::__pgrx_c_macros::expression::implicit::<
                                                     $crate::__pgrx_c_macros::expression::CPointer<
                                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                                            $crate::varlena
+                                                            $crate::__pgrx_c_bindings::varlena
                                                         >,
                                                         $crate::__pgrx_c_macros::expression::ReadWrite
                                                     >,
@@ -317,10 +333,10 @@ macro_rules! DatumGetJsonbP {
                                                         _
                                                     >(
                                                         $crate::__pgrx_c_macros::expression::cast_as::<
-                                                            *mut $crate::varlena,
+                                                            *mut $crate::__pgrx_c_bindings::varlena,
                                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                                    $crate::varlena
+                                                                    $crate::__pgrx_c_bindings::varlena
                                                                 >,
                                                                 $crate::__pgrx_c_macros::expression::ReadWrite
                                                             >,
@@ -332,7 +348,7 @@ macro_rules! DatumGetJsonbP {
                                                                     _
                                                                 >(
                                                                     $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                        $crate::Pointer,
+                                                                        $crate::__pgrx_c_bindings::Pointer,
                                                                         $crate::__pgrx_c_macros::expression::CPointer<
                                                                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                                                 $crate::__pgrx_c_macros::CChar,
@@ -380,9 +396,11 @@ macro_rules! DatumGetJsonbP {
         {
             let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::cast_as::<
-                    *mut $crate::Jsonb,
+                    *mut $crate::__pgrx_c_bindings::Jsonb,
                     $crate::__pgrx_c_macros::expression::CPointer<
-                        $crate::__pgrx_c_macros::expression::CRecord<$crate::Jsonb>,
+                        $crate::__pgrx_c_macros::expression::CRecord<
+                            $crate::__pgrx_c_bindings::Jsonb
+                        >,
                         $crate::__pgrx_c_macros::expression::ReadWrite
                     >,
                     _
@@ -390,15 +408,17 @@ macro_rules! DatumGetJsonbP {
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         <
                             $crate::__pgrx_c_macros::expression::CPointer<
-                                $crate::__pgrx_c_macros::expression::CRecord<$crate::varlena>,
+                                $crate::__pgrx_c_macros::expression::CRecord<
+                                    $crate::__pgrx_c_bindings::varlena
+                                >,
                                 $crate::__pgrx_c_macros::expression::ReadWrite
                             > as $crate::__pgrx_c_macros::expression::CType
                         >::from_storage(
-                            $crate::pg_detoast_datum(
+                            $crate::__pgrx_c_bindings::pg_detoast_datum(
                                 <
                                     $crate::__pgrx_c_macros::expression::CPointer<
                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                            $crate::varlena
+                                            $crate::__pgrx_c_bindings::varlena
                                         >,
                                         $crate::__pgrx_c_macros::expression::ReadWrite
                                     > as $crate::__pgrx_c_macros::expression::CType
@@ -406,7 +426,7 @@ macro_rules! DatumGetJsonbP {
                                     $crate::__pgrx_c_macros::expression::implicit::<
                                         $crate::__pgrx_c_macros::expression::CPointer<
                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                $crate::varlena
+                                                $crate::__pgrx_c_bindings::varlena
                                             >,
                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                         >,
@@ -417,10 +437,10 @@ macro_rules! DatumGetJsonbP {
                                             _
                                         >(
                                             $crate::__pgrx_c_macros::expression::cast_as::<
-                                                *mut $crate::varlena,
+                                                *mut $crate::__pgrx_c_bindings::varlena,
                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                        $crate::varlena
+                                                        $crate::__pgrx_c_bindings::varlena
                                                     >,
                                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                                 >,
@@ -432,7 +452,7 @@ macro_rules! DatumGetJsonbP {
                                                         _
                                                     >(
                                                         $crate::__pgrx_c_macros::expression::cast_as::<
-                                                            $crate::Pointer,
+                                                            $crate::__pgrx_c_bindings::Pointer,
                                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                                     $crate::__pgrx_c_macros::CChar,
@@ -476,8 +496,8 @@ macro_rules! DatumGetJsonbP {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -504,20 +524,24 @@ macro_rules! __pgrx_c_args_DatumGetJsonbPCopy {
         $crate::__pgrx_c_args_DatumGetJsonbPCopy!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_DatumGetJsonbPCopy!(@p1 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_DatumGetJsonbPCopy!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_DatumGetJsonbPCopy!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_DatumGetJsonbPCopy!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_DatumGetJsonbPCopy!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_DatumGetJsonbPCopy!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -525,7 +549,9 @@ macro_rules! __pgrx_c_args_DatumGetJsonbPCopy {
         $crate::__pgrx_c_args_DatumGetJsonbPCopy!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_DatumGetJsonbPCopy!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_DatumGetJsonbPCopy!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -547,14 +573,18 @@ macro_rules! __pgrx_c_args_DatumGetJsonbPCopy {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_DatumGetJsonbPCopy!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_DatumGetJsonbPCopy!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_DatumGetJsonbPCopy!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_DatumGetJsonbPCopy!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_DatumGetJsonbPCopy!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -581,13 +611,13 @@ macro_rules! __pgrx_c_args_DatumGetJsonbPCopy {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_DatumGetJsonbPCopy!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_DatumGetJsonbPCopy!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -634,9 +664,11 @@ macro_rules! DatumGetJsonbPCopy {
         (
             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::cast_as::<
-                    *mut $crate::Jsonb,
+                    *mut $crate::__pgrx_c_bindings::Jsonb,
                     $crate::__pgrx_c_macros::expression::CPointer<
-                        $crate::__pgrx_c_macros::expression::CRecord<$crate::Jsonb>,
+                        $crate::__pgrx_c_macros::expression::CRecord<
+                            $crate::__pgrx_c_bindings::Jsonb
+                        >,
                         $crate::__pgrx_c_macros::expression::ReadWrite
                     >,
                     _
@@ -644,15 +676,17 @@ macro_rules! DatumGetJsonbPCopy {
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         <
                             $crate::__pgrx_c_macros::expression::CPointer<
-                                $crate::__pgrx_c_macros::expression::CRecord<$crate::varlena>,
+                                $crate::__pgrx_c_macros::expression::CRecord<
+                                    $crate::__pgrx_c_bindings::varlena
+                                >,
                                 $crate::__pgrx_c_macros::expression::ReadWrite
                             > as $crate::__pgrx_c_macros::expression::CType
                         >::from_storage(
-                            $crate::pg_detoast_datum_copy(
+                            $crate::__pgrx_c_bindings::pg_detoast_datum_copy(
                                 <
                                     $crate::__pgrx_c_macros::expression::CPointer<
                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                            $crate::varlena
+                                            $crate::__pgrx_c_bindings::varlena
                                         >,
                                         $crate::__pgrx_c_macros::expression::ReadWrite
                                     > as $crate::__pgrx_c_macros::expression::CType
@@ -660,7 +694,7 @@ macro_rules! DatumGetJsonbPCopy {
                                     $crate::__pgrx_c_macros::expression::implicit::<
                                         $crate::__pgrx_c_macros::expression::CPointer<
                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                $crate::varlena
+                                                $crate::__pgrx_c_bindings::varlena
                                             >,
                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                         >,
@@ -671,10 +705,10 @@ macro_rules! DatumGetJsonbPCopy {
                                             _
                                         >(
                                             $crate::__pgrx_c_macros::expression::cast_as::<
-                                                *mut $crate::varlena,
+                                                *mut $crate::__pgrx_c_bindings::varlena,
                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                        $crate::varlena
+                                                        $crate::__pgrx_c_bindings::varlena
                                                     >,
                                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                                 >,
@@ -686,7 +720,7 @@ macro_rules! DatumGetJsonbPCopy {
                                                         _
                                                     >(
                                                         $crate::__pgrx_c_macros::expression::cast_as::<
-                                                            $crate::Pointer,
+                                                            $crate::__pgrx_c_bindings::Pointer,
                                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                                     $crate::__pgrx_c_macros::CChar,
@@ -749,9 +783,11 @@ macro_rules! DatumGetJsonbPCopy {
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::cast_as::<
-                                *mut $crate::Jsonb,
+                                *mut $crate::__pgrx_c_bindings::Jsonb,
                                 $crate::__pgrx_c_macros::expression::CPointer<
-                                    $crate::__pgrx_c_macros::expression::CRecord<$crate::Jsonb>,
+                                    $crate::__pgrx_c_macros::expression::CRecord<
+                                        $crate::__pgrx_c_bindings::Jsonb
+                                    >,
                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                 >,
                                 _
@@ -760,16 +796,16 @@ macro_rules! DatumGetJsonbPCopy {
                                     <
                                         $crate::__pgrx_c_macros::expression::CPointer<
                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                $crate::varlena
+                                                $crate::__pgrx_c_bindings::varlena
                                             >,
                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::from_storage(
-                                        $crate::pg_detoast_datum_copy(
+                                        $crate::__pgrx_c_bindings::pg_detoast_datum_copy(
                                             <
                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                        $crate::varlena
+                                                        $crate::__pgrx_c_bindings::varlena
                                                     >,
                                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                                 > as $crate::__pgrx_c_macros::expression::CType
@@ -777,7 +813,7 @@ macro_rules! DatumGetJsonbPCopy {
                                                 $crate::__pgrx_c_macros::expression::implicit::<
                                                     $crate::__pgrx_c_macros::expression::CPointer<
                                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                                            $crate::varlena
+                                                            $crate::__pgrx_c_bindings::varlena
                                                         >,
                                                         $crate::__pgrx_c_macros::expression::ReadWrite
                                                     >,
@@ -788,10 +824,10 @@ macro_rules! DatumGetJsonbPCopy {
                                                         _
                                                     >(
                                                         $crate::__pgrx_c_macros::expression::cast_as::<
-                                                            *mut $crate::varlena,
+                                                            *mut $crate::__pgrx_c_bindings::varlena,
                                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                                    $crate::varlena
+                                                                    $crate::__pgrx_c_bindings::varlena
                                                                 >,
                                                                 $crate::__pgrx_c_macros::expression::ReadWrite
                                                             >,
@@ -803,7 +839,7 @@ macro_rules! DatumGetJsonbPCopy {
                                                                     _
                                                                 >(
                                                                     $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                        $crate::Pointer,
+                                                                        $crate::__pgrx_c_bindings::Pointer,
                                                                         $crate::__pgrx_c_macros::expression::CPointer<
                                                                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                                                 $crate::__pgrx_c_macros::CChar,
@@ -851,9 +887,11 @@ macro_rules! DatumGetJsonbPCopy {
         {
             let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::cast_as::<
-                    *mut $crate::Jsonb,
+                    *mut $crate::__pgrx_c_bindings::Jsonb,
                     $crate::__pgrx_c_macros::expression::CPointer<
-                        $crate::__pgrx_c_macros::expression::CRecord<$crate::Jsonb>,
+                        $crate::__pgrx_c_macros::expression::CRecord<
+                            $crate::__pgrx_c_bindings::Jsonb
+                        >,
                         $crate::__pgrx_c_macros::expression::ReadWrite
                     >,
                     _
@@ -861,15 +899,17 @@ macro_rules! DatumGetJsonbPCopy {
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         <
                             $crate::__pgrx_c_macros::expression::CPointer<
-                                $crate::__pgrx_c_macros::expression::CRecord<$crate::varlena>,
+                                $crate::__pgrx_c_macros::expression::CRecord<
+                                    $crate::__pgrx_c_bindings::varlena
+                                >,
                                 $crate::__pgrx_c_macros::expression::ReadWrite
                             > as $crate::__pgrx_c_macros::expression::CType
                         >::from_storage(
-                            $crate::pg_detoast_datum_copy(
+                            $crate::__pgrx_c_bindings::pg_detoast_datum_copy(
                                 <
                                     $crate::__pgrx_c_macros::expression::CPointer<
                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                            $crate::varlena
+                                            $crate::__pgrx_c_bindings::varlena
                                         >,
                                         $crate::__pgrx_c_macros::expression::ReadWrite
                                     > as $crate::__pgrx_c_macros::expression::CType
@@ -877,7 +917,7 @@ macro_rules! DatumGetJsonbPCopy {
                                     $crate::__pgrx_c_macros::expression::implicit::<
                                         $crate::__pgrx_c_macros::expression::CPointer<
                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                $crate::varlena
+                                                $crate::__pgrx_c_bindings::varlena
                                             >,
                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                         >,
@@ -888,10 +928,10 @@ macro_rules! DatumGetJsonbPCopy {
                                             _
                                         >(
                                             $crate::__pgrx_c_macros::expression::cast_as::<
-                                                *mut $crate::varlena,
+                                                *mut $crate::__pgrx_c_bindings::varlena,
                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                        $crate::varlena
+                                                        $crate::__pgrx_c_bindings::varlena
                                                     >,
                                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                                 >,
@@ -903,7 +943,7 @@ macro_rules! DatumGetJsonbPCopy {
                                                         _
                                                     >(
                                                         $crate::__pgrx_c_macros::expression::cast_as::<
-                                                            $crate::Pointer,
+                                                            $crate::__pgrx_c_bindings::Pointer,
                                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                                     $crate::__pgrx_c_macros::CChar,
@@ -947,8 +987,8 @@ macro_rules! DatumGetJsonbPCopy {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -975,20 +1015,24 @@ macro_rules! __pgrx_c_args_IsAJsonbScalar {
         $crate::__pgrx_c_args_IsAJsonbScalar!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_IsAJsonbScalar!(@p1 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_IsAJsonbScalar!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_IsAJsonbScalar!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_IsAJsonbScalar!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_IsAJsonbScalar!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_IsAJsonbScalar!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -996,7 +1040,9 @@ macro_rules! __pgrx_c_args_IsAJsonbScalar {
         $crate::__pgrx_c_args_IsAJsonbScalar!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_IsAJsonbScalar!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_IsAJsonbScalar!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -1018,14 +1064,18 @@ macro_rules! __pgrx_c_args_IsAJsonbScalar {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_IsAJsonbScalar!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_IsAJsonbScalar!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_IsAJsonbScalar!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_IsAJsonbScalar!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_IsAJsonbScalar!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -1052,13 +1102,13 @@ macro_rules! __pgrx_c_args_IsAJsonbScalar {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_IsAJsonbScalar!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_IsAJsonbScalar!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -1143,7 +1193,9 @@ macro_rules! IsAJsonbScalar {
                                                     $crate::__pgrx_c_macros::expression::null_constant(
                                                         $crate::__pgrx_c_macros::CValue::<
                                                             $crate::__pgrx_c_macros::CInt
-                                                        >::new($crate::jbvType::jbvNull as i32)
+                                                        >::new(
+                                                            $crate::__pgrx_c_bindings::jbvType::jbvNull as i32
+                                                        )
                                                     )
                                                 )
                                             )
@@ -1186,7 +1238,9 @@ macro_rules! IsAJsonbScalar {
                                                 >(
                                                     $crate::__pgrx_c_macros::CValue::<
                                                         $crate::__pgrx_c_macros::CInt
-                                                    >::new($crate::jbvType::jbvBool as i32)
+                                                    >::new(
+                                                        $crate::__pgrx_c_bindings::jbvType::jbvBool as i32
+                                                    )
                                                 )
                                             )
                                         )
@@ -1226,7 +1280,7 @@ macro_rules! IsAJsonbScalar {
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                        $crate::jbvType::jbvDatetime as i32
+                                        $crate::__pgrx_c_bindings::jbvType::jbvDatetime as i32
                                     )
                                 )
                             )
@@ -1318,7 +1372,7 @@ macro_rules! IsAJsonbScalar {
                                                                     $crate::__pgrx_c_macros::CValue::<
                                                                         $crate::__pgrx_c_macros::CInt
                                                                     >::new(
-                                                                        $crate::jbvType::jbvNull as i32
+                                                                        $crate::__pgrx_c_bindings::jbvType::jbvNull as i32
                                                                     )
                                                                 )
                                                             )
@@ -1365,7 +1419,7 @@ macro_rules! IsAJsonbScalar {
                                                                 $crate::__pgrx_c_macros::CValue::<
                                                                     $crate::__pgrx_c_macros::CInt
                                                                 >::new(
-                                                                    $crate::jbvType::jbvBool as i32
+                                                                    $crate::__pgrx_c_bindings::jbvType::jbvBool as i32
                                                                 )
                                                             )
                                                         )
@@ -1413,7 +1467,9 @@ macro_rules! IsAJsonbScalar {
                                             >(
                                                 $crate::__pgrx_c_macros::CValue::<
                                                     $crate::__pgrx_c_macros::CInt
-                                                >::new($crate::jbvType::jbvDatetime as i32)
+                                                >::new(
+                                                    $crate::__pgrx_c_bindings::jbvType::jbvDatetime as i32
+                                                )
                                             )
                                         )
                                     )
@@ -1481,7 +1537,9 @@ macro_rules! IsAJsonbScalar {
                                                     $crate::__pgrx_c_macros::expression::null_constant(
                                                         $crate::__pgrx_c_macros::CValue::<
                                                             $crate::__pgrx_c_macros::CInt
-                                                        >::new($crate::jbvType::jbvNull as i32)
+                                                        >::new(
+                                                            $crate::__pgrx_c_bindings::jbvType::jbvNull as i32
+                                                        )
                                                     )
                                                 )
                                             )
@@ -1524,7 +1582,9 @@ macro_rules! IsAJsonbScalar {
                                                 >(
                                                     $crate::__pgrx_c_macros::CValue::<
                                                         $crate::__pgrx_c_macros::CInt
-                                                    >::new($crate::jbvType::jbvBool as i32)
+                                                    >::new(
+                                                        $crate::__pgrx_c_bindings::jbvType::jbvBool as i32
+                                                    )
                                                 )
                                             )
                                         )
@@ -1564,7 +1624,7 @@ macro_rules! IsAJsonbScalar {
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                        $crate::jbvType::jbvDatetime as i32
+                                        $crate::__pgrx_c_bindings::jbvType::jbvDatetime as i32
                                     )
                                 )
                             )
@@ -1587,8 +1647,8 @@ macro_rules! IsAJsonbScalar {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -1616,13 +1676,13 @@ macro_rules! __pgrx_c_args_JBE_ADVANCE_OFFSET {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_JBE_ADVANCE_OFFSET!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_JBE_ADVANCE_OFFSET!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -1631,7 +1691,7 @@ macro_rules! __pgrx_c_args_JBE_ADVANCE_OFFSET {
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_JBE_ADVANCE_OFFSET!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -1658,31 +1718,35 @@ macro_rules! __pgrx_c_args_JBE_ADVANCE_OFFSET {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_JBE_ADVANCE_OFFSET!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_JBE_ADVANCE_OFFSET!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_JBE_ADVANCE_OFFSET!(@p2 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_JBE_ADVANCE_OFFSET!(
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative1 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_JBE_ADVANCE_OFFSET!(@p2 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_JBE_ADVANCE_OFFSET!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_JBE_ADVANCE_OFFSET!(
-            @p2 $mode [$($done)* (@literal [- $argument]),];
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_JBE_ADVANCE_OFFSET!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -1690,7 +1754,9 @@ macro_rules! __pgrx_c_args_JBE_ADVANCE_OFFSET {
         $crate::__pgrx_c_args_JBE_ADVANCE_OFFSET!(@negative1 $mode [$($done)*]; - $($raw)*)
     };
     (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_JBE_ADVANCE_OFFSET!(@p2 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_JBE_ADVANCE_OFFSET!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -1712,14 +1778,18 @@ macro_rules! __pgrx_c_args_JBE_ADVANCE_OFFSET {
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_JBE_ADVANCE_OFFSET!(@p2 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_JBE_ADVANCE_OFFSET!(
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_JBE_ADVANCE_OFFSET!(@p2 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_JBE_ADVANCE_OFFSET!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_JBE_ADVANCE_OFFSET!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -1746,13 +1816,13 @@ macro_rules! __pgrx_c_args_JBE_ADVANCE_OFFSET {
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_JBE_ADVANCE_OFFSET!(
-            @p2 $mode [$($done)* (@literal [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_JBE_ADVANCE_OFFSET!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -1843,7 +1913,9 @@ macro_rules! JBE_ADVANCE_OFFSET {
                                             >(
                                                 $crate::__pgrx_c_macros::CValue::<
                                                     $crate::__pgrx_c_macros::CUnsignedInt
-                                                >::new($crate::JENTRY_HAS_OFF as u32)
+                                                >::new(
+                                                    $crate::__pgrx_c_bindings::JENTRY_HAS_OFF as u32
+                                                )
                                             )
                                         )
                                     )
@@ -1892,7 +1964,9 @@ macro_rules! JBE_ADVANCE_OFFSET {
                                         >(
                                             $crate::__pgrx_c_macros::CValue::<
                                                 $crate::__pgrx_c_macros::CInt
-                                            >::new($crate::JENTRY_OFFLENMASK as i32)
+                                            >::new(
+                                                $crate::__pgrx_c_bindings::JENTRY_OFFLENMASK as i32
+                                            )
                                         )
                                     )
                                 )
@@ -1933,7 +2007,9 @@ macro_rules! JBE_ADVANCE_OFFSET {
                                         >(
                                             $crate::__pgrx_c_macros::CValue::<
                                                 $crate::__pgrx_c_macros::CInt
-                                            >::new($crate::JENTRY_OFFLENMASK as i32)
+                                            >::new(
+                                                $crate::__pgrx_c_bindings::JENTRY_OFFLENMASK as i32
+                                            )
                                         )
                                     )
                                 )
@@ -1977,8 +2053,8 @@ macro_rules! JBE_ADVANCE_OFFSET {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -2005,25 +2081,34 @@ macro_rules! __pgrx_c_args_JBE_HAS_OFF {
         $crate::__pgrx_c_args_JBE_HAS_OFF!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_JBE_HAS_OFF!(@p1 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_JBE_HAS_OFF!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_JBE_HAS_OFF!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_JBE_HAS_OFF!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_JBE_HAS_OFF!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_JBE_HAS_OFF!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_JBE_HAS_OFF!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $($raw:tt)*) => {
         $crate::__pgrx_c_args_JBE_HAS_OFF!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_JBE_HAS_OFF!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_JBE_HAS_OFF!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -2045,13 +2130,20 @@ macro_rules! __pgrx_c_args_JBE_HAS_OFF {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_JBE_HAS_OFF!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_JBE_HAS_OFF!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_JBE_HAS_OFF!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_JBE_HAS_OFF!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
-        $crate::__pgrx_c_args_JBE_HAS_OFF!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_JBE_HAS_OFF!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
         $crate::__pgrx_c_classify!(
@@ -2073,10 +2165,16 @@ macro_rules! __pgrx_c_args_JBE_HAS_OFF {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_JBE_HAS_OFF!(@p1 $mode [$($done)* (@literal [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_JBE_HAS_OFF!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+            $($rest)*
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_JBE_HAS_OFF!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_JBE_HAS_OFF!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p1 $mode:ident [$($done:tt)*];) => {
         $crate::JBE_HAS_OFF!(@$mode; $($done)*)
@@ -2127,7 +2225,7 @@ macro_rules! JBE_HAS_OFF {
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::CValue::<
                                         $crate::__pgrx_c_macros::CUnsignedInt
-                                    >::new($crate::JENTRY_HAS_OFF as u32)
+                                    >::new($crate::__pgrx_c_bindings::JENTRY_HAS_OFF as u32)
                                 )
                             )
                         )
@@ -2185,7 +2283,9 @@ macro_rules! JBE_HAS_OFF {
                                             >(
                                                 $crate::__pgrx_c_macros::CValue::<
                                                     $crate::__pgrx_c_macros::CUnsignedInt
-                                                >::new($crate::JENTRY_HAS_OFF as u32)
+                                                >::new(
+                                                    $crate::__pgrx_c_bindings::JENTRY_HAS_OFF as u32
+                                                )
                                             )
                                         )
                                     )
@@ -2224,7 +2324,7 @@ macro_rules! JBE_HAS_OFF {
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::CValue::<
                                         $crate::__pgrx_c_macros::CUnsignedInt
-                                    >::new($crate::JENTRY_HAS_OFF as u32)
+                                    >::new($crate::__pgrx_c_bindings::JENTRY_HAS_OFF as u32)
                                 )
                             )
                         )
@@ -2249,8 +2349,8 @@ macro_rules! JBE_HAS_OFF {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -2277,25 +2377,34 @@ macro_rules! __pgrx_c_args_JBE_ISBOOL {
         $crate::__pgrx_c_args_JBE_ISBOOL!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_JBE_ISBOOL!(@p1 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_JBE_ISBOOL!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_JBE_ISBOOL!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_JBE_ISBOOL!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_JBE_ISBOOL!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_JBE_ISBOOL!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_JBE_ISBOOL!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $($raw:tt)*) => {
         $crate::__pgrx_c_args_JBE_ISBOOL!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_JBE_ISBOOL!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_JBE_ISBOOL!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -2317,13 +2426,20 @@ macro_rules! __pgrx_c_args_JBE_ISBOOL {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_JBE_ISBOOL!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_JBE_ISBOOL!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_JBE_ISBOOL!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_JBE_ISBOOL!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
-        $crate::__pgrx_c_args_JBE_ISBOOL!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_JBE_ISBOOL!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
         $crate::__pgrx_c_classify!(
@@ -2345,10 +2461,16 @@ macro_rules! __pgrx_c_args_JBE_ISBOOL {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_JBE_ISBOOL!(@p1 $mode [$($done)* (@literal [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_JBE_ISBOOL!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+            $($rest)*
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_JBE_ISBOOL!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_JBE_ISBOOL!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p1 $mode:ident [$($done:tt)*];) => {
         $crate::JBE_ISBOOL!(@$mode; $($done)*)
@@ -2416,7 +2538,9 @@ macro_rules! JBE_ISBOOL {
                                                 >(
                                                     $crate::__pgrx_c_macros::CValue::<
                                                         $crate::__pgrx_c_macros::CInt
-                                                    >::new($crate::JENTRY_TYPEMASK as i32)
+                                                    >::new(
+                                                        $crate::__pgrx_c_bindings::JENTRY_TYPEMASK as i32
+                                                    )
                                                 )
                                             )
                                         )
@@ -2424,7 +2548,7 @@ macro_rules! JBE_ISBOOL {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::CValue::<
                                             $crate::__pgrx_c_macros::CInt
-                                        >::new($crate::JENTRY_ISBOOL_TRUE as i32)
+                                        >::new($crate::__pgrx_c_bindings::JENTRY_ISBOOL_TRUE as i32)
                                     )
                                 )
                             )
@@ -2456,7 +2580,9 @@ macro_rules! JBE_ISBOOL {
                                                 >(
                                                     $crate::__pgrx_c_macros::CValue::<
                                                         $crate::__pgrx_c_macros::CInt
-                                                    >::new($crate::JENTRY_TYPEMASK as i32)
+                                                    >::new(
+                                                        $crate::__pgrx_c_bindings::JENTRY_TYPEMASK as i32
+                                                    )
                                                 )
                                             )
                                         )
@@ -2464,7 +2590,9 @@ macro_rules! JBE_ISBOOL {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::CValue::<
                                             $crate::__pgrx_c_macros::CInt
-                                        >::new($crate::JENTRY_ISBOOL_FALSE as i32)
+                                        >::new(
+                                            $crate::__pgrx_c_bindings::JENTRY_ISBOOL_FALSE as i32
+                                        )
                                     )
                                 )
                             )
@@ -2537,7 +2665,7 @@ macro_rules! JBE_ISBOOL {
                                                                 $crate::__pgrx_c_macros::CValue::<
                                                                     $crate::__pgrx_c_macros::CInt
                                                                 >::new(
-                                                                    $crate::JENTRY_TYPEMASK as i32
+                                                                    $crate::__pgrx_c_bindings::JENTRY_TYPEMASK as i32
                                                                 )
                                                             )
                                                         )
@@ -2549,7 +2677,9 @@ macro_rules! JBE_ISBOOL {
                                                 >(
                                                     $crate::__pgrx_c_macros::CValue::<
                                                         $crate::__pgrx_c_macros::CInt
-                                                    >::new($crate::JENTRY_ISBOOL_TRUE as i32)
+                                                    >::new(
+                                                        $crate::__pgrx_c_bindings::JENTRY_ISBOOL_TRUE as i32
+                                                    )
                                                 )
                                             )
                                         )
@@ -2585,7 +2715,7 @@ macro_rules! JBE_ISBOOL {
                                                                 $crate::__pgrx_c_macros::CValue::<
                                                                     $crate::__pgrx_c_macros::CInt
                                                                 >::new(
-                                                                    $crate::JENTRY_TYPEMASK as i32
+                                                                    $crate::__pgrx_c_bindings::JENTRY_TYPEMASK as i32
                                                                 )
                                                             )
                                                         )
@@ -2597,7 +2727,9 @@ macro_rules! JBE_ISBOOL {
                                                 >(
                                                     $crate::__pgrx_c_macros::CValue::<
                                                         $crate::__pgrx_c_macros::CInt
-                                                    >::new($crate::JENTRY_ISBOOL_FALSE as i32)
+                                                    >::new(
+                                                        $crate::__pgrx_c_bindings::JENTRY_ISBOOL_FALSE as i32
+                                                    )
                                                 )
                                             )
                                         )
@@ -2651,7 +2783,9 @@ macro_rules! JBE_ISBOOL {
                                                 >(
                                                     $crate::__pgrx_c_macros::CValue::<
                                                         $crate::__pgrx_c_macros::CInt
-                                                    >::new($crate::JENTRY_TYPEMASK as i32)
+                                                    >::new(
+                                                        $crate::__pgrx_c_bindings::JENTRY_TYPEMASK as i32
+                                                    )
                                                 )
                                             )
                                         )
@@ -2659,7 +2793,7 @@ macro_rules! JBE_ISBOOL {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::CValue::<
                                             $crate::__pgrx_c_macros::CInt
-                                        >::new($crate::JENTRY_ISBOOL_TRUE as i32)
+                                        >::new($crate::__pgrx_c_bindings::JENTRY_ISBOOL_TRUE as i32)
                                     )
                                 )
                             )
@@ -2691,7 +2825,9 @@ macro_rules! JBE_ISBOOL {
                                                 >(
                                                     $crate::__pgrx_c_macros::CValue::<
                                                         $crate::__pgrx_c_macros::CInt
-                                                    >::new($crate::JENTRY_TYPEMASK as i32)
+                                                    >::new(
+                                                        $crate::__pgrx_c_bindings::JENTRY_TYPEMASK as i32
+                                                    )
                                                 )
                                             )
                                         )
@@ -2699,7 +2835,9 @@ macro_rules! JBE_ISBOOL {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::CValue::<
                                             $crate::__pgrx_c_macros::CInt
-                                        >::new($crate::JENTRY_ISBOOL_FALSE as i32)
+                                        >::new(
+                                            $crate::__pgrx_c_bindings::JENTRY_ISBOOL_FALSE as i32
+                                        )
                                     )
                                 )
                             )
@@ -2722,8 +2860,8 @@ macro_rules! JBE_ISBOOL {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -2750,20 +2888,24 @@ macro_rules! __pgrx_c_args_JBE_ISBOOL_FALSE {
         $crate::__pgrx_c_args_JBE_ISBOOL_FALSE!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_JBE_ISBOOL_FALSE!(@p1 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_JBE_ISBOOL_FALSE!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_JBE_ISBOOL_FALSE!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_JBE_ISBOOL_FALSE!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_JBE_ISBOOL_FALSE!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_JBE_ISBOOL_FALSE!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -2771,7 +2913,9 @@ macro_rules! __pgrx_c_args_JBE_ISBOOL_FALSE {
         $crate::__pgrx_c_args_JBE_ISBOOL_FALSE!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_JBE_ISBOOL_FALSE!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_JBE_ISBOOL_FALSE!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -2793,14 +2937,18 @@ macro_rules! __pgrx_c_args_JBE_ISBOOL_FALSE {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_JBE_ISBOOL_FALSE!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_JBE_ISBOOL_FALSE!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_JBE_ISBOOL_FALSE!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_JBE_ISBOOL_FALSE!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_JBE_ISBOOL_FALSE!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -2827,13 +2975,13 @@ macro_rules! __pgrx_c_args_JBE_ISBOOL_FALSE {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_JBE_ISBOOL_FALSE!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_JBE_ISBOOL_FALSE!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -2885,7 +3033,7 @@ macro_rules! JBE_ISBOOL_FALSE {
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                        $crate::JENTRY_TYPEMASK as i32
+                                        $crate::__pgrx_c_bindings::JENTRY_TYPEMASK as i32
                                     )
                                 )
                             )
@@ -2893,7 +3041,7 @@ macro_rules! JBE_ISBOOL_FALSE {
                     ),
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                            $crate::JENTRY_ISBOOL_FALSE as i32
+                            $crate::__pgrx_c_bindings::JENTRY_ISBOOL_FALSE as i32
                         )
                     )
                 )
@@ -2942,14 +3090,16 @@ macro_rules! JBE_ISBOOL_FALSE {
                                             >(
                                                 $crate::__pgrx_c_macros::CValue::<
                                                     $crate::__pgrx_c_macros::CInt
-                                                >::new($crate::JENTRY_TYPEMASK as i32)
+                                                >::new(
+                                                    $crate::__pgrx_c_bindings::JENTRY_TYPEMASK as i32
+                                                )
                                             )
                                         )
                                     )
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                        $crate::JENTRY_ISBOOL_FALSE as i32
+                                        $crate::__pgrx_c_bindings::JENTRY_ISBOOL_FALSE as i32
                                     )
                                 )
                             )
@@ -2978,7 +3128,7 @@ macro_rules! JBE_ISBOOL_FALSE {
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                        $crate::JENTRY_TYPEMASK as i32
+                                        $crate::__pgrx_c_bindings::JENTRY_TYPEMASK as i32
                                     )
                                 )
                             )
@@ -2986,7 +3136,7 @@ macro_rules! JBE_ISBOOL_FALSE {
                     ),
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                            $crate::JENTRY_ISBOOL_FALSE as i32
+                            $crate::__pgrx_c_bindings::JENTRY_ISBOOL_FALSE as i32
                         )
                     )
                 )
@@ -3002,8 +3152,8 @@ macro_rules! JBE_ISBOOL_FALSE {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -3030,20 +3180,24 @@ macro_rules! __pgrx_c_args_JBE_ISBOOL_TRUE {
         $crate::__pgrx_c_args_JBE_ISBOOL_TRUE!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_JBE_ISBOOL_TRUE!(@p1 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_JBE_ISBOOL_TRUE!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_JBE_ISBOOL_TRUE!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_JBE_ISBOOL_TRUE!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_JBE_ISBOOL_TRUE!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_JBE_ISBOOL_TRUE!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -3051,7 +3205,9 @@ macro_rules! __pgrx_c_args_JBE_ISBOOL_TRUE {
         $crate::__pgrx_c_args_JBE_ISBOOL_TRUE!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_JBE_ISBOOL_TRUE!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_JBE_ISBOOL_TRUE!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -3073,14 +3229,18 @@ macro_rules! __pgrx_c_args_JBE_ISBOOL_TRUE {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_JBE_ISBOOL_TRUE!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_JBE_ISBOOL_TRUE!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_JBE_ISBOOL_TRUE!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_JBE_ISBOOL_TRUE!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_JBE_ISBOOL_TRUE!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -3107,13 +3267,13 @@ macro_rules! __pgrx_c_args_JBE_ISBOOL_TRUE {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_JBE_ISBOOL_TRUE!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_JBE_ISBOOL_TRUE!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -3165,7 +3325,7 @@ macro_rules! JBE_ISBOOL_TRUE {
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                        $crate::JENTRY_TYPEMASK as i32
+                                        $crate::__pgrx_c_bindings::JENTRY_TYPEMASK as i32
                                     )
                                 )
                             )
@@ -3173,7 +3333,7 @@ macro_rules! JBE_ISBOOL_TRUE {
                     ),
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                            $crate::JENTRY_ISBOOL_TRUE as i32
+                            $crate::__pgrx_c_bindings::JENTRY_ISBOOL_TRUE as i32
                         )
                     )
                 )
@@ -3222,14 +3382,16 @@ macro_rules! JBE_ISBOOL_TRUE {
                                             >(
                                                 $crate::__pgrx_c_macros::CValue::<
                                                     $crate::__pgrx_c_macros::CInt
-                                                >::new($crate::JENTRY_TYPEMASK as i32)
+                                                >::new(
+                                                    $crate::__pgrx_c_bindings::JENTRY_TYPEMASK as i32
+                                                )
                                             )
                                         )
                                     )
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                        $crate::JENTRY_ISBOOL_TRUE as i32
+                                        $crate::__pgrx_c_bindings::JENTRY_ISBOOL_TRUE as i32
                                     )
                                 )
                             )
@@ -3258,7 +3420,7 @@ macro_rules! JBE_ISBOOL_TRUE {
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                        $crate::JENTRY_TYPEMASK as i32
+                                        $crate::__pgrx_c_bindings::JENTRY_TYPEMASK as i32
                                     )
                                 )
                             )
@@ -3266,7 +3428,7 @@ macro_rules! JBE_ISBOOL_TRUE {
                     ),
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                            $crate::JENTRY_ISBOOL_TRUE as i32
+                            $crate::__pgrx_c_bindings::JENTRY_ISBOOL_TRUE as i32
                         )
                     )
                 )
@@ -3282,8 +3444,8 @@ macro_rules! JBE_ISBOOL_TRUE {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -3310,20 +3472,24 @@ macro_rules! __pgrx_c_args_JBE_ISCONTAINER {
         $crate::__pgrx_c_args_JBE_ISCONTAINER!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_JBE_ISCONTAINER!(@p1 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_JBE_ISCONTAINER!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_JBE_ISCONTAINER!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_JBE_ISCONTAINER!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_JBE_ISCONTAINER!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_JBE_ISCONTAINER!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -3331,7 +3497,9 @@ macro_rules! __pgrx_c_args_JBE_ISCONTAINER {
         $crate::__pgrx_c_args_JBE_ISCONTAINER!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_JBE_ISCONTAINER!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_JBE_ISCONTAINER!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -3353,14 +3521,18 @@ macro_rules! __pgrx_c_args_JBE_ISCONTAINER {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_JBE_ISCONTAINER!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_JBE_ISCONTAINER!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_JBE_ISCONTAINER!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_JBE_ISCONTAINER!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_JBE_ISCONTAINER!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -3387,13 +3559,13 @@ macro_rules! __pgrx_c_args_JBE_ISCONTAINER {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_JBE_ISCONTAINER!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_JBE_ISCONTAINER!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -3445,7 +3617,7 @@ macro_rules! JBE_ISCONTAINER {
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                        $crate::JENTRY_TYPEMASK as i32
+                                        $crate::__pgrx_c_bindings::JENTRY_TYPEMASK as i32
                                     )
                                 )
                             )
@@ -3453,7 +3625,7 @@ macro_rules! JBE_ISCONTAINER {
                     ),
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                            $crate::JENTRY_ISCONTAINER as i32
+                            $crate::__pgrx_c_bindings::JENTRY_ISCONTAINER as i32
                         )
                     )
                 )
@@ -3502,14 +3674,16 @@ macro_rules! JBE_ISCONTAINER {
                                             >(
                                                 $crate::__pgrx_c_macros::CValue::<
                                                     $crate::__pgrx_c_macros::CInt
-                                                >::new($crate::JENTRY_TYPEMASK as i32)
+                                                >::new(
+                                                    $crate::__pgrx_c_bindings::JENTRY_TYPEMASK as i32
+                                                )
                                             )
                                         )
                                     )
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                        $crate::JENTRY_ISCONTAINER as i32
+                                        $crate::__pgrx_c_bindings::JENTRY_ISCONTAINER as i32
                                     )
                                 )
                             )
@@ -3538,7 +3712,7 @@ macro_rules! JBE_ISCONTAINER {
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                        $crate::JENTRY_TYPEMASK as i32
+                                        $crate::__pgrx_c_bindings::JENTRY_TYPEMASK as i32
                                     )
                                 )
                             )
@@ -3546,7 +3720,7 @@ macro_rules! JBE_ISCONTAINER {
                     ),
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                            $crate::JENTRY_ISCONTAINER as i32
+                            $crate::__pgrx_c_bindings::JENTRY_ISCONTAINER as i32
                         )
                     )
                 )
@@ -3562,8 +3736,8 @@ macro_rules! JBE_ISCONTAINER {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -3590,25 +3764,34 @@ macro_rules! __pgrx_c_args_JBE_ISNULL {
         $crate::__pgrx_c_args_JBE_ISNULL!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_JBE_ISNULL!(@p1 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_JBE_ISNULL!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_JBE_ISNULL!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_JBE_ISNULL!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_JBE_ISNULL!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_JBE_ISNULL!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_JBE_ISNULL!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $($raw:tt)*) => {
         $crate::__pgrx_c_args_JBE_ISNULL!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_JBE_ISNULL!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_JBE_ISNULL!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -3630,13 +3813,20 @@ macro_rules! __pgrx_c_args_JBE_ISNULL {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_JBE_ISNULL!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_JBE_ISNULL!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_JBE_ISNULL!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_JBE_ISNULL!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
-        $crate::__pgrx_c_args_JBE_ISNULL!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_JBE_ISNULL!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
         $crate::__pgrx_c_classify!(
@@ -3658,10 +3848,16 @@ macro_rules! __pgrx_c_args_JBE_ISNULL {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_JBE_ISNULL!(@p1 $mode [$($done)* (@literal [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_JBE_ISNULL!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+            $($rest)*
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_JBE_ISNULL!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_JBE_ISNULL!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p1 $mode:ident [$($done:tt)*];) => {
         $crate::JBE_ISNULL!(@$mode; $($done)*)
@@ -3711,7 +3907,7 @@ macro_rules! JBE_ISNULL {
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                        $crate::JENTRY_TYPEMASK as i32
+                                        $crate::__pgrx_c_bindings::JENTRY_TYPEMASK as i32
                                     )
                                 )
                             )
@@ -3719,7 +3915,7 @@ macro_rules! JBE_ISNULL {
                     ),
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                            $crate::JENTRY_ISNULL as i32
+                            $crate::__pgrx_c_bindings::JENTRY_ISNULL as i32
                         )
                     )
                 )
@@ -3768,14 +3964,16 @@ macro_rules! JBE_ISNULL {
                                             >(
                                                 $crate::__pgrx_c_macros::CValue::<
                                                     $crate::__pgrx_c_macros::CInt
-                                                >::new($crate::JENTRY_TYPEMASK as i32)
+                                                >::new(
+                                                    $crate::__pgrx_c_bindings::JENTRY_TYPEMASK as i32
+                                                )
                                             )
                                         )
                                     )
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                        $crate::JENTRY_ISNULL as i32
+                                        $crate::__pgrx_c_bindings::JENTRY_ISNULL as i32
                                     )
                                 )
                             )
@@ -3804,7 +4002,7 @@ macro_rules! JBE_ISNULL {
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                        $crate::JENTRY_TYPEMASK as i32
+                                        $crate::__pgrx_c_bindings::JENTRY_TYPEMASK as i32
                                     )
                                 )
                             )
@@ -3812,7 +4010,7 @@ macro_rules! JBE_ISNULL {
                     ),
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                            $crate::JENTRY_ISNULL as i32
+                            $crate::__pgrx_c_bindings::JENTRY_ISNULL as i32
                         )
                     )
                 )
@@ -3828,8 +4026,8 @@ macro_rules! JBE_ISNULL {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -3856,20 +4054,24 @@ macro_rules! __pgrx_c_args_JBE_ISNUMERIC {
         $crate::__pgrx_c_args_JBE_ISNUMERIC!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_JBE_ISNUMERIC!(@p1 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_JBE_ISNUMERIC!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_JBE_ISNUMERIC!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_JBE_ISNUMERIC!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_JBE_ISNUMERIC!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_JBE_ISNUMERIC!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -3877,7 +4079,9 @@ macro_rules! __pgrx_c_args_JBE_ISNUMERIC {
         $crate::__pgrx_c_args_JBE_ISNUMERIC!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_JBE_ISNUMERIC!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_JBE_ISNUMERIC!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -3899,14 +4103,18 @@ macro_rules! __pgrx_c_args_JBE_ISNUMERIC {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_JBE_ISNUMERIC!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_JBE_ISNUMERIC!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_JBE_ISNUMERIC!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_JBE_ISNUMERIC!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_JBE_ISNUMERIC!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -3933,13 +4141,13 @@ macro_rules! __pgrx_c_args_JBE_ISNUMERIC {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_JBE_ISNUMERIC!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_JBE_ISNUMERIC!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -3991,7 +4199,7 @@ macro_rules! JBE_ISNUMERIC {
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                        $crate::JENTRY_TYPEMASK as i32
+                                        $crate::__pgrx_c_bindings::JENTRY_TYPEMASK as i32
                                     )
                                 )
                             )
@@ -3999,7 +4207,7 @@ macro_rules! JBE_ISNUMERIC {
                     ),
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                            $crate::JENTRY_ISNUMERIC as i32
+                            $crate::__pgrx_c_bindings::JENTRY_ISNUMERIC as i32
                         )
                     )
                 )
@@ -4048,14 +4256,16 @@ macro_rules! JBE_ISNUMERIC {
                                             >(
                                                 $crate::__pgrx_c_macros::CValue::<
                                                     $crate::__pgrx_c_macros::CInt
-                                                >::new($crate::JENTRY_TYPEMASK as i32)
+                                                >::new(
+                                                    $crate::__pgrx_c_bindings::JENTRY_TYPEMASK as i32
+                                                )
                                             )
                                         )
                                     )
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                        $crate::JENTRY_ISNUMERIC as i32
+                                        $crate::__pgrx_c_bindings::JENTRY_ISNUMERIC as i32
                                     )
                                 )
                             )
@@ -4084,7 +4294,7 @@ macro_rules! JBE_ISNUMERIC {
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                        $crate::JENTRY_TYPEMASK as i32
+                                        $crate::__pgrx_c_bindings::JENTRY_TYPEMASK as i32
                                     )
                                 )
                             )
@@ -4092,7 +4302,7 @@ macro_rules! JBE_ISNUMERIC {
                     ),
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                            $crate::JENTRY_ISNUMERIC as i32
+                            $crate::__pgrx_c_bindings::JENTRY_ISNUMERIC as i32
                         )
                     )
                 )
@@ -4108,8 +4318,8 @@ macro_rules! JBE_ISNUMERIC {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -4136,25 +4346,34 @@ macro_rules! __pgrx_c_args_JBE_ISSTRING {
         $crate::__pgrx_c_args_JBE_ISSTRING!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_JBE_ISSTRING!(@p1 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_JBE_ISSTRING!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_JBE_ISSTRING!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_JBE_ISSTRING!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_JBE_ISSTRING!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_JBE_ISSTRING!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_JBE_ISSTRING!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $($raw:tt)*) => {
         $crate::__pgrx_c_args_JBE_ISSTRING!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_JBE_ISSTRING!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_JBE_ISSTRING!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -4176,13 +4395,20 @@ macro_rules! __pgrx_c_args_JBE_ISSTRING {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_JBE_ISSTRING!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_JBE_ISSTRING!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_JBE_ISSTRING!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_JBE_ISSTRING!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
-        $crate::__pgrx_c_args_JBE_ISSTRING!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_JBE_ISSTRING!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
         $crate::__pgrx_c_classify!(
@@ -4205,12 +4431,15 @@ macro_rules! __pgrx_c_args_JBE_ISSTRING {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_JBE_ISSTRING!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_JBE_ISSTRING!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_JBE_ISSTRING!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p1 $mode:ident [$($done:tt)*];) => {
         $crate::JBE_ISSTRING!(@$mode; $($done)*)
@@ -4260,7 +4489,7 @@ macro_rules! JBE_ISSTRING {
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                        $crate::JENTRY_TYPEMASK as i32
+                                        $crate::__pgrx_c_bindings::JENTRY_TYPEMASK as i32
                                     )
                                 )
                             )
@@ -4269,7 +4498,7 @@ macro_rules! JBE_ISSTRING {
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::expression::null_constant(
                             $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                $crate::JENTRY_ISSTRING as i32
+                                $crate::__pgrx_c_bindings::JENTRY_ISSTRING as i32
                             )
                         )
                     )
@@ -4319,7 +4548,9 @@ macro_rules! JBE_ISSTRING {
                                             >(
                                                 $crate::__pgrx_c_macros::CValue::<
                                                     $crate::__pgrx_c_macros::CInt
-                                                >::new($crate::JENTRY_TYPEMASK as i32)
+                                                >::new(
+                                                    $crate::__pgrx_c_bindings::JENTRY_TYPEMASK as i32
+                                                )
                                             )
                                         )
                                     )
@@ -4328,7 +4559,7 @@ macro_rules! JBE_ISSTRING {
                                     $crate::__pgrx_c_macros::expression::null_constant(
                                         $crate::__pgrx_c_macros::CValue::<
                                             $crate::__pgrx_c_macros::CInt
-                                        >::new($crate::JENTRY_ISSTRING as i32)
+                                        >::new($crate::__pgrx_c_bindings::JENTRY_ISSTRING as i32)
                                     )
                                 )
                             )
@@ -4357,7 +4588,7 @@ macro_rules! JBE_ISSTRING {
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                        $crate::JENTRY_TYPEMASK as i32
+                                        $crate::__pgrx_c_bindings::JENTRY_TYPEMASK as i32
                                     )
                                 )
                             )
@@ -4366,7 +4597,7 @@ macro_rules! JBE_ISSTRING {
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::expression::null_constant(
                             $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                $crate::JENTRY_ISSTRING as i32
+                                $crate::__pgrx_c_bindings::JENTRY_ISSTRING as i32
                             )
                         )
                     )
@@ -4383,8 +4614,8 @@ macro_rules! JBE_ISSTRING {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -4411,20 +4642,24 @@ macro_rules! __pgrx_c_args_JBE_OFFLENFLD {
         $crate::__pgrx_c_args_JBE_OFFLENFLD!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_JBE_OFFLENFLD!(@p1 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_JBE_OFFLENFLD!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_JBE_OFFLENFLD!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_JBE_OFFLENFLD!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_JBE_OFFLENFLD!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_JBE_OFFLENFLD!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -4432,7 +4667,9 @@ macro_rules! __pgrx_c_args_JBE_OFFLENFLD {
         $crate::__pgrx_c_args_JBE_OFFLENFLD!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_JBE_OFFLENFLD!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_JBE_OFFLENFLD!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -4454,14 +4691,18 @@ macro_rules! __pgrx_c_args_JBE_OFFLENFLD {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_JBE_OFFLENFLD!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_JBE_OFFLENFLD!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_JBE_OFFLENFLD!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_JBE_OFFLENFLD!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_JBE_OFFLENFLD!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -4488,13 +4729,13 @@ macro_rules! __pgrx_c_args_JBE_OFFLENFLD {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_JBE_OFFLENFLD!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_JBE_OFFLENFLD!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -4543,7 +4784,7 @@ macro_rules! JBE_OFFLENFLD {
                     ),
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                            $crate::JENTRY_OFFLENMASK as i32
+                            $crate::__pgrx_c_bindings::JENTRY_OFFLENMASK as i32
                         )
                     )
                 )
@@ -4584,7 +4825,7 @@ macro_rules! JBE_OFFLENFLD {
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                        $crate::JENTRY_OFFLENMASK as i32
+                                        $crate::__pgrx_c_bindings::JENTRY_OFFLENMASK as i32
                                     )
                                 )
                             )
@@ -4610,7 +4851,7 @@ macro_rules! JBE_OFFLENFLD {
                     ),
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                            $crate::JENTRY_OFFLENMASK as i32
+                            $crate::__pgrx_c_bindings::JENTRY_OFFLENMASK as i32
                         )
                     )
                 )
@@ -4626,8 +4867,8 @@ macro_rules! JBE_OFFLENFLD {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -4654,20 +4895,24 @@ macro_rules! __pgrx_c_args_JB_ROOT_COUNT {
         $crate::__pgrx_c_args_JB_ROOT_COUNT!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_JB_ROOT_COUNT!(@p1 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_JB_ROOT_COUNT!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_JB_ROOT_COUNT!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_JB_ROOT_COUNT!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_JB_ROOT_COUNT!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_JB_ROOT_COUNT!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -4675,7 +4920,9 @@ macro_rules! __pgrx_c_args_JB_ROOT_COUNT {
         $crate::__pgrx_c_args_JB_ROOT_COUNT!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_JB_ROOT_COUNT!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_JB_ROOT_COUNT!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -4697,14 +4944,18 @@ macro_rules! __pgrx_c_args_JB_ROOT_COUNT {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_JB_ROOT_COUNT!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_JB_ROOT_COUNT!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_JB_ROOT_COUNT!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_JB_ROOT_COUNT!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_JB_ROOT_COUNT!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -4731,13 +4982,13 @@ macro_rules! __pgrx_c_args_JB_ROOT_COUNT {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_JB_ROOT_COUNT!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_JB_ROOT_COUNT!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -4788,7 +5039,7 @@ macro_rules! JB_ROOT_COUNT {
                         $crate::__pgrx_c_macros::expression::dereference(
                             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                 $crate::__pgrx_c_macros::expression::cast_as::<
-                                    *mut $crate::uint32,
+                                    *mut $crate::__pgrx_c_bindings::uint32,
                                     $crate::__pgrx_c_macros::expression::CPointer<
                                         $crate::__pgrx_c_macros::CUnsignedInt,
                                         $crate::__pgrx_c_macros::expression::ReadWrite
@@ -4818,10 +5069,10 @@ macro_rules! JB_ROOT_COUNT {
                                                                     _
                                                                 >(
                                                                     $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                        *mut $crate::varattrib_4b,
+                                                                        *mut $crate::__pgrx_c_bindings::varattrib_4b,
                                                                         $crate::__pgrx_c_macros::expression::CPointer<
                                                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                $crate::varattrib_4b
+                                                                                $crate::__pgrx_c_bindings::varattrib_4b
                                                                             >,
                                                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                                                         >,
@@ -4853,7 +5104,7 @@ macro_rules! JB_ROOT_COUNT {
                     ),
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                            $crate::JB_CMASK as i32
+                            $crate::__pgrx_c_bindings::JB_CMASK as i32
                         )
                     )
                 )
@@ -4895,7 +5146,7 @@ macro_rules! JB_ROOT_COUNT {
                                             _
                                         >(
                                             $crate::__pgrx_c_macros::expression::cast_as::<
-                                                *mut $crate::uint32,
+                                                *mut $crate::__pgrx_c_bindings::uint32,
                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                     $crate::__pgrx_c_macros::CUnsignedInt,
                                                     $crate::__pgrx_c_macros::expression::ReadWrite
@@ -4925,10 +5176,10 @@ macro_rules! JB_ROOT_COUNT {
                                                                                 _
                                                                             >(
                                                                                 $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                                    *mut $crate::varattrib_4b,
+                                                                                    *mut $crate::__pgrx_c_bindings::varattrib_4b,
                                                                                     $crate::__pgrx_c_macros::expression::CPointer<
                                                                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                            $crate::varattrib_4b
+                                                                                            $crate::__pgrx_c_bindings::varattrib_4b
                                                                                         >,
                                                                                         $crate::__pgrx_c_macros::expression::ReadWrite
                                                                                     >,
@@ -4962,7 +5213,7 @@ macro_rules! JB_ROOT_COUNT {
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                        $crate::JB_CMASK as i32
+                                        $crate::__pgrx_c_bindings::JB_CMASK as i32
                                     )
                                 )
                             )
@@ -4986,7 +5237,7 @@ macro_rules! JB_ROOT_COUNT {
                         $crate::__pgrx_c_macros::expression::dereference(
                             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                 $crate::__pgrx_c_macros::expression::cast_as::<
-                                    *mut $crate::uint32,
+                                    *mut $crate::__pgrx_c_bindings::uint32,
                                     $crate::__pgrx_c_macros::expression::CPointer<
                                         $crate::__pgrx_c_macros::CUnsignedInt,
                                         $crate::__pgrx_c_macros::expression::ReadWrite
@@ -5016,10 +5267,10 @@ macro_rules! JB_ROOT_COUNT {
                                                                     _
                                                                 >(
                                                                     $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                        *mut $crate::varattrib_4b,
+                                                                        *mut $crate::__pgrx_c_bindings::varattrib_4b,
                                                                         $crate::__pgrx_c_macros::expression::CPointer<
                                                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                $crate::varattrib_4b
+                                                                                $crate::__pgrx_c_bindings::varattrib_4b
                                                                             >,
                                                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                                                         >,
@@ -5051,7 +5302,7 @@ macro_rules! JB_ROOT_COUNT {
                     ),
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                            $crate::JB_CMASK as i32
+                            $crate::__pgrx_c_bindings::JB_CMASK as i32
                         )
                     )
                 )
@@ -5067,8 +5318,8 @@ macro_rules! JB_ROOT_COUNT {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -5095,20 +5346,24 @@ macro_rules! __pgrx_c_args_JB_ROOT_IS_ARRAY {
         $crate::__pgrx_c_args_JB_ROOT_IS_ARRAY!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_JB_ROOT_IS_ARRAY!(@p1 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_JB_ROOT_IS_ARRAY!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_JB_ROOT_IS_ARRAY!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_JB_ROOT_IS_ARRAY!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_JB_ROOT_IS_ARRAY!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_JB_ROOT_IS_ARRAY!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -5116,7 +5371,9 @@ macro_rules! __pgrx_c_args_JB_ROOT_IS_ARRAY {
         $crate::__pgrx_c_args_JB_ROOT_IS_ARRAY!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_JB_ROOT_IS_ARRAY!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_JB_ROOT_IS_ARRAY!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -5138,14 +5395,18 @@ macro_rules! __pgrx_c_args_JB_ROOT_IS_ARRAY {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_JB_ROOT_IS_ARRAY!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_JB_ROOT_IS_ARRAY!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_JB_ROOT_IS_ARRAY!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_JB_ROOT_IS_ARRAY!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_JB_ROOT_IS_ARRAY!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -5172,13 +5433,13 @@ macro_rules! __pgrx_c_args_JB_ROOT_IS_ARRAY {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_JB_ROOT_IS_ARRAY!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_JB_ROOT_IS_ARRAY!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -5235,7 +5496,7 @@ macro_rules! JB_ROOT_IS_ARRAY {
                                             _
                                         >(
                                             $crate::__pgrx_c_macros::expression::cast_as::<
-                                                *mut $crate::uint32,
+                                                *mut $crate::__pgrx_c_bindings::uint32,
                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                     $crate::__pgrx_c_macros::CUnsignedInt,
                                                     $crate::__pgrx_c_macros::expression::ReadWrite
@@ -5265,10 +5526,10 @@ macro_rules! JB_ROOT_IS_ARRAY {
                                                                                 _
                                                                             >(
                                                                                 $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                                    *mut $crate::varattrib_4b,
+                                                                                    *mut $crate::__pgrx_c_bindings::varattrib_4b,
                                                                                     $crate::__pgrx_c_macros::expression::CPointer<
                                                                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                            $crate::varattrib_4b
+                                                                                            $crate::__pgrx_c_bindings::varattrib_4b
                                                                                         >,
                                                                                         $crate::__pgrx_c_macros::expression::ReadWrite
                                                                                     >,
@@ -5302,7 +5563,7 @@ macro_rules! JB_ROOT_IS_ARRAY {
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                        $crate::JB_FARRAY as i32
+                                        $crate::__pgrx_c_bindings::JB_FARRAY as i32
                                     )
                                 )
                             )
@@ -5360,7 +5621,7 @@ macro_rules! JB_ROOT_IS_ARRAY {
                                                         _
                                                     >(
                                                         $crate::__pgrx_c_macros::expression::cast_as::<
-                                                            *mut $crate::uint32,
+                                                            *mut $crate::__pgrx_c_bindings::uint32,
                                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                                 $crate::__pgrx_c_macros::CUnsignedInt,
                                                                 $crate::__pgrx_c_macros::expression::ReadWrite
@@ -5390,10 +5651,10 @@ macro_rules! JB_ROOT_IS_ARRAY {
                                                                                             _
                                                                                         >(
                                                                                             $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                                                *mut $crate::varattrib_4b,
+                                                                                                *mut $crate::__pgrx_c_bindings::varattrib_4b,
                                                                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                        $crate::varattrib_4b
+                                                                                                        $crate::__pgrx_c_bindings::varattrib_4b
                                                                                                     >,
                                                                                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                                                                                 >,
@@ -5431,7 +5692,7 @@ macro_rules! JB_ROOT_IS_ARRAY {
                                             >(
                                                 $crate::__pgrx_c_macros::CValue::<
                                                     $crate::__pgrx_c_macros::CInt
-                                                >::new($crate::JB_FARRAY as i32)
+                                                >::new($crate::__pgrx_c_bindings::JB_FARRAY as i32)
                                             )
                                         )
                                     )
@@ -5470,7 +5731,7 @@ macro_rules! JB_ROOT_IS_ARRAY {
                                             _
                                         >(
                                             $crate::__pgrx_c_macros::expression::cast_as::<
-                                                *mut $crate::uint32,
+                                                *mut $crate::__pgrx_c_bindings::uint32,
                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                     $crate::__pgrx_c_macros::CUnsignedInt,
                                                     $crate::__pgrx_c_macros::expression::ReadWrite
@@ -5500,10 +5761,10 @@ macro_rules! JB_ROOT_IS_ARRAY {
                                                                                 _
                                                                             >(
                                                                                 $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                                    *mut $crate::varattrib_4b,
+                                                                                    *mut $crate::__pgrx_c_bindings::varattrib_4b,
                                                                                     $crate::__pgrx_c_macros::expression::CPointer<
                                                                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                            $crate::varattrib_4b
+                                                                                            $crate::__pgrx_c_bindings::varattrib_4b
                                                                                         >,
                                                                                         $crate::__pgrx_c_macros::expression::ReadWrite
                                                                                     >,
@@ -5537,7 +5798,7 @@ macro_rules! JB_ROOT_IS_ARRAY {
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                        $crate::JB_FARRAY as i32
+                                        $crate::__pgrx_c_bindings::JB_FARRAY as i32
                                     )
                                 )
                             )
@@ -5563,8 +5824,8 @@ macro_rules! JB_ROOT_IS_ARRAY {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -5591,20 +5852,24 @@ macro_rules! __pgrx_c_args_JB_ROOT_IS_OBJECT {
         $crate::__pgrx_c_args_JB_ROOT_IS_OBJECT!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_JB_ROOT_IS_OBJECT!(@p1 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_JB_ROOT_IS_OBJECT!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_JB_ROOT_IS_OBJECT!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_JB_ROOT_IS_OBJECT!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_JB_ROOT_IS_OBJECT!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_JB_ROOT_IS_OBJECT!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -5612,7 +5877,9 @@ macro_rules! __pgrx_c_args_JB_ROOT_IS_OBJECT {
         $crate::__pgrx_c_args_JB_ROOT_IS_OBJECT!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_JB_ROOT_IS_OBJECT!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_JB_ROOT_IS_OBJECT!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -5634,14 +5901,18 @@ macro_rules! __pgrx_c_args_JB_ROOT_IS_OBJECT {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_JB_ROOT_IS_OBJECT!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_JB_ROOT_IS_OBJECT!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_JB_ROOT_IS_OBJECT!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_JB_ROOT_IS_OBJECT!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_JB_ROOT_IS_OBJECT!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -5668,13 +5939,13 @@ macro_rules! __pgrx_c_args_JB_ROOT_IS_OBJECT {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_JB_ROOT_IS_OBJECT!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_JB_ROOT_IS_OBJECT!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -5731,7 +6002,7 @@ macro_rules! JB_ROOT_IS_OBJECT {
                                             _
                                         >(
                                             $crate::__pgrx_c_macros::expression::cast_as::<
-                                                *mut $crate::uint32,
+                                                *mut $crate::__pgrx_c_bindings::uint32,
                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                     $crate::__pgrx_c_macros::CUnsignedInt,
                                                     $crate::__pgrx_c_macros::expression::ReadWrite
@@ -5761,10 +6032,10 @@ macro_rules! JB_ROOT_IS_OBJECT {
                                                                                 _
                                                                             >(
                                                                                 $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                                    *mut $crate::varattrib_4b,
+                                                                                    *mut $crate::__pgrx_c_bindings::varattrib_4b,
                                                                                     $crate::__pgrx_c_macros::expression::CPointer<
                                                                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                            $crate::varattrib_4b
+                                                                                            $crate::__pgrx_c_bindings::varattrib_4b
                                                                                         >,
                                                                                         $crate::__pgrx_c_macros::expression::ReadWrite
                                                                                     >,
@@ -5798,7 +6069,7 @@ macro_rules! JB_ROOT_IS_OBJECT {
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                        $crate::JB_FOBJECT as i32
+                                        $crate::__pgrx_c_bindings::JB_FOBJECT as i32
                                     )
                                 )
                             )
@@ -5856,7 +6127,7 @@ macro_rules! JB_ROOT_IS_OBJECT {
                                                         _
                                                     >(
                                                         $crate::__pgrx_c_macros::expression::cast_as::<
-                                                            *mut $crate::uint32,
+                                                            *mut $crate::__pgrx_c_bindings::uint32,
                                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                                 $crate::__pgrx_c_macros::CUnsignedInt,
                                                                 $crate::__pgrx_c_macros::expression::ReadWrite
@@ -5886,10 +6157,10 @@ macro_rules! JB_ROOT_IS_OBJECT {
                                                                                             _
                                                                                         >(
                                                                                             $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                                                *mut $crate::varattrib_4b,
+                                                                                                *mut $crate::__pgrx_c_bindings::varattrib_4b,
                                                                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                        $crate::varattrib_4b
+                                                                                                        $crate::__pgrx_c_bindings::varattrib_4b
                                                                                                     >,
                                                                                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                                                                                 >,
@@ -5927,7 +6198,7 @@ macro_rules! JB_ROOT_IS_OBJECT {
                                             >(
                                                 $crate::__pgrx_c_macros::CValue::<
                                                     $crate::__pgrx_c_macros::CInt
-                                                >::new($crate::JB_FOBJECT as i32)
+                                                >::new($crate::__pgrx_c_bindings::JB_FOBJECT as i32)
                                             )
                                         )
                                     )
@@ -5966,7 +6237,7 @@ macro_rules! JB_ROOT_IS_OBJECT {
                                             _
                                         >(
                                             $crate::__pgrx_c_macros::expression::cast_as::<
-                                                *mut $crate::uint32,
+                                                *mut $crate::__pgrx_c_bindings::uint32,
                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                     $crate::__pgrx_c_macros::CUnsignedInt,
                                                     $crate::__pgrx_c_macros::expression::ReadWrite
@@ -5996,10 +6267,10 @@ macro_rules! JB_ROOT_IS_OBJECT {
                                                                                 _
                                                                             >(
                                                                                 $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                                    *mut $crate::varattrib_4b,
+                                                                                    *mut $crate::__pgrx_c_bindings::varattrib_4b,
                                                                                     $crate::__pgrx_c_macros::expression::CPointer<
                                                                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                            $crate::varattrib_4b
+                                                                                            $crate::__pgrx_c_bindings::varattrib_4b
                                                                                         >,
                                                                                         $crate::__pgrx_c_macros::expression::ReadWrite
                                                                                     >,
@@ -6033,7 +6304,7 @@ macro_rules! JB_ROOT_IS_OBJECT {
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                        $crate::JB_FOBJECT as i32
+                                        $crate::__pgrx_c_bindings::JB_FOBJECT as i32
                                     )
                                 )
                             )
@@ -6059,8 +6330,8 @@ macro_rules! JB_ROOT_IS_OBJECT {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -6087,20 +6358,24 @@ macro_rules! __pgrx_c_args_JB_ROOT_IS_SCALAR {
         $crate::__pgrx_c_args_JB_ROOT_IS_SCALAR!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_JB_ROOT_IS_SCALAR!(@p1 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_JB_ROOT_IS_SCALAR!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_JB_ROOT_IS_SCALAR!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_JB_ROOT_IS_SCALAR!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_JB_ROOT_IS_SCALAR!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_JB_ROOT_IS_SCALAR!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -6108,7 +6383,9 @@ macro_rules! __pgrx_c_args_JB_ROOT_IS_SCALAR {
         $crate::__pgrx_c_args_JB_ROOT_IS_SCALAR!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_JB_ROOT_IS_SCALAR!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_JB_ROOT_IS_SCALAR!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -6130,14 +6407,18 @@ macro_rules! __pgrx_c_args_JB_ROOT_IS_SCALAR {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_JB_ROOT_IS_SCALAR!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_JB_ROOT_IS_SCALAR!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_JB_ROOT_IS_SCALAR!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_JB_ROOT_IS_SCALAR!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_JB_ROOT_IS_SCALAR!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -6164,13 +6445,13 @@ macro_rules! __pgrx_c_args_JB_ROOT_IS_SCALAR {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_JB_ROOT_IS_SCALAR!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_JB_ROOT_IS_SCALAR!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -6227,7 +6508,7 @@ macro_rules! JB_ROOT_IS_SCALAR {
                                             _
                                         >(
                                             $crate::__pgrx_c_macros::expression::cast_as::<
-                                                *mut $crate::uint32,
+                                                *mut $crate::__pgrx_c_bindings::uint32,
                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                     $crate::__pgrx_c_macros::CUnsignedInt,
                                                     $crate::__pgrx_c_macros::expression::ReadWrite
@@ -6257,10 +6538,10 @@ macro_rules! JB_ROOT_IS_SCALAR {
                                                                                 _
                                                                             >(
                                                                                 $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                                    *mut $crate::varattrib_4b,
+                                                                                    *mut $crate::__pgrx_c_bindings::varattrib_4b,
                                                                                     $crate::__pgrx_c_macros::expression::CPointer<
                                                                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                            $crate::varattrib_4b
+                                                                                            $crate::__pgrx_c_bindings::varattrib_4b
                                                                                         >,
                                                                                         $crate::__pgrx_c_macros::expression::ReadWrite
                                                                                     >,
@@ -6294,7 +6575,7 @@ macro_rules! JB_ROOT_IS_SCALAR {
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                        $crate::JB_FSCALAR as i32
+                                        $crate::__pgrx_c_bindings::JB_FSCALAR as i32
                                     )
                                 )
                             )
@@ -6352,7 +6633,7 @@ macro_rules! JB_ROOT_IS_SCALAR {
                                                         _
                                                     >(
                                                         $crate::__pgrx_c_macros::expression::cast_as::<
-                                                            *mut $crate::uint32,
+                                                            *mut $crate::__pgrx_c_bindings::uint32,
                                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                                 $crate::__pgrx_c_macros::CUnsignedInt,
                                                                 $crate::__pgrx_c_macros::expression::ReadWrite
@@ -6382,10 +6663,10 @@ macro_rules! JB_ROOT_IS_SCALAR {
                                                                                             _
                                                                                         >(
                                                                                             $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                                                *mut $crate::varattrib_4b,
+                                                                                                *mut $crate::__pgrx_c_bindings::varattrib_4b,
                                                                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                                        $crate::varattrib_4b
+                                                                                                        $crate::__pgrx_c_bindings::varattrib_4b
                                                                                                     >,
                                                                                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                                                                                 >,
@@ -6423,7 +6704,7 @@ macro_rules! JB_ROOT_IS_SCALAR {
                                             >(
                                                 $crate::__pgrx_c_macros::CValue::<
                                                     $crate::__pgrx_c_macros::CInt
-                                                >::new($crate::JB_FSCALAR as i32)
+                                                >::new($crate::__pgrx_c_bindings::JB_FSCALAR as i32)
                                             )
                                         )
                                     )
@@ -6462,7 +6743,7 @@ macro_rules! JB_ROOT_IS_SCALAR {
                                             _
                                         >(
                                             $crate::__pgrx_c_macros::expression::cast_as::<
-                                                *mut $crate::uint32,
+                                                *mut $crate::__pgrx_c_bindings::uint32,
                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                     $crate::__pgrx_c_macros::CUnsignedInt,
                                                     $crate::__pgrx_c_macros::expression::ReadWrite
@@ -6492,10 +6773,10 @@ macro_rules! JB_ROOT_IS_SCALAR {
                                                                                 _
                                                                             >(
                                                                                 $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                                    *mut $crate::varattrib_4b,
+                                                                                    *mut $crate::__pgrx_c_bindings::varattrib_4b,
                                                                                     $crate::__pgrx_c_macros::expression::CPointer<
                                                                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                            $crate::varattrib_4b
+                                                                                            $crate::__pgrx_c_bindings::varattrib_4b
                                                                                         >,
                                                                                         $crate::__pgrx_c_macros::expression::ReadWrite
                                                                                     >,
@@ -6529,7 +6810,7 @@ macro_rules! JB_ROOT_IS_SCALAR {
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                        $crate::JB_FSCALAR as i32
+                                        $crate::__pgrx_c_bindings::JB_FSCALAR as i32
                                     )
                                 )
                             )
@@ -6555,8 +6836,8 @@ macro_rules! JB_ROOT_IS_SCALAR {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -6587,21 +6868,23 @@ macro_rules! __pgrx_c_args_JsonContainerIsArray {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
         $crate::__pgrx_c_args_JsonContainerIsArray!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_JsonContainerIsArray!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_JsonContainerIsArray!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_JsonContainerIsArray!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_JsonContainerIsArray!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -6609,7 +6892,9 @@ macro_rules! __pgrx_c_args_JsonContainerIsArray {
         $crate::__pgrx_c_args_JsonContainerIsArray!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_JsonContainerIsArray!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_JsonContainerIsArray!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -6631,14 +6916,18 @@ macro_rules! __pgrx_c_args_JsonContainerIsArray {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_JsonContainerIsArray!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_JsonContainerIsArray!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_JsonContainerIsArray!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_JsonContainerIsArray!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_JsonContainerIsArray!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -6665,13 +6954,13 @@ macro_rules! __pgrx_c_args_JsonContainerIsArray {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_JsonContainerIsArray!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_JsonContainerIsArray!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -6736,7 +7025,7 @@ macro_rules! JsonContainerIsArray {
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                        $crate::JB_FARRAY as i32
+                                        $crate::__pgrx_c_bindings::JB_FARRAY as i32
                                     )
                                 )
                             )
@@ -6815,7 +7104,7 @@ macro_rules! JsonContainerIsArray {
                                             >(
                                                 $crate::__pgrx_c_macros::CValue::<
                                                     $crate::__pgrx_c_macros::CInt
-                                                >::new($crate::JB_FARRAY as i32)
+                                                >::new($crate::__pgrx_c_bindings::JB_FARRAY as i32)
                                             )
                                         )
                                     )
@@ -6866,7 +7155,7 @@ macro_rules! JsonContainerIsArray {
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                        $crate::JB_FARRAY as i32
+                                        $crate::__pgrx_c_bindings::JB_FARRAY as i32
                                     )
                                 )
                             )
@@ -6892,8 +7181,8 @@ macro_rules! JsonContainerIsArray {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -6924,21 +7213,23 @@ macro_rules! __pgrx_c_args_JsonContainerIsObject {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
         $crate::__pgrx_c_args_JsonContainerIsObject!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_JsonContainerIsObject!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_JsonContainerIsObject!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_JsonContainerIsObject!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_JsonContainerIsObject!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -6946,7 +7237,9 @@ macro_rules! __pgrx_c_args_JsonContainerIsObject {
         $crate::__pgrx_c_args_JsonContainerIsObject!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_JsonContainerIsObject!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_JsonContainerIsObject!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -6968,14 +7261,18 @@ macro_rules! __pgrx_c_args_JsonContainerIsObject {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_JsonContainerIsObject!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_JsonContainerIsObject!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_JsonContainerIsObject!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_JsonContainerIsObject!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_JsonContainerIsObject!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -7002,13 +7299,13 @@ macro_rules! __pgrx_c_args_JsonContainerIsObject {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_JsonContainerIsObject!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_JsonContainerIsObject!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -7073,7 +7370,7 @@ macro_rules! JsonContainerIsObject {
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                        $crate::JB_FOBJECT as i32
+                                        $crate::__pgrx_c_bindings::JB_FOBJECT as i32
                                     )
                                 )
                             )
@@ -7152,7 +7449,7 @@ macro_rules! JsonContainerIsObject {
                                             >(
                                                 $crate::__pgrx_c_macros::CValue::<
                                                     $crate::__pgrx_c_macros::CInt
-                                                >::new($crate::JB_FOBJECT as i32)
+                                                >::new($crate::__pgrx_c_bindings::JB_FOBJECT as i32)
                                             )
                                         )
                                     )
@@ -7203,7 +7500,7 @@ macro_rules! JsonContainerIsObject {
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                        $crate::JB_FOBJECT as i32
+                                        $crate::__pgrx_c_bindings::JB_FOBJECT as i32
                                     )
                                 )
                             )
@@ -7229,8 +7526,8 @@ macro_rules! JsonContainerIsObject {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -7261,21 +7558,23 @@ macro_rules! __pgrx_c_args_JsonContainerIsScalar {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
         $crate::__pgrx_c_args_JsonContainerIsScalar!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_JsonContainerIsScalar!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_JsonContainerIsScalar!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_JsonContainerIsScalar!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_JsonContainerIsScalar!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -7283,7 +7582,9 @@ macro_rules! __pgrx_c_args_JsonContainerIsScalar {
         $crate::__pgrx_c_args_JsonContainerIsScalar!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_JsonContainerIsScalar!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_JsonContainerIsScalar!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -7305,14 +7606,18 @@ macro_rules! __pgrx_c_args_JsonContainerIsScalar {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_JsonContainerIsScalar!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_JsonContainerIsScalar!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_JsonContainerIsScalar!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_JsonContainerIsScalar!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_JsonContainerIsScalar!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -7339,13 +7644,13 @@ macro_rules! __pgrx_c_args_JsonContainerIsScalar {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_JsonContainerIsScalar!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_JsonContainerIsScalar!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -7410,7 +7715,7 @@ macro_rules! JsonContainerIsScalar {
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                        $crate::JB_FSCALAR as i32
+                                        $crate::__pgrx_c_bindings::JB_FSCALAR as i32
                                     )
                                 )
                             )
@@ -7489,7 +7794,7 @@ macro_rules! JsonContainerIsScalar {
                                             >(
                                                 $crate::__pgrx_c_macros::CValue::<
                                                     $crate::__pgrx_c_macros::CInt
-                                                >::new($crate::JB_FSCALAR as i32)
+                                                >::new($crate::__pgrx_c_bindings::JB_FSCALAR as i32)
                                             )
                                         )
                                     )
@@ -7540,7 +7845,7 @@ macro_rules! JsonContainerIsScalar {
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                        $crate::JB_FSCALAR as i32
+                                        $crate::__pgrx_c_bindings::JB_FSCALAR as i32
                                     )
                                 )
                             )
@@ -7566,8 +7871,8 @@ macro_rules! JsonContainerIsScalar {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -7594,20 +7899,24 @@ macro_rules! __pgrx_c_args_JsonContainerSize {
         $crate::__pgrx_c_args_JsonContainerSize!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_JsonContainerSize!(@p1 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_JsonContainerSize!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_JsonContainerSize!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_JsonContainerSize!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_JsonContainerSize!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_JsonContainerSize!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -7615,7 +7924,9 @@ macro_rules! __pgrx_c_args_JsonContainerSize {
         $crate::__pgrx_c_args_JsonContainerSize!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_JsonContainerSize!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_JsonContainerSize!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -7637,14 +7948,18 @@ macro_rules! __pgrx_c_args_JsonContainerSize {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_JsonContainerSize!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_JsonContainerSize!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_JsonContainerSize!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_JsonContainerSize!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_JsonContainerSize!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -7671,13 +7986,13 @@ macro_rules! __pgrx_c_args_JsonContainerSize {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_JsonContainerSize!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_JsonContainerSize!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -7739,7 +8054,7 @@ macro_rules! JsonContainerSize {
                     ),
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                            $crate::JB_CMASK as i32
+                            $crate::__pgrx_c_bindings::JB_CMASK as i32
                         )
                     )
                 )
@@ -7793,7 +8108,7 @@ macro_rules! JsonContainerSize {
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                        $crate::JB_CMASK as i32
+                                        $crate::__pgrx_c_bindings::JB_CMASK as i32
                                     )
                                 )
                             )
@@ -7832,7 +8147,7 @@ macro_rules! JsonContainerSize {
                     ),
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                            $crate::JB_CMASK as i32
+                            $crate::__pgrx_c_bindings::JB_CMASK as i32
                         )
                     )
                 )
@@ -7848,8 +8163,8 @@ macro_rules! JsonContainerSize {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -7876,20 +8191,24 @@ macro_rules! __pgrx_c_args_JsonbPGetDatum {
         $crate::__pgrx_c_args_JsonbPGetDatum!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_JsonbPGetDatum!(@p1 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_JsonbPGetDatum!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_JsonbPGetDatum!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_JsonbPGetDatum!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_JsonbPGetDatum!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_JsonbPGetDatum!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -7897,7 +8216,9 @@ macro_rules! __pgrx_c_args_JsonbPGetDatum {
         $crate::__pgrx_c_args_JsonbPGetDatum!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_JsonbPGetDatum!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_JsonbPGetDatum!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -7919,14 +8240,18 @@ macro_rules! __pgrx_c_args_JsonbPGetDatum {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_JsonbPGetDatum!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_JsonbPGetDatum!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_JsonbPGetDatum!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_JsonbPGetDatum!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_JsonbPGetDatum!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -7953,13 +8278,13 @@ macro_rules! __pgrx_c_args_JsonbPGetDatum {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_JsonbPGetDatum!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_JsonbPGetDatum!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -8037,8 +8362,8 @@ macro_rules! JsonbPGetDatum {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -8069,7 +8394,7 @@ macro_rules! __pgrx_c_args_PG_GETARG_JSONB_P {
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_PG_GETARG_JSONB_P!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -8078,7 +8403,7 @@ macro_rules! __pgrx_c_args_PG_GETARG_JSONB_P {
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_PG_GETARG_JSONB_P!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -8105,31 +8430,35 @@ macro_rules! __pgrx_c_args_PG_GETARG_JSONB_P {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_PG_GETARG_JSONB_P!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:tt, $($rest:tt)*) => {
         $crate::__pgrx_c_args_PG_GETARG_JSONB_P!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_PG_GETARG_JSONB_P!(@p2 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_PG_GETARG_JSONB_P!(
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative1 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_PG_GETARG_JSONB_P!(@p2 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_PG_GETARG_JSONB_P!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_PG_GETARG_JSONB_P!(
-            @p2 $mode [$($done)* (@literal [- $argument]),];
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_PG_GETARG_JSONB_P!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -8137,7 +8466,9 @@ macro_rules! __pgrx_c_args_PG_GETARG_JSONB_P {
         $crate::__pgrx_c_args_PG_GETARG_JSONB_P!(@negative1 $mode [$($done)*]; - $($raw)*)
     };
     (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_PG_GETARG_JSONB_P!(@p2 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_PG_GETARG_JSONB_P!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -8159,14 +8490,18 @@ macro_rules! __pgrx_c_args_PG_GETARG_JSONB_P {
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_PG_GETARG_JSONB_P!(@p2 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_PG_GETARG_JSONB_P!(
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_PG_GETARG_JSONB_P!(@p2 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_PG_GETARG_JSONB_P!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_PG_GETARG_JSONB_P!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -8193,13 +8528,13 @@ macro_rules! __pgrx_c_args_PG_GETARG_JSONB_P {
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_PG_GETARG_JSONB_P!(
-            @p2 $mode [$($done)* (@literal [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_PG_GETARG_JSONB_P!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -8249,9 +8584,11 @@ macro_rules! PG_GETARG_JSONB_P {
         (
             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::cast_as::<
-                    *mut $crate::Jsonb,
+                    *mut $crate::__pgrx_c_bindings::Jsonb,
                     $crate::__pgrx_c_macros::expression::CPointer<
-                        $crate::__pgrx_c_macros::expression::CRecord<$crate::Jsonb>,
+                        $crate::__pgrx_c_macros::expression::CRecord<
+                            $crate::__pgrx_c_bindings::Jsonb
+                        >,
                         $crate::__pgrx_c_macros::expression::ReadWrite
                     >,
                     _
@@ -8259,15 +8596,17 @@ macro_rules! PG_GETARG_JSONB_P {
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         <
                             $crate::__pgrx_c_macros::expression::CPointer<
-                                $crate::__pgrx_c_macros::expression::CRecord<$crate::varlena>,
+                                $crate::__pgrx_c_macros::expression::CRecord<
+                                    $crate::__pgrx_c_bindings::varlena
+                                >,
                                 $crate::__pgrx_c_macros::expression::ReadWrite
                             > as $crate::__pgrx_c_macros::expression::CType
                         >::from_storage(
-                            $crate::pg_detoast_datum(
+                            $crate::__pgrx_c_bindings::pg_detoast_datum(
                                 <
                                     $crate::__pgrx_c_macros::expression::CPointer<
                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                            $crate::varlena
+                                            $crate::__pgrx_c_bindings::varlena
                                         >,
                                         $crate::__pgrx_c_macros::expression::ReadWrite
                                     > as $crate::__pgrx_c_macros::expression::CType
@@ -8275,7 +8614,7 @@ macro_rules! PG_GETARG_JSONB_P {
                                     $crate::__pgrx_c_macros::expression::implicit::<
                                         $crate::__pgrx_c_macros::expression::CPointer<
                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                $crate::varlena
+                                                $crate::__pgrx_c_bindings::varlena
                                             >,
                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                         >,
@@ -8286,10 +8625,10 @@ macro_rules! PG_GETARG_JSONB_P {
                                             _
                                         >(
                                             $crate::__pgrx_c_macros::expression::cast_as::<
-                                                *mut $crate::varlena,
+                                                *mut $crate::__pgrx_c_bindings::varlena,
                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                        $crate::varlena
+                                                        $crate::__pgrx_c_bindings::varlena
                                                     >,
                                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                                 >,
@@ -8301,7 +8640,7 @@ macro_rules! PG_GETARG_JSONB_P {
                                                         _
                                                     >(
                                                         $crate::__pgrx_c_macros::expression::cast_as::<
-                                                            $crate::Pointer,
+                                                            $crate::__pgrx_c_bindings::Pointer,
                                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                                     $crate::__pgrx_c_macros::CChar,
@@ -8410,9 +8749,11 @@ macro_rules! PG_GETARG_JSONB_P {
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::cast_as::<
-                                *mut $crate::Jsonb,
+                                *mut $crate::__pgrx_c_bindings::Jsonb,
                                 $crate::__pgrx_c_macros::expression::CPointer<
-                                    $crate::__pgrx_c_macros::expression::CRecord<$crate::Jsonb>,
+                                    $crate::__pgrx_c_macros::expression::CRecord<
+                                        $crate::__pgrx_c_bindings::Jsonb
+                                    >,
                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                 >,
                                 _
@@ -8421,16 +8762,16 @@ macro_rules! PG_GETARG_JSONB_P {
                                     <
                                         $crate::__pgrx_c_macros::expression::CPointer<
                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                $crate::varlena
+                                                $crate::__pgrx_c_bindings::varlena
                                             >,
                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::from_storage(
-                                        $crate::pg_detoast_datum(
+                                        $crate::__pgrx_c_bindings::pg_detoast_datum(
                                             <
                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                        $crate::varlena
+                                                        $crate::__pgrx_c_bindings::varlena
                                                     >,
                                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                                 > as $crate::__pgrx_c_macros::expression::CType
@@ -8438,7 +8779,7 @@ macro_rules! PG_GETARG_JSONB_P {
                                                 $crate::__pgrx_c_macros::expression::implicit::<
                                                     $crate::__pgrx_c_macros::expression::CPointer<
                                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                                            $crate::varlena
+                                                            $crate::__pgrx_c_bindings::varlena
                                                         >,
                                                         $crate::__pgrx_c_macros::expression::ReadWrite
                                                     >,
@@ -8449,10 +8790,10 @@ macro_rules! PG_GETARG_JSONB_P {
                                                         _
                                                     >(
                                                         $crate::__pgrx_c_macros::expression::cast_as::<
-                                                            *mut $crate::varlena,
+                                                            *mut $crate::__pgrx_c_bindings::varlena,
                                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                                    $crate::varlena
+                                                                    $crate::__pgrx_c_bindings::varlena
                                                                 >,
                                                                 $crate::__pgrx_c_macros::expression::ReadWrite
                                                             >,
@@ -8464,7 +8805,7 @@ macro_rules! PG_GETARG_JSONB_P {
                                                                     _
                                                                 >(
                                                                     $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                        $crate::Pointer,
+                                                                        $crate::__pgrx_c_bindings::Pointer,
                                                                         $crate::__pgrx_c_macros::expression::CPointer<
                                                                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                                                 $crate::__pgrx_c_macros::CChar,
@@ -8557,9 +8898,11 @@ macro_rules! PG_GETARG_JSONB_P {
         {
             let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::cast_as::<
-                    *mut $crate::Jsonb,
+                    *mut $crate::__pgrx_c_bindings::Jsonb,
                     $crate::__pgrx_c_macros::expression::CPointer<
-                        $crate::__pgrx_c_macros::expression::CRecord<$crate::Jsonb>,
+                        $crate::__pgrx_c_macros::expression::CRecord<
+                            $crate::__pgrx_c_bindings::Jsonb
+                        >,
                         $crate::__pgrx_c_macros::expression::ReadWrite
                     >,
                     _
@@ -8567,15 +8910,17 @@ macro_rules! PG_GETARG_JSONB_P {
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         <
                             $crate::__pgrx_c_macros::expression::CPointer<
-                                $crate::__pgrx_c_macros::expression::CRecord<$crate::varlena>,
+                                $crate::__pgrx_c_macros::expression::CRecord<
+                                    $crate::__pgrx_c_bindings::varlena
+                                >,
                                 $crate::__pgrx_c_macros::expression::ReadWrite
                             > as $crate::__pgrx_c_macros::expression::CType
                         >::from_storage(
-                            $crate::pg_detoast_datum(
+                            $crate::__pgrx_c_bindings::pg_detoast_datum(
                                 <
                                     $crate::__pgrx_c_macros::expression::CPointer<
                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                            $crate::varlena
+                                            $crate::__pgrx_c_bindings::varlena
                                         >,
                                         $crate::__pgrx_c_macros::expression::ReadWrite
                                     > as $crate::__pgrx_c_macros::expression::CType
@@ -8583,7 +8928,7 @@ macro_rules! PG_GETARG_JSONB_P {
                                     $crate::__pgrx_c_macros::expression::implicit::<
                                         $crate::__pgrx_c_macros::expression::CPointer<
                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                $crate::varlena
+                                                $crate::__pgrx_c_bindings::varlena
                                             >,
                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                         >,
@@ -8594,10 +8939,10 @@ macro_rules! PG_GETARG_JSONB_P {
                                             _
                                         >(
                                             $crate::__pgrx_c_macros::expression::cast_as::<
-                                                *mut $crate::varlena,
+                                                *mut $crate::__pgrx_c_bindings::varlena,
                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                        $crate::varlena
+                                                        $crate::__pgrx_c_bindings::varlena
                                                     >,
                                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                                 >,
@@ -8609,7 +8954,7 @@ macro_rules! PG_GETARG_JSONB_P {
                                                         _
                                                     >(
                                                         $crate::__pgrx_c_macros::expression::cast_as::<
-                                                            $crate::Pointer,
+                                                            $crate::__pgrx_c_bindings::Pointer,
                                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                                     $crate::__pgrx_c_macros::CChar,
@@ -8698,8 +9043,8 @@ macro_rules! PG_GETARG_JSONB_P {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -8733,7 +9078,7 @@ macro_rules! __pgrx_c_args_PG_GETARG_JSONB_P_COPY {
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_PG_GETARG_JSONB_P_COPY!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -8742,7 +9087,7 @@ macro_rules! __pgrx_c_args_PG_GETARG_JSONB_P_COPY {
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_PG_GETARG_JSONB_P_COPY!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -8769,33 +9114,35 @@ macro_rules! __pgrx_c_args_PG_GETARG_JSONB_P_COPY {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_PG_GETARG_JSONB_P_COPY!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:tt, $($rest:tt)*) => {
         $crate::__pgrx_c_args_PG_GETARG_JSONB_P_COPY!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $argument:literal) => {
         $crate::__pgrx_c_args_PG_GETARG_JSONB_P_COPY!(
-            @p2 $mode [$($done)* (@literal [- $argument]),];
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
         )
     };
     (@negative1 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_PG_GETARG_JSONB_P_COPY!(@p2 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_PG_GETARG_JSONB_P_COPY!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_PG_GETARG_JSONB_P_COPY!(
-            @p2 $mode [$($done)* (@literal [- $argument]),];
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_PG_GETARG_JSONB_P_COPY!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -8803,7 +9150,9 @@ macro_rules! __pgrx_c_args_PG_GETARG_JSONB_P_COPY {
         $crate::__pgrx_c_args_PG_GETARG_JSONB_P_COPY!(@negative1 $mode [$($done)*]; - $($raw)*)
     };
     (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_PG_GETARG_JSONB_P_COPY!(@p2 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_PG_GETARG_JSONB_P_COPY!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -8828,15 +9177,17 @@ macro_rules! __pgrx_c_args_PG_GETARG_JSONB_P_COPY {
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_PG_GETARG_JSONB_P_COPY!(
-            @p2 $mode [$($done)* (@literal [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_PG_GETARG_JSONB_P_COPY!(@p2 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_PG_GETARG_JSONB_P_COPY!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_PG_GETARG_JSONB_P_COPY!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -8863,13 +9214,13 @@ macro_rules! __pgrx_c_args_PG_GETARG_JSONB_P_COPY {
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_PG_GETARG_JSONB_P_COPY!(
-            @p2 $mode [$($done)* (@literal [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_PG_GETARG_JSONB_P_COPY!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -8922,9 +9273,11 @@ macro_rules! PG_GETARG_JSONB_P_COPY {
         (
             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::cast_as::<
-                    *mut $crate::Jsonb,
+                    *mut $crate::__pgrx_c_bindings::Jsonb,
                     $crate::__pgrx_c_macros::expression::CPointer<
-                        $crate::__pgrx_c_macros::expression::CRecord<$crate::Jsonb>,
+                        $crate::__pgrx_c_macros::expression::CRecord<
+                            $crate::__pgrx_c_bindings::Jsonb
+                        >,
                         $crate::__pgrx_c_macros::expression::ReadWrite
                     >,
                     _
@@ -8932,15 +9285,17 @@ macro_rules! PG_GETARG_JSONB_P_COPY {
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         <
                             $crate::__pgrx_c_macros::expression::CPointer<
-                                $crate::__pgrx_c_macros::expression::CRecord<$crate::varlena>,
+                                $crate::__pgrx_c_macros::expression::CRecord<
+                                    $crate::__pgrx_c_bindings::varlena
+                                >,
                                 $crate::__pgrx_c_macros::expression::ReadWrite
                             > as $crate::__pgrx_c_macros::expression::CType
                         >::from_storage(
-                            $crate::pg_detoast_datum_copy(
+                            $crate::__pgrx_c_bindings::pg_detoast_datum_copy(
                                 <
                                     $crate::__pgrx_c_macros::expression::CPointer<
                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                            $crate::varlena
+                                            $crate::__pgrx_c_bindings::varlena
                                         >,
                                         $crate::__pgrx_c_macros::expression::ReadWrite
                                     > as $crate::__pgrx_c_macros::expression::CType
@@ -8948,7 +9303,7 @@ macro_rules! PG_GETARG_JSONB_P_COPY {
                                     $crate::__pgrx_c_macros::expression::implicit::<
                                         $crate::__pgrx_c_macros::expression::CPointer<
                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                $crate::varlena
+                                                $crate::__pgrx_c_bindings::varlena
                                             >,
                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                         >,
@@ -8959,10 +9314,10 @@ macro_rules! PG_GETARG_JSONB_P_COPY {
                                             _
                                         >(
                                             $crate::__pgrx_c_macros::expression::cast_as::<
-                                                *mut $crate::varlena,
+                                                *mut $crate::__pgrx_c_bindings::varlena,
                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                        $crate::varlena
+                                                        $crate::__pgrx_c_bindings::varlena
                                                     >,
                                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                                 >,
@@ -8974,7 +9329,7 @@ macro_rules! PG_GETARG_JSONB_P_COPY {
                                                         _
                                                     >(
                                                         $crate::__pgrx_c_macros::expression::cast_as::<
-                                                            $crate::Pointer,
+                                                            $crate::__pgrx_c_bindings::Pointer,
                                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                                     $crate::__pgrx_c_macros::CChar,
@@ -9083,9 +9438,11 @@ macro_rules! PG_GETARG_JSONB_P_COPY {
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::cast_as::<
-                                *mut $crate::Jsonb,
+                                *mut $crate::__pgrx_c_bindings::Jsonb,
                                 $crate::__pgrx_c_macros::expression::CPointer<
-                                    $crate::__pgrx_c_macros::expression::CRecord<$crate::Jsonb>,
+                                    $crate::__pgrx_c_macros::expression::CRecord<
+                                        $crate::__pgrx_c_bindings::Jsonb
+                                    >,
                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                 >,
                                 _
@@ -9094,16 +9451,16 @@ macro_rules! PG_GETARG_JSONB_P_COPY {
                                     <
                                         $crate::__pgrx_c_macros::expression::CPointer<
                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                $crate::varlena
+                                                $crate::__pgrx_c_bindings::varlena
                                             >,
                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::from_storage(
-                                        $crate::pg_detoast_datum_copy(
+                                        $crate::__pgrx_c_bindings::pg_detoast_datum_copy(
                                             <
                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                        $crate::varlena
+                                                        $crate::__pgrx_c_bindings::varlena
                                                     >,
                                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                                 > as $crate::__pgrx_c_macros::expression::CType
@@ -9111,7 +9468,7 @@ macro_rules! PG_GETARG_JSONB_P_COPY {
                                                 $crate::__pgrx_c_macros::expression::implicit::<
                                                     $crate::__pgrx_c_macros::expression::CPointer<
                                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                                            $crate::varlena
+                                                            $crate::__pgrx_c_bindings::varlena
                                                         >,
                                                         $crate::__pgrx_c_macros::expression::ReadWrite
                                                     >,
@@ -9122,10 +9479,10 @@ macro_rules! PG_GETARG_JSONB_P_COPY {
                                                         _
                                                     >(
                                                         $crate::__pgrx_c_macros::expression::cast_as::<
-                                                            *mut $crate::varlena,
+                                                            *mut $crate::__pgrx_c_bindings::varlena,
                                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                                    $crate::varlena
+                                                                    $crate::__pgrx_c_bindings::varlena
                                                                 >,
                                                                 $crate::__pgrx_c_macros::expression::ReadWrite
                                                             >,
@@ -9137,7 +9494,7 @@ macro_rules! PG_GETARG_JSONB_P_COPY {
                                                                     _
                                                                 >(
                                                                     $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                        $crate::Pointer,
+                                                                        $crate::__pgrx_c_bindings::Pointer,
                                                                         $crate::__pgrx_c_macros::expression::CPointer<
                                                                             $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                                                 $crate::__pgrx_c_macros::CChar,
@@ -9230,9 +9587,11 @@ macro_rules! PG_GETARG_JSONB_P_COPY {
         {
             let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::cast_as::<
-                    *mut $crate::Jsonb,
+                    *mut $crate::__pgrx_c_bindings::Jsonb,
                     $crate::__pgrx_c_macros::expression::CPointer<
-                        $crate::__pgrx_c_macros::expression::CRecord<$crate::Jsonb>,
+                        $crate::__pgrx_c_macros::expression::CRecord<
+                            $crate::__pgrx_c_bindings::Jsonb
+                        >,
                         $crate::__pgrx_c_macros::expression::ReadWrite
                     >,
                     _
@@ -9240,15 +9599,17 @@ macro_rules! PG_GETARG_JSONB_P_COPY {
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         <
                             $crate::__pgrx_c_macros::expression::CPointer<
-                                $crate::__pgrx_c_macros::expression::CRecord<$crate::varlena>,
+                                $crate::__pgrx_c_macros::expression::CRecord<
+                                    $crate::__pgrx_c_bindings::varlena
+                                >,
                                 $crate::__pgrx_c_macros::expression::ReadWrite
                             > as $crate::__pgrx_c_macros::expression::CType
                         >::from_storage(
-                            $crate::pg_detoast_datum_copy(
+                            $crate::__pgrx_c_bindings::pg_detoast_datum_copy(
                                 <
                                     $crate::__pgrx_c_macros::expression::CPointer<
                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                            $crate::varlena
+                                            $crate::__pgrx_c_bindings::varlena
                                         >,
                                         $crate::__pgrx_c_macros::expression::ReadWrite
                                     > as $crate::__pgrx_c_macros::expression::CType
@@ -9256,7 +9617,7 @@ macro_rules! PG_GETARG_JSONB_P_COPY {
                                     $crate::__pgrx_c_macros::expression::implicit::<
                                         $crate::__pgrx_c_macros::expression::CPointer<
                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                $crate::varlena
+                                                $crate::__pgrx_c_bindings::varlena
                                             >,
                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                         >,
@@ -9267,10 +9628,10 @@ macro_rules! PG_GETARG_JSONB_P_COPY {
                                             _
                                         >(
                                             $crate::__pgrx_c_macros::expression::cast_as::<
-                                                *mut $crate::varlena,
+                                                *mut $crate::__pgrx_c_bindings::varlena,
                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                        $crate::varlena
+                                                        $crate::__pgrx_c_bindings::varlena
                                                     >,
                                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                                 >,
@@ -9282,7 +9643,7 @@ macro_rules! PG_GETARG_JSONB_P_COPY {
                                                         _
                                                     >(
                                                         $crate::__pgrx_c_macros::expression::cast_as::<
-                                                            $crate::Pointer,
+                                                            $crate::__pgrx_c_bindings::Pointer,
                                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                                     $crate::__pgrx_c_macros::CChar,
@@ -9371,8 +9732,8 @@ macro_rules! PG_GETARG_JSONB_P_COPY {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -9399,20 +9760,24 @@ macro_rules! __pgrx_c_args_PG_RETURN_JSONB_P {
         $crate::__pgrx_c_args_PG_RETURN_JSONB_P!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_PG_RETURN_JSONB_P!(@p1 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_PG_RETURN_JSONB_P!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_PG_RETURN_JSONB_P!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_PG_RETURN_JSONB_P!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_PG_RETURN_JSONB_P!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_PG_RETURN_JSONB_P!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -9420,7 +9785,9 @@ macro_rules! __pgrx_c_args_PG_RETURN_JSONB_P {
         $crate::__pgrx_c_args_PG_RETURN_JSONB_P!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_PG_RETURN_JSONB_P!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_PG_RETURN_JSONB_P!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -9442,14 +9809,18 @@ macro_rules! __pgrx_c_args_PG_RETURN_JSONB_P {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_PG_RETURN_JSONB_P!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_PG_RETURN_JSONB_P!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_PG_RETURN_JSONB_P!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_PG_RETURN_JSONB_P!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_PG_RETURN_JSONB_P!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -9476,13 +9847,13 @@ macro_rules! __pgrx_c_args_PG_RETURN_JSONB_P {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_PG_RETURN_JSONB_P!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_PG_RETURN_JSONB_P!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };

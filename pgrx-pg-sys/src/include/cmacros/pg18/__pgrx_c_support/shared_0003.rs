@@ -105,59 +105,32 @@ macro_rules! __pgrx_c_field_marker {
     (WritableSxactCount) => {
         $crate::__pgrx_c_generated::Field_WritableSxactCount
     };
-    (__dd_fd) => {
-        $crate::__pgrx_c_generated::Field___dd_fd
+    (__mask_was_saved) => {
+        $crate::__pgrx_c_generated::Field___mask_was_saved
     };
-    (__dd_flags) => {
-        $crate::__pgrx_c_generated::Field___dd_flags
+    (_cur_column) => {
+        $crate::__pgrx_c_generated::Field__cur_column
     };
-    (__dd_len) => {
-        $crate::__pgrx_c_generated::Field___dd_len
-    };
-    (__dd_loc) => {
-        $crate::__pgrx_c_generated::Field___dd_loc
-    };
-    (__dd_seek) => {
-        $crate::__pgrx_c_generated::Field___dd_seek
-    };
-    (__dd_size) => {
-        $crate::__pgrx_c_generated::Field___dd_size
-    };
-    (__padding) => {
-        $crate::__pgrx_c_generated::Field___padding
-    };
-    (__sig) => {
-        $crate::__pgrx_c_generated::Field___sig
-    };
-    (__ss_align) => {
-        $crate::__pgrx_c_generated::Field___ss_align
-    };
-    (_blksize) => {
-        $crate::__pgrx_c_generated::Field__blksize
-    };
-    (_file) => {
-        $crate::__pgrx_c_generated::Field__file
+    (_fileno) => {
+        $crate::__pgrx_c_generated::Field__fileno
     };
     (_flags) => {
         $crate::__pgrx_c_generated::Field__flags
     };
-    (_lbfsize) => {
-        $crate::__pgrx_c_generated::Field__lbfsize
+    (_flags2) => {
+        $crate::__pgrx_c_generated::Field__flags2
+    };
+    (_mode) => {
+        $crate::__pgrx_c_generated::Field__mode
     };
     (_offset) => {
         $crate::__pgrx_c_generated::Field__offset
     };
-    (_r) => {
-        $crate::__pgrx_c_generated::Field__r
+    (_old_offset) => {
+        $crate::__pgrx_c_generated::Field__old_offset
     };
-    (_size) => {
-        $crate::__pgrx_c_generated::Field__size
-    };
-    (_ur) => {
-        $crate::__pgrx_c_generated::Field__ur
-    };
-    (_w) => {
-        $crate::__pgrx_c_generated::Field__w
+    (_vtable_offset) => {
+        $crate::__pgrx_c_generated::Field__vtable_offset
     };
     (abbreviate) => {
         $crate::__pgrx_c_generated::Field_abbreviate
@@ -2232,14 +2205,11 @@ macro_rules! __pgrx_c_field_marker {
     (d_ino) => {
         $crate::__pgrx_c_generated::Field_d_ino
     };
-    (d_namlen) => {
-        $crate::__pgrx_c_generated::Field_d_namlen
+    (d_off) => {
+        $crate::__pgrx_c_generated::Field_d_off
     };
     (d_reclen) => {
         $crate::__pgrx_c_generated::Field_d_reclen
-    };
-    (d_seekoff) => {
-        $crate::__pgrx_c_generated::Field_d_seekoff
     };
     (d_type) => {
         $crate::__pgrx_c_generated::Field_d_type
@@ -9830,12 +9800,6 @@ macro_rules! __pgrx_c_field_marker {
     };
     (srvowner) => {
         $crate::__pgrx_c_generated::Field_srvowner
-    };
-    (ss_family) => {
-        $crate::__pgrx_c_generated::Field_ss_family
-    };
-    (ss_len) => {
-        $crate::__pgrx_c_generated::Field_ss_len
     };
     (ssize) => {
         $crate::__pgrx_c_generated::Field_ssize

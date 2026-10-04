@@ -5,8 +5,8 @@ This code is generated for documentation purposes, so that it is easy to referen
 // C macros from snapmgr.h.
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -33,20 +33,24 @@ macro_rules! __pgrx_c_args_InitDirtySnapshot {
         $crate::__pgrx_c_args_InitDirtySnapshot!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_InitDirtySnapshot!(@p1 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_InitDirtySnapshot!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_InitDirtySnapshot!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_InitDirtySnapshot!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_InitDirtySnapshot!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_InitDirtySnapshot!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -54,7 +58,9 @@ macro_rules! __pgrx_c_args_InitDirtySnapshot {
         $crate::__pgrx_c_args_InitDirtySnapshot!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_InitDirtySnapshot!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_InitDirtySnapshot!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -76,14 +82,18 @@ macro_rules! __pgrx_c_args_InitDirtySnapshot {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_InitDirtySnapshot!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_InitDirtySnapshot!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_InitDirtySnapshot!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_InitDirtySnapshot!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_InitDirtySnapshot!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -110,13 +120,13 @@ macro_rules! __pgrx_c_args_InitDirtySnapshot {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_InitDirtySnapshot!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_InitDirtySnapshot!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -165,7 +175,7 @@ macro_rules! InitDirtySnapshot {
                     >(($crate::__pgrx_c_operand!(@place; $snapshotdata))),
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                            $crate::SnapshotType::SNAPSHOT_DIRTY as i32
+                            $crate::__pgrx_c_bindings::SnapshotType::SNAPSHOT_DIRTY as i32
                         )
                     )
                 )
@@ -206,7 +216,7 @@ macro_rules! InitDirtySnapshot {
                                 >(($crate::__pgrx_c_operand!(@place; $snapshotdata))),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                        $crate::SnapshotType::SNAPSHOT_DIRTY as i32
+                                        $crate::__pgrx_c_bindings::SnapshotType::SNAPSHOT_DIRTY as i32
                                     )
                                 )
                             )
@@ -232,7 +242,7 @@ macro_rules! InitDirtySnapshot {
                     >(($crate::__pgrx_c_operand!(@place; $snapshotdata))),
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                            $crate::SnapshotType::SNAPSHOT_DIRTY as i32
+                            $crate::__pgrx_c_bindings::SnapshotType::SNAPSHOT_DIRTY as i32
                         )
                     )
                 )
@@ -248,8 +258,8 @@ macro_rules! InitDirtySnapshot {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -280,13 +290,13 @@ macro_rules! __pgrx_c_args_InitNonVacuumableSnapshot {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_InitNonVacuumableSnapshot!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_InitNonVacuumableSnapshot!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -295,7 +305,7 @@ macro_rules! __pgrx_c_args_InitNonVacuumableSnapshot {
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_InitNonVacuumableSnapshot!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -322,35 +332,35 @@ macro_rules! __pgrx_c_args_InitNonVacuumableSnapshot {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_InitNonVacuumableSnapshot!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_InitNonVacuumableSnapshot!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $argument:literal) => {
         $crate::__pgrx_c_args_InitNonVacuumableSnapshot!(
-            @p2 $mode [$($done)* (@literal [- $argument]),];
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
         )
     };
     (@negative1 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_InitNonVacuumableSnapshot!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_InitNonVacuumableSnapshot!(
-            @p2 $mode [$($done)* (@literal [- $argument]),];
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_InitNonVacuumableSnapshot!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -359,7 +369,7 @@ macro_rules! __pgrx_c_args_InitNonVacuumableSnapshot {
     };
     (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
         $crate::__pgrx_c_args_InitNonVacuumableSnapshot!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
@@ -385,17 +395,17 @@ macro_rules! __pgrx_c_args_InitNonVacuumableSnapshot {
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_InitNonVacuumableSnapshot!(
-            @p2 $mode [$($done)* (@literal [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_InitNonVacuumableSnapshot!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_InitNonVacuumableSnapshot!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -422,13 +432,13 @@ macro_rules! __pgrx_c_args_InitNonVacuumableSnapshot {
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_InitNonVacuumableSnapshot!(
-            @p2 $mode [$($done)* (@literal [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_InitNonVacuumableSnapshot!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -484,7 +494,7 @@ macro_rules! InitNonVacuumableSnapshot {
                                 >(($crate::__pgrx_c_operand!(@place; $snapshotdata))),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                        $crate::SnapshotType::SNAPSHOT_NON_VACUUMABLE as i32
+                                        $crate::__pgrx_c_bindings::SnapshotType::SNAPSHOT_NON_VACUUMABLE as i32
                                     )
                                 )
                             )
@@ -557,7 +567,7 @@ macro_rules! InitNonVacuumableSnapshot {
                                                 $crate::__pgrx_c_macros::CValue::<
                                                     $crate::__pgrx_c_macros::CInt
                                                 >::new(
-                                                    $crate::SnapshotType::SNAPSHOT_NON_VACUUMABLE as i32
+                                                    $crate::__pgrx_c_bindings::SnapshotType::SNAPSHOT_NON_VACUUMABLE as i32
                                                 )
                                             )
                                         )
@@ -604,7 +614,7 @@ macro_rules! InitNonVacuumableSnapshot {
                                 >(($crate::__pgrx_c_operand!(@place; $snapshotdata))),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                        $crate::SnapshotType::SNAPSHOT_NON_VACUUMABLE as i32
+                                        $crate::__pgrx_c_bindings::SnapshotType::SNAPSHOT_NON_VACUUMABLE as i32
                                     )
                                 )
                             )
@@ -637,8 +647,8 @@ macro_rules! InitNonVacuumableSnapshot {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -669,21 +679,23 @@ macro_rules! __pgrx_c_args_IsHistoricMVCCSnapshot {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
         $crate::__pgrx_c_args_IsHistoricMVCCSnapshot!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_IsHistoricMVCCSnapshot!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_IsHistoricMVCCSnapshot!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_IsHistoricMVCCSnapshot!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_IsHistoricMVCCSnapshot!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -691,7 +703,9 @@ macro_rules! __pgrx_c_args_IsHistoricMVCCSnapshot {
         $crate::__pgrx_c_args_IsHistoricMVCCSnapshot!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_IsHistoricMVCCSnapshot!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_IsHistoricMVCCSnapshot!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -716,15 +730,17 @@ macro_rules! __pgrx_c_args_IsHistoricMVCCSnapshot {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_IsHistoricMVCCSnapshot!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_IsHistoricMVCCSnapshot!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_IsHistoricMVCCSnapshot!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_IsHistoricMVCCSnapshot!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -751,13 +767,13 @@ macro_rules! __pgrx_c_args_IsHistoricMVCCSnapshot {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_IsHistoricMVCCSnapshot!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_IsHistoricMVCCSnapshot!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -822,7 +838,7 @@ macro_rules! IsHistoricMVCCSnapshot {
                     ),
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                            $crate::SnapshotType::SNAPSHOT_HISTORIC_MVCC as i32
+                            $crate::__pgrx_c_bindings::SnapshotType::SNAPSHOT_HISTORIC_MVCC as i32
                         )
                     )
                 )
@@ -881,7 +897,7 @@ macro_rules! IsHistoricMVCCSnapshot {
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                        $crate::SnapshotType::SNAPSHOT_HISTORIC_MVCC as i32
+                                        $crate::__pgrx_c_bindings::SnapshotType::SNAPSHOT_HISTORIC_MVCC as i32
                                     )
                                 )
                             )
@@ -920,7 +936,7 @@ macro_rules! IsHistoricMVCCSnapshot {
                     ),
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                            $crate::SnapshotType::SNAPSHOT_HISTORIC_MVCC as i32
+                            $crate::__pgrx_c_bindings::SnapshotType::SNAPSHOT_HISTORIC_MVCC as i32
                         )
                     )
                 )
@@ -936,8 +952,8 @@ macro_rules! IsHistoricMVCCSnapshot {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -964,20 +980,24 @@ macro_rules! __pgrx_c_args_IsMVCCLikeSnapshot {
         $crate::__pgrx_c_args_IsMVCCLikeSnapshot!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_IsMVCCLikeSnapshot!(@p1 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_IsMVCCLikeSnapshot!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_IsMVCCLikeSnapshot!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_IsMVCCLikeSnapshot!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_IsMVCCLikeSnapshot!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_IsMVCCLikeSnapshot!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -985,7 +1005,9 @@ macro_rules! __pgrx_c_args_IsMVCCLikeSnapshot {
         $crate::__pgrx_c_args_IsMVCCLikeSnapshot!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_IsMVCCLikeSnapshot!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_IsMVCCLikeSnapshot!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -1007,14 +1029,18 @@ macro_rules! __pgrx_c_args_IsMVCCLikeSnapshot {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_IsMVCCLikeSnapshot!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_IsMVCCLikeSnapshot!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_IsMVCCLikeSnapshot!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_IsMVCCLikeSnapshot!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_IsMVCCLikeSnapshot!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -1041,13 +1067,13 @@ macro_rules! __pgrx_c_args_IsMVCCLikeSnapshot {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_IsMVCCLikeSnapshot!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_IsMVCCLikeSnapshot!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -1121,7 +1147,9 @@ macro_rules! IsMVCCLikeSnapshot {
                                         $crate::__pgrx_c_macros::expression::null_constant(
                                             $crate::__pgrx_c_macros::CValue::<
                                                 $crate::__pgrx_c_macros::CInt
-                                            >::new($crate::SnapshotType::SNAPSHOT_MVCC as i32)
+                                            >::new(
+                                                $crate::__pgrx_c_bindings::SnapshotType::SNAPSHOT_MVCC as i32
+                                            )
                                         )
                                     )
                                 )
@@ -1157,7 +1185,9 @@ macro_rules! IsMVCCLikeSnapshot {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::CValue::<
                                             $crate::__pgrx_c_macros::CInt
-                                        >::new($crate::SnapshotType::SNAPSHOT_HISTORIC_MVCC as i32)
+                                        >::new(
+                                            $crate::__pgrx_c_bindings::SnapshotType::SNAPSHOT_HISTORIC_MVCC as i32
+                                        )
                                     )
                                 )
                             )
@@ -1240,7 +1270,7 @@ macro_rules! IsMVCCLikeSnapshot {
                                                         $crate::__pgrx_c_macros::CValue::<
                                                             $crate::__pgrx_c_macros::CInt
                                                         >::new(
-                                                            $crate::SnapshotType::SNAPSHOT_MVCC as i32
+                                                            $crate::__pgrx_c_bindings::SnapshotType::SNAPSHOT_MVCC as i32
                                                         )
                                                     )
                                                 )
@@ -1287,7 +1317,7 @@ macro_rules! IsMVCCLikeSnapshot {
                                                     $crate::__pgrx_c_macros::CValue::<
                                                         $crate::__pgrx_c_macros::CInt
                                                     >::new(
-                                                        $crate::SnapshotType::SNAPSHOT_HISTORIC_MVCC as i32
+                                                        $crate::__pgrx_c_bindings::SnapshotType::SNAPSHOT_HISTORIC_MVCC as i32
                                                     )
                                                 )
                                             )
@@ -1346,7 +1376,9 @@ macro_rules! IsMVCCLikeSnapshot {
                                         $crate::__pgrx_c_macros::expression::null_constant(
                                             $crate::__pgrx_c_macros::CValue::<
                                                 $crate::__pgrx_c_macros::CInt
-                                            >::new($crate::SnapshotType::SNAPSHOT_MVCC as i32)
+                                            >::new(
+                                                $crate::__pgrx_c_bindings::SnapshotType::SNAPSHOT_MVCC as i32
+                                            )
                                         )
                                     )
                                 )
@@ -1382,7 +1414,9 @@ macro_rules! IsMVCCLikeSnapshot {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::CValue::<
                                             $crate::__pgrx_c_macros::CInt
-                                        >::new($crate::SnapshotType::SNAPSHOT_HISTORIC_MVCC as i32)
+                                        >::new(
+                                            $crate::__pgrx_c_bindings::SnapshotType::SNAPSHOT_HISTORIC_MVCC as i32
+                                        )
                                     )
                                 )
                             )
@@ -1405,8 +1439,8 @@ macro_rules! IsMVCCLikeSnapshot {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -1433,20 +1467,24 @@ macro_rules! __pgrx_c_args_IsMVCCSnapshot {
         $crate::__pgrx_c_args_IsMVCCSnapshot!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_IsMVCCSnapshot!(@p1 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_IsMVCCSnapshot!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_IsMVCCSnapshot!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_IsMVCCSnapshot!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_IsMVCCSnapshot!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_IsMVCCSnapshot!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -1454,7 +1492,9 @@ macro_rules! __pgrx_c_args_IsMVCCSnapshot {
         $crate::__pgrx_c_args_IsMVCCSnapshot!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_IsMVCCSnapshot!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_IsMVCCSnapshot!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -1476,14 +1516,18 @@ macro_rules! __pgrx_c_args_IsMVCCSnapshot {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_IsMVCCSnapshot!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_IsMVCCSnapshot!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_IsMVCCSnapshot!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_IsMVCCSnapshot!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_IsMVCCSnapshot!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -1510,13 +1554,13 @@ macro_rules! __pgrx_c_args_IsMVCCSnapshot {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_IsMVCCSnapshot!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_IsMVCCSnapshot!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -1579,7 +1623,7 @@ macro_rules! IsMVCCSnapshot {
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::expression::null_constant(
                             $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                $crate::SnapshotType::SNAPSHOT_MVCC as i32
+                                $crate::__pgrx_c_bindings::SnapshotType::SNAPSHOT_MVCC as i32
                             )
                         )
                     )
@@ -1641,7 +1685,9 @@ macro_rules! IsMVCCSnapshot {
                                     $crate::__pgrx_c_macros::expression::null_constant(
                                         $crate::__pgrx_c_macros::CValue::<
                                             $crate::__pgrx_c_macros::CInt
-                                        >::new($crate::SnapshotType::SNAPSHOT_MVCC as i32)
+                                        >::new(
+                                            $crate::__pgrx_c_bindings::SnapshotType::SNAPSHOT_MVCC as i32
+                                        )
                                     )
                                 )
                             )
@@ -1681,7 +1727,7 @@ macro_rules! IsMVCCSnapshot {
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::expression::null_constant(
                             $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                $crate::SnapshotType::SNAPSHOT_MVCC as i32
+                                $crate::__pgrx_c_bindings::SnapshotType::SNAPSHOT_MVCC as i32
                             )
                         )
                     )
@@ -1697,8 +1743,264 @@ macro_rules! IsMVCCSnapshot {
     };
 }
 
+#[cfg(not(all(
+    target_arch = "x86_64",
+    target_os = "linux",
+    target_pointer_width = "64",
+    target_endian = "little"
+)))]
+#[cfg(not(docsrs))]
+compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
+/// C macro SnapshotAny from snapmgr.h:33
+///
+/// ```text
+/// #define SnapshotAny ( & SnapshotAnyData )
+/// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+#[macro_export]
+macro_rules! SnapshotAny {
+    (@__pgrx_emit_check_safety;) => {
+        {
+            if false {}
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::SnapshotAny!(@__pgrx_emit_check_safety; $($raw)*)
+    };
+    (@__pgrx_emit_public;) => {
+        $crate::__pgrx_c_macros::expression_result::finish(
+            $crate::SnapshotAny!(@__pgrx_emit_value;)
+        )
+    };
+    (@__pgrx_emit_value;) => {
+        (
+            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                $crate::__pgrx_c_macros::expression::address(
+                    $crate::__pgrx_c_macros::expression::place::<
+                        $crate::__pgrx_c_macros::expression::CRecord<
+                            $crate::__pgrx_c_bindings::SnapshotData
+                        >>(::core::ptr::addr_of_mut!($crate::__pgrx_c_bindings::SnapshotAnyData))
+                )
+            )
+        )
+    };
+    (@__pgrx_c_value; $($raw:tt)*) => {
+        $crate::SnapshotAny!(@__pgrx_emit_value; $($raw)*)
+    };
+    (@__pgrx_emit_place;) => {
+        compile_error!("C expression is not a place in this operation")
+    };
+    (@__pgrx_c_place; $($raw:tt)*) => {
+        $crate::SnapshotAny!(@__pgrx_emit_place; $($raw)*)
+    };
+    (@__pgrx_emit_read_place;) => {
+        compile_error!("C expression is not a place in this operation")
+    };
+    (@__pgrx_c_read_place; $($raw:tt)*) => {
+        $crate::SnapshotAny!(@__pgrx_emit_read_place; $($raw)*)
+    };
+    (@__pgrx_emit_size;) => {
+        $crate::__pgrx_c_macros::expression::size_of_value_type(
+            if false {
+                {
+                    if false {}
+                }
+                Some(
+                    unsafe {
+                        $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                            $crate::__pgrx_c_macros::expression::address(
+                                $crate::__pgrx_c_macros::expression::place::<
+                                    $crate::__pgrx_c_macros::expression::CRecord<
+                                        $crate::__pgrx_c_bindings::SnapshotData
+                                    >>(
+                                    ::core::ptr::addr_of_mut!(
+                                        $crate::__pgrx_c_bindings::SnapshotAnyData
+                                    )
+                                )
+                            )
+                        )
+                    }
+                )
+            } else {
+                None
+            }
+        )
+    };
+    (@__pgrx_c_size; $($raw:tt)*) => {
+        $crate::SnapshotAny!(@__pgrx_emit_size; $($raw)*)
+    };
+    (@__pgrx_emit_discard;) => {
+        {
+            let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                $crate::__pgrx_c_macros::expression::address(
+                    $crate::__pgrx_c_macros::expression::place::<
+                        $crate::__pgrx_c_macros::expression::CRecord<
+                            $crate::__pgrx_c_bindings::SnapshotData
+                        >>(::core::ptr::addr_of_mut!($crate::__pgrx_c_bindings::SnapshotAnyData))
+                )
+            );
+        }
+    };
+    (@__pgrx_c_discard; $($raw:tt)*) => {
+        $crate::SnapshotAny!(@__pgrx_emit_discard; $($raw)*)
+    };
+    (@$mode:ident; $($invalid:tt)*) => {
+        compile_error!("arguments do not satisfy this C macro's invocation contract")
+    };
+    () => {
+        $crate::SnapshotAny!(@__pgrx_emit_public;)
+    };
+    ($($invalid:tt)*) => {
+        compile_error!("arguments do not satisfy this C macro's invocation contract")
+    };
+}
+
+#[cfg(not(all(
+    target_arch = "x86_64",
+    target_os = "linux",
+    target_pointer_width = "64",
+    target_endian = "little"
+)))]
+#[cfg(not(docsrs))]
+compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
+/// C macro SnapshotSelf from snapmgr.h:32
+///
+/// ```text
+/// #define SnapshotSelf ( & SnapshotSelfData )
+/// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+#[macro_export]
+macro_rules! SnapshotSelf {
+    (@__pgrx_emit_check_safety;) => {
+        {
+            if false {}
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::SnapshotSelf!(@__pgrx_emit_check_safety; $($raw)*)
+    };
+    (@__pgrx_emit_public;) => {
+        $crate::__pgrx_c_macros::expression_result::finish(
+            $crate::SnapshotSelf!(@__pgrx_emit_value;)
+        )
+    };
+    (@__pgrx_emit_value;) => {
+        (
+            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                $crate::__pgrx_c_macros::expression::address(
+                    $crate::__pgrx_c_macros::expression::place::<
+                        $crate::__pgrx_c_macros::expression::CRecord<
+                            $crate::__pgrx_c_bindings::SnapshotData
+                        >>(::core::ptr::addr_of_mut!($crate::__pgrx_c_bindings::SnapshotSelfData))
+                )
+            )
+        )
+    };
+    (@__pgrx_c_value; $($raw:tt)*) => {
+        $crate::SnapshotSelf!(@__pgrx_emit_value; $($raw)*)
+    };
+    (@__pgrx_emit_place;) => {
+        compile_error!("C expression is not a place in this operation")
+    };
+    (@__pgrx_c_place; $($raw:tt)*) => {
+        $crate::SnapshotSelf!(@__pgrx_emit_place; $($raw)*)
+    };
+    (@__pgrx_emit_read_place;) => {
+        compile_error!("C expression is not a place in this operation")
+    };
+    (@__pgrx_c_read_place; $($raw:tt)*) => {
+        $crate::SnapshotSelf!(@__pgrx_emit_read_place; $($raw)*)
+    };
+    (@__pgrx_emit_size;) => {
+        $crate::__pgrx_c_macros::expression::size_of_value_type(
+            if false {
+                {
+                    if false {}
+                }
+                Some(
+                    unsafe {
+                        $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                            $crate::__pgrx_c_macros::expression::address(
+                                $crate::__pgrx_c_macros::expression::place::<
+                                    $crate::__pgrx_c_macros::expression::CRecord<
+                                        $crate::__pgrx_c_bindings::SnapshotData
+                                    >>(
+                                    ::core::ptr::addr_of_mut!(
+                                        $crate::__pgrx_c_bindings::SnapshotSelfData
+                                    )
+                                )
+                            )
+                        )
+                    }
+                )
+            } else {
+                None
+            }
+        )
+    };
+    (@__pgrx_c_size; $($raw:tt)*) => {
+        $crate::SnapshotSelf!(@__pgrx_emit_size; $($raw)*)
+    };
+    (@__pgrx_emit_discard;) => {
+        {
+            let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                $crate::__pgrx_c_macros::expression::address(
+                    $crate::__pgrx_c_macros::expression::place::<
+                        $crate::__pgrx_c_macros::expression::CRecord<
+                            $crate::__pgrx_c_bindings::SnapshotData
+                        >>(::core::ptr::addr_of_mut!($crate::__pgrx_c_bindings::SnapshotSelfData))
+                )
+            );
+        }
+    };
+    (@__pgrx_c_discard; $($raw:tt)*) => {
+        $crate::SnapshotSelf!(@__pgrx_emit_discard; $($raw)*)
+    };
+    (@$mode:ident; $($invalid:tt)*) => {
+        compile_error!("arguments do not satisfy this C macro's invocation contract")
+    };
+    () => {
+        $crate::SnapshotSelf!(@__pgrx_emit_public;)
+    };
+    ($($invalid:tt)*) => {
+        compile_error!("arguments do not satisfy this C macro's invocation contract")
+    };
+}
+
 pub use InitDirtySnapshot;
 pub use InitNonVacuumableSnapshot;
 pub use IsHistoricMVCCSnapshot;
 pub use IsMVCCLikeSnapshot;
 pub use IsMVCCSnapshot;
+pub use SnapshotAny;
+pub use SnapshotSelf;

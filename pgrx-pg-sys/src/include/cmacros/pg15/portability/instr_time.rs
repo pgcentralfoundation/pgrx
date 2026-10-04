@@ -5,8 +5,8 @@ This code is generated for documentation purposes, so that it is easy to referen
 // C macros from instr_time.h.
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -37,23 +37,23 @@ macro_rules! __pgrx_c_args_INSTR_TIME_GET_MICROSEC {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
         $crate::__pgrx_c_args_INSTR_TIME_GET_MICROSEC!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_INSTR_TIME_GET_MICROSEC!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_INSTR_TIME_GET_MICROSEC!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_INSTR_TIME_GET_MICROSEC!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -62,7 +62,7 @@ macro_rules! __pgrx_c_args_INSTR_TIME_GET_MICROSEC {
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
         $crate::__pgrx_c_args_INSTR_TIME_GET_MICROSEC!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
@@ -88,17 +88,17 @@ macro_rules! __pgrx_c_args_INSTR_TIME_GET_MICROSEC {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_INSTR_TIME_GET_MICROSEC!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_INSTR_TIME_GET_MICROSEC!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_INSTR_TIME_GET_MICROSEC!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -125,13 +125,13 @@ macro_rules! __pgrx_c_args_INSTR_TIME_GET_MICROSEC {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_INSTR_TIME_GET_MICROSEC!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_INSTR_TIME_GET_MICROSEC!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -189,7 +189,7 @@ macro_rules! INSTR_TIME_GET_MICROSEC {
                             >(
                                 $crate::__pgrx_c_macros::expression::profile_value::<false, _>(
                                     $crate::__pgrx_c_macros::expression::cast_as::<
-                                        $crate::uint64,
+                                        $crate::__pgrx_c_bindings::uint64,
                                         $crate::__pgrx_c_macros::CUnsignedLong,
                                         _
                                     >(
@@ -209,7 +209,7 @@ macro_rules! INSTR_TIME_GET_MICROSEC {
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<false, _>(
                                     $crate::__pgrx_c_macros::expression::cast_as::<
-                                        $crate::uint64,
+                                        $crate::__pgrx_c_bindings::uint64,
                                         $crate::__pgrx_c_macros::CUnsignedLong,
                                         _
                                     >(
@@ -228,7 +228,7 @@ macro_rules! INSTR_TIME_GET_MICROSEC {
                     ),
                     $crate::__pgrx_c_macros::expression::profile_value::<false, _>(
                         $crate::__pgrx_c_macros::expression::cast_as::<
-                            $crate::uint64,
+                            $crate::__pgrx_c_bindings::uint64,
                             $crate::__pgrx_c_macros::CUnsignedLong,
                             _
                         >(
@@ -307,7 +307,7 @@ macro_rules! INSTR_TIME_GET_MICROSEC {
                                                 _
                                             >(
                                                 $crate::__pgrx_c_macros::expression::cast_as::<
-                                                    $crate::uint64,
+                                                    $crate::__pgrx_c_bindings::uint64,
                                                     $crate::__pgrx_c_macros::CUnsignedLong,
                                                     _
                                                 >(
@@ -337,7 +337,7 @@ macro_rules! INSTR_TIME_GET_MICROSEC {
                                                 _
                                             >(
                                                 $crate::__pgrx_c_macros::expression::cast_as::<
-                                                    $crate::uint64,
+                                                    $crate::__pgrx_c_bindings::uint64,
                                                     $crate::__pgrx_c_macros::CUnsignedLong,
                                                     _
                                                 >(
@@ -356,7 +356,7 @@ macro_rules! INSTR_TIME_GET_MICROSEC {
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<false, _>(
                                     $crate::__pgrx_c_macros::expression::cast_as::<
-                                        $crate::uint64,
+                                        $crate::__pgrx_c_bindings::uint64,
                                         $crate::__pgrx_c_macros::CUnsignedLong,
                                         _
                                     >(
@@ -423,7 +423,7 @@ macro_rules! INSTR_TIME_GET_MICROSEC {
                             >(
                                 $crate::__pgrx_c_macros::expression::profile_value::<false, _>(
                                     $crate::__pgrx_c_macros::expression::cast_as::<
-                                        $crate::uint64,
+                                        $crate::__pgrx_c_bindings::uint64,
                                         $crate::__pgrx_c_macros::CUnsignedLong,
                                         _
                                     >(
@@ -443,7 +443,7 @@ macro_rules! INSTR_TIME_GET_MICROSEC {
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<false, _>(
                                     $crate::__pgrx_c_macros::expression::cast_as::<
-                                        $crate::uint64,
+                                        $crate::__pgrx_c_bindings::uint64,
                                         $crate::__pgrx_c_macros::CUnsignedLong,
                                         _
                                     >(
@@ -462,7 +462,7 @@ macro_rules! INSTR_TIME_GET_MICROSEC {
                     ),
                     $crate::__pgrx_c_macros::expression::profile_value::<false, _>(
                         $crate::__pgrx_c_macros::expression::cast_as::<
-                            $crate::uint64,
+                            $crate::__pgrx_c_bindings::uint64,
                             $crate::__pgrx_c_macros::CUnsignedLong,
                             _
                         >(
@@ -507,8 +507,8 @@ macro_rules! INSTR_TIME_GET_MICROSEC {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -535,20 +535,24 @@ macro_rules! __pgrx_c_args_INSTR_TIME_IS_ZERO {
         $crate::__pgrx_c_args_INSTR_TIME_IS_ZERO!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_INSTR_TIME_IS_ZERO!(@p1 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_INSTR_TIME_IS_ZERO!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_INSTR_TIME_IS_ZERO!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_INSTR_TIME_IS_ZERO!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_INSTR_TIME_IS_ZERO!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_INSTR_TIME_IS_ZERO!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -556,7 +560,9 @@ macro_rules! __pgrx_c_args_INSTR_TIME_IS_ZERO {
         $crate::__pgrx_c_args_INSTR_TIME_IS_ZERO!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_INSTR_TIME_IS_ZERO!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_INSTR_TIME_IS_ZERO!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -578,14 +584,18 @@ macro_rules! __pgrx_c_args_INSTR_TIME_IS_ZERO {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_INSTR_TIME_IS_ZERO!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_INSTR_TIME_IS_ZERO!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_INSTR_TIME_IS_ZERO!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_INSTR_TIME_IS_ZERO!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_INSTR_TIME_IS_ZERO!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -612,13 +622,13 @@ macro_rules! __pgrx_c_args_INSTR_TIME_IS_ZERO {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_INSTR_TIME_IS_ZERO!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_INSTR_TIME_IS_ZERO!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -873,8 +883,8 @@ macro_rules! INSTR_TIME_IS_ZERO {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -905,21 +915,23 @@ macro_rules! __pgrx_c_args_INSTR_TIME_SET_CURRENT {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
         $crate::__pgrx_c_args_INSTR_TIME_SET_CURRENT!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_INSTR_TIME_SET_CURRENT!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_INSTR_TIME_SET_CURRENT!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_INSTR_TIME_SET_CURRENT!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_INSTR_TIME_SET_CURRENT!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -927,7 +939,9 @@ macro_rules! __pgrx_c_args_INSTR_TIME_SET_CURRENT {
         $crate::__pgrx_c_args_INSTR_TIME_SET_CURRENT!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_INSTR_TIME_SET_CURRENT!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_INSTR_TIME_SET_CURRENT!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -952,15 +966,17 @@ macro_rules! __pgrx_c_args_INSTR_TIME_SET_CURRENT {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_INSTR_TIME_SET_CURRENT!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_INSTR_TIME_SET_CURRENT!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_INSTR_TIME_SET_CURRENT!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_INSTR_TIME_SET_CURRENT!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -987,13 +1003,13 @@ macro_rules! __pgrx_c_args_INSTR_TIME_SET_CURRENT {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_INSTR_TIME_SET_CURRENT!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_INSTR_TIME_SET_CURRENT!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -1047,37 +1063,30 @@ macro_rules! INSTR_TIME_SET_CURRENT {
                             <
                                 $crate::__pgrx_c_macros::CInt as $crate::__pgrx_c_macros::expression::CType
                             >::from_storage(
-                                $crate::__pgrx_c_generated::Inline_4225cf2962a0997b443d76f4ffe1b627(
+                                $crate::__pgrx_c_generated::Inline_35a59c297b37771e04736e8a08e536bc(
                                     <
-                                        $crate::__pgrx_c_macros::expression::CEnumObject<
-                                            $crate::__pgrx_c_generated::EnumIdentity_06a6112cc9e65b020a9a70ed4f325bd692b029706c2806dfefbbca6ef527aed2,
-                                            $crate::__pgrx_c_macros::CUnsignedInt,
-                                            u32
-                                        > as $crate::__pgrx_c_macros::expression::CType
+                                        $crate::__pgrx_c_macros::CInt as $crate::__pgrx_c_macros::expression::CType
                                     >::into_storage(
                                         $crate::__pgrx_c_macros::expression::implicit::<
-                                            $crate::__pgrx_c_macros::expression::CEnumObject<
-                                                $crate::__pgrx_c_generated::EnumIdentity_06a6112cc9e65b020a9a70ed4f325bd692b029706c2806dfefbbca6ef527aed2,
-                                                $crate::__pgrx_c_macros::CUnsignedInt,
-                                                u32
-                                            >,
+                                            $crate::__pgrx_c_macros::CInt,
                                             _
                                         >(
                                             $crate::__pgrx_c_macros::expression::profile_value::<
                                                 true,
                                                 _
                                             >(
-                                                /* PGRX: PG_INSTR_CLOCK remains expanded because no integer constant binding is available in the defining Rust crate. */
                                                 $crate::__pgrx_c_macros::CValue::<
                                                     $crate::__pgrx_c_macros::CInt
-                                                >::new(4i32)
+                                                >::new(
+                                                    $crate::__pgrx_c_bindings::PG_INSTR_CLOCK as i32
+                                                )
                                             )
                                         )
                                     ),
                                     <
                                         $crate::__pgrx_c_macros::expression::CPointer<
                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                $crate::timespec
+                                                $crate::__pgrx_c_bindings::timespec
                                             >,
                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                         > as $crate::__pgrx_c_macros::expression::CType
@@ -1085,7 +1094,7 @@ macro_rules! INSTR_TIME_SET_CURRENT {
                                         $crate::__pgrx_c_macros::expression::implicit::<
                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                    $crate::timespec
+                                                    $crate::__pgrx_c_bindings::timespec
                                                 >,
                                                 $crate::__pgrx_c_macros::expression::ReadWrite
                                             >,
@@ -1144,37 +1153,30 @@ macro_rules! INSTR_TIME_SET_CURRENT {
                                         <
                                             $crate::__pgrx_c_macros::CInt as $crate::__pgrx_c_macros::expression::CType
                                         >::from_storage(
-                                            $crate::__pgrx_c_generated::Inline_4225cf2962a0997b443d76f4ffe1b627(
+                                            $crate::__pgrx_c_generated::Inline_35a59c297b37771e04736e8a08e536bc(
                                                 <
-                                                    $crate::__pgrx_c_macros::expression::CEnumObject<
-                                                        $crate::__pgrx_c_generated::EnumIdentity_06a6112cc9e65b020a9a70ed4f325bd692b029706c2806dfefbbca6ef527aed2,
-                                                        $crate::__pgrx_c_macros::CUnsignedInt,
-                                                        u32
-                                                    > as $crate::__pgrx_c_macros::expression::CType
+                                                    $crate::__pgrx_c_macros::CInt as $crate::__pgrx_c_macros::expression::CType
                                                 >::into_storage(
                                                     $crate::__pgrx_c_macros::expression::implicit::<
-                                                        $crate::__pgrx_c_macros::expression::CEnumObject<
-                                                            $crate::__pgrx_c_generated::EnumIdentity_06a6112cc9e65b020a9a70ed4f325bd692b029706c2806dfefbbca6ef527aed2,
-                                                            $crate::__pgrx_c_macros::CUnsignedInt,
-                                                            u32
-                                                        >,
+                                                        $crate::__pgrx_c_macros::CInt,
                                                         _
                                                     >(
                                                         $crate::__pgrx_c_macros::expression::profile_value::<
                                                             true,
                                                             _
                                                         >(
-                                                            /* PGRX: PG_INSTR_CLOCK remains expanded because no integer constant binding is available in the defining Rust crate. */
                                                             $crate::__pgrx_c_macros::CValue::<
                                                                 $crate::__pgrx_c_macros::CInt
-                                                            >::new(4i32)
+                                                            >::new(
+                                                                $crate::__pgrx_c_bindings::PG_INSTR_CLOCK as i32
+                                                            )
                                                         )
                                                     )
                                                 ),
                                                 <
                                                     $crate::__pgrx_c_macros::expression::CPointer<
                                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                                            $crate::timespec
+                                                            $crate::__pgrx_c_bindings::timespec
                                                         >,
                                                         $crate::__pgrx_c_macros::expression::ReadWrite
                                                     > as $crate::__pgrx_c_macros::expression::CType
@@ -1182,7 +1184,7 @@ macro_rules! INSTR_TIME_SET_CURRENT {
                                                     $crate::__pgrx_c_macros::expression::implicit::<
                                                         $crate::__pgrx_c_macros::expression::CPointer<
                                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                                $crate::timespec
+                                                                $crate::__pgrx_c_bindings::timespec
                                                             >,
                                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                                         >,
@@ -1228,37 +1230,30 @@ macro_rules! INSTR_TIME_SET_CURRENT {
                             <
                                 $crate::__pgrx_c_macros::CInt as $crate::__pgrx_c_macros::expression::CType
                             >::from_storage(
-                                $crate::__pgrx_c_generated::Inline_4225cf2962a0997b443d76f4ffe1b627(
+                                $crate::__pgrx_c_generated::Inline_35a59c297b37771e04736e8a08e536bc(
                                     <
-                                        $crate::__pgrx_c_macros::expression::CEnumObject<
-                                            $crate::__pgrx_c_generated::EnumIdentity_06a6112cc9e65b020a9a70ed4f325bd692b029706c2806dfefbbca6ef527aed2,
-                                            $crate::__pgrx_c_macros::CUnsignedInt,
-                                            u32
-                                        > as $crate::__pgrx_c_macros::expression::CType
+                                        $crate::__pgrx_c_macros::CInt as $crate::__pgrx_c_macros::expression::CType
                                     >::into_storage(
                                         $crate::__pgrx_c_macros::expression::implicit::<
-                                            $crate::__pgrx_c_macros::expression::CEnumObject<
-                                                $crate::__pgrx_c_generated::EnumIdentity_06a6112cc9e65b020a9a70ed4f325bd692b029706c2806dfefbbca6ef527aed2,
-                                                $crate::__pgrx_c_macros::CUnsignedInt,
-                                                u32
-                                            >,
+                                            $crate::__pgrx_c_macros::CInt,
                                             _
                                         >(
                                             $crate::__pgrx_c_macros::expression::profile_value::<
                                                 true,
                                                 _
                                             >(
-                                                /* PGRX: PG_INSTR_CLOCK remains expanded because no integer constant binding is available in the defining Rust crate. */
                                                 $crate::__pgrx_c_macros::CValue::<
                                                     $crate::__pgrx_c_macros::CInt
-                                                >::new(4i32)
+                                                >::new(
+                                                    $crate::__pgrx_c_bindings::PG_INSTR_CLOCK as i32
+                                                )
                                             )
                                         )
                                     ),
                                     <
                                         $crate::__pgrx_c_macros::expression::CPointer<
                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                $crate::timespec
+                                                $crate::__pgrx_c_bindings::timespec
                                             >,
                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                         > as $crate::__pgrx_c_macros::expression::CType
@@ -1266,7 +1261,7 @@ macro_rules! INSTR_TIME_SET_CURRENT {
                                         $crate::__pgrx_c_macros::expression::implicit::<
                                             $crate::__pgrx_c_macros::expression::CPointer<
                                                 $crate::__pgrx_c_macros::expression::CRecord<
-                                                    $crate::timespec
+                                                    $crate::__pgrx_c_bindings::timespec
                                                 >,
                                                 $crate::__pgrx_c_macros::expression::ReadWrite
                                             >,
@@ -1299,8 +1294,8 @@ macro_rules! INSTR_TIME_SET_CURRENT {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -1331,23 +1326,23 @@ macro_rules! __pgrx_c_args_INSTR_TIME_SET_CURRENT_LAZY {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
         $crate::__pgrx_c_args_INSTR_TIME_SET_CURRENT_LAZY!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_INSTR_TIME_SET_CURRENT_LAZY!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_INSTR_TIME_SET_CURRENT_LAZY!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_INSTR_TIME_SET_CURRENT_LAZY!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -1356,7 +1351,7 @@ macro_rules! __pgrx_c_args_INSTR_TIME_SET_CURRENT_LAZY {
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
         $crate::__pgrx_c_args_INSTR_TIME_SET_CURRENT_LAZY!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
@@ -1382,17 +1377,17 @@ macro_rules! __pgrx_c_args_INSTR_TIME_SET_CURRENT_LAZY {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_INSTR_TIME_SET_CURRENT_LAZY!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_INSTR_TIME_SET_CURRENT_LAZY!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_INSTR_TIME_SET_CURRENT_LAZY!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -1419,13 +1414,13 @@ macro_rules! __pgrx_c_args_INSTR_TIME_SET_CURRENT_LAZY {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_INSTR_TIME_SET_CURRENT_LAZY!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_INSTR_TIME_SET_CURRENT_LAZY!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -1579,37 +1574,30 @@ macro_rules! INSTR_TIME_SET_CURRENT_LAZY {
                                                         <
                                                             $crate::__pgrx_c_macros::CInt as $crate::__pgrx_c_macros::expression::CType
                                                         >::from_storage(
-                                                            $crate::__pgrx_c_generated::Inline_4225cf2962a0997b443d76f4ffe1b627(
+                                                            $crate::__pgrx_c_generated::Inline_35a59c297b37771e04736e8a08e536bc(
                                                                 <
-                                                                    $crate::__pgrx_c_macros::expression::CEnumObject<
-                                                                        $crate::__pgrx_c_generated::EnumIdentity_06a6112cc9e65b020a9a70ed4f325bd692b029706c2806dfefbbca6ef527aed2,
-                                                                        $crate::__pgrx_c_macros::CUnsignedInt,
-                                                                        u32
-                                                                    > as $crate::__pgrx_c_macros::expression::CType
+                                                                    $crate::__pgrx_c_macros::CInt as $crate::__pgrx_c_macros::expression::CType
                                                                 >::into_storage(
                                                                     $crate::__pgrx_c_macros::expression::implicit::<
-                                                                        $crate::__pgrx_c_macros::expression::CEnumObject<
-                                                                            $crate::__pgrx_c_generated::EnumIdentity_06a6112cc9e65b020a9a70ed4f325bd692b029706c2806dfefbbca6ef527aed2,
-                                                                            $crate::__pgrx_c_macros::CUnsignedInt,
-                                                                            u32
-                                                                        >,
+                                                                        $crate::__pgrx_c_macros::CInt,
                                                                         _
                                                                     >(
                                                                         $crate::__pgrx_c_macros::expression::profile_value::<
                                                                             true,
                                                                             _
                                                                         >(
-                                                                            /* PGRX: PG_INSTR_CLOCK remains expanded because no integer constant binding is available in the defining Rust crate. */
                                                                             $crate::__pgrx_c_macros::CValue::<
                                                                                 $crate::__pgrx_c_macros::CInt
-                                                                            >::new(4i32)
+                                                                            >::new(
+                                                                                $crate::__pgrx_c_bindings::PG_INSTR_CLOCK as i32
+                                                                            )
                                                                         )
                                                                     )
                                                                 ),
                                                                 <
                                                                     $crate::__pgrx_c_macros::expression::CPointer<
                                                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                                                            $crate::timespec
+                                                                            $crate::__pgrx_c_bindings::timespec
                                                                         >,
                                                                         $crate::__pgrx_c_macros::expression::ReadWrite
                                                                     > as $crate::__pgrx_c_macros::expression::CType
@@ -1617,7 +1605,7 @@ macro_rules! INSTR_TIME_SET_CURRENT_LAZY {
                                                                     $crate::__pgrx_c_macros::expression::implicit::<
                                                                         $crate::__pgrx_c_macros::expression::CPointer<
                                                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                $crate::timespec
+                                                                                $crate::__pgrx_c_bindings::timespec
                                                                             >,
                                                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                                                         >,
@@ -1813,37 +1801,30 @@ macro_rules! INSTR_TIME_SET_CURRENT_LAZY {
                                                                     <
                                                                         $crate::__pgrx_c_macros::CInt as $crate::__pgrx_c_macros::expression::CType
                                                                     >::from_storage(
-                                                                        $crate::__pgrx_c_generated::Inline_4225cf2962a0997b443d76f4ffe1b627(
+                                                                        $crate::__pgrx_c_generated::Inline_35a59c297b37771e04736e8a08e536bc(
                                                                             <
-                                                                                $crate::__pgrx_c_macros::expression::CEnumObject<
-                                                                                    $crate::__pgrx_c_generated::EnumIdentity_06a6112cc9e65b020a9a70ed4f325bd692b029706c2806dfefbbca6ef527aed2,
-                                                                                    $crate::__pgrx_c_macros::CUnsignedInt,
-                                                                                    u32
-                                                                                > as $crate::__pgrx_c_macros::expression::CType
+                                                                                $crate::__pgrx_c_macros::CInt as $crate::__pgrx_c_macros::expression::CType
                                                                             >::into_storage(
                                                                                 $crate::__pgrx_c_macros::expression::implicit::<
-                                                                                    $crate::__pgrx_c_macros::expression::CEnumObject<
-                                                                                        $crate::__pgrx_c_generated::EnumIdentity_06a6112cc9e65b020a9a70ed4f325bd692b029706c2806dfefbbca6ef527aed2,
-                                                                                        $crate::__pgrx_c_macros::CUnsignedInt,
-                                                                                        u32
-                                                                                    >,
+                                                                                    $crate::__pgrx_c_macros::CInt,
                                                                                     _
                                                                                 >(
                                                                                     $crate::__pgrx_c_macros::expression::profile_value::<
                                                                                         true,
                                                                                         _
                                                                                     >(
-                                                                                        /* PGRX: PG_INSTR_CLOCK remains expanded because no integer constant binding is available in the defining Rust crate. */
                                                                                         $crate::__pgrx_c_macros::CValue::<
                                                                                             $crate::__pgrx_c_macros::CInt
-                                                                                        >::new(4i32)
+                                                                                        >::new(
+                                                                                            $crate::__pgrx_c_bindings::PG_INSTR_CLOCK as i32
+                                                                                        )
                                                                                     )
                                                                                 )
                                                                             ),
                                                                             <
                                                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                                                     $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                        $crate::timespec
+                                                                                        $crate::__pgrx_c_bindings::timespec
                                                                                     >,
                                                                                     $crate::__pgrx_c_macros::expression::ReadWrite
                                                                                 > as $crate::__pgrx_c_macros::expression::CType
@@ -1851,7 +1832,7 @@ macro_rules! INSTR_TIME_SET_CURRENT_LAZY {
                                                                                 $crate::__pgrx_c_macros::expression::implicit::<
                                                                                     $crate::__pgrx_c_macros::expression::CPointer<
                                                                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                            $crate::timespec
+                                                                                            $crate::__pgrx_c_bindings::timespec
                                                                                         >,
                                                                                         $crate::__pgrx_c_macros::expression::ReadWrite
                                                                                     >,
@@ -2027,37 +2008,30 @@ macro_rules! INSTR_TIME_SET_CURRENT_LAZY {
                                                         <
                                                             $crate::__pgrx_c_macros::CInt as $crate::__pgrx_c_macros::expression::CType
                                                         >::from_storage(
-                                                            $crate::__pgrx_c_generated::Inline_4225cf2962a0997b443d76f4ffe1b627(
+                                                            $crate::__pgrx_c_generated::Inline_35a59c297b37771e04736e8a08e536bc(
                                                                 <
-                                                                    $crate::__pgrx_c_macros::expression::CEnumObject<
-                                                                        $crate::__pgrx_c_generated::EnumIdentity_06a6112cc9e65b020a9a70ed4f325bd692b029706c2806dfefbbca6ef527aed2,
-                                                                        $crate::__pgrx_c_macros::CUnsignedInt,
-                                                                        u32
-                                                                    > as $crate::__pgrx_c_macros::expression::CType
+                                                                    $crate::__pgrx_c_macros::CInt as $crate::__pgrx_c_macros::expression::CType
                                                                 >::into_storage(
                                                                     $crate::__pgrx_c_macros::expression::implicit::<
-                                                                        $crate::__pgrx_c_macros::expression::CEnumObject<
-                                                                            $crate::__pgrx_c_generated::EnumIdentity_06a6112cc9e65b020a9a70ed4f325bd692b029706c2806dfefbbca6ef527aed2,
-                                                                            $crate::__pgrx_c_macros::CUnsignedInt,
-                                                                            u32
-                                                                        >,
+                                                                        $crate::__pgrx_c_macros::CInt,
                                                                         _
                                                                     >(
                                                                         $crate::__pgrx_c_macros::expression::profile_value::<
                                                                             true,
                                                                             _
                                                                         >(
-                                                                            /* PGRX: PG_INSTR_CLOCK remains expanded because no integer constant binding is available in the defining Rust crate. */
                                                                             $crate::__pgrx_c_macros::CValue::<
                                                                                 $crate::__pgrx_c_macros::CInt
-                                                                            >::new(4i32)
+                                                                            >::new(
+                                                                                $crate::__pgrx_c_bindings::PG_INSTR_CLOCK as i32
+                                                                            )
                                                                         )
                                                                     )
                                                                 ),
                                                                 <
                                                                     $crate::__pgrx_c_macros::expression::CPointer<
                                                                         $crate::__pgrx_c_macros::expression::CRecord<
-                                                                            $crate::timespec
+                                                                            $crate::__pgrx_c_bindings::timespec
                                                                         >,
                                                                         $crate::__pgrx_c_macros::expression::ReadWrite
                                                                     > as $crate::__pgrx_c_macros::expression::CType
@@ -2065,7 +2039,7 @@ macro_rules! INSTR_TIME_SET_CURRENT_LAZY {
                                                                     $crate::__pgrx_c_macros::expression::implicit::<
                                                                         $crate::__pgrx_c_macros::expression::CPointer<
                                                                             $crate::__pgrx_c_macros::expression::CRecord<
-                                                                                $crate::timespec
+                                                                                $crate::__pgrx_c_bindings::timespec
                                                                             >,
                                                                             $crate::__pgrx_c_macros::expression::ReadWrite
                                                                         >,
@@ -2130,8 +2104,8 @@ macro_rules! INSTR_TIME_SET_CURRENT_LAZY {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -2158,20 +2132,24 @@ macro_rules! __pgrx_c_args_INSTR_TIME_SET_ZERO {
         $crate::__pgrx_c_args_INSTR_TIME_SET_ZERO!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_INSTR_TIME_SET_ZERO!(@p1 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_INSTR_TIME_SET_ZERO!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_INSTR_TIME_SET_ZERO!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_INSTR_TIME_SET_ZERO!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_INSTR_TIME_SET_ZERO!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_INSTR_TIME_SET_ZERO!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -2179,7 +2157,9 @@ macro_rules! __pgrx_c_args_INSTR_TIME_SET_ZERO {
         $crate::__pgrx_c_args_INSTR_TIME_SET_ZERO!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_INSTR_TIME_SET_ZERO!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_INSTR_TIME_SET_ZERO!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -2201,14 +2181,18 @@ macro_rules! __pgrx_c_args_INSTR_TIME_SET_ZERO {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_INSTR_TIME_SET_ZERO!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_INSTR_TIME_SET_ZERO!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_INSTR_TIME_SET_ZERO!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_INSTR_TIME_SET_ZERO!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_INSTR_TIME_SET_ZERO!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -2235,13 +2219,13 @@ macro_rules! __pgrx_c_args_INSTR_TIME_SET_ZERO {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_INSTR_TIME_SET_ZERO!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_INSTR_TIME_SET_ZERO!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };

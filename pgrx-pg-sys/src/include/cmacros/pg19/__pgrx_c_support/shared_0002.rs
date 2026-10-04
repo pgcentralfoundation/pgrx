@@ -6,7 +6,23 @@ This code is generated for documentation purposes, so that it is easy to referen
 
 #[doc(hidden)]
 #[macro_export]
+macro_rules! __pgrx_c_original {
+    (@classified [$callback:ident $state:tt [$($original:tt)*]] $descriptor:tt) => {
+        $crate::$callback!(@classified $state (@original [$($original)*] $descriptor))
+    };
+}
+#[doc(hidden)]
+#[macro_export]
 macro_rules! __pgrx_c_operand {
+    (@stringify; (@original [$($original:tt)*] $descriptor:tt)) => {
+        ::core::stringify!($($original)*)
+    };
+    (@$mode:ident [$floats:tt]; (@original $original:tt $descriptor:tt)) => {
+        $crate::__pgrx_c_operand!(@$mode [$floats]; $descriptor)
+    };
+    (@$mode:ident; (@original $original:tt $descriptor:tt)) => {
+        $crate::__pgrx_c_operand!(@$mode; $descriptor)
+    };
     (@check_safety; (@native [$expression:expr])) => {
         {
             let _ = || {

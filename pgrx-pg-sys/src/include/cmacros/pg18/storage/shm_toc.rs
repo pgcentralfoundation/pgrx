@@ -5,8 +5,8 @@ This code is generated for documentation purposes, so that it is easy to referen
 // C macros from shm_toc.h.
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -37,13 +37,13 @@ macro_rules! __pgrx_c_args_shm_toc_estimate_chunk {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_shm_toc_estimate_chunk!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_shm_toc_estimate_chunk!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -52,7 +52,7 @@ macro_rules! __pgrx_c_args_shm_toc_estimate_chunk {
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_shm_toc_estimate_chunk!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -79,33 +79,35 @@ macro_rules! __pgrx_c_args_shm_toc_estimate_chunk {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_shm_toc_estimate_chunk!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_shm_toc_estimate_chunk!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $argument:literal) => {
         $crate::__pgrx_c_args_shm_toc_estimate_chunk!(
-            @p2 $mode [$($done)* (@literal [- $argument]),];
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
         )
     };
     (@negative1 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_shm_toc_estimate_chunk!(@p2 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_shm_toc_estimate_chunk!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_shm_toc_estimate_chunk!(
-            @p2 $mode [$($done)* (@literal [- $argument]),];
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_shm_toc_estimate_chunk!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -113,7 +115,9 @@ macro_rules! __pgrx_c_args_shm_toc_estimate_chunk {
         $crate::__pgrx_c_args_shm_toc_estimate_chunk!(@negative1 $mode [$($done)*]; - $($raw)*)
     };
     (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_shm_toc_estimate_chunk!(@p2 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_shm_toc_estimate_chunk!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -138,15 +142,17 @@ macro_rules! __pgrx_c_args_shm_toc_estimate_chunk {
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_shm_toc_estimate_chunk!(
-            @p2 $mode [$($done)* (@literal [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_shm_toc_estimate_chunk!(@p2 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_shm_toc_estimate_chunk!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_shm_toc_estimate_chunk!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -173,13 +179,13 @@ macro_rules! __pgrx_c_args_shm_toc_estimate_chunk {
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_shm_toc_estimate_chunk!(
-            @p2 $mode [$($done)* (@literal [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_shm_toc_estimate_chunk!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -250,7 +256,7 @@ macro_rules! shm_toc_estimate_chunk {
                                 usize
                             > as $crate::__pgrx_c_macros::expression::CType
                         >::from_storage(
-                            $crate::add_size(
+                            $crate::__pgrx_c_bindings::add_size(
                                 <
                                     $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                         $crate::__pgrx_c_macros::CUnsignedLong,
@@ -365,7 +371,7 @@ macro_rules! shm_toc_estimate_chunk {
                                                                                     $crate::__pgrx_c_macros::CValue::<
                                                                                         $crate::__pgrx_c_macros::CInt
                                                                                     >::new(
-                                                                                        $crate::ALIGNOF_BUFFER as i32
+                                                                                        $crate::__pgrx_c_bindings::ALIGNOF_BUFFER as i32
                                                                                     )
                                                                                 )
                                                                             ),
@@ -416,7 +422,7 @@ macro_rules! shm_toc_estimate_chunk {
                                                                                             $crate::__pgrx_c_macros::CValue::<
                                                                                                 $crate::__pgrx_c_macros::CInt
                                                                                             >::new(
-                                                                                                $crate::ALIGNOF_BUFFER as i32
+                                                                                                $crate::__pgrx_c_bindings::ALIGNOF_BUFFER as i32
                                                                                             )
                                                                                         )
                                                                                     ),
@@ -498,7 +504,7 @@ macro_rules! shm_toc_estimate_chunk {
                                             usize
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::from_storage(
-                                        $crate::add_size(
+                                        $crate::__pgrx_c_bindings::add_size(
                                             <
                                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                     $crate::__pgrx_c_macros::CUnsignedLong,
@@ -613,7 +619,7 @@ macro_rules! shm_toc_estimate_chunk {
                                                                                                 $crate::__pgrx_c_macros::CValue::<
                                                                                                     $crate::__pgrx_c_macros::CInt
                                                                                                 >::new(
-                                                                                                    $crate::ALIGNOF_BUFFER as i32
+                                                                                                    $crate::__pgrx_c_bindings::ALIGNOF_BUFFER as i32
                                                                                                 )
                                                                                             )
                                                                                         ),
@@ -666,7 +672,7 @@ macro_rules! shm_toc_estimate_chunk {
                                                                                                         $crate::__pgrx_c_macros::CValue::<
                                                                                                             $crate::__pgrx_c_macros::CInt
                                                                                                         >::new(
-                                                                                                            $crate::ALIGNOF_BUFFER as i32
+                                                                                                            $crate::__pgrx_c_bindings::ALIGNOF_BUFFER as i32
                                                                                                         )
                                                                                                     )
                                                                                                 ),
@@ -733,7 +739,7 @@ macro_rules! shm_toc_estimate_chunk {
                                 usize
                             > as $crate::__pgrx_c_macros::expression::CType
                         >::from_storage(
-                            $crate::add_size(
+                            $crate::__pgrx_c_bindings::add_size(
                                 <
                                     $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                         $crate::__pgrx_c_macros::CUnsignedLong,
@@ -848,7 +854,7 @@ macro_rules! shm_toc_estimate_chunk {
                                                                                     $crate::__pgrx_c_macros::CValue::<
                                                                                         $crate::__pgrx_c_macros::CInt
                                                                                     >::new(
-                                                                                        $crate::ALIGNOF_BUFFER as i32
+                                                                                        $crate::__pgrx_c_bindings::ALIGNOF_BUFFER as i32
                                                                                     )
                                                                                 )
                                                                             ),
@@ -899,7 +905,7 @@ macro_rules! shm_toc_estimate_chunk {
                                                                                             $crate::__pgrx_c_macros::CValue::<
                                                                                                 $crate::__pgrx_c_macros::CInt
                                                                                             >::new(
-                                                                                                $crate::ALIGNOF_BUFFER as i32
+                                                                                                $crate::__pgrx_c_bindings::ALIGNOF_BUFFER as i32
                                                                                             )
                                                                                         )
                                                                                     ),
@@ -940,8 +946,8 @@ macro_rules! shm_toc_estimate_chunk {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -972,13 +978,13 @@ macro_rules! __pgrx_c_args_shm_toc_estimate_keys {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_shm_toc_estimate_keys!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_shm_toc_estimate_keys!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -987,7 +993,7 @@ macro_rules! __pgrx_c_args_shm_toc_estimate_keys {
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_shm_toc_estimate_keys!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -1014,33 +1020,35 @@ macro_rules! __pgrx_c_args_shm_toc_estimate_keys {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_shm_toc_estimate_keys!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_shm_toc_estimate_keys!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $argument:literal) => {
         $crate::__pgrx_c_args_shm_toc_estimate_keys!(
-            @p2 $mode [$($done)* (@literal [- $argument]),];
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
         )
     };
     (@negative1 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_shm_toc_estimate_keys!(@p2 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_shm_toc_estimate_keys!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_shm_toc_estimate_keys!(
-            @p2 $mode [$($done)* (@literal [- $argument]),];
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_shm_toc_estimate_keys!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -1048,7 +1056,9 @@ macro_rules! __pgrx_c_args_shm_toc_estimate_keys {
         $crate::__pgrx_c_args_shm_toc_estimate_keys!(@negative1 $mode [$($done)*]; - $($raw)*)
     };
     (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_shm_toc_estimate_keys!(@p2 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_shm_toc_estimate_keys!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -1070,14 +1080,18 @@ macro_rules! __pgrx_c_args_shm_toc_estimate_keys {
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_shm_toc_estimate_keys!(@p2 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_shm_toc_estimate_keys!(
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_shm_toc_estimate_keys!(@p2 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_shm_toc_estimate_keys!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_shm_toc_estimate_keys!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -1104,13 +1118,13 @@ macro_rules! __pgrx_c_args_shm_toc_estimate_keys {
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_shm_toc_estimate_keys!(
-            @p2 $mode [$($done)* (@literal [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_shm_toc_estimate_keys!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -1177,7 +1191,7 @@ macro_rules! shm_toc_estimate_keys {
                                 usize
                             > as $crate::__pgrx_c_macros::expression::CType
                         >::from_storage(
-                            $crate::add_size(
+                            $crate::__pgrx_c_bindings::add_size(
                                 <
                                     $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                         $crate::__pgrx_c_macros::CUnsignedLong,
@@ -1294,7 +1308,7 @@ macro_rules! shm_toc_estimate_keys {
                                             usize
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::from_storage(
-                                        $crate::add_size(
+                                        $crate::__pgrx_c_bindings::add_size(
                                             <
                                                 $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                                     $crate::__pgrx_c_macros::CUnsignedLong,
@@ -1399,7 +1413,7 @@ macro_rules! shm_toc_estimate_keys {
                                 usize
                             > as $crate::__pgrx_c_macros::expression::CType
                         >::from_storage(
-                            $crate::add_size(
+                            $crate::__pgrx_c_bindings::add_size(
                                 <
                                     $crate::__pgrx_c_macros::expression::CIntegerStorage<
                                         $crate::__pgrx_c_macros::CUnsignedLong,
@@ -1476,8 +1490,8 @@ macro_rules! shm_toc_estimate_keys {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -1508,23 +1522,23 @@ macro_rules! __pgrx_c_args_shm_toc_initialize_estimator {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
         $crate::__pgrx_c_args_shm_toc_initialize_estimator!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_shm_toc_initialize_estimator!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_shm_toc_initialize_estimator!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_shm_toc_initialize_estimator!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -1536,7 +1550,7 @@ macro_rules! __pgrx_c_args_shm_toc_initialize_estimator {
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
         $crate::__pgrx_c_args_shm_toc_initialize_estimator!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
@@ -1562,17 +1576,17 @@ macro_rules! __pgrx_c_args_shm_toc_initialize_estimator {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_shm_toc_initialize_estimator!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_shm_toc_initialize_estimator!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_shm_toc_initialize_estimator!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -1599,13 +1613,13 @@ macro_rules! __pgrx_c_args_shm_toc_initialize_estimator {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_shm_toc_initialize_estimator!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_shm_toc_initialize_estimator!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };

@@ -5,8 +5,556 @@ This code is generated for documentation purposes, so that it is easy to referen
 // C macros from c.h.
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
+    target_pointer_width = "64",
+    target_endian = "little"
+)))]
+#[cfg(not(docsrs))]
+compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
+#[doc(hidden)]
+#[macro_export]
+macro_rules! __pgrx_c_args_Assert {
+    (@collect $mode:ident [$($done:tt)*]; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_Assert!(@p0 $mode [$($done)*]; $($raw)*)
+    };
+    (@classified [$next:ident $mode:ident [$($done:tt)*] [$($rest:tt)*]] $descriptor:tt) => {
+        $crate::__pgrx_c_args_Assert!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_Assert!(
+            @ignore0 $mode [$($done)*] [
+                @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @
+            ];
+            $($raw)*
+        )
+    };
+    (@ignore0 $mode:ident [$($done:tt)*] $budget:tt; , $($rest:tt)*) => {
+        $crate::__pgrx_c_args_Assert!(@p1 $mode [$($done)* (@unused),]; $($rest)*)
+    };
+    (@ignore0 $mode:ident [$($done:tt)*] $budget:tt;) => {
+        $crate::__pgrx_c_args_Assert!(@p1 $mode [$($done)* (@unused),];)
+    };
+    (@ignore0 $mode:ident [$($done:tt)*] [@ $($budget:tt)*]; $token:tt $($rest:tt)*) => {
+        $crate::__pgrx_c_args_Assert!(@ignore0 $mode [$($done)*] [$($budget)*]; $($rest)*)
+    };
+    (@ignore0 $mode:ident [$($done:tt)*] []; $($raw:tt)+) => {
+        compile_error!("unused C macro argument exceeds the 64-token normalization bound")
+    };
+    (@p1 $mode:ident [$($done:tt)*];) => {
+        $crate::Assert!(@$mode; $($done)*)
+    };
+    ($($invalid:tt)*) => {
+        compile_error!("arguments do not satisfy this C macro's invocation contract")
+    };
+}
+/// C macro Assert from c.h:950
+///
+/// ```text
+/// #define Assert( condition ) ( ( void ) true )
+/// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+#[macro_export]
+macro_rules! Assert {
+    (@__pgrx_emit_check_safety; $condition:tt $(,)?) => {
+        {
+            if false {}
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_Assert!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
+    (@__pgrx_emit_public; $condition:tt $(,)?) => {
+        $crate::__pgrx_c_macros::expression_result::finish(
+            $crate::Assert!(@__pgrx_emit_value; $condition)
+        )
+    };
+    (@__pgrx_emit_value; $condition:tt $(,)?) => {
+        (
+            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                {
+                    {
+                        let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                            /* PGRX: true remains expanded because no integer constant binding is available in the defining Rust crate. */
+                            $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
+                                1i32
+                            )
+                        );
+                    }
+                }
+            )
+        )
+    };
+    (@__pgrx_c_value; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_Assert!(@collect __pgrx_emit_value []; $($raw)*)
+    };
+    (@__pgrx_emit_place; $condition:tt $(,)?) => {
+        compile_error!("C expression is not a place in this operation")
+    };
+    (@__pgrx_c_place; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_Assert!(@collect __pgrx_emit_place []; $($raw)*)
+    };
+    (@__pgrx_emit_read_place; $condition:tt $(,)?) => {
+        compile_error!("C expression is not a place in this operation")
+    };
+    (@__pgrx_c_read_place; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_Assert!(@collect __pgrx_emit_read_place []; $($raw)*)
+    };
+    (@__pgrx_emit_size; $condition:tt $(,)?) => {
+        $crate::__pgrx_c_macros::expression::size_of_value_type(
+            if false {
+                {
+                    if false {}
+                }
+                Some(
+                    unsafe {
+                        $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                            {
+                                {
+                                    let _ = $crate::__pgrx_c_macros::expression::profile_value::<
+                                        true,
+                                        _
+                                    >(
+                                        /* PGRX: true remains expanded because no integer constant binding is available in the defining Rust crate. */
+                                        $crate::__pgrx_c_macros::CValue::<
+                                            $crate::__pgrx_c_macros::CInt
+                                        >::new(1i32)
+                                    );
+                                }
+                            }
+                        )
+                    }
+                )
+            } else {
+                None
+            }
+        )
+    };
+    (@__pgrx_c_size; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_Assert!(@collect __pgrx_emit_size []; $($raw)*)
+    };
+    (@__pgrx_emit_discard; $condition:tt $(,)?) => {
+        {
+            let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                {
+                    {
+                        let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                            /* PGRX: true remains expanded because no integer constant binding is available in the defining Rust crate. */
+                            $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
+                                1i32
+                            )
+                        );
+                    }
+                }
+            );
+        }
+    };
+    (@__pgrx_c_discard; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_Assert!(@collect __pgrx_emit_discard []; $($raw)*)
+    };
+    ($($raw:tt)*) => {
+        $crate::__pgrx_c_args_Assert!(@collect __pgrx_emit_public []; $($raw)*)
+    };
+}
+
+#[cfg(not(all(
+    target_arch = "x86_64",
+    target_os = "linux",
+    target_pointer_width = "64",
+    target_endian = "little"
+)))]
+#[cfg(not(docsrs))]
+compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
+#[doc(hidden)]
+#[macro_export]
+macro_rules! __pgrx_c_args_AssertMacro {
+    (@collect $mode:ident [$($done:tt)*]; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_AssertMacro!(@p0 $mode [$($done)*]; $($raw)*)
+    };
+    (@classified [$next:ident $mode:ident [$($done:tt)*] [$($rest:tt)*]] $descriptor:tt) => {
+        $crate::__pgrx_c_args_AssertMacro!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_AssertMacro!(
+            @ignore0 $mode [$($done)*] [
+                @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @
+            ];
+            $($raw)*
+        )
+    };
+    (@ignore0 $mode:ident [$($done:tt)*] $budget:tt; , $($rest:tt)*) => {
+        $crate::__pgrx_c_args_AssertMacro!(@p1 $mode [$($done)* (@unused),]; $($rest)*)
+    };
+    (@ignore0 $mode:ident [$($done:tt)*] $budget:tt;) => {
+        $crate::__pgrx_c_args_AssertMacro!(@p1 $mode [$($done)* (@unused),];)
+    };
+    (@ignore0 $mode:ident [$($done:tt)*] [@ $($budget:tt)*]; $token:tt $($rest:tt)*) => {
+        $crate::__pgrx_c_args_AssertMacro!(@ignore0 $mode [$($done)*] [$($budget)*]; $($rest)*)
+    };
+    (@ignore0 $mode:ident [$($done:tt)*] []; $($raw:tt)+) => {
+        compile_error!("unused C macro argument exceeds the 64-token normalization bound")
+    };
+    (@p1 $mode:ident [$($done:tt)*];) => {
+        $crate::AssertMacro!(@$mode; $($done)*)
+    };
+    ($($invalid:tt)*) => {
+        compile_error!("arguments do not satisfy this C macro's invocation contract")
+    };
+}
+/// C macro AssertMacro from c.h:951
+///
+/// ```text
+/// #define AssertMacro( condition ) ( ( void ) true )
+/// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+#[macro_export]
+macro_rules! AssertMacro {
+    (@__pgrx_emit_check_safety; $condition:tt $(,)?) => {
+        {
+            if false {}
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_AssertMacro!(@collect __pgrx_emit_check_safety []; $($raw)*)
+    };
+    (@__pgrx_emit_public; $condition:tt $(,)?) => {
+        $crate::__pgrx_c_macros::expression_result::finish(
+            $crate::AssertMacro!(@__pgrx_emit_value; $condition)
+        )
+    };
+    (@__pgrx_emit_value; $condition:tt $(,)?) => {
+        (
+            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                {
+                    {
+                        let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                            /* PGRX: true remains expanded because no integer constant binding is available in the defining Rust crate. */
+                            $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
+                                1i32
+                            )
+                        );
+                    }
+                }
+            )
+        )
+    };
+    (@__pgrx_c_value; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_AssertMacro!(@collect __pgrx_emit_value []; $($raw)*)
+    };
+    (@__pgrx_emit_place; $condition:tt $(,)?) => {
+        compile_error!("C expression is not a place in this operation")
+    };
+    (@__pgrx_c_place; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_AssertMacro!(@collect __pgrx_emit_place []; $($raw)*)
+    };
+    (@__pgrx_emit_read_place; $condition:tt $(,)?) => {
+        compile_error!("C expression is not a place in this operation")
+    };
+    (@__pgrx_c_read_place; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_AssertMacro!(@collect __pgrx_emit_read_place []; $($raw)*)
+    };
+    (@__pgrx_emit_size; $condition:tt $(,)?) => {
+        $crate::__pgrx_c_macros::expression::size_of_value_type(
+            if false {
+                {
+                    if false {}
+                }
+                Some(
+                    unsafe {
+                        $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                            {
+                                {
+                                    let _ = $crate::__pgrx_c_macros::expression::profile_value::<
+                                        true,
+                                        _
+                                    >(
+                                        /* PGRX: true remains expanded because no integer constant binding is available in the defining Rust crate. */
+                                        $crate::__pgrx_c_macros::CValue::<
+                                            $crate::__pgrx_c_macros::CInt
+                                        >::new(1i32)
+                                    );
+                                }
+                            }
+                        )
+                    }
+                )
+            } else {
+                None
+            }
+        )
+    };
+    (@__pgrx_c_size; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_AssertMacro!(@collect __pgrx_emit_size []; $($raw)*)
+    };
+    (@__pgrx_emit_discard; $condition:tt $(,)?) => {
+        {
+            let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                {
+                    {
+                        let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                            /* PGRX: true remains expanded because no integer constant binding is available in the defining Rust crate. */
+                            $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
+                                1i32
+                            )
+                        );
+                    }
+                }
+            );
+        }
+    };
+    (@__pgrx_c_discard; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_AssertMacro!(@collect __pgrx_emit_discard []; $($raw)*)
+    };
+    ($($raw:tt)*) => {
+        $crate::__pgrx_c_args_AssertMacro!(@collect __pgrx_emit_public []; $($raw)*)
+    };
+}
+
+#[cfg(not(all(
+    target_arch = "x86_64",
+    target_os = "linux",
+    target_pointer_width = "64",
+    target_endian = "little"
+)))]
+#[cfg(not(docsrs))]
+compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
+#[doc(hidden)]
+#[macro_export]
+macro_rules! __pgrx_c_args_AssertPointerAlignment {
+    (@collect $mode:ident [$($done:tt)*]; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_AssertPointerAlignment!(@p0 $mode [$($done)*]; $($raw)*)
+    };
+    (@classified [$next:ident $mode:ident [$($done:tt)*] [$($rest:tt)*]] $descriptor:tt) => {
+        $crate::__pgrx_c_args_AssertPointerAlignment!(
+            @$next $mode [$($done)* $descriptor,];
+            $($rest)*
+        )
+    };
+    (@p0 $mode:ident [$($done:tt)*]; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_AssertPointerAlignment!(
+            @ignore0 $mode [$($done)*] [
+                @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @
+            ];
+            $($raw)*
+        )
+    };
+    (@ignore0 $mode:ident [$($done:tt)*] $budget:tt; , $($rest:tt)*) => {
+        $crate::__pgrx_c_args_AssertPointerAlignment!(@p1 $mode [$($done)* (@unused),]; $($rest)*)
+    };
+    (@ignore0 $mode:ident [$($done:tt)*] [@ $($budget:tt)*]; $token:tt $($rest:tt)*) => {
+        $crate::__pgrx_c_args_AssertPointerAlignment!(
+            @ignore0 $mode [$($done)*] [$($budget)*];
+            $($rest)*
+        )
+    };
+    (@ignore0 $mode:ident [$($done:tt)*] []; $($raw:tt)+) => {
+        compile_error!("unused C macro argument exceeds the 64-token normalization bound")
+    };
+    (@p1 $mode:ident [$($done:tt)*]; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_AssertPointerAlignment!(
+            @ignore1 $mode [$($done)*] [
+                @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @
+            ];
+            $($raw)*
+        )
+    };
+    (@ignore1 $mode:ident [$($done:tt)*] $budget:tt; , $($rest:tt)*) => {
+        $crate::__pgrx_c_args_AssertPointerAlignment!(@p2 $mode [$($done)* (@unused),]; $($rest)*)
+    };
+    (@ignore1 $mode:ident [$($done:tt)*] $budget:tt;) => {
+        $crate::__pgrx_c_args_AssertPointerAlignment!(@p2 $mode [$($done)* (@unused),];)
+    };
+    (@ignore1 $mode:ident [$($done:tt)*] [@ $($budget:tt)*]; $token:tt $($rest:tt)*) => {
+        $crate::__pgrx_c_args_AssertPointerAlignment!(
+            @ignore1 $mode [$($done)*] [$($budget)*];
+            $($rest)*
+        )
+    };
+    (@ignore1 $mode:ident [$($done:tt)*] []; $($raw:tt)+) => {
+        compile_error!("unused C macro argument exceeds the 64-token normalization bound")
+    };
+    (@p2 $mode:ident [$($done:tt)*];) => {
+        $crate::AssertPointerAlignment!(@$mode; $($done)*)
+    };
+    ($($invalid:tt)*) => {
+        compile_error!("arguments do not satisfy this C macro's invocation contract")
+    };
+}
+/// C macro AssertPointerAlignment from c.h:985
+///
+/// ```text
+/// #define AssertPointerAlignment( ptr , bndr ) Assert ( TYPEALIGN ( bndr , ( uintptr_t ) ( ptr ) ) == ( uintptr_t ) ( ptr ) )
+/// ```
+///
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Conversions involving floats reject nonfinite or out-of-range integer results; conversions into Rust enums reject values without a represented discriminant. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+#[macro_export]
+macro_rules! AssertPointerAlignment {
+    (@__pgrx_emit_check_safety; $ptr:tt, $bndr:tt $(,)?) => {
+        {
+            if false {}
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_AssertPointerAlignment!(
+            @collect __pgrx_emit_check_safety [];
+            $($raw)*
+        )
+    };
+    (@__pgrx_emit_public; $ptr:tt, $bndr:tt $(,)?) => {
+        $crate::__pgrx_c_macros::expression_result::finish(
+            $crate::AssertPointerAlignment!(@__pgrx_emit_value; $ptr, $bndr)
+        )
+    };
+    (@__pgrx_emit_value; $ptr:tt, $bndr:tt $(,)?) => {
+        /* PGRX: AssertPointerAlignment remains expanded because Assert expression structure differs after compiler expansion. */
+        (
+            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                {
+                    {
+                        let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                            /* PGRX: true remains expanded because no integer constant binding is available in the defining Rust crate. */
+                            $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
+                                1i32
+                            )
+                        );
+                    }
+                }
+            )
+        )
+    };
+    (@__pgrx_c_value; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_AssertPointerAlignment!(@collect __pgrx_emit_value []; $($raw)*)
+    };
+    (@__pgrx_emit_place; $ptr:tt, $bndr:tt $(,)?) => {
+        compile_error!("C expression is not a place in this operation")
+    };
+    (@__pgrx_c_place; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_AssertPointerAlignment!(@collect __pgrx_emit_place []; $($raw)*)
+    };
+    (@__pgrx_emit_read_place; $ptr:tt, $bndr:tt $(,)?) => {
+        compile_error!("C expression is not a place in this operation")
+    };
+    (@__pgrx_c_read_place; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_AssertPointerAlignment!(@collect __pgrx_emit_read_place []; $($raw)*)
+    };
+    (@__pgrx_emit_size; $ptr:tt, $bndr:tt $(,)?) => {
+        /* PGRX: AssertPointerAlignment remains expanded because Assert expression structure differs after compiler expansion. */
+        $crate::__pgrx_c_macros::expression::size_of_value_type(
+            if false {
+                {
+                    if false {}
+                }
+                Some(
+                    unsafe {
+                        $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                            {
+                                {
+                                    let _ = $crate::__pgrx_c_macros::expression::profile_value::<
+                                        true,
+                                        _
+                                    >(
+                                        /* PGRX: true remains expanded because no integer constant binding is available in the defining Rust crate. */
+                                        $crate::__pgrx_c_macros::CValue::<
+                                            $crate::__pgrx_c_macros::CInt
+                                        >::new(1i32)
+                                    );
+                                }
+                            }
+                        )
+                    }
+                )
+            } else {
+                None
+            }
+        )
+    };
+    (@__pgrx_c_size; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_AssertPointerAlignment!(@collect __pgrx_emit_size []; $($raw)*)
+    };
+    (@__pgrx_emit_discard; $ptr:tt, $bndr:tt $(,)?) => {
+        /* PGRX: AssertPointerAlignment remains expanded because Assert expression structure differs after compiler expansion. */
+        {
+            let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                {
+                    {
+                        let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                            /* PGRX: true remains expanded because no integer constant binding is available in the defining Rust crate. */
+                            $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
+                                1i32
+                            )
+                        );
+                    }
+                }
+            );
+        }
+    };
+    (@__pgrx_c_discard; $($raw:tt)*) => {
+        $crate::__pgrx_c_args_AssertPointerAlignment!(@collect __pgrx_emit_discard []; $($raw)*)
+    };
+    ($($raw:tt)*) => {
+        $crate::__pgrx_c_args_AssertPointerAlignment!(@collect __pgrx_emit_public []; $($raw)*)
+    };
+}
+
+#[cfg(not(all(
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -33,25 +581,34 @@ macro_rules! __pgrx_c_args_BUFFERALIGN {
         $crate::__pgrx_c_args_BUFFERALIGN!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_BUFFERALIGN!(@p1 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_BUFFERALIGN!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_BUFFERALIGN!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_BUFFERALIGN!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_BUFFERALIGN!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_BUFFERALIGN!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_BUFFERALIGN!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $($raw:tt)*) => {
         $crate::__pgrx_c_args_BUFFERALIGN!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_BUFFERALIGN!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_BUFFERALIGN!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -73,13 +630,20 @@ macro_rules! __pgrx_c_args_BUFFERALIGN {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_BUFFERALIGN!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_BUFFERALIGN!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_BUFFERALIGN!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_BUFFERALIGN!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
-        $crate::__pgrx_c_args_BUFFERALIGN!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_BUFFERALIGN!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
         $crate::__pgrx_c_classify!(
@@ -101,10 +665,16 @@ macro_rules! __pgrx_c_args_BUFFERALIGN {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_BUFFERALIGN!(@p1 $mode [$($done)* (@literal [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_BUFFERALIGN!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+            $($rest)*
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_BUFFERALIGN!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_BUFFERALIGN!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p1 $mode:ident [$($done:tt)*];) => {
         $crate::BUFFERALIGN!(@$mode; $($done)*)
@@ -113,7 +683,7 @@ macro_rules! __pgrx_c_args_BUFFERALIGN {
         compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
-/// C macro BUFFERALIGN from c.h:898
+/// C macro BUFFERALIGN from c.h:905
 ///
 /// ```text
 /// #define BUFFERALIGN( LEN ) TYPEALIGN ( ALIGNOF_BUFFER , ( LEN ) )
@@ -151,7 +721,7 @@ macro_rules! BUFFERALIGN {
                 @compiled [
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                            $crate::ALIGNOF_BUFFER as i32
+                            $crate::__pgrx_c_bindings::ALIGNOF_BUFFER as i32
                         )
                     )
                 ] [compile_error!("a C literal or constant is not an object place")] [
@@ -169,7 +739,7 @@ macro_rules! BUFFERALIGN {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::CValue::<
                                             $crate::__pgrx_c_macros::CInt
-                                        >::new($crate::ALIGNOF_BUFFER as i32)
+                                        >::new($crate::__pgrx_c_bindings::ALIGNOF_BUFFER as i32)
                                     )
                                 }
                             )
@@ -192,7 +762,7 @@ macro_rules! BUFFERALIGN {
                 @compiled [
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                            $crate::ALIGNOF_BUFFER as i32
+                            $crate::__pgrx_c_bindings::ALIGNOF_BUFFER as i32
                         )
                     )
                 ] [compile_error!("a C literal or constant is not an object place")] [
@@ -210,7 +780,7 @@ macro_rules! BUFFERALIGN {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::CValue::<
                                             $crate::__pgrx_c_macros::CInt
-                                        >::new($crate::ALIGNOF_BUFFER as i32)
+                                        >::new($crate::__pgrx_c_bindings::ALIGNOF_BUFFER as i32)
                                     )
                                 }
                             )
@@ -233,7 +803,7 @@ macro_rules! BUFFERALIGN {
                 @compiled [
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                            $crate::ALIGNOF_BUFFER as i32
+                            $crate::__pgrx_c_bindings::ALIGNOF_BUFFER as i32
                         )
                     )
                 ] [compile_error!("a C literal or constant is not an object place")] [
@@ -251,7 +821,7 @@ macro_rules! BUFFERALIGN {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::CValue::<
                                             $crate::__pgrx_c_macros::CInt
-                                        >::new($crate::ALIGNOF_BUFFER as i32)
+                                        >::new($crate::__pgrx_c_bindings::ALIGNOF_BUFFER as i32)
                                     )
                                 }
                             )
@@ -274,7 +844,7 @@ macro_rules! BUFFERALIGN {
                 @compiled [
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                            $crate::ALIGNOF_BUFFER as i32
+                            $crate::__pgrx_c_bindings::ALIGNOF_BUFFER as i32
                         )
                     )
                 ] [compile_error!("a C literal or constant is not an object place")] [
@@ -292,7 +862,7 @@ macro_rules! BUFFERALIGN {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::CValue::<
                                             $crate::__pgrx_c_macros::CInt
-                                        >::new($crate::ALIGNOF_BUFFER as i32)
+                                        >::new($crate::__pgrx_c_bindings::ALIGNOF_BUFFER as i32)
                                     )
                                 }
                             )
@@ -315,7 +885,7 @@ macro_rules! BUFFERALIGN {
                 @compiled [
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                            $crate::ALIGNOF_BUFFER as i32
+                            $crate::__pgrx_c_bindings::ALIGNOF_BUFFER as i32
                         )
                     )
                 ] [compile_error!("a C literal or constant is not an object place")] [
@@ -333,7 +903,7 @@ macro_rules! BUFFERALIGN {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::CValue::<
                                             $crate::__pgrx_c_macros::CInt
-                                        >::new($crate::ALIGNOF_BUFFER as i32)
+                                        >::new($crate::__pgrx_c_bindings::ALIGNOF_BUFFER as i32)
                                     )
                                 }
                             )
@@ -355,8 +925,8 @@ macro_rules! BUFFERALIGN {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -383,20 +953,24 @@ macro_rules! __pgrx_c_args_BUFFERALIGN_DOWN {
         $crate::__pgrx_c_args_BUFFERALIGN_DOWN!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_BUFFERALIGN_DOWN!(@p1 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_BUFFERALIGN_DOWN!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_BUFFERALIGN_DOWN!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_BUFFERALIGN_DOWN!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_BUFFERALIGN_DOWN!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_BUFFERALIGN_DOWN!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -404,7 +978,9 @@ macro_rules! __pgrx_c_args_BUFFERALIGN_DOWN {
         $crate::__pgrx_c_args_BUFFERALIGN_DOWN!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_BUFFERALIGN_DOWN!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_BUFFERALIGN_DOWN!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -426,14 +1002,18 @@ macro_rules! __pgrx_c_args_BUFFERALIGN_DOWN {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_BUFFERALIGN_DOWN!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_BUFFERALIGN_DOWN!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_BUFFERALIGN_DOWN!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_BUFFERALIGN_DOWN!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_BUFFERALIGN_DOWN!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -460,13 +1040,13 @@ macro_rules! __pgrx_c_args_BUFFERALIGN_DOWN {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_BUFFERALIGN_DOWN!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_BUFFERALIGN_DOWN!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -477,7 +1057,7 @@ macro_rules! __pgrx_c_args_BUFFERALIGN_DOWN {
         compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
-/// C macro BUFFERALIGN_DOWN from c.h:909
+/// C macro BUFFERALIGN_DOWN from c.h:916
 ///
 /// ```text
 /// #define BUFFERALIGN_DOWN( LEN ) TYPEALIGN_DOWN ( ALIGNOF_BUFFER , ( LEN ) )
@@ -515,7 +1095,7 @@ macro_rules! BUFFERALIGN_DOWN {
                 @compiled [
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                            $crate::ALIGNOF_BUFFER as i32
+                            $crate::__pgrx_c_bindings::ALIGNOF_BUFFER as i32
                         )
                     )
                 ] [compile_error!("a C literal or constant is not an object place")] [
@@ -533,7 +1113,7 @@ macro_rules! BUFFERALIGN_DOWN {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::CValue::<
                                             $crate::__pgrx_c_macros::CInt
-                                        >::new($crate::ALIGNOF_BUFFER as i32)
+                                        >::new($crate::__pgrx_c_bindings::ALIGNOF_BUFFER as i32)
                                     )
                                 }
                             )
@@ -556,7 +1136,7 @@ macro_rules! BUFFERALIGN_DOWN {
                 @compiled [
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                            $crate::ALIGNOF_BUFFER as i32
+                            $crate::__pgrx_c_bindings::ALIGNOF_BUFFER as i32
                         )
                     )
                 ] [compile_error!("a C literal or constant is not an object place")] [
@@ -574,7 +1154,7 @@ macro_rules! BUFFERALIGN_DOWN {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::CValue::<
                                             $crate::__pgrx_c_macros::CInt
-                                        >::new($crate::ALIGNOF_BUFFER as i32)
+                                        >::new($crate::__pgrx_c_bindings::ALIGNOF_BUFFER as i32)
                                     )
                                 }
                             )
@@ -597,7 +1177,7 @@ macro_rules! BUFFERALIGN_DOWN {
                 @compiled [
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                            $crate::ALIGNOF_BUFFER as i32
+                            $crate::__pgrx_c_bindings::ALIGNOF_BUFFER as i32
                         )
                     )
                 ] [compile_error!("a C literal or constant is not an object place")] [
@@ -615,7 +1195,7 @@ macro_rules! BUFFERALIGN_DOWN {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::CValue::<
                                             $crate::__pgrx_c_macros::CInt
-                                        >::new($crate::ALIGNOF_BUFFER as i32)
+                                        >::new($crate::__pgrx_c_bindings::ALIGNOF_BUFFER as i32)
                                     )
                                 }
                             )
@@ -638,7 +1218,7 @@ macro_rules! BUFFERALIGN_DOWN {
                 @compiled [
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                            $crate::ALIGNOF_BUFFER as i32
+                            $crate::__pgrx_c_bindings::ALIGNOF_BUFFER as i32
                         )
                     )
                 ] [compile_error!("a C literal or constant is not an object place")] [
@@ -656,7 +1236,7 @@ macro_rules! BUFFERALIGN_DOWN {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::CValue::<
                                             $crate::__pgrx_c_macros::CInt
-                                        >::new($crate::ALIGNOF_BUFFER as i32)
+                                        >::new($crate::__pgrx_c_bindings::ALIGNOF_BUFFER as i32)
                                     )
                                 }
                             )
@@ -679,7 +1259,7 @@ macro_rules! BUFFERALIGN_DOWN {
                 @compiled [
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                            $crate::ALIGNOF_BUFFER as i32
+                            $crate::__pgrx_c_bindings::ALIGNOF_BUFFER as i32
                         )
                     )
                 ] [compile_error!("a C literal or constant is not an object place")] [
@@ -697,7 +1277,7 @@ macro_rules! BUFFERALIGN_DOWN {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::CValue::<
                                             $crate::__pgrx_c_macros::CInt
-                                        >::new($crate::ALIGNOF_BUFFER as i32)
+                                        >::new($crate::__pgrx_c_bindings::ALIGNOF_BUFFER as i32)
                                     )
                                 }
                             )
@@ -719,8 +1299,8 @@ macro_rules! BUFFERALIGN_DOWN {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -747,25 +1327,34 @@ macro_rules! __pgrx_c_args_BoolIsValid {
         $crate::__pgrx_c_args_BoolIsValid!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_BoolIsValid!(@p1 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_BoolIsValid!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_BoolIsValid!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_BoolIsValid!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_BoolIsValid!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_BoolIsValid!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_BoolIsValid!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $($raw:tt)*) => {
         $crate::__pgrx_c_args_BoolIsValid!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_BoolIsValid!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_BoolIsValid!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -787,13 +1376,20 @@ macro_rules! __pgrx_c_args_BoolIsValid {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_BoolIsValid!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_BoolIsValid!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_BoolIsValid!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_BoolIsValid!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
-        $crate::__pgrx_c_args_BoolIsValid!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_BoolIsValid!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
         $crate::__pgrx_c_classify!(
@@ -815,10 +1411,16 @@ macro_rules! __pgrx_c_args_BoolIsValid {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_BoolIsValid!(@p1 $mode [$($done)* (@literal [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_BoolIsValid!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+            $($rest)*
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_BoolIsValid!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_BoolIsValid!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p1 $mode:ident [$($done:tt)*];) => {
         $crate::BoolIsValid!(@$mode; $($done)*)
@@ -827,7 +1429,7 @@ macro_rules! __pgrx_c_args_BoolIsValid {
         compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
-/// C macro BoolIsValid from c.h:846
+/// C macro BoolIsValid from c.h:853
 ///
 /// ```text
 /// #define BoolIsValid( boolean ) ( ( boolean ) == false || ( boolean ) == true )
@@ -1053,8 +1655,8 @@ macro_rules! BoolIsValid {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -1081,20 +1683,24 @@ macro_rules! __pgrx_c_args_CACHELINEALIGN {
         $crate::__pgrx_c_args_CACHELINEALIGN!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_CACHELINEALIGN!(@p1 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_CACHELINEALIGN!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_CACHELINEALIGN!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_CACHELINEALIGN!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_CACHELINEALIGN!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_CACHELINEALIGN!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -1102,7 +1708,9 @@ macro_rules! __pgrx_c_args_CACHELINEALIGN {
         $crate::__pgrx_c_args_CACHELINEALIGN!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_CACHELINEALIGN!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_CACHELINEALIGN!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -1124,14 +1732,18 @@ macro_rules! __pgrx_c_args_CACHELINEALIGN {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_CACHELINEALIGN!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_CACHELINEALIGN!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_CACHELINEALIGN!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_CACHELINEALIGN!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_CACHELINEALIGN!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -1158,13 +1770,13 @@ macro_rules! __pgrx_c_args_CACHELINEALIGN {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_CACHELINEALIGN!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_CACHELINEALIGN!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -1175,7 +1787,7 @@ macro_rules! __pgrx_c_args_CACHELINEALIGN {
         compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
-/// C macro CACHELINEALIGN from c.h:899
+/// C macro CACHELINEALIGN from c.h:906
 ///
 /// ```text
 /// #define CACHELINEALIGN( LEN ) TYPEALIGN ( PG_CACHE_LINE_SIZE , ( LEN ) )
@@ -1213,7 +1825,7 @@ macro_rules! CACHELINEALIGN {
                 @compiled [
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                            $crate::PG_CACHE_LINE_SIZE as i32
+                            $crate::__pgrx_c_bindings::PG_CACHE_LINE_SIZE as i32
                         )
                     )
                 ] [compile_error!("a C literal or constant is not an object place")] [
@@ -1231,7 +1843,7 @@ macro_rules! CACHELINEALIGN {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::CValue::<
                                             $crate::__pgrx_c_macros::CInt
-                                        >::new($crate::PG_CACHE_LINE_SIZE as i32)
+                                        >::new($crate::__pgrx_c_bindings::PG_CACHE_LINE_SIZE as i32)
                                     )
                                 }
                             )
@@ -1254,7 +1866,7 @@ macro_rules! CACHELINEALIGN {
                 @compiled [
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                            $crate::PG_CACHE_LINE_SIZE as i32
+                            $crate::__pgrx_c_bindings::PG_CACHE_LINE_SIZE as i32
                         )
                     )
                 ] [compile_error!("a C literal or constant is not an object place")] [
@@ -1272,7 +1884,7 @@ macro_rules! CACHELINEALIGN {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::CValue::<
                                             $crate::__pgrx_c_macros::CInt
-                                        >::new($crate::PG_CACHE_LINE_SIZE as i32)
+                                        >::new($crate::__pgrx_c_bindings::PG_CACHE_LINE_SIZE as i32)
                                     )
                                 }
                             )
@@ -1295,7 +1907,7 @@ macro_rules! CACHELINEALIGN {
                 @compiled [
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                            $crate::PG_CACHE_LINE_SIZE as i32
+                            $crate::__pgrx_c_bindings::PG_CACHE_LINE_SIZE as i32
                         )
                     )
                 ] [compile_error!("a C literal or constant is not an object place")] [
@@ -1313,7 +1925,7 @@ macro_rules! CACHELINEALIGN {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::CValue::<
                                             $crate::__pgrx_c_macros::CInt
-                                        >::new($crate::PG_CACHE_LINE_SIZE as i32)
+                                        >::new($crate::__pgrx_c_bindings::PG_CACHE_LINE_SIZE as i32)
                                     )
                                 }
                             )
@@ -1336,7 +1948,7 @@ macro_rules! CACHELINEALIGN {
                 @compiled [
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                            $crate::PG_CACHE_LINE_SIZE as i32
+                            $crate::__pgrx_c_bindings::PG_CACHE_LINE_SIZE as i32
                         )
                     )
                 ] [compile_error!("a C literal or constant is not an object place")] [
@@ -1354,7 +1966,7 @@ macro_rules! CACHELINEALIGN {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::CValue::<
                                             $crate::__pgrx_c_macros::CInt
-                                        >::new($crate::PG_CACHE_LINE_SIZE as i32)
+                                        >::new($crate::__pgrx_c_bindings::PG_CACHE_LINE_SIZE as i32)
                                     )
                                 }
                             )
@@ -1377,7 +1989,7 @@ macro_rules! CACHELINEALIGN {
                 @compiled [
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                            $crate::PG_CACHE_LINE_SIZE as i32
+                            $crate::__pgrx_c_bindings::PG_CACHE_LINE_SIZE as i32
                         )
                     )
                 ] [compile_error!("a C literal or constant is not an object place")] [
@@ -1395,7 +2007,7 @@ macro_rules! CACHELINEALIGN {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::CValue::<
                                             $crate::__pgrx_c_macros::CInt
-                                        >::new($crate::PG_CACHE_LINE_SIZE as i32)
+                                        >::new($crate::__pgrx_c_bindings::PG_CACHE_LINE_SIZE as i32)
                                     )
                                 }
                             )
@@ -1417,8 +2029,8 @@ macro_rules! CACHELINEALIGN {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -1445,25 +2057,34 @@ macro_rules! __pgrx_c_args_DOUBLEALIGN {
         $crate::__pgrx_c_args_DOUBLEALIGN!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_DOUBLEALIGN!(@p1 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_DOUBLEALIGN!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_DOUBLEALIGN!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_DOUBLEALIGN!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_DOUBLEALIGN!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_DOUBLEALIGN!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_DOUBLEALIGN!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $($raw:tt)*) => {
         $crate::__pgrx_c_args_DOUBLEALIGN!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_DOUBLEALIGN!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_DOUBLEALIGN!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -1485,13 +2106,20 @@ macro_rules! __pgrx_c_args_DOUBLEALIGN {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_DOUBLEALIGN!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_DOUBLEALIGN!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_DOUBLEALIGN!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_DOUBLEALIGN!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
-        $crate::__pgrx_c_args_DOUBLEALIGN!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_DOUBLEALIGN!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
         $crate::__pgrx_c_classify!(
@@ -1513,10 +2141,16 @@ macro_rules! __pgrx_c_args_DOUBLEALIGN {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_DOUBLEALIGN!(@p1 $mode [$($done)* (@literal [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_DOUBLEALIGN!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+            $($rest)*
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_DOUBLEALIGN!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_DOUBLEALIGN!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p1 $mode:ident [$($done:tt)*];) => {
         $crate::DOUBLEALIGN!(@$mode; $($done)*)
@@ -1525,7 +2159,7 @@ macro_rules! __pgrx_c_args_DOUBLEALIGN {
         compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
-/// C macro DOUBLEALIGN from c.h:895
+/// C macro DOUBLEALIGN from c.h:902
 ///
 /// ```text
 /// #define DOUBLEALIGN( LEN ) TYPEALIGN ( ALIGNOF_DOUBLE , ( LEN ) )
@@ -1563,7 +2197,7 @@ macro_rules! DOUBLEALIGN {
                 @compiled [
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                            $crate::ALIGNOF_DOUBLE as i32
+                            $crate::__pgrx_c_bindings::ALIGNOF_DOUBLE as i32
                         )
                     )
                 ] [compile_error!("a C literal or constant is not an object place")] [
@@ -1581,7 +2215,7 @@ macro_rules! DOUBLEALIGN {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::CValue::<
                                             $crate::__pgrx_c_macros::CInt
-                                        >::new($crate::ALIGNOF_DOUBLE as i32)
+                                        >::new($crate::__pgrx_c_bindings::ALIGNOF_DOUBLE as i32)
                                     )
                                 }
                             )
@@ -1604,7 +2238,7 @@ macro_rules! DOUBLEALIGN {
                 @compiled [
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                            $crate::ALIGNOF_DOUBLE as i32
+                            $crate::__pgrx_c_bindings::ALIGNOF_DOUBLE as i32
                         )
                     )
                 ] [compile_error!("a C literal or constant is not an object place")] [
@@ -1622,7 +2256,7 @@ macro_rules! DOUBLEALIGN {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::CValue::<
                                             $crate::__pgrx_c_macros::CInt
-                                        >::new($crate::ALIGNOF_DOUBLE as i32)
+                                        >::new($crate::__pgrx_c_bindings::ALIGNOF_DOUBLE as i32)
                                     )
                                 }
                             )
@@ -1645,7 +2279,7 @@ macro_rules! DOUBLEALIGN {
                 @compiled [
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                            $crate::ALIGNOF_DOUBLE as i32
+                            $crate::__pgrx_c_bindings::ALIGNOF_DOUBLE as i32
                         )
                     )
                 ] [compile_error!("a C literal or constant is not an object place")] [
@@ -1663,7 +2297,7 @@ macro_rules! DOUBLEALIGN {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::CValue::<
                                             $crate::__pgrx_c_macros::CInt
-                                        >::new($crate::ALIGNOF_DOUBLE as i32)
+                                        >::new($crate::__pgrx_c_bindings::ALIGNOF_DOUBLE as i32)
                                     )
                                 }
                             )
@@ -1686,7 +2320,7 @@ macro_rules! DOUBLEALIGN {
                 @compiled [
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                            $crate::ALIGNOF_DOUBLE as i32
+                            $crate::__pgrx_c_bindings::ALIGNOF_DOUBLE as i32
                         )
                     )
                 ] [compile_error!("a C literal or constant is not an object place")] [
@@ -1704,7 +2338,7 @@ macro_rules! DOUBLEALIGN {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::CValue::<
                                             $crate::__pgrx_c_macros::CInt
-                                        >::new($crate::ALIGNOF_DOUBLE as i32)
+                                        >::new($crate::__pgrx_c_bindings::ALIGNOF_DOUBLE as i32)
                                     )
                                 }
                             )
@@ -1727,7 +2361,7 @@ macro_rules! DOUBLEALIGN {
                 @compiled [
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                            $crate::ALIGNOF_DOUBLE as i32
+                            $crate::__pgrx_c_bindings::ALIGNOF_DOUBLE as i32
                         )
                     )
                 ] [compile_error!("a C literal or constant is not an object place")] [
@@ -1745,7 +2379,7 @@ macro_rules! DOUBLEALIGN {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::CValue::<
                                             $crate::__pgrx_c_macros::CInt
-                                        >::new($crate::ALIGNOF_DOUBLE as i32)
+                                        >::new($crate::__pgrx_c_bindings::ALIGNOF_DOUBLE as i32)
                                     )
                                 }
                             )
@@ -1767,8 +2401,8 @@ macro_rules! DOUBLEALIGN {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -1795,20 +2429,24 @@ macro_rules! __pgrx_c_args_DOUBLEALIGN_DOWN {
         $crate::__pgrx_c_args_DOUBLEALIGN_DOWN!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_DOUBLEALIGN_DOWN!(@p1 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_DOUBLEALIGN_DOWN!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_DOUBLEALIGN_DOWN!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_DOUBLEALIGN_DOWN!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_DOUBLEALIGN_DOWN!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_DOUBLEALIGN_DOWN!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -1816,7 +2454,9 @@ macro_rules! __pgrx_c_args_DOUBLEALIGN_DOWN {
         $crate::__pgrx_c_args_DOUBLEALIGN_DOWN!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_DOUBLEALIGN_DOWN!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_DOUBLEALIGN_DOWN!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -1838,14 +2478,18 @@ macro_rules! __pgrx_c_args_DOUBLEALIGN_DOWN {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_DOUBLEALIGN_DOWN!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_DOUBLEALIGN_DOWN!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_DOUBLEALIGN_DOWN!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_DOUBLEALIGN_DOWN!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_DOUBLEALIGN_DOWN!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -1872,13 +2516,13 @@ macro_rules! __pgrx_c_args_DOUBLEALIGN_DOWN {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_DOUBLEALIGN_DOWN!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_DOUBLEALIGN_DOWN!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -1889,7 +2533,7 @@ macro_rules! __pgrx_c_args_DOUBLEALIGN_DOWN {
         compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
-/// C macro DOUBLEALIGN_DOWN from c.h:907
+/// C macro DOUBLEALIGN_DOWN from c.h:914
 ///
 /// ```text
 /// #define DOUBLEALIGN_DOWN( LEN ) TYPEALIGN_DOWN ( ALIGNOF_DOUBLE , ( LEN ) )
@@ -1927,7 +2571,7 @@ macro_rules! DOUBLEALIGN_DOWN {
                 @compiled [
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                            $crate::ALIGNOF_DOUBLE as i32
+                            $crate::__pgrx_c_bindings::ALIGNOF_DOUBLE as i32
                         )
                     )
                 ] [compile_error!("a C literal or constant is not an object place")] [
@@ -1945,7 +2589,7 @@ macro_rules! DOUBLEALIGN_DOWN {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::CValue::<
                                             $crate::__pgrx_c_macros::CInt
-                                        >::new($crate::ALIGNOF_DOUBLE as i32)
+                                        >::new($crate::__pgrx_c_bindings::ALIGNOF_DOUBLE as i32)
                                     )
                                 }
                             )
@@ -1968,7 +2612,7 @@ macro_rules! DOUBLEALIGN_DOWN {
                 @compiled [
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                            $crate::ALIGNOF_DOUBLE as i32
+                            $crate::__pgrx_c_bindings::ALIGNOF_DOUBLE as i32
                         )
                     )
                 ] [compile_error!("a C literal or constant is not an object place")] [
@@ -1986,7 +2630,7 @@ macro_rules! DOUBLEALIGN_DOWN {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::CValue::<
                                             $crate::__pgrx_c_macros::CInt
-                                        >::new($crate::ALIGNOF_DOUBLE as i32)
+                                        >::new($crate::__pgrx_c_bindings::ALIGNOF_DOUBLE as i32)
                                     )
                                 }
                             )
@@ -2009,7 +2653,7 @@ macro_rules! DOUBLEALIGN_DOWN {
                 @compiled [
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                            $crate::ALIGNOF_DOUBLE as i32
+                            $crate::__pgrx_c_bindings::ALIGNOF_DOUBLE as i32
                         )
                     )
                 ] [compile_error!("a C literal or constant is not an object place")] [
@@ -2027,7 +2671,7 @@ macro_rules! DOUBLEALIGN_DOWN {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::CValue::<
                                             $crate::__pgrx_c_macros::CInt
-                                        >::new($crate::ALIGNOF_DOUBLE as i32)
+                                        >::new($crate::__pgrx_c_bindings::ALIGNOF_DOUBLE as i32)
                                     )
                                 }
                             )
@@ -2050,7 +2694,7 @@ macro_rules! DOUBLEALIGN_DOWN {
                 @compiled [
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                            $crate::ALIGNOF_DOUBLE as i32
+                            $crate::__pgrx_c_bindings::ALIGNOF_DOUBLE as i32
                         )
                     )
                 ] [compile_error!("a C literal or constant is not an object place")] [
@@ -2068,7 +2712,7 @@ macro_rules! DOUBLEALIGN_DOWN {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::CValue::<
                                             $crate::__pgrx_c_macros::CInt
-                                        >::new($crate::ALIGNOF_DOUBLE as i32)
+                                        >::new($crate::__pgrx_c_bindings::ALIGNOF_DOUBLE as i32)
                                     )
                                 }
                             )
@@ -2091,7 +2735,7 @@ macro_rules! DOUBLEALIGN_DOWN {
                 @compiled [
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                            $crate::ALIGNOF_DOUBLE as i32
+                            $crate::__pgrx_c_bindings::ALIGNOF_DOUBLE as i32
                         )
                     )
                 ] [compile_error!("a C literal or constant is not an object place")] [
@@ -2109,7 +2753,7 @@ macro_rules! DOUBLEALIGN_DOWN {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::CValue::<
                                             $crate::__pgrx_c_macros::CInt
-                                        >::new($crate::ALIGNOF_DOUBLE as i32)
+                                        >::new($crate::__pgrx_c_bindings::ALIGNOF_DOUBLE as i32)
                                     )
                                 }
                             )
@@ -2131,8 +2775,8 @@ macro_rules! DOUBLEALIGN_DOWN {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -2163,21 +2807,23 @@ macro_rules! __pgrx_c_args_FLOAT4_FITS_IN_INT16 {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
         $crate::__pgrx_c_args_FLOAT4_FITS_IN_INT16!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_FLOAT4_FITS_IN_INT16!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_FLOAT4_FITS_IN_INT16!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_FLOAT4_FITS_IN_INT16!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_FLOAT4_FITS_IN_INT16!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -2185,7 +2831,9 @@ macro_rules! __pgrx_c_args_FLOAT4_FITS_IN_INT16 {
         $crate::__pgrx_c_args_FLOAT4_FITS_IN_INT16!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_FLOAT4_FITS_IN_INT16!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_FLOAT4_FITS_IN_INT16!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -2207,14 +2855,18 @@ macro_rules! __pgrx_c_args_FLOAT4_FITS_IN_INT16 {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_FLOAT4_FITS_IN_INT16!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_FLOAT4_FITS_IN_INT16!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_FLOAT4_FITS_IN_INT16!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_FLOAT4_FITS_IN_INT16!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_FLOAT4_FITS_IN_INT16!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -2241,13 +2893,13 @@ macro_rules! __pgrx_c_args_FLOAT4_FITS_IN_INT16 {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_FLOAT4_FITS_IN_INT16!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_FLOAT4_FITS_IN_INT16!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -2258,7 +2910,7 @@ macro_rules! __pgrx_c_args_FLOAT4_FITS_IN_INT16 {
         compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
-/// C macro FLOAT4_FITS_IN_INT16 from c.h:1172
+/// C macro FLOAT4_FITS_IN_INT16 from c.h:1179
 ///
 /// ```text
 /// #define FLOAT4_FITS_IN_INT16( num ) ( ( num ) >= ( float4 ) PG_INT16_MIN && ( num ) < - ( ( float4 ) PG_INT16_MIN ) )
@@ -2290,7 +2942,6 @@ macro_rules! FLOAT4_FITS_IN_INT16 {
         )
     };
     (@__pgrx_emit_value; $num:tt $(,)?) => {
-        /* PGRX: INT16_MIN remains expanded because a binding reference could change C grouping because the object expansion is neither atomic nor enclosed in parentheses. */ /* PGRX: PG_INT16_MIN remains expanded because a binding reference could change C grouping because the object expansion is neither atomic nor enclosed in parentheses. */
         (
             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
@@ -2304,7 +2955,7 @@ macro_rules! FLOAT4_FITS_IN_INT16 {
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::cast_as::<
-                                        $crate::float4,
+                                        $crate::__pgrx_c_bindings::float4,
                                         $crate::__pgrx_c_macros::expression::CFloat,
                                         _
                                     >(
@@ -2312,19 +2963,9 @@ macro_rules! FLOAT4_FITS_IN_INT16 {
                                             true,
                                             _
                                         >(
-                                            $crate::__pgrx_c_macros::expression::neg::<
-                                                $crate::__pgrx_c_macros::Wrapping,
-                                                _
-                                            >(
-                                                $crate::__pgrx_c_macros::expression::profile_value::<
-                                                    true,
-                                                    _
-                                                >(
-                                                    $crate::__pgrx_c_macros::CValue::<
-                                                        $crate::__pgrx_c_macros::CInt
-                                                    >::new(32768i32)
-                                                )
-                                            )
+                                            $crate::__pgrx_c_macros::CValue::<
+                                                $crate::__pgrx_c_macros::CInt
+                                            >::new($crate::__pgrx_c_bindings::PG_INT16_MIN as i32)
                                         )
                                     )
                                 )
@@ -2349,7 +2990,7 @@ macro_rules! FLOAT4_FITS_IN_INT16 {
                                                 _
                                             >(
                                                 $crate::__pgrx_c_macros::expression::cast_as::<
-                                                    $crate::float4,
+                                                    $crate::__pgrx_c_bindings::float4,
                                                     $crate::__pgrx_c_macros::expression::CFloat,
                                                     _
                                                 >(
@@ -2357,18 +2998,10 @@ macro_rules! FLOAT4_FITS_IN_INT16 {
                                                         true,
                                                         _
                                                     >(
-                                                        $crate::__pgrx_c_macros::expression::neg::<
-                                                            $crate::__pgrx_c_macros::Wrapping,
-                                                            _
-                                                        >(
-                                                            $crate::__pgrx_c_macros::expression::profile_value::<
-                                                                true,
-                                                                _
-                                                            >(
-                                                                $crate::__pgrx_c_macros::CValue::<
-                                                                    $crate::__pgrx_c_macros::CInt
-                                                                >::new(32768i32)
-                                                            )
+                                                        $crate::__pgrx_c_macros::CValue::<
+                                                            $crate::__pgrx_c_macros::CInt
+                                                        >::new(
+                                                            $crate::__pgrx_c_bindings::PG_INT16_MIN as i32
                                                         )
                                                     )
                                                 )
@@ -2403,7 +3036,6 @@ macro_rules! FLOAT4_FITS_IN_INT16 {
         $crate::__pgrx_c_args_FLOAT4_FITS_IN_INT16!(@collect __pgrx_emit_read_place []; $($raw)*)
     };
     (@__pgrx_emit_size; $num:tt $(,)?) => {
-        /* PGRX: INT16_MIN remains expanded because a binding reference could change C grouping because the object expansion is neither atomic nor enclosed in parentheses. */ /* PGRX: PG_INT16_MIN remains expanded because a binding reference could change C grouping because the object expansion is neither atomic nor enclosed in parentheses. */
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
                 {
@@ -2429,7 +3061,7 @@ macro_rules! FLOAT4_FITS_IN_INT16 {
                                                 _
                                             >(
                                                 $crate::__pgrx_c_macros::expression::cast_as::<
-                                                    $crate::float4,
+                                                    $crate::__pgrx_c_bindings::float4,
                                                     $crate::__pgrx_c_macros::expression::CFloat,
                                                     _
                                                 >(
@@ -2437,18 +3069,10 @@ macro_rules! FLOAT4_FITS_IN_INT16 {
                                                         true,
                                                         _
                                                     >(
-                                                        $crate::__pgrx_c_macros::expression::neg::<
-                                                            $crate::__pgrx_c_macros::Wrapping,
-                                                            _
-                                                        >(
-                                                            $crate::__pgrx_c_macros::expression::profile_value::<
-                                                                true,
-                                                                _
-                                                            >(
-                                                                $crate::__pgrx_c_macros::CValue::<
-                                                                    $crate::__pgrx_c_macros::CInt
-                                                                >::new(32768i32)
-                                                            )
+                                                        $crate::__pgrx_c_macros::CValue::<
+                                                            $crate::__pgrx_c_macros::CInt
+                                                        >::new(
+                                                            $crate::__pgrx_c_bindings::PG_INT16_MIN as i32
                                                         )
                                                     )
                                                 )
@@ -2478,7 +3102,7 @@ macro_rules! FLOAT4_FITS_IN_INT16 {
                                                             _
                                                         >(
                                                             $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                $crate::float4,
+                                                                $crate::__pgrx_c_bindings::float4,
                                                                 $crate::__pgrx_c_macros::expression::CFloat,
                                                                 _
                                                             >(
@@ -2486,18 +3110,10 @@ macro_rules! FLOAT4_FITS_IN_INT16 {
                                                                     true,
                                                                     _
                                                                 >(
-                                                                    $crate::__pgrx_c_macros::expression::neg::<
-                                                                        $crate::__pgrx_c_macros::Wrapping,
-                                                                        _
-                                                                    >(
-                                                                        $crate::__pgrx_c_macros::expression::profile_value::<
-                                                                            true,
-                                                                            _
-                                                                        >(
-                                                                            $crate::__pgrx_c_macros::CValue::<
-                                                                                $crate::__pgrx_c_macros::CInt
-                                                                            >::new(32768i32)
-                                                                        )
+                                                                    $crate::__pgrx_c_macros::CValue::<
+                                                                        $crate::__pgrx_c_macros::CInt
+                                                                    >::new(
+                                                                        $crate::__pgrx_c_bindings::PG_INT16_MIN as i32
                                                                     )
                                                                 )
                                                             )
@@ -2525,7 +3141,6 @@ macro_rules! FLOAT4_FITS_IN_INT16 {
         $crate::__pgrx_c_args_FLOAT4_FITS_IN_INT16!(@collect __pgrx_emit_size []; $($raw)*)
     };
     (@__pgrx_emit_discard; $num:tt $(,)?) => {
-        /* PGRX: INT16_MIN remains expanded because a binding reference could change C grouping because the object expansion is neither atomic nor enclosed in parentheses. */ /* PGRX: PG_INT16_MIN remains expanded because a binding reference could change C grouping because the object expansion is neither atomic nor enclosed in parentheses. */
         {
             let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
@@ -2539,7 +3154,7 @@ macro_rules! FLOAT4_FITS_IN_INT16 {
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::cast_as::<
-                                        $crate::float4,
+                                        $crate::__pgrx_c_bindings::float4,
                                         $crate::__pgrx_c_macros::expression::CFloat,
                                         _
                                     >(
@@ -2547,19 +3162,9 @@ macro_rules! FLOAT4_FITS_IN_INT16 {
                                             true,
                                             _
                                         >(
-                                            $crate::__pgrx_c_macros::expression::neg::<
-                                                $crate::__pgrx_c_macros::Wrapping,
-                                                _
-                                            >(
-                                                $crate::__pgrx_c_macros::expression::profile_value::<
-                                                    true,
-                                                    _
-                                                >(
-                                                    $crate::__pgrx_c_macros::CValue::<
-                                                        $crate::__pgrx_c_macros::CInt
-                                                    >::new(32768i32)
-                                                )
-                                            )
+                                            $crate::__pgrx_c_macros::CValue::<
+                                                $crate::__pgrx_c_macros::CInt
+                                            >::new($crate::__pgrx_c_bindings::PG_INT16_MIN as i32)
                                         )
                                     )
                                 )
@@ -2584,7 +3189,7 @@ macro_rules! FLOAT4_FITS_IN_INT16 {
                                                 _
                                             >(
                                                 $crate::__pgrx_c_macros::expression::cast_as::<
-                                                    $crate::float4,
+                                                    $crate::__pgrx_c_bindings::float4,
                                                     $crate::__pgrx_c_macros::expression::CFloat,
                                                     _
                                                 >(
@@ -2592,18 +3197,10 @@ macro_rules! FLOAT4_FITS_IN_INT16 {
                                                         true,
                                                         _
                                                     >(
-                                                        $crate::__pgrx_c_macros::expression::neg::<
-                                                            $crate::__pgrx_c_macros::Wrapping,
-                                                            _
-                                                        >(
-                                                            $crate::__pgrx_c_macros::expression::profile_value::<
-                                                                true,
-                                                                _
-                                                            >(
-                                                                $crate::__pgrx_c_macros::CValue::<
-                                                                    $crate::__pgrx_c_macros::CInt
-                                                                >::new(32768i32)
-                                                            )
+                                                        $crate::__pgrx_c_macros::CValue::<
+                                                            $crate::__pgrx_c_macros::CInt
+                                                        >::new(
+                                                            $crate::__pgrx_c_bindings::PG_INT16_MIN as i32
                                                         )
                                                     )
                                                 )
@@ -2631,8 +3228,8 @@ macro_rules! FLOAT4_FITS_IN_INT16 {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -2663,21 +3260,23 @@ macro_rules! __pgrx_c_args_FLOAT4_FITS_IN_INT32 {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
         $crate::__pgrx_c_args_FLOAT4_FITS_IN_INT32!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_FLOAT4_FITS_IN_INT32!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_FLOAT4_FITS_IN_INT32!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_FLOAT4_FITS_IN_INT32!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_FLOAT4_FITS_IN_INT32!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -2685,7 +3284,9 @@ macro_rules! __pgrx_c_args_FLOAT4_FITS_IN_INT32 {
         $crate::__pgrx_c_args_FLOAT4_FITS_IN_INT32!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_FLOAT4_FITS_IN_INT32!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_FLOAT4_FITS_IN_INT32!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -2707,14 +3308,18 @@ macro_rules! __pgrx_c_args_FLOAT4_FITS_IN_INT32 {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_FLOAT4_FITS_IN_INT32!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_FLOAT4_FITS_IN_INT32!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_FLOAT4_FITS_IN_INT32!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_FLOAT4_FITS_IN_INT32!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_FLOAT4_FITS_IN_INT32!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -2741,13 +3346,13 @@ macro_rules! __pgrx_c_args_FLOAT4_FITS_IN_INT32 {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_FLOAT4_FITS_IN_INT32!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_FLOAT4_FITS_IN_INT32!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -2758,7 +3363,7 @@ macro_rules! __pgrx_c_args_FLOAT4_FITS_IN_INT32 {
         compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
-/// C macro FLOAT4_FITS_IN_INT32 from c.h:1174
+/// C macro FLOAT4_FITS_IN_INT32 from c.h:1181
 ///
 /// ```text
 /// #define FLOAT4_FITS_IN_INT32( num ) ( ( num ) >= ( float4 ) PG_INT32_MIN && ( num ) < - ( ( float4 ) PG_INT32_MIN ) )
@@ -2803,7 +3408,7 @@ macro_rules! FLOAT4_FITS_IN_INT32 {
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::cast_as::<
-                                        $crate::float4,
+                                        $crate::__pgrx_c_bindings::float4,
                                         $crate::__pgrx_c_macros::expression::CFloat,
                                         _
                                     >(
@@ -2813,7 +3418,7 @@ macro_rules! FLOAT4_FITS_IN_INT32 {
                                         >(
                                             $crate::__pgrx_c_macros::CValue::<
                                                 $crate::__pgrx_c_macros::CInt
-                                            >::new($crate::PG_INT32_MIN as i32)
+                                            >::new($crate::__pgrx_c_bindings::PG_INT32_MIN as i32)
                                         )
                                     )
                                 )
@@ -2838,7 +3443,7 @@ macro_rules! FLOAT4_FITS_IN_INT32 {
                                                 _
                                             >(
                                                 $crate::__pgrx_c_macros::expression::cast_as::<
-                                                    $crate::float4,
+                                                    $crate::__pgrx_c_bindings::float4,
                                                     $crate::__pgrx_c_macros::expression::CFloat,
                                                     _
                                                 >(
@@ -2848,7 +3453,9 @@ macro_rules! FLOAT4_FITS_IN_INT32 {
                                                     >(
                                                         $crate::__pgrx_c_macros::CValue::<
                                                             $crate::__pgrx_c_macros::CInt
-                                                        >::new($crate::PG_INT32_MIN as i32)
+                                                        >::new(
+                                                            $crate::__pgrx_c_bindings::PG_INT32_MIN as i32
+                                                        )
                                                     )
                                                 )
                                             )
@@ -2907,7 +3514,7 @@ macro_rules! FLOAT4_FITS_IN_INT32 {
                                                 _
                                             >(
                                                 $crate::__pgrx_c_macros::expression::cast_as::<
-                                                    $crate::float4,
+                                                    $crate::__pgrx_c_bindings::float4,
                                                     $crate::__pgrx_c_macros::expression::CFloat,
                                                     _
                                                 >(
@@ -2917,7 +3524,9 @@ macro_rules! FLOAT4_FITS_IN_INT32 {
                                                     >(
                                                         $crate::__pgrx_c_macros::CValue::<
                                                             $crate::__pgrx_c_macros::CInt
-                                                        >::new($crate::PG_INT32_MIN as i32)
+                                                        >::new(
+                                                            $crate::__pgrx_c_bindings::PG_INT32_MIN as i32
+                                                        )
                                                     )
                                                 )
                                             )
@@ -2946,7 +3555,7 @@ macro_rules! FLOAT4_FITS_IN_INT32 {
                                                             _
                                                         >(
                                                             $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                $crate::float4,
+                                                                $crate::__pgrx_c_bindings::float4,
                                                                 $crate::__pgrx_c_macros::expression::CFloat,
                                                                 _
                                                             >(
@@ -2957,7 +3566,7 @@ macro_rules! FLOAT4_FITS_IN_INT32 {
                                                                     $crate::__pgrx_c_macros::CValue::<
                                                                         $crate::__pgrx_c_macros::CInt
                                                                     >::new(
-                                                                        $crate::PG_INT32_MIN as i32
+                                                                        $crate::__pgrx_c_bindings::PG_INT32_MIN as i32
                                                                     )
                                                                 )
                                                             )
@@ -2998,7 +3607,7 @@ macro_rules! FLOAT4_FITS_IN_INT32 {
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::cast_as::<
-                                        $crate::float4,
+                                        $crate::__pgrx_c_bindings::float4,
                                         $crate::__pgrx_c_macros::expression::CFloat,
                                         _
                                     >(
@@ -3008,7 +3617,7 @@ macro_rules! FLOAT4_FITS_IN_INT32 {
                                         >(
                                             $crate::__pgrx_c_macros::CValue::<
                                                 $crate::__pgrx_c_macros::CInt
-                                            >::new($crate::PG_INT32_MIN as i32)
+                                            >::new($crate::__pgrx_c_bindings::PG_INT32_MIN as i32)
                                         )
                                     )
                                 )
@@ -3033,7 +3642,7 @@ macro_rules! FLOAT4_FITS_IN_INT32 {
                                                 _
                                             >(
                                                 $crate::__pgrx_c_macros::expression::cast_as::<
-                                                    $crate::float4,
+                                                    $crate::__pgrx_c_bindings::float4,
                                                     $crate::__pgrx_c_macros::expression::CFloat,
                                                     _
                                                 >(
@@ -3043,7 +3652,9 @@ macro_rules! FLOAT4_FITS_IN_INT32 {
                                                     >(
                                                         $crate::__pgrx_c_macros::CValue::<
                                                             $crate::__pgrx_c_macros::CInt
-                                                        >::new($crate::PG_INT32_MIN as i32)
+                                                        >::new(
+                                                            $crate::__pgrx_c_bindings::PG_INT32_MIN as i32
+                                                        )
                                                     )
                                                 )
                                             )
@@ -3070,8 +3681,8 @@ macro_rules! FLOAT4_FITS_IN_INT32 {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -3102,21 +3713,23 @@ macro_rules! __pgrx_c_args_FLOAT4_FITS_IN_INT64 {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
         $crate::__pgrx_c_args_FLOAT4_FITS_IN_INT64!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_FLOAT4_FITS_IN_INT64!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_FLOAT4_FITS_IN_INT64!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_FLOAT4_FITS_IN_INT64!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_FLOAT4_FITS_IN_INT64!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -3124,7 +3737,9 @@ macro_rules! __pgrx_c_args_FLOAT4_FITS_IN_INT64 {
         $crate::__pgrx_c_args_FLOAT4_FITS_IN_INT64!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_FLOAT4_FITS_IN_INT64!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_FLOAT4_FITS_IN_INT64!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -3146,14 +3761,18 @@ macro_rules! __pgrx_c_args_FLOAT4_FITS_IN_INT64 {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_FLOAT4_FITS_IN_INT64!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_FLOAT4_FITS_IN_INT64!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_FLOAT4_FITS_IN_INT64!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_FLOAT4_FITS_IN_INT64!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_FLOAT4_FITS_IN_INT64!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -3180,13 +3799,13 @@ macro_rules! __pgrx_c_args_FLOAT4_FITS_IN_INT64 {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_FLOAT4_FITS_IN_INT64!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_FLOAT4_FITS_IN_INT64!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -3197,7 +3816,7 @@ macro_rules! __pgrx_c_args_FLOAT4_FITS_IN_INT64 {
         compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
-/// C macro FLOAT4_FITS_IN_INT64 from c.h:1176
+/// C macro FLOAT4_FITS_IN_INT64 from c.h:1183
 ///
 /// ```text
 /// #define FLOAT4_FITS_IN_INT64( num ) ( ( num ) >= ( float4 ) PG_INT64_MIN && ( num ) < - ( ( float4 ) PG_INT64_MIN ) )
@@ -3229,6 +3848,7 @@ macro_rules! FLOAT4_FITS_IN_INT64 {
         )
     };
     (@__pgrx_emit_value; $num:tt $(,)?) => {
+        /* PGRX: __INT64_C remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */
         (
             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
@@ -3242,7 +3862,7 @@ macro_rules! FLOAT4_FITS_IN_INT64 {
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::cast_as::<
-                                        $crate::float4,
+                                        $crate::__pgrx_c_bindings::float4,
                                         $crate::__pgrx_c_macros::expression::CFloat,
                                         _
                                     >(
@@ -3251,8 +3871,8 @@ macro_rules! FLOAT4_FITS_IN_INT64 {
                                             _
                                         >(
                                             $crate::__pgrx_c_macros::CValue::<
-                                                $crate::__pgrx_c_macros::CLongLong
-                                            >::new($crate::PG_INT64_MIN as i64)
+                                                $crate::__pgrx_c_macros::CLong
+                                            >::new($crate::__pgrx_c_bindings::PG_INT64_MIN as i64)
                                         )
                                     )
                                 )
@@ -3277,7 +3897,7 @@ macro_rules! FLOAT4_FITS_IN_INT64 {
                                                 _
                                             >(
                                                 $crate::__pgrx_c_macros::expression::cast_as::<
-                                                    $crate::float4,
+                                                    $crate::__pgrx_c_bindings::float4,
                                                     $crate::__pgrx_c_macros::expression::CFloat,
                                                     _
                                                 >(
@@ -3286,8 +3906,10 @@ macro_rules! FLOAT4_FITS_IN_INT64 {
                                                         _
                                                     >(
                                                         $crate::__pgrx_c_macros::CValue::<
-                                                            $crate::__pgrx_c_macros::CLongLong
-                                                        >::new($crate::PG_INT64_MIN as i64)
+                                                            $crate::__pgrx_c_macros::CLong
+                                                        >::new(
+                                                            $crate::__pgrx_c_bindings::PG_INT64_MIN as i64
+                                                        )
                                                     )
                                                 )
                                             )
@@ -3321,6 +3943,7 @@ macro_rules! FLOAT4_FITS_IN_INT64 {
         $crate::__pgrx_c_args_FLOAT4_FITS_IN_INT64!(@collect __pgrx_emit_read_place []; $($raw)*)
     };
     (@__pgrx_emit_size; $num:tt $(,)?) => {
+        /* PGRX: __INT64_C remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
                 {
@@ -3346,7 +3969,7 @@ macro_rules! FLOAT4_FITS_IN_INT64 {
                                                 _
                                             >(
                                                 $crate::__pgrx_c_macros::expression::cast_as::<
-                                                    $crate::float4,
+                                                    $crate::__pgrx_c_bindings::float4,
                                                     $crate::__pgrx_c_macros::expression::CFloat,
                                                     _
                                                 >(
@@ -3355,8 +3978,10 @@ macro_rules! FLOAT4_FITS_IN_INT64 {
                                                         _
                                                     >(
                                                         $crate::__pgrx_c_macros::CValue::<
-                                                            $crate::__pgrx_c_macros::CLongLong
-                                                        >::new($crate::PG_INT64_MIN as i64)
+                                                            $crate::__pgrx_c_macros::CLong
+                                                        >::new(
+                                                            $crate::__pgrx_c_bindings::PG_INT64_MIN as i64
+                                                        )
                                                     )
                                                 )
                                             )
@@ -3385,7 +4010,7 @@ macro_rules! FLOAT4_FITS_IN_INT64 {
                                                             _
                                                         >(
                                                             $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                $crate::float4,
+                                                                $crate::__pgrx_c_bindings::float4,
                                                                 $crate::__pgrx_c_macros::expression::CFloat,
                                                                 _
                                                             >(
@@ -3394,9 +4019,9 @@ macro_rules! FLOAT4_FITS_IN_INT64 {
                                                                     _
                                                                 >(
                                                                     $crate::__pgrx_c_macros::CValue::<
-                                                                        $crate::__pgrx_c_macros::CLongLong
+                                                                        $crate::__pgrx_c_macros::CLong
                                                                     >::new(
-                                                                        $crate::PG_INT64_MIN as i64
+                                                                        $crate::__pgrx_c_bindings::PG_INT64_MIN as i64
                                                                     )
                                                                 )
                                                             )
@@ -3424,6 +4049,7 @@ macro_rules! FLOAT4_FITS_IN_INT64 {
         $crate::__pgrx_c_args_FLOAT4_FITS_IN_INT64!(@collect __pgrx_emit_size []; $($raw)*)
     };
     (@__pgrx_emit_discard; $num:tt $(,)?) => {
+        /* PGRX: __INT64_C remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */
         {
             let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
@@ -3437,7 +4063,7 @@ macro_rules! FLOAT4_FITS_IN_INT64 {
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::cast_as::<
-                                        $crate::float4,
+                                        $crate::__pgrx_c_bindings::float4,
                                         $crate::__pgrx_c_macros::expression::CFloat,
                                         _
                                     >(
@@ -3446,8 +4072,8 @@ macro_rules! FLOAT4_FITS_IN_INT64 {
                                             _
                                         >(
                                             $crate::__pgrx_c_macros::CValue::<
-                                                $crate::__pgrx_c_macros::CLongLong
-                                            >::new($crate::PG_INT64_MIN as i64)
+                                                $crate::__pgrx_c_macros::CLong
+                                            >::new($crate::__pgrx_c_bindings::PG_INT64_MIN as i64)
                                         )
                                     )
                                 )
@@ -3472,7 +4098,7 @@ macro_rules! FLOAT4_FITS_IN_INT64 {
                                                 _
                                             >(
                                                 $crate::__pgrx_c_macros::expression::cast_as::<
-                                                    $crate::float4,
+                                                    $crate::__pgrx_c_bindings::float4,
                                                     $crate::__pgrx_c_macros::expression::CFloat,
                                                     _
                                                 >(
@@ -3481,8 +4107,10 @@ macro_rules! FLOAT4_FITS_IN_INT64 {
                                                         _
                                                     >(
                                                         $crate::__pgrx_c_macros::CValue::<
-                                                            $crate::__pgrx_c_macros::CLongLong
-                                                        >::new($crate::PG_INT64_MIN as i64)
+                                                            $crate::__pgrx_c_macros::CLong
+                                                        >::new(
+                                                            $crate::__pgrx_c_bindings::PG_INT64_MIN as i64
+                                                        )
                                                     )
                                                 )
                                             )
@@ -3509,8 +4137,8 @@ macro_rules! FLOAT4_FITS_IN_INT64 {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -3541,21 +4169,23 @@ macro_rules! __pgrx_c_args_FLOAT8_FITS_IN_INT16 {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
         $crate::__pgrx_c_args_FLOAT8_FITS_IN_INT16!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_FLOAT8_FITS_IN_INT16!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_FLOAT8_FITS_IN_INT16!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_FLOAT8_FITS_IN_INT16!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_FLOAT8_FITS_IN_INT16!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -3563,7 +4193,9 @@ macro_rules! __pgrx_c_args_FLOAT8_FITS_IN_INT16 {
         $crate::__pgrx_c_args_FLOAT8_FITS_IN_INT16!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_FLOAT8_FITS_IN_INT16!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_FLOAT8_FITS_IN_INT16!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -3585,14 +4217,18 @@ macro_rules! __pgrx_c_args_FLOAT8_FITS_IN_INT16 {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_FLOAT8_FITS_IN_INT16!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_FLOAT8_FITS_IN_INT16!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_FLOAT8_FITS_IN_INT16!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_FLOAT8_FITS_IN_INT16!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_FLOAT8_FITS_IN_INT16!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -3619,13 +4255,13 @@ macro_rules! __pgrx_c_args_FLOAT8_FITS_IN_INT16 {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_FLOAT8_FITS_IN_INT16!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_FLOAT8_FITS_IN_INT16!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -3636,7 +4272,7 @@ macro_rules! __pgrx_c_args_FLOAT8_FITS_IN_INT16 {
         compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
-/// C macro FLOAT8_FITS_IN_INT16 from c.h:1178
+/// C macro FLOAT8_FITS_IN_INT16 from c.h:1185
 ///
 /// ```text
 /// #define FLOAT8_FITS_IN_INT16( num ) ( ( num ) >= ( float8 ) PG_INT16_MIN && ( num ) < - ( ( float8 ) PG_INT16_MIN ) )
@@ -3668,7 +4304,6 @@ macro_rules! FLOAT8_FITS_IN_INT16 {
         )
     };
     (@__pgrx_emit_value; $num:tt $(,)?) => {
-        /* PGRX: INT16_MIN remains expanded because a binding reference could change C grouping because the object expansion is neither atomic nor enclosed in parentheses. */ /* PGRX: PG_INT16_MIN remains expanded because a binding reference could change C grouping because the object expansion is neither atomic nor enclosed in parentheses. */
         (
             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
@@ -3682,7 +4317,7 @@ macro_rules! FLOAT8_FITS_IN_INT16 {
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::cast_as::<
-                                        $crate::float8,
+                                        $crate::__pgrx_c_bindings::float8,
                                         $crate::__pgrx_c_macros::expression::CDouble,
                                         _
                                     >(
@@ -3690,19 +4325,9 @@ macro_rules! FLOAT8_FITS_IN_INT16 {
                                             true,
                                             _
                                         >(
-                                            $crate::__pgrx_c_macros::expression::neg::<
-                                                $crate::__pgrx_c_macros::Wrapping,
-                                                _
-                                            >(
-                                                $crate::__pgrx_c_macros::expression::profile_value::<
-                                                    true,
-                                                    _
-                                                >(
-                                                    $crate::__pgrx_c_macros::CValue::<
-                                                        $crate::__pgrx_c_macros::CInt
-                                                    >::new(32768i32)
-                                                )
-                                            )
+                                            $crate::__pgrx_c_macros::CValue::<
+                                                $crate::__pgrx_c_macros::CInt
+                                            >::new($crate::__pgrx_c_bindings::PG_INT16_MIN as i32)
                                         )
                                     )
                                 )
@@ -3727,7 +4352,7 @@ macro_rules! FLOAT8_FITS_IN_INT16 {
                                                 _
                                             >(
                                                 $crate::__pgrx_c_macros::expression::cast_as::<
-                                                    $crate::float8,
+                                                    $crate::__pgrx_c_bindings::float8,
                                                     $crate::__pgrx_c_macros::expression::CDouble,
                                                     _
                                                 >(
@@ -3735,18 +4360,10 @@ macro_rules! FLOAT8_FITS_IN_INT16 {
                                                         true,
                                                         _
                                                     >(
-                                                        $crate::__pgrx_c_macros::expression::neg::<
-                                                            $crate::__pgrx_c_macros::Wrapping,
-                                                            _
-                                                        >(
-                                                            $crate::__pgrx_c_macros::expression::profile_value::<
-                                                                true,
-                                                                _
-                                                            >(
-                                                                $crate::__pgrx_c_macros::CValue::<
-                                                                    $crate::__pgrx_c_macros::CInt
-                                                                >::new(32768i32)
-                                                            )
+                                                        $crate::__pgrx_c_macros::CValue::<
+                                                            $crate::__pgrx_c_macros::CInt
+                                                        >::new(
+                                                            $crate::__pgrx_c_bindings::PG_INT16_MIN as i32
                                                         )
                                                     )
                                                 )
@@ -3781,7 +4398,6 @@ macro_rules! FLOAT8_FITS_IN_INT16 {
         $crate::__pgrx_c_args_FLOAT8_FITS_IN_INT16!(@collect __pgrx_emit_read_place []; $($raw)*)
     };
     (@__pgrx_emit_size; $num:tt $(,)?) => {
-        /* PGRX: INT16_MIN remains expanded because a binding reference could change C grouping because the object expansion is neither atomic nor enclosed in parentheses. */ /* PGRX: PG_INT16_MIN remains expanded because a binding reference could change C grouping because the object expansion is neither atomic nor enclosed in parentheses. */
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
                 {
@@ -3807,7 +4423,7 @@ macro_rules! FLOAT8_FITS_IN_INT16 {
                                                 _
                                             >(
                                                 $crate::__pgrx_c_macros::expression::cast_as::<
-                                                    $crate::float8,
+                                                    $crate::__pgrx_c_bindings::float8,
                                                     $crate::__pgrx_c_macros::expression::CDouble,
                                                     _
                                                 >(
@@ -3815,18 +4431,10 @@ macro_rules! FLOAT8_FITS_IN_INT16 {
                                                         true,
                                                         _
                                                     >(
-                                                        $crate::__pgrx_c_macros::expression::neg::<
-                                                            $crate::__pgrx_c_macros::Wrapping,
-                                                            _
-                                                        >(
-                                                            $crate::__pgrx_c_macros::expression::profile_value::<
-                                                                true,
-                                                                _
-                                                            >(
-                                                                $crate::__pgrx_c_macros::CValue::<
-                                                                    $crate::__pgrx_c_macros::CInt
-                                                                >::new(32768i32)
-                                                            )
+                                                        $crate::__pgrx_c_macros::CValue::<
+                                                            $crate::__pgrx_c_macros::CInt
+                                                        >::new(
+                                                            $crate::__pgrx_c_bindings::PG_INT16_MIN as i32
                                                         )
                                                     )
                                                 )
@@ -3856,7 +4464,7 @@ macro_rules! FLOAT8_FITS_IN_INT16 {
                                                             _
                                                         >(
                                                             $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                $crate::float8,
+                                                                $crate::__pgrx_c_bindings::float8,
                                                                 $crate::__pgrx_c_macros::expression::CDouble,
                                                                 _
                                                             >(
@@ -3864,18 +4472,10 @@ macro_rules! FLOAT8_FITS_IN_INT16 {
                                                                     true,
                                                                     _
                                                                 >(
-                                                                    $crate::__pgrx_c_macros::expression::neg::<
-                                                                        $crate::__pgrx_c_macros::Wrapping,
-                                                                        _
-                                                                    >(
-                                                                        $crate::__pgrx_c_macros::expression::profile_value::<
-                                                                            true,
-                                                                            _
-                                                                        >(
-                                                                            $crate::__pgrx_c_macros::CValue::<
-                                                                                $crate::__pgrx_c_macros::CInt
-                                                                            >::new(32768i32)
-                                                                        )
+                                                                    $crate::__pgrx_c_macros::CValue::<
+                                                                        $crate::__pgrx_c_macros::CInt
+                                                                    >::new(
+                                                                        $crate::__pgrx_c_bindings::PG_INT16_MIN as i32
                                                                     )
                                                                 )
                                                             )
@@ -3903,7 +4503,6 @@ macro_rules! FLOAT8_FITS_IN_INT16 {
         $crate::__pgrx_c_args_FLOAT8_FITS_IN_INT16!(@collect __pgrx_emit_size []; $($raw)*)
     };
     (@__pgrx_emit_discard; $num:tt $(,)?) => {
-        /* PGRX: INT16_MIN remains expanded because a binding reference could change C grouping because the object expansion is neither atomic nor enclosed in parentheses. */ /* PGRX: PG_INT16_MIN remains expanded because a binding reference could change C grouping because the object expansion is neither atomic nor enclosed in parentheses. */
         {
             let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
@@ -3917,7 +4516,7 @@ macro_rules! FLOAT8_FITS_IN_INT16 {
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::cast_as::<
-                                        $crate::float8,
+                                        $crate::__pgrx_c_bindings::float8,
                                         $crate::__pgrx_c_macros::expression::CDouble,
                                         _
                                     >(
@@ -3925,19 +4524,9 @@ macro_rules! FLOAT8_FITS_IN_INT16 {
                                             true,
                                             _
                                         >(
-                                            $crate::__pgrx_c_macros::expression::neg::<
-                                                $crate::__pgrx_c_macros::Wrapping,
-                                                _
-                                            >(
-                                                $crate::__pgrx_c_macros::expression::profile_value::<
-                                                    true,
-                                                    _
-                                                >(
-                                                    $crate::__pgrx_c_macros::CValue::<
-                                                        $crate::__pgrx_c_macros::CInt
-                                                    >::new(32768i32)
-                                                )
-                                            )
+                                            $crate::__pgrx_c_macros::CValue::<
+                                                $crate::__pgrx_c_macros::CInt
+                                            >::new($crate::__pgrx_c_bindings::PG_INT16_MIN as i32)
                                         )
                                     )
                                 )
@@ -3962,7 +4551,7 @@ macro_rules! FLOAT8_FITS_IN_INT16 {
                                                 _
                                             >(
                                                 $crate::__pgrx_c_macros::expression::cast_as::<
-                                                    $crate::float8,
+                                                    $crate::__pgrx_c_bindings::float8,
                                                     $crate::__pgrx_c_macros::expression::CDouble,
                                                     _
                                                 >(
@@ -3970,18 +4559,10 @@ macro_rules! FLOAT8_FITS_IN_INT16 {
                                                         true,
                                                         _
                                                     >(
-                                                        $crate::__pgrx_c_macros::expression::neg::<
-                                                            $crate::__pgrx_c_macros::Wrapping,
-                                                            _
-                                                        >(
-                                                            $crate::__pgrx_c_macros::expression::profile_value::<
-                                                                true,
-                                                                _
-                                                            >(
-                                                                $crate::__pgrx_c_macros::CValue::<
-                                                                    $crate::__pgrx_c_macros::CInt
-                                                                >::new(32768i32)
-                                                            )
+                                                        $crate::__pgrx_c_macros::CValue::<
+                                                            $crate::__pgrx_c_macros::CInt
+                                                        >::new(
+                                                            $crate::__pgrx_c_bindings::PG_INT16_MIN as i32
                                                         )
                                                     )
                                                 )
@@ -4009,8 +4590,8 @@ macro_rules! FLOAT8_FITS_IN_INT16 {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -4041,21 +4622,23 @@ macro_rules! __pgrx_c_args_FLOAT8_FITS_IN_INT32 {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
         $crate::__pgrx_c_args_FLOAT8_FITS_IN_INT32!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_FLOAT8_FITS_IN_INT32!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_FLOAT8_FITS_IN_INT32!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_FLOAT8_FITS_IN_INT32!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_FLOAT8_FITS_IN_INT32!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -4063,7 +4646,9 @@ macro_rules! __pgrx_c_args_FLOAT8_FITS_IN_INT32 {
         $crate::__pgrx_c_args_FLOAT8_FITS_IN_INT32!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_FLOAT8_FITS_IN_INT32!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_FLOAT8_FITS_IN_INT32!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -4085,14 +4670,18 @@ macro_rules! __pgrx_c_args_FLOAT8_FITS_IN_INT32 {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_FLOAT8_FITS_IN_INT32!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_FLOAT8_FITS_IN_INT32!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_FLOAT8_FITS_IN_INT32!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_FLOAT8_FITS_IN_INT32!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_FLOAT8_FITS_IN_INT32!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -4119,13 +4708,13 @@ macro_rules! __pgrx_c_args_FLOAT8_FITS_IN_INT32 {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_FLOAT8_FITS_IN_INT32!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_FLOAT8_FITS_IN_INT32!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -4136,7 +4725,7 @@ macro_rules! __pgrx_c_args_FLOAT8_FITS_IN_INT32 {
         compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
-/// C macro FLOAT8_FITS_IN_INT32 from c.h:1180
+/// C macro FLOAT8_FITS_IN_INT32 from c.h:1187
 ///
 /// ```text
 /// #define FLOAT8_FITS_IN_INT32( num ) ( ( num ) >= ( float8 ) PG_INT32_MIN && ( num ) < - ( ( float8 ) PG_INT32_MIN ) )
@@ -4181,7 +4770,7 @@ macro_rules! FLOAT8_FITS_IN_INT32 {
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::cast_as::<
-                                        $crate::float8,
+                                        $crate::__pgrx_c_bindings::float8,
                                         $crate::__pgrx_c_macros::expression::CDouble,
                                         _
                                     >(
@@ -4191,7 +4780,7 @@ macro_rules! FLOAT8_FITS_IN_INT32 {
                                         >(
                                             $crate::__pgrx_c_macros::CValue::<
                                                 $crate::__pgrx_c_macros::CInt
-                                            >::new($crate::PG_INT32_MIN as i32)
+                                            >::new($crate::__pgrx_c_bindings::PG_INT32_MIN as i32)
                                         )
                                     )
                                 )
@@ -4216,7 +4805,7 @@ macro_rules! FLOAT8_FITS_IN_INT32 {
                                                 _
                                             >(
                                                 $crate::__pgrx_c_macros::expression::cast_as::<
-                                                    $crate::float8,
+                                                    $crate::__pgrx_c_bindings::float8,
                                                     $crate::__pgrx_c_macros::expression::CDouble,
                                                     _
                                                 >(
@@ -4226,7 +4815,9 @@ macro_rules! FLOAT8_FITS_IN_INT32 {
                                                     >(
                                                         $crate::__pgrx_c_macros::CValue::<
                                                             $crate::__pgrx_c_macros::CInt
-                                                        >::new($crate::PG_INT32_MIN as i32)
+                                                        >::new(
+                                                            $crate::__pgrx_c_bindings::PG_INT32_MIN as i32
+                                                        )
                                                     )
                                                 )
                                             )
@@ -4285,7 +4876,7 @@ macro_rules! FLOAT8_FITS_IN_INT32 {
                                                 _
                                             >(
                                                 $crate::__pgrx_c_macros::expression::cast_as::<
-                                                    $crate::float8,
+                                                    $crate::__pgrx_c_bindings::float8,
                                                     $crate::__pgrx_c_macros::expression::CDouble,
                                                     _
                                                 >(
@@ -4295,7 +4886,9 @@ macro_rules! FLOAT8_FITS_IN_INT32 {
                                                     >(
                                                         $crate::__pgrx_c_macros::CValue::<
                                                             $crate::__pgrx_c_macros::CInt
-                                                        >::new($crate::PG_INT32_MIN as i32)
+                                                        >::new(
+                                                            $crate::__pgrx_c_bindings::PG_INT32_MIN as i32
+                                                        )
                                                     )
                                                 )
                                             )
@@ -4324,7 +4917,7 @@ macro_rules! FLOAT8_FITS_IN_INT32 {
                                                             _
                                                         >(
                                                             $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                $crate::float8,
+                                                                $crate::__pgrx_c_bindings::float8,
                                                                 $crate::__pgrx_c_macros::expression::CDouble,
                                                                 _
                                                             >(
@@ -4335,7 +4928,7 @@ macro_rules! FLOAT8_FITS_IN_INT32 {
                                                                     $crate::__pgrx_c_macros::CValue::<
                                                                         $crate::__pgrx_c_macros::CInt
                                                                     >::new(
-                                                                        $crate::PG_INT32_MIN as i32
+                                                                        $crate::__pgrx_c_bindings::PG_INT32_MIN as i32
                                                                     )
                                                                 )
                                                             )
@@ -4376,7 +4969,7 @@ macro_rules! FLOAT8_FITS_IN_INT32 {
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::cast_as::<
-                                        $crate::float8,
+                                        $crate::__pgrx_c_bindings::float8,
                                         $crate::__pgrx_c_macros::expression::CDouble,
                                         _
                                     >(
@@ -4386,7 +4979,7 @@ macro_rules! FLOAT8_FITS_IN_INT32 {
                                         >(
                                             $crate::__pgrx_c_macros::CValue::<
                                                 $crate::__pgrx_c_macros::CInt
-                                            >::new($crate::PG_INT32_MIN as i32)
+                                            >::new($crate::__pgrx_c_bindings::PG_INT32_MIN as i32)
                                         )
                                     )
                                 )
@@ -4411,7 +5004,7 @@ macro_rules! FLOAT8_FITS_IN_INT32 {
                                                 _
                                             >(
                                                 $crate::__pgrx_c_macros::expression::cast_as::<
-                                                    $crate::float8,
+                                                    $crate::__pgrx_c_bindings::float8,
                                                     $crate::__pgrx_c_macros::expression::CDouble,
                                                     _
                                                 >(
@@ -4421,7 +5014,9 @@ macro_rules! FLOAT8_FITS_IN_INT32 {
                                                     >(
                                                         $crate::__pgrx_c_macros::CValue::<
                                                             $crate::__pgrx_c_macros::CInt
-                                                        >::new($crate::PG_INT32_MIN as i32)
+                                                        >::new(
+                                                            $crate::__pgrx_c_bindings::PG_INT32_MIN as i32
+                                                        )
                                                     )
                                                 )
                                             )
@@ -4448,8 +5043,8 @@ macro_rules! FLOAT8_FITS_IN_INT32 {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -4480,21 +5075,23 @@ macro_rules! __pgrx_c_args_FLOAT8_FITS_IN_INT64 {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
         $crate::__pgrx_c_args_FLOAT8_FITS_IN_INT64!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_FLOAT8_FITS_IN_INT64!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_FLOAT8_FITS_IN_INT64!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_FLOAT8_FITS_IN_INT64!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_FLOAT8_FITS_IN_INT64!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -4502,7 +5099,9 @@ macro_rules! __pgrx_c_args_FLOAT8_FITS_IN_INT64 {
         $crate::__pgrx_c_args_FLOAT8_FITS_IN_INT64!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_FLOAT8_FITS_IN_INT64!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_FLOAT8_FITS_IN_INT64!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -4524,14 +5123,18 @@ macro_rules! __pgrx_c_args_FLOAT8_FITS_IN_INT64 {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_FLOAT8_FITS_IN_INT64!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_FLOAT8_FITS_IN_INT64!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_FLOAT8_FITS_IN_INT64!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_FLOAT8_FITS_IN_INT64!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_FLOAT8_FITS_IN_INT64!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -4558,13 +5161,13 @@ macro_rules! __pgrx_c_args_FLOAT8_FITS_IN_INT64 {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_FLOAT8_FITS_IN_INT64!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_FLOAT8_FITS_IN_INT64!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -4575,7 +5178,7 @@ macro_rules! __pgrx_c_args_FLOAT8_FITS_IN_INT64 {
         compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
-/// C macro FLOAT8_FITS_IN_INT64 from c.h:1182
+/// C macro FLOAT8_FITS_IN_INT64 from c.h:1189
 ///
 /// ```text
 /// #define FLOAT8_FITS_IN_INT64( num ) ( ( num ) >= ( float8 ) PG_INT64_MIN && ( num ) < - ( ( float8 ) PG_INT64_MIN ) )
@@ -4607,6 +5210,7 @@ macro_rules! FLOAT8_FITS_IN_INT64 {
         )
     };
     (@__pgrx_emit_value; $num:tt $(,)?) => {
+        /* PGRX: __INT64_C remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */
         (
             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
@@ -4620,7 +5224,7 @@ macro_rules! FLOAT8_FITS_IN_INT64 {
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::cast_as::<
-                                        $crate::float8,
+                                        $crate::__pgrx_c_bindings::float8,
                                         $crate::__pgrx_c_macros::expression::CDouble,
                                         _
                                     >(
@@ -4629,8 +5233,8 @@ macro_rules! FLOAT8_FITS_IN_INT64 {
                                             _
                                         >(
                                             $crate::__pgrx_c_macros::CValue::<
-                                                $crate::__pgrx_c_macros::CLongLong
-                                            >::new($crate::PG_INT64_MIN as i64)
+                                                $crate::__pgrx_c_macros::CLong
+                                            >::new($crate::__pgrx_c_bindings::PG_INT64_MIN as i64)
                                         )
                                     )
                                 )
@@ -4655,7 +5259,7 @@ macro_rules! FLOAT8_FITS_IN_INT64 {
                                                 _
                                             >(
                                                 $crate::__pgrx_c_macros::expression::cast_as::<
-                                                    $crate::float8,
+                                                    $crate::__pgrx_c_bindings::float8,
                                                     $crate::__pgrx_c_macros::expression::CDouble,
                                                     _
                                                 >(
@@ -4664,8 +5268,10 @@ macro_rules! FLOAT8_FITS_IN_INT64 {
                                                         _
                                                     >(
                                                         $crate::__pgrx_c_macros::CValue::<
-                                                            $crate::__pgrx_c_macros::CLongLong
-                                                        >::new($crate::PG_INT64_MIN as i64)
+                                                            $crate::__pgrx_c_macros::CLong
+                                                        >::new(
+                                                            $crate::__pgrx_c_bindings::PG_INT64_MIN as i64
+                                                        )
                                                     )
                                                 )
                                             )
@@ -4699,6 +5305,7 @@ macro_rules! FLOAT8_FITS_IN_INT64 {
         $crate::__pgrx_c_args_FLOAT8_FITS_IN_INT64!(@collect __pgrx_emit_read_place []; $($raw)*)
     };
     (@__pgrx_emit_size; $num:tt $(,)?) => {
+        /* PGRX: __INT64_C remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
                 {
@@ -4724,7 +5331,7 @@ macro_rules! FLOAT8_FITS_IN_INT64 {
                                                 _
                                             >(
                                                 $crate::__pgrx_c_macros::expression::cast_as::<
-                                                    $crate::float8,
+                                                    $crate::__pgrx_c_bindings::float8,
                                                     $crate::__pgrx_c_macros::expression::CDouble,
                                                     _
                                                 >(
@@ -4733,8 +5340,10 @@ macro_rules! FLOAT8_FITS_IN_INT64 {
                                                         _
                                                     >(
                                                         $crate::__pgrx_c_macros::CValue::<
-                                                            $crate::__pgrx_c_macros::CLongLong
-                                                        >::new($crate::PG_INT64_MIN as i64)
+                                                            $crate::__pgrx_c_macros::CLong
+                                                        >::new(
+                                                            $crate::__pgrx_c_bindings::PG_INT64_MIN as i64
+                                                        )
                                                     )
                                                 )
                                             )
@@ -4763,7 +5372,7 @@ macro_rules! FLOAT8_FITS_IN_INT64 {
                                                             _
                                                         >(
                                                             $crate::__pgrx_c_macros::expression::cast_as::<
-                                                                $crate::float8,
+                                                                $crate::__pgrx_c_bindings::float8,
                                                                 $crate::__pgrx_c_macros::expression::CDouble,
                                                                 _
                                                             >(
@@ -4772,9 +5381,9 @@ macro_rules! FLOAT8_FITS_IN_INT64 {
                                                                     _
                                                                 >(
                                                                     $crate::__pgrx_c_macros::CValue::<
-                                                                        $crate::__pgrx_c_macros::CLongLong
+                                                                        $crate::__pgrx_c_macros::CLong
                                                                     >::new(
-                                                                        $crate::PG_INT64_MIN as i64
+                                                                        $crate::__pgrx_c_bindings::PG_INT64_MIN as i64
                                                                     )
                                                                 )
                                                             )
@@ -4802,6 +5411,7 @@ macro_rules! FLOAT8_FITS_IN_INT64 {
         $crate::__pgrx_c_args_FLOAT8_FITS_IN_INT64!(@collect __pgrx_emit_size []; $($raw)*)
     };
     (@__pgrx_emit_discard; $num:tt $(,)?) => {
+        /* PGRX: __INT64_C remains expanded because preserving a call inside this expression has not been proved equivalent to C substitution. */
         {
             let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
@@ -4815,7 +5425,7 @@ macro_rules! FLOAT8_FITS_IN_INT64 {
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::cast_as::<
-                                        $crate::float8,
+                                        $crate::__pgrx_c_bindings::float8,
                                         $crate::__pgrx_c_macros::expression::CDouble,
                                         _
                                     >(
@@ -4824,8 +5434,8 @@ macro_rules! FLOAT8_FITS_IN_INT64 {
                                             _
                                         >(
                                             $crate::__pgrx_c_macros::CValue::<
-                                                $crate::__pgrx_c_macros::CLongLong
-                                            >::new($crate::PG_INT64_MIN as i64)
+                                                $crate::__pgrx_c_macros::CLong
+                                            >::new($crate::__pgrx_c_bindings::PG_INT64_MIN as i64)
                                         )
                                     )
                                 )
@@ -4850,7 +5460,7 @@ macro_rules! FLOAT8_FITS_IN_INT64 {
                                                 _
                                             >(
                                                 $crate::__pgrx_c_macros::expression::cast_as::<
-                                                    $crate::float8,
+                                                    $crate::__pgrx_c_bindings::float8,
                                                     $crate::__pgrx_c_macros::expression::CDouble,
                                                     _
                                                 >(
@@ -4859,8 +5469,10 @@ macro_rules! FLOAT8_FITS_IN_INT64 {
                                                         _
                                                     >(
                                                         $crate::__pgrx_c_macros::CValue::<
-                                                            $crate::__pgrx_c_macros::CLongLong
-                                                        >::new($crate::PG_INT64_MIN as i64)
+                                                            $crate::__pgrx_c_macros::CLong
+                                                        >::new(
+                                                            $crate::__pgrx_c_bindings::PG_INT64_MIN as i64
+                                                        )
                                                     )
                                                 )
                                             )
@@ -4887,8 +5499,8 @@ macro_rules! FLOAT8_FITS_IN_INT64 {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -4915,25 +5527,34 @@ macro_rules! __pgrx_c_args_INT64ALIGN {
         $crate::__pgrx_c_args_INT64ALIGN!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_INT64ALIGN!(@p1 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_INT64ALIGN!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_INT64ALIGN!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_INT64ALIGN!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_INT64ALIGN!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_INT64ALIGN!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_INT64ALIGN!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $($raw:tt)*) => {
         $crate::__pgrx_c_args_INT64ALIGN!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_INT64ALIGN!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_INT64ALIGN!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -4955,13 +5576,20 @@ macro_rules! __pgrx_c_args_INT64ALIGN {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_INT64ALIGN!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_INT64ALIGN!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_INT64ALIGN!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_INT64ALIGN!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
-        $crate::__pgrx_c_args_INT64ALIGN!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_INT64ALIGN!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
         $crate::__pgrx_c_classify!(
@@ -4983,10 +5611,16 @@ macro_rules! __pgrx_c_args_INT64ALIGN {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_INT64ALIGN!(@p1 $mode [$($done)* (@literal [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_INT64ALIGN!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+            $($rest)*
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_INT64ALIGN!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_INT64ALIGN!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p1 $mode:ident [$($done:tt)*];) => {
         $crate::INT64ALIGN!(@$mode; $($done)*)
@@ -4995,7 +5629,7 @@ macro_rules! __pgrx_c_args_INT64ALIGN {
         compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
-/// C macro INT64ALIGN from c.h:894
+/// C macro INT64ALIGN from c.h:901
 ///
 /// ```text
 /// #define INT64ALIGN( LEN ) TYPEALIGN ( ALIGNOF_INT64_T , ( LEN ) )
@@ -5033,7 +5667,7 @@ macro_rules! INT64ALIGN {
                 @compiled [
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                            $crate::ALIGNOF_INT64_T as i32
+                            $crate::__pgrx_c_bindings::ALIGNOF_INT64_T as i32
                         )
                     )
                 ] [compile_error!("a C literal or constant is not an object place")] [
@@ -5051,7 +5685,7 @@ macro_rules! INT64ALIGN {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::CValue::<
                                             $crate::__pgrx_c_macros::CInt
-                                        >::new($crate::ALIGNOF_INT64_T as i32)
+                                        >::new($crate::__pgrx_c_bindings::ALIGNOF_INT64_T as i32)
                                     )
                                 }
                             )
@@ -5074,7 +5708,7 @@ macro_rules! INT64ALIGN {
                 @compiled [
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                            $crate::ALIGNOF_INT64_T as i32
+                            $crate::__pgrx_c_bindings::ALIGNOF_INT64_T as i32
                         )
                     )
                 ] [compile_error!("a C literal or constant is not an object place")] [
@@ -5092,7 +5726,7 @@ macro_rules! INT64ALIGN {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::CValue::<
                                             $crate::__pgrx_c_macros::CInt
-                                        >::new($crate::ALIGNOF_INT64_T as i32)
+                                        >::new($crate::__pgrx_c_bindings::ALIGNOF_INT64_T as i32)
                                     )
                                 }
                             )
@@ -5115,7 +5749,7 @@ macro_rules! INT64ALIGN {
                 @compiled [
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                            $crate::ALIGNOF_INT64_T as i32
+                            $crate::__pgrx_c_bindings::ALIGNOF_INT64_T as i32
                         )
                     )
                 ] [compile_error!("a C literal or constant is not an object place")] [
@@ -5133,7 +5767,7 @@ macro_rules! INT64ALIGN {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::CValue::<
                                             $crate::__pgrx_c_macros::CInt
-                                        >::new($crate::ALIGNOF_INT64_T as i32)
+                                        >::new($crate::__pgrx_c_bindings::ALIGNOF_INT64_T as i32)
                                     )
                                 }
                             )
@@ -5156,7 +5790,7 @@ macro_rules! INT64ALIGN {
                 @compiled [
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                            $crate::ALIGNOF_INT64_T as i32
+                            $crate::__pgrx_c_bindings::ALIGNOF_INT64_T as i32
                         )
                     )
                 ] [compile_error!("a C literal or constant is not an object place")] [
@@ -5174,7 +5808,7 @@ macro_rules! INT64ALIGN {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::CValue::<
                                             $crate::__pgrx_c_macros::CInt
-                                        >::new($crate::ALIGNOF_INT64_T as i32)
+                                        >::new($crate::__pgrx_c_bindings::ALIGNOF_INT64_T as i32)
                                     )
                                 }
                             )
@@ -5197,7 +5831,7 @@ macro_rules! INT64ALIGN {
                 @compiled [
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                            $crate::ALIGNOF_INT64_T as i32
+                            $crate::__pgrx_c_bindings::ALIGNOF_INT64_T as i32
                         )
                     )
                 ] [compile_error!("a C literal or constant is not an object place")] [
@@ -5215,7 +5849,7 @@ macro_rules! INT64ALIGN {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::CValue::<
                                             $crate::__pgrx_c_macros::CInt
-                                        >::new($crate::ALIGNOF_INT64_T as i32)
+                                        >::new($crate::__pgrx_c_bindings::ALIGNOF_INT64_T as i32)
                                     )
                                 }
                             )
@@ -5237,8 +5871,8 @@ macro_rules! INT64ALIGN {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -5265,20 +5899,24 @@ macro_rules! __pgrx_c_args_INT64ALIGN_DOWN {
         $crate::__pgrx_c_args_INT64ALIGN_DOWN!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_INT64ALIGN_DOWN!(@p1 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_INT64ALIGN_DOWN!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_INT64ALIGN_DOWN!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_INT64ALIGN_DOWN!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_INT64ALIGN_DOWN!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_INT64ALIGN_DOWN!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -5286,7 +5924,9 @@ macro_rules! __pgrx_c_args_INT64ALIGN_DOWN {
         $crate::__pgrx_c_args_INT64ALIGN_DOWN!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_INT64ALIGN_DOWN!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_INT64ALIGN_DOWN!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -5308,14 +5948,18 @@ macro_rules! __pgrx_c_args_INT64ALIGN_DOWN {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_INT64ALIGN_DOWN!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_INT64ALIGN_DOWN!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_INT64ALIGN_DOWN!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_INT64ALIGN_DOWN!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_INT64ALIGN_DOWN!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -5342,13 +5986,13 @@ macro_rules! __pgrx_c_args_INT64ALIGN_DOWN {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_INT64ALIGN_DOWN!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_INT64ALIGN_DOWN!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -5359,7 +6003,7 @@ macro_rules! __pgrx_c_args_INT64ALIGN_DOWN {
         compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
-/// C macro INT64ALIGN_DOWN from c.h:906
+/// C macro INT64ALIGN_DOWN from c.h:913
 ///
 /// ```text
 /// #define INT64ALIGN_DOWN( LEN ) TYPEALIGN_DOWN ( ALIGNOF_INT64_T , ( LEN ) )
@@ -5397,7 +6041,7 @@ macro_rules! INT64ALIGN_DOWN {
                 @compiled [
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                            $crate::ALIGNOF_INT64_T as i32
+                            $crate::__pgrx_c_bindings::ALIGNOF_INT64_T as i32
                         )
                     )
                 ] [compile_error!("a C literal or constant is not an object place")] [
@@ -5415,7 +6059,7 @@ macro_rules! INT64ALIGN_DOWN {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::CValue::<
                                             $crate::__pgrx_c_macros::CInt
-                                        >::new($crate::ALIGNOF_INT64_T as i32)
+                                        >::new($crate::__pgrx_c_bindings::ALIGNOF_INT64_T as i32)
                                     )
                                 }
                             )
@@ -5438,7 +6082,7 @@ macro_rules! INT64ALIGN_DOWN {
                 @compiled [
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                            $crate::ALIGNOF_INT64_T as i32
+                            $crate::__pgrx_c_bindings::ALIGNOF_INT64_T as i32
                         )
                     )
                 ] [compile_error!("a C literal or constant is not an object place")] [
@@ -5456,7 +6100,7 @@ macro_rules! INT64ALIGN_DOWN {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::CValue::<
                                             $crate::__pgrx_c_macros::CInt
-                                        >::new($crate::ALIGNOF_INT64_T as i32)
+                                        >::new($crate::__pgrx_c_bindings::ALIGNOF_INT64_T as i32)
                                     )
                                 }
                             )
@@ -5479,7 +6123,7 @@ macro_rules! INT64ALIGN_DOWN {
                 @compiled [
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                            $crate::ALIGNOF_INT64_T as i32
+                            $crate::__pgrx_c_bindings::ALIGNOF_INT64_T as i32
                         )
                     )
                 ] [compile_error!("a C literal or constant is not an object place")] [
@@ -5497,7 +6141,7 @@ macro_rules! INT64ALIGN_DOWN {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::CValue::<
                                             $crate::__pgrx_c_macros::CInt
-                                        >::new($crate::ALIGNOF_INT64_T as i32)
+                                        >::new($crate::__pgrx_c_bindings::ALIGNOF_INT64_T as i32)
                                     )
                                 }
                             )
@@ -5520,7 +6164,7 @@ macro_rules! INT64ALIGN_DOWN {
                 @compiled [
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                            $crate::ALIGNOF_INT64_T as i32
+                            $crate::__pgrx_c_bindings::ALIGNOF_INT64_T as i32
                         )
                     )
                 ] [compile_error!("a C literal or constant is not an object place")] [
@@ -5538,7 +6182,7 @@ macro_rules! INT64ALIGN_DOWN {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::CValue::<
                                             $crate::__pgrx_c_macros::CInt
-                                        >::new($crate::ALIGNOF_INT64_T as i32)
+                                        >::new($crate::__pgrx_c_bindings::ALIGNOF_INT64_T as i32)
                                     )
                                 }
                             )
@@ -5561,7 +6205,7 @@ macro_rules! INT64ALIGN_DOWN {
                 @compiled [
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                            $crate::ALIGNOF_INT64_T as i32
+                            $crate::__pgrx_c_bindings::ALIGNOF_INT64_T as i32
                         )
                     )
                 ] [compile_error!("a C literal or constant is not an object place")] [
@@ -5579,7 +6223,7 @@ macro_rules! INT64ALIGN_DOWN {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::CValue::<
                                             $crate::__pgrx_c_macros::CInt
-                                        >::new($crate::ALIGNOF_INT64_T as i32)
+                                        >::new($crate::__pgrx_c_bindings::ALIGNOF_INT64_T as i32)
                                     )
                                 }
                             )
@@ -5601,8 +6245,8 @@ macro_rules! INT64ALIGN_DOWN {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -5629,22 +6273,34 @@ macro_rules! __pgrx_c_args_INTALIGN {
         $crate::__pgrx_c_args_INTALIGN!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_INTALIGN!(@p1 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_INTALIGN!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_INTALIGN!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_INTALIGN!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_INTALIGN!(@p1 $mode [$($done)* (@literal [- $argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_INTALIGN!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+            $($rest)*
+        )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_INTALIGN!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_INTALIGN!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $($raw:tt)*) => {
         $crate::__pgrx_c_args_INTALIGN!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_INTALIGN!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_INTALIGN!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -5666,13 +6322,20 @@ macro_rules! __pgrx_c_args_INTALIGN {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_INTALIGN!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_INTALIGN!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_INTALIGN!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_INTALIGN!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
-        $crate::__pgrx_c_args_INTALIGN!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_INTALIGN!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
         $crate::__pgrx_c_classify!(
@@ -5694,10 +6357,16 @@ macro_rules! __pgrx_c_args_INTALIGN {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_INTALIGN!(@p1 $mode [$($done)* (@literal [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_INTALIGN!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+            $($rest)*
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_INTALIGN!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_INTALIGN!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p1 $mode:ident [$($done:tt)*];) => {
         $crate::INTALIGN!(@$mode; $($done)*)
@@ -5706,7 +6375,7 @@ macro_rules! __pgrx_c_args_INTALIGN {
         compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
-/// C macro INTALIGN from c.h:893
+/// C macro INTALIGN from c.h:900
 ///
 /// ```text
 /// #define INTALIGN( LEN ) TYPEALIGN ( ALIGNOF_INT , ( LEN ) )
@@ -5744,7 +6413,7 @@ macro_rules! INTALIGN {
                 @compiled [
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                            $crate::ALIGNOF_INT as i32
+                            $crate::__pgrx_c_bindings::ALIGNOF_INT as i32
                         )
                     )
                 ] [compile_error!("a C literal or constant is not an object place")] [
@@ -5762,7 +6431,7 @@ macro_rules! INTALIGN {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::CValue::<
                                             $crate::__pgrx_c_macros::CInt
-                                        >::new($crate::ALIGNOF_INT as i32)
+                                        >::new($crate::__pgrx_c_bindings::ALIGNOF_INT as i32)
                                     )
                                 }
                             )
@@ -5785,7 +6454,7 @@ macro_rules! INTALIGN {
                 @compiled [
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                            $crate::ALIGNOF_INT as i32
+                            $crate::__pgrx_c_bindings::ALIGNOF_INT as i32
                         )
                     )
                 ] [compile_error!("a C literal or constant is not an object place")] [
@@ -5803,7 +6472,7 @@ macro_rules! INTALIGN {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::CValue::<
                                             $crate::__pgrx_c_macros::CInt
-                                        >::new($crate::ALIGNOF_INT as i32)
+                                        >::new($crate::__pgrx_c_bindings::ALIGNOF_INT as i32)
                                     )
                                 }
                             )
@@ -5826,7 +6495,7 @@ macro_rules! INTALIGN {
                 @compiled [
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                            $crate::ALIGNOF_INT as i32
+                            $crate::__pgrx_c_bindings::ALIGNOF_INT as i32
                         )
                     )
                 ] [compile_error!("a C literal or constant is not an object place")] [
@@ -5844,7 +6513,7 @@ macro_rules! INTALIGN {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::CValue::<
                                             $crate::__pgrx_c_macros::CInt
-                                        >::new($crate::ALIGNOF_INT as i32)
+                                        >::new($crate::__pgrx_c_bindings::ALIGNOF_INT as i32)
                                     )
                                 }
                             )
@@ -5867,7 +6536,7 @@ macro_rules! INTALIGN {
                 @compiled [
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                            $crate::ALIGNOF_INT as i32
+                            $crate::__pgrx_c_bindings::ALIGNOF_INT as i32
                         )
                     )
                 ] [compile_error!("a C literal or constant is not an object place")] [
@@ -5885,7 +6554,7 @@ macro_rules! INTALIGN {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::CValue::<
                                             $crate::__pgrx_c_macros::CInt
-                                        >::new($crate::ALIGNOF_INT as i32)
+                                        >::new($crate::__pgrx_c_bindings::ALIGNOF_INT as i32)
                                     )
                                 }
                             )
@@ -5908,7 +6577,7 @@ macro_rules! INTALIGN {
                 @compiled [
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                            $crate::ALIGNOF_INT as i32
+                            $crate::__pgrx_c_bindings::ALIGNOF_INT as i32
                         )
                     )
                 ] [compile_error!("a C literal or constant is not an object place")] [
@@ -5926,7 +6595,7 @@ macro_rules! INTALIGN {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::CValue::<
                                             $crate::__pgrx_c_macros::CInt
-                                        >::new($crate::ALIGNOF_INT as i32)
+                                        >::new($crate::__pgrx_c_bindings::ALIGNOF_INT as i32)
                                     )
                                 }
                             )
@@ -5948,8 +6617,8 @@ macro_rules! INTALIGN {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -5976,20 +6645,24 @@ macro_rules! __pgrx_c_args_INTALIGN_DOWN {
         $crate::__pgrx_c_args_INTALIGN_DOWN!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_INTALIGN_DOWN!(@p1 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_INTALIGN_DOWN!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_INTALIGN_DOWN!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_INTALIGN_DOWN!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_INTALIGN_DOWN!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_INTALIGN_DOWN!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -5997,7 +6670,9 @@ macro_rules! __pgrx_c_args_INTALIGN_DOWN {
         $crate::__pgrx_c_args_INTALIGN_DOWN!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_INTALIGN_DOWN!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_INTALIGN_DOWN!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -6019,14 +6694,18 @@ macro_rules! __pgrx_c_args_INTALIGN_DOWN {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_INTALIGN_DOWN!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_INTALIGN_DOWN!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_INTALIGN_DOWN!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_INTALIGN_DOWN!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_INTALIGN_DOWN!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -6053,13 +6732,13 @@ macro_rules! __pgrx_c_args_INTALIGN_DOWN {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_INTALIGN_DOWN!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_INTALIGN_DOWN!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -6070,7 +6749,7 @@ macro_rules! __pgrx_c_args_INTALIGN_DOWN {
         compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
-/// C macro INTALIGN_DOWN from c.h:905
+/// C macro INTALIGN_DOWN from c.h:912
 ///
 /// ```text
 /// #define INTALIGN_DOWN( LEN ) TYPEALIGN_DOWN ( ALIGNOF_INT , ( LEN ) )
@@ -6108,7 +6787,7 @@ macro_rules! INTALIGN_DOWN {
                 @compiled [
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                            $crate::ALIGNOF_INT as i32
+                            $crate::__pgrx_c_bindings::ALIGNOF_INT as i32
                         )
                     )
                 ] [compile_error!("a C literal or constant is not an object place")] [
@@ -6126,7 +6805,7 @@ macro_rules! INTALIGN_DOWN {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::CValue::<
                                             $crate::__pgrx_c_macros::CInt
-                                        >::new($crate::ALIGNOF_INT as i32)
+                                        >::new($crate::__pgrx_c_bindings::ALIGNOF_INT as i32)
                                     )
                                 }
                             )
@@ -6149,7 +6828,7 @@ macro_rules! INTALIGN_DOWN {
                 @compiled [
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                            $crate::ALIGNOF_INT as i32
+                            $crate::__pgrx_c_bindings::ALIGNOF_INT as i32
                         )
                     )
                 ] [compile_error!("a C literal or constant is not an object place")] [
@@ -6167,7 +6846,7 @@ macro_rules! INTALIGN_DOWN {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::CValue::<
                                             $crate::__pgrx_c_macros::CInt
-                                        >::new($crate::ALIGNOF_INT as i32)
+                                        >::new($crate::__pgrx_c_bindings::ALIGNOF_INT as i32)
                                     )
                                 }
                             )
@@ -6190,7 +6869,7 @@ macro_rules! INTALIGN_DOWN {
                 @compiled [
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                            $crate::ALIGNOF_INT as i32
+                            $crate::__pgrx_c_bindings::ALIGNOF_INT as i32
                         )
                     )
                 ] [compile_error!("a C literal or constant is not an object place")] [
@@ -6208,7 +6887,7 @@ macro_rules! INTALIGN_DOWN {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::CValue::<
                                             $crate::__pgrx_c_macros::CInt
-                                        >::new($crate::ALIGNOF_INT as i32)
+                                        >::new($crate::__pgrx_c_bindings::ALIGNOF_INT as i32)
                                     )
                                 }
                             )
@@ -6231,7 +6910,7 @@ macro_rules! INTALIGN_DOWN {
                 @compiled [
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                            $crate::ALIGNOF_INT as i32
+                            $crate::__pgrx_c_bindings::ALIGNOF_INT as i32
                         )
                     )
                 ] [compile_error!("a C literal or constant is not an object place")] [
@@ -6249,7 +6928,7 @@ macro_rules! INTALIGN_DOWN {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::CValue::<
                                             $crate::__pgrx_c_macros::CInt
-                                        >::new($crate::ALIGNOF_INT as i32)
+                                        >::new($crate::__pgrx_c_bindings::ALIGNOF_INT as i32)
                                     )
                                 }
                             )
@@ -6272,7 +6951,7 @@ macro_rules! INTALIGN_DOWN {
                 @compiled [
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                            $crate::ALIGNOF_INT as i32
+                            $crate::__pgrx_c_bindings::ALIGNOF_INT as i32
                         )
                     )
                 ] [compile_error!("a C literal or constant is not an object place")] [
@@ -6290,7 +6969,7 @@ macro_rules! INTALIGN_DOWN {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::CValue::<
                                             $crate::__pgrx_c_macros::CInt
-                                        >::new($crate::ALIGNOF_INT as i32)
+                                        >::new($crate::__pgrx_c_bindings::ALIGNOF_INT as i32)
                                     )
                                 }
                             )
@@ -6312,8 +6991,8 @@ macro_rules! INTALIGN_DOWN {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -6344,21 +7023,23 @@ macro_rules! __pgrx_c_args_INVERT_COMPARE_RESULT {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
         $crate::__pgrx_c_args_INVERT_COMPARE_RESULT!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_INVERT_COMPARE_RESULT!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_INVERT_COMPARE_RESULT!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_INVERT_COMPARE_RESULT!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_INVERT_COMPARE_RESULT!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -6366,7 +7047,9 @@ macro_rules! __pgrx_c_args_INVERT_COMPARE_RESULT {
         $crate::__pgrx_c_args_INVERT_COMPARE_RESULT!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_INVERT_COMPARE_RESULT!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_INVERT_COMPARE_RESULT!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -6388,14 +7071,18 @@ macro_rules! __pgrx_c_args_INVERT_COMPARE_RESULT {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_INVERT_COMPARE_RESULT!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_INVERT_COMPARE_RESULT!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_INVERT_COMPARE_RESULT!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_INVERT_COMPARE_RESULT!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_INVERT_COMPARE_RESULT!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -6422,13 +7109,13 @@ macro_rules! __pgrx_c_args_INVERT_COMPARE_RESULT {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_INVERT_COMPARE_RESULT!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_INVERT_COMPARE_RESULT!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -6439,7 +7126,7 @@ macro_rules! __pgrx_c_args_INVERT_COMPARE_RESULT {
         compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
-/// C macro INVERT_COMPARE_RESULT from c.h:1196
+/// C macro INVERT_COMPARE_RESULT from c.h:1203
 ///
 /// ```text
 /// #define INVERT_COMPARE_RESULT( var ) ( ( var ) = ( ( var ) < 0 ) ? 1 : - ( var ) )
@@ -6712,8 +7399,8 @@ macro_rules! INVERT_COMPARE_RESULT {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -6740,20 +7427,24 @@ macro_rules! __pgrx_c_args_IS_HIGHBIT_SET {
         $crate::__pgrx_c_args_IS_HIGHBIT_SET!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_IS_HIGHBIT_SET!(@p1 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_IS_HIGHBIT_SET!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_IS_HIGHBIT_SET!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_IS_HIGHBIT_SET!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_IS_HIGHBIT_SET!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_IS_HIGHBIT_SET!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -6761,7 +7452,9 @@ macro_rules! __pgrx_c_args_IS_HIGHBIT_SET {
         $crate::__pgrx_c_args_IS_HIGHBIT_SET!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_IS_HIGHBIT_SET!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_IS_HIGHBIT_SET!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -6783,14 +7476,18 @@ macro_rules! __pgrx_c_args_IS_HIGHBIT_SET {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_IS_HIGHBIT_SET!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_IS_HIGHBIT_SET!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_IS_HIGHBIT_SET!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_IS_HIGHBIT_SET!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_IS_HIGHBIT_SET!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -6817,13 +7514,13 @@ macro_rules! __pgrx_c_args_IS_HIGHBIT_SET {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_IS_HIGHBIT_SET!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_IS_HIGHBIT_SET!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -6834,7 +7531,7 @@ macro_rules! __pgrx_c_args_IS_HIGHBIT_SET {
         compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
-/// C macro IS_HIGHBIT_SET from c.h:1247
+/// C macro IS_HIGHBIT_SET from c.h:1254
 ///
 /// ```text
 /// #define IS_HIGHBIT_SET( ch ) ( ( unsigned char ) ( ch ) & HIGHBIT )
@@ -6883,7 +7580,7 @@ macro_rules! IS_HIGHBIT_SET {
                     ),
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                            $crate::HIGHBIT as i32
+                            $crate::__pgrx_c_bindings::HIGHBIT as i32
                         )
                     )
                 )
@@ -6932,7 +7629,7 @@ macro_rules! IS_HIGHBIT_SET {
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                        $crate::HIGHBIT as i32
+                                        $crate::__pgrx_c_bindings::HIGHBIT as i32
                                     )
                                 )
                             )
@@ -6965,7 +7662,7 @@ macro_rules! IS_HIGHBIT_SET {
                     ),
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                            $crate::HIGHBIT as i32
+                            $crate::__pgrx_c_bindings::HIGHBIT as i32
                         )
                     )
                 )
@@ -6981,8 +7678,8 @@ macro_rules! IS_HIGHBIT_SET {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -7009,22 +7706,34 @@ macro_rules! __pgrx_c_args_MAXALIGN {
         $crate::__pgrx_c_args_MAXALIGN!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_MAXALIGN!(@p1 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_MAXALIGN!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_MAXALIGN!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_MAXALIGN!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_MAXALIGN!(@p1 $mode [$($done)* (@literal [- $argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_MAXALIGN!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+            $($rest)*
+        )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_MAXALIGN!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_MAXALIGN!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $($raw:tt)*) => {
         $crate::__pgrx_c_args_MAXALIGN!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_MAXALIGN!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_MAXALIGN!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -7046,13 +7755,20 @@ macro_rules! __pgrx_c_args_MAXALIGN {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_MAXALIGN!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_MAXALIGN!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_MAXALIGN!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_MAXALIGN!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
-        $crate::__pgrx_c_args_MAXALIGN!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_MAXALIGN!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
         $crate::__pgrx_c_classify!(
@@ -7074,10 +7790,16 @@ macro_rules! __pgrx_c_args_MAXALIGN {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_MAXALIGN!(@p1 $mode [$($done)* (@literal [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_MAXALIGN!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+            $($rest)*
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_MAXALIGN!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_MAXALIGN!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p1 $mode:ident [$($done:tt)*];) => {
         $crate::MAXALIGN!(@$mode; $($done)*)
@@ -7086,7 +7808,7 @@ macro_rules! __pgrx_c_args_MAXALIGN {
         compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
-/// C macro MAXALIGN from c.h:896
+/// C macro MAXALIGN from c.h:903
 ///
 /// ```text
 /// #define MAXALIGN( LEN ) TYPEALIGN ( MAXIMUM_ALIGNOF , ( LEN ) )
@@ -7124,7 +7846,7 @@ macro_rules! MAXALIGN {
                 @compiled [
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                            $crate::MAXIMUM_ALIGNOF as i32
+                            $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                         )
                     )
                 ] [compile_error!("a C literal or constant is not an object place")] [
@@ -7142,7 +7864,7 @@ macro_rules! MAXALIGN {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::CValue::<
                                             $crate::__pgrx_c_macros::CInt
-                                        >::new($crate::MAXIMUM_ALIGNOF as i32)
+                                        >::new($crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32)
                                     )
                                 }
                             )
@@ -7165,7 +7887,7 @@ macro_rules! MAXALIGN {
                 @compiled [
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                            $crate::MAXIMUM_ALIGNOF as i32
+                            $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                         )
                     )
                 ] [compile_error!("a C literal or constant is not an object place")] [
@@ -7183,7 +7905,7 @@ macro_rules! MAXALIGN {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::CValue::<
                                             $crate::__pgrx_c_macros::CInt
-                                        >::new($crate::MAXIMUM_ALIGNOF as i32)
+                                        >::new($crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32)
                                     )
                                 }
                             )
@@ -7206,7 +7928,7 @@ macro_rules! MAXALIGN {
                 @compiled [
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                            $crate::MAXIMUM_ALIGNOF as i32
+                            $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                         )
                     )
                 ] [compile_error!("a C literal or constant is not an object place")] [
@@ -7224,7 +7946,7 @@ macro_rules! MAXALIGN {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::CValue::<
                                             $crate::__pgrx_c_macros::CInt
-                                        >::new($crate::MAXIMUM_ALIGNOF as i32)
+                                        >::new($crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32)
                                     )
                                 }
                             )
@@ -7247,7 +7969,7 @@ macro_rules! MAXALIGN {
                 @compiled [
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                            $crate::MAXIMUM_ALIGNOF as i32
+                            $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                         )
                     )
                 ] [compile_error!("a C literal or constant is not an object place")] [
@@ -7265,7 +7987,7 @@ macro_rules! MAXALIGN {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::CValue::<
                                             $crate::__pgrx_c_macros::CInt
-                                        >::new($crate::MAXIMUM_ALIGNOF as i32)
+                                        >::new($crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32)
                                     )
                                 }
                             )
@@ -7288,7 +8010,7 @@ macro_rules! MAXALIGN {
                 @compiled [
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                            $crate::MAXIMUM_ALIGNOF as i32
+                            $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                         )
                     )
                 ] [compile_error!("a C literal or constant is not an object place")] [
@@ -7306,7 +8028,7 @@ macro_rules! MAXALIGN {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::CValue::<
                                             $crate::__pgrx_c_macros::CInt
-                                        >::new($crate::MAXIMUM_ALIGNOF as i32)
+                                        >::new($crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32)
                                     )
                                 }
                             )
@@ -7328,8 +8050,8 @@ macro_rules! MAXALIGN {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -7356,25 +8078,34 @@ macro_rules! __pgrx_c_args_MAXALIGN64 {
         $crate::__pgrx_c_args_MAXALIGN64!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_MAXALIGN64!(@p1 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_MAXALIGN64!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_MAXALIGN64!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_MAXALIGN64!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_MAXALIGN64!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_MAXALIGN64!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_MAXALIGN64!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $($raw:tt)*) => {
         $crate::__pgrx_c_args_MAXALIGN64!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_MAXALIGN64!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_MAXALIGN64!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -7396,13 +8127,20 @@ macro_rules! __pgrx_c_args_MAXALIGN64 {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_MAXALIGN64!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_MAXALIGN64!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_MAXALIGN64!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_MAXALIGN64!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
-        $crate::__pgrx_c_args_MAXALIGN64!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_MAXALIGN64!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
         $crate::__pgrx_c_classify!(
@@ -7424,10 +8162,16 @@ macro_rules! __pgrx_c_args_MAXALIGN64 {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_MAXALIGN64!(@p1 $mode [$($done)* (@literal [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_MAXALIGN64!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+            $($rest)*
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_MAXALIGN64!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_MAXALIGN64!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p1 $mode:ident [$($done:tt)*];) => {
         $crate::MAXALIGN64!(@$mode; $($done)*)
@@ -7436,7 +8180,7 @@ macro_rules! __pgrx_c_args_MAXALIGN64 {
         compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
-/// C macro MAXALIGN64 from c.h:921
+/// C macro MAXALIGN64 from c.h:928
 ///
 /// ```text
 /// #define MAXALIGN64( LEN ) TYPEALIGN64 ( MAXIMUM_ALIGNOF , ( LEN ) )
@@ -7474,7 +8218,7 @@ macro_rules! MAXALIGN64 {
                 @compiled [
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                            $crate::MAXIMUM_ALIGNOF as i32
+                            $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                         )
                     )
                 ] [compile_error!("a C literal or constant is not an object place")] [
@@ -7492,7 +8236,7 @@ macro_rules! MAXALIGN64 {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::CValue::<
                                             $crate::__pgrx_c_macros::CInt
-                                        >::new($crate::MAXIMUM_ALIGNOF as i32)
+                                        >::new($crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32)
                                     )
                                 }
                             )
@@ -7515,7 +8259,7 @@ macro_rules! MAXALIGN64 {
                 @compiled [
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                            $crate::MAXIMUM_ALIGNOF as i32
+                            $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                         )
                     )
                 ] [compile_error!("a C literal or constant is not an object place")] [
@@ -7533,7 +8277,7 @@ macro_rules! MAXALIGN64 {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::CValue::<
                                             $crate::__pgrx_c_macros::CInt
-                                        >::new($crate::MAXIMUM_ALIGNOF as i32)
+                                        >::new($crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32)
                                     )
                                 }
                             )
@@ -7556,7 +8300,7 @@ macro_rules! MAXALIGN64 {
                 @compiled [
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                            $crate::MAXIMUM_ALIGNOF as i32
+                            $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                         )
                     )
                 ] [compile_error!("a C literal or constant is not an object place")] [
@@ -7574,7 +8318,7 @@ macro_rules! MAXALIGN64 {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::CValue::<
                                             $crate::__pgrx_c_macros::CInt
-                                        >::new($crate::MAXIMUM_ALIGNOF as i32)
+                                        >::new($crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32)
                                     )
                                 }
                             )
@@ -7597,7 +8341,7 @@ macro_rules! MAXALIGN64 {
                 @compiled [
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                            $crate::MAXIMUM_ALIGNOF as i32
+                            $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                         )
                     )
                 ] [compile_error!("a C literal or constant is not an object place")] [
@@ -7615,7 +8359,7 @@ macro_rules! MAXALIGN64 {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::CValue::<
                                             $crate::__pgrx_c_macros::CInt
-                                        >::new($crate::MAXIMUM_ALIGNOF as i32)
+                                        >::new($crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32)
                                     )
                                 }
                             )
@@ -7638,7 +8382,7 @@ macro_rules! MAXALIGN64 {
                 @compiled [
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                            $crate::MAXIMUM_ALIGNOF as i32
+                            $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                         )
                     )
                 ] [compile_error!("a C literal or constant is not an object place")] [
@@ -7656,7 +8400,7 @@ macro_rules! MAXALIGN64 {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::CValue::<
                                             $crate::__pgrx_c_macros::CInt
-                                        >::new($crate::MAXIMUM_ALIGNOF as i32)
+                                        >::new($crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32)
                                     )
                                 }
                             )
@@ -7678,8 +8422,8 @@ macro_rules! MAXALIGN64 {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -7706,20 +8450,24 @@ macro_rules! __pgrx_c_args_MAXALIGN_DOWN {
         $crate::__pgrx_c_args_MAXALIGN_DOWN!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_MAXALIGN_DOWN!(@p1 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_MAXALIGN_DOWN!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_MAXALIGN_DOWN!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_MAXALIGN_DOWN!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_MAXALIGN_DOWN!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_MAXALIGN_DOWN!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -7727,7 +8475,9 @@ macro_rules! __pgrx_c_args_MAXALIGN_DOWN {
         $crate::__pgrx_c_args_MAXALIGN_DOWN!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_MAXALIGN_DOWN!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_MAXALIGN_DOWN!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -7749,14 +8499,18 @@ macro_rules! __pgrx_c_args_MAXALIGN_DOWN {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_MAXALIGN_DOWN!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_MAXALIGN_DOWN!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_MAXALIGN_DOWN!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_MAXALIGN_DOWN!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_MAXALIGN_DOWN!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -7783,13 +8537,13 @@ macro_rules! __pgrx_c_args_MAXALIGN_DOWN {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_MAXALIGN_DOWN!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_MAXALIGN_DOWN!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -7800,7 +8554,7 @@ macro_rules! __pgrx_c_args_MAXALIGN_DOWN {
         compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
-/// C macro MAXALIGN_DOWN from c.h:908
+/// C macro MAXALIGN_DOWN from c.h:915
 ///
 /// ```text
 /// #define MAXALIGN_DOWN( LEN ) TYPEALIGN_DOWN ( MAXIMUM_ALIGNOF , ( LEN ) )
@@ -7838,7 +8592,7 @@ macro_rules! MAXALIGN_DOWN {
                 @compiled [
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                            $crate::MAXIMUM_ALIGNOF as i32
+                            $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                         )
                     )
                 ] [compile_error!("a C literal or constant is not an object place")] [
@@ -7856,7 +8610,7 @@ macro_rules! MAXALIGN_DOWN {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::CValue::<
                                             $crate::__pgrx_c_macros::CInt
-                                        >::new($crate::MAXIMUM_ALIGNOF as i32)
+                                        >::new($crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32)
                                     )
                                 }
                             )
@@ -7879,7 +8633,7 @@ macro_rules! MAXALIGN_DOWN {
                 @compiled [
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                            $crate::MAXIMUM_ALIGNOF as i32
+                            $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                         )
                     )
                 ] [compile_error!("a C literal or constant is not an object place")] [
@@ -7897,7 +8651,7 @@ macro_rules! MAXALIGN_DOWN {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::CValue::<
                                             $crate::__pgrx_c_macros::CInt
-                                        >::new($crate::MAXIMUM_ALIGNOF as i32)
+                                        >::new($crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32)
                                     )
                                 }
                             )
@@ -7920,7 +8674,7 @@ macro_rules! MAXALIGN_DOWN {
                 @compiled [
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                            $crate::MAXIMUM_ALIGNOF as i32
+                            $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                         )
                     )
                 ] [compile_error!("a C literal or constant is not an object place")] [
@@ -7938,7 +8692,7 @@ macro_rules! MAXALIGN_DOWN {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::CValue::<
                                             $crate::__pgrx_c_macros::CInt
-                                        >::new($crate::MAXIMUM_ALIGNOF as i32)
+                                        >::new($crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32)
                                     )
                                 }
                             )
@@ -7961,7 +8715,7 @@ macro_rules! MAXALIGN_DOWN {
                 @compiled [
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                            $crate::MAXIMUM_ALIGNOF as i32
+                            $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                         )
                     )
                 ] [compile_error!("a C literal or constant is not an object place")] [
@@ -7979,7 +8733,7 @@ macro_rules! MAXALIGN_DOWN {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::CValue::<
                                             $crate::__pgrx_c_macros::CInt
-                                        >::new($crate::MAXIMUM_ALIGNOF as i32)
+                                        >::new($crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32)
                                     )
                                 }
                             )
@@ -8002,7 +8756,7 @@ macro_rules! MAXALIGN_DOWN {
                 @compiled [
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                            $crate::MAXIMUM_ALIGNOF as i32
+                            $crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32
                         )
                     )
                 ] [compile_error!("a C literal or constant is not an object place")] [
@@ -8020,7 +8774,7 @@ macro_rules! MAXALIGN_DOWN {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::CValue::<
                                             $crate::__pgrx_c_macros::CInt
-                                        >::new($crate::MAXIMUM_ALIGNOF as i32)
+                                        >::new($crate::__pgrx_c_bindings::MAXIMUM_ALIGNOF as i32)
                                     )
                                 }
                             )
@@ -8042,8 +8796,8 @@ macro_rules! MAXALIGN_DOWN {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -8070,16 +8824,25 @@ macro_rules! __pgrx_c_args_Max {
         $crate::__pgrx_c_args_Max!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_Max!(@p1 $mode [$($done)* (@literal [- $argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_Max!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+            $($rest)*
+        )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_Max!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_Max!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $($raw:tt)*) => {
         $crate::__pgrx_c_args_Max!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
-        $crate::__pgrx_c_args_Max!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_Max!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
         $crate::__pgrx_c_classify!(
@@ -8101,28 +8864,46 @@ macro_rules! __pgrx_c_args_Max {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_Max!(@p1 $mode [$($done)* (@literal [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_Max!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+            $($rest)*
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_Max!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_Max!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_Max!(@p2 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_Max!(
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative1 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_Max!(@p2 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_Max!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_Max!(@p2 $mode [$($done)* (@literal [- $argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_Max!(
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+            $($rest)*
+        )
     };
     (@negative1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_Max!(@p2 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_Max!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $($raw:tt)*) => {
         $crate::__pgrx_c_args_Max!(@negative1 $mode [$($done)*]; - $($raw)*)
     };
     (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_Max!(@p2 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_Max!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -8140,13 +8921,20 @@ macro_rules! __pgrx_c_args_Max {
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_Max!(@p2 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_Max!(
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_Max!(@p2 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_Max!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
-        $crate::__pgrx_c_args_Max!(@p2 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_Max!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
         $crate::__pgrx_c_classify!(
@@ -8168,10 +8956,16 @@ macro_rules! __pgrx_c_args_Max {
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_Max!(@p2 $mode [$($done)* (@literal [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_Max!(
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+            $($rest)*
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_Max!(@p2 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_Max!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p2 $mode:ident [$($done:tt)*];) => {
         $crate::Max!(@$mode; $($done)*)
@@ -8180,7 +8974,7 @@ macro_rules! __pgrx_c_args_Max {
         compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
-/// C macro Max from c.h:1085
+/// C macro Max from c.h:1092
 ///
 /// ```text
 /// #define Max( x , y ) ( ( x ) > ( y ) ? ( x ) : ( y ) )
@@ -8371,8 +9165,8 @@ macro_rules! Max {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -8399,16 +9193,25 @@ macro_rules! __pgrx_c_args_Min {
         $crate::__pgrx_c_args_Min!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_Min!(@p1 $mode [$($done)* (@literal [- $argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_Min!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+            $($rest)*
+        )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_Min!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_Min!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $($raw:tt)*) => {
         $crate::__pgrx_c_args_Min!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
-        $crate::__pgrx_c_args_Min!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_Min!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
         $crate::__pgrx_c_classify!(
@@ -8430,28 +9233,46 @@ macro_rules! __pgrx_c_args_Min {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_Min!(@p1 $mode [$($done)* (@literal [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_Min!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+            $($rest)*
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_Min!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_Min!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_Min!(@p2 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_Min!(
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative1 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_Min!(@p2 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_Min!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_Min!(@p2 $mode [$($done)* (@literal [- $argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_Min!(
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+            $($rest)*
+        )
     };
     (@negative1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_Min!(@p2 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_Min!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $($raw:tt)*) => {
         $crate::__pgrx_c_args_Min!(@negative1 $mode [$($done)*]; - $($raw)*)
     };
     (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_Min!(@p2 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_Min!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -8469,13 +9290,20 @@ macro_rules! __pgrx_c_args_Min {
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_Min!(@p2 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_Min!(
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_Min!(@p2 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_Min!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
-        $crate::__pgrx_c_args_Min!(@p2 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_Min!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
         $crate::__pgrx_c_classify!(
@@ -8497,10 +9325,16 @@ macro_rules! __pgrx_c_args_Min {
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_Min!(@p2 $mode [$($done)* (@literal [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_Min!(
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+            $($rest)*
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_Min!(@p2 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_Min!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p2 $mode:ident [$($done:tt)*];) => {
         $crate::Min!(@$mode; $($done)*)
@@ -8509,7 +9343,7 @@ macro_rules! __pgrx_c_args_Min {
         compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
-/// C macro Min from c.h:1091
+/// C macro Min from c.h:1098
 ///
 /// ```text
 /// #define Min( x , y ) ( ( x ) < ( y ) ? ( x ) : ( y ) )
@@ -8700,8 +9534,8 @@ macro_rules! Min {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -8728,22 +9562,34 @@ macro_rules! __pgrx_c_args_NameStr {
         $crate::__pgrx_c_args_NameStr!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_NameStr!(@p1 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_NameStr!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_NameStr!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_NameStr!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_NameStr!(@p1 $mode [$($done)* (@literal [- $argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_NameStr!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+            $($rest)*
+        )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_NameStr!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_NameStr!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $($raw:tt)*) => {
         $crate::__pgrx_c_args_NameStr!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_NameStr!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_NameStr!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -8763,13 +9609,20 @@ macro_rules! __pgrx_c_args_NameStr {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_NameStr!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_NameStr!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_NameStr!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_NameStr!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
-        $crate::__pgrx_c_args_NameStr!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_NameStr!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
         $crate::__pgrx_c_classify!(
@@ -8791,10 +9644,16 @@ macro_rules! __pgrx_c_args_NameStr {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_NameStr!(@p1 $mode [$($done)* (@literal [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_NameStr!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+            $($rest)*
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_NameStr!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_NameStr!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p1 $mode:ident [$($done:tt)*];) => {
         $crate::NameStr!(@$mode; $($done)*)
@@ -8803,7 +9662,7 @@ macro_rules! __pgrx_c_args_NameStr {
         compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
-/// C macro NameStr from c.h:835
+/// C macro NameStr from c.h:842
 ///
 /// ```text
 /// #define NameStr( name ) ( ( name ) . data )
@@ -8917,8 +9776,8 @@ macro_rules! NameStr {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -8949,7 +9808,7 @@ macro_rules! __pgrx_c_args_OffsetToPointer {
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_OffsetToPointer!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -8958,7 +9817,7 @@ macro_rules! __pgrx_c_args_OffsetToPointer {
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_OffsetToPointer!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -8985,13 +9844,13 @@ macro_rules! __pgrx_c_args_OffsetToPointer {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_OffsetToPointer!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:tt, $($rest:tt)*) => {
         $crate::__pgrx_c_args_OffsetToPointer!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -8999,14 +9858,16 @@ macro_rules! __pgrx_c_args_OffsetToPointer {
         compile_error!("an ungrouped C parameter requires a parenthesized negative literal")
     };
     (@negative1 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_OffsetToPointer!(@p2 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_OffsetToPointer!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         compile_error!("an ungrouped C parameter requires a parenthesized negative literal")
     };
     (@negative1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_OffsetToPointer!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -9014,7 +9875,9 @@ macro_rules! __pgrx_c_args_OffsetToPointer {
         compile_error!("an ungrouped C parameter requires one token tree")
     };
     (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_OffsetToPointer!(@p2 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_OffsetToPointer!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -9036,14 +9899,18 @@ macro_rules! __pgrx_c_args_OffsetToPointer {
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_OffsetToPointer!(@p2 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_OffsetToPointer!(
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:tt) => {
-        $crate::__pgrx_c_args_OffsetToPointer!(@p2 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_OffsetToPointer!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_OffsetToPointer!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -9070,13 +9937,13 @@ macro_rules! __pgrx_c_args_OffsetToPointer {
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_OffsetToPointer!(
-            @p2 $mode [$($done)* (@literal [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:tt, $($rest:tt)*) => {
         $crate::__pgrx_c_args_OffsetToPointer!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -9087,7 +9954,7 @@ macro_rules! __pgrx_c_args_OffsetToPointer {
         compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
-/// C macro OffsetToPointer from c.h:855
+/// C macro OffsetToPointer from c.h:862
 ///
 /// ```text
 /// #define OffsetToPointer( base , offset ) ( ( void * ) ( ( char * ) base + offset ) )
@@ -9292,8 +10159,8 @@ macro_rules! OffsetToPointer {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -9320,25 +10187,34 @@ macro_rules! __pgrx_c_args_Oid8IsValid {
         $crate::__pgrx_c_args_Oid8IsValid!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_Oid8IsValid!(@p1 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_Oid8IsValid!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_Oid8IsValid!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_Oid8IsValid!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_Oid8IsValid!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_Oid8IsValid!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_Oid8IsValid!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $($raw:tt)*) => {
         $crate::__pgrx_c_args_Oid8IsValid!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_Oid8IsValid!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_Oid8IsValid!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -9360,13 +10236,20 @@ macro_rules! __pgrx_c_args_Oid8IsValid {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_Oid8IsValid!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_Oid8IsValid!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_Oid8IsValid!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_Oid8IsValid!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
-        $crate::__pgrx_c_args_Oid8IsValid!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_Oid8IsValid!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
         $crate::__pgrx_c_classify!(
@@ -9388,10 +10271,16 @@ macro_rules! __pgrx_c_args_Oid8IsValid {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_Oid8IsValid!(@p1 $mode [$($done)* (@literal [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_Oid8IsValid!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+            $($rest)*
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_Oid8IsValid!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_Oid8IsValid!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p1 $mode:ident [$($done:tt)*];) => {
         $crate::Oid8IsValid!(@$mode; $($done)*)
@@ -9400,7 +10289,7 @@ macro_rules! __pgrx_c_args_Oid8IsValid {
         compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
-/// C macro Oid8IsValid from c.h:860
+/// C macro Oid8IsValid from c.h:867
 ///
 /// ```text
 /// #define Oid8IsValid( objectId ) ( ( bool ) ( ( objectId ) != InvalidOid8 ) )
@@ -9446,10 +10335,9 @@ macro_rules! Oid8IsValid {
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::null_constant(
-                                        /* PGRX: InvalidOid8 remains expanded because no integer constant binding is available in the defining Rust crate. */
                                         $crate::__pgrx_c_macros::CValue::<
-                                            $crate::__pgrx_c_macros::CUnsignedLongLong
-                                        >::new(0u64)
+                                            $crate::__pgrx_c_macros::CUnsignedLong
+                                        >::new($crate::__pgrx_c_bindings::InvalidOid8 as u64)
                                     )
                                 )
                             )
@@ -9509,10 +10397,11 @@ macro_rules! Oid8IsValid {
                                                 _
                                             >(
                                                 $crate::__pgrx_c_macros::expression::null_constant(
-                                                    /* PGRX: InvalidOid8 remains expanded because no integer constant binding is available in the defining Rust crate. */
                                                     $crate::__pgrx_c_macros::CValue::<
-                                                        $crate::__pgrx_c_macros::CUnsignedLongLong
-                                                    >::new(0u64)
+                                                        $crate::__pgrx_c_macros::CUnsignedLong
+                                                    >::new(
+                                                        $crate::__pgrx_c_bindings::InvalidOid8 as u64
+                                                    )
                                                 )
                                             )
                                         )
@@ -9545,10 +10434,9 @@ macro_rules! Oid8IsValid {
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::null_constant(
-                                        /* PGRX: InvalidOid8 remains expanded because no integer constant binding is available in the defining Rust crate. */
                                         $crate::__pgrx_c_macros::CValue::<
-                                            $crate::__pgrx_c_macros::CUnsignedLongLong
-                                        >::new(0u64)
+                                            $crate::__pgrx_c_macros::CUnsignedLong
+                                        >::new($crate::__pgrx_c_bindings::InvalidOid8 as u64)
                                     )
                                 )
                             )
@@ -9567,8 +10455,8 @@ macro_rules! Oid8IsValid {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -9595,25 +10483,34 @@ macro_rules! __pgrx_c_args_OidIsValid {
         $crate::__pgrx_c_args_OidIsValid!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_OidIsValid!(@p1 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_OidIsValid!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_OidIsValid!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_OidIsValid!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_OidIsValid!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_OidIsValid!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_OidIsValid!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $($raw:tt)*) => {
         $crate::__pgrx_c_args_OidIsValid!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_OidIsValid!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_OidIsValid!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -9635,13 +10532,20 @@ macro_rules! __pgrx_c_args_OidIsValid {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_OidIsValid!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_OidIsValid!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_OidIsValid!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_OidIsValid!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
-        $crate::__pgrx_c_args_OidIsValid!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_OidIsValid!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
         $crate::__pgrx_c_classify!(
@@ -9663,10 +10567,16 @@ macro_rules! __pgrx_c_args_OidIsValid {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_OidIsValid!(@p1 $mode [$($done)* (@literal [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_OidIsValid!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+            $($rest)*
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_OidIsValid!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_OidIsValid!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p1 $mode:ident [$($done:tt)*];) => {
         $crate::OidIsValid!(@$mode; $($done)*)
@@ -9675,7 +10585,7 @@ macro_rules! __pgrx_c_args_OidIsValid {
         compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
-/// C macro OidIsValid from c.h:858
+/// C macro OidIsValid from c.h:865
 ///
 /// ```text
 /// #define OidIsValid( objectId ) ( ( bool ) ( ( objectId ) != InvalidOid ) )
@@ -9721,10 +10631,9 @@ macro_rules! OidIsValid {
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::null_constant(
-                                        /* PGRX: InvalidOid remains expanded because no integer constant binding is available in the defining Rust crate. */
                                         $crate::__pgrx_c_macros::CValue::<
                                             $crate::__pgrx_c_macros::CUnsignedInt
-                                        >::new(0u32)
+                                        >::new($crate::__pgrx_c_bindings::InvalidOid as u32)
                                     )
                                 )
                             )
@@ -9784,10 +10693,11 @@ macro_rules! OidIsValid {
                                                 _
                                             >(
                                                 $crate::__pgrx_c_macros::expression::null_constant(
-                                                    /* PGRX: InvalidOid remains expanded because no integer constant binding is available in the defining Rust crate. */
                                                     $crate::__pgrx_c_macros::CValue::<
                                                         $crate::__pgrx_c_macros::CUnsignedInt
-                                                    >::new(0u32)
+                                                    >::new(
+                                                        $crate::__pgrx_c_bindings::InvalidOid as u32
+                                                    )
                                                 )
                                             )
                                         )
@@ -9820,10 +10730,9 @@ macro_rules! OidIsValid {
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::null_constant(
-                                        /* PGRX: InvalidOid remains expanded because no integer constant binding is available in the defining Rust crate. */
                                         $crate::__pgrx_c_macros::CValue::<
                                             $crate::__pgrx_c_macros::CUnsignedInt
-                                        >::new(0u32)
+                                        >::new($crate::__pgrx_c_bindings::InvalidOid as u32)
                                     )
                                 )
                             )
@@ -9842,8 +10751,8 @@ macro_rules! OidIsValid {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -9871,13 +10780,13 @@ macro_rules! __pgrx_c_args_PointerIsAligned {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_PointerIsAligned!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_PointerIsAligned!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -9886,7 +10795,7 @@ macro_rules! __pgrx_c_args_PointerIsAligned {
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_PointerIsAligned!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -9913,31 +10822,35 @@ macro_rules! __pgrx_c_args_PointerIsAligned {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_PointerIsAligned!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_PointerIsAligned!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_PointerIsAligned!(@p2 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_PointerIsAligned!(
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative1 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_PointerIsAligned!(@p2 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_PointerIsAligned!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_PointerIsAligned!(
-            @p2 $mode [$($done)* (@literal [- $argument]),];
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_PointerIsAligned!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -9945,7 +10858,9 @@ macro_rules! __pgrx_c_args_PointerIsAligned {
         $crate::__pgrx_c_args_PointerIsAligned!(@negative1 $mode [$($done)*]; - $($raw)*)
     };
     (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_PointerIsAligned!(@p2 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_PointerIsAligned!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -9967,14 +10882,18 @@ macro_rules! __pgrx_c_args_PointerIsAligned {
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_PointerIsAligned!(@p2 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_PointerIsAligned!(
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_PointerIsAligned!(@p2 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_PointerIsAligned!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_PointerIsAligned!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -10001,13 +10920,13 @@ macro_rules! __pgrx_c_args_PointerIsAligned {
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_PointerIsAligned!(
-            @p2 $mode [$($done)* (@literal [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_PointerIsAligned!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -10018,7 +10937,7 @@ macro_rules! __pgrx_c_args_PointerIsAligned {
         compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
-/// C macro PointerIsAligned from c.h:852
+/// C macro PointerIsAligned from c.h:859
 ///
 /// ```text
 /// #define PointerIsAligned( pointer , type ) ( ( ( uintptr_t ) ( pointer ) % ( sizeof ( type ) ) ) == 0 )
@@ -10220,8 +11139,8 @@ macro_rules! PointerIsAligned {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -10248,20 +11167,24 @@ macro_rules! __pgrx_c_args_RegProcedureIsValid {
         $crate::__pgrx_c_args_RegProcedureIsValid!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_RegProcedureIsValid!(@p1 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_RegProcedureIsValid!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_RegProcedureIsValid!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_RegProcedureIsValid!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_RegProcedureIsValid!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_RegProcedureIsValid!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -10269,7 +11192,9 @@ macro_rules! __pgrx_c_args_RegProcedureIsValid {
         $crate::__pgrx_c_args_RegProcedureIsValid!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_RegProcedureIsValid!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_RegProcedureIsValid!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -10291,14 +11216,18 @@ macro_rules! __pgrx_c_args_RegProcedureIsValid {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_RegProcedureIsValid!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_RegProcedureIsValid!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_RegProcedureIsValid!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_RegProcedureIsValid!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_RegProcedureIsValid!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -10325,13 +11254,13 @@ macro_rules! __pgrx_c_args_RegProcedureIsValid {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_RegProcedureIsValid!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_RegProcedureIsValid!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -10342,7 +11271,7 @@ macro_rules! __pgrx_c_args_RegProcedureIsValid {
         compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
-/// C macro RegProcedureIsValid from c.h:862
+/// C macro RegProcedureIsValid from c.h:869
 ///
 /// ```text
 /// #define RegProcedureIsValid( p ) OidIsValid ( p )
@@ -10414,8 +11343,8 @@ macro_rules! RegProcedureIsValid {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -10442,25 +11371,34 @@ macro_rules! __pgrx_c_args_SHORTALIGN {
         $crate::__pgrx_c_args_SHORTALIGN!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_SHORTALIGN!(@p1 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_SHORTALIGN!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_SHORTALIGN!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_SHORTALIGN!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SHORTALIGN!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_SHORTALIGN!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_SHORTALIGN!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $($raw:tt)*) => {
         $crate::__pgrx_c_args_SHORTALIGN!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_SHORTALIGN!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_SHORTALIGN!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -10482,13 +11420,20 @@ macro_rules! __pgrx_c_args_SHORTALIGN {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_SHORTALIGN!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_SHORTALIGN!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_SHORTALIGN!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_SHORTALIGN!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
-        $crate::__pgrx_c_args_SHORTALIGN!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_SHORTALIGN!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
         $crate::__pgrx_c_classify!(
@@ -10510,10 +11455,16 @@ macro_rules! __pgrx_c_args_SHORTALIGN {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_SHORTALIGN!(@p1 $mode [$($done)* (@literal [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_SHORTALIGN!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+            $($rest)*
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_SHORTALIGN!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_SHORTALIGN!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p1 $mode:ident [$($done:tt)*];) => {
         $crate::SHORTALIGN!(@$mode; $($done)*)
@@ -10522,7 +11473,7 @@ macro_rules! __pgrx_c_args_SHORTALIGN {
         compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
-/// C macro SHORTALIGN from c.h:892
+/// C macro SHORTALIGN from c.h:899
 ///
 /// ```text
 /// #define SHORTALIGN( LEN ) TYPEALIGN ( ALIGNOF_SHORT , ( LEN ) )
@@ -10560,7 +11511,7 @@ macro_rules! SHORTALIGN {
                 @compiled [
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                            $crate::ALIGNOF_SHORT as i32
+                            $crate::__pgrx_c_bindings::ALIGNOF_SHORT as i32
                         )
                     )
                 ] [compile_error!("a C literal or constant is not an object place")] [
@@ -10578,7 +11529,7 @@ macro_rules! SHORTALIGN {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::CValue::<
                                             $crate::__pgrx_c_macros::CInt
-                                        >::new($crate::ALIGNOF_SHORT as i32)
+                                        >::new($crate::__pgrx_c_bindings::ALIGNOF_SHORT as i32)
                                     )
                                 }
                             )
@@ -10601,7 +11552,7 @@ macro_rules! SHORTALIGN {
                 @compiled [
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                            $crate::ALIGNOF_SHORT as i32
+                            $crate::__pgrx_c_bindings::ALIGNOF_SHORT as i32
                         )
                     )
                 ] [compile_error!("a C literal or constant is not an object place")] [
@@ -10619,7 +11570,7 @@ macro_rules! SHORTALIGN {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::CValue::<
                                             $crate::__pgrx_c_macros::CInt
-                                        >::new($crate::ALIGNOF_SHORT as i32)
+                                        >::new($crate::__pgrx_c_bindings::ALIGNOF_SHORT as i32)
                                     )
                                 }
                             )
@@ -10642,7 +11593,7 @@ macro_rules! SHORTALIGN {
                 @compiled [
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                            $crate::ALIGNOF_SHORT as i32
+                            $crate::__pgrx_c_bindings::ALIGNOF_SHORT as i32
                         )
                     )
                 ] [compile_error!("a C literal or constant is not an object place")] [
@@ -10660,7 +11611,7 @@ macro_rules! SHORTALIGN {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::CValue::<
                                             $crate::__pgrx_c_macros::CInt
-                                        >::new($crate::ALIGNOF_SHORT as i32)
+                                        >::new($crate::__pgrx_c_bindings::ALIGNOF_SHORT as i32)
                                     )
                                 }
                             )
@@ -10683,7 +11634,7 @@ macro_rules! SHORTALIGN {
                 @compiled [
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                            $crate::ALIGNOF_SHORT as i32
+                            $crate::__pgrx_c_bindings::ALIGNOF_SHORT as i32
                         )
                     )
                 ] [compile_error!("a C literal or constant is not an object place")] [
@@ -10701,7 +11652,7 @@ macro_rules! SHORTALIGN {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::CValue::<
                                             $crate::__pgrx_c_macros::CInt
-                                        >::new($crate::ALIGNOF_SHORT as i32)
+                                        >::new($crate::__pgrx_c_bindings::ALIGNOF_SHORT as i32)
                                     )
                                 }
                             )
@@ -10724,7 +11675,7 @@ macro_rules! SHORTALIGN {
                 @compiled [
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                            $crate::ALIGNOF_SHORT as i32
+                            $crate::__pgrx_c_bindings::ALIGNOF_SHORT as i32
                         )
                     )
                 ] [compile_error!("a C literal or constant is not an object place")] [
@@ -10742,7 +11693,7 @@ macro_rules! SHORTALIGN {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::CValue::<
                                             $crate::__pgrx_c_macros::CInt
-                                        >::new($crate::ALIGNOF_SHORT as i32)
+                                        >::new($crate::__pgrx_c_bindings::ALIGNOF_SHORT as i32)
                                     )
                                 }
                             )
@@ -10764,8 +11715,8 @@ macro_rules! SHORTALIGN {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -10792,20 +11743,24 @@ macro_rules! __pgrx_c_args_SHORTALIGN_DOWN {
         $crate::__pgrx_c_args_SHORTALIGN_DOWN!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_SHORTALIGN_DOWN!(@p1 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_SHORTALIGN_DOWN!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_SHORTALIGN_DOWN!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_SHORTALIGN_DOWN!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SHORTALIGN_DOWN!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SHORTALIGN_DOWN!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -10813,7 +11768,9 @@ macro_rules! __pgrx_c_args_SHORTALIGN_DOWN {
         $crate::__pgrx_c_args_SHORTALIGN_DOWN!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_SHORTALIGN_DOWN!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_SHORTALIGN_DOWN!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -10835,14 +11792,18 @@ macro_rules! __pgrx_c_args_SHORTALIGN_DOWN {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_SHORTALIGN_DOWN!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_SHORTALIGN_DOWN!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_SHORTALIGN_DOWN!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_SHORTALIGN_DOWN!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_SHORTALIGN_DOWN!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -10869,13 +11830,13 @@ macro_rules! __pgrx_c_args_SHORTALIGN_DOWN {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SHORTALIGN_DOWN!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SHORTALIGN_DOWN!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -10886,7 +11847,7 @@ macro_rules! __pgrx_c_args_SHORTALIGN_DOWN {
         compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
-/// C macro SHORTALIGN_DOWN from c.h:904
+/// C macro SHORTALIGN_DOWN from c.h:911
 ///
 /// ```text
 /// #define SHORTALIGN_DOWN( LEN ) TYPEALIGN_DOWN ( ALIGNOF_SHORT , ( LEN ) )
@@ -10924,7 +11885,7 @@ macro_rules! SHORTALIGN_DOWN {
                 @compiled [
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                            $crate::ALIGNOF_SHORT as i32
+                            $crate::__pgrx_c_bindings::ALIGNOF_SHORT as i32
                         )
                     )
                 ] [compile_error!("a C literal or constant is not an object place")] [
@@ -10942,7 +11903,7 @@ macro_rules! SHORTALIGN_DOWN {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::CValue::<
                                             $crate::__pgrx_c_macros::CInt
-                                        >::new($crate::ALIGNOF_SHORT as i32)
+                                        >::new($crate::__pgrx_c_bindings::ALIGNOF_SHORT as i32)
                                     )
                                 }
                             )
@@ -10965,7 +11926,7 @@ macro_rules! SHORTALIGN_DOWN {
                 @compiled [
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                            $crate::ALIGNOF_SHORT as i32
+                            $crate::__pgrx_c_bindings::ALIGNOF_SHORT as i32
                         )
                     )
                 ] [compile_error!("a C literal or constant is not an object place")] [
@@ -10983,7 +11944,7 @@ macro_rules! SHORTALIGN_DOWN {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::CValue::<
                                             $crate::__pgrx_c_macros::CInt
-                                        >::new($crate::ALIGNOF_SHORT as i32)
+                                        >::new($crate::__pgrx_c_bindings::ALIGNOF_SHORT as i32)
                                     )
                                 }
                             )
@@ -11006,7 +11967,7 @@ macro_rules! SHORTALIGN_DOWN {
                 @compiled [
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                            $crate::ALIGNOF_SHORT as i32
+                            $crate::__pgrx_c_bindings::ALIGNOF_SHORT as i32
                         )
                     )
                 ] [compile_error!("a C literal or constant is not an object place")] [
@@ -11024,7 +11985,7 @@ macro_rules! SHORTALIGN_DOWN {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::CValue::<
                                             $crate::__pgrx_c_macros::CInt
-                                        >::new($crate::ALIGNOF_SHORT as i32)
+                                        >::new($crate::__pgrx_c_bindings::ALIGNOF_SHORT as i32)
                                     )
                                 }
                             )
@@ -11047,7 +12008,7 @@ macro_rules! SHORTALIGN_DOWN {
                 @compiled [
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                            $crate::ALIGNOF_SHORT as i32
+                            $crate::__pgrx_c_bindings::ALIGNOF_SHORT as i32
                         )
                     )
                 ] [compile_error!("a C literal or constant is not an object place")] [
@@ -11065,7 +12026,7 @@ macro_rules! SHORTALIGN_DOWN {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::CValue::<
                                             $crate::__pgrx_c_macros::CInt
-                                        >::new($crate::ALIGNOF_SHORT as i32)
+                                        >::new($crate::__pgrx_c_bindings::ALIGNOF_SHORT as i32)
                                     )
                                 }
                             )
@@ -11088,7 +12049,7 @@ macro_rules! SHORTALIGN_DOWN {
                 @compiled [
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                            $crate::ALIGNOF_SHORT as i32
+                            $crate::__pgrx_c_bindings::ALIGNOF_SHORT as i32
                         )
                     )
                 ] [compile_error!("a C literal or constant is not an object place")] [
@@ -11106,7 +12067,7 @@ macro_rules! SHORTALIGN_DOWN {
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::CValue::<
                                             $crate::__pgrx_c_macros::CInt
-                                        >::new($crate::ALIGNOF_SHORT as i32)
+                                        >::new($crate::__pgrx_c_bindings::ALIGNOF_SHORT as i32)
                                     )
                                 }
                             )
@@ -11128,8 +12089,8 @@ macro_rules! SHORTALIGN_DOWN {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -11157,13 +12118,13 @@ macro_rules! __pgrx_c_args_SQL_STR_DOUBLE {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SQL_STR_DOUBLE!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SQL_STR_DOUBLE!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -11172,7 +12133,7 @@ macro_rules! __pgrx_c_args_SQL_STR_DOUBLE {
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_SQL_STR_DOUBLE!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -11199,31 +12160,35 @@ macro_rules! __pgrx_c_args_SQL_STR_DOUBLE {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SQL_STR_DOUBLE!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SQL_STR_DOUBLE!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_SQL_STR_DOUBLE!(@p2 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_SQL_STR_DOUBLE!(
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative1 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_SQL_STR_DOUBLE!(@p2 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_SQL_STR_DOUBLE!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SQL_STR_DOUBLE!(
-            @p2 $mode [$($done)* (@literal [- $argument]),];
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SQL_STR_DOUBLE!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -11231,7 +12196,9 @@ macro_rules! __pgrx_c_args_SQL_STR_DOUBLE {
         $crate::__pgrx_c_args_SQL_STR_DOUBLE!(@negative1 $mode [$($done)*]; - $($raw)*)
     };
     (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_SQL_STR_DOUBLE!(@p2 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_SQL_STR_DOUBLE!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -11253,14 +12220,18 @@ macro_rules! __pgrx_c_args_SQL_STR_DOUBLE {
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_SQL_STR_DOUBLE!(@p2 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_SQL_STR_DOUBLE!(
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_SQL_STR_DOUBLE!(@p2 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_SQL_STR_DOUBLE!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_SQL_STR_DOUBLE!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -11287,13 +12258,13 @@ macro_rules! __pgrx_c_args_SQL_STR_DOUBLE {
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SQL_STR_DOUBLE!(
-            @p2 $mode [$($done)* (@literal [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_SQL_STR_DOUBLE!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -11304,7 +12275,7 @@ macro_rules! __pgrx_c_args_SQL_STR_DOUBLE {
         compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
-/// C macro SQL_STR_DOUBLE from c.h:1255
+/// C macro SQL_STR_DOUBLE from c.h:1262
 ///
 /// ```text
 /// #define SQL_STR_DOUBLE( ch , escape_backslash ) ( ( ch ) == '\'' || ( ( ch ) == '\\' && ( escape_backslash ) ) )
@@ -11609,8 +12580,8 @@ macro_rules! SQL_STR_DOUBLE {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -11637,16 +12608,25 @@ macro_rules! __pgrx_c_args_TYPEALIGN {
         $crate::__pgrx_c_args_TYPEALIGN!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_TYPEALIGN!(@p1 $mode [$($done)* (@literal [- $argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_TYPEALIGN!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+            $($rest)*
+        )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_TYPEALIGN!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_TYPEALIGN!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $($raw:tt)*) => {
         $crate::__pgrx_c_args_TYPEALIGN!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
-        $crate::__pgrx_c_args_TYPEALIGN!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_TYPEALIGN!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
         $crate::__pgrx_c_classify!(
@@ -11668,28 +12648,46 @@ macro_rules! __pgrx_c_args_TYPEALIGN {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_TYPEALIGN!(@p1 $mode [$($done)* (@literal [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_TYPEALIGN!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+            $($rest)*
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_TYPEALIGN!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_TYPEALIGN!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_TYPEALIGN!(@p2 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_TYPEALIGN!(
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative1 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_TYPEALIGN!(@p2 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_TYPEALIGN!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_TYPEALIGN!(@p2 $mode [$($done)* (@literal [- $argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_TYPEALIGN!(
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+            $($rest)*
+        )
     };
     (@negative1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_TYPEALIGN!(@p2 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_TYPEALIGN!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $($raw:tt)*) => {
         $crate::__pgrx_c_args_TYPEALIGN!(@negative1 $mode [$($done)*]; - $($raw)*)
     };
     (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_TYPEALIGN!(@p2 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_TYPEALIGN!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -11711,13 +12709,20 @@ macro_rules! __pgrx_c_args_TYPEALIGN {
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_TYPEALIGN!(@p2 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_TYPEALIGN!(
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_TYPEALIGN!(@p2 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_TYPEALIGN!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
-        $crate::__pgrx_c_args_TYPEALIGN!(@p2 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_TYPEALIGN!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
         $crate::__pgrx_c_classify!(
@@ -11739,10 +12744,16 @@ macro_rules! __pgrx_c_args_TYPEALIGN {
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_TYPEALIGN!(@p2 $mode [$($done)* (@literal [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_TYPEALIGN!(
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+            $($rest)*
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_TYPEALIGN!(@p2 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_TYPEALIGN!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p2 $mode:ident [$($done:tt)*];) => {
         $crate::TYPEALIGN!(@$mode; $($done)*)
@@ -11751,7 +12762,7 @@ macro_rules! __pgrx_c_args_TYPEALIGN {
         compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
-/// C macro TYPEALIGN from c.h:889
+/// C macro TYPEALIGN from c.h:896
 ///
 /// ```text
 /// #define TYPEALIGN( ALIGNVAL , LEN ) ( ( ( uintptr_t ) ( LEN ) + ( ( ALIGNVAL ) - 1 ) ) & ~ ( ( uintptr_t ) ( ( ALIGNVAL ) - 1 ) ) )
@@ -12159,8 +13170,8 @@ macro_rules! TYPEALIGN {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -12188,18 +13199,24 @@ macro_rules! __pgrx_c_args_TYPEALIGN64 {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_TYPEALIGN64!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_TYPEALIGN64!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_TYPEALIGN64!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $($raw:tt)*) => {
         $crate::__pgrx_c_args_TYPEALIGN64!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
-        $crate::__pgrx_c_args_TYPEALIGN64!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_TYPEALIGN64!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
         $crate::__pgrx_c_classify!(
@@ -12221,31 +13238,46 @@ macro_rules! __pgrx_c_args_TYPEALIGN64 {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_TYPEALIGN64!(@p1 $mode [$($done)* (@literal [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_TYPEALIGN64!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+            $($rest)*
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_TYPEALIGN64!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_TYPEALIGN64!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_TYPEALIGN64!(@p2 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_TYPEALIGN64!(
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative1 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_TYPEALIGN64!(@p2 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_TYPEALIGN64!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_TYPEALIGN64!(
-            @p2 $mode [$($done)* (@literal [- $argument]),];
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_TYPEALIGN64!(@p2 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_TYPEALIGN64!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $($raw:tt)*) => {
         $crate::__pgrx_c_args_TYPEALIGN64!(@negative1 $mode [$($done)*]; - $($raw)*)
     };
     (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_TYPEALIGN64!(@p2 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_TYPEALIGN64!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -12267,13 +13299,20 @@ macro_rules! __pgrx_c_args_TYPEALIGN64 {
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_TYPEALIGN64!(@p2 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_TYPEALIGN64!(
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_TYPEALIGN64!(@p2 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_TYPEALIGN64!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
-        $crate::__pgrx_c_args_TYPEALIGN64!(@p2 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_TYPEALIGN64!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
         $crate::__pgrx_c_classify!(
@@ -12295,10 +13334,16 @@ macro_rules! __pgrx_c_args_TYPEALIGN64 {
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_TYPEALIGN64!(@p2 $mode [$($done)* (@literal [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_TYPEALIGN64!(
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+            $($rest)*
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_TYPEALIGN64!(@p2 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_TYPEALIGN64!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p2 $mode:ident [$($done:tt)*];) => {
         $crate::TYPEALIGN64!(@$mode; $($done)*)
@@ -12307,7 +13352,7 @@ macro_rules! __pgrx_c_args_TYPEALIGN64 {
         compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
-/// C macro TYPEALIGN64 from c.h:917
+/// C macro TYPEALIGN64 from c.h:924
 ///
 /// ```text
 /// #define TYPEALIGN64( ALIGNVAL , LEN ) ( ( ( uint64 ) ( LEN ) + ( ( ALIGNVAL ) - 1 ) ) & ~ ( ( uint64 ) ( ( ALIGNVAL ) - 1 ) ) )
@@ -12352,8 +13397,8 @@ macro_rules! TYPEALIGN64 {
                             >(
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::cast_as::<
-                                        $crate::uint64,
-                                        $crate::__pgrx_c_macros::CUnsignedLongLong,
+                                        $crate::__pgrx_c_bindings::uint64,
+                                        $crate::__pgrx_c_macros::CUnsignedLong,
                                         _
                                     >(
                                         (
@@ -12401,8 +13446,8 @@ macro_rules! TYPEALIGN64 {
                             (
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::cast_as::<
-                                        $crate::uint64,
-                                        $crate::__pgrx_c_macros::CUnsignedLongLong,
+                                        $crate::__pgrx_c_bindings::uint64,
+                                        $crate::__pgrx_c_macros::CUnsignedLong,
                                         _
                                     >(
                                         (
@@ -12486,8 +13531,8 @@ macro_rules! TYPEALIGN64 {
                                                 _
                                             >(
                                                 $crate::__pgrx_c_macros::expression::cast_as::<
-                                                    $crate::uint64,
-                                                    $crate::__pgrx_c_macros::CUnsignedLongLong,
+                                                    $crate::__pgrx_c_bindings::uint64,
+                                                    $crate::__pgrx_c_macros::CUnsignedLong,
                                                     _
                                                 >(
                                                     (
@@ -12546,8 +13591,8 @@ macro_rules! TYPEALIGN64 {
                                                 _
                                             >(
                                                 $crate::__pgrx_c_macros::expression::cast_as::<
-                                                    $crate::uint64,
-                                                    $crate::__pgrx_c_macros::CUnsignedLongLong,
+                                                    $crate::__pgrx_c_bindings::uint64,
+                                                    $crate::__pgrx_c_macros::CUnsignedLong,
                                                     _
                                                 >(
                                                     (
@@ -12612,8 +13657,8 @@ macro_rules! TYPEALIGN64 {
                             >(
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::cast_as::<
-                                        $crate::uint64,
-                                        $crate::__pgrx_c_macros::CUnsignedLongLong,
+                                        $crate::__pgrx_c_bindings::uint64,
+                                        $crate::__pgrx_c_macros::CUnsignedLong,
                                         _
                                     >(
                                         (
@@ -12661,8 +13706,8 @@ macro_rules! TYPEALIGN64 {
                             (
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::cast_as::<
-                                        $crate::uint64,
-                                        $crate::__pgrx_c_macros::CUnsignedLongLong,
+                                        $crate::__pgrx_c_bindings::uint64,
+                                        $crate::__pgrx_c_macros::CUnsignedLong,
                                         _
                                     >(
                                         (
@@ -12715,8 +13760,8 @@ macro_rules! TYPEALIGN64 {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -12744,13 +13789,13 @@ macro_rules! __pgrx_c_args_TYPEALIGN_DOWN {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_TYPEALIGN_DOWN!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_TYPEALIGN_DOWN!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -12759,7 +13804,7 @@ macro_rules! __pgrx_c_args_TYPEALIGN_DOWN {
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_TYPEALIGN_DOWN!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -12786,31 +13831,35 @@ macro_rules! __pgrx_c_args_TYPEALIGN_DOWN {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_TYPEALIGN_DOWN!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_TYPEALIGN_DOWN!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_TYPEALIGN_DOWN!(@p2 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_TYPEALIGN_DOWN!(
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative1 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_TYPEALIGN_DOWN!(@p2 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_TYPEALIGN_DOWN!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_TYPEALIGN_DOWN!(
-            @p2 $mode [$($done)* (@literal [- $argument]),];
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_TYPEALIGN_DOWN!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -12818,7 +13867,9 @@ macro_rules! __pgrx_c_args_TYPEALIGN_DOWN {
         $crate::__pgrx_c_args_TYPEALIGN_DOWN!(@negative1 $mode [$($done)*]; - $($raw)*)
     };
     (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_TYPEALIGN_DOWN!(@p2 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_TYPEALIGN_DOWN!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -12840,14 +13891,18 @@ macro_rules! __pgrx_c_args_TYPEALIGN_DOWN {
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_TYPEALIGN_DOWN!(@p2 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_TYPEALIGN_DOWN!(
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_TYPEALIGN_DOWN!(@p2 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_TYPEALIGN_DOWN!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_TYPEALIGN_DOWN!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -12874,13 +13929,13 @@ macro_rules! __pgrx_c_args_TYPEALIGN_DOWN {
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_TYPEALIGN_DOWN!(
-            @p2 $mode [$($done)* (@literal [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_TYPEALIGN_DOWN!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -12891,7 +13946,7 @@ macro_rules! __pgrx_c_args_TYPEALIGN_DOWN {
         compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
-/// C macro TYPEALIGN_DOWN from c.h:901
+/// C macro TYPEALIGN_DOWN from c.h:908
 ///
 /// ```text
 /// #define TYPEALIGN_DOWN( ALIGNVAL , LEN ) ( ( ( uintptr_t ) ( LEN ) ) & ~ ( ( uintptr_t ) ( ( ALIGNVAL ) - 1 ) ) )
@@ -13175,758 +14230,8 @@ macro_rules! TYPEALIGN_DOWN {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
-    target_pointer_width = "64",
-    target_endian = "little"
-)))]
-#[cfg(not(docsrs))]
-compile_error!("generated C macros require their inspected C target profile");
-const _: () = {
-    use crate::__pgrx_c_macros::CInteger as _;
-    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
-    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
-    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
-    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
-    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
-    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
-    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
-    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
-};
-#[doc(hidden)]
-#[macro_export]
-macro_rules! __pgrx_c_args_dgettext {
-    (@collect $mode:ident [$($done:tt)*]; $($raw:tt)*) => {
-        $crate::__pgrx_c_args_dgettext!(@p0 $mode [$($done)*]; $($raw)*)
-    };
-    (@classified [$next:ident $mode:ident [$($done:tt)*] [$($rest:tt)*]] $descriptor:tt) => {
-        $crate::__pgrx_c_args_dgettext!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
-    };
-    (@p0 $mode:ident [$($done:tt)*]; $($raw:tt)*) => {
-        $crate::__pgrx_c_args_dgettext!(
-            @ignore0 $mode [$($done)*] [
-                @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @
-            ];
-            $($raw)*
-        )
-    };
-    (@ignore0 $mode:ident [$($done:tt)*] $budget:tt; , $($rest:tt)*) => {
-        $crate::__pgrx_c_args_dgettext!(@p1 $mode [$($done)* (@unused),]; $($rest)*)
-    };
-    (@ignore0 $mode:ident [$($done:tt)*] [@ $($budget:tt)*]; $token:tt $($rest:tt)*) => {
-        $crate::__pgrx_c_args_dgettext!(@ignore0 $mode [$($done)*] [$($budget)*]; $($rest)*)
-    };
-    (@ignore0 $mode:ident [$($done:tt)*] []; $($raw:tt)+) => {
-        compile_error!("unused C macro argument exceeds the 64-token normalization bound")
-    };
-    (@p1 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_dgettext!(@p2 $mode [$($done)* (@literal [- $argument]),];)
-    };
-    (@negative1 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_dgettext!(@p2 $mode [$($done)* (@native [$argument]),];)
-    };
-    (@p1 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_dgettext!(@p2 $mode [$($done)* (@literal [- $argument]),]; $($rest)*)
-    };
-    (@negative1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_dgettext!(@p2 $mode [$($done)* (@native [$argument]),]; $($rest)*)
-    };
-    (@p1 $mode:ident [$($done:tt)*]; - $($raw:tt)*) => {
-        $crate::__pgrx_c_args_dgettext!(@negative1 $mode [$($done)*]; - $($raw)*)
-    };
-    (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_dgettext!(@p2 $mode [$($done)* (@native [$argument]),];)
-    };
-    (@p1 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
-        $crate::__pgrx_c_classify!(
-            @argument [__pgrx_c_args_dgettext] [p2 $mode [$($done)*] []] [
-                $head $(::$tail)* ! $group
-            ]
-        )
-    };
-    (@p1 $mode:ident [$($done:tt)*]; ::$head:ident $(::$tail:ident)* ! $group:tt) => {
-        $crate::__pgrx_c_classify!(
-            @argument [__pgrx_c_args_dgettext] [p2 $mode [$($done)*] []] [
-                ::$head $(::$tail)* ! $group
-            ]
-        )
-    };
-    (@p1 $mode:ident [$($done:tt)*]; ($($inner:tt)*)) => {
-        $crate::__pgrx_c_classify!(
-            @argument [__pgrx_c_args_dgettext] [p2 $mode [$($done)*] []] [($($inner)*)]
-        )
-    };
-    (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_dgettext!(@p2 $mode [$($done)* (@literal [$argument]),];)
-    };
-    (@p1 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_dgettext!(@p2 $mode [$($done)* (@native [$argument]),];)
-    };
-    (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
-        $crate::__pgrx_c_args_dgettext!(@p2 $mode [$($done)* (@native [$argument]),]; $($rest)*)
-    };
-    (@p1 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
-        $crate::__pgrx_c_classify!(
-            @argument [__pgrx_c_args_dgettext] [p2 $mode [$($done)*] [$($rest)*]] [
-                $head $(::$tail)* ! $group
-            ]
-        )
-    };
-    (@p1 $mode:ident [$($done:tt)*]; ::$head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
-        $crate::__pgrx_c_classify!(
-            @argument [__pgrx_c_args_dgettext] [p2 $mode [$($done)*] [$($rest)*]] [
-                ::$head $(::$tail)* ! $group
-            ]
-        )
-    };
-    (@p1 $mode:ident [$($done:tt)*]; ($($inner:tt)*), $($rest:tt)*) => {
-        $crate::__pgrx_c_classify!(
-            @argument [__pgrx_c_args_dgettext] [p2 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
-        )
-    };
-    (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_dgettext!(@p2 $mode [$($done)* (@literal [$argument]),]; $($rest)*)
-    };
-    (@p1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_dgettext!(@p2 $mode [$($done)* (@native [$argument]),]; $($rest)*)
-    };
-    (@p2 $mode:ident [$($done:tt)*];) => {
-        $crate::dgettext!(@$mode; $($done)*)
-    };
-    ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
-    };
-}
-/// C macro dgettext from c.h:1272
-///
-/// ```text
-/// #define dgettext( d , x ) ( x )
-/// ```
-///
-///
-/// # Safety
-///
-/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
-#[macro_export]
-macro_rules! dgettext {
-    (@__pgrx_emit_check_safety; $d:tt, $x:tt $(,)?) => {
-        {
-            if false {
-                $crate::__pgrx_c_operand!(@check_safety; $x);
-            }
-        }
-    };
-    (@__pgrx_c_check_safety; $($raw:tt)*) => {
-        $crate::__pgrx_c_args_dgettext!(@collect __pgrx_emit_check_safety []; $($raw)*)
-    };
-    (@__pgrx_emit_public; $d:tt, $x:tt $(,)?) => {
-        $crate::__pgrx_c_macros::expression_result::finish(
-            $crate::dgettext!(@__pgrx_emit_value; $d, $x)
-        )
-    };
-    (@__pgrx_emit_value; $d:tt, $x:tt $(,)?) => {
-        (
-            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                $crate::__pgrx_c_operand!(@value [true]; $x)
-            )
-        )
-    };
-    (@__pgrx_c_value; $($raw:tt)*) => {
-        $crate::__pgrx_c_args_dgettext!(@collect __pgrx_emit_value []; $($raw)*)
-    };
-    (@__pgrx_emit_place; $d:tt, $x:tt $(,)?) => {
-        ($crate::__pgrx_c_operand!(@place; $x))
-    };
-    (@__pgrx_c_place; $($raw:tt)*) => {
-        $crate::__pgrx_c_args_dgettext!(@collect __pgrx_emit_place []; $($raw)*)
-    };
-    (@__pgrx_emit_read_place; $d:tt, $x:tt $(,)?) => {
-        ($crate::__pgrx_c_operand!(@read_place; $x))
-    };
-    (@__pgrx_c_read_place; $($raw:tt)*) => {
-        $crate::__pgrx_c_args_dgettext!(@collect __pgrx_emit_read_place []; $($raw)*)
-    };
-    (@__pgrx_emit_size; $d:tt, $x:tt $(,)?) => {
-        $crate::__pgrx_c_operand!(@size; $x)
-    };
-    (@__pgrx_c_size; $($raw:tt)*) => {
-        $crate::__pgrx_c_args_dgettext!(@collect __pgrx_emit_size []; $($raw)*)
-    };
-    (@__pgrx_emit_discard; $d:tt, $x:tt $(,)?) => {
-        $crate::__pgrx_c_operand!(@discard [true]; $x)
-    };
-    (@__pgrx_c_discard; $($raw:tt)*) => {
-        $crate::__pgrx_c_args_dgettext!(@collect __pgrx_emit_discard []; $($raw)*)
-    };
-    ($($raw:tt)*) => {
-        $crate::__pgrx_c_args_dgettext!(@collect __pgrx_emit_public []; $($raw)*)
-    };
-}
-
-#[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
-    target_pointer_width = "64",
-    target_endian = "little"
-)))]
-#[cfg(not(docsrs))]
-compile_error!("generated C macros require their inspected C target profile");
-const _: () = {
-    use crate::__pgrx_c_macros::CInteger as _;
-    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
-    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
-    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
-    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
-    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
-    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
-    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
-    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
-};
-#[doc(hidden)]
-#[macro_export]
-macro_rules! __pgrx_c_args_dngettext {
-    (@collect $mode:ident [$($done:tt)*]; $($raw:tt)*) => {
-        $crate::__pgrx_c_args_dngettext!(@p0 $mode [$($done)*]; $($raw)*)
-    };
-    (@classified [$next:ident $mode:ident [$($done:tt)*] [$($rest:tt)*]] $descriptor:tt) => {
-        $crate::__pgrx_c_args_dngettext!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
-    };
-    (@p0 $mode:ident [$($done:tt)*]; $($raw:tt)*) => {
-        $crate::__pgrx_c_args_dngettext!(
-            @ignore0 $mode [$($done)*] [
-                @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @
-            ];
-            $($raw)*
-        )
-    };
-    (@ignore0 $mode:ident [$($done:tt)*] $budget:tt; , $($rest:tt)*) => {
-        $crate::__pgrx_c_args_dngettext!(@p1 $mode [$($done)* (@unused),]; $($rest)*)
-    };
-    (@ignore0 $mode:ident [$($done:tt)*] [@ $($budget:tt)*]; $token:tt $($rest:tt)*) => {
-        $crate::__pgrx_c_args_dngettext!(@ignore0 $mode [$($done)*] [$($budget)*]; $($rest)*)
-    };
-    (@ignore0 $mode:ident [$($done:tt)*] []; $($raw:tt)+) => {
-        compile_error!("unused C macro argument exceeds the 64-token normalization bound")
-    };
-    (@p1 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_dngettext!(@p2 $mode [$($done)* (@literal [- $argument]),]; $($rest)*)
-    };
-    (@negative1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_dngettext!(@p2 $mode [$($done)* (@native [$argument]),]; $($rest)*)
-    };
-    (@p1 $mode:ident [$($done:tt)*]; - $($raw:tt)*) => {
-        $crate::__pgrx_c_args_dngettext!(@negative1 $mode [$($done)*]; - $($raw)*)
-    };
-    (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
-        $crate::__pgrx_c_args_dngettext!(@p2 $mode [$($done)* (@native [$argument]),]; $($rest)*)
-    };
-    (@p1 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
-        $crate::__pgrx_c_classify!(
-            @argument [__pgrx_c_args_dngettext] [p2 $mode [$($done)*] [$($rest)*]] [
-                $head $(::$tail)* ! $group
-            ]
-        )
-    };
-    (@p1 $mode:ident [$($done:tt)*]; ::$head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
-        $crate::__pgrx_c_classify!(
-            @argument [__pgrx_c_args_dngettext] [p2 $mode [$($done)*] [$($rest)*]] [
-                ::$head $(::$tail)* ! $group
-            ]
-        )
-    };
-    (@p1 $mode:ident [$($done:tt)*]; ($($inner:tt)*), $($rest:tt)*) => {
-        $crate::__pgrx_c_classify!(
-            @argument [__pgrx_c_args_dngettext] [p2 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
-        )
-    };
-    (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_dngettext!(@p2 $mode [$($done)* (@literal [$argument]),]; $($rest)*)
-    };
-    (@p1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_dngettext!(@p2 $mode [$($done)* (@native [$argument]),]; $($rest)*)
-    };
-    (@p2 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_dngettext!(@p3 $mode [$($done)* (@literal [- $argument]),]; $($rest)*)
-    };
-    (@negative2 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_dngettext!(@p3 $mode [$($done)* (@native [$argument]),]; $($rest)*)
-    };
-    (@p2 $mode:ident [$($done:tt)*]; - $($raw:tt)*) => {
-        $crate::__pgrx_c_args_dngettext!(@negative2 $mode [$($done)*]; - $($raw)*)
-    };
-    (@p2 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
-        $crate::__pgrx_c_args_dngettext!(@p3 $mode [$($done)* (@native [$argument]),]; $($rest)*)
-    };
-    (@p2 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
-        $crate::__pgrx_c_classify!(
-            @argument [__pgrx_c_args_dngettext] [p3 $mode [$($done)*] [$($rest)*]] [
-                $head $(::$tail)* ! $group
-            ]
-        )
-    };
-    (@p2 $mode:ident [$($done:tt)*]; ::$head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
-        $crate::__pgrx_c_classify!(
-            @argument [__pgrx_c_args_dngettext] [p3 $mode [$($done)*] [$($rest)*]] [
-                ::$head $(::$tail)* ! $group
-            ]
-        )
-    };
-    (@p2 $mode:ident [$($done:tt)*]; ($($inner:tt)*), $($rest:tt)*) => {
-        $crate::__pgrx_c_classify!(
-            @argument [__pgrx_c_args_dngettext] [p3 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
-        )
-    };
-    (@p2 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_dngettext!(@p3 $mode [$($done)* (@literal [$argument]),]; $($rest)*)
-    };
-    (@p2 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_dngettext!(@p3 $mode [$($done)* (@native [$argument]),]; $($rest)*)
-    };
-    (@p3 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_dngettext!(@p4 $mode [$($done)* (@literal [- $argument]),];)
-    };
-    (@negative3 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_dngettext!(@p4 $mode [$($done)* (@native [$argument]),];)
-    };
-    (@p3 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_dngettext!(@p4 $mode [$($done)* (@literal [- $argument]),]; $($rest)*)
-    };
-    (@negative3 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_dngettext!(@p4 $mode [$($done)* (@native [$argument]),]; $($rest)*)
-    };
-    (@p3 $mode:ident [$($done:tt)*]; - $($raw:tt)*) => {
-        $crate::__pgrx_c_args_dngettext!(@negative3 $mode [$($done)*]; - $($raw)*)
-    };
-    (@p3 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_dngettext!(@p4 $mode [$($done)* (@native [$argument]),];)
-    };
-    (@p3 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
-        $crate::__pgrx_c_classify!(
-            @argument [__pgrx_c_args_dngettext] [p4 $mode [$($done)*] []] [
-                $head $(::$tail)* ! $group
-            ]
-        )
-    };
-    (@p3 $mode:ident [$($done:tt)*]; ::$head:ident $(::$tail:ident)* ! $group:tt) => {
-        $crate::__pgrx_c_classify!(
-            @argument [__pgrx_c_args_dngettext] [p4 $mode [$($done)*] []] [
-                ::$head $(::$tail)* ! $group
-            ]
-        )
-    };
-    (@p3 $mode:ident [$($done:tt)*]; ($($inner:tt)*)) => {
-        $crate::__pgrx_c_classify!(
-            @argument [__pgrx_c_args_dngettext] [p4 $mode [$($done)*] []] [($($inner)*)]
-        )
-    };
-    (@p3 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_dngettext!(@p4 $mode [$($done)* (@literal [$argument]),];)
-    };
-    (@p3 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_dngettext!(@p4 $mode [$($done)* (@native [$argument]),];)
-    };
-    (@p3 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
-        $crate::__pgrx_c_args_dngettext!(@p4 $mode [$($done)* (@native [$argument]),]; $($rest)*)
-    };
-    (@p3 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
-        $crate::__pgrx_c_classify!(
-            @argument [__pgrx_c_args_dngettext] [p4 $mode [$($done)*] [$($rest)*]] [
-                $head $(::$tail)* ! $group
-            ]
-        )
-    };
-    (@p3 $mode:ident [$($done:tt)*]; ::$head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
-        $crate::__pgrx_c_classify!(
-            @argument [__pgrx_c_args_dngettext] [p4 $mode [$($done)*] [$($rest)*]] [
-                ::$head $(::$tail)* ! $group
-            ]
-        )
-    };
-    (@p3 $mode:ident [$($done:tt)*]; ($($inner:tt)*), $($rest:tt)*) => {
-        $crate::__pgrx_c_classify!(
-            @argument [__pgrx_c_args_dngettext] [p4 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
-        )
-    };
-    (@p3 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_dngettext!(@p4 $mode [$($done)* (@literal [$argument]),]; $($rest)*)
-    };
-    (@p3 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_dngettext!(@p4 $mode [$($done)* (@native [$argument]),]; $($rest)*)
-    };
-    (@p4 $mode:ident [$($done:tt)*];) => {
-        $crate::dngettext!(@$mode; $($done)*)
-    };
-    ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
-    };
-}
-/// C macro dngettext from c.h:1274
-///
-/// ```text
-/// #define dngettext( d , s , p , n ) ( ( n ) == 1 ? ( s ) : ( p ) )
-/// ```
-///
-///
-/// # Safety
-///
-/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
-#[macro_export]
-macro_rules! dngettext {
-    (@__pgrx_emit_check_safety; $d:tt, $s:tt, $p:tt, $n:tt $(,)?) => {
-        {
-            if false {
-                $crate::__pgrx_c_operand!(@check_safety; $s);
-                $crate::__pgrx_c_operand!(@check_safety; $p);
-                $crate::__pgrx_c_operand!(@check_safety; $n);
-            }
-        }
-    };
-    (@__pgrx_c_check_safety; $($raw:tt)*) => {
-        $crate::__pgrx_c_args_dngettext!(@collect __pgrx_emit_check_safety []; $($raw)*)
-    };
-    (@__pgrx_emit_public; $d:tt, $s:tt, $p:tt, $n:tt $(,)?) => {
-        $crate::__pgrx_c_macros::expression_result::finish(
-            $crate::dngettext!(@__pgrx_emit_value; $d, $s, $p, $n)
-        )
-    };
-    (@__pgrx_emit_value; $d:tt, $s:tt, $p:tt, $n:tt $(,)?) => {
-        (
-            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                $crate::__pgrx_c_macros::expression::select(
-                    if $crate::__pgrx_c_macros::expression::truth(
-                        $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                            $crate::__pgrx_c_macros::expression::eq(
-                                (
-                                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                                        $crate::__pgrx_c_operand!(@value [true]; $n)
-                                    )
-                                ),
-                                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                                    $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                        1i32
-                                    )
-                                )
-                            )
-                        )
-                    ) {
-                        $crate::__pgrx_c_macros::Either::Left(
-                            (
-                                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                                    $crate::__pgrx_c_operand!(@value [true]; $s)
-                                )
-                            )
-                        )
-                    } else {
-                        $crate::__pgrx_c_macros::Either::Right(
-                            (
-                                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                                    $crate::__pgrx_c_operand!(@value [true]; $p)
-                                )
-                            )
-                        )
-                    }
-                )
-            )
-        )
-    };
-    (@__pgrx_c_value; $($raw:tt)*) => {
-        $crate::__pgrx_c_args_dngettext!(@collect __pgrx_emit_value []; $($raw)*)
-    };
-    (@__pgrx_emit_place; $d:tt, $s:tt, $p:tt, $n:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
-    };
-    (@__pgrx_c_place; $($raw:tt)*) => {
-        $crate::__pgrx_c_args_dngettext!(@collect __pgrx_emit_place []; $($raw)*)
-    };
-    (@__pgrx_emit_read_place; $d:tt, $s:tt, $p:tt, $n:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
-    };
-    (@__pgrx_c_read_place; $($raw:tt)*) => {
-        $crate::__pgrx_c_args_dngettext!(@collect __pgrx_emit_read_place []; $($raw)*)
-    };
-    (@__pgrx_emit_size; $d:tt, $s:tt, $p:tt, $n:tt $(,)?) => {
-        $crate::__pgrx_c_macros::expression::size_of_value_type(
-            if false {
-                {
-                    if false {
-                        $crate::__pgrx_c_operand!(@check_safety; $s);
-                        $crate::__pgrx_c_operand!(@check_safety; $p);
-                        $crate::__pgrx_c_operand!(@check_safety; $n);
-                    }
-                }
-                Some(
-                    unsafe {
-                        $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                            $crate::__pgrx_c_macros::expression::select(
-                                if $crate::__pgrx_c_macros::expression::truth(
-                                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                                        $crate::__pgrx_c_macros::expression::eq(
-                                            (
-                                                $crate::__pgrx_c_macros::expression::profile_value::<
-                                                    true,
-                                                    _
-                                                >($crate::__pgrx_c_operand!(@value [true]; $n))
-                                            ),
-                                            $crate::__pgrx_c_macros::expression::profile_value::<
-                                                true,
-                                                _
-                                            >(
-                                                $crate::__pgrx_c_macros::CValue::<
-                                                    $crate::__pgrx_c_macros::CInt
-                                                >::new(1i32)
-                                            )
-                                        )
-                                    )
-                                ) {
-                                    $crate::__pgrx_c_macros::Either::Left(
-                                        (
-                                            $crate::__pgrx_c_macros::expression::profile_value::<
-                                                true,
-                                                _
-                                            >($crate::__pgrx_c_operand!(@value [true]; $s))
-                                        )
-                                    )
-                                } else {
-                                    $crate::__pgrx_c_macros::Either::Right(
-                                        (
-                                            $crate::__pgrx_c_macros::expression::profile_value::<
-                                                true,
-                                                _
-                                            >($crate::__pgrx_c_operand!(@value [true]; $p))
-                                        )
-                                    )
-                                }
-                            )
-                        )
-                    }
-                )
-            } else {
-                None
-            }
-        )
-    };
-    (@__pgrx_c_size; $($raw:tt)*) => {
-        $crate::__pgrx_c_args_dngettext!(@collect __pgrx_emit_size []; $($raw)*)
-    };
-    (@__pgrx_emit_discard; $d:tt, $s:tt, $p:tt, $n:tt $(,)?) => {
-        {
-            let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                $crate::__pgrx_c_macros::expression::select(
-                    if $crate::__pgrx_c_macros::expression::truth(
-                        $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                            $crate::__pgrx_c_macros::expression::eq(
-                                (
-                                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                                        $crate::__pgrx_c_operand!(@value [true]; $n)
-                                    )
-                                ),
-                                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                                    $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                        1i32
-                                    )
-                                )
-                            )
-                        )
-                    ) {
-                        $crate::__pgrx_c_macros::Either::Left(
-                            (
-                                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                                    $crate::__pgrx_c_operand!(@value [true]; $s)
-                                )
-                            )
-                        )
-                    } else {
-                        $crate::__pgrx_c_macros::Either::Right(
-                            (
-                                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                                    $crate::__pgrx_c_operand!(@value [true]; $p)
-                                )
-                            )
-                        )
-                    }
-                )
-            );
-        }
-    };
-    (@__pgrx_c_discard; $($raw:tt)*) => {
-        $crate::__pgrx_c_args_dngettext!(@collect __pgrx_emit_discard []; $($raw)*)
-    };
-    ($($raw:tt)*) => {
-        $crate::__pgrx_c_args_dngettext!(@collect __pgrx_emit_public []; $($raw)*)
-    };
-}
-
-#[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
-    target_pointer_width = "64",
-    target_endian = "little"
-)))]
-#[cfg(not(docsrs))]
-compile_error!("generated C macros require their inspected C target profile");
-const _: () = {
-    use crate::__pgrx_c_macros::CInteger as _;
-    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
-    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
-    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
-    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
-    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
-    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
-    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
-    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
-};
-#[doc(hidden)]
-#[macro_export]
-macro_rules! __pgrx_c_args_gettext {
-    (@collect $mode:ident [$($done:tt)*]; $($raw:tt)*) => {
-        $crate::__pgrx_c_args_gettext!(@p0 $mode [$($done)*]; $($raw)*)
-    };
-    (@classified [$next:ident $mode:ident [$($done:tt)*] [$($rest:tt)*]] $descriptor:tt) => {
-        $crate::__pgrx_c_args_gettext!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
-    };
-    (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_gettext!(@p1 $mode [$($done)* (@literal [- $argument]),];)
-    };
-    (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_gettext!(@p1 $mode [$($done)* (@native [$argument]),];)
-    };
-    (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_gettext!(@p1 $mode [$($done)* (@literal [- $argument]),]; $($rest)*)
-    };
-    (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_gettext!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
-    };
-    (@p0 $mode:ident [$($done:tt)*]; - $($raw:tt)*) => {
-        $crate::__pgrx_c_args_gettext!(@negative0 $mode [$($done)*]; - $($raw)*)
-    };
-    (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_gettext!(@p1 $mode [$($done)* (@native [$argument]),];)
-    };
-    (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
-        $crate::__pgrx_c_classify!(
-            @argument [__pgrx_c_args_gettext] [p1 $mode [$($done)*] []] [$head $(::$tail)* ! $group]
-        )
-    };
-    (@p0 $mode:ident [$($done:tt)*]; ::$head:ident $(::$tail:ident)* ! $group:tt) => {
-        $crate::__pgrx_c_classify!(
-            @argument [__pgrx_c_args_gettext] [p1 $mode [$($done)*] []] [
-                ::$head $(::$tail)* ! $group
-            ]
-        )
-    };
-    (@p0 $mode:ident [$($done:tt)*]; ($($inner:tt)*)) => {
-        $crate::__pgrx_c_classify!(
-            @argument [__pgrx_c_args_gettext] [p1 $mode [$($done)*] []] [($($inner)*)]
-        )
-    };
-    (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_gettext!(@p1 $mode [$($done)* (@literal [$argument]),];)
-    };
-    (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_gettext!(@p1 $mode [$($done)* (@native [$argument]),];)
-    };
-    (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
-        $crate::__pgrx_c_args_gettext!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
-    };
-    (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
-        $crate::__pgrx_c_classify!(
-            @argument [__pgrx_c_args_gettext] [p1 $mode [$($done)*] [$($rest)*]] [
-                $head $(::$tail)* ! $group
-            ]
-        )
-    };
-    (@p0 $mode:ident [$($done:tt)*]; ::$head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
-        $crate::__pgrx_c_classify!(
-            @argument [__pgrx_c_args_gettext] [p1 $mode [$($done)*] [$($rest)*]] [
-                ::$head $(::$tail)* ! $group
-            ]
-        )
-    };
-    (@p0 $mode:ident [$($done:tt)*]; ($($inner:tt)*), $($rest:tt)*) => {
-        $crate::__pgrx_c_classify!(
-            @argument [__pgrx_c_args_gettext] [p1 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
-        )
-    };
-    (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_gettext!(@p1 $mode [$($done)* (@literal [$argument]),]; $($rest)*)
-    };
-    (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_gettext!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
-    };
-    (@p1 $mode:ident [$($done:tt)*];) => {
-        $crate::gettext!(@$mode; $($done)*)
-    };
-    ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
-    };
-}
-/// C macro gettext from c.h:1271
-///
-/// ```text
-/// #define gettext( x ) ( x )
-/// ```
-///
-///
-/// # Safety
-///
-/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
-#[macro_export]
-macro_rules! gettext {
-    (@__pgrx_emit_check_safety; $x:tt $(,)?) => {
-        {
-            if false {
-                $crate::__pgrx_c_operand!(@check_safety; $x);
-            }
-        }
-    };
-    (@__pgrx_c_check_safety; $($raw:tt)*) => {
-        $crate::__pgrx_c_args_gettext!(@collect __pgrx_emit_check_safety []; $($raw)*)
-    };
-    (@__pgrx_emit_public; $x:tt $(,)?) => {
-        $crate::__pgrx_c_macros::expression_result::finish($crate::gettext!(@__pgrx_emit_value; $x))
-    };
-    (@__pgrx_emit_value; $x:tt $(,)?) => {
-        (
-            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                $crate::__pgrx_c_operand!(@value [true]; $x)
-            )
-        )
-    };
-    (@__pgrx_c_value; $($raw:tt)*) => {
-        $crate::__pgrx_c_args_gettext!(@collect __pgrx_emit_value []; $($raw)*)
-    };
-    (@__pgrx_emit_place; $x:tt $(,)?) => {
-        ($crate::__pgrx_c_operand!(@place; $x))
-    };
-    (@__pgrx_c_place; $($raw:tt)*) => {
-        $crate::__pgrx_c_args_gettext!(@collect __pgrx_emit_place []; $($raw)*)
-    };
-    (@__pgrx_emit_read_place; $x:tt $(,)?) => {
-        ($crate::__pgrx_c_operand!(@read_place; $x))
-    };
-    (@__pgrx_c_read_place; $($raw:tt)*) => {
-        $crate::__pgrx_c_args_gettext!(@collect __pgrx_emit_read_place []; $($raw)*)
-    };
-    (@__pgrx_emit_size; $x:tt $(,)?) => {
-        $crate::__pgrx_c_operand!(@size; $x)
-    };
-    (@__pgrx_c_size; $($raw:tt)*) => {
-        $crate::__pgrx_c_args_gettext!(@collect __pgrx_emit_size []; $($raw)*)
-    };
-    (@__pgrx_emit_discard; $x:tt $(,)?) => {
-        $crate::__pgrx_c_operand!(@discard [true]; $x)
-    };
-    (@__pgrx_c_discard; $($raw:tt)*) => {
-        $crate::__pgrx_c_args_gettext!(@collect __pgrx_emit_discard []; $($raw)*)
-    };
-    ($($raw:tt)*) => {
-        $crate::__pgrx_c_args_gettext!(@collect __pgrx_emit_public []; $($raw)*)
-    };
-}
-
-#[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -13953,25 +14258,34 @@ macro_rules! __pgrx_c_args_gettext_noop {
         $crate::__pgrx_c_args_gettext_noop!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_gettext_noop!(@p1 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_gettext_noop!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_gettext_noop!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_gettext_noop!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_gettext_noop!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_gettext_noop!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_gettext_noop!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $($raw:tt)*) => {
         $crate::__pgrx_c_args_gettext_noop!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_gettext_noop!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_gettext_noop!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -13993,13 +14307,20 @@ macro_rules! __pgrx_c_args_gettext_noop {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_gettext_noop!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_gettext_noop!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_gettext_noop!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_gettext_noop!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
-        $crate::__pgrx_c_args_gettext_noop!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_gettext_noop!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
         $crate::__pgrx_c_classify!(
@@ -14022,12 +14343,15 @@ macro_rules! __pgrx_c_args_gettext_noop {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_gettext_noop!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_gettext_noop!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_gettext_noop!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p1 $mode:ident [$($done:tt)*];) => {
         $crate::gettext_noop!(@$mode; $($done)*)
@@ -14036,7 +14360,7 @@ macro_rules! __pgrx_c_args_gettext_noop {
         compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
-/// C macro gettext_noop from c.h:1288
+/// C macro gettext_noop from c.h:1295
 ///
 /// ```text
 /// #define gettext_noop( x ) ( x )
@@ -14103,8 +14427,8 @@ macro_rules! gettext_noop {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -14131,22 +14455,34 @@ macro_rules! __pgrx_c_args_i64abs {
         $crate::__pgrx_c_args_i64abs!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_i64abs!(@p1 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_i64abs!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_i64abs!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_i64abs!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_i64abs!(@p1 $mode [$($done)* (@literal [- $argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_i64abs!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+            $($rest)*
+        )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_i64abs!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_i64abs!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $($raw:tt)*) => {
         $crate::__pgrx_c_args_i64abs!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_i64abs!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_i64abs!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -14166,13 +14502,20 @@ macro_rules! __pgrx_c_args_i64abs {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_i64abs!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_i64abs!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_i64abs!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_i64abs!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
-        $crate::__pgrx_c_args_i64abs!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_i64abs!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
         $crate::__pgrx_c_classify!(
@@ -14194,10 +14537,16 @@ macro_rules! __pgrx_c_args_i64abs {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_i64abs!(@p1 $mode [$($done)* (@literal [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_i64abs!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+            $($rest)*
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_i64abs!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_i64abs!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p1 $mode:ident [$($done:tt)*];) => {
         $crate::i64abs!(@$mode; $($done)*)
@@ -14206,7 +14555,7 @@ macro_rules! __pgrx_c_args_i64abs {
         compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
-/// C macro i64abs from c.h:1411
+/// C macro i64abs from c.h:1430
 ///
 /// ```text
 /// #define i64abs( i ) ( ( int64 ) labs ( i ) )
@@ -14239,15 +14588,15 @@ macro_rules! i64abs {
         (
             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::cast_as::<
-                    $crate::int64,
-                    $crate::__pgrx_c_macros::CLongLong,
+                    $crate::__pgrx_c_bindings::int64,
+                    $crate::__pgrx_c_macros::CLong,
                     _
                 >(
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         <
                             $crate::__pgrx_c_macros::CLong as $crate::__pgrx_c_macros::expression::CType
                         >::from_storage(
-                            $crate::__pgrx_c_generated::Inline_60080af74795b80d4641fb5f1f82478b(
+                            $crate::__pgrx_c_generated::Inline_3638850d6b632824bb6d5c597268e128(
                                 <
                                     $crate::__pgrx_c_macros::CLong as $crate::__pgrx_c_macros::expression::CType
                                 >::into_storage(
@@ -14295,15 +14644,15 @@ macro_rules! i64abs {
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::cast_as::<
-                                $crate::int64,
-                                $crate::__pgrx_c_macros::CLongLong,
+                                $crate::__pgrx_c_bindings::int64,
+                                $crate::__pgrx_c_macros::CLong,
                                 _
                             >(
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     <
                                         $crate::__pgrx_c_macros::CLong as $crate::__pgrx_c_macros::expression::CType
                                     >::from_storage(
-                                        $crate::__pgrx_c_generated::Inline_60080af74795b80d4641fb5f1f82478b(
+                                        $crate::__pgrx_c_generated::Inline_3638850d6b632824bb6d5c597268e128(
                                             <
                                                 $crate::__pgrx_c_macros::CLong as $crate::__pgrx_c_macros::expression::CType
                                             >::into_storage(
@@ -14336,15 +14685,15 @@ macro_rules! i64abs {
         {
             let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::cast_as::<
-                    $crate::int64,
-                    $crate::__pgrx_c_macros::CLongLong,
+                    $crate::__pgrx_c_bindings::int64,
+                    $crate::__pgrx_c_macros::CLong,
                     _
                 >(
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         <
                             $crate::__pgrx_c_macros::CLong as $crate::__pgrx_c_macros::expression::CType
                         >::from_storage(
-                            $crate::__pgrx_c_generated::Inline_60080af74795b80d4641fb5f1f82478b(
+                            $crate::__pgrx_c_generated::Inline_3638850d6b632824bb6d5c597268e128(
                                 <
                                     $crate::__pgrx_c_macros::CLong as $crate::__pgrx_c_macros::expression::CType
                                 >::into_storage(
@@ -14374,8 +14723,8 @@ macro_rules! i64abs {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -14402,22 +14751,34 @@ macro_rules! __pgrx_c_args_lengthof {
         $crate::__pgrx_c_args_lengthof!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_lengthof!(@p1 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_lengthof!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_lengthof!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_lengthof!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_lengthof!(@p1 $mode [$($done)* (@literal [- $argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_lengthof!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+            $($rest)*
+        )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_lengthof!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_lengthof!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $($raw:tt)*) => {
         $crate::__pgrx_c_args_lengthof!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_lengthof!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_lengthof!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -14439,13 +14800,20 @@ macro_rules! __pgrx_c_args_lengthof {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_lengthof!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_lengthof!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_lengthof!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_lengthof!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
-        $crate::__pgrx_c_args_lengthof!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_lengthof!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
         $crate::__pgrx_c_classify!(
@@ -14467,10 +14835,16 @@ macro_rules! __pgrx_c_args_lengthof {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_lengthof!(@p1 $mode [$($done)* (@literal [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_lengthof!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+            $($rest)*
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_lengthof!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_lengthof!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p1 $mode:ident [$($done:tt)*];) => {
         $crate::lengthof!(@$mode; $($done)*)
@@ -14479,7 +14853,7 @@ macro_rules! __pgrx_c_args_lengthof {
         compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
-/// C macro lengthof from c.h:873
+/// C macro lengthof from c.h:880
 ///
 /// ```text
 /// #define lengthof( array ) ( sizeof ( array ) / sizeof ( ( array ) [ 0 ] ) )
@@ -14693,8 +15067,8 @@ macro_rules! lengthof {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -14721,22 +15095,34 @@ macro_rules! __pgrx_c_args_likely {
         $crate::__pgrx_c_args_likely!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_likely!(@p1 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_likely!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_likely!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_likely!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_likely!(@p1 $mode [$($done)* (@literal [- $argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_likely!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+            $($rest)*
+        )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_likely!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_likely!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $($raw:tt)*) => {
         $crate::__pgrx_c_args_likely!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_likely!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_likely!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -14756,13 +15142,20 @@ macro_rules! __pgrx_c_args_likely {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_likely!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_likely!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_likely!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_likely!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
-        $crate::__pgrx_c_args_likely!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_likely!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
         $crate::__pgrx_c_classify!(
@@ -14784,10 +15177,16 @@ macro_rules! __pgrx_c_args_likely {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_likely!(@p1 $mode [$($done)* (@literal [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_likely!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+            $($rest)*
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_likely!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_likely!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p1 $mode:ident [$($done:tt)*];) => {
         $crate::likely!(@$mode; $($done)*)
@@ -14796,7 +15195,7 @@ macro_rules! __pgrx_c_args_likely {
         compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
-/// C macro likely from c.h:434
+/// C macro likely from c.h:441
 ///
 /// ```text
 /// #define likely( x ) __builtin_expect ( ( x ) != 0 , 1 )
@@ -15029,497 +15428,8 @@ macro_rules! likely {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
-    target_pointer_width = "64",
-    target_endian = "little"
-)))]
-#[cfg(not(docsrs))]
-compile_error!("generated C macros require their inspected C target profile");
-const _: () = {
-    use crate::__pgrx_c_macros::CInteger as _;
-    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
-    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
-    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
-    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
-    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
-    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
-    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
-    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
-};
-#[doc(hidden)]
-#[macro_export]
-macro_rules! __pgrx_c_args_ngettext {
-    (@collect $mode:ident [$($done:tt)*]; $($raw:tt)*) => {
-        $crate::__pgrx_c_args_ngettext!(@p0 $mode [$($done)*]; $($raw)*)
-    };
-    (@classified [$next:ident $mode:ident [$($done:tt)*] [$($rest:tt)*]] $descriptor:tt) => {
-        $crate::__pgrx_c_args_ngettext!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
-    };
-    (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_ngettext!(@p1 $mode [$($done)* (@literal [- $argument]),]; $($rest)*)
-    };
-    (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_ngettext!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
-    };
-    (@p0 $mode:ident [$($done:tt)*]; - $($raw:tt)*) => {
-        $crate::__pgrx_c_args_ngettext!(@negative0 $mode [$($done)*]; - $($raw)*)
-    };
-    (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
-        $crate::__pgrx_c_args_ngettext!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
-    };
-    (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
-        $crate::__pgrx_c_classify!(
-            @argument [__pgrx_c_args_ngettext] [p1 $mode [$($done)*] [$($rest)*]] [
-                $head $(::$tail)* ! $group
-            ]
-        )
-    };
-    (@p0 $mode:ident [$($done:tt)*]; ::$head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
-        $crate::__pgrx_c_classify!(
-            @argument [__pgrx_c_args_ngettext] [p1 $mode [$($done)*] [$($rest)*]] [
-                ::$head $(::$tail)* ! $group
-            ]
-        )
-    };
-    (@p0 $mode:ident [$($done:tt)*]; ($($inner:tt)*), $($rest:tt)*) => {
-        $crate::__pgrx_c_classify!(
-            @argument [__pgrx_c_args_ngettext] [p1 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
-        )
-    };
-    (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_ngettext!(@p1 $mode [$($done)* (@literal [$argument]),]; $($rest)*)
-    };
-    (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_ngettext!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
-    };
-    (@p1 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_ngettext!(@p2 $mode [$($done)* (@literal [- $argument]),]; $($rest)*)
-    };
-    (@negative1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_ngettext!(@p2 $mode [$($done)* (@native [$argument]),]; $($rest)*)
-    };
-    (@p1 $mode:ident [$($done:tt)*]; - $($raw:tt)*) => {
-        $crate::__pgrx_c_args_ngettext!(@negative1 $mode [$($done)*]; - $($raw)*)
-    };
-    (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
-        $crate::__pgrx_c_args_ngettext!(@p2 $mode [$($done)* (@native [$argument]),]; $($rest)*)
-    };
-    (@p1 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
-        $crate::__pgrx_c_classify!(
-            @argument [__pgrx_c_args_ngettext] [p2 $mode [$($done)*] [$($rest)*]] [
-                $head $(::$tail)* ! $group
-            ]
-        )
-    };
-    (@p1 $mode:ident [$($done:tt)*]; ::$head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
-        $crate::__pgrx_c_classify!(
-            @argument [__pgrx_c_args_ngettext] [p2 $mode [$($done)*] [$($rest)*]] [
-                ::$head $(::$tail)* ! $group
-            ]
-        )
-    };
-    (@p1 $mode:ident [$($done:tt)*]; ($($inner:tt)*), $($rest:tt)*) => {
-        $crate::__pgrx_c_classify!(
-            @argument [__pgrx_c_args_ngettext] [p2 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
-        )
-    };
-    (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_ngettext!(@p2 $mode [$($done)* (@literal [$argument]),]; $($rest)*)
-    };
-    (@p1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_ngettext!(@p2 $mode [$($done)* (@native [$argument]),]; $($rest)*)
-    };
-    (@p2 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_ngettext!(@p3 $mode [$($done)* (@literal [- $argument]),];)
-    };
-    (@negative2 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_ngettext!(@p3 $mode [$($done)* (@native [$argument]),];)
-    };
-    (@p2 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_ngettext!(@p3 $mode [$($done)* (@literal [- $argument]),]; $($rest)*)
-    };
-    (@negative2 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_ngettext!(@p3 $mode [$($done)* (@native [$argument]),]; $($rest)*)
-    };
-    (@p2 $mode:ident [$($done:tt)*]; - $($raw:tt)*) => {
-        $crate::__pgrx_c_args_ngettext!(@negative2 $mode [$($done)*]; - $($raw)*)
-    };
-    (@p2 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_ngettext!(@p3 $mode [$($done)* (@native [$argument]),];)
-    };
-    (@p2 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
-        $crate::__pgrx_c_classify!(
-            @argument [__pgrx_c_args_ngettext] [p3 $mode [$($done)*] []] [
-                $head $(::$tail)* ! $group
-            ]
-        )
-    };
-    (@p2 $mode:ident [$($done:tt)*]; ::$head:ident $(::$tail:ident)* ! $group:tt) => {
-        $crate::__pgrx_c_classify!(
-            @argument [__pgrx_c_args_ngettext] [p3 $mode [$($done)*] []] [
-                ::$head $(::$tail)* ! $group
-            ]
-        )
-    };
-    (@p2 $mode:ident [$($done:tt)*]; ($($inner:tt)*)) => {
-        $crate::__pgrx_c_classify!(
-            @argument [__pgrx_c_args_ngettext] [p3 $mode [$($done)*] []] [($($inner)*)]
-        )
-    };
-    (@p2 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_ngettext!(@p3 $mode [$($done)* (@literal [$argument]),];)
-    };
-    (@p2 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_ngettext!(@p3 $mode [$($done)* (@native [$argument]),];)
-    };
-    (@p2 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
-        $crate::__pgrx_c_args_ngettext!(@p3 $mode [$($done)* (@native [$argument]),]; $($rest)*)
-    };
-    (@p2 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
-        $crate::__pgrx_c_classify!(
-            @argument [__pgrx_c_args_ngettext] [p3 $mode [$($done)*] [$($rest)*]] [
-                $head $(::$tail)* ! $group
-            ]
-        )
-    };
-    (@p2 $mode:ident [$($done:tt)*]; ::$head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
-        $crate::__pgrx_c_classify!(
-            @argument [__pgrx_c_args_ngettext] [p3 $mode [$($done)*] [$($rest)*]] [
-                ::$head $(::$tail)* ! $group
-            ]
-        )
-    };
-    (@p2 $mode:ident [$($done:tt)*]; ($($inner:tt)*), $($rest:tt)*) => {
-        $crate::__pgrx_c_classify!(
-            @argument [__pgrx_c_args_ngettext] [p3 $mode [$($done)*] [$($rest)*]] [($($inner)*)]
-        )
-    };
-    (@p2 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_ngettext!(@p3 $mode [$($done)* (@literal [$argument]),]; $($rest)*)
-    };
-    (@p2 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_ngettext!(@p3 $mode [$($done)* (@native [$argument]),]; $($rest)*)
-    };
-    (@p3 $mode:ident [$($done:tt)*];) => {
-        $crate::ngettext!(@$mode; $($done)*)
-    };
-    ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
-    };
-}
-/// C macro ngettext from c.h:1273
-///
-/// ```text
-/// #define ngettext( s , p , n ) ( ( n ) == 1 ? ( s ) : ( p ) )
-/// ```
-///
-///
-/// # Safety
-///
-/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
-#[macro_export]
-macro_rules! ngettext {
-    (@__pgrx_emit_check_safety; $s:tt, $p:tt, $n:tt $(,)?) => {
-        {
-            if false {
-                $crate::__pgrx_c_operand!(@check_safety; $s);
-                $crate::__pgrx_c_operand!(@check_safety; $p);
-                $crate::__pgrx_c_operand!(@check_safety; $n);
-            }
-        }
-    };
-    (@__pgrx_c_check_safety; $($raw:tt)*) => {
-        $crate::__pgrx_c_args_ngettext!(@collect __pgrx_emit_check_safety []; $($raw)*)
-    };
-    (@__pgrx_emit_public; $s:tt, $p:tt, $n:tt $(,)?) => {
-        $crate::__pgrx_c_macros::expression_result::finish(
-            $crate::ngettext!(@__pgrx_emit_value; $s, $p, $n)
-        )
-    };
-    (@__pgrx_emit_value; $s:tt, $p:tt, $n:tt $(,)?) => {
-        (
-            $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                $crate::__pgrx_c_macros::expression::select(
-                    if $crate::__pgrx_c_macros::expression::truth(
-                        $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                            $crate::__pgrx_c_macros::expression::eq(
-                                (
-                                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                                        $crate::__pgrx_c_operand!(@value [true]; $n)
-                                    )
-                                ),
-                                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                                    $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                        1i32
-                                    )
-                                )
-                            )
-                        )
-                    ) {
-                        $crate::__pgrx_c_macros::Either::Left(
-                            (
-                                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                                    $crate::__pgrx_c_operand!(@value [true]; $s)
-                                )
-                            )
-                        )
-                    } else {
-                        $crate::__pgrx_c_macros::Either::Right(
-                            (
-                                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                                    $crate::__pgrx_c_operand!(@value [true]; $p)
-                                )
-                            )
-                        )
-                    }
-                )
-            )
-        )
-    };
-    (@__pgrx_c_value; $($raw:tt)*) => {
-        $crate::__pgrx_c_args_ngettext!(@collect __pgrx_emit_value []; $($raw)*)
-    };
-    (@__pgrx_emit_place; $s:tt, $p:tt, $n:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
-    };
-    (@__pgrx_c_place; $($raw:tt)*) => {
-        $crate::__pgrx_c_args_ngettext!(@collect __pgrx_emit_place []; $($raw)*)
-    };
-    (@__pgrx_emit_read_place; $s:tt, $p:tt, $n:tt $(,)?) => {
-        compile_error!("C expression is not a place in this operation")
-    };
-    (@__pgrx_c_read_place; $($raw:tt)*) => {
-        $crate::__pgrx_c_args_ngettext!(@collect __pgrx_emit_read_place []; $($raw)*)
-    };
-    (@__pgrx_emit_size; $s:tt, $p:tt, $n:tt $(,)?) => {
-        $crate::__pgrx_c_macros::expression::size_of_value_type(
-            if false {
-                {
-                    if false {
-                        $crate::__pgrx_c_operand!(@check_safety; $s);
-                        $crate::__pgrx_c_operand!(@check_safety; $p);
-                        $crate::__pgrx_c_operand!(@check_safety; $n);
-                    }
-                }
-                Some(
-                    unsafe {
-                        $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                            $crate::__pgrx_c_macros::expression::select(
-                                if $crate::__pgrx_c_macros::expression::truth(
-                                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                                        $crate::__pgrx_c_macros::expression::eq(
-                                            (
-                                                $crate::__pgrx_c_macros::expression::profile_value::<
-                                                    true,
-                                                    _
-                                                >($crate::__pgrx_c_operand!(@value [true]; $n))
-                                            ),
-                                            $crate::__pgrx_c_macros::expression::profile_value::<
-                                                true,
-                                                _
-                                            >(
-                                                $crate::__pgrx_c_macros::CValue::<
-                                                    $crate::__pgrx_c_macros::CInt
-                                                >::new(1i32)
-                                            )
-                                        )
-                                    )
-                                ) {
-                                    $crate::__pgrx_c_macros::Either::Left(
-                                        (
-                                            $crate::__pgrx_c_macros::expression::profile_value::<
-                                                true,
-                                                _
-                                            >($crate::__pgrx_c_operand!(@value [true]; $s))
-                                        )
-                                    )
-                                } else {
-                                    $crate::__pgrx_c_macros::Either::Right(
-                                        (
-                                            $crate::__pgrx_c_macros::expression::profile_value::<
-                                                true,
-                                                _
-                                            >($crate::__pgrx_c_operand!(@value [true]; $p))
-                                        )
-                                    )
-                                }
-                            )
-                        )
-                    }
-                )
-            } else {
-                None
-            }
-        )
-    };
-    (@__pgrx_c_size; $($raw:tt)*) => {
-        $crate::__pgrx_c_args_ngettext!(@collect __pgrx_emit_size []; $($raw)*)
-    };
-    (@__pgrx_emit_discard; $s:tt, $p:tt, $n:tt $(,)?) => {
-        {
-            let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                $crate::__pgrx_c_macros::expression::select(
-                    if $crate::__pgrx_c_macros::expression::truth(
-                        $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                            $crate::__pgrx_c_macros::expression::eq(
-                                (
-                                    $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                                        $crate::__pgrx_c_operand!(@value [true]; $n)
-                                    )
-                                ),
-                                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                                    $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CInt>::new(
-                                        1i32
-                                    )
-                                )
-                            )
-                        )
-                    ) {
-                        $crate::__pgrx_c_macros::Either::Left(
-                            (
-                                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                                    $crate::__pgrx_c_operand!(@value [true]; $s)
-                                )
-                            )
-                        )
-                    } else {
-                        $crate::__pgrx_c_macros::Either::Right(
-                            (
-                                $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                                    $crate::__pgrx_c_operand!(@value [true]; $p)
-                                )
-                            )
-                        )
-                    }
-                )
-            );
-        }
-    };
-    (@__pgrx_c_discard; $($raw:tt)*) => {
-        $crate::__pgrx_c_args_ngettext!(@collect __pgrx_emit_discard []; $($raw)*)
-    };
-    ($($raw:tt)*) => {
-        $crate::__pgrx_c_args_ngettext!(@collect __pgrx_emit_public []; $($raw)*)
-    };
-}
-
-#[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
-    target_pointer_width = "64",
-    target_endian = "little"
-)))]
-#[cfg(not(docsrs))]
-compile_error!("generated C macros require their inspected C target profile");
-const _: () = {
-    use crate::__pgrx_c_macros::CInteger as _;
-    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
-    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
-    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
-    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
-    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
-    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
-    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
-    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
-};
-/// C macro pg_unreachable from c.h:367
-///
-/// ```text
-/// #define pg_unreachable( ) abort ( )
-/// ```
-///
-///
-/// # Safety
-///
-/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
-///
-/// # Panics
-///
-/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
-#[macro_export]
-macro_rules! pg_unreachable {
-    (@__pgrx_emit_check_safety;) => {
-        {
-            if false {}
-        }
-    };
-    (@__pgrx_c_check_safety; $($raw:tt)*) => {
-        $crate::pg_unreachable!(@__pgrx_emit_check_safety; $($raw)*)
-    };
-    (@__pgrx_emit_public;) => {
-        $crate::__pgrx_c_macros::expression_result::finish(
-            $crate::pg_unreachable!(@__pgrx_emit_value;)
-        )
-    };
-    (@__pgrx_emit_value;) => {
-        /* PGRX: pg_unreachable remains expanded because abort is not an active function-like macro. */
-        $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-            $crate::__pgrx_c_generated::Inline_a4a847eeb3e2f1f582cafbae11462dfa()
-        )
-    };
-    (@__pgrx_c_value; $($raw:tt)*) => {
-        $crate::pg_unreachable!(@__pgrx_emit_value; $($raw)*)
-    };
-    (@__pgrx_emit_place;) => {
-        compile_error!("C expression is not a place in this operation")
-    };
-    (@__pgrx_c_place; $($raw:tt)*) => {
-        $crate::pg_unreachable!(@__pgrx_emit_place; $($raw)*)
-    };
-    (@__pgrx_emit_read_place;) => {
-        compile_error!("C expression is not a place in this operation")
-    };
-    (@__pgrx_c_read_place; $($raw:tt)*) => {
-        $crate::pg_unreachable!(@__pgrx_emit_read_place; $($raw)*)
-    };
-    (@__pgrx_emit_size;) => {
-        /* PGRX: pg_unreachable remains expanded because abort is not an active function-like macro. */
-        $crate::__pgrx_c_macros::expression::size_of_value_type(
-            if false {
-                {
-                    if false {}
-                }
-                Some(
-                    unsafe {
-                        $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                            $crate::__pgrx_c_generated::Inline_a4a847eeb3e2f1f582cafbae11462dfa()
-                        )
-                    }
-                )
-            } else {
-                None
-            }
-        )
-    };
-    (@__pgrx_c_size; $($raw:tt)*) => {
-        $crate::pg_unreachable!(@__pgrx_emit_size; $($raw)*)
-    };
-    (@__pgrx_emit_discard;) => {
-        /* PGRX: pg_unreachable remains expanded because abort is not an active function-like macro. */
-        {
-            let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                $crate::__pgrx_c_generated::Inline_a4a847eeb3e2f1f582cafbae11462dfa()
-            );
-        }
-    };
-    (@__pgrx_c_discard; $($raw:tt)*) => {
-        $crate::pg_unreachable!(@__pgrx_emit_discard; $($raw)*)
-    };
-    (@$mode:ident; $($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
-    };
-    () => {
-        $crate::pg_unreachable!(@__pgrx_emit_public;)
-    };
-    ($($invalid:tt)*) => {
-        compile_error!("arguments do not satisfy this C macro's invocation contract")
-    };
-}
-
-#[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -15546,16 +15456,25 @@ macro_rules! __pgrx_c_args_strtoi64 {
         $crate::__pgrx_c_args_strtoi64!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_strtoi64!(@p1 $mode [$($done)* (@literal [- $argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_strtoi64!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+            $($rest)*
+        )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_strtoi64!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_strtoi64!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $($raw:tt)*) => {
         $crate::__pgrx_c_args_strtoi64!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
-        $crate::__pgrx_c_args_strtoi64!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_strtoi64!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
         $crate::__pgrx_c_classify!(
@@ -15577,22 +15496,37 @@ macro_rules! __pgrx_c_args_strtoi64 {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_strtoi64!(@p1 $mode [$($done)* (@literal [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_strtoi64!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+            $($rest)*
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_strtoi64!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_strtoi64!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_strtoi64!(@p2 $mode [$($done)* (@literal [- $argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_strtoi64!(
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+            $($rest)*
+        )
     };
     (@negative1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_strtoi64!(@p2 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_strtoi64!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $($raw:tt)*) => {
         $crate::__pgrx_c_args_strtoi64!(@negative1 $mode [$($done)*]; - $($raw)*)
     };
     (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
-        $crate::__pgrx_c_args_strtoi64!(@p2 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_strtoi64!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
         $crate::__pgrx_c_classify!(
@@ -15614,28 +15548,46 @@ macro_rules! __pgrx_c_args_strtoi64 {
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_strtoi64!(@p2 $mode [$($done)* (@literal [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_strtoi64!(
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+            $($rest)*
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_strtoi64!(@p2 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_strtoi64!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p2 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_strtoi64!(@p3 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_strtoi64!(
+            @p3 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative2 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_strtoi64!(@p3 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_strtoi64!(
+            @p3 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p2 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_strtoi64!(@p3 $mode [$($done)* (@literal [- $argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_strtoi64!(
+            @p3 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+            $($rest)*
+        )
     };
     (@negative2 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_strtoi64!(@p3 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_strtoi64!(
+            @p3 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p2 $mode:ident [$($done:tt)*]; - $($raw:tt)*) => {
         $crate::__pgrx_c_args_strtoi64!(@negative2 $mode [$($done)*]; - $($raw)*)
     };
     (@p2 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_strtoi64!(@p3 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_strtoi64!(
+            @p3 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p2 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -15657,13 +15609,20 @@ macro_rules! __pgrx_c_args_strtoi64 {
         )
     };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_strtoi64!(@p3 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_strtoi64!(
+            @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p2 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_strtoi64!(@p3 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_strtoi64!(
+            @p3 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p2 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
-        $crate::__pgrx_c_args_strtoi64!(@p3 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_strtoi64!(
+            @p3 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p2 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
         $crate::__pgrx_c_classify!(
@@ -15685,10 +15644,16 @@ macro_rules! __pgrx_c_args_strtoi64 {
         )
     };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_strtoi64!(@p3 $mode [$($done)* (@literal [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_strtoi64!(
+            @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+            $($rest)*
+        )
     };
     (@p2 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_strtoi64!(@p3 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_strtoi64!(
+            @p3 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p3 $mode:ident [$($done:tt)*];) => {
         $crate::strtoi64!(@$mode; $($done)*)
@@ -15697,7 +15662,7 @@ macro_rules! __pgrx_c_args_strtoi64 {
         compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
-/// C macro strtoi64 from c.h:1398
+/// C macro strtoi64 from c.h:1417
 ///
 /// ```text
 /// #define strtoi64( str , endptr , base ) ( ( int64 ) strtol ( str , endptr , base ) )
@@ -15734,15 +15699,15 @@ macro_rules! strtoi64 {
         (
             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::cast_as::<
-                    $crate::int64,
-                    $crate::__pgrx_c_macros::CLongLong,
+                    $crate::__pgrx_c_bindings::int64,
+                    $crate::__pgrx_c_macros::CLong,
                     _
                 >(
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         <
                             $crate::__pgrx_c_macros::CLong as $crate::__pgrx_c_macros::expression::CType
                         >::from_storage(
-                            $crate::__pgrx_c_generated::Inline_cad72b87a8a2f8f6a99f92d69ec5091f(
+                            $crate::__pgrx_c_generated::Inline_bcbcb74bb6644804ba1b3d4dc51cdce6(
                                 <
                                     $crate::__pgrx_c_macros::expression::CPointer<
                                         $crate::__pgrx_c_macros::CChar,
@@ -15836,15 +15801,15 @@ macro_rules! strtoi64 {
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::cast_as::<
-                                $crate::int64,
-                                $crate::__pgrx_c_macros::CLongLong,
+                                $crate::__pgrx_c_bindings::int64,
+                                $crate::__pgrx_c_macros::CLong,
                                 _
                             >(
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     <
                                         $crate::__pgrx_c_macros::CLong as $crate::__pgrx_c_macros::expression::CType
                                     >::from_storage(
-                                        $crate::__pgrx_c_generated::Inline_cad72b87a8a2f8f6a99f92d69ec5091f(
+                                        $crate::__pgrx_c_generated::Inline_bcbcb74bb6644804ba1b3d4dc51cdce6(
                                             <
                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                     $crate::__pgrx_c_macros::CChar,
@@ -15936,15 +15901,15 @@ macro_rules! strtoi64 {
         {
             let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::cast_as::<
-                    $crate::int64,
-                    $crate::__pgrx_c_macros::CLongLong,
+                    $crate::__pgrx_c_bindings::int64,
+                    $crate::__pgrx_c_macros::CLong,
                     _
                 >(
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         <
                             $crate::__pgrx_c_macros::CLong as $crate::__pgrx_c_macros::expression::CType
                         >::from_storage(
-                            $crate::__pgrx_c_generated::Inline_cad72b87a8a2f8f6a99f92d69ec5091f(
+                            $crate::__pgrx_c_generated::Inline_bcbcb74bb6644804ba1b3d4dc51cdce6(
                                 <
                                     $crate::__pgrx_c_macros::expression::CPointer<
                                         $crate::__pgrx_c_macros::CChar,
@@ -16018,8 +15983,8 @@ macro_rules! strtoi64 {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -16046,16 +16011,25 @@ macro_rules! __pgrx_c_args_strtou64 {
         $crate::__pgrx_c_args_strtou64!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_strtou64!(@p1 $mode [$($done)* (@literal [- $argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_strtou64!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+            $($rest)*
+        )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_strtou64!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_strtou64!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $($raw:tt)*) => {
         $crate::__pgrx_c_args_strtou64!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
-        $crate::__pgrx_c_args_strtou64!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_strtou64!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
         $crate::__pgrx_c_classify!(
@@ -16077,22 +16051,37 @@ macro_rules! __pgrx_c_args_strtou64 {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_strtou64!(@p1 $mode [$($done)* (@literal [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_strtou64!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+            $($rest)*
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_strtou64!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_strtou64!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_strtou64!(@p2 $mode [$($done)* (@literal [- $argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_strtou64!(
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+            $($rest)*
+        )
     };
     (@negative1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_strtou64!(@p2 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_strtou64!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $($raw:tt)*) => {
         $crate::__pgrx_c_args_strtou64!(@negative1 $mode [$($done)*]; - $($raw)*)
     };
     (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
-        $crate::__pgrx_c_args_strtou64!(@p2 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_strtou64!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
         $crate::__pgrx_c_classify!(
@@ -16114,28 +16103,46 @@ macro_rules! __pgrx_c_args_strtou64 {
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_strtou64!(@p2 $mode [$($done)* (@literal [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_strtou64!(
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+            $($rest)*
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_strtou64!(@p2 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_strtou64!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p2 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_strtou64!(@p3 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_strtou64!(
+            @p3 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative2 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_strtou64!(@p3 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_strtou64!(
+            @p3 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p2 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_strtou64!(@p3 $mode [$($done)* (@literal [- $argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_strtou64!(
+            @p3 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+            $($rest)*
+        )
     };
     (@negative2 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_strtou64!(@p3 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_strtou64!(
+            @p3 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p2 $mode:ident [$($done:tt)*]; - $($raw:tt)*) => {
         $crate::__pgrx_c_args_strtou64!(@negative2 $mode [$($done)*]; - $($raw)*)
     };
     (@p2 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_strtou64!(@p3 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_strtou64!(
+            @p3 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p2 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -16157,13 +16164,20 @@ macro_rules! __pgrx_c_args_strtou64 {
         )
     };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_strtou64!(@p3 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_strtou64!(
+            @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p2 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_strtou64!(@p3 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_strtou64!(
+            @p3 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p2 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
-        $crate::__pgrx_c_args_strtou64!(@p3 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_strtou64!(
+            @p3 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p2 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
         $crate::__pgrx_c_classify!(
@@ -16185,10 +16199,16 @@ macro_rules! __pgrx_c_args_strtou64 {
         )
     };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_strtou64!(@p3 $mode [$($done)* (@literal [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_strtou64!(
+            @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+            $($rest)*
+        )
     };
     (@p2 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_strtou64!(@p3 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_strtou64!(
+            @p3 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p3 $mode:ident [$($done:tt)*];) => {
         $crate::strtou64!(@$mode; $($done)*)
@@ -16197,7 +16217,7 @@ macro_rules! __pgrx_c_args_strtou64 {
         compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
-/// C macro strtou64 from c.h:1399
+/// C macro strtou64 from c.h:1418
 ///
 /// ```text
 /// #define strtou64( str , endptr , base ) ( ( uint64 ) strtoul ( str , endptr , base ) )
@@ -16234,15 +16254,15 @@ macro_rules! strtou64 {
         (
             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::cast_as::<
-                    $crate::uint64,
-                    $crate::__pgrx_c_macros::CUnsignedLongLong,
+                    $crate::__pgrx_c_bindings::uint64,
+                    $crate::__pgrx_c_macros::CUnsignedLong,
                     _
                 >(
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         <
                             $crate::__pgrx_c_macros::CUnsignedLong as $crate::__pgrx_c_macros::expression::CType
                         >::from_storage(
-                            $crate::__pgrx_c_generated::Inline_632678b604986137a90153a316bf8ef7(
+                            $crate::__pgrx_c_generated::Inline_7a36c1076b6da100af6c7bf8093dbc0a(
                                 <
                                     $crate::__pgrx_c_macros::expression::CPointer<
                                         $crate::__pgrx_c_macros::CChar,
@@ -16336,15 +16356,15 @@ macro_rules! strtou64 {
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::cast_as::<
-                                $crate::uint64,
-                                $crate::__pgrx_c_macros::CUnsignedLongLong,
+                                $crate::__pgrx_c_bindings::uint64,
+                                $crate::__pgrx_c_macros::CUnsignedLong,
                                 _
                             >(
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     <
                                         $crate::__pgrx_c_macros::CUnsignedLong as $crate::__pgrx_c_macros::expression::CType
                                     >::from_storage(
-                                        $crate::__pgrx_c_generated::Inline_632678b604986137a90153a316bf8ef7(
+                                        $crate::__pgrx_c_generated::Inline_7a36c1076b6da100af6c7bf8093dbc0a(
                                             <
                                                 $crate::__pgrx_c_macros::expression::CPointer<
                                                     $crate::__pgrx_c_macros::CChar,
@@ -16436,15 +16456,15 @@ macro_rules! strtou64 {
         {
             let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::cast_as::<
-                    $crate::uint64,
-                    $crate::__pgrx_c_macros::CUnsignedLongLong,
+                    $crate::__pgrx_c_bindings::uint64,
+                    $crate::__pgrx_c_macros::CUnsignedLong,
                     _
                 >(
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         <
                             $crate::__pgrx_c_macros::CUnsignedLong as $crate::__pgrx_c_macros::expression::CType
                         >::from_storage(
-                            $crate::__pgrx_c_generated::Inline_632678b604986137a90153a316bf8ef7(
+                            $crate::__pgrx_c_generated::Inline_7a36c1076b6da100af6c7bf8093dbc0a(
                                 <
                                     $crate::__pgrx_c_macros::expression::CPointer<
                                         $crate::__pgrx_c_macros::CChar,
@@ -16518,8 +16538,8 @@ macro_rules! strtou64 {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -16546,22 +16566,34 @@ macro_rules! __pgrx_c_args_unlikely {
         $crate::__pgrx_c_args_unlikely!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_unlikely!(@p1 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_unlikely!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_unlikely!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_unlikely!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_unlikely!(@p1 $mode [$($done)* (@literal [- $argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_unlikely!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+            $($rest)*
+        )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_unlikely!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_unlikely!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $($raw:tt)*) => {
         $crate::__pgrx_c_args_unlikely!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_unlikely!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_unlikely!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -16583,13 +16615,20 @@ macro_rules! __pgrx_c_args_unlikely {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_unlikely!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_unlikely!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_unlikely!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_unlikely!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
-        $crate::__pgrx_c_args_unlikely!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_unlikely!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt, $($rest:tt)*) => {
         $crate::__pgrx_c_classify!(
@@ -16611,10 +16650,16 @@ macro_rules! __pgrx_c_args_unlikely {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_unlikely!(@p1 $mode [$($done)* (@literal [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_unlikely!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+            $($rest)*
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
-        $crate::__pgrx_c_args_unlikely!(@p1 $mode [$($done)* (@native [$argument]),]; $($rest)*)
+        $crate::__pgrx_c_args_unlikely!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+            $($rest)*
+        )
     };
     (@p1 $mode:ident [$($done:tt)*];) => {
         $crate::unlikely!(@$mode; $($done)*)
@@ -16623,7 +16668,7 @@ macro_rules! __pgrx_c_args_unlikely {
         compile_error!("arguments do not satisfy this C macro's invocation contract")
     };
 }
-/// C macro unlikely from c.h:435
+/// C macro unlikely from c.h:442
 ///
 /// ```text
 /// #define unlikely( x ) __builtin_expect ( ( x ) != 0 , 0 )
@@ -16869,6 +16914,9 @@ macro_rules! unlikely {
     };
 }
 
+pub use Assert;
+pub use AssertMacro;
+pub use AssertPointerAlignment;
 pub use BUFFERALIGN;
 pub use BUFFERALIGN_DOWN;
 pub use BoolIsValid;
@@ -16904,15 +16952,10 @@ pub use SQL_STR_DOUBLE;
 pub use TYPEALIGN;
 pub use TYPEALIGN_DOWN;
 pub use TYPEALIGN64;
-pub use dgettext;
-pub use dngettext;
-pub use gettext;
 pub use gettext_noop;
 pub use i64abs;
 pub use lengthof;
 pub use likely;
-pub use ngettext;
-pub use pg_unreachable;
 pub use strtoi64;
 pub use strtou64;
 pub use unlikely;

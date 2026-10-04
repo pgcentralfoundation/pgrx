@@ -10,8 +10,8 @@
 //! ownership without changing include lookup spelling.
 
 use crate::{
-    ActiveProvenance, Error, FrontendOutput, MacroDefinition, MacroInventory, MacroKind,
-    MacroScanner,
+    ActiveProvenance, Error, FrontendError, FrontendOutput, MacroDefinition, MacroInventory,
+    MacroKind, MacroScanner, postgres_clang_flags,
 };
 use pgrx_pg_config::{PgConfig, Pgrx};
 use sha2::{Digest, Sha256};
@@ -71,13 +71,13 @@ impl PostgresConfig {
             directories.push(pg_config.includedir_server_port_win32_msvc()?);
         }
         let mut clang_args = Vec::new();
-        // PostgreSQL's Windows CPPFLAGS are for MSVC; the binding generator also
-        // omits them when parsing with Clang.
-        if !cfg!(target_os = "windows") {
-            let flags = pg_config.cppflags()?;
-            let flags = flags.to_str().ok_or(PostgresError::InvalidCppFlags)?;
-            clang_args.extend(shlex::split(flags).ok_or(PostgresError::InvalidCppFlags)?);
-        }
+        let flags = pg_config.cppflags()?;
+        let flags = flags.to_str().ok_or(PostgresError::InvalidCppFlags)?;
+        clang_args.extend(
+            postgres_clang_flags(flags, cfg!(target_env = "msvc")).map_err(|error| {
+                FrontendError::Arguments(format!("PostgreSQL CPPFLAGS: {error}"))
+            })?,
+        );
         for directory in directories {
             let path = directory
                 .to_str()
@@ -105,7 +105,7 @@ impl PostgresConfig {
         materialize_wrapper(self.major_version, &home.join("c-macros/headers"))
     }
 
-    /// Compiler arguments derived from the server include directory and CPPFLAGS.
+    /// Compiler arguments derived from the server include directory and decoded CPPFLAGS.
     pub fn clang_args(&self) -> &[String] {
         &self.clang_args
     }
@@ -113,9 +113,10 @@ impl PostgresConfig {
     /// Inspect the final C environment using recorded compiler flags when available.
     ///
     /// Explicit arguments follow the recorded flags, so callers can supply the target and
-    /// overrides used by a binding generator. Discovery through [`Self::scan`] retains its
-    /// existing preprocessing-only behavior. Missing historical metadata selects that current
-    /// binding invocation; it never invents the installed server's optimization flags.
+    /// overrides used by a binding generator. Missing historical metadata, including
+    /// unrecorded MSVC flags, selects the installed headers and explicit binding arguments;
+    /// it never claims to recover absent server build flags. Discovery through [`Self::scan`]
+    /// retains its existing preprocessing-only behavior.
     pub fn inspect(
         &self,
         scanner: &MacroScanner,
@@ -126,8 +127,9 @@ impl PostgresConfig {
         let mut arguments = Vec::new();
         if let Some(cflags) = self.pg_config.optional_cflags()? {
             let cflags = cflags.to_str().ok_or(PostgresError::InvalidCFlags)?;
-            arguments
-                .extend(crate::split_recorded_cflags(cflags, cfg!(windows))?.unwrap_or_default());
+            arguments.extend(postgres_clang_flags(cflags, cfg!(target_env = "msvc")).map_err(
+                |error| FrontendError::Arguments(format!("PostgreSQL CFLAGS: {error}")),
+            )?);
         }
         // PostgreSQL's COMPILE.c applies CFLAGS before CPPFLAGS. Preserve that
         // precedence before the same include defaults and explicit overrides as bindgen.
@@ -148,7 +150,9 @@ impl PostgresConfig {
     ///
     /// The caller supplies the complete CFLAGS, CPPFLAGS, target, include directories and
     /// overrides in their intended order. No installation flags are added here. Inspection
-    /// may append an explicit compiler resource directory; use the returned profile's
+    /// lowers recorded/explicit CRT selections across the complete MSVC argument vector,
+    /// preserving the CL driver's final runtime choice and user define/undefine precedence.
+    /// The frontend may append an explicit compiler resource directory; use the returned profile's
     /// arguments when parsing the bindings so both tools see the same environment.
     pub fn inspect_with_arguments(
         &self,
@@ -260,6 +264,7 @@ impl PostgresConfig {
         };
         let mut clang_args = self.clang_args.clone();
         clang_args.extend_from_slice(extra_clang_args);
+        let clang_args = crate::frontend::prepare_arguments(&clang_args)?;
         let MacroInventory { macros, diagnostics } = scanner.scan(header, &clang_args)?;
         let mut inventory = MacroInventory { macros: Vec::new(), diagnostics };
         let mut context = Vec::new();
@@ -343,11 +348,61 @@ pub fn postgres_function_macro_names(
     inspected: &FrontendOutput,
     server_include_dir: &Path,
 ) -> Result<Vec<String>, PostgresError> {
+    postgres_macro_names(inspected, server_include_dir, MacroKind::FunctionLike)
+}
+
+/// Select final active object macros physically owned by a PostgreSQL server header tree.
+///
+/// This applies the same canonical source and definition-history rules as
+/// [`postgres_function_macro_names`]. An include path, `..` component, or symlink
+/// cannot promote an external definition into the server's object inventory.
+pub fn postgres_object_macro_names(
+    inspected: &FrontendOutput,
+    server_include_dir: &Path,
+) -> Result<Vec<String>, PostgresError> {
+    postgres_macro_names(inspected, server_include_dir, MacroKind::ObjectLike)
+}
+
+/// Select original static inline definitions physically owned by the selected server headers.
+///
+/// Names with active C macros retain their original preprocessing semantics. Prototype and ABI
+/// refusals remain visible when the caller explicitly prepares these native invocation roots.
+pub fn postgres_inline_function_names(
+    inspected: &FrontendOutput,
+    server_include_dir: &Path,
+) -> Result<Vec<String>, PostgresError> {
+    let root = canonicalize_header_path(server_include_dir)?;
+    let mut sources = HashMap::new();
+    let mut names = Vec::new();
+    for (name, function) in &inspected.declarations().function_signatures {
+        if inspected.environment().active.contains_key(name)
+            || !function.is_static
+            || !function.is_inline
+            || !function.definition_available
+            || function.linkage != Some(crate::DeclarationLinkage::Internal)
+        {
+            continue;
+        }
+        if let Some(definition) = &function.definition
+            && owns_source(&definition.provenance.file, &root, &mut sources)?
+        {
+            names.push(name.clone());
+        }
+    }
+    Ok(names)
+}
+
+/// Share canonical physical ownership and uncertain-provenance history across both macro kinds.
+fn postgres_macro_names(
+    inspected: &FrontendOutput,
+    server_include_dir: &Path,
+    kind: MacroKind,
+) -> Result<Vec<String>, PostgresError> {
     let root = canonicalize_header_path(server_include_dir)?;
     let mut sources = HashMap::new();
     let mut owned_history = HashSet::new();
     for definition in &inspected.inventory().macros {
-        if definition.kind == MacroKind::FunctionLike
+        if definition.kind == kind
             && let Some(span) = &definition.provenance
             && owns_source(&span.file, &root, &mut sources)?
         {
@@ -356,7 +411,7 @@ pub fn postgres_function_macro_names(
     }
     let mut names = Vec::new();
     for (name, active) in &inspected.environment().active {
-        if active.definition.kind != MacroKind::FunctionLike {
+        if active.definition.kind != kind {
             continue;
         }
         let owned = match &active.provenance {
@@ -435,10 +490,10 @@ pub enum PostgresError {
         PathBuf,
     ),
     /// Recorded PostgreSQL preprocessing flags could not be decoded safely.
-    #[error("PostgreSQL CPPFLAGS must be UTF-8 with balanced shell quoting")]
+    #[error("PostgreSQL CPPFLAGS must be UTF-8")]
     InvalidCppFlags,
     /// Recorded PostgreSQL compiler flags could not be decoded safely.
-    #[error("PostgreSQL CFLAGS must be UTF-8 with balanced shell quoting")]
+    #[error("PostgreSQL CFLAGS must be UTF-8")]
     InvalidCFlags,
     /// Compiler inspection or a required probe failed.
     #[error(transparent)]
@@ -456,8 +511,8 @@ pub enum PostgresError {
     ),
 }
 
-/// Check published header inputs and cache publication without a PostgreSQL installation or
-/// writes to the user's configured PGRX_HOME.
+/// Check immutable header publication and canonical macro ownership without a server process
+/// or writes to the user's configured PGRX_HOME.
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -507,5 +562,72 @@ mod tests {
             matches!(materialize_wrapper(18, directory.path()), Err(PostgresError::WrapperCache { source, .. }) if source.kind() == std::io::ErrorKind::InvalidData)
         );
         assert_eq!(std::fs::read_to_string(&header).unwrap(), "#error unexpected cached content\n");
+    }
+
+    /// Keep `..` paths and external final redefinitions outside the selected object inventory.
+    #[test]
+    fn object_selection_uses_canonical_paths_and_final_definition_ownership() {
+        let _lock = crate::SCANNER_LOCK.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
+        let scanner = MacroScanner::new().expect("libclang must be available");
+        let directory = tempfile::tempdir().unwrap();
+        let root = directory.path().join("server");
+        std::fs::create_dir_all(root.join("nested")).unwrap();
+        std::fs::write(
+            root.join("inside.h"),
+            "#define OWNED_OBJECT 1\n#define OWNED_FUNCTION(x) (x)\n#define OWNED_REDEFINED 2\n",
+        )
+        .unwrap();
+        std::fs::write(
+            directory.path().join("external.h"),
+            "#define EXTERNAL_OBJECT 3\n#undef OWNED_REDEFINED\n#define OWNED_REDEFINED 4\n",
+        )
+        .unwrap();
+        let header = directory.path().join("wrapper.h");
+        std::fs::write(
+            &header,
+            "#include \"server/nested/../inside.h\"\n#include \"server/../external.h\"\n",
+        )
+        .unwrap();
+        let mut inspected = crate::inspect(&scanner, &header, &[], None).unwrap();
+        assert_eq!(postgres_object_macro_names(&inspected, &root).unwrap(), ["OWNED_OBJECT"]);
+        assert_eq!(postgres_function_macro_names(&inspected, &root).unwrap(), ["OWNED_FUNCTION"]);
+        // Uncertain final provenance keeps only names with history physically
+        // owned by the selected tree so analysis can explain their refusal.
+        inspected.environment.active.get_mut("OWNED_REDEFINED").unwrap().provenance =
+            ActiveProvenance::Unresolved;
+        inspected.environment.active.get_mut("EXTERNAL_OBJECT").unwrap().provenance =
+            ActiveProvenance::Unresolved;
+        assert_eq!(
+            postgres_object_macro_names(&inspected, &root).unwrap(),
+            ["OWNED_OBJECT", "OWNED_REDEFINED"]
+        );
+    }
+
+    /// Resolve aliases in both directions, including a symlinked server ownership root.
+    #[cfg(unix)]
+    #[test]
+    fn object_selection_resolves_source_and_root_symlinks() {
+        let _lock = crate::SCANNER_LOCK.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
+        let scanner = MacroScanner::new().expect("libclang must be available");
+        let directory = tempfile::tempdir().unwrap();
+        let root = directory.path().join("server");
+        std::fs::create_dir(&root).unwrap();
+        let inside = root.join("inside.h");
+        let outside = directory.path().join("outside.h");
+        std::fs::write(&inside, "#define OWNED_OBJECT 1\n").unwrap();
+        std::fs::write(&outside, "#define EXTERNAL_OBJECT 2\n").unwrap();
+        std::os::unix::fs::symlink(&inside, directory.path().join("inside-alias.h")).unwrap();
+        std::os::unix::fs::symlink(&outside, root.join("outside-alias.h")).unwrap();
+        let root_alias = directory.path().join("server-alias");
+        std::os::unix::fs::symlink(&root, &root_alias).unwrap();
+        let header = directory.path().join("wrapper.h");
+        std::fs::write(
+            &header,
+            "#include \"inside-alias.h\"\n#include \"server/outside-alias.h\"\n",
+        )
+        .unwrap();
+        let inspected = crate::inspect(&scanner, &header, &[], None).unwrap();
+        assert_eq!(postgres_object_macro_names(&inspected, &root).unwrap(), ["OWNED_OBJECT"]);
+        assert_eq!(postgres_object_macro_names(&inspected, &root_alias).unwrap(), ["OWNED_OBJECT"]);
     }
 }

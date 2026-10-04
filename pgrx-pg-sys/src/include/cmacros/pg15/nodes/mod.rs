@@ -10,10 +10,18 @@ pub use execnodes::*;
 mod memnodes;
 #[allow(unused_imports)]
 pub use memnodes::*;
+#[path = "nodeFuncs.rs"]
+mod nodeFuncs;
+#[allow(unused_imports)]
+pub use nodeFuncs::*;
 #[path = "nodes.rs"]
 mod nodes;
 #[allow(unused_imports)]
 pub use nodes::*;
+#[path = "parsenodes.rs"]
+mod parsenodes;
+#[allow(unused_imports)]
+pub use parsenodes::*;
 #[path = "pathnodes.rs"]
 mod pathnodes;
 #[allow(unused_imports)]

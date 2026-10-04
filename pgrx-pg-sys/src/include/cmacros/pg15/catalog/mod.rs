@@ -6,6 +6,10 @@ This code is generated for documentation purposes, so that it is easy to referen
 mod genbki;
 #[allow(unused_imports)]
 pub use genbki::*;
+#[path = "index.rs"]
+mod index;
+#[allow(unused_imports)]
+pub use index::*;
 #[path = "namespace.rs"]
 mod namespace;
 #[allow(unused_imports)]
@@ -26,6 +30,10 @@ pub use pg_aggregate_d::*;
 mod pg_class_d;
 #[allow(unused_imports)]
 pub use pg_class_d::*;
+#[path = "pg_collation_d.rs"]
+mod pg_collation_d;
+#[allow(unused_imports)]
+pub use pg_collation_d::*;
 #[path = "pg_opfamily_d.rs"]
 mod pg_opfamily_d;
 #[allow(unused_imports)]

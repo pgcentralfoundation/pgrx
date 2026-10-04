@@ -5,8 +5,8 @@ This code is generated for documentation purposes, so that it is easy to referen
 // C macros from instr_time.h.
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -37,13 +37,13 @@ macro_rules! __pgrx_c_args_INSTR_TIME_ACCUM_DIFF {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_INSTR_TIME_ACCUM_DIFF!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_INSTR_TIME_ACCUM_DIFF!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -52,7 +52,7 @@ macro_rules! __pgrx_c_args_INSTR_TIME_ACCUM_DIFF {
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_INSTR_TIME_ACCUM_DIFF!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -79,25 +79,25 @@ macro_rules! __pgrx_c_args_INSTR_TIME_ACCUM_DIFF {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_INSTR_TIME_ACCUM_DIFF!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_INSTR_TIME_ACCUM_DIFF!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_INSTR_TIME_ACCUM_DIFF!(
-            @p2 $mode [$($done)* (@literal [- $argument]),];
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_INSTR_TIME_ACCUM_DIFF!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -106,7 +106,7 @@ macro_rules! __pgrx_c_args_INSTR_TIME_ACCUM_DIFF {
     };
     (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_INSTR_TIME_ACCUM_DIFF!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -133,33 +133,35 @@ macro_rules! __pgrx_c_args_INSTR_TIME_ACCUM_DIFF {
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_INSTR_TIME_ACCUM_DIFF!(
-            @p2 $mode [$($done)* (@literal [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_INSTR_TIME_ACCUM_DIFF!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
     (@p2 $mode:ident [$($done:tt)*]; - $argument:literal) => {
         $crate::__pgrx_c_args_INSTR_TIME_ACCUM_DIFF!(
-            @p3 $mode [$($done)* (@literal [- $argument]),];
+            @p3 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
         )
     };
     (@negative2 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_INSTR_TIME_ACCUM_DIFF!(@p3 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_INSTR_TIME_ACCUM_DIFF!(
+            @p3 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p2 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_INSTR_TIME_ACCUM_DIFF!(
-            @p3 $mode [$($done)* (@literal [- $argument]),];
+            @p3 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative2 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_INSTR_TIME_ACCUM_DIFF!(
-            @p3 $mode [$($done)* (@native [$argument]),];
+            @p3 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -167,7 +169,9 @@ macro_rules! __pgrx_c_args_INSTR_TIME_ACCUM_DIFF {
         $crate::__pgrx_c_args_INSTR_TIME_ACCUM_DIFF!(@negative2 $mode [$($done)*]; - $($raw)*)
     };
     (@p2 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_INSTR_TIME_ACCUM_DIFF!(@p3 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_INSTR_TIME_ACCUM_DIFF!(
+            @p3 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p2 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -189,14 +193,18 @@ macro_rules! __pgrx_c_args_INSTR_TIME_ACCUM_DIFF {
         )
     };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_INSTR_TIME_ACCUM_DIFF!(@p3 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_INSTR_TIME_ACCUM_DIFF!(
+            @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p2 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_INSTR_TIME_ACCUM_DIFF!(@p3 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_INSTR_TIME_ACCUM_DIFF!(
+            @p3 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p2 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_INSTR_TIME_ACCUM_DIFF!(
-            @p3 $mode [$($done)* (@native [$argument]),];
+            @p3 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -223,13 +231,13 @@ macro_rules! __pgrx_c_args_INSTR_TIME_ACCUM_DIFF {
     };
     (@p2 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_INSTR_TIME_ACCUM_DIFF!(
-            @p3 $mode [$($done)* (@literal [$argument]),];
+            @p3 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p2 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_INSTR_TIME_ACCUM_DIFF!(
-            @p3 $mode [$($done)* (@native [$argument]),];
+            @p3 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -456,8 +464,8 @@ macro_rules! INSTR_TIME_ACCUM_DIFF {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -485,13 +493,13 @@ macro_rules! __pgrx_c_args_INSTR_TIME_ADD {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_INSTR_TIME_ADD!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_INSTR_TIME_ADD!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -500,7 +508,7 @@ macro_rules! __pgrx_c_args_INSTR_TIME_ADD {
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_INSTR_TIME_ADD!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -527,31 +535,35 @@ macro_rules! __pgrx_c_args_INSTR_TIME_ADD {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_INSTR_TIME_ADD!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_INSTR_TIME_ADD!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_INSTR_TIME_ADD!(@p2 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_INSTR_TIME_ADD!(
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative1 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_INSTR_TIME_ADD!(@p2 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_INSTR_TIME_ADD!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_INSTR_TIME_ADD!(
-            @p2 $mode [$($done)* (@literal [- $argument]),];
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_INSTR_TIME_ADD!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -559,7 +571,9 @@ macro_rules! __pgrx_c_args_INSTR_TIME_ADD {
         $crate::__pgrx_c_args_INSTR_TIME_ADD!(@negative1 $mode [$($done)*]; - $($raw)*)
     };
     (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_INSTR_TIME_ADD!(@p2 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_INSTR_TIME_ADD!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -581,14 +595,18 @@ macro_rules! __pgrx_c_args_INSTR_TIME_ADD {
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_INSTR_TIME_ADD!(@p2 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_INSTR_TIME_ADD!(
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_INSTR_TIME_ADD!(@p2 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_INSTR_TIME_ADD!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_INSTR_TIME_ADD!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -615,13 +633,13 @@ macro_rules! __pgrx_c_args_INSTR_TIME_ADD {
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_INSTR_TIME_ADD!(
-            @p2 $mode [$($done)* (@literal [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_INSTR_TIME_ADD!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -789,8 +807,8 @@ macro_rules! INSTR_TIME_ADD {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -821,21 +839,23 @@ macro_rules! __pgrx_c_args_INSTR_TIME_GET_DOUBLE {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
         $crate::__pgrx_c_args_INSTR_TIME_GET_DOUBLE!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_INSTR_TIME_GET_DOUBLE!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_INSTR_TIME_GET_DOUBLE!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_INSTR_TIME_GET_DOUBLE!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_INSTR_TIME_GET_DOUBLE!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -843,7 +863,9 @@ macro_rules! __pgrx_c_args_INSTR_TIME_GET_DOUBLE {
         $crate::__pgrx_c_args_INSTR_TIME_GET_DOUBLE!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_INSTR_TIME_GET_DOUBLE!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_INSTR_TIME_GET_DOUBLE!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -865,14 +887,18 @@ macro_rules! __pgrx_c_args_INSTR_TIME_GET_DOUBLE {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_INSTR_TIME_GET_DOUBLE!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_INSTR_TIME_GET_DOUBLE!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_INSTR_TIME_GET_DOUBLE!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_INSTR_TIME_GET_DOUBLE!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_INSTR_TIME_GET_DOUBLE!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -899,13 +925,13 @@ macro_rules! __pgrx_c_args_INSTR_TIME_GET_DOUBLE {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_INSTR_TIME_GET_DOUBLE!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_INSTR_TIME_GET_DOUBLE!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -960,7 +986,7 @@ macro_rules! INSTR_TIME_GET_DOUBLE {
                             (
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::cast_as::<
-                                        $crate::int64,
+                                        $crate::__pgrx_c_bindings::int64,
                                         $crate::__pgrx_c_macros::CLong,
                                         _
                                     >(
@@ -982,9 +1008,8 @@ macro_rules! INSTR_TIME_GET_DOUBLE {
                         )
                     ),
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                        /* PGRX: NS_PER_S remains expanded because no integer constant binding is available in the defining Rust crate. */
                         $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CLong>::new(
-                            1000000000i64
+                            $crate::__pgrx_c_bindings::NS_PER_S as i64
                         )
                     )
                 )
@@ -1030,7 +1055,7 @@ macro_rules! INSTR_TIME_GET_DOUBLE {
                                                 _
                                             >(
                                                 $crate::__pgrx_c_macros::expression::cast_as::<
-                                                    $crate::int64,
+                                                    $crate::__pgrx_c_bindings::int64,
                                                     $crate::__pgrx_c_macros::CLong,
                                                     _
                                                 >(
@@ -1059,10 +1084,9 @@ macro_rules! INSTR_TIME_GET_DOUBLE {
                                     )
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                                    /* PGRX: NS_PER_S remains expanded because no integer constant binding is available in the defining Rust crate. */
                                     $crate::__pgrx_c_macros::CValue::<
                                         $crate::__pgrx_c_macros::CLong
-                                    >::new(1000000000i64)
+                                    >::new($crate::__pgrx_c_bindings::NS_PER_S as i64)
                                 )
                             )
                         )
@@ -1089,7 +1113,7 @@ macro_rules! INSTR_TIME_GET_DOUBLE {
                             (
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::cast_as::<
-                                        $crate::int64,
+                                        $crate::__pgrx_c_bindings::int64,
                                         $crate::__pgrx_c_macros::CLong,
                                         _
                                     >(
@@ -1111,9 +1135,8 @@ macro_rules! INSTR_TIME_GET_DOUBLE {
                         )
                     ),
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                        /* PGRX: NS_PER_S remains expanded because no integer constant binding is available in the defining Rust crate. */
                         $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CLong>::new(
-                            1000000000i64
+                            $crate::__pgrx_c_bindings::NS_PER_S as i64
                         )
                     )
                 )
@@ -1129,8 +1152,8 @@ macro_rules! INSTR_TIME_GET_DOUBLE {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -1161,23 +1184,23 @@ macro_rules! __pgrx_c_args_INSTR_TIME_GET_MICROSEC {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
         $crate::__pgrx_c_args_INSTR_TIME_GET_MICROSEC!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_INSTR_TIME_GET_MICROSEC!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_INSTR_TIME_GET_MICROSEC!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_INSTR_TIME_GET_MICROSEC!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -1186,7 +1209,7 @@ macro_rules! __pgrx_c_args_INSTR_TIME_GET_MICROSEC {
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
         $crate::__pgrx_c_args_INSTR_TIME_GET_MICROSEC!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
@@ -1212,17 +1235,17 @@ macro_rules! __pgrx_c_args_INSTR_TIME_GET_MICROSEC {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_INSTR_TIME_GET_MICROSEC!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_INSTR_TIME_GET_MICROSEC!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_INSTR_TIME_GET_MICROSEC!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -1249,13 +1272,13 @@ macro_rules! __pgrx_c_args_INSTR_TIME_GET_MICROSEC {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_INSTR_TIME_GET_MICROSEC!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_INSTR_TIME_GET_MICROSEC!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -1308,7 +1331,7 @@ macro_rules! INSTR_TIME_GET_MICROSEC {
                     (
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::cast_as::<
-                                $crate::int64,
+                                $crate::__pgrx_c_bindings::int64,
                                 $crate::__pgrx_c_macros::CLong,
                                 _
                             >(
@@ -1325,9 +1348,8 @@ macro_rules! INSTR_TIME_GET_MICROSEC {
                         )
                     ),
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                        /* PGRX: NS_PER_US remains expanded because no integer constant binding is available in the defining Rust crate. */
                         $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CLong>::new(
-                            1000i64
+                            $crate::__pgrx_c_bindings::NS_PER_US as i64
                         )
                     )
                 )
@@ -1365,7 +1387,7 @@ macro_rules! INSTR_TIME_GET_MICROSEC {
                                 (
                                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                         $crate::__pgrx_c_macros::expression::cast_as::<
-                                            $crate::int64,
+                                            $crate::__pgrx_c_bindings::int64,
                                             $crate::__pgrx_c_macros::CLong,
                                             _
                                         >(
@@ -1385,10 +1407,9 @@ macro_rules! INSTR_TIME_GET_MICROSEC {
                                     )
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                                    /* PGRX: NS_PER_US remains expanded because no integer constant binding is available in the defining Rust crate. */
                                     $crate::__pgrx_c_macros::CValue::<
                                         $crate::__pgrx_c_macros::CLong
-                                    >::new(1000i64)
+                                    >::new($crate::__pgrx_c_bindings::NS_PER_US as i64)
                                 )
                             )
                         )
@@ -1410,7 +1431,7 @@ macro_rules! INSTR_TIME_GET_MICROSEC {
                     (
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::cast_as::<
-                                $crate::int64,
+                                $crate::__pgrx_c_bindings::int64,
                                 $crate::__pgrx_c_macros::CLong,
                                 _
                             >(
@@ -1427,9 +1448,8 @@ macro_rules! INSTR_TIME_GET_MICROSEC {
                         )
                     ),
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                        /* PGRX: NS_PER_US remains expanded because no integer constant binding is available in the defining Rust crate. */
                         $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CLong>::new(
-                            1000i64
+                            $crate::__pgrx_c_bindings::NS_PER_US as i64
                         )
                     )
                 )
@@ -1445,8 +1465,8 @@ macro_rules! INSTR_TIME_GET_MICROSEC {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -1477,23 +1497,23 @@ macro_rules! __pgrx_c_args_INSTR_TIME_GET_MILLISEC {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
         $crate::__pgrx_c_args_INSTR_TIME_GET_MILLISEC!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_INSTR_TIME_GET_MILLISEC!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_INSTR_TIME_GET_MILLISEC!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_INSTR_TIME_GET_MILLISEC!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -1502,7 +1522,7 @@ macro_rules! __pgrx_c_args_INSTR_TIME_GET_MILLISEC {
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
         $crate::__pgrx_c_args_INSTR_TIME_GET_MILLISEC!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
@@ -1528,17 +1548,17 @@ macro_rules! __pgrx_c_args_INSTR_TIME_GET_MILLISEC {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_INSTR_TIME_GET_MILLISEC!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_INSTR_TIME_GET_MILLISEC!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_INSTR_TIME_GET_MILLISEC!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -1565,13 +1585,13 @@ macro_rules! __pgrx_c_args_INSTR_TIME_GET_MILLISEC {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_INSTR_TIME_GET_MILLISEC!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_INSTR_TIME_GET_MILLISEC!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -1629,7 +1649,7 @@ macro_rules! INSTR_TIME_GET_MILLISEC {
                             (
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::cast_as::<
-                                        $crate::int64,
+                                        $crate::__pgrx_c_bindings::int64,
                                         $crate::__pgrx_c_macros::CLong,
                                         _
                                     >(
@@ -1651,9 +1671,8 @@ macro_rules! INSTR_TIME_GET_MILLISEC {
                         )
                     ),
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                        /* PGRX: NS_PER_MS remains expanded because no integer constant binding is available in the defining Rust crate. */
                         $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CLong>::new(
-                            1000000i64
+                            $crate::__pgrx_c_bindings::NS_PER_MS as i64
                         )
                     )
                 )
@@ -1699,7 +1718,7 @@ macro_rules! INSTR_TIME_GET_MILLISEC {
                                                 _
                                             >(
                                                 $crate::__pgrx_c_macros::expression::cast_as::<
-                                                    $crate::int64,
+                                                    $crate::__pgrx_c_bindings::int64,
                                                     $crate::__pgrx_c_macros::CLong,
                                                     _
                                                 >(
@@ -1728,10 +1747,9 @@ macro_rules! INSTR_TIME_GET_MILLISEC {
                                     )
                                 ),
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                                    /* PGRX: NS_PER_MS remains expanded because no integer constant binding is available in the defining Rust crate. */
                                     $crate::__pgrx_c_macros::CValue::<
                                         $crate::__pgrx_c_macros::CLong
-                                    >::new(1000000i64)
+                                    >::new($crate::__pgrx_c_bindings::NS_PER_MS as i64)
                                 )
                             )
                         )
@@ -1758,7 +1776,7 @@ macro_rules! INSTR_TIME_GET_MILLISEC {
                             (
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     $crate::__pgrx_c_macros::expression::cast_as::<
-                                        $crate::int64,
+                                        $crate::__pgrx_c_bindings::int64,
                                         $crate::__pgrx_c_macros::CLong,
                                         _
                                     >(
@@ -1780,9 +1798,8 @@ macro_rules! INSTR_TIME_GET_MILLISEC {
                         )
                     ),
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
-                        /* PGRX: NS_PER_MS remains expanded because no integer constant binding is available in the defining Rust crate. */
                         $crate::__pgrx_c_macros::CValue::<$crate::__pgrx_c_macros::CLong>::new(
-                            1000000i64
+                            $crate::__pgrx_c_bindings::NS_PER_MS as i64
                         )
                     )
                 )
@@ -1798,8 +1815,8 @@ macro_rules! INSTR_TIME_GET_MILLISEC {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -1830,21 +1847,23 @@ macro_rules! __pgrx_c_args_INSTR_TIME_GET_NANOSEC {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
         $crate::__pgrx_c_args_INSTR_TIME_GET_NANOSEC!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_INSTR_TIME_GET_NANOSEC!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_INSTR_TIME_GET_NANOSEC!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_INSTR_TIME_GET_NANOSEC!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_INSTR_TIME_GET_NANOSEC!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -1852,7 +1871,9 @@ macro_rules! __pgrx_c_args_INSTR_TIME_GET_NANOSEC {
         $crate::__pgrx_c_args_INSTR_TIME_GET_NANOSEC!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_INSTR_TIME_GET_NANOSEC!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_INSTR_TIME_GET_NANOSEC!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -1877,15 +1898,17 @@ macro_rules! __pgrx_c_args_INSTR_TIME_GET_NANOSEC {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_INSTR_TIME_GET_NANOSEC!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_INSTR_TIME_GET_NANOSEC!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_INSTR_TIME_GET_NANOSEC!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_INSTR_TIME_GET_NANOSEC!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -1912,13 +1935,13 @@ macro_rules! __pgrx_c_args_INSTR_TIME_GET_NANOSEC {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_INSTR_TIME_GET_NANOSEC!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_INSTR_TIME_GET_NANOSEC!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -1967,7 +1990,7 @@ macro_rules! INSTR_TIME_GET_NANOSEC {
         (
             $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::cast_as::<
-                    $crate::int64,
+                    $crate::__pgrx_c_bindings::int64,
                     $crate::__pgrx_c_macros::CLong,
                     _
                 >(
@@ -2011,7 +2034,7 @@ macro_rules! INSTR_TIME_GET_NANOSEC {
                     unsafe {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             $crate::__pgrx_c_macros::expression::cast_as::<
-                                $crate::int64,
+                                $crate::__pgrx_c_bindings::int64,
                                 $crate::__pgrx_c_macros::CLong,
                                 _
                             >(
@@ -2040,7 +2063,7 @@ macro_rules! INSTR_TIME_GET_NANOSEC {
         {
             let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 $crate::__pgrx_c_macros::expression::cast_as::<
-                    $crate::int64,
+                    $crate::__pgrx_c_bindings::int64,
                     $crate::__pgrx_c_macros::CLong,
                     _
                 >(
@@ -2066,8 +2089,8 @@ macro_rules! INSTR_TIME_GET_NANOSEC {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -2094,20 +2117,24 @@ macro_rules! __pgrx_c_args_INSTR_TIME_IS_ZERO {
         $crate::__pgrx_c_args_INSTR_TIME_IS_ZERO!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_INSTR_TIME_IS_ZERO!(@p1 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_INSTR_TIME_IS_ZERO!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_INSTR_TIME_IS_ZERO!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_INSTR_TIME_IS_ZERO!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_INSTR_TIME_IS_ZERO!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_INSTR_TIME_IS_ZERO!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -2115,7 +2142,9 @@ macro_rules! __pgrx_c_args_INSTR_TIME_IS_ZERO {
         $crate::__pgrx_c_args_INSTR_TIME_IS_ZERO!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_INSTR_TIME_IS_ZERO!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_INSTR_TIME_IS_ZERO!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -2137,14 +2166,18 @@ macro_rules! __pgrx_c_args_INSTR_TIME_IS_ZERO {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_INSTR_TIME_IS_ZERO!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_INSTR_TIME_IS_ZERO!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_INSTR_TIME_IS_ZERO!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_INSTR_TIME_IS_ZERO!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_INSTR_TIME_IS_ZERO!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -2171,13 +2204,13 @@ macro_rules! __pgrx_c_args_INSTR_TIME_IS_ZERO {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_INSTR_TIME_IS_ZERO!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_INSTR_TIME_IS_ZERO!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -2327,8 +2360,8 @@ macro_rules! INSTR_TIME_IS_ZERO {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -2359,21 +2392,23 @@ macro_rules! __pgrx_c_args_INSTR_TIME_SET_CURRENT {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
         $crate::__pgrx_c_args_INSTR_TIME_SET_CURRENT!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_INSTR_TIME_SET_CURRENT!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_INSTR_TIME_SET_CURRENT!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_INSTR_TIME_SET_CURRENT!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_INSTR_TIME_SET_CURRENT!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -2381,7 +2416,9 @@ macro_rules! __pgrx_c_args_INSTR_TIME_SET_CURRENT {
         $crate::__pgrx_c_args_INSTR_TIME_SET_CURRENT!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_INSTR_TIME_SET_CURRENT!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_INSTR_TIME_SET_CURRENT!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -2406,15 +2443,17 @@ macro_rules! __pgrx_c_args_INSTR_TIME_SET_CURRENT {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_INSTR_TIME_SET_CURRENT!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_INSTR_TIME_SET_CURRENT!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_INSTR_TIME_SET_CURRENT!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_INSTR_TIME_SET_CURRENT!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -2441,13 +2480,13 @@ macro_rules! __pgrx_c_args_INSTR_TIME_SET_CURRENT {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_INSTR_TIME_SET_CURRENT!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_INSTR_TIME_SET_CURRENT!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -2499,9 +2538,11 @@ macro_rules! INSTR_TIME_SET_CURRENT {
                     ($crate::__pgrx_c_operand!(@place; $t)),
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         <
-                            $crate::__pgrx_c_macros::expression::CRawRecord<$crate::instr_time> as $crate::__pgrx_c_macros::expression::CType
+                            $crate::__pgrx_c_macros::expression::CRawRecord<
+                                $crate::__pgrx_c_bindings::instr_time
+                            > as $crate::__pgrx_c_macros::expression::CType
                         >::from_storage(
-                            $crate::__pgrx_c_generated::Inline_21ca6ea3d89ee306cafd41701afb006b()
+                            $crate::__pgrx_c_generated::Inline_5478280976dd3a47c6c919744a51baed()
                         )
                     )
                 )
@@ -2539,10 +2580,10 @@ macro_rules! INSTR_TIME_SET_CURRENT {
                                 $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                                     <
                                         $crate::__pgrx_c_macros::expression::CRawRecord<
-                                            $crate::instr_time
+                                            $crate::__pgrx_c_bindings::instr_time
                                         > as $crate::__pgrx_c_macros::expression::CType
                                     >::from_storage(
-                                        $crate::__pgrx_c_generated::Inline_21ca6ea3d89ee306cafd41701afb006b()
+                                        $crate::__pgrx_c_generated::Inline_5478280976dd3a47c6c919744a51baed()
                                     )
                                 )
                             )
@@ -2564,9 +2605,11 @@ macro_rules! INSTR_TIME_SET_CURRENT {
                     ($crate::__pgrx_c_operand!(@place; $t)),
                     $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                         <
-                            $crate::__pgrx_c_macros::expression::CRawRecord<$crate::instr_time> as $crate::__pgrx_c_macros::expression::CType
+                            $crate::__pgrx_c_macros::expression::CRawRecord<
+                                $crate::__pgrx_c_bindings::instr_time
+                            > as $crate::__pgrx_c_macros::expression::CType
                         >::from_storage(
-                            $crate::__pgrx_c_generated::Inline_21ca6ea3d89ee306cafd41701afb006b()
+                            $crate::__pgrx_c_generated::Inline_5478280976dd3a47c6c919744a51baed()
                         )
                     )
                 )
@@ -2582,8 +2625,8 @@ macro_rules! INSTR_TIME_SET_CURRENT {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -2614,23 +2657,23 @@ macro_rules! __pgrx_c_args_INSTR_TIME_SET_CURRENT_LAZY {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
         $crate::__pgrx_c_args_INSTR_TIME_SET_CURRENT_LAZY!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_INSTR_TIME_SET_CURRENT_LAZY!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_INSTR_TIME_SET_CURRENT_LAZY!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_INSTR_TIME_SET_CURRENT_LAZY!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -2639,7 +2682,7 @@ macro_rules! __pgrx_c_args_INSTR_TIME_SET_CURRENT_LAZY {
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
         $crate::__pgrx_c_args_INSTR_TIME_SET_CURRENT_LAZY!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
@@ -2665,17 +2708,17 @@ macro_rules! __pgrx_c_args_INSTR_TIME_SET_CURRENT_LAZY {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
         $crate::__pgrx_c_args_INSTR_TIME_SET_CURRENT_LAZY!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
         $crate::__pgrx_c_args_INSTR_TIME_SET_CURRENT_LAZY!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_INSTR_TIME_SET_CURRENT_LAZY!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -2702,13 +2745,13 @@ macro_rules! __pgrx_c_args_INSTR_TIME_SET_CURRENT_LAZY {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_INSTR_TIME_SET_CURRENT_LAZY!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_INSTR_TIME_SET_CURRENT_LAZY!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -2798,10 +2841,10 @@ macro_rules! INSTR_TIME_SET_CURRENT_LAZY {
                                                 >(
                                                     <
                                                         $crate::__pgrx_c_macros::expression::CRawRecord<
-                                                            $crate::instr_time
+                                                            $crate::__pgrx_c_bindings::instr_time
                                                         > as $crate::__pgrx_c_macros::expression::CType
                                                     >::from_storage(
-                                                        $crate::__pgrx_c_generated::Inline_21ca6ea3d89ee306cafd41701afb006b()
+                                                        $crate::__pgrx_c_generated::Inline_5478280976dd3a47c6c919744a51baed()
                                                     )
                                                 )
                                             )
@@ -2922,10 +2965,10 @@ macro_rules! INSTR_TIME_SET_CURRENT_LAZY {
                                                             >(
                                                                 <
                                                                     $crate::__pgrx_c_macros::expression::CRawRecord<
-                                                                        $crate::instr_time
+                                                                        $crate::__pgrx_c_bindings::instr_time
                                                                     > as $crate::__pgrx_c_macros::expression::CType
                                                                 >::from_storage(
-                                                                    $crate::__pgrx_c_generated::Inline_21ca6ea3d89ee306cafd41701afb006b()
+                                                                    $crate::__pgrx_c_generated::Inline_5478280976dd3a47c6c919744a51baed()
                                                                 )
                                                             )
                                                         )
@@ -3015,10 +3058,10 @@ macro_rules! INSTR_TIME_SET_CURRENT_LAZY {
                                                 >(
                                                     <
                                                         $crate::__pgrx_c_macros::expression::CRawRecord<
-                                                            $crate::instr_time
+                                                            $crate::__pgrx_c_bindings::instr_time
                                                         > as $crate::__pgrx_c_macros::expression::CType
                                                     >::from_storage(
-                                                        $crate::__pgrx_c_generated::Inline_21ca6ea3d89ee306cafd41701afb006b()
+                                                        $crate::__pgrx_c_generated::Inline_5478280976dd3a47c6c919744a51baed()
                                                     )
                                                 )
                                             )
@@ -3061,8 +3104,8 @@ macro_rules! INSTR_TIME_SET_CURRENT_LAZY {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -3089,20 +3132,24 @@ macro_rules! __pgrx_c_args_INSTR_TIME_SET_ZERO {
         $crate::__pgrx_c_args_INSTR_TIME_SET_ZERO!(@$next $mode [$($done)* $descriptor,]; $($rest)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_INSTR_TIME_SET_ZERO!(@p1 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_INSTR_TIME_SET_ZERO!(
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_INSTR_TIME_SET_ZERO!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_INSTR_TIME_SET_ZERO!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_INSTR_TIME_SET_ZERO!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_INSTR_TIME_SET_ZERO!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -3110,7 +3157,9 @@ macro_rules! __pgrx_c_args_INSTR_TIME_SET_ZERO {
         $crate::__pgrx_c_args_INSTR_TIME_SET_ZERO!(@negative0 $mode [$($done)*]; - $($raw)*)
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_INSTR_TIME_SET_ZERO!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_INSTR_TIME_SET_ZERO!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -3132,14 +3181,18 @@ macro_rules! __pgrx_c_args_INSTR_TIME_SET_ZERO {
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_INSTR_TIME_SET_ZERO!(@p1 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_INSTR_TIME_SET_ZERO!(
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_INSTR_TIME_SET_ZERO!(@p1 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_INSTR_TIME_SET_ZERO!(
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_INSTR_TIME_SET_ZERO!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -3166,13 +3219,13 @@ macro_rules! __pgrx_c_args_INSTR_TIME_SET_ZERO {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_INSTR_TIME_SET_ZERO!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_INSTR_TIME_SET_ZERO!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -3310,8 +3363,8 @@ macro_rules! INSTR_TIME_SET_ZERO {
 }
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -3339,13 +3392,13 @@ macro_rules! __pgrx_c_args_INSTR_TIME_SUBTRACT {
     };
     (@p0 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_INSTR_TIME_SUBTRACT!(
-            @p1 $mode [$($done)* (@literal [- $argument]),];
+            @p1 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_INSTR_TIME_SUBTRACT!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -3354,7 +3407,7 @@ macro_rules! __pgrx_c_args_INSTR_TIME_SUBTRACT {
     };
     (@p0 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_INSTR_TIME_SUBTRACT!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -3381,31 +3434,35 @@ macro_rules! __pgrx_c_args_INSTR_TIME_SUBTRACT {
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_INSTR_TIME_SUBTRACT!(
-            @p1 $mode [$($done)* (@literal [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p0 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_INSTR_TIME_SUBTRACT!(
-            @p1 $mode [$($done)* (@native [$argument]),];
+            @p1 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $argument:literal) => {
-        $crate::__pgrx_c_args_INSTR_TIME_SUBTRACT!(@p2 $mode [$($done)* (@literal [- $argument]),];)
+        $crate::__pgrx_c_args_INSTR_TIME_SUBTRACT!(
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
+        )
     };
     (@negative1 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_INSTR_TIME_SUBTRACT!(@p2 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_INSTR_TIME_SUBTRACT!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; - $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_INSTR_TIME_SUBTRACT!(
-            @p2 $mode [$($done)* (@literal [- $argument]),];
+            @p2 $mode [$($done)* (@original [- $argument] (@literal [- $argument])),];
             $($rest)*
         )
     };
     (@negative1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_INSTR_TIME_SUBTRACT!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -3413,7 +3470,9 @@ macro_rules! __pgrx_c_args_INSTR_TIME_SUBTRACT {
         $crate::__pgrx_c_args_INSTR_TIME_SUBTRACT!(@negative1 $mode [$($done)*]; - $($raw)*)
     };
     (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr])) => {
-        $crate::__pgrx_c_args_INSTR_TIME_SUBTRACT!(@p2 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_INSTR_TIME_SUBTRACT!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; $head:ident $(::$tail:ident)* ! $group:tt) => {
         $crate::__pgrx_c_classify!(
@@ -3435,14 +3494,18 @@ macro_rules! __pgrx_c_args_INSTR_TIME_SUBTRACT {
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal) => {
-        $crate::__pgrx_c_args_INSTR_TIME_SUBTRACT!(@p2 $mode [$($done)* (@literal [$argument]),];)
+        $crate::__pgrx_c_args_INSTR_TIME_SUBTRACT!(
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:expr) => {
-        $crate::__pgrx_c_args_INSTR_TIME_SUBTRACT!(@p2 $mode [$($done)* (@native [$argument]),];)
+        $crate::__pgrx_c_args_INSTR_TIME_SUBTRACT!(
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
+        )
     };
     (@p1 $mode:ident [$($done:tt)*]; (@__pgrx_c_native [$argument:expr]), $($rest:tt)*) => {
         $crate::__pgrx_c_args_INSTR_TIME_SUBTRACT!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -3469,13 +3532,13 @@ macro_rules! __pgrx_c_args_INSTR_TIME_SUBTRACT {
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:literal, $($rest:tt)*) => {
         $crate::__pgrx_c_args_INSTR_TIME_SUBTRACT!(
-            @p2 $mode [$($done)* (@literal [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@literal [$argument])),];
             $($rest)*
         )
     };
     (@p1 $mode:ident [$($done:tt)*]; $argument:expr, $($rest:tt)*) => {
         $crate::__pgrx_c_args_INSTR_TIME_SUBTRACT!(
-            @p2 $mode [$($done)* (@native [$argument]),];
+            @p2 $mode [$($done)* (@original [$argument] (@native [$argument])),];
             $($rest)*
         )
     };
@@ -3642,6 +3705,144 @@ macro_rules! INSTR_TIME_SUBTRACT {
     };
 }
 
+#[cfg(not(all(
+    target_arch = "x86_64",
+    target_os = "linux",
+    target_pointer_width = "64",
+    target_endian = "little"
+)))]
+#[cfg(not(docsrs))]
+compile_error!("generated C macros require their inspected C target profile");
+const _: () = {
+    use crate::__pgrx_c_macros::CInteger as _;
+    assert!(crate::__pgrx_c_macros::CChar::SIGNED == true);
+    assert!(crate::__pgrx_c_macros::CLong::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CSize::RANK == 4);
+    assert!(!crate::__pgrx_c_macros::CSize::SIGNED);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::BITS == 64);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
+    assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
+};
+/// Typed call adapter for C inline function pg_clock_gettime_ns from instr_time.h:110
+///
+/// ```c
+/// static inline instr_time
+/// pg_clock_gettime_ns(void)
+/// {
+/// 	instr_time	now;
+/// 	struct timespec tmp;
+///
+/// 	clock_gettime(PG_INSTR_CLOCK, &tmp);
+/// 	now.ticks = tmp.tv_sec * NS_PER_S + tmp.tv_nsec;
+///
+/// 	return now;
+/// }
+/// ```
+///
+///
+/// Calls the original function through its inspected C prototype. Each operand is evaluated once and converted using C parameter assignment rules. The result retains the function's original C type; `.get()` extracts its native storage, including `()` for a void result. Native calls retain the backend thread, PostgreSQL error, and caller safety contracts of the generated guarded binding.
+///
+/// # Safety
+///
+/// Preserve each operand's original C identity; a Rust alias or bindgen constant's storage type may differ from its C expression type. For pointer or place operations, the caller must establish provenance, allocation bounds, alignment, initialization, valid values, lifetimes and aliasing required by the original C operation. Mutation requires writable storage. Native calls and globals require the permitted PostgreSQL backend thread, valid PostgreSQL resource ownership and the original function's preconditions. Generated guards preserve error boundaries; they do not prove these obligations.
+///
+/// # Panics
+///
+/// Indirect calls reject null function pointers; guarded native calls reject the wrong PostgreSQL thread and propagate PostgreSQL errors. These checks apply to the operand types selected by this invocation. A Rust panic is converted to PostgreSQL ERROR when it reaches a pgrx extension entry guard; otherwise normal Rust panic behavior applies.
+#[macro_export]
+macro_rules! pg_clock_gettime_ns {
+    (@__pgrx_emit_check_safety;) => {
+        {
+            if false {}
+        }
+    };
+    (@__pgrx_c_check_safety; $($raw:tt)*) => {
+        $crate::pg_clock_gettime_ns!(@__pgrx_emit_check_safety; $($raw)*)
+    };
+    (@__pgrx_emit_public;) => {
+        $crate::__pgrx_c_macros::expression_result::finish(
+            $crate::pg_clock_gettime_ns!(@__pgrx_emit_value;)
+        )
+    };
+    (@__pgrx_emit_value;) => {
+        $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+            <
+                $crate::__pgrx_c_macros::expression::CRawRecord<
+                    $crate::__pgrx_c_bindings::instr_time
+                > as $crate::__pgrx_c_macros::expression::CType
+            >::from_storage($crate::__pgrx_c_generated::Inline_5478280976dd3a47c6c919744a51baed())
+        )
+    };
+    (@__pgrx_c_value; $($raw:tt)*) => {
+        $crate::pg_clock_gettime_ns!(@__pgrx_emit_value; $($raw)*)
+    };
+    (@__pgrx_emit_place;) => {
+        compile_error!("C expression is not a place in this operation")
+    };
+    (@__pgrx_c_place; $($raw:tt)*) => {
+        $crate::pg_clock_gettime_ns!(@__pgrx_emit_place; $($raw)*)
+    };
+    (@__pgrx_emit_read_place;) => {
+        compile_error!("C expression is not a place in this operation")
+    };
+    (@__pgrx_c_read_place; $($raw:tt)*) => {
+        $crate::pg_clock_gettime_ns!(@__pgrx_emit_read_place; $($raw)*)
+    };
+    (@__pgrx_emit_size;) => {
+        $crate::__pgrx_c_macros::expression::size_of_value_type(
+            if false {
+                {
+                    if false {}
+                }
+                Some(
+                    unsafe {
+                        $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                            <
+                                $crate::__pgrx_c_macros::expression::CRawRecord<
+                                    $crate::__pgrx_c_bindings::instr_time
+                                > as $crate::__pgrx_c_macros::expression::CType
+                            >::from_storage(
+                                $crate::__pgrx_c_generated::Inline_5478280976dd3a47c6c919744a51baed()
+                            )
+                        )
+                    }
+                )
+            } else {
+                None
+            }
+        )
+    };
+    (@__pgrx_c_size; $($raw:tt)*) => {
+        $crate::pg_clock_gettime_ns!(@__pgrx_emit_size; $($raw)*)
+    };
+    (@__pgrx_emit_discard;) => {
+        {
+            let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
+                <
+                    $crate::__pgrx_c_macros::expression::CRawRecord<
+                        $crate::__pgrx_c_bindings::instr_time
+                    > as $crate::__pgrx_c_macros::expression::CType
+                >::from_storage(
+                    $crate::__pgrx_c_generated::Inline_5478280976dd3a47c6c919744a51baed()
+                )
+            );
+        }
+    };
+    (@__pgrx_c_discard; $($raw:tt)*) => {
+        $crate::pg_clock_gettime_ns!(@__pgrx_emit_discard; $($raw)*)
+    };
+    (@$mode:ident; $($invalid:tt)*) => {
+        compile_error!("arguments do not satisfy this C macro's invocation contract")
+    };
+    () => {
+        $crate::pg_clock_gettime_ns!(@__pgrx_emit_public;)
+    };
+    ($($invalid:tt)*) => {
+        compile_error!("arguments do not satisfy this C macro's invocation contract")
+    };
+}
+
 pub use INSTR_TIME_ACCUM_DIFF;
 pub use INSTR_TIME_ADD;
 pub use INSTR_TIME_GET_DOUBLE;
@@ -3653,3 +3854,4 @@ pub use INSTR_TIME_SET_CURRENT;
 pub use INSTR_TIME_SET_CURRENT_LAZY;
 pub use INSTR_TIME_SET_ZERO;
 pub use INSTR_TIME_SUBTRACT;
+pub use pg_clock_gettime_ns;

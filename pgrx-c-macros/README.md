@@ -5,6 +5,9 @@ pgrx. The CLI lists PostgreSQL function-like macros; the library retains other
 definitions separately as conversion context. Analysis and translation into Rust
 `macro_rules!` cover supported C expressions, with generated type and storage
 adapters derived from Clang declarations and the corresponding Rust bindings.
+The binding build also selects PostgreSQL-owned object expressions as
+zero-argument macros and supplements missing integer constants with independent
+compiler proofs. These paths preserve the original C definition and type.
 
 See [ARCHITECTURE.md](ARCHITECTURE.md) for the end-to-end implementation, phase
 contracts, C semantics, generated native adapters, and validation strategy.
@@ -156,18 +159,45 @@ cargo run -p pgrx-c-macros -- emit pg18 --format json
 `analyze` and `emit` use the final active macro map, declaration catalog and target
 facts. They expand nested macros with Clang while retaining the original main-file
 preprocessing context. PostgreSQL owns the primary macros; external headers and
-object macros remain context.
+unselected object macros remain context. CLI discovery still lists function-like
+definitions. Library callers can select object expressions with
+`AnalysisSession::prepare_objects` or mix both root kinds with
+`prepare_with_objects`. The binding build selects owned nonempty objects whose
+dependency closure refers to a declared variable, exposing them as `NAME!()`;
+pure integer objects belong in the constant bindings instead.
+
+Compiler-proven PostgreSQL static inline functions also expose `NAME!(arguments)`.
+The binding build and CLI analysis/emission select every eligible definition
+physically owned by the server headers. Library generators select these separately
+with `postgres_inline_function_names` and pass them to
+`AnalysisSession::prepare_with_inline_functions` beside their macro and object
+lists. Active C macros win any name collision; no function adapter is inserted into
+the actual macro inventory or preprocessing environment, and `list` still shows
+only original macro definitions.
+
+An inline adapter calls the original function through its verified prototype,
+evaluates each argument once, and preserves C conversions, pointer qualifiers and
+the actual return type. `.get()` extracts native storage, including `()` for a void
+return. When a macro becomes an inline function, its return rank or evaluation
+rules can therefore change with PostgreSQL. Predicate callers can use `.is_true()`
+for either C `int` or C `bool`; this explicitly converts truth without changing
+`.get()` or the original C identity. Native calls retain generated FFI guards and
+require the original function's unsafe caller contract.
 
 `emit` writes Rust source to stdout and skip reasons to stderr. JSON output contains
 the compilation profile, analysis, source, and structured skips. Emitted source
 uses `$crate::__pgrx_c_macros`, provided by `pgrx-pg-sys`, and includes a target guard.
 Each generated macro's `///` doc comments include its source location and full unexpanded
-C definition in a fenced `text` block. As in `list` output, whitespace is normalized
-and line comments are omitted.
+C macro definition in a fenced `text` block. As in `list` output, whitespace is normalized
+and line comments are omitted. Inline call adapters instead document the actual
+physical function definition in a fenced `c` block, retaining its original source
+and formals; their documentation never presents an invented `#define`.
 The bindgen build pipeline generates these definitions alongside the bindings.
 Each selected version gets a `cmacros/pgN/` module tree and
 `pgN_macro_report.json` in `OUT_DIR`, plus native support source and an archive
-when the generated adapters require them. Header paths determine the Rust files:
+for the active version. Bindgen emits native static-inline wrappers with either
+setting of `cshim`; the archive also supplies original immutable PostgreSQL
+metadata and any required macro primitives. Header paths determine the Rust files:
 `utils/acl.h`, for example, becomes `cmacros/pgN/utils/acl.rs`. Shared Rust
 support is split into fragments under `__pgrx_c_support/`, included in the same
 module scope to preserve private adapter access. Macro definitions receive
@@ -202,17 +232,45 @@ invalidate the recorded input identity.
 Custom compiler or `pg_config` wrappers must declare hidden inputs in their build
 script so changes to those inputs can trigger generation.
 
-Windows/MSVC and precomputed target-binding imports currently report macro generation
-unavailable. Other unsupported inspected profiles retain per-macro skips. The docs.rs
-path uses shipped bindings, macro definitions and input adapters without requiring
-PostgreSQL or Clang. Native adapter implementations are excluded from documentation
-builds because they belong to the inspected installation's platform and layouts.
-Existing handwritten ports remain available while migration proceeds.
+The runtime admits compiler-verified LP64, LLP64, and ILP32 profiles with either
+byte order, subject to a recognized Rust architecture, OS, and ABI guard. This
+model does not establish backend test coverage for every admitted target.
+Plain char follows the inspected compiler's signedness and promotion,
+independently of Rust's native `core::ffi::c_char` alias. A verified one-byte
+storage bridge preserves its bytes. Raw `i8` and `u8` inputs retain the separate
+signed-char and unsigned-char identities, so a plain-char operand requires an
+explicit `CValue<CChar>` or `Pointer<CChar, _>` tag.
+Recorded MSVC flags use Windows quoting and explicit Clang translations; unknown
+options fail rather than disappearing. Optional inspection or native-generation
+failures record unavailable macros; unsupported individual macros retain
+structured skips.
+The decoder retains runtime choices until `lower_msvc_runtime_flags` sees the
+combined flags: the last `/MD[d]` or `/MT[d]` choice determines the runtime
+predefines and native COFF library directives. User define/undefine overrides
+remain effective, including on older Clang versions without `-fms-runtime-lib`.
+Build integration refuses runtime selectors in `BINDGEN_EXTRA_CLANG_ARGS`, whose
+unchanged tail bindgen appends internally; recorded flags carry those selections.
+
+Precomputed imports require a complete target bundle containing raw bindings,
+macro/support source, the compiler report, native wrapper source, and the native
+archive. The importer checks member hashes and lengths, target, major, generator
+version, and `cshim` before linkage. Raw-only imports cannot supply the migrated
+callers. Format 2 includes the inline invocation interface; older bundles require
+fresh generation into a new directory. See the [cross-compilation guide](../docs/src/extension/build/cross-compile.md)
+for `PGRX_PG_SYS_EXTRA_TARGET_INFO_PATH` export and
+`PGRX_TARGET_INFO_PATH_PGnn` import. Bundle integrity does not authenticate its
+producer; use trusted artifacts from the same pgrx release and revision.
+
+The docs.rs path uses shipped bindings, macro definitions and generated adapter
+types without requiring PostgreSQL or Clang. Only installation-specific target
+error guards are disabled there. Native interfaces can be type-checked, but
+calling their C symbols still requires the matching native archive. Documentation
+snapshots and handwritten ports are not semantic fallbacks for ordinary builds.
 
 ### Build diagnostics
 
 Macro-generation Cargo warnings are quiet by default. Set `PGRX_MACRO_DEBUG=1`
-to print the generation summary, unavailable-profile notices, and a warning for
+to print the generation summary and a warning for
 each skipped macro, including bindgen/Clang value disagreements and their
 dependent skips:
 
@@ -262,6 +320,14 @@ parenthesized object expressions. Otherwise expansion remains, with a
 Uncertain constant arithmetic also stays expanded so folding cannot bypass the
 support's checks for undefined operations, even when Clang can evaluate it.
 
+For integer object macros omitted by bindgen, `probe_integer_object_constants`
+requires valid constant initialization, a concrete C integer identity and value,
+and independent Clang driver witnesses. The binding build adds only missing
+constants, including closed integer-suffix pastes that the compiler proves. It
+never overwrites an existing disagreement. Accepted facts and refusals appear in
+the report; a malformed candidate does not establish a neighboring candidate's
+value. This constant path is separate from readable expression-name retention.
+
 Direct wrappers such as `BUFFERALIGN` call `$crate::TYPEALIGN!` when that callee
 is emitted. Matching the two compiler-expanded expression trees recovers the
 argument expressions while preserving grouping, C type identity, repeated
@@ -272,6 +338,19 @@ catalog, named constants use documented fallbacks.
 Ordinary character literals support a bounded ASCII subset after compiler and
 libclang probes verify the execution character set; wide, multi-character and
 unmodeled encoding forms remain explicit skips.
+Ordinary closed strings support the verified ASCII byte subset, escapes, embedded
+zeros, adjacent literal concatenation, array extent, decay and read-only access.
+Clang can resolve closed stringification in a dependency to such a literal.
+Operand-dependent dependency stringification is narrower: it must feed a direct
+`const char *` argument of a fixed, nonvariadic, void-returning native diagnostic.
+The C text template is retained, while holes stringify the outer Rust invocation
+tokens without evaluating them. Non-ASCII token spelling, returned strings,
+unknown array extents, address-taking, pointer arithmetic, and concatenation of
+such holes are refused. Root `#` stringification remains unsupported.
+`__FILE__` and `__LINE__` use the Rust invocation's `file!()` and `line!()`, rather
+than freezing the generator's source location. Stringification of those location
+markers and other dynamic builtins remain unsupported. Literal writes acquire
+no mutation capability; wide, UTF-prefixed and unproved encodings are skipped.
 The typed expression support also covers:
 
 - Qualified pointers, array decay, indexing, pointer arithmetic and casts, with
@@ -323,9 +402,10 @@ thread requirements. PostgreSQL calls retain pgrx's FFI error and panic guard.
 Native adapters convert arguments and check nullable function pointers before
 entering that guard, and decode results after leaving it.
 
-Other statements and initialization constructs, variadic arguments, stringification,
-operand-dependent token pasting, unsupported compiler constructs and unmodeled literals remain
-explicit skips. Parser and type limitations are reported as skips. Referenced
+Other statements and initialization constructs, variadic arguments,
+stringification outside the diagnostic contract, operand-dependent token pasting,
+unsupported compiler constructs and unmodeled literals remain explicit skips.
+Parser and type limitations are reported as skips. Referenced
 declarations and the final macro environment must match the inspection.
 An application such as `(T)(x)` is ambiguous when `T` is a macro parameter:
 C callers can supply either a type or a function pointer. Translation requires
@@ -394,6 +474,10 @@ Rust cannot infer the intended type. Some generic conditional expressions still
 require a suffix even where the corresponding C literal defaults to `int`.
 The sealed input traits accept only the modeled C value families; Rust operator
 implementations do not change the C arithmetic rules.
+Generated `__pgrx_c_types` aliases name each inspected integer typedef's C marker.
+Use these for portable `int64`, `Timestamp`, `Size`, or `size_t` operands rather
+than assuming that 64-bit storage means `long`. On LLP64, `long` uses 32-bit
+storage and `long long` retains 64-bit storage and its higher rank.
 
 Generated adapters accept `pgrx-pg-sys::Oid` and `TransactionId` after checking
 their original C typedef identities and storage. The verified `Datum` adapter
@@ -404,9 +488,9 @@ return a tagged C `int`, so extract the value and compare it to zero when a Rust
 
 ```rust,ignore
 use pgrx_pg_sys as pg_sys;
-use pg_sys::__pgrx_c_macros::{CUnsignedLong, CValue};
+use pg_sys::cmacros::c::CValue;
 
-let aligned = pg_sys::TYPEALIGN!(8_i32, CValue::<CUnsignedLong>::new(13_u64)).get();
+let aligned = pg_sys::TYPEALIGN!(8_i32, CValue::<pg_sys::__pgrx_c_types::size_t>::new(13 as _)).get();
 let normal = pg_sys::TransactionIdIsNormal!(pg_sys::TransactionId::from_inner(3)).get() != 0;
 ```
 
@@ -437,8 +521,9 @@ unnamed C values never require construction of an invalid Rust enum.
 
 Generation and helpers currently support runtime expressions and report
 `RuntimeOnly`, rather than promising const evaluation. `PGSIXBIT` and
-`MAKE_SQLSTATE` emit at runtime; existing enum discriminants still need
-const-capable lowering before they can migrate.
+`MAKE_SQLSTATE` emit at runtime. Compiler-proved object constants, such as missing
+`ERRCODE_*` bindings, supply Rust const items through the separate constant path;
+they do not make arbitrary macro invocations const-capable.
 
 ## Binding generator integration
 
@@ -484,6 +569,13 @@ Caller-selected native function pointers receive an input bridge only when the
 complete binding catalog proves one validated C identity for their Rust storage.
 Unselected, rejected and missing C witnesses participate in that proof. Ambiguous
 storage retains the tagged `FunctionValue` interface.
+Selected, validated typedefs also appear under `__pgrx_c_callbacks`, following
+their actual binding module paths. For example,
+`__pgrx_c_callbacks::MyCallback::new(pointer)` explicitly tags that typedef's
+exact nullable native storage. This constructor adds no ABI cast or permission
+to call the pointer. Different C prototypes remain different markers even when
+their Rust function-pointer storage is equal; rejected prototypes receive no
+constructor. Invocation still requires the original callback's unsafe contract.
 An identity-only callback does not retain adapters for its prototype's nested
 callbacks. Function address references likewise do not retain callable wrappers;
 calls inside unevaluated operands still retain the code Rust needs to type-check.
@@ -528,6 +620,15 @@ generation or verification fails.
 `frontend.dependencies()` exposes that graph, its direct and reverse edges,
 and affected callers for auditing.
 
+The pgrx binding build handles declaration metadata through the original C macros,
+outside expression translation. C initializes a static `PG_MODULE_MAGIC_DATA`
+record and emits `PG_FUNCTION_INFO_V1`; generated getters return immutable data.
+Recursive C/Rust storage, size, alignment and field-offset witnesses establish
+record validity before Rust copies module magic or borrows function info. These
+pure getters have no backend, callback or error effects. The exported Rust glue
+and custom static name/version controls remain in pgrx, with module magic cached
+once. No copied version arithmetic or function-info initializer supplies values.
+
 ## Validation
 
 Ordinary `cargo test -p pgrx-c-macros` runs native fixtures using Clang and libclang.
@@ -535,8 +636,10 @@ The tests compile original C and emitted Rust separately and compare types,
 values, mutations and evaluation counts. They cover partial aggregate initialization,
 enum values, callback ABI and guards, packed and volatile storage, unevaluated
 operands, nested macro contexts, `$crate` hygiene and invalid invocations. These
-checks use the original C definitions as the oracle. Handwritten pgrx ports only
-identify additional test targets.
+checks use the original C definitions as the oracle. The historically named
+`postgres_handports` target keeps an explicit test-only corpus of original-header
+primitives so deleting a Rust port does not delete its oracle coverage. This is
+not a production signature list.
 
 Installed-header comparisons also run as ordinary tests for every configured
 version, or the exact `PG_VER` selection used by CI. An explicit selection without

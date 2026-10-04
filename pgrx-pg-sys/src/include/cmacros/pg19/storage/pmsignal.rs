@@ -5,8 +5,8 @@ This code is generated for documentation purposes, so that it is easy to referen
 // C macros from pmsignal.h.
 
 #[cfg(not(all(
-    target_arch = "aarch64",
-    target_os = "macos",
+    target_arch = "x86_64",
+    target_os = "linux",
     target_pointer_width = "64",
     target_endian = "little"
 )))]
@@ -23,12 +23,20 @@ const _: () = {
     assert!(crate::__pgrx_c_macros::CPtrDiff::RANK == 4);
     assert!(crate::__pgrx_c_macros::CPtrDiff::SIGNED);
 };
-/// C macro PostmasterIsAlive from pmsignal.h:106
+/// Typed call adapter for C inline function PostmasterIsAlive from pmsignal.h:98
 ///
-/// ```text
-/// #define PostmasterIsAlive( ) PostmasterIsAliveInternal ( )
+/// ```c
+/// static inline bool
+/// PostmasterIsAlive(void)
+/// {
+/// 	if (likely(!postmaster_possibly_dead))
+/// 		return true;
+/// 	return PostmasterIsAliveInternal();
+/// }
 /// ```
 ///
+///
+/// Calls the original function through its inspected C prototype. Each operand is evaluated once and converted using C parameter assignment rules. The result retains the function's original C type; `.get()` extracts its native storage, including `()` for a void result. Native calls retain the backend thread, PostgreSQL error, and caller safety contracts of the generated guarded binding.
 ///
 /// # Safety
 ///
@@ -53,10 +61,9 @@ macro_rules! PostmasterIsAlive {
         )
     };
     (@__pgrx_emit_value;) => {
-        /* PGRX: PostmasterIsAlive remains expanded because PostmasterIsAliveInternal is not an active function-like macro. */
         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
             <$crate::__pgrx_c_macros::CBool as $crate::__pgrx_c_macros::expression::CType>::from_storage(
-                $crate::PostmasterIsAliveInternal()
+                $crate::__pgrx_c_bindings::PostmasterIsAlive()
             )
         )
     };
@@ -76,7 +83,6 @@ macro_rules! PostmasterIsAlive {
         $crate::PostmasterIsAlive!(@__pgrx_emit_read_place; $($raw)*)
     };
     (@__pgrx_emit_size;) => {
-        /* PGRX: PostmasterIsAlive remains expanded because PostmasterIsAliveInternal is not an active function-like macro. */
         $crate::__pgrx_c_macros::expression::size_of_value_type(
             if false {
                 {
@@ -87,7 +93,7 @@ macro_rules! PostmasterIsAlive {
                         $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                             <
                                 $crate::__pgrx_c_macros::CBool as $crate::__pgrx_c_macros::expression::CType
-                            >::from_storage($crate::PostmasterIsAliveInternal())
+                            >::from_storage($crate::__pgrx_c_bindings::PostmasterIsAlive())
                         )
                     }
                 )
@@ -100,11 +106,10 @@ macro_rules! PostmasterIsAlive {
         $crate::PostmasterIsAlive!(@__pgrx_emit_size; $($raw)*)
     };
     (@__pgrx_emit_discard;) => {
-        /* PGRX: PostmasterIsAlive remains expanded because PostmasterIsAliveInternal is not an active function-like macro. */
         {
             let _ = $crate::__pgrx_c_macros::expression::profile_value::<true, _>(
                 <$crate::__pgrx_c_macros::CBool as $crate::__pgrx_c_macros::expression::CType>::from_storage(
-                    $crate::PostmasterIsAliveInternal()
+                    $crate::__pgrx_c_bindings::PostmasterIsAlive()
                 )
             );
         }

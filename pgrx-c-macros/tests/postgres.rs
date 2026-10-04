@@ -7,7 +7,9 @@
 #![cfg(unix)]
 
 use pgrx_c_macros::{
-    DiagnosticSeverity, MacroDefinition, MacroScanner, PostgresConfig, PostgresError,
+    AnalysisSession, BindingCatalog, DiagnosticSeverity, EmissionStatus, MacroDefinition,
+    MacroScanner, PostgresConfig, PostgresError, SkipReasonCode, emit_batch_with_bindings,
+    postgres_inline_function_names,
 };
 use pgrx_pg_config::PgConfig;
 use std::os::unix::fs::{PermissionsExt, symlink};
@@ -68,6 +70,8 @@ impl TestConfig {
                  case \"$1\" in\n\
                  --version) printf '%s\\n' 'PostgreSQL 18.0' ;;\n\
                  --includedir-server) printf '%s\\n' {quoted_include} ;;\n\
+                 --cflags) printf '%s\\n' '-std=c17' ;;\n\
+                 --configure) printf '%s\\n' '' ;;\n\
                  --cppflags) printf '%s\\n' '-DOWNERSHIP_COMMAND_LINE(value)=((value)+4)' ;;\n\
                  *) exit 1 ;;\n\
                  esac\n"
@@ -310,4 +314,95 @@ fn reports_a_server_root_removed_after_configuration() {
         Err(PostgresError::HeaderPath { path, source })
             if path == config.include_dir && source.kind() == std::io::ErrorKind::NotFound
     ));
+}
+
+/// Function roots follow physical definitions, preserve macro priority and detect changed C inputs.
+#[test]
+fn inline_selection_uses_original_physical_definitions_and_unchanged_inputs() {
+    let _lock = SCANNER_LOCK.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
+    let scanner = MacroScanner::new().expect("libclang must be available for these tests");
+    let config = TestConfig::new();
+    let primary = config.write("server/primary.h", &format!("static inline int OWNERSHIP_INLINE(int value) {{ return value + 1; }}\nstatic inline int OWNERSHIP_COLLISION(int value) {{ return value; }}\n#define OWNERSHIP_COLLISION(value) ((value) + 2)\n#define OWNERSHIP_DEFINE_INLINE(name) static inline int name(int value) {{ return value; }}\nstatic inline int OWNERSHIP_UNDEFINED(int value);\nstatic inline int OWNERSHIP_EXTERNAL_DEFINITION(int value);\nint OWNERSHIP_EXTERNAL_LINKAGE(int value) {{ return value; }}\nstatic inline int OWNERSHIP_BIG_SOURCE(int value) {{ /*{}*/ return value; }}\n", " ".repeat(65 * 1024)));
+    let external = config.write(
+        "external.h",
+        "static inline int OWNERSHIP_EXTERNAL_INLINE(int value) { return value; }\nstatic inline int OWNERSHIP_EXTERNAL_DEFINITION(int value) { return value; }\nOWNERSHIP_DEFINE_INLINE(OWNERSHIP_EXTERNAL_GENERATED)\n",
+    );
+    symlink(&primary, config.home.join("primary-alias.h")).unwrap();
+    symlink(&external, config.include_dir.join("external-alias.h")).unwrap();
+    let wrapper = config.write("wrapper.h", "#include \"primary-alias.h\"\n#include <external-alias.h>\nstatic inline int OWNERSHIP_WRAPPER_INLINE(int value) { return value; }\n");
+    let frontend =
+        config.postgres().inspect(&scanner, Some(&wrapper), &["-std=c17".into()], None).unwrap();
+    let names = postgres_inline_function_names(&frontend, &config.include_dir).unwrap();
+    assert_eq!(names, ["OWNERSHIP_BIG_SOURCE", "OWNERSHIP_INLINE"]);
+    let original_external =
+        frontend.declarations().function_signatures["OWNERSHIP_EXTERNAL_DEFINITION"]
+            .definition
+            .as_ref()
+            .unwrap();
+    assert_eq!(
+        original_external.provenance.file.canonicalize().unwrap(),
+        external.canonicalize().unwrap()
+    );
+    let generated_external =
+        frontend.declarations().function_signatures["OWNERSHIP_EXTERNAL_GENERATED"]
+            .definition
+            .as_ref()
+            .unwrap();
+    assert_eq!(
+        generated_external.provenance.file.canonicalize().unwrap(),
+        external.canonicalize().unwrap()
+    );
+    assert_eq!(
+        generated_external.source.as_deref(),
+        Some("OWNERSHIP_DEFINE_INLINE(OWNERSHIP_EXTERNAL_GENERATED)")
+    );
+    assert!(
+        frontend.declarations().function_signatures["OWNERSHIP_BIG_SOURCE"]
+            .definition
+            .as_ref()
+            .unwrap()
+            .source
+            .is_none()
+    );
+    let alias = config.home.join("server-link");
+    symlink(&config.include_dir, &alias).unwrap();
+    assert_eq!(
+        postgres_inline_function_names(&frontend, &alias.join("../server-link")).unwrap(),
+        names
+    );
+    let function = &frontend.declarations().function_signatures["OWNERSHIP_INLINE"];
+    let original = function.definition.as_ref().unwrap();
+    assert_eq!(original.provenance.file.canonicalize().unwrap(), primary.canonicalize().unwrap());
+    assert_eq!(original.parameters, [Some("value".into())]);
+    assert_eq!(
+        original.source.as_deref(),
+        Some("static inline int OWNERSHIP_INLINE(int value) { return value + 1; }")
+    );
+    let session = AnalysisSession::prepare_with_inline_functions(
+        &scanner,
+        &frontend,
+        &[] as &[String],
+        &[] as &[String],
+        &names,
+    )
+    .unwrap();
+    let emission =
+        emit_batch_with_bindings(&session, &["OWNERSHIP_BIG_SOURCE"], &BindingCatalog::default())
+            .unwrap()
+            .pop()
+            .unwrap();
+    let EmissionStatus::Skipped { reason } = emission.status else {
+        panic!("unavailable original source must not emit an undocumented root");
+    };
+    assert_eq!(reason.code, SkipReasonCode::BudgetExceeded);
+    session.verify_inputs().unwrap();
+    std::fs::write(
+        &primary,
+        "static inline int OWNERSHIP_INLINE(int value) { return value + 3; }\n",
+    )
+    .unwrap();
+    assert!(
+        session.verify_inputs().is_err(),
+        "changed original function source must invalidate its session"
+    );
 }
